@@ -1,4 +1,4 @@
-# skill-library-mcp
+# Skill Library MCP
 
 **690+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
 
