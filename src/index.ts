@@ -12,7 +12,7 @@ const skillsDir = join(__dirname, "..", "skills");
 
 async function main() {
   const index = await buildIndex(skillsDir);
-  console.error(`[skill-library] Indexed ${index.length} skills from ${skillsDir}`);
+  console.error(`[skill-library] Indexed ${index.entries.length} skills from ${skillsDir}`);
 
   const server = createServer(index, skillsDir);
   const transport = new StdioServerTransport();

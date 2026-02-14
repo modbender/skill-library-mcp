@@ -13,6 +13,12 @@ export interface SkillEntry {
   resourceFiles: string[];
 }
 
+export interface SearchIndex {
+  entries: SkillEntry[];
+  idfScores: Map<string, number>;
+  totalDocs: number;
+}
+
 export interface SearchResult {
   name: string;
   dirName: string;

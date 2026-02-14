@@ -1,12 +1,33 @@
 # skill-library-mcp
 
-An MCP server that provides on-demand skill loading for Claude Code. Search and load skills from your local skill library without keeping them all in context.
+**690+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
 
-## Installation
+[![npm version](https://img.shields.io/npm/v/skill-library-mcp)](https://www.npmjs.com/package/skill-library-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 
-### Using npx (recommended)
+An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 690+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
 
-Add to your Claude Code MCP config (`~/.claude/settings.json`):
+## Why?
+
+- **690+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
+- **On-demand loading** — skills are fetched only when needed, not crammed into every conversation
+- **IDF-weighted search** — finds the right skill even from natural language queries like "help me debug a memory leak"
+- **Works with any MCP-compatible tool** — Claude Code, Cursor, Windsurf, VS Code, Claude Desktop, and others
+- **Zero config** — run with `npx`, no setup needed
+
+## Quick Start
+
+```
+npx -y skill-library-mcp
+```
+
+Add it to your tool's MCP configuration:
+
+<details>
+<summary><strong>Claude Code (CLI)</strong></summary>
+
+Add to `~/.claude/settings.json`:
 
 ```json
 {
@@ -19,10 +40,92 @@ Add to your Claude Code MCP config (`~/.claude/settings.json`):
 }
 ```
 
-### Manual
+</details>
+
+<details>
+<summary><strong>Claude Desktop</strong></summary>
+
+Add to your `claude_desktop_config.json` ([location varies by OS](https://modelcontextprotocol.io/quickstart/user)):
+
+```json
+{
+  "mcpServers": {
+    "skill-library": {
+      "command": "npx",
+      "args": ["-y", "skill-library-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "skill-library": {
+      "command": "npx",
+      "args": ["-y", "skill-library-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Windsurf</strong></summary>
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "skill-library": {
+      "command": "npx",
+      "args": ["-y", "skill-library-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>VS Code (Copilot)</strong></summary>
+
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "skill-library": {
+      "command": "npx",
+      "args": ["-y", "skill-library-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Antigravity</strong></summary>
+
+See [Antigravity docs](https://docs.antigravity.dev) for MCP server configuration format.
+
+</details>
+
+<details>
+<summary><strong>Manual installation</strong></summary>
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/modbender/skill-library-mcp
 cd skill-library-mcp
 pnpm install
 pnpm build
@@ -41,58 +144,50 @@ Then point your MCP config to the built binary:
 }
 ```
 
+</details>
+
 ## Tools
 
-### search_skill
+### `search_skill`
 
 Search for skills by keyword. Returns a ranked list of matching skill names and descriptions.
 
-**Parameters:**
-- `query` (string) — Keywords to search for (e.g. "debugging", "react patterns", "terraform")
-
-**Example:**
 ```
-search_skill({ query: "react" })
-→ Found 5 skills matching "react":
-  - react-patterns (react-patterns) — Common React component patterns
-  - react-best-practices (react-best-practices) — Best practices for React apps
-  ...
+search_skill({ query: "react patterns" })
 ```
 
-### load_skill
+### `load_skill`
 
-Load the full content of a skill by name. Returns the complete SKILL.md content and optionally resources.
+Load the full content of a skill by name. Optionally includes resource files.
 
-**Parameters:**
-- `name` (string) — Skill name or directory name (e.g. "brainstorming", "ai-engineer")
-- `include_resources` (boolean, default: false) — Whether to include resource files
-
-**Example:**
 ```
 load_skill({ name: "brainstorming", include_resources: true })
-→ [Full SKILL.md content with appended resource files]
 ```
+
+## Skill Categories
+
+The library includes 690+ skills across areas like:
+
+| Category | Examples |
+|----------|----------|
+| **Frontend** | React patterns, Angular, Tailwind, accessibility, web performance |
+| **Backend** | Node.js, FastAPI, Django, NestJS, GraphQL, API design |
+| **DevOps & Cloud** | Terraform, Kubernetes, Docker, AWS, CI/CD, GitOps |
+| **Testing** | TDD workflows, Playwright, testing patterns, E2E testing |
+| **Security** | Penetration testing, OWASP, threat modeling, security scanning |
+| **AI & ML** | LLM application dev, RAG implementation, agent patterns, prompt engineering |
+| **Databases** | PostgreSQL, database design, migrations, SQL optimization |
+| **Automation** | Slack, GitHub, Jira, Salesforce, Zapier, and 40+ integrations |
+| **Architecture** | Microservices, event sourcing, CQRS, clean code, design patterns |
 
 ## Skill Format
 
 Skills are directories containing a `SKILL.md` file with YAML frontmatter:
 
-```
-my-skill/
-  SKILL.md
-  resources/        # Optional
-    guide.md
-    examples.md
-```
-
-`SKILL.md` format:
-
 ```markdown
 ---
 name: my-skill
 description: What this skill does
-metadata:
-  category: development
 ---
 
 # My Skill
@@ -100,22 +195,28 @@ metadata:
 Skill content here...
 ```
 
-## Configuration
+Skills can optionally include a `resources/` directory with additional `.md` files that are appended when `include_resources: true` is set.
 
-The server looks for skills in `../skills` relative to the built `dist/index.js`. Skills are shipped with the package — no additional setup needed.
+## Contributing
+
+Contributions are welcome! To add a new skill:
+
+1. Create a directory under `skills/` with your skill name
+2. Add a `SKILL.md` file with YAML frontmatter (`name`, `description`)
+3. Run `pnpm dedup` to check for duplicates
+4. Submit a PR
 
 ## Development
 
 ```bash
 pnpm install          # Install dependencies
 pnpm test             # Run tests
-pnpm test:watch       # Run tests in watch mode
 pnpm build            # Build to dist/
-pnpm dev              # Run server locally via tsx
+pnpm dev              # Run server locally
+pnpm dedup            # Check for duplicate skills
 make ci               # Run test + build
-make mcp-test         # Build and test MCP initialize handshake
 ```
 
 ## License
 
-MIT
+[MIT](LICENSE)

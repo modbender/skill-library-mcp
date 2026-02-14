@@ -1,7 +1,7 @@
 import { readdir, readFile, access } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import type { SkillEntry, SkillFrontmatter } from "./types.js";
+import type { SkillEntry, SkillFrontmatter, SearchIndex } from "./types.js";
 
 function parseFrontmatter(content: string): SkillFrontmatter | null {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -23,17 +23,27 @@ function parseFrontmatter(content: string): SkillFrontmatter | null {
 
 function tokenize(text: string): Set<string> {
   const words = text.toLowerCase().replace(/[^a-z0-9\-]/g, " ").split(/\s+/).filter(Boolean);
-  return new Set(words);
+  const tokens = new Set<string>();
+  for (const word of words) {
+    tokens.add(word);
+    // Split hyphenated tokens into sub-tokens
+    if (word.includes("-")) {
+      for (const part of word.split("-")) {
+        if (part) tokens.add(part);
+      }
+    }
+  }
+  return tokens;
 }
 
-export async function buildIndex(skillsDir: string): Promise<SkillEntry[]> {
+export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
   const entries: SkillEntry[] = [];
   let dirs: string[];
 
   try {
     dirs = await readdir(skillsDir);
   } catch {
-    return entries;
+    return { entries, idfScores: new Map(), totalDocs: 0 };
   }
 
   for (const dirName of dirs) {
@@ -76,5 +86,20 @@ export async function buildIndex(skillsDir: string): Promise<SkillEntry[]> {
     });
   }
 
-  return entries;
+  // Compute IDF scores
+  const totalDocs = entries.length;
+  const docFrequency = new Map<string, number>();
+
+  for (const entry of entries) {
+    for (const token of entry.searchTokens) {
+      docFrequency.set(token, (docFrequency.get(token) ?? 0) + 1);
+    }
+  }
+
+  const idfScores = new Map<string, number>();
+  for (const [token, df] of docFrequency) {
+    idfScores.set(token, Math.log(totalDocs / df));
+  }
+
+  return { entries, idfScores, totalDocs };
 }

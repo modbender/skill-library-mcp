@@ -1,10 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import type { SkillEntry } from "./types.js";
+import type { SkillEntry, SearchIndex } from "./types.js";
 import { searchSkills } from "./search.js";
 import { loadSkill } from "./loader.js";
 
-export function createServer(index: SkillEntry[], skillsDir: string): McpServer {
+export function createServer(index: SearchIndex, skillsDir: string): McpServer {
   const server = new McpServer({
     name: "skill-library",
     version: "1.0.0",
@@ -12,7 +12,7 @@ export function createServer(index: SkillEntry[], skillsDir: string): McpServer 
 
   // Build lookup map keyed by both dirName and frontmatter name
   const lookupMap = new Map<string, SkillEntry>();
-  for (const entry of index) {
+  for (const entry of index.entries) {
     lookupMap.set(entry.dirName.toLowerCase(), entry);
     lookupMap.set(entry.frontmatter.name.toLowerCase(), entry);
   }

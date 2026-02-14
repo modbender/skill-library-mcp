@@ -1,5 +1,5 @@
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import type { SkillEntry } from "./types.js";
 
 export async function loadSkill(
@@ -7,8 +7,11 @@ export async function loadSkill(
   skillsDir: string,
   includeResources: boolean = false,
 ): Promise<string> {
-  const skillPath = join(skillsDir, entry.dirName, "SKILL.md");
-  let content = await readFile(skillPath, "utf-8");
+  const skillDir = join(skillsDir, entry.dirName);
+  const skillPath = join(skillDir, "SKILL.md");
+  const absoluteSkillDir = resolve(skillDir);
+  let content = `> **Skill directory**: ${absoluteSkillDir}\n> Resolve relative paths (scripts/, resources/, etc.) against this directory.\n\n`;
+  content += await readFile(skillPath, "utf-8");
 
   if (includeResources && entry.hasResources) {
     const resourceDir = join(skillsDir, entry.dirName, "resources");

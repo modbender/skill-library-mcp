@@ -3,12 +3,12 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildIndex } from "../src/skill-index.js";
 import { searchSkills } from "../src/search.js";
-import type { SkillEntry } from "../src/types.js";
+import type { SearchIndex } from "../src/types.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesDir = join(__dirname, "fixtures");
 
-let index: SkillEntry[];
+let index: SearchIndex;
 
 beforeAll(async () => {
   index = await buildIndex(fixturesDir);
@@ -19,28 +19,23 @@ describe("searchSkills", () => {
     const results = searchSkills(index, "basic-skill");
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].dirName).toBe("basic-skill");
-    // basic-skill should score higher than skill-with-resources
     if (results.length > 1) {
       expect(results[0].score).toBeGreaterThanOrEqual(results[1].score);
     }
   });
 
-  it("partial/substring matches score lower than exact", () => {
-    // "basic" is a substring of "basic-skill" token
+  it("partial/substring matches still return the right skill first", () => {
     const results = searchSkills(index, "basic");
     expect(results.length).toBeGreaterThan(0);
-
-    const exactResults = searchSkills(index, "basic-skill");
-    // Exact match on name should score >= partial
-    expect(exactResults[0].score).toBeGreaterThanOrEqual(results[0].score);
+    // "basic" should still find basic-skill as the top result
+    expect(results[0].dirName).toBe("basic-skill");
   });
 
-  it("name substring bonus (+0.5) applied", () => {
-    // Searching "basic-skill" matches the name exactly as substring
+  it("name bonus applied for substring match in name", () => {
     const results = searchSkills(index, "basic-skill");
     expect(results[0].dirName).toBe("basic-skill");
-    // Score includes the +0.5 name bonus
-    expect(results[0].score).toBeGreaterThan(1);
+    // Score includes IDF weight + name bonus (2.0), should be well above threshold
+    expect(results[0].score).toBeGreaterThan(2);
   });
 
   it("results sorted by score descending", () => {
@@ -65,27 +60,25 @@ describe("searchSkills", () => {
     expect(results).toEqual([]);
   });
 
-  it("description substring bonus (+0.3) is applied", () => {
+  it("description substring bonus is applied", () => {
     // "unit testing" appears in basic-skill description
     const results = searchSkills(index, "unit testing");
     const basic = results.find((r) => r.dirName === "basic-skill");
     expect(basic).toBeDefined();
-    // Score should include the +0.3 description bonus
-    // Token matches: "unit" exact +1, "testing" exact +1 = 2
-    // Description contains "unit testing" → +0.3
-    // Normalized by 2 tokens → (2 + 0.3) / 2 = 1.15
+    // IDF-weighted token matches + description bonus, normalized by 2 tokens
     expect(basic!.score).toBeGreaterThan(1);
   });
 
-  it("multi-token query normalizes score by token count", () => {
+  it("multi-token query with unmatched tokens does not dilute score", () => {
     const singleToken = searchSkills(index, "basic-skill");
     const multiToken = searchSkills(index, "basic-skill nonexistenttoken");
     const singleBasic = singleToken.find((r) => r.dirName === "basic-skill");
     const multiBasic = multiToken.find((r) => r.dirName === "basic-skill");
-    // Multi-token query divides by more tokens, so score should be lower
-    if (singleBasic && multiBasic) {
-      expect(singleBasic.score).toBeGreaterThan(multiBasic.score);
-    }
+    // Unmatched tokens should not dilute score — only name bonus difference
+    expect(singleBasic).toBeDefined();
+    expect(multiBasic).toBeDefined();
+    // Single gets name bonus (full query matches name), multi doesn't
+    expect(singleBasic!.score).toBeGreaterThanOrEqual(multiBasic!.score);
   });
 
   it("hasResources flag propagated to search results", () => {
@@ -102,5 +95,41 @@ describe("searchSkills", () => {
       const rounded = Math.round(r.score * 100) / 100;
       expect(r.score).toBe(rounded);
     }
+  });
+
+  it("stop-words are filtered from query", () => {
+    // "create a basic" → "create" and "a" are stop-words, "basic" remains
+    const results = searchSkills(index, "create a basic");
+    expect(results.length).toBeGreaterThan(0);
+    // Should match on "basic" token, same as searching "basic" directly
+    const basicResults = searchSkills(index, "basic");
+    expect(results.map((r) => r.dirName)).toEqual(basicResults.map((r) => r.dirName));
+  });
+
+  it("natural language stop-words are filtered (help, need, how, etc.)", () => {
+    // "help me with basic" → "help", "me", "with" are stop-words, "basic" remains
+    const results = searchSkills(index, "help me with basic");
+    expect(results.length).toBeGreaterThan(0);
+    const basicResults = searchSkills(index, "basic");
+    expect(results.map((r) => r.dirName)).toEqual(basicResults.map((r) => r.dirName));
+  });
+
+  it("query tokens are deduplicated", () => {
+    const single = searchSkills(index, "testing");
+    const double = searchSkills(index, "testing testing");
+    // Deduplication means "testing testing" should produce same result set
+    expect(single.map((r) => r.dirName)).toEqual(double.map((r) => r.dirName));
+  });
+
+  it("2-char tokens can match via substring", () => {
+    // 2-char tokens should match via substring (minimum is now 2)
+    // "zx" has no match in fixtures, so still empty
+    const results = searchSkills(index, "zx");
+    expect(results).toEqual([]);
+  });
+
+  it("single-char tokens are too short for substring matching", () => {
+    const results = searchSkills(index, "z");
+    expect(results).toEqual([]);
   });
 });

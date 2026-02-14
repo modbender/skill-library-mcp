@@ -1,48 +1,73 @@
-import type { SkillEntry, SearchResult } from "./types.js";
+import type { SearchIndex, SearchResult } from "./types.js";
+
+const STOP_WORDS = new Set([
+  "a", "an", "the", "build", "write", "create", "use", "using", "when",
+  "this", "for", "from", "with", "that", "are", "has", "its", "was",
+  "will", "your", "you", "is", "it", "in", "on", "of", "to", "be",
+  "by", "at", "as", "and", "help", "need", "want", "how", "do", "can",
+  "me", "i", "my", "show", "about", "what", "should", "please",
+]);
 
 function tokenize(text: string): string[] {
   return text.toLowerCase().replace(/[^a-z0-9\-]/g, " ").split(/\s+/).filter(Boolean);
 }
 
 export function searchSkills(
-  index: SkillEntry[],
+  index: SearchIndex,
   query: string,
   limit: number = 20,
 ): SearchResult[] {
-  const queryTokens = tokenize(query);
-  if (queryTokens.length === 0) return [];
+  const rawTokens = tokenize(query);
+  if (rawTokens.length === 0) return [];
+
+  // Filter stop-words, but keep all if every token is a stop-word
+  const filtered = rawTokens.filter((t) => !STOP_WORDS.has(t));
+  const meaningful = filtered.length > 0 ? filtered : rawTokens;
+
+  // Deduplicate query tokens
+  const queryTokens = [...new Set(meaningful)];
 
   const queryLower = query.toLowerCase();
   const results: SearchResult[] = [];
 
-  for (const entry of index) {
+  // Default IDF for tokens not in the index (treat as very rare)
+  const defaultIdf = Math.log((index.totalDocs || 1) + 1);
+
+  for (const entry of index.entries) {
     let score = 0;
 
-    // Token overlap scoring
+    let matchedTokens = 0;
+
     for (const qt of queryTokens) {
+      const idfWeight = index.idfScores.get(qt) ?? defaultIdf;
+      let bestTokenScore = 0;
+
       for (const st of entry.searchTokens) {
         if (st === qt) {
-          score += 1;
-        } else if (st.includes(qt) || qt.includes(st)) {
-          score += 0.5;
+          bestTokenScore = Math.max(bestTokenScore, idfWeight);
+        } else if (qt.length >= 2 && st.length >= 2 && (st.includes(qt) || qt.includes(st))) {
+          bestTokenScore = Math.max(bestTokenScore, idfWeight * 0.5);
         }
       }
+
+      if (bestTokenScore > 0) matchedTokens++;
+      score += bestTokenScore;
     }
 
     // Bonus for exact substring match in name
     if (entry.frontmatter.name.toLowerCase().includes(queryLower)) {
-      score += 0.5;
+      score += 2.0;
     }
 
     // Bonus for exact substring match in description
     if (entry.frontmatter.description.toLowerCase().includes(queryLower)) {
-      score += 0.3;
+      score += 1.0;
     }
 
-    // Normalize by query token count
-    score = score / queryTokens.length;
+    // Normalize by matched token count (unmatched tokens don't dilute score)
+    score = score / Math.max(matchedTokens, 1);
 
-    if (score >= 0.2) {
+    if (score >= 0.5) {
       results.push({
         name: entry.frontmatter.name,
         dirName: entry.dirName,

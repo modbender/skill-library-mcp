@@ -5,7 +5,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { buildIndex } from "../src/skill-index.js";
 import { createServer } from "../src/server.js";
-import type { SkillEntry } from "../src/types.js";
+import type { SearchIndex } from "../src/types.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesDir = join(__dirname, "fixtures");
