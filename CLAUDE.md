@@ -1,53 +1,47 @@
-# skill-library-mcp
+# CLAUDE.md
 
-MCP server that indexes and serves Claude Code skills on demand.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Architecture
+## What This Is
 
-- `src/skill-index.ts` — Builds search index from `skills/` directory by parsing YAML frontmatter from SKILL.md files
-- `src/search.ts` — Token-based search with scoring (exact match +1, substring +0.5, name bonus +0.5, description bonus +0.3)
-- `src/loader.ts` — Loads skill content with optional resource file inclusion
-- `src/server.ts` — MCP server exposing `search_skill` and `load_skill` tools
-- `src/index.ts` — Entry point: builds index, starts stdio transport
-- `src/types.ts` — TypeScript interfaces (SkillFrontmatter, SkillEntry, SearchResult)
+MCP server that indexes and serves Claude Code skills on demand. It exposes two tools (`search_skill`, `load_skill`) over stdio transport using the Model Context Protocol SDK.
 
-## Key Files
-
-- `skills/` — Committed skill library shipped with the package (~708 skills)
-- `test/fixtures/` — Test skills (do not use real skills/ dir in tests)
-
-## Development
+## Commands
 
 ```bash
 pnpm install          # Install dependencies
-pnpm test             # Run tests
-pnpm build            # Build to dist/
+pnpm test             # Run all tests (vitest)
+pnpm test -- test/search.test.ts              # Run a single test file
+pnpm test -- -t "exact token match"           # Run a single test by name
+pnpm build            # Build to dist/ (tsup, ESM-only, node22 target)
 pnpm dev              # Run server locally via tsx
 make ci               # Run test + build
-make mcp-test         # Build and send initialize request
+make mcp-test         # Build and send initialize request to verify MCP handshake
 ```
+
+## Architecture
+
+The data flow is: `skills/` → `buildIndex()` → `SkillEntry[]` → `createServer()` → MCP tools over stdio.
+
+- `src/skill-index.ts` — Reads `skills/*/SKILL.md`, parses YAML frontmatter, builds tokenized search index as `SkillEntry[]`
+- `src/search.ts` — Token-based search: exact match +1, substring +0.5, name bonus +0.5, description bonus +0.3, normalized by query token count, threshold ≥0.2
+- `src/loader.ts` — Loads full SKILL.md content; optionally appends `resources/*.md` files
+- `src/server.ts` — Creates `McpServer` with two tools. Builds a case-insensitive lookup map keyed by both `dirName` and `frontmatter.name`. `load_skill` falls back to fuzzy search suggestions when exact lookup fails
+- `src/index.ts` — Entry point: resolves `skills/` dir relative to `dist/`, builds index, connects stdio transport
+- `src/types.ts` — `SkillFrontmatter`, `SkillEntry`, `SearchResult` interfaces
 
 ## Testing
 
-Two test layers:
+Two test layers, both using vitest:
 
-**Unit tests** (`test/fixtures/`): Synthetic skills for deterministic, fast testing.
-- `test/skill-index.test.ts` — Index building, frontmatter parsing
-- `test/search.test.ts` — Search scoring, ranking, limits
-- `test/loader.test.ts` — Content loading, resource inclusion
-- `test/server.test.ts` — MCP server tools via in-memory transport
+**Unit tests** use synthetic skills in `test/fixtures/` for deterministic results. Never use the real `skills/` directory in unit tests.
 
-**Integration tests** (`skills/`): Real skill library for end-to-end validation.
-- `test/integration.test.ts` — Index completeness, search relevance, resource loading
-
-## CI/CD
-
-- **CI** (`.github/workflows/ci.yml`): Runs on push/PR to main. test → build → ci-summary.
-- **Release** (`.github/workflows/release.yml`): Runs on `v*` tags. test → build → publish (npm OIDC) + GitHub Release.
+**Integration tests** (`test/integration.test.ts`) use the real `skills/` directory to validate index completeness and search relevance.
 
 ## Conventions
 
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`
-- ESM-only (`"type": "module"`)
-- Node 22 target
-- pnpm package manager
+- ESM-only (`"type": "module"`) — all internal imports use `.js` extensions
+- Node 22 target, pnpm package manager
+- tsup bundles `src/index.ts` to `dist/index.js` with `#!/usr/bin/env node` banner
+- `skills/` lives at project root, resolved at runtime as `join(__dirname, "..", "skills")` from `dist/`
