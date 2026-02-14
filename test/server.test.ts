@@ -54,6 +54,24 @@ describe("search_skill tool", () => {
   });
 });
 
+describe("list_categories tool", () => {
+  it("returns formatted category list", async () => {
+    const text = await callTool("list_categories", {});
+    expect(text).toContain("categories:");
+    expect(text).toContain("**Other**");
+  });
+
+  it("output contains category counts", async () => {
+    const text = await callTool("list_categories", {});
+    expect(text).toMatch(/\(\d+\)/);
+  });
+
+  it("mentions total skill count", async () => {
+    const text = await callTool("list_categories", {});
+    expect(text).toMatch(/^\d+ skills in/);
+  });
+});
+
 describe("load_skill tool", () => {
   it("loads skill by exact dirName", async () => {
     const text = await callTool("load_skill", { name: "basic-skill" });

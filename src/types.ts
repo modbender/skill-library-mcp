@@ -17,6 +17,7 @@ export interface SearchIndex {
   entries: SkillEntry[];
   idfScores: Map<string, number>;
   totalDocs: number;
+  categories: Map<string, string[]>;
 }
 
 export interface SearchResult {

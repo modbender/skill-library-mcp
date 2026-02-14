@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { tokenize } from "./tokenize.js";
 import type { SkillEntry, SkillFrontmatter, SearchIndex } from "./types.js";
+import { buildCategories } from "./categories.js";
 
 export function parseFrontmatter(content: string): SkillFrontmatter | null {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -40,7 +41,7 @@ export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
   try {
     dirs = await readdir(skillsDir);
   } catch {
-    return { entries, idfScores: new Map(), totalDocs: 0 };
+    return { entries, idfScores: new Map(), totalDocs: 0, categories: new Map() };
   }
 
   for (const dirName of dirs) {
@@ -97,5 +98,7 @@ export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
     idfScores.set(token, Math.log(totalDocs / df));
   }
 
-  return { entries, idfScores, totalDocs };
+  const categories = buildCategories(entries);
+
+  return { entries, idfScores, totalDocs, categories };
 }

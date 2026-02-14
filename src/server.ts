@@ -5,10 +5,12 @@ import { searchSkills } from "./search.js";
 import { loadSkill } from "./loader.js";
 
 export function createServer(index: SearchIndex, skillsDir: string): McpServer {
-  const server = new McpServer({
-    name: "skill-library",
-    version: "1.0.0",
-  });
+  const server = new McpServer(
+    { name: "skill-library", version: "1.0.0" },
+    {
+      instructions: `Skill library with ${index.totalDocs} skills across ${index.categories.size} categories. Use search_skill to find skills by keyword, or list_categories to browse available categories.`,
+    },
+  );
 
   // Build lookup map keyed by both dirName and frontmatter name
   const lookupMap = new Map<string, SkillEntry>();
@@ -75,6 +77,26 @@ export function createServer(index: SearchIndex, skillsDir: string): McpServer {
 
       return {
         content: [{ type: "text", text: content }],
+      };
+    },
+  );
+
+  server.tool(
+    "list_categories",
+    "List all skill categories with counts and examples. Use this to discover what skills are available before searching.",
+    {},
+    async () => {
+      const lines: string[] = [];
+      for (const [category, skills] of index.categories) {
+        const examples = skills.slice(0, 3).join(", ");
+        const more = skills.length > 3 ? `, +${skills.length - 3} more` : "";
+        lines.push(`- **${category}** (${skills.length}) — ${examples}${more}`);
+      }
+      return {
+        content: [{
+          type: "text" as const,
+          text: `${index.totalDocs} skills in ${index.categories.size} categories:\n\n${lines.join("\n")}`,
+        }],
       };
     },
   );

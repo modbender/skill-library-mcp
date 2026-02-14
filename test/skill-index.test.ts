@@ -134,6 +134,15 @@ describe("buildIndex", () => {
     }
   });
 
+  it("populates categories map", async () => {
+    const index = await buildIndex(fixturesDir);
+    expect(index.categories).toBeInstanceOf(Map);
+    expect(index.categories.size).toBeGreaterThan(0);
+    // All fixture skills have generic names, so they should land in "Other"
+    const allCategorized = [...index.categories.values()].flat();
+    expect(allCategorized.length).toBe(index.entries.length);
+  });
+
   it("rare tokens have higher IDF than common tokens", async () => {
     const index = await buildIndex(fixturesDir);
     // "unit" appears only in basic-skill, "skill" appears in multiple
