@@ -18,11 +18,7 @@ An MCP server that provides on-demand skill loading for AI coding assistants. In
 
 ## Quick Start
 
-```
-npx -y skill-library-mcp
-```
-
-Add it to your tool's MCP configuration:
+Add to your tool's MCP configuration:
 
 <details>
 <summary><strong>Claude Code (CLI)</strong></summary>
