@@ -1,39 +1,36 @@
-import { readdir, readFile, access } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { tokenize } from "./tokenize.js";
 import type { SkillEntry, SkillFrontmatter, SearchIndex } from "./types.js";
 
-function parseFrontmatter(content: string): SkillFrontmatter | null {
+export function parseFrontmatter(content: string): SkillFrontmatter | null {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return null;
 
   try {
     const parsed = parseYaml(match[1]);
     if (!parsed || typeof parsed.name !== "string") return null;
+
+    const metadata =
+      parsed.metadata && typeof parsed.metadata === "object" && !Array.isArray(parsed.metadata)
+        ? (parsed.metadata as Record<string, unknown>)
+        : undefined;
+
+    const allowedTools =
+      Array.isArray(parsed.allowedTools) && parsed.allowedTools.every((t: unknown) => typeof t === "string")
+        ? (parsed.allowedTools as string[])
+        : undefined;
+
     return {
       name: parsed.name,
       description: typeof parsed.description === "string" ? parsed.description.trim() : "",
-      metadata: parsed.metadata,
-      allowedTools: parsed.allowedTools,
+      metadata,
+      allowedTools,
     };
   } catch {
     return null;
   }
-}
-
-function tokenize(text: string): Set<string> {
-  const words = text.toLowerCase().replace(/[^a-z0-9\-]/g, " ").split(/\s+/).filter(Boolean);
-  const tokens = new Set<string>();
-  for (const word of words) {
-    tokens.add(word);
-    // Split hyphenated tokens into sub-tokens
-    if (word.includes("-")) {
-      for (const part of word.split("-")) {
-        if (part) tokens.add(part);
-      }
-    }
-  }
-  return tokens;
 }
 
 export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
@@ -49,13 +46,13 @@ export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
   for (const dirName of dirs) {
     const skillPath = join(skillsDir, dirName, "SKILL.md");
 
+    let content: string;
     try {
-      await access(skillPath);
+      content = await readFile(skillPath, "utf-8");
     } catch {
       continue;
     }
 
-    const content = await readFile(skillPath, "utf-8");
     const frontmatter = parseFrontmatter(content);
     if (!frontmatter) continue;
 
@@ -72,10 +69,9 @@ export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
       // No resources directory
     }
 
-    const searchTokens = new Set([
-      ...tokenize(frontmatter.name),
-      ...tokenize(frontmatter.description),
-    ]);
+    const searchTokens = new Set(
+      [...tokenize(frontmatter.name), ...tokenize(frontmatter.description)],
+    );
 
     entries.push({
       dirName,

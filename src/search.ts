@@ -1,4 +1,5 @@
 import type { SearchIndex, SearchResult } from "./types.js";
+import { tokenize } from "./tokenize.js";
 
 const STOP_WORDS = new Set([
   "a", "an", "the", "build", "write", "create", "use", "using", "when",
@@ -7,10 +8,6 @@ const STOP_WORDS = new Set([
   "by", "at", "as", "and", "help", "need", "want", "how", "do", "can",
   "me", "i", "my", "show", "about", "what", "should", "please",
 ]);
-
-function tokenize(text: string): string[] {
-  return text.toLowerCase().replace(/[^a-z0-9\-]/g, " ").split(/\s+/).filter(Boolean);
-}
 
 export function searchSkills(
   index: SearchIndex,

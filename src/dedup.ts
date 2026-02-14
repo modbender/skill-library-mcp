@@ -1,7 +1,7 @@
-import { readdir, readFile, access } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { parse as parseYaml } from "yaml";
+import { parseFrontmatter } from "./skill-index.js";
 
 interface SkillMeta {
   dirName: string;
@@ -14,22 +14,7 @@ export interface DuplicateReport {
   nearDuplicates: { pair: [SkillMeta, SkillMeta]; similarity: number }[];
 }
 
-function parseFrontmatter(content: string): { name: string; description: string } | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return null;
-  try {
-    const parsed = parseYaml(match[1]);
-    if (!parsed || typeof parsed.name !== "string") return null;
-    return {
-      name: parsed.name,
-      description: typeof parsed.description === "string" ? parsed.description.trim() : "",
-    };
-  } catch {
-    return null;
-  }
-}
-
-function jaccardSimilarity(a: string, b: string): number {
+export function jaccardSimilarity(a: string, b: string): number {
   const wordsA = new Set(a.toLowerCase().split(/\s+/).filter(Boolean));
   const wordsB = new Set(b.toLowerCase().split(/\s+/).filter(Boolean));
   if (wordsA.size === 0 && wordsB.size === 0) return 1;
@@ -55,13 +40,13 @@ export async function findDuplicates(skillsDir: string): Promise<DuplicateReport
 
   for (const dirName of dirs) {
     const skillPath = join(skillsDir, dirName, "SKILL.md");
+
+    let content: string;
     try {
-      await access(skillPath);
+      content = await readFile(skillPath, "utf-8");
     } catch {
       continue;
     }
-
-    const content = await readFile(skillPath, "utf-8");
     const fm = parseFrontmatter(content);
     if (!fm) continue;
 

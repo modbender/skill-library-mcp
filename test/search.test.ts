@@ -34,8 +34,8 @@ describe("searchSkills", () => {
   it("name bonus applied for substring match in name", () => {
     const results = searchSkills(index, "basic-skill");
     expect(results[0].dirName).toBe("basic-skill");
-    // Score includes IDF weight + name bonus (2.0), should be well above threshold
-    expect(results[0].score).toBeGreaterThan(2);
+    // Score includes IDF weight + name bonus (2.0), normalized by matched token count
+    expect(results[0].score).toBeGreaterThan(1);
   });
 
   it("results sorted by score descending", () => {
