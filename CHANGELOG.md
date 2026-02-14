@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/modbender/skill-library-mcp/compare/v1.0.1...v1.1.0) (2026-02-14)
+
+
+### Features
+
+* add list category and instructions tool ([2593840](https://github.com/modbender/skill-library-mcp/commit/2593840dfb7bb904064e3a4a2f8dc56eeeb2295d))
+
 ## [1.0.1](https://github.com/modbender/skill-library-mcp/compare/v1.0.0...v1.0.1) (2026-02-14)
 
 
