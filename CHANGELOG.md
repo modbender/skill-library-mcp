@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/modbender/skill-library-mcp/compare/v1.0.0...v1.0.1) (2026-02-14)
+
+
+### Bug Fixes
+
+* package bloat ([3b4693f](https://github.com/modbender/skill-library-mcp/commit/3b4693fc96a938b9bb9173ca91c1697c2a7fe7b7))
+
 ## 1.0.0 (2026-02-14)
 
 
