@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/modbender/skill-library-mcp/compare/v1.1.0...v1.1.1) (2026-02-14)
+
+
+### Bug Fixes
+
+* missing fields ([f44905e](https://github.com/modbender/skill-library-mcp/commit/f44905e01ff64296c855731a7477ae2872327d07))
+
 ## [1.1.0](https://github.com/modbender/skill-library-mcp/compare/v1.0.1...v1.1.0) (2026-02-14)
 
 
