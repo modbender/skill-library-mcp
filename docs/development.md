@@ -55,6 +55,23 @@ pnpm dev
 
 Then paste JSON-RPC messages to stdin.
 
+## Local Plugin Testing
+
+To test the plugin locally without publishing:
+
+```bash
+pnpm build
+claude plugin install --plugin-dir .
+```
+
+This installs the plugin from the current directory. Verify the MCP tools are available by starting Claude Code and checking for `search_skill`, `load_skill`, and `list_categories`.
+
+To uninstall:
+
+```bash
+claude plugin remove skill-library
+```
+
 ## Makefile Targets
 
 | Target | Description |
@@ -68,11 +85,9 @@ Then paste JSON-RPC messages to stdin.
 
 ## Release Process
 
-1. Bump version in `package.json`
-2. Commit: `git commit -m "chore: release v1.x.x"`
-3. Tag: `git tag v1.x.x`
-4. Push: `git push && git push --tags`
-5. GitHub Actions automatically: runs tests → builds → publishes to npm (OIDC) → creates GitHub Release with changelog
+Releases are automated via [release-please](https://github.com/googleapis/release-please). On every push to `main`, release-please analyzes conventional commits and opens/updates a Release PR with version bumps and changelog. Merging that PR creates a git tag and GitHub Release, which triggers npm publish.
+
+When bumping the version, also update `version` in `.claude-plugin/plugin.json` to match.
 
 ## Troubleshooting
 

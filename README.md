@@ -14,11 +14,31 @@ An MCP server that provides on-demand skill loading for AI coding assistants. In
 - **On-demand loading** — skills are fetched only when needed, not crammed into every conversation
 - **IDF-weighted search** — finds the right skill even from natural language queries like "help me debug a memory leak"
 - **Works with any MCP-compatible tool** — Claude Code, Cursor, Windsurf, VS Code, Claude Desktop, and others
+- **Claude Code plugin** — one-command install with `claude plugin install`
 - **Zero config** — run with `npx`, no setup needed
 
 ## Quick Start
 
-Add to your tool's MCP configuration:
+### Claude Code Plugin (Recommended)
+
+The easiest way to use this with Claude Code — install as a plugin:
+
+```bash
+claude plugin install skill-library-mcp
+```
+
+The MCP server starts automatically when Claude Code launches. No manual configuration needed.
+
+To install for a specific scope:
+
+```bash
+claude plugin install skill-library-mcp --scope user      # Default, available everywhere
+claude plugin install skill-library-mcp --scope project   # Project-only, shared with collaborators
+```
+
+### MCP Server (Manual)
+
+For other tools or manual Claude Code setup, add to your MCP configuration:
 
 <details>
 <summary><strong>Claude Code (CLI)</strong></summary>

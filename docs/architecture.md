@@ -42,6 +42,23 @@ Given a query string, the algorithm:
 4. **Filters** results below 0.2 threshold
 5. **Sorts** descending by score, limits to top N (default 20)
 
+## Plugin Mode
+
+The server can also run as a Claude Code plugin. The plugin layout:
+
+```
+.claude-plugin/plugin.json   — Plugin manifest (name, description, version, etc.)
+.mcp.json                    — MCP server config using ${CLAUDE_PLUGIN_ROOT}
+```
+
+When installed as a plugin (`claude plugin install skill-library-mcp`), Claude Code:
+1. Downloads/installs the package
+2. Reads `.mcp.json` to discover MCP servers
+3. Starts the MCP server automatically on launch
+4. Exposes `search_skill`, `load_skill`, and `list_categories` as tools
+
+The `${CLAUDE_PLUGIN_ROOT}` variable resolves to the plugin's install directory, so `dist/index.js` and `skills/` are found correctly. This works because the npm package ships both `dist/` and `skills/` in its `files` array.
+
 ## Design Decisions
 
 - **In-memory index**: Skills are indexed once at startup. The index is small (frontmatter + tokens only, not full content). Search is O(n) over entries — fast enough for hundreds of skills.
