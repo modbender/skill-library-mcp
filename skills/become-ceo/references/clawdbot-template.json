@@ -1,0 +1,136 @@
+{
+  "models": {
+    "providers": {
+      "$LLM_PROVIDER": {
+        "baseUrl": "$LLM_BASE_URL",
+        "apiKey": "$LLM_API_KEY",
+        "api": "$LLM_API_FORMAT",
+        "models": [
+          {
+            "id": "$MODEL_FAST",
+            "name": "Fast Model",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "$MODEL_STRONG",
+            "name": "Strong Model",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 16384
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "$HOME/clawd",
+      "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+      "maxConcurrent": 4,
+      "subagents": { "maxConcurrent": 8 }
+    },
+    "list": [
+      {
+        "id": "main",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+        "identity": {
+          "name": "Chief of Staff",
+          "theme": "You are the Chief of Staff. Route tasks to the right specialist. Keep it short and decisive. When delegating, use the template: [Role] + [Task] + [Context] + [Requirements] + [Output format].",
+          "emoji": "⚡"
+        },
+        "subagents": {
+          "allowAgents": ["engineering", "finance", "marketing", "devops", "management", "legal"]
+        }
+      },
+      {
+        "id": "engineering",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_STRONG" },
+        "identity": {
+          "name": "Engineering",
+          "theme": "You are the Engineering lead. You handle software architecture, code reviews, and system design. Be direct, give working solutions, not lectures.",
+          "emoji": "⚔️"
+        }
+      },
+      {
+        "id": "finance",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_STRONG" },
+        "identity": {
+          "name": "Finance",
+          "theme": "You are the Finance lead. You handle budgets, cost analysis, and spend tracking. Always looking for ways to save money. Numbers first, opinions second.",
+          "emoji": "💰"
+        }
+      },
+      {
+        "id": "marketing",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+        "identity": {
+          "name": "Marketing",
+          "theme": "You are the Marketing lead. You handle branding, content, and social media. Creative but practical. Know your audience.",
+          "emoji": "🎭"
+        }
+      },
+      {
+        "id": "devops",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+        "identity": {
+          "name": "DevOps",
+          "theme": "You are the DevOps lead. You handle servers, CI/CD, infrastructure, and deployments. Hands-on, practical, automate everything.",
+          "emoji": "🔧"
+        }
+      },
+      {
+        "id": "management",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+        "identity": {
+          "name": "Management",
+          "theme": "You are the Management lead. You handle project coordination, hiring, and team ops. Keep things organized and moving.",
+          "emoji": "👔"
+        }
+      },
+      {
+        "id": "legal",
+        "model": { "primary": "$LLM_PROVIDER/$MODEL_FAST" },
+        "identity": {
+          "name": "Legal",
+          "theme": "You are the Legal lead. You handle compliance, contracts, and IP. Precise, cite specifics, flag real risks not theoretical ones.",
+          "emoji": "⚖️"
+        }
+      }
+    ]
+  },
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "groupPolicy": "open",
+      "historyLimit": 20,
+      "accounts": {
+        "main":        { "name": "Chief of Staff", "token": "$DISCORD_BOT_TOKEN_MAIN",        "groupPolicy": "open" },
+        "engineering": { "name": "Engineering",    "token": "$DISCORD_BOT_TOKEN_ENGINEERING",  "groupPolicy": "open" },
+        "finance":     { "name": "Finance",        "token": "$DISCORD_BOT_TOKEN_FINANCE",      "groupPolicy": "open" },
+        "marketing":   { "name": "Marketing",      "token": "$DISCORD_BOT_TOKEN_MARKETING",    "groupPolicy": "open" },
+        "devops":      { "name": "DevOps",         "token": "$DISCORD_BOT_TOKEN_DEVOPS",       "groupPolicy": "open" },
+        "management":  { "name": "Management",     "token": "$DISCORD_BOT_TOKEN_MANAGEMENT",   "groupPolicy": "open" },
+        "legal":       { "name": "Legal",          "token": "$DISCORD_BOT_TOKEN_LEGAL",        "groupPolicy": "open" }
+      },
+      "guilds": {
+        "$DISCORD_GUILD_ID": {
+          "requireMention": true
+        }
+      }
+    }
+  },
+  "bindings": [
+    { "agentId": "main",        "match": { "channel": "discord", "accountId": "main" } },
+    { "agentId": "engineering", "match": { "channel": "discord", "accountId": "engineering" } },
+    { "agentId": "finance",     "match": { "channel": "discord", "accountId": "finance" } },
+    { "agentId": "marketing",   "match": { "channel": "discord", "accountId": "marketing" } },
+    { "agentId": "devops",      "match": { "channel": "discord", "accountId": "devops" } },
+    { "agentId": "management",  "match": { "channel": "discord", "accountId": "management" } },
+    { "agentId": "legal",       "match": { "channel": "discord", "accountId": "legal" } }
+  ],
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  }
+}

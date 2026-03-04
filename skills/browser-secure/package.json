@@ -1,0 +1,41 @@
+{
+  "name": "browser-secure",
+  "version": "0.2.0",
+  "description": "Secure browser automation with vault integration, approval gates, and audit logging",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": {
+    "browser-secure": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "link": "npm link",
+    "setup": "node scripts/onboarding.js",
+    "install:full": "npm install && npm run build && npm link"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.0",
+    "yaml": "^2.4.0",
+    "uuid": "^9.0.0",
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "optionalEnv": {
+    "BW_CLIENTID": "Bitwarden API key ID (for automation - stored in .env only on trusted machines)",
+    "BW_CLIENTSECRET": "Bitwarden API key secret (for automation - stored in .env only on trusted machines)",
+    "BW_PASSWORD": "Bitwarden master password (alternative to session token)",
+    "BW_SESSION": "Bitwarden session token (from 'bw unlock --raw')",
+    "OP_SERVICE_ACCOUNT_TOKEN": "1Password service account token",
+    "BROWSER_SECURE_CONFIG": "Custom config file path",
+    "BROWSER_SECURE_TIMEOUT": "Session timeout override in seconds"
+  }
+}

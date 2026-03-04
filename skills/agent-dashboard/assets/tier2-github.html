@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #18181b;
+            --bg-card: #1a1a1d;
+            --bg-hover: #222225;
+            --border: #27272a;
+            --border-light: #3f3f46;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+            --accent-orange: #f97316;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        #password-overlay {
+            position: fixed; inset: 0;
+            background: var(--bg-primary);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .password-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+        }
+        .password-box h2 { font-size: 1.5rem; margin-bottom: 8px; }
+        .password-box p { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 24px; }
+        .password-box input {
+            width: 100%; padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+        .password-box input:focus { outline: none; border-color: var(--accent-blue); }
+        .password-box button {
+            width: 100%; padding: 12px 24px;
+            background: var(--accent-blue);
+            color: white; border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .password-box button:hover { opacity: 0.9; }
+        .password-error { color: var(--accent-red); font-size: 0.875rem; margin-top: 12px; display: none; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+        }
+        .logo h1 { font-size: 1.5rem; font-weight: 600; }
+        .header-status { display: flex; align-items: center; gap: 12px; }
+        .connection-status {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem; font-weight: 500;
+            color: var(--accent-yellow);
+            border-color: var(--accent-yellow);
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .last-updated { color: var(--text-muted); font-size: 0.875rem; }
+        .refresh-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover { background: var(--bg-hover); border-color: var(--border-light); color: var(--text-primary); }
+        .refresh-btn:active { transform: scale(0.97); }
+        .refresh-btn.loading { pointer-events: none; opacity: 0.6; }
+        .refresh-btn .spinner { display: none; animation: spin 1s linear infinite; }
+        .refresh-btn.loading .spinner { display: inline; }
+        .refresh-btn.loading .icon { display: none; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .alert-banner {
+            background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(249,115,22,0.15));
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+        .alert-banner.empty { display: none; }
+        .alert-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .alert-header h2 { font-size: 1rem; font-weight: 600; color: var(--accent-orange); }
+        .alert-items { display: flex; flex-direction: column; gap: 12px; }
+        .alert-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .alert-item-content { display: flex; align-items: center; gap: 12px; }
+        .priority {
+            padding: 4px 8px; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 500; text-transform: uppercase;
+        }
+        .priority.high { background: var(--accent-red); color: white; }
+        .priority.medium { background: var(--accent-orange); color: white; }
+        .priority.low { background: var(--accent-yellow); color: black; }
+        .alert-item a { color: var(--accent-blue); font-size: 0.875rem; text-decoration: none; }
+        .alert-item a:hover { text-decoration: underline; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-bottom: 24px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .card-header h2 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); }
+        .card-header .icon { font-size: 1.125rem; }
+        
+        .active-task {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .active-task:last-child { margin-bottom: 0; }
+        .active-indicator {
+            width: 10px; height: 10px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .active-task-info { flex: 1; }
+        .active-task-name { font-weight: 500; margin-bottom: 2px; }
+        .active-task-meta { font-size: 0.75rem; color: var(--text-muted); }
+        .empty-state {
+            color: var(--text-muted); font-size: 0.875rem;
+            padding: 20px; text-align: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .product-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .product-card:hover { background: var(--bg-hover); border-color: var(--border-light); }
+        .product-name { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+        .product-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem; font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .product-status.live { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .product-status.testing { background: rgba(234,179,8,0.15); color: var(--accent-yellow); }
+        .product-status.down { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .product-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .product-checked { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .cron-table { width: 100%; }
+        .cron-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .cron-row:hover { background: var(--bg-tertiary); }
+        .cron-row.has-error { background: rgba(239,68,68,0.08); }
+        .cron-name { font-weight: 500; font-size: 0.875rem; }
+        .cron-schedule { font-size: 0.75rem; color: var(--text-muted); }
+        .cron-status { font-size: 1rem; }
+        .cron-errors {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(239,68,68,0.2);
+            color: var(--accent-red);
+        }
+        .cron-error-detail {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 12px;
+            background: rgba(239,68,68,0.1);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            margin-top: 8px;
+        }
+        .cron-row.expanded .cron-error-detail { display: block; }
+        
+        .activity-list { display: flex; flex-direction: column; gap: 2px; }
+        .activity-item {
+            display: flex; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .activity-item:hover { background: var(--bg-tertiary); }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); min-width: 60px; }
+        .activity-event { font-size: 0.875rem; color: var(--text-secondary); }
+        
+        .stats-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .stat-pill {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+        .stat-pill .num { font-weight: 600; }
+        .stat-pill .label { color: var(--text-muted); }
+        
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            .card { padding: 20px; }
+            .cron-row { grid-template-columns: 1fr auto; }
+            .cron-schedule { display: none; }
+            .header-status { flex-direction: column; align-items: flex-end; gap: 8px; }
+        }
+        
+        @keyframes flash-update { 0% { background-color: rgba(34,197,94,0.2); } 100% { background-color: transparent; } }
+        .flash-update { animation: flash-update 1s ease-out; }
+    </style>
+</head>
+<body>
+    <!-- Password Protection -->
+    <div id="password-overlay">
+        <div class="password-box">
+            <h2>🔐 Mission Control</h2>
+            <p>Enter your PIN to access the dashboard</p>
+            <input type="password" id="pin-input" placeholder="••••••" maxlength="20" autofocus aria-label="PIN input">
+            <button onclick="checkPassword()">Access Dashboard</button>
+            <p class="password-error" id="password-error">Incorrect PIN. Try again.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="main-content" style="display: none;">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🚀</div>
+                <h1>Mission Control</h1>
+            </div>
+            <div class="header-status">
+                <button class="refresh-btn" onclick="forceUpdate()" id="refresh-btn" aria-label="Force update">
+                    <span class="icon">🔄</span>
+                    <span class="spinner">⟳</span>
+                    Update
+                </button>
+                <div class="connection-status">
+                    <span class="status-dot"></span>
+                    <span>Polling</span>
+                </div>
+                <div class="last-updated" id="last-updated-text">Loading...</div>
+            </div>
+        </header>
+
+        <div class="alert-banner" id="action-required">
+            <div class="alert-header">
+                <span>🚨</span>
+                <h2>Action Required</h2>
+            </div>
+            <div class="alert-items" id="action-items"></div>
+        </div>
+
+        <div class="stats-row" id="stats-row"></div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">⚡</span>
+                    <h2>Active Now</h2>
+                </div>
+                <div id="active-tasks"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📋</span>
+                    <h2>Recent Activity</h2>
+                </div>
+                <div class="activity-list" id="activity-list"></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <span class="icon">📊</span>
+                <h2>Products</h2>
+            </div>
+            <div class="product-grid" id="products-grid"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">⏰</span>
+                <h2>Cron Jobs</h2>
+            </div>
+            <div class="cron-table" id="cron-table"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION — Edit these values
+        // ============================================
+        const CONFIG = {
+            PIN: 'YOUR_PIN_HERE',  // Change this!
+            DATA_URL: './data/dashboard-data.json',  // Path to your JSON file
+            REFRESH_INTERVAL: 30000  // 30 seconds
+        };
+        // ============================================
+
+        let lastUpdateTime = null;
+        let updateTickerInterval;
+
+        function checkPassword() {
+            const input = document.getElementById('pin-input').value;
+            if (input === CONFIG.PIN) {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                sessionStorage.setItem('mc_authenticated', 'true');
+                initDashboard();
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+                document.getElementById('pin-input').value = '';
+                document.getElementById('pin-input').focus();
+            }
+        }
+
+        document.getElementById('pin-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        if (sessionStorage.getItem('mc_authenticated') === 'true') {
+            document.getElementById('password-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            initDashboard();
+        }
+
+        function updateLastUpdatedTicker() {
+            if (!lastUpdateTime) return;
+            const now = new Date();
+            const diffSecs = Math.floor((now - lastUpdateTime) / 1000);
+            let text;
+            if (diffSecs < 5) text = 'Just now';
+            else if (diffSecs < 60) text = `${diffSecs}s ago`;
+            else if (diffSecs < 3600) text = `${Math.floor(diffSecs / 60)}m ago`;
+            else text = `${Math.floor(diffSecs / 3600)}h ago`;
+            document.getElementById('last-updated-text').textContent = `Updated ${text}`;
+        }
+
+        async function fetchData() {
+            try {
+                const cacheBuster = `?_=${Date.now()}`;
+                const response = await fetch(CONFIG.DATA_URL + cacheBuster);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                lastUpdateTime = new Date(data.lastUpdated || Date.now());
+                renderDashboard(data);
+                document.getElementById('main-content').classList.add('flash-update');
+                setTimeout(() => document.getElementById('main-content').classList.remove('flash-update'), 1000);
+                return true;
+            } catch (err) {
+                console.error('Failed to fetch dashboard data:', err);
+                return false;
+            }
+        }
+
+        async function forceUpdate() {
+            const btn = document.getElementById('refresh-btn');
+            btn.classList.add('loading');
+            await fetchData();
+            setTimeout(() => btn.classList.remove('loading'), 500);
+        }
+
+        function initDashboard() {
+            fetchData();
+            updateLastUpdatedTicker();
+            updateTickerInterval = setInterval(updateLastUpdatedTicker, 1000);
+            setInterval(fetchData, CONFIG.REFRESH_INTERVAL);
+        }
+
+        function renderDashboard(data) {
+            const now = new Date();
+
+            // Action Required
+            const actionBanner = document.getElementById('action-required');
+            const actionItems = document.getElementById('action-items');
+            if (data.actionRequired && data.actionRequired.length > 0) {
+                actionBanner.classList.remove('empty');
+                actionItems.innerHTML = data.actionRequired.map(item => `
+                    <div class="alert-item">
+                        <div class="alert-item-content">
+                            <span class="priority ${item.priority}">${item.priority}</span>
+                            <span>${escapeHtml(item.title)}</span>
+                        </div>
+                        ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open →</a>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                actionBanner.classList.add('empty');
+            }
+
+            // Stats Row
+            const statsRow = document.getElementById('stats-row');
+            const enabledCrons = data.crons?.filter(c => c.status !== 'paused').length || 0;
+            const pausedCrons = data.crons?.filter(c => c.status === 'paused').length || 0;
+            const errorCrons = data.crons?.filter(c => c.errors > 0).length || 0;
+            statsRow.innerHTML = `
+                <div class="stat-pill"><span class="num">${data.products?.length || 0}</span><span class="label">Products</span></div>
+                <div class="stat-pill"><span class="num">${enabledCrons}</span><span class="label">Active Crons</span></div>
+                <div class="stat-pill"><span class="num">${pausedCrons}</span><span class="label">Paused</span></div>
+                ${errorCrons > 0 ? `<div class="stat-pill" style="border-color:var(--accent-red);"><span class="num" style="color:var(--accent-red);">${errorCrons}</span><span class="label">Errors</span></div>` : ''}
+            `;
+
+            // Active Now
+            const activeTasks = document.getElementById('active-tasks');
+            if (data.activeNow && data.activeNow.length > 0) {
+                activeTasks.innerHTML = data.activeNow.map(task => {
+                    const started = new Date(task.startedAt);
+                    const mins = Math.floor((now - started) / 60000);
+                    return `
+                        <div class="active-task">
+                            <div class="active-indicator"></div>
+                            <div class="active-task-info">
+                                <div class="active-task-name">${escapeHtml(task.task)}</div>
+                                <div class="active-task-meta">${escapeHtml(task.model || '')} · ${mins}m</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                activeTasks.innerHTML = '<div class="empty-state">✨ All quiet — no active tasks</div>';
+            }
+
+            // Products
+            const productsGrid = document.getElementById('products-grid');
+            if (data.products && data.products.length > 0) {
+                productsGrid.innerHTML = data.products.map(product => `
+                    <a href="${escapeHtml(product.url)}" target="_blank" rel="noopener" class="product-card">
+                        <div class="product-name">${escapeHtml(product.name)}</div>
+                        <div class="product-status ${product.status}">
+                            <span class="dot"></span>
+                            ${product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                        </div>
+                        <div class="product-checked">Checked ${formatTime(product.lastChecked)}</div>
+                    </a>
+                `).join('');
+            } else {
+                productsGrid.innerHTML = '<div class="empty-state">No products configured</div>';
+            }
+
+            // Cron Jobs
+            const cronTable = document.getElementById('cron-table');
+            if (data.crons && data.crons.length > 0) {
+                const sortedCrons = [...data.crons].sort((a, b) => {
+                    if (a.errors > 0 && b.errors === 0) return -1;
+                    if (b.errors > 0 && a.errors === 0) return 1;
+                    if (a.status === 'paused' && b.status !== 'paused') return 1;
+                    if (b.status === 'paused' && a.status !== 'paused') return -1;
+                    return 0;
+                });
+                cronTable.innerHTML = sortedCrons.map(cron => {
+                    const statusIcon = cron.status === 'ok' ? '✅' : cron.status === 'error' ? '❌' : cron.status === 'paused' ? '⏸️' : '⚪';
+                    return `
+                        <div class="cron-row ${cron.errors > 0 ? 'has-error' : ''}" onclick="this.classList.toggle('expanded')">
+                            <div>
+                                <div class="cron-name">${escapeHtml(cron.name)}</div>
+                                <div class="cron-schedule">${escapeHtml(cron.schedule)}</div>
+                            </div>
+                            <div class="cron-status">${statusIcon}</div>
+                            ${cron.errors > 0 ? `<div class="cron-errors">${cron.errors} errors</div>` : ''}
+                            ${cron.lastError ? `<div class="cron-error-detail">${escapeHtml(cron.lastError)}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                cronTable.innerHTML = '<div class="empty-state">No cron jobs configured</div>';
+            }
+
+            // Recent Activity
+            const activityList = document.getElementById('activity-list');
+            if (data.recentActivity && data.recentActivity.length > 0) {
+                activityList.innerHTML = data.recentActivity.slice(0, 10).map(activity => {
+                    const time = new Date(activity.time);
+                    const hours = time.getHours().toString().padStart(2, '0');
+                    const mins = time.getMinutes().toString().padStart(2, '0');
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-time">${hours}:${mins}</div>
+                            <div class="activity-event">${escapeHtml(activity.event)}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                activityList.innerHTML = '<div class="empty-state">No recent activity</div>';
+            }
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return 'never';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMins = Math.floor((now - date) / 60000);
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

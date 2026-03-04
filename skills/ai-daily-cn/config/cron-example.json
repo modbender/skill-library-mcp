@@ -1,0 +1,40 @@
+{
+  "_comment": "OpenClaw Cron 配置示例 - 每日 8:00 自动生成 AI 日报",
+  "_usage": "使用以下命令添加:",
+  "_command": "openclaw cron add --job cron-example.json",
+  
+  "jobs": [
+    {
+      "name": "ai-daily-morning",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "payload": {
+        "kind": "systemEvent",
+        "text": "📰 AI 日报定时任务：cd /home/admin/.openclaw/workspace/skills/ai-daily && bash scripts/generate.sh"
+      },
+      "sessionTarget": "main",
+      "delivery": {
+        "mode": "announce",
+        "channel": "default"
+      }
+    },
+    {
+      "name": "ai-daily-reminder",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 9 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "payload": {
+        "kind": "systemEvent",
+        "text": "☕ 早安！今日的 AI 大模型日报已生成，请查看 output/AI-Daily-$(date +%Y-%m-%d).md"
+      },
+      "sessionTarget": "main"
+    }
+  ]
+}

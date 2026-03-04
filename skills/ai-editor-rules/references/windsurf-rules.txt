@@ -1,0 +1,141 @@
+# Windsurf Rules — Mobile App (React Native)
+# Place this file in your project root as `.windsurfrules`
+
+## Project Context
+
+React Native mobile application with:
+- React Native 0.76 (New Architecture enabled)
+- TypeScript 5.7 strict mode
+- Expo SDK 52 (managed workflow)
+- Navigation: React Navigation 7
+- State: Zustand + TanStack Query
+- Backend: Supabase (PostgreSQL, Auth, Storage, Realtime)
+- Testing: Jest + React Native Testing Library
+
+## Code Style
+
+### TypeScript
+- Strict mode is ON. No `any`, no `@ts-ignore`, no non-null assertions (`!`).
+- Use `interface` for object shapes, `type` for unions/intersections.
+- Prefer `unknown` over `any` for untyped data, then narrow with type guards.
+- All function parameters and return types must be explicitly typed.
+
+### Component Patterns
+```tsx
+// Prefer: named export, props interface, destructured props
+interface UserCardProps {
+  user: User;
+  onPress: (userId: string) => void;
+  showAvatar?: boolean;  // optional with default
+}
+
+export function UserCard({ user, onPress, showAvatar = true }: UserCardProps) {
+  // Component body
+}
+```
+
+### Styling
+- Use `StyleSheet.create()` at the bottom of component files.
+- Never use inline styles for anything more than one property.
+- Use design tokens from `theme/` for colors, spacing, typography.
+- Support both light and dark mode via `useColorScheme()`.
+
+```tsx
+// Design tokens
+import { spacing, colors, typography } from '@/theme';
+
+const styles = StyleSheet.create({
+  container: {
+    padding: spacing.md,        // 16
+    backgroundColor: colors.background,
+  },
+  title: {
+    ...typography.heading2,
+    color: colors.textPrimary,
+  },
+});
+```
+
+### File Organization
+```
+src/
+├── app/                    # Expo Router screens
+│   ├── (tabs)/            # Tab navigation
+│   ├── (auth)/            # Auth flow screens
+│   └── _layout.tsx        # Root layout
+├── components/
+│   ├── ui/                # Design system primitives
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   └── index.ts       # Barrel export
+│   └── features/          # Domain-specific components
+│       ├── profile/
+│       └── feed/
+├── hooks/                 # Custom hooks
+│   ├── useAuth.ts
+│   └── useNotifications.ts
+├── stores/                # Zustand stores
+│   ├── authStore.ts
+│   └── settingsStore.ts
+├── services/              # API/Supabase calls
+│   ├── userService.ts
+│   └── supabase.ts
+├── theme/                 # Design tokens
+│   ├── colors.ts
+│   ├── spacing.ts
+│   └── typography.ts
+├── types/                 # Shared types
+└── utils/                 # Pure utility functions
+```
+
+### Naming Conventions
+- Files: PascalCase for components (`UserCard.tsx`), camelCase for everything else (`useAuth.ts`)
+- Components: PascalCase
+- Hooks: `use` prefix + PascalCase (`useAuth`, `useNotifications`)
+- Stores: camelCase + `Store` suffix (`authStore`, `settingsStore`)
+- Types: PascalCase, no `I` prefix (`User`, not `IUser`)
+- Test files: `ComponentName.test.tsx` (colocated)
+
+## Architecture Rules
+
+### State Management
+- **Server state**: TanStack Query (fetch, cache, sync)
+- **Client state**: Zustand (UI state, user preferences)
+- **Form state**: React Hook Form
+- Never duplicate server state in Zustand.
+- TanStack Query keys: `['users', userId]` — predictable, hierarchical.
+
+### Navigation
+- Type-safe navigation with React Navigation typed routes.
+- Deep linking configured for all public screens.
+- Screen names: PascalCase matching the component (`ProfileScreen`, `SettingsScreen`).
+
+### Performance
+- Use `React.memo()` for list items in FlatList.
+- Use `useCallback` for functions passed as props.
+- Images: use `expo-image` with proper `contentFit` and cache headers.
+- Lists: FlatList with `getItemLayout` for fixed-height items.
+- Avoid re-renders: split components so parent state changes don't re-render children.
+
+### Security
+- No secrets in the app bundle. Use Expo SecureStore for sensitive tokens.
+- Supabase: Row Level Security (RLS) enabled on all tables.
+- Validate all user input before sending to the backend.
+- Use certificate pinning for production API calls.
+
+## Testing
+- Colocated test files: `Button.test.tsx` next to `Button.tsx`.
+- Test behavior, not implementation. Don't test state internals.
+- Mock navigation, Supabase client, and native modules.
+- Snapshot tests only for design system components (ui/).
+- Name tests: `it('shows error message when login fails')`.
+
+## What NOT to Do
+- Do NOT use class components.
+- Do NOT use `StyleSheet.flatten()` — it defeats optimization.
+- Do NOT store navigation state in Zustand.
+- Do NOT make API calls directly from components. Go through services.
+- Do NOT use `console.log` — use a proper logger that's stripped in production.
+- Do NOT hardcode colors or spacing. Use theme tokens.
+- Do NOT use `setTimeout` for animation. Use Reanimated.
+- Do NOT install native modules without checking Expo compatibility first.

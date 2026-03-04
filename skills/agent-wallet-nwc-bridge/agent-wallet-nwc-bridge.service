@@ -1,0 +1,23 @@
+[Unit]
+Description=Nostr Wallet Connect (NIP-47) bridge for agent-wallet
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/agent-wallet-nwc-bridge
+# Relays + state path live in this file
+EnvironmentFile=%h/agent-wallet-nwc-bridge/nwc.env
+ExecStart=/usr/bin/node %h/agent-wallet-nwc-bridge/index.js run
+Restart=always
+RestartSec=3
+
+# Hardening (user service, no root anyway)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/agent-wallet-nwc-bridge
+
+[Install]
+WantedBy=default.target

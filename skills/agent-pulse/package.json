@@ -1,0 +1,69 @@
+{
+  "name": "@clawhub/agent-pulse",
+  "version": "2.2.0",
+  "description": "On-chain liveness signaling for autonomous agents on Base via the Agent Pulse protocol",
+  "author": "consensus-hq",
+  "license": "MIT",
+  "homepage": "https://x402pulse.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/consensus-hq/agent-pulse"
+  },
+  "keywords": [
+    "openclaw",
+    "skill",
+    "agent-pulse",
+    "liveness",
+    "heartbeat",
+    "base",
+    "evm",
+    "on-chain",
+    "autonomous-agents"
+  ],
+  "openclaw": {
+    "type": "skill",
+    "emoji": "💓",
+    "chain": "base",
+    "chainId": 8453,
+    "requires": {
+      "bins": ["curl", "jq", "cast"],
+      "env": ["PRIVATE_KEY"],
+      "optionalEnv": [
+        "BASE_RPC_URL",
+        "API_BASE",
+        "PULSE_AMOUNT",
+        "TTL_THRESHOLD",
+        "PULSE_REGISTRY_ADDRESS",
+        "PULSE_TOKEN_ADDRESS",
+        "X402_PAYMENT_HEADER",
+        "X402_HEADER_NAME"
+      ]
+    },
+    "security": {
+      "requiresPrivateKey": true,
+      "writesOnChain": true,
+      "maxApproval": "bounded-1000-pulse",
+      "externalAPIs": ["x402pulse.xyz"]
+    },
+    "contracts": {
+      "PulseToken": "0x21111B39A502335aC7e45c4574Dd083A69258b07",
+      "PulseRegistry": "0xe61C615743A02983A46aFF66Db035297e8a43846"
+    },
+    "api": "https://x402pulse.xyz",
+    "scripts": {
+      "setup": "scripts/setup.sh",
+      "pulse": "scripts/pulse.sh",
+      "auto-pulse": "scripts/auto-pulse.sh",
+      "status": "scripts/status.sh",
+      "monitor": "scripts/monitor.sh",
+      "config": "scripts/config.sh",
+      "health": "scripts/health.sh"
+    }
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "scripts/",
+    "references/"
+  ]
+}

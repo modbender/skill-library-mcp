@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=600">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 600px;
+      height: 400px;
+      background: #0a0f1e;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .card {
+      width: 600px;
+      height: 400px;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Left image panel ── */
+    .image-panel {
+      width: 280px;
+      height: 400px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bird-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: {{OBJECT_POSITION}};
+    }
+
+    /* Rarity glow at bottom of image */
+    .image-glow {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(to top, {{RARITY_COLOR}}30, transparent);
+      pointer-events: none;
+    }
+
+    /* ── Right info panel — solid dark background ── */
+    .info-panel {
+      flex: 1;
+      background: #0a0f1e;
+      padding: 26px 24px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+      border-left: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Decorative dots on info panel */
+    .info-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+    }
+
+    /* ── Rarity badge ── */
+    .rarity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: {{RARITY_COLOR}};
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px 4px 8px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+      width: fit-content;
+      box-shadow: 0 2px 12px {{RARITY_COLOR}}60;
+    }
+
+    /* ── Species names ── */
+    .common-name {
+      font-size: 24px;
+      font-weight: 900;
+      color: #f1f5f9;
+      line-height: 1.05;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .scientific-name {
+      font-size: 11px;
+      color: #64748b;
+      font-style: italic;
+      margin-bottom: 14px;
+    }
+
+    /* ── Accent line ── */
+    .accent-line {
+      width: 36px;
+      height: 3px;
+      background: {{RARITY_COLOR}};
+      border-radius: 2px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 8px {{RARITY_COLOR}}80;
+    }
+
+    /* ── Meta grid ── */
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .meta-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #334155;
+      min-width: 52px;
+    }
+
+    .meta-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    /* ── Fun fact box ── */
+    .fun-fact {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left: 3px solid {{RARITY_COLOR}};
+      padding: 9px 12px;
+      font-size: 11px;
+      line-height: 1.55;
+      color: #64748b;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .life-count {
+      font-size: 10px;
+      color: #334155;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .birdfolio-logo {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #334155;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .logo-bird {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="image-panel">
+      <img class="bird-image" src="{{BIRD_IMAGE_SRC}}" alt="{{COMMON_NAME}}">
+      <div class="image-glow"></div>
+    </div>
+
+    <div class="info-panel">
+      <div class="rarity-badge">{{RARITY_EMOJI}} {{RARITY}}</div>
+      <div class="common-name">{{COMMON_NAME}}</div>
+      <div class="scientific-name">{{SCIENTIFIC_NAME}}</div>
+      <div class="accent-line"></div>
+
+      <div class="meta">
+        <div class="meta-row">
+          <span class="meta-label">Region</span>
+          <span class="meta-value">{{REGION}}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Spotted</span>
+          <span class="meta-value">{{DATE}}</span>
+        </div>
+      </div>
+
+      <div class="fun-fact">{{FUN_FACT}}</div>
+
+      <div class="footer">
+        <span class="life-count">Bird #{{LIFE_COUNT}} in your collection</span>
+        <span class="birdfolio-logo">
+          <span class="logo-bird">&#x1F985;</span>
+          Birdfolio
+        </span>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

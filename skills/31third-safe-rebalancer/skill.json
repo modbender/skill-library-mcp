@@ -1,0 +1,44 @@
+{
+  "name": "31third-safe-rebalancer",
+  "version": "0.1.3",
+  "entrypoint": "dist/index.js",
+  "runtime": "node",
+  "description": "Automates Safe portfolio rebalancing through the 31Third ExecutorModule with policy-aware drift checks.",
+  "tools": [
+    {
+      "name": "check_drift",
+      "description": "Reads on-chain balances and policy targets, then computes weight drift against configured allocation.",
+      "handler": "check_drift"
+    },
+    {
+      "name": "validate_trade",
+      "description": "Validates proposed trades against asset-universe and slippage policy constraints.",
+      "handler": "validate_trade"
+    },
+    {
+      "name": "automation",
+      "description": "Runs a 6-hour heartbeat drift monitor and returns a notification payload when threshold is breached.",
+      "handler": "automation"
+    },
+    {
+      "name": "execute_rebalance",
+      "description": "Simulates and executes a validated rebalance trade batch through the 31Third ExecutorModule.",
+      "handler": "execute_rebalance"
+    },
+    {
+      "name": "plan_rebalance",
+      "description": "Generates a policy-aware rebalance plan via 31Third SDK using deployed target allocations.",
+      "handler": "plan_rebalance"
+    },
+    {
+      "name": "rebalance_now",
+      "description": "One-step rebalance that checks drift, plans with SDK from on-chain policies, then executes through ExecutorModule.",
+      "handler": "rebalance_now"
+    },
+    {
+      "name": "help",
+      "description": "Explains skill capabilities, required environment variables, and setup path via the 31Third Safe policy wizard.",
+      "handler": "help"
+    }
+  ]
+}

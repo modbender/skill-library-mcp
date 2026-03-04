@@ -1,0 +1,74 @@
+{
+    "name": "@arkade-os/skill",
+    "version": "0.1.5",
+    "description": "Arkade SDK skills for agent integration - send and receive Bitcoin over Arkade and Lightning, swap USDC/USDT via LendaSwap",
+    "type": "module",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js",
+            "default": "./dist/esm/index.js"
+        }
+    },
+    "bin": {
+        "arkade": "./cli/arkade.mjs"
+    },
+    "files": [
+        "dist",
+        "cli",
+        "SKILL.md"
+    ],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "scripts": {
+        "build": "rimraf dist && pnpm run build:esm && pnpm run build:cjs && pnpm run build:types",
+        "build:esm": "tsc -p tsconfig.esm.json --outDir dist/esm",
+        "build:cjs": "tsc -p tsconfig.cjs.json --outDir dist/cjs",
+        "build:types": "tsc -p tsconfig.json --outDir dist/types --emitDeclarationOnly",
+        "format": "prettier --write src cli",
+        "lint": "prettier --check src cli",
+        "prepublishOnly": "pnpm run build"
+    },
+    "dependencies": {
+        "@arkade-os/boltz-swap": "^0.2.18",
+        "@arkade-os/sdk": "^0.3.12",
+        "@lendasat/lendaswap-sdk-pure": "^0.0.2"
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.0",
+        "prettier": "^3.6.0",
+        "rimraf": "^6.0.0",
+        "typescript": "^5.9.0"
+    },
+    "skill": {
+        "configPaths": [
+            "~/.arkade-wallet/config.json",
+            "~/.arkade-wallet/lendaswap.db"
+        ]
+    },
+    "keywords": [
+        "bitcoin",
+        "arkade",
+        "lightning",
+        "skill",
+        "agent",
+        "cli",
+        "mcp",
+        "lendaswap",
+        "usdc",
+        "usdt",
+        "stablecoin"
+    ],
+    "author": "Ark Labs",
+    "license": "MIT",
+    "packageManager": "pnpm@10.20.0",
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

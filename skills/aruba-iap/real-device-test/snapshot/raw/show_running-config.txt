@@ -1,0 +1,224 @@
+version 8.6.0.0-8.6.0
+virtual-controller-country CN
+virtual-controller-key 2fb36d2a01da23e1d3c47eb060a8250cbb1a75c14dafc22c03
+name SetMeUp-C6:D6:E6
+terminal-access
+clock timezone none 00 00
+rf-band all
+report-rssi-to-central unassociated-and-associated-clients
+
+allow-new-aps
+
+allowed-ap 18:64:72:c6:d6:e6
+allowed-ap 20:4c:03:24:e7:38
+allowed-ap f0:5c:19:c8:73:aa
+
+
+snmp-server community 8f981a1bd252ce3b03822e4038e3206e
+snmp-server host 192.168.11.11 version 2c public inform
+
+arm
+ wide-bands 5ghz
+ 80mhz-support
+ min-tx-power 127
+ max-tx-power 127
+ band-steering-mode prefer-5ghz
+ air-time-fairness-mode default-access
+ client-aware
+ scanning
+ client-match
+
+
+syslog-level warn ap-debug
+syslog-level warn network
+syslog-level warn security
+syslog-level warn system
+syslog-level warn user
+syslog-level warn user-debug
+syslog-level warn wireless
+
+
+
+extended-ssid
+
+
+
+
+
+
+
+
+
+
+
+
+
+hash-mgmt-password
+hash-mgmt-user admin password hash 1ef68a4502699f3503006a5518133db6305205f196df001a1b2d93c947e7457a038778d113
+
+
+
+wlan access-rule default_wired_port_profile
+ index 0
+ rule any any match any any any permit
+
+wlan access-rule wired-SetMeUp
+ index 1
+ rule masterip 0.0.0.0 match tcp 80 80 permit
+ rule masterip 0.0.0.0 match tcp 4343 4343 permit
+ rule any any match udp 67 68 permit
+ rule any any match udp 53 53 permit
+
+wlan access-rule Aruba-IAP
+ utf8
+ index 2
+ rule any any match any any any permit
+
+wlan ssid-profile Aruba-IAP
+ enable
+ index 0
+ type employee
+ essid ArubaCloud
+ utf8
+ wpa-passphrase d15e0978a5a37eacd6bfa7c6ccad05500bb8936822d3c480
+ opmode wpa2-psk-aes
+ max-authentication-failures 0
+ vlan 1
+ auth-server InternalServer
+ rf-band all
+ captive-portal disable
+ dtim-period 1
+ broadcast-filter none
+ dmo-channel-utilization-threshold 90
+ local-probe-req-thresh 0
+ max-clients-threshold 64
+
+auth-survivability cache-time-out 24
+
+
+
+dpi
+
+wlan auth-server cppm
+ ip 192.168.11.11
+ port 1812
+ acctport 1813
+ key 3fad03aa7e168657387ed2b44d8dba731d8e53564f0d4191
+ nas-id mac
+
+wlan captive-portal
+ background-color 16777215
+ banner-color 15329769
+ decoded-texts banner/terms/policy
+ banner-text "Welcome to Guest Network"
+ terms-of-use "This network is not secure and use it at your own risk."
+ use-policy "Please read and accept terms and conditions and then login."
+
+wlan external-captive-portal
+ server localhost
+ port 80
+ url "/"
+ auth-text "Authenticated"
+ auto-whitelist-disable
+ https
+
+
+blacklist-time 3600
+auth-failure-blacklist-time 3600
+
+
+ids
+ wireless-containment none
+
+
+wired-port-profile wired-SetMeUp
+ switchport-mode access
+ allowed-vlan all
+ native-vlan guest
+ no shutdown
+ access-rule-name wired-SetMeUp
+ speed auto
+ duplex auto
+ no poe
+ type guest
+ captive-portal disable
+ no dot1x
+
+wired-port-profile default_wired_port_profile
+ switchport-mode trunk
+ allowed-vlan all
+ native-vlan 1
+ shutdown
+ access-rule-name default_wired_port_profile
+ speed auto
+ duplex full
+ no poe
+ type employee
+ captive-portal disable
+ no dot1x
+
+
+enet0-port-profile default_wired_port_profile
+
+uplink
+ preemption
+ enforce none
+ failover-internet-pkt-lost-cnt 10
+ failover-internet-pkt-send-freq 30
+ failover-vpn-timeout 180
+
+
+
+airgroup
+ disable
+
+airgroupservice airplay
+ disable
+ description AirPlay
+
+airgroupservice airprint
+ disable
+ description AirPrint
+
+airgroupservice DIAL
+ disable
+
+airgroupservice remotemgmt
+ disable
+
+airgroupservice AmazonTV
+ disable
+
+airgroupservice allowall
+ disable
+
+airgroupservice googlecast
+ disable
+
+airgroupservice itunes
+ disable
+
+airgroupservice sharing
+ disable
+
+airgroupservice chat
+ disable
+
+airgroupservice "DLNA Print"
+ disable
+
+airgroupservice "DLNA Media"
+ disable
+
+
+
+
+
+clarity
+ inline-sta-stats
+ inline-auth-stats
+ inline-dhcp-stats
+ inline-dns-stats
+
+cluster-security
+ allow-low-assurance-devices

@@ -1,5 +1,6 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { parseFrontmatter } from "../src/skill-index.js";
 
 const SKILLS_DIR = process.argv[2] || join(process.cwd(), "skills");
@@ -17,19 +18,26 @@ async function isDirectory(path: string): Promise<boolean> {
   }
 }
 
-async function validateSkill(skillPath: string, name: string): Promise<Violation[]> {
+interface SkillValidation {
+  violations: Violation[];
+  /** Hash of name+description for exact duplicate detection */
+  contentHash?: string;
+}
+
+async function validateSkill(skillPath: string, name: string): Promise<SkillValidation> {
   const violations: Violation[] = [];
 
   // Must have SKILL.md
-  let skillMdPath = join(skillPath, "SKILL.md");
+  const skillMdPath = join(skillPath, "SKILL.md");
   try {
     await stat(skillMdPath);
   } catch {
     violations.push({ skill: name, issue: "missing SKILL.md" });
-    return violations;
+    return { violations };
   }
 
   // SKILL.md must have valid frontmatter with name and description
+  let contentHash: string | undefined;
   try {
     const content = await readFile(skillMdPath, "utf-8");
     const fm = parseFrontmatter(content);
@@ -38,12 +46,15 @@ async function validateSkill(skillPath: string, name: string): Promise<Violation
     } else {
       if (!fm.name) violations.push({ skill: name, issue: "frontmatter missing 'name'" });
       if (!fm.description) violations.push({ skill: name, issue: "frontmatter missing 'description'" });
+      // Hash name+description for exact duplicate detection
+      const key = `${fm.name.toLowerCase().trim()}::${fm.description.toLowerCase().trim()}`;
+      contentHash = createHash("sha256").update(key).digest("hex");
     }
   } catch (err) {
     violations.push({ skill: name, issue: `cannot read SKILL.md: ${err}` });
   }
 
-  return violations;
+  return { violations, contentHash };
 }
 
 async function main() {
@@ -51,13 +62,34 @@ async function main() {
   const allViolations: Violation[] = [];
   let skillCount = 0;
 
+  // Map hash → list of dir names for exact duplicate detection
+  const hashToSkills = new Map<string, string[]>();
+
   for (const name of entries) {
     const skillPath = join(SKILLS_DIR, name);
     if (!(await isDirectory(skillPath))) continue;
     skillCount++;
 
-    const violations = await validateSkill(skillPath, name);
+    const { violations, contentHash } = await validateSkill(skillPath, name);
     allViolations.push(...violations);
+
+    if (contentHash) {
+      const existing = hashToSkills.get(contentHash) ?? [];
+      existing.push(name);
+      hashToSkills.set(contentHash, existing);
+    }
+  }
+
+  // Check for exact duplicates (same name + description hash)
+  for (const [, skills] of hashToSkills) {
+    if (skills.length > 1) {
+      for (const skill of skills) {
+        allViolations.push({
+          skill,
+          issue: `exact duplicate (same name+description) with: ${skills.filter((s) => s !== skill).join(", ")}`,
+        });
+      }
+    }
   }
 
   if (allViolations.length === 0) {

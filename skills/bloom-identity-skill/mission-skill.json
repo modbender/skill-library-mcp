@@ -1,0 +1,74 @@
+{
+  "name": "bloom-mission-discovery",
+  "version": "1.0.0",
+  "description": "Discover Bloom Protocol missions matched to your taste profile. Heartbeat tracking, taste-based scoring, submission, and reward status.",
+  "homepage": "https://bloomprotocol.ai",
+  "author": "Bloom Protocol",
+  "license": "MIT",
+  "openclaw": {
+    "emoji": "🎯",
+    "triggers": [
+      "discover bloom missions",
+      "find missions for me",
+      "show active missions",
+      "bloom missions",
+      "check mission status"
+    ],
+    "execution": {
+      "type": "script",
+      "entrypoint": "scripts/missions.sh",
+      "args": ["--wallet", "$OPENCLAW_WALLET_ADDRESS"]
+    },
+    "requirements": {
+      "node": ">=18.0.0",
+      "bins": ["node", "npx"]
+    }
+  },
+  "environment": {
+    "required": [
+      {
+        "key": "BLOOM_API_URL",
+        "description": "Bloom Protocol API base URL",
+        "default": "https://api.bloomprotocol.ai"
+      }
+    ],
+    "optional": [
+      {
+        "key": "BLOOM_DASHBOARD_URL",
+        "description": "Bloom dashboard URL for mission links",
+        "default": "https://bloomprotocol.ai"
+      },
+      {
+        "key": "OPENCLAW_WALLET_ADDRESS",
+        "description": "Agent wallet address for heartbeat tracking"
+      },
+      {
+        "key": "OPENCLAW_AGENT_USER_ID",
+        "description": "Agent user ID for taste-profile matching (from /bloom)"
+      }
+    ]
+  },
+  "permissions": {
+    "network": [
+      "https://api.bloomprotocol.ai"
+    ],
+    "filesystem": ["read"],
+    "execution": ["node", "npx"]
+  },
+  "installation": {
+    "steps": [
+      {
+        "action": "clone",
+        "source": "https://github.com/unicornbloom/bloom-identity-skill.git"
+      },
+      {
+        "action": "install_dependencies",
+        "command": "npm install"
+      },
+      {
+        "action": "verify",
+        "command": "npx tsx src/mission-cli.ts --help"
+      }
+    ]
+  }
+}

@@ -13,7 +13,7 @@ let index: SearchIndex;
 
 beforeAll(async () => {
   index = await buildIndex(skillsDir);
-});
+}, 120_000);
 
 describe("integration: real skills/ directory", () => {
   it("indexes all skills (expect ≥690)", () => {
@@ -136,7 +136,7 @@ describe("integration: search relevance", () => {
     expect(hasAiSkill).toBe(true);
   });
 
-  it("every skill is findable by its own name", () => {
+  it("every skill is findable by its own name", { timeout: 120_000 }, () => {
     const unfindable: string[] = [];
     for (const entry of index.entries) {
       const results = searchSkills(index, entry.frontmatter.name);

@@ -1,0 +1,68 @@
+{
+  "setupComplete": false,
+  "prerequisites": {
+    "python": {
+      "required": true,
+      "installed": false,
+      "description": "Python 3.9+ (preferably Homebrew Python 3.11+ to avoid urllib3/LibreSSL warnings)"
+    },
+    "alpacaPy": {
+      "required": true,
+      "installed": false,
+      "description": "alpaca-py Python package installed"
+    },
+    "pytz": {
+      "required": true,
+      "installed": false,
+      "description": "pytz Python package (dependency of alpaca-py)"
+    },
+    "apiKeys": {
+      "required": true,
+      "configured": false,
+      "description": "ALPACA_API_KEY, ALPACA_SECRET_KEY, and ALPACA_PAPER environment variables configured"
+    },
+    "alpacaCommand": {
+      "required": true,
+      "installed": false,
+      "description": "alpaca CLI script accessible in PATH or via full path"
+    }
+  },
+  "setupInstructions": [
+    "1. (Recommended) Install Homebrew Python to avoid urllib3/LibreSSL warnings:",
+    "   brew install python@3.11",
+    "2. Install alpaca-py package:",
+    "   /opt/homebrew/bin/pip3.11 install alpaca-py (Homebrew Python)",
+    "   OR pip3 install alpaca-py (system Python)",
+    "3. Install pytz if missing:",
+    "   /opt/homebrew/bin/pip3.11 install pytz (Homebrew Python)",
+    "   OR pip3 install pytz (system Python)",
+    "4. Configure API credentials (interactive):",
+    "   Run: alpaca auth",
+    "   This will prompt for API Key, Secret Key, and trading mode (Paper/Live)",
+    "   Credentials are saved to your shell config (~/.zshrc, ~/.bashrc, or ~/.profile)",
+    "5. Get API keys from https://alpaca.markets (Dashboard → API Keys)",
+    "   - Use Paper Trading keys for testing (virtual $100k, no real money)",
+    "   - Use Live Trading keys only after thorough testing",
+    "6. If using Homebrew Python, update the alpaca script shebang:",
+    "   sed -i '' '1s|#!/usr/bin/env python3|#!/opt/homebrew/bin/python3.11|' ~/.openclaw/workspace/skills/alpaca-py-cli/scripts/alpaca",
+    "7. Test installation:",
+    "   alpaca clock (check market status)",
+    "   alpaca account (check account info)",
+    "8. Update this setup.json: set all 'installed'/'configured' to true and 'setupComplete' to true"
+  ],
+  "verifySetup": "Run 'alpaca clock' to verify the CLI works and shows market status without errors",
+  "troubleshooting": {
+    "urllib3Warning": {
+      "issue": "NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently using LibreSSL",
+      "solution": "Install and use Homebrew Python 3.11+ which uses OpenSSL instead of LibreSSL. See setup instructions step 1 and 6."
+    },
+    "missingPytz": {
+      "issue": "ModuleNotFoundError: No module named 'pytz'",
+      "solution": "Install pytz: pip3 install pytz (or pip3.11 if using Homebrew Python)"
+    },
+    "commandNotFound": {
+      "issue": "alpaca: command not found",
+      "solution": "Use full path: ~/.openclaw/workspace/skills/alpaca-py-cli/scripts/alpaca, or add scripts directory to PATH"
+    }
+  }
+}

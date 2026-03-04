@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClawMeter</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Neutral scale — warm-tinted like Linear */
+  --gray-50:  #fafafa;
+  --gray-100: #f4f4f5;
+  --gray-200: #e4e4e7;
+  --gray-300: #d4d4d8;
+  --gray-400: #a1a1aa;
+  --gray-500: #71717a;
+  --gray-600: #52525b;
+  --gray-700: #3f3f46;
+  --gray-800: #27272a;
+  --gray-850: #1e1e22;
+  --gray-900: #18181b;
+  --gray-950: #0c0c0e;
+
+  /* Accent — violet (Vercel-ish but distinctive) */
+  --violet-50:  #f5f3ff;
+  --violet-100: #ede9fe;
+  --violet-200: #ddd6fe;
+  --violet-400: #a78bfa;
+  --violet-500: #8b5cf6;
+  --violet-600: #7c3aed;
+  --violet-700: #6d28d9;
+
+  /* Semantic */
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --amber-400:   #fbbf24;
+  --amber-500:   #f59e0b;
+  --rose-400:    #fb7185;
+  --rose-500:    #f43f5e;
+  --sky-400:     #38bdf8;
+  --sky-500:     #0ea5e9;
+
+  /* Surfaces */
+  --bg:       var(--gray-950);
+  --surface:  var(--gray-900);
+  --surface2: var(--gray-850);
+  --border:   var(--gray-800);
+  --border-subtle: rgba(255,255,255,0.06);
+
+  /* Text */
+  --text-primary:   var(--gray-50);
+  --text-secondary: var(--gray-400);
+  --text-tertiary:  var(--gray-500);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ─── Sidebar ─── */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+}
+
+.sidebar-brand {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.sidebar-brand h1 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-brand .logo {
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, var(--violet-500), var(--violet-700));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+.sidebar-brand .version {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.sidebar nav { flex: 1; padding: 8px 12px; }
+
+.nav-section {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 8px 6px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+
+.nav-item:hover { background: var(--border-subtle); color: var(--text-primary); }
+.nav-item.active { background: rgba(139,92,246,0.12); color: var(--violet-400); }
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-footer .status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-tertiary);
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  background: var(--emerald-500);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--emerald-500);
+}
+
+/* ─── Main content ─── */
+.main { flex: 1; margin-left: 240px; }
+
+.topbar {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(12px);
+  background: rgba(24,24,27,0.8);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar h2 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.topbar .breadcrumb {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.btn:hover { background: var(--surface2); border-color: var(--gray-700); }
+
+.btn-primary {
+  background: var(--violet-600);
+  border-color: var(--violet-600);
+  color: white;
+}
+
+.btn-primary:hover { background: var(--violet-700); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover { background: var(--border-subtle); color: var(--text-primary); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-green { background: rgba(16,185,129,0.12); color: var(--emerald-400); }
+.badge-amber { background: rgba(245,158,11,0.12); color: var(--amber-400); }
+.badge-rose  { background: rgba(244,63,94,0.12);  color: var(--rose-400); }
+
+/* ─── Page ─── */
+.page { padding: 28px 32px; max-width: 1280px; }
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ─── Stat Cards ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--gray-700); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: transparent;
+}
+
+.stat-card.accent::before {
+  background: linear-gradient(90deg, var(--violet-500), transparent);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-sub .pct {
+  font-weight: 600;
+}
+
+.stat-sub .pct.ok { color: var(--emerald-400); }
+.stat-sub .pct.warn { color: var(--amber-400); }
+.stat-sub .pct.danger { color: var(--rose-400); }
+
+/* Progress bar for budget */
+.budget-bar {
+  height: 3px;
+  background: var(--gray-800);
+  border-radius: 2px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.budget-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ─── Panels ─── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.grid-3-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-body { padding: 20px; }
+.panel-body.flush { padding: 0; }
+
+/* ─── Charts ─── */
+.chart-wrap {
+  height: 260px;
+  padding: 16px 20px 20px;
+}
+
+/* ─── Tables ─── */
+table { width: 100%; border-collapse: collapse; }
+
+th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+
+td {
+  padding: 12px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+.td-primary { color: var(--text-primary); font-weight: 500; }
+
+.cost {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--emerald-400);
+}
+
+.mono {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.model-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(139,92,246,0.1);
+  color: var(--violet-400);
+  white-space: nowrap;
+}
+
+.model-tag.openai { background: rgba(14,165,233,0.1); color: var(--sky-400); }
+.model-tag.google { background: rgba(52,211,153,0.1); color: var(--emerald-400); }
+
+/* ─── Donut legend override ─── */
+.donut-stats { padding: 16px 20px; }
+.donut-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px;
+}
+.donut-stat-row:last-child { border-bottom: none; }
+.donut-stat-label {
+  display: flex; align-items: center; gap: 8px;
+}
+.donut-dot {
+  width: 8px; height: 8px; border-radius: 2px;
+}
+.donut-stat-value { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.donut-stat-pct { color: var(--text-tertiary); font-size: 12px; margin-left: 8px; }
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3-1 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .page { padding: 20px 16px; }
+  .topbar { padding: 0 16px; }
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeIn 0.3s ease forwards; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-800) 25%, var(--gray-700) 50%, var(--gray-800) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+  height: 20px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-700); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-600); }
+
+/* ─── Empty state ─── */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.empty .icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1><span class="logo">⚡</span> ClawMeter</h1>
+      <div class="version">v0.1.0 · MVP</div>
+    </div>
+    <nav>
+      <div class="nav-section">Overview</div>
+      <a class="nav-item active"><span class="icon">📊</span> Dashboard</a>
+      <a class="nav-item" onclick="scrollTo('#sessions-section')"><span class="icon">💬</span> Sessions</a>
+      <a class="nav-item" onclick="scrollTo('#models-section')"><span class="icon">🤖</span> Models</a>
+      <div class="nav-section">Monitoring</div>
+      <a class="nav-item" onclick="scrollTo('#alerts-section')"><span class="icon">🔔</span> Alerts</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="watch-status">Watching logs</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Dashboard</h2>
+      </div>
+      <div class="topbar-right">
+        <span id="last-updated" style="font-size:12px; color:var(--text-tertiary)"></span>
+        <button class="btn" onclick="loadAll()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 8a7 7 0 0113.36-2.94M15 8A7 7 0 011.64 10.94"/><path d="M15 2v4h-4M1 14v-4h4"/></svg>
+          Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="page">
+      <div class="page-header animate-in">
+        <h1>Usage & Spending</h1>
+        <p>Track your OpenClaw token usage and API costs in real time.</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="skeleton" style="width:60%;margin-bottom:12px"></div><div class="skeleton" style="width:40%;height:32px"></div></div>
+        <div class="stat-card"><div class="skeleton" style="width:60%;margin-bottom:12px"></div><div class="skeleton" style="width:40%;height:32px"></div></div>
+        <div class="stat-card"><div class="skeleton" style="width:60%;margin-bottom:12px"></div><div class="skeleton" style="width:40%;height:32px"></div></div>
+        <div class="stat-card"><div class="skeleton" style="width:60%;margin-bottom:12px"></div><div class="skeleton" style="width:40%;height:32px"></div></div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid-3-1" id="charts-section">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><rect x="1" y="5" width="3" height="10" rx="1"/><rect x="6.5" y="1" width="3" height="14" rx="1"/><rect x="12" y="8" width="3" height="7" rx="1"/></svg>
+              Daily Spend
+            </span>
+            <select id="days-select" class="btn btn-ghost" style="font-size:12px;padding:4px 8px" onchange="loadDaily()">
+              <option value="7">7 days</option>
+              <option value="14">14 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="90">90 days</option>
+            </select>
+          </div>
+          <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+        </div>
+        <div class="panel" id="models-section">
+          <div class="panel-header">
+            <span class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M8 1v7l5 3"/></svg>
+              Cost by Model
+            </span>
+          </div>
+          <div class="chart-wrap" style="height:160px"><canvas id="modelChart"></canvas></div>
+          <div class="donut-stats" id="model-legend"></div>
+        </div>
+      </div>
+
+      <!-- Tables -->
+      <div class="grid-2" id="sessions-section">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><path d="M4 1h8l3 4v10H1V5z"/><path d="M1 5h14"/></svg>
+              Top Sessions by Cost
+            </span>
+          </div>
+          <div class="panel-body flush">
+            <table><thead id="top-thead"></thead><tbody id="top-sessions"></tbody></table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l2.5 2.5"/></svg>
+              Recent Sessions
+            </span>
+          </div>
+          <div class="panel-body flush">
+            <table><thead id="recent-thead"></thead><tbody id="recent-sessions"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div id="alerts-section" class="panel" style="margin-bottom:28px">
+        <div class="panel-header">
+          <span class="panel-title">🔔 Budget Alerts</span>
+        </div>
+        <div class="panel-body flush" id="alerts-body">
+          <div class="empty"><div class="icon">🎉</div>No budget alerts triggered</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function fmt(n) {
+  if (n === 0) return '$0.00';
+  if (n < 0.01) return '$' + n.toFixed(4);
+  return '$' + n.toFixed(2);
+}
+
+function fmtTokens(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function timeAgo(ts) {
+  const d = Date.now() - new Date(ts).getTime();
+  if (d < 60000) return 'just now';
+  if (d < 3600000) return Math.floor(d / 60000) + 'm ago';
+  if (d < 86400000) return Math.floor(d / 3600000) + 'h ago';
+  return Math.floor(d / 86400000) + 'd ago';
+}
+
+function budgetColor(pct) {
+  if (pct > 100) return { cls: 'danger', bg: 'var(--rose-500)' };
+  if (pct > 75) return { cls: 'warn', bg: 'var(--amber-500)' };
+  return { cls: 'ok', bg: 'var(--emerald-500)' };
+}
+
+function modelTagClass(model) {
+  if (!model) return '';
+  if (model.includes('gpt') || model.includes('o1') || model.includes('o3') || model.includes('o4')) return 'openai';
+  if (model.includes('gemini')) return 'google';
+  return '';
+}
+
+function scrollTo(sel) {
+  document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function api(path) { return (await fetch(path)).json(); }
+
+let dailyChart, modelChart;
+
+// Chart.js global config
+Chart.defaults.color = '#71717a';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+
+async function loadSummary() {
+  const d = await api('/api/summary');
+  const pctD = d.budgetDaily > 0 ? (d.today / d.budgetDaily * 100) : 0;
+  const pctM = d.budgetMonthly > 0 ? (d.month / d.budgetMonthly * 100) : 0;
+  const dc = budgetColor(pctD);
+  const mc = budgetColor(pctM);
+
+  $('#stats-grid').innerHTML = `
+    <div class="stat-card accent animate-in">
+      <div class="stat-label">Today's spend</div>
+      <div class="stat-value">${fmt(d.today)}</div>
+      <div class="stat-sub"><span class="pct ${dc.cls}">${pctD.toFixed(0)}%</span> of ${fmt(d.budgetDaily)} daily budget</div>
+      <div class="budget-bar"><div class="budget-bar-fill" style="width:${Math.min(pctD,100)}%;background:${dc.bg}"></div></div>
+    </div>
+    <div class="stat-card animate-in" style="animation-delay:50ms">
+      <div class="stat-label">This week</div>
+      <div class="stat-value">${fmt(d.week)}</div>
+      <div class="stat-sub">${d.sessions} sessions</div>
+    </div>
+    <div class="stat-card animate-in" style="animation-delay:100ms">
+      <div class="stat-label">This month</div>
+      <div class="stat-value">${fmt(d.month)}</div>
+      <div class="stat-sub"><span class="pct ${mc.cls}">${pctM.toFixed(0)}%</span> of ${fmt(d.budgetMonthly)} monthly budget</div>
+      <div class="budget-bar"><div class="budget-bar-fill" style="width:${Math.min(pctM,100)}%;background:${mc.bg}"></div></div>
+    </div>
+    <div class="stat-card animate-in" style="animation-delay:150ms">
+      <div class="stat-label">API calls</div>
+      <div class="stat-value">${fmtTokens(d.messages)}</div>
+      <div class="stat-sub">All time: ${fmt(d.allTime)}</div>
+    </div>
+  `;
+}
+
+async function loadDaily() {
+  const days = parseInt($('#days-select').value);
+  const rows = await api(`/api/daily?days=${days}`);
+  if (!rows.length) return;
+
+  const labels = rows.map(r => {
+    const d = new Date(r.date + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  });
+  const data = rows.map(r => r.cost);
+
+  if (dailyChart) dailyChart.destroy();
+  dailyChart = new Chart($('#dailyChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map(v => v > 5 ? 'rgba(244,63,94,0.6)' : 'rgba(139,92,246,0.5)'),
+        hoverBackgroundColor: data.map(v => v > 5 ? 'rgba(244,63,94,0.8)' : 'rgba(139,92,246,0.7)'),
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 32,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#27272a',
+          borderColor: '#3f3f46',
+          borderWidth: 1,
+          titleFont: { weight: '600' },
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: { label: ctx => fmt(ctx.raw) }
+        }
+      },
+      scales: {
+        y: {
+          ticks: { callback: v => '$' + v.toFixed(v < 1 ? 2 : 0), maxTicksLimit: 5 },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+        },
+        x: {
+          grid: { display: false },
+          ticks: { maxRotation: 0 },
+        }
+      }
+    }
+  });
+}
+
+async function loadModels() {
+  const rows = await api('/api/models');
+  if (!rows.length) return;
+
+  const colors = ['#8b5cf6', '#10b981', '#0ea5e9', '#f59e0b', '#f43f5e', '#ec4899', '#6366f1'];
+  const total = rows.reduce((s, r) => s + r.total_cost, 0);
+
+  if (modelChart) modelChart.destroy();
+  modelChart = new Chart($('#modelChart'), {
+    type: 'doughnut',
+    data: {
+      labels: rows.map(r => r.model || 'unknown'),
+      datasets: [{
+        data: rows.map(r => r.total_cost),
+        backgroundColor: colors.slice(0, rows.length),
+        borderWidth: 0,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#27272a',
+          borderColor: '#3f3f46',
+          borderWidth: 1,
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: { label: ctx => `${ctx.label}: ${fmt(ctx.raw)}` }
+        }
+      }
+    }
+  });
+
+  // Custom legend
+  $('#model-legend').innerHTML = rows.map((r, i) => {
+    const pct = total > 0 ? (r.total_cost / total * 100).toFixed(1) : '0.0';
+    return `<div class="donut-stat-row">
+      <span class="donut-stat-label">
+        <span class="donut-dot" style="background:${colors[i % colors.length]}"></span>
+        <span class="model-tag ${modelTagClass(r.model)}">${r.model || 'unknown'}</span>
+      </span>
+      <span>
+        <span class="donut-stat-value">${fmt(r.total_cost)}</span>
+        <span class="donut-stat-pct">${pct}%</span>
+      </span>
+    </div>`;
+  }).join('');
+}
+
+const tHead = '<tr><th>Session</th><th>Model</th><th>Messages</th><th style="text-align:right">Cost</th></tr>';
+
+async function loadTopSessions() {
+  const rows = await api('/api/top-sessions?limit=8');
+  $('#top-thead').innerHTML = tHead;
+  if (!rows.length) { $('#top-sessions').innerHTML = '<tr><td colspan="4" class="empty">No sessions yet</td></tr>'; return; }
+  $('#top-sessions').innerHTML = rows.map(r => `<tr>
+    <td><span class="mono">${r.id.slice(0, 8)}</span></td>
+    <td><span class="model-tag ${modelTagClass(r.model)}">${r.model || '—'}</span></td>
+    <td class="td-primary">${r.message_count}</td>
+    <td style="text-align:right"><span class="cost">${fmt(r.total_cost)}</span></td>
+  </tr>`).join('');
+}
+
+async function loadRecentSessions() {
+  const rows = await api('/api/sessions?limit=8');
+  $('#recent-thead').innerHTML = '<tr><th>When</th><th>Model</th><th>Messages</th><th style="text-align:right">Cost</th></tr>';
+  if (!rows.length) { $('#recent-sessions').innerHTML = '<tr><td colspan="4" class="empty">No sessions yet</td></tr>'; return; }
+  $('#recent-sessions').innerHTML = rows.map(r => `<tr>
+    <td class="td-primary">${timeAgo(r.started_at)}</td>
+    <td><span class="model-tag ${modelTagClass(r.model)}">${r.model || '—'}</span></td>
+    <td>${r.message_count}</td>
+    <td style="text-align:right"><span class="cost">${fmt(r.total_cost)}</span></td>
+  </tr>`).join('');
+}
+
+async function loadAlerts() {
+  const rows = await api('/api/alerts');
+  if (!rows.length) return;
+  $('#alerts-body').innerHTML = '<table><thead><tr><th>Type</th><th>Message</th><th>When</th></tr></thead><tbody>' +
+    rows.map(r => `<tr>
+      <td><span class="badge ${r.type.includes('daily') ? 'badge-amber' : 'badge-rose'}">${r.type}</span></td>
+      <td>${r.message}</td>
+      <td class="mono">${timeAgo(r.sent_at)}</td>
+    </tr>`).join('') + '</tbody></table>';
+}
+
+async function loadAll() {
+  await Promise.all([loadSummary(), loadDaily(), loadModels(), loadTopSessions(), loadRecentSessions(), loadAlerts()]);
+  $('#last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
+
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

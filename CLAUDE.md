@@ -10,7 +10,8 @@ MCP server that indexes and serves Claude Code skills on demand. It exposes two 
 
 ```bash
 pnpm install          # Install dependencies
-pnpm test             # Run all tests (vitest)
+pnpm test             # Run unit tests (vitest)
+pnpm test:integration # Run integration + dedup tests (slow, uses real skills/)
 pnpm test -- test/search.test.ts              # Run a single test file
 pnpm test -- -t "exact token match"           # Run a single test by name
 pnpm build            # Build to dist/ (tsup, ESM-only, node22 target)
@@ -35,7 +36,7 @@ The data flow is: `skills/` → `buildIndex()` → `SearchIndex` → `createServ
 - `src/types.ts` — `SkillFrontmatter`, `SkillEntry`, `SearchIndex`, `SearchResult` interfaces
 - `src/dedup.ts` — Deduplication utility: finds exact (hash-based) and near (Jaccard similarity >0.8) duplicate skills. Runnable as CLI
 - `scripts/import-skills.ts` — Imports skills from external directories (supports flat and nested `author/skill-name` layouts) with content-based dedup and dry-run support
-- `scripts/validate-skills.ts` — Validates all skill dirs have `SKILL.md` with valid frontmatter (`name` + `description`). Runs in CI
+- `scripts/validate-skills.ts` — Validates all skill dirs have `SKILL.md` with valid frontmatter (`name` + `description`) and detects exact duplicates (O(n) hash-based). Runs in CI
 - `scripts/clean-skills.ts` — Removes skill dirs that lack `SKILL.md`. Dry run by default
 
 ## Skill Directory Structure
@@ -60,9 +61,11 @@ skills/
 
 Two test layers, both using vitest:
 
-**Unit tests** use synthetic skills in `test/fixtures/` for deterministic results. Never use the real `skills/` directory in unit tests.
+**Unit tests** (`pnpm test`) use synthetic skills in `test/fixtures/` for deterministic results. Never use the real `skills/` directory in unit tests. These run in CI.
 
-**Integration tests** (`test/integration.test.ts`) use the real `skills/` directory to validate index completeness and search relevance.
+**Integration tests** (`pnpm test:integration`) use the real `skills/` directory to validate index completeness, search relevance, and exact duplicate detection. These are slow with 17K+ skills and run on-demand, not in CI.
+
+**Near-duplicate detection** (`pnpm dedup`) is O(n²) Jaccard similarity — too slow for CI with 17K+ skills. Run on-demand only.
 
 ## Conventions
 

@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  akaunting:
+    image: akaunting/akaunting:latest
+    container_name: akaunting
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - LOCALE=en-US
+      - DB_HOST=akaunting-db
+      - DB_PORT=3306
+      - DB_DATABASE=akaunting
+      - DB_USERNAME=akaunting
+      - DB_PASSWORD=akaunting_secure_password
+      - DB_PREFIX=ak_
+      - COMPANY_NAME=My Company
+      - COMPANY_EMAIL=admin@example.com
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=changeme123
+    volumes:
+      - akaunting-data:/var/www/html/storage
+    depends_on:
+      - akaunting-db
+
+  akaunting-db:
+    image: mariadb:10.6
+    container_name: akaunting-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_secure_password
+      - MYSQL_DATABASE=akaunting
+      - MYSQL_USER=akaunting
+      - MYSQL_PASSWORD=akaunting_secure_password
+    volumes:
+      - akaunting-db-data:/var/lib/mysql
+
+volumes:
+  akaunting-data:
+  akaunting-db-data:

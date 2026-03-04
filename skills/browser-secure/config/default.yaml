@@ -1,0 +1,47 @@
+vault:
+  provider: keychain  # 1password | bitwarden | hashicorp | keychain | env
+  sites: {}
+    # Example site configuration:
+    # nytimes:
+    #   vault: "Personal"
+    #   item: "NYT Account"
+    #   usernameField: "username"
+    #   passwordField: "password"
+    #   policy:
+    #     approvalTier: "always"
+    #     sessionTtlMinutes: 30
+    #     require2fa: false
+    # github:
+    #   vault: "Work"
+    #   item: "GitHub"
+    #   tokenField: "token"
+    #   policy:
+    #     approvalTier: "2fa"
+    #     sessionTtlMinutes: 60
+    #     require2fa: true
+
+security:
+  defaultTtl: 1800  # 30 minutes
+  requireApprovalForLogin: true
+  screenshotEveryAction: true
+  network:
+    blockLocalhost: true
+    blockPrivateIps: true
+    allowedHosts: []  # Add allowed domains here
+  audit:
+    enabled: true
+    logPath: "~/.browser-secure/audit.log"
+    retentionDays: 30
+    mode: "file"  # file | webhook | both
+    webhook:
+      url: ""  # Webhook URL for audit events
+      headers: {}  # Optional headers for webhook requests
+  session:
+    ttlMinutes: 30
+    warningAtMinutes: 25
+    credentialCacheMinutes: 10
+
+isolation:
+  incognitoMode: true
+  secureWorkdir: true
+  autoCleanup: true

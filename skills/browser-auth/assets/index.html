@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AIC Commander - Browser Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        #header { width: 100%; padding: 10px; background: #333; text-align: center; border-bottom: 2px solid #D4FF00; }
+        #browser-container { position: relative; margin: 10px; border: 2px solid #444; width: 95vw; overflow: auto; -webkit-overflow-scrolling: touch; }
+        #screen { display: block; width: 100%; height: auto; cursor: crosshair; }
+        #controls { padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: #222; width: 100%; }
+        input, button { padding: 12px; border-radius: 5px; border: none; font-size: 16px; }
+        #urlInput { flex-grow: 1; min-width: 200px; }
+        button { background: #D4FF00; color: black; font-weight: bold; cursor: pointer; }
+        button.secondary { background: #666; color: white; }
+        #status { color: #D4FF00; padding: 10px; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h2 style="margin:5px 0; font-size: 1.2rem;">AIC Commander - Session Auth</h2>
+    </div>
+
+    <div id="controls">
+        <input type="text" id="urlInput" placeholder="URL (e.g. medium.com)">
+        <button onclick="goto()">GO</button>
+        <button class="secondary" onclick="sendKey('Enter')">ENTER</button>
+        <button class="secondary" onclick="doPaste()">PASTE</button>
+        <input type="text" id="mobileInput" placeholder="Type here..." style="width: 120px;">
+        <button style="background: #ff4444; color: white;" onclick="done()">DONE</button>
+    </div>
+
+    <div id="browser-container">
+        <img id="screen" src="" onclick="handleClick(event)">
+    </div>
+
+    <div id="status">Waiting for stream...</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            alert('Missing authentication token!');
+            throw new Error('No token');
+        }
+
+        // Remove token from URL for basic referrer/leakage protection
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        const socket = io({
+            query: { token: token }
+        });
+
+        const screen = document.getElementById('screen');
+        const status = document.getElementById('status');
+        const mobileInput = document.getElementById('mobileInput');
+
+        socket.on('screenshot', (base64) => {
+            screen.src = 'data:image/jpeg;base64,' + base64;
+            status.innerText = 'Stream: ' + new Date().toLocaleTimeString();
+        });
+
+        socket.on('captured', (data) => {
+            alert('SESSION CAPTURED! You can now close this window.');
+        });
+
+        socket.on('connect_error', (err) => {
+            status.innerText = 'Connection error: ' + err.message;
+            status.style.color = '#ff4444';
+        });
+
+        function handleClick(e) {
+            const rect = screen.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (1280 / rect.width);
+            const y = (e.clientY - rect.top) * (720 / rect.height);
+            socket.emit('mouseClick', { x, y });
+        }
+
+        mobileInput.addEventListener('input', (e) => {
+            if (e.data) {
+                socket.emit('type', { text: e.data });
+                mobileInput.value = '';
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (document.activeElement.tagName === 'INPUT') return;
+            if (e.key.length === 1) {
+                socket.emit('type', { text: e.key });
+            } else {
+                socket.emit('key', { key: e.key });
+            }
+        });
+
+        function goto() {
+            const url = document.getElementById('urlInput').value;
+            socket.emit('goto', { url });
+        }
+
+        function sendKey(key) {
+            socket.emit('key', { key });
+        }
+
+        async function doPaste() {
+            const text = prompt("Paste text here:");
+            if (text) {
+                socket.emit('type', { text });
+            }
+        }
+
+        function done() {
+            if (confirm('Complete session transfer?')) {
+                socket.emit('done');
+            }
+        }
+    </script>
+</body>
+</html>

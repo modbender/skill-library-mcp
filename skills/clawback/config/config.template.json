@@ -1,0 +1,102 @@
+{
+  "_comment": "ClawBack - Congressional Trade Mirror Bot Configuration",
+  "_instructions": "Copy this to config.json and fill in your values, or use environment variables",
+
+  "broker": {
+    "_comment": "Specify which broker adapter to use. Adapter-specific URLs are built into the adapter code.",
+    "adapter": "etrade",
+    "credentials": {
+      "apiKey": "${BROKER_API_KEY}",
+      "apiSecret": "${BROKER_API_SECRET}"
+    }
+  },
+  "trading": {
+    "accountId": "${BROKER_ACCOUNT_ID}",
+    "initialCapital": 50000,
+    "tradeScalePercentage": 0.02,  // Reduced from 5% to 2% based on research
+    "maxPositionPercentage": 0.02,  // Reduced from 5% to 2% (1-2% recommended)
+    "maxPositions": 20,
+    "dailyLossLimit": 0.05,  // Increased from 3% to 5% for better risk management
+    "portfolioStopLoss": 0.15,
+    "positionStopLoss": 0.08,
+    "tradeDelayDays": 3,
+    "holdingPeriodDays": 30,
+    "marketHoursOnly": true,
+    "marketOpen": "09:30",
+    "marketClose": "16:00"
+  },
+  "strategy": {
+    "entryDelayDays": 3,
+    "holdingPeriodDays": 30,
+    "purchasesOnly": true,
+    "minimumTradeSize": 50000,
+    "maxSectorExposure": 0.25,
+    "prioritizeLeadership": true,
+    "multiMemberBonus": true,
+    "leadershipWeight": 2.0,  // Weight leadership trades 2x more (47% outperformance)
+    "minimumMarketCap": 1000000000,  // $1B minimum market cap filter
+    "sectorTracking": true,
+    "performanceBenchmark": "SPX"  // Track vs S&P 500
+  },
+  "congress": {
+    "dataSource": "official",
+    "pollIntervalHours": 24,
+    "minimumTradeSize": 50000,
+    "tradeTypes": ["purchase"],
+    "includeSenate": true,
+    "leadershipFocus": true,  // Prioritize leadership trades (47% outperformance)
+    "performanceTracking": true,  // Track performance of each politician's trades
+    "delayOptimization": {
+      "enabled": true,
+      "minDelayDays": 1,
+      "maxDelayDays": 5,
+      "optimizeBySector": true
+    },
+    "targetPoliticians": [
+      {"name": "Nancy Pelosi", "chamber": "house", "priority": 1, "weight": 2.0},
+      {"name": "Dan Crenshaw", "chamber": "house", "priority": 2, "weight": 1.5},
+      {"name": "Tommy Tuberville", "chamber": "senate", "priority": 2, "weight": 1.5},
+      {"name": "Marjorie Taylor Greene", "chamber": "house", "priority": 3, "weight": 1.0}
+    ]
+  },
+  "riskManagement": {
+    "maxDrawdown": 0.15,
+    "dailyLossLimit": 0.05,  // Increased from 3% to 5% (research recommendation)
+    "positionStopLoss": 0.08,
+    "trailingStopActivation": 0.10,
+    "trailingStopPercent": 0.05,
+    "consecutiveLossLimit": 3,
+    "sectorExposureLimits": {
+      "technology": 0.25,
+      "healthcare": 0.25,
+      "financials": 0.25,
+      "consumer": 0.25,
+      "industrial": 0.25,
+      "energy": 0.25,
+      "utilities": 0.25,
+      "realEstate": 0.25,
+      "materials": 0.25,
+      "communication": 0.25
+    },
+    "correlationLimit": 0.70,  // Maximum correlation between positions
+    "liquidityRequirement": 1000000,  // Minimum daily volume requirement
+    "volatilityFilter": true,  // Filter high-volatility stocks
+    "kellyFraction": 0.50  // Use 50% of full Kelly Criterion (professional practice)
+  },
+  "notifications": {
+    "telegram": {
+      "enabled": false,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "chatId": "${TELEGRAM_CHAT_ID}"
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "logs/trading.log",
+    "maxSize": "10MB",
+    "maxFiles": 10
+  },
+  "database": {
+    "path": "data/trading.db"
+  }
+}

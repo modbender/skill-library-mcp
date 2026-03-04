@@ -1,0 +1,71 @@
+# Skill Triggers Configuration
+# 技能触发规则配置
+
+skills:
+  agent-evolver:
+    # 关键词触发
+    keywords:
+      - "进化"
+      - "优化"
+      - "学习"
+      - "改进"
+      - "错误分析"
+      - "自学习"
+      - "经验"
+      - "策略优化"
+      - "持续学习"
+      - "性能改进"
+      - "失败分析"
+      - "历史经验"
+    
+    # 条件触发
+    conditions:
+      - type: "error_count"
+        threshold: 3
+        action: "analyze"
+        description: "同一任务失败超过3次时触发分析"
+      
+      - type: "user_request"
+        patterns:
+          - "帮我改进"
+          - "分析一下错误"
+          - "优化一下策略"
+          - "为什么失败"
+          - "之前遇到过"
+          - "历史经验"
+        action: "evolve"
+        description: "用户请求改进时触发进化"
+      
+      - type: "performance_drop"
+        threshold: 0.1
+        action: "optimize"
+        description: "性能下降超过10%时触发优化"
+      
+      - type: "new_task_type"
+        action: "learn"
+        description: "遇到新任务类型时触发学习"
+    
+    # 自动触发
+    auto_trigger:
+      - event: "task_failed"
+        action: "extract_experience"
+        probability: 1.0
+        description: "任务失败时自动提取经验"
+      
+      - event: "task_success"
+        action: "extract_experience"
+        probability: 0.1
+        description: "任务成功时10%概率提取经验"
+      
+      - event: "periodic"
+        interval: 3600
+        action: "stats_report"
+        description: "每小时生成统计报告"
+    
+    # 命令映射
+    commands:
+      analyze: "python3 scripts/evolution_cli.py analyze"
+      search: "python3 scripts/evolution_cli.py search"
+      stats: "python3 scripts/evolution_cli.py stats"
+      history: "python3 scripts/evolution_cli.py history"
+      evolve: "python3 scripts/evolution_cli.py evolve"

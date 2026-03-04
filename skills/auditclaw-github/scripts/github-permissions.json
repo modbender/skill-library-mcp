@@ -1,0 +1,26 @@
+{
+  "provider": "github",
+  "title": "GitHub Token Permissions",
+  "description": "Required permissions for AuditClaw GitHub compliance scanning",
+  "token_type": "fine_grained",
+  "recommended_expiry": "90 days",
+  "organization_access": "required",
+  "permissions": {
+    "repository": {
+      "contents": {"access": "read", "reason": "Check CODEOWNERS file, license files"},
+      "metadata": {"access": "read", "reason": "Repository metadata, visibility, settings"},
+      "administration": {"access": "read", "reason": "Branch protection rules, deploy keys"},
+      "secret_scanning_alerts": {"access": "read", "reason": "Secret scanning alert count and status"},
+      "dependabot_alerts": {"access": "read", "reason": "Dependency vulnerability alerts by severity"},
+      "code_scanning_alerts": {"access": "read", "reason": "Code scanning (CodeQL) results"},
+      "actions": {"access": "read", "reason": "GitHub Actions workflow permissions and security"},
+      "webhooks": {"access": "read", "reason": "Webhook configuration audit (HTTPS, secrets)"}
+    },
+    "organization": {
+      "members": {"access": "read", "reason": "Check 2FA enforcement across org members"},
+      "administration": {"access": "read", "reason": "Org security settings, audit log access"}
+    }
+  },
+  "classic_token_scopes": ["repo", "read:org", "security_events"],
+  "classic_token_note": "If fine-grained tokens are not available, use a classic token with these 3 scopes"
+}

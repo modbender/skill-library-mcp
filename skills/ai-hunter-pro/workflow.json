@@ -1,0 +1,117 @@
+{
+    "workflow_id": "daily-content-automation",
+    "name": "AI Trend Hunter · 每日内容自动化流水线",
+    "version": "1.0.0",
+    "description": "从 TechCrunch 抓取热门科技新闻，调用 DeepSeek AI 生成爆款推文，自动保存草稿",
+    "trigger": "manual",
+    "environment": {
+        "python_version": ">=3.10",
+        "required_packages": [
+            "requests",
+            "beautifulsoup4"
+        ],
+        "env_vars": {
+            "DEEPSEEK_API_KEY": "string (required for AI generation)",
+            "PYTHONIOENCODING": "utf-8"
+        }
+    },
+    "steps": [
+        {
+            "step_id": 1,
+            "name": "数据抓取",
+            "description": "从 TechCrunch 首页抓取前 3 条热门标题",
+            "type": "web_scraping",
+            "config": {
+                "source_url": "User Input",
+                "selectors": [
+                    "h2.loop-card__title",
+                    "h2.post-block__title",
+                    "a.post-block__title__link",
+                    "h2.wp-block-post-title"
+                ],
+                "fallback": "关键词兜底（ai / tech / startup / app / model）",
+                "max_items": 3
+            },
+            "output": {
+                "file": "outputs/raw_titles_YYYYMMDD.json",
+                "format": "json",
+                "example": [
+                    "Go-to-market strategies for an AI era"
+                ]
+            }
+        },
+        {
+            "step_id": 2,
+            "name": "AI 文案生成",
+            "description": "将原始标题投喂给 DeepSeek，生成「工具猎人·尤瑟夫」风格推文",
+            "type": "ai_generation",
+            "config": {
+                "provider": "DeepSeek",
+                "model": "deepseek-chat",
+                "api_endpoint": "https://api.deepseek.com/v1/chat/completions",
+                "max_tokens": 200,
+                "temperature": 0.85,
+                "system_prompt": "你现在是 {{USER_PERSONA}}。请根据以下内容 {{SCRAPED_CONTENT}}，按照 {{STYLE_REQUIREMENT}} 的要求创作一段推文。
+                "fallback": "无 API Key 时，输出「🔥 原标题 | 🔗 [LINK]」格式占位草稿"
+            },
+            "input": "step_1.output",
+            "output": {
+                "format": "list",
+                "fields": [
+                    "title",
+                    "tweet"
+                ]
+            }
+        },
+        {
+            "step_id": 3,
+            "name": "草稿落盘",
+            "description": "将推文草稿保存为 Markdown 文件",
+            "type": "file_output",
+            "config": {
+                "output_dir": "skills/x-ai-hunter/outputs/",
+                "filename_pattern": "tweet_drafts_YYYYMMDD.md",
+                "format": "markdown"
+            },
+            "input": "step_2.output"
+        },
+        {
+            "step_id": 4,
+            "name": "人工审核",
+            "description": "打开草稿文件，确认选题与文案是否符合要求",
+            "type": "human_review",
+            "config": {
+                "review_checklist": [
+                    "选题是否够硬核？",
+                    "文案风格是否符合人设？",
+                    "变现链接 [LINK] 是否替换为真实地址？"
+                ],
+                "approval_trigger": "回复「批准」"
+            }
+        },
+        {
+            "step_id": 5,
+            "name": "X 平台同步",
+            "description": "调用 browser_subagent 自动打开 X 并将草稿填入草稿箱",
+            "type": "browser_automation",
+            "config": {
+                "tool": "browser_subagent",
+                "target_url": "https://x.com",
+                "action": "post_draft"
+            },
+            "condition": "step_4.approved == true",
+            "input": "step_3.output"
+        }
+    ],
+    "run_command": {
+        "windows_powershell": "$env:PYTHONIOENCODING='utf-8'; $env:DEEPSEEK_API_KEY='sk-xxxx'; python 'C:/Users/phq28/.gemini/antigravity/skills/x-ai-hunter/daily_content_automation.py'",
+        "antigravity_workflow": "/daily-content"
+    },
+    "tested_at": "2026-02-24T20:39:06+08:00",
+    "test_result": {
+        "status": "passed",
+        "scraped_titles": 1,
+        "ai_generation": "skipped (no API key in test)",
+        "output_file": "outputs/tweet_drafts_20260224.md"
+    }
+}

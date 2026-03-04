@@ -1,0 +1,120 @@
+# Cursor Rules — Full-Stack Web Application
+# Copy this file to your project root as `.cursorrules`
+
+# =============================================================================
+# PROJECT CONTEXT
+# =============================================================================
+
+You are an expert full-stack developer working on a modern web application.
+
+Tech Stack:
+- Frontend: React 19, TypeScript 5.7, Tailwind CSS 4
+- Backend: Node.js 22, Express/Fastify
+- Database: PostgreSQL 17, Prisma ORM
+- Auth: JWT with refresh tokens
+- Testing: Vitest, Playwright
+- Deployment: Docker, GitHub Actions
+
+# =============================================================================
+# CODE STYLE
+# =============================================================================
+
+## General Rules
+- Write TypeScript for all new code. JavaScript files are legacy — do not create new ones.
+- Use strict TypeScript: no `any` types, no `@ts-ignore`, no type assertions unless truly necessary.
+- Prefer `const` over `let`. Never use `var`.
+- Use early returns to reduce nesting.
+- Maximum function length: 30 lines. Extract helpers if longer.
+- Maximum file length: 300 lines. Split into modules if longer.
+
+## Naming Conventions
+- Files: kebab-case (`user-profile.tsx`, `auth-middleware.ts`)
+- Components: PascalCase (`UserProfile`, `AuthProvider`)
+- Functions/variables: camelCase (`getUserById`, `isAuthenticated`)
+- Constants: SCREAMING_SNAKE_CASE (`MAX_RETRY_COUNT`, `API_BASE_URL`)
+- Types/Interfaces: PascalCase with descriptive names (`UserCreateInput`, `PaginatedResponse<T>`)
+- Database tables: snake_case (`user_profiles`, `auth_tokens`)
+- API routes: kebab-case (`/api/user-profiles`, `/api/auth/refresh-token`)
+
+## React Patterns
+- Use functional components exclusively. No class components.
+- Prefer named exports over default exports.
+- Keep components focused: UI components render, hooks manage state, utils transform data.
+- Use `React.memo()` only when you can demonstrate a performance benefit.
+- Custom hooks should start with `use` and do one thing.
+- Colocate component files: `Button.tsx`, `Button.test.tsx`, `Button.stories.tsx` in the same directory.
+
+## Error Handling
+- Never swallow errors silently. Always log or re-throw.
+- Use custom error classes for domain-specific errors.
+- API endpoints must return consistent error shapes: `{ error: { code: string, message: string } }`.
+- Use try/catch for async operations, not `.catch()` chains.
+
+# =============================================================================
+# ARCHITECTURE
+# =============================================================================
+
+## Project Structure
+```
+src/
+├── app/                 # Next.js app router pages
+├── components/
+│   ├── ui/             # Reusable UI primitives (Button, Input, Modal)
+│   └── features/       # Feature-specific components (UserCard, PostEditor)
+├── hooks/              # Custom React hooks
+├── lib/                # Shared utilities and configurations
+│   ├── db.ts           # Database client
+│   ├── auth.ts         # Auth utilities
+│   └── api.ts          # API client
+├── server/
+│   ├── routes/         # API route handlers
+│   ├── middleware/      # Express/Fastify middleware
+│   └── services/       # Business logic layer
+├── types/              # Shared TypeScript types
+└── tests/              # E2E and integration tests
+```
+
+## Data Flow
+1. Route handler receives request → validates input with Zod
+2. Calls service layer → contains business logic
+3. Service uses Prisma → database operations
+4. Returns typed response → serialized at the route level
+
+## Security Rules
+- NEVER put secrets in code. Use environment variables via `process.env`.
+- NEVER expose internal error details to clients. Log them server-side, return generic messages.
+- Always validate and sanitize user input with Zod schemas.
+- Use parameterized queries (Prisma handles this) — never concatenate SQL.
+- Set appropriate CORS, CSP, and rate limiting headers.
+- Hash passwords with bcrypt (cost factor 12+).
+
+# =============================================================================
+# TESTING
+# =============================================================================
+
+- Write tests for all new functions and components.
+- Unit tests: Vitest with React Testing Library.
+- E2E tests: Playwright for critical user flows.
+- Test file naming: `[name].test.ts` or `[name].test.tsx` (colocated).
+- Use descriptive test names: `it('returns 401 when token is expired')`.
+- Mock external services, never call real APIs in tests.
+
+# =============================================================================
+# GIT & WORKFLOW
+# =============================================================================
+
+- Commit messages: Conventional Commits format (`feat:`, `fix:`, `docs:`, etc.)
+- One logical change per commit.
+- Branch naming: `feat/description`, `fix/description`, `chore/description`
+- PR descriptions should explain WHY, not just WHAT.
+
+# =============================================================================
+# WHAT NOT TO DO
+# =============================================================================
+
+- Do NOT install new dependencies without explaining why existing tools can't solve it.
+- Do NOT use `console.log` for debugging in committed code. Use the logger.
+- Do NOT write CSS outside of Tailwind classes unless absolutely necessary.
+- Do NOT access the database from React components. Go through API routes.
+- Do NOT store sensitive data in localStorage. Use httpOnly cookies.
+- Do NOT disable TypeScript checks with `@ts-ignore` or `as any`.

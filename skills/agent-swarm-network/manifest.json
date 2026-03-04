@@ -1,0 +1,144 @@
+{
+    "$schema": "https://spec.modelcontextprotocol.io/2025-03/skill.json",
+    "name": "agent-swarm-network",
+    "version": "1.0.6",
+    "description": "Agent Swarm Network skill for cross-session persistent context, event-driven collaboration, and sub-agent routing. Powered by the open-source Pilot Protocol by TeoSlayer.",
+    "author": "sarahmirrand001-oss",
+    "license": "MIT",
+    "homepage": "https://agent-swarm-network.vercel.app",
+    "source": "https://github.com/sarahmirrand001-oss/openclaw-skill-pilot-protocol",
+    "repository": "https://github.com/sarahmirrand001-oss/openclaw-skill-pilot-protocol",
+    "upstream": "https://github.com/TeoSlayer/pilotprotocol",
+    "categories": [
+        "communication",
+        "agent-coordination",
+        "context-management",
+        "networking"
+    ],
+    "required_config": {
+        "pilotctl_path": {
+            "type": "path",
+            "description": "Absolute path to the pilotctl binary.",
+            "required": true,
+            "default": "~/.pilot/bin/pilotctl"
+        },
+        "agent_hostname": {
+            "type": "string",
+            "description": "This agent's hostname on the Pilot network.",
+            "required": true,
+            "default": "keke-agent"
+        },
+        "inbox_path": {
+            "type": "path",
+            "description": "Directory where incoming messages and context snapshots are stored.",
+            "required": false,
+            "default": "~/.pilot/inbox/"
+        },
+        "received_path": {
+            "type": "path",
+            "description": "Directory where received files from peer agents are stored.",
+            "required": false,
+            "default": "~/.pilot/received/"
+        }
+    },
+    "credentials": {},
+    "file_permissions": {
+        "read": [
+            "~/.pilot/inbox/ — reads context snapshots and incoming messages",
+            "~/.pilot/received/ — reads transferred files from peers"
+        ],
+        "write": [
+            "~/.pilot/inbox/ — writes context snapshots as JSON files",
+            "~/.pilot/received/ — incoming file transfers land here (managed by daemon)"
+        ],
+        "execute": [
+            "~/.pilot/bin/pilotctl — all agent operations go through this CLI",
+            "~/.pilot/start-local.sh — daemon startup script",
+            "~/.pilot/context-snapshot.sh — context snapshot helper",
+            "~/.pilot/pilot-publish.sh — event publishing helper"
+        ],
+        "system_privileges": [
+            "NO root/sudo required. Gateway bridging over user ports (>1024) is strictly unprivileged."
+        ]
+    },
+    "network_behavior": {
+        "description": "This Skill communicates over the local Unix socket to the Pilot daemon. The daemon handles encrypted UDP tunnels to peers. No direct HTTP/HTTPS calls are made by the Skill itself.",
+        "channels": [
+            "Unix socket (localhost) — Agent to Daemon communication",
+            "Encrypted UDP tunnels (X25519 + AES-256-GCM) — Daemon to Daemon, peer-to-peer",
+            "TCP :9000 — Local registry connection for peer discovery (defaults to 127.0.0.1:9000; no data is sent to any external server unless the user explicitly reconfigures)"
+        ],
+        "note": "In single-node mode, network commands fall back to local file writes. No external network traffic in single-node mode."
+    },
+    "privacy_considerations": [
+        "All inter-agent traffic is encrypted end-to-end (AES-256-GCM).",
+        "Agents are private by default; mutual trust handshake required before communication.",
+        "Context snapshots are stored as plain JSON files locally in ~/.pilot/inbox/. Users MUST secure this directory (chmod 700) as snapshots may contain sensitive PII or API keys.",
+        "No data is sent to third-party cloud services by default. The rendezvous registry defaults to 127.0.0.1:9000 (localhost). No peer-discovery metadata leaves the machine unless the user explicitly changes registry_url to a remote address.",
+        "The Skill does not access any browser sessions, cookies, or external credentials."
+    ],
+    "persistence_effects": [
+        "Creates JSON snapshot files in ~/.pilot/inbox/ on session end.",
+        "Received files from peers are stored in ~/.pilot/received/.",
+        "Event stream publishes are ephemeral (pub/sub, not persisted by the Skill).",
+        "Daemon process runs continuously in the background until explicitly stopped."
+    ],
+    "capabilities": {
+        "input": [
+            {
+                "type": "command",
+                "description": "CLI commands to pilotctl for agent operations (messaging, snapshots, diagnostics)"
+            },
+            {
+                "type": "event",
+                "description": "Agent lifecycle events (model switch, task complete, errors) to publish"
+            }
+        ],
+        "output": [
+            {
+                "type": "context_snapshot",
+                "format": "json",
+                "path_pattern": "~/.pilot/inbox/snapshot_YYYYMMDD_HHMMSS.json",
+                "description": "Serialized context state for cross-session persistence"
+            },
+            {
+                "type": "event_publication",
+                "format": "json",
+                "description": "Published events on the Pilot event stream (pub/sub)"
+            },
+            {
+                "type": "diagnostic_report",
+                "format": "json",
+                "description": "Daemon status, peer info, connection state, latency results"
+            }
+        ]
+    },
+    "dependencies": {
+        "binaries": [
+            "pilotctl",
+            "go"
+        ],
+        "required": [
+            "openclaw"
+        ],
+        "optional": []
+    },
+    "safety": {
+        "auto_install": false,
+        "always_on": false,
+        "self_modification": false,
+        "principle": "This Skill executes local CLI commands and writes files only within the ~/.pilot/ directory. It does not access browser state, external APIs, or credentials outside the Pilot Protocol ecosystem."
+    },
+    "triggers": {
+        "auto": [
+            "session start (auto-restore context from inbox)",
+            "session end (auto-snapshot context)",
+            "model switch event",
+            "context overflow detected (>80% token usage)"
+        ],
+        "exclude": [
+            "general conversation unrelated to agent coordination",
+            "tasks that do not involve cross-session or cross-agent operations"
+        ]
+    }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mulch Self Improver — Benchmark vs Baseline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'DM Serif Display', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #e8eef4;
+    --surface-elevated: #f8fafc;
+    --border: rgba(15, 23, 42, 0.08);
+    --border-bright: rgba(15, 23, 42, 0.14);
+    --text: #0f172a;
+    --text-dim: #64748b;
+    --accent: #0e7490;
+    --accent-dim: rgba(14, 116, 144, 0.08);
+    --green: #059669;
+    --green-dim: rgba(5, 150, 105, 0.08);
+    --amber: #d97706;
+    --amber-dim: rgba(217, 119, 6, 0.08);
+    --navy: #0f172a;
+    --navy-dim: rgba(15, 23, 42, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --surface-elevated: #1e293b;
+      --border: rgba(255,255,255,0.06);
+      --border-bright: rgba(255,255,255,0.12);
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --accent: #22d3ee;
+      --accent-dim: rgba(34, 211, 238, 0.12);
+      --green: #34d399;
+      --green-dim: rgba(52, 211, 153, 0.1);
+      --amber: #fbbf24;
+      --amber-dim: rgba(251, 191, 36, 0.1);
+      --navy: #cbd5e1;
+      --navy-dim: rgba(203, 213, 225, 0.08);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at 30% 0%, var(--accent-dim) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, var(--green-dim) 0%, transparent 40%);
+    color: var(--text);
+    font-family: var(--font-sans);
+    padding: 40px;
+    min-height: 100vh;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: fadeUp 0.35s ease-out both; animation-delay: calc(var(--i, 0) * 0.04s); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; } }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { font-family: var(--font-body); font-size: 32px; font-weight: 400; letter-spacing: -0.3px; margin-bottom: 6px; }
+  .subtitle { color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; margin-bottom: 32px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .kpi-card {
+    background: var(--surface-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .kpi-card__value { font-family: var(--font-body); font-size: 32px; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .kpi-card__value--green { color: var(--green); }
+  .kpi-card__label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); margin-top: 6px; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.55; }
+  .data-table thead { position: sticky; top: 0; z-index: 2; }
+  .data-table th {
+    background: var(--surface2); font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); text-align: left; padding: 14px 16px; border-bottom: 2px solid var(--border-bright); white-space: nowrap;
+  }
+  .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:nth-child(even) { background: var(--accent-dim); }
+  .data-table tbody tr { transition: background 0.15s ease; animation: fadeUp 0.35s ease-out both; animation-delay: calc(var(--i, 0) * 0.03s); }
+  .data-table tbody tr:hover { background: var(--border); }
+  .data-table code { font-family: var(--font-mono); font-size: 11px; background: var(--accent-dim); color: var(--accent); padding: 1px 5px; border-radius: 3px; }
+  .winner { font-weight: 600; color: var(--green); }
+  .section-title { font-family: var(--font-body); font-size: 22px; margin: 32px 0 16px; color: var(--text); }
+  @media (max-width: 768px) { body { padding: 16px; } h1 { font-size: 24px; } .data-table th, .data-table td { padding: 10px 12px; } }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Mulch Self Improver — Benchmark</h1>
+  <p class="subtitle animate" style="--i:1">Side-by-side vs <a href="https://clawhub.ai/pskoett/self-improving-agent" style="color:var(--accent)">Self Improving Agent — Rank #2 on ClawHub</a> (legacy .learnings flow)</p>
+
+  <div class="kpi-row animate" style="--i:2">
+    <div class="kpi-card">
+      <div class="kpi-card__value kpi-card__value--green">27.5%</div>
+      <div class="kpi-card__label">Fewer chars (total)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">3792</div>
+      <div class="kpi-card__label">Mulch (chars)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">5233</div>
+      <div class="kpi-card__label">Baseline (chars)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value" style="color:var(--accent)">~352</div>
+      <div class="kpi-card__label">Tokens saved/session</div>
+    </div>
+  </div>
+
+  <h2 class="section-title animate" style="--i:3">1. Token efficiency (session + retrieval)</h2>
+  <div class="table-wrap animate" style="--i:4">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr><th>Metric</th><th>Baseline (legacy)</th><th>Mulch</th><th>Winner</th></tr>
+        </thead>
+        <tbody>
+          <tr style="--i:0"><td>Reminder (chars)</td><td>632</td><td>452</td><td class="winner">Mulch (shorter)</td></tr>
+          <tr style="--i:1"><td>Session context (chars)</td><td>1318</td><td>1694</td><td>Baseline</td></tr>
+          <tr style="--i:2"><td>Retrieval (2 queries, chars)</td><td>932</td><td>330</td><td class="winner">Mulch 65% less</td></tr>
+          <tr style="--i:3"><td><strong>Total (rem + ctx + ret)</strong></td><td><strong>2882</strong></td><td><strong>2476</strong></td><td class="winner">Mulch 14% less</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="section-title animate" style="--i:5">2. Troubleshooting (3 error lookups)</h2>
+  <div class="table-wrap animate" style="--i:6">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr><th>Metric</th><th>Baseline (legacy)</th><th>Mulch</th><th>Winner</th></tr>
+        </thead>
+        <tbody>
+          <tr style="--i:0"><td>Chars to get all 3 resolutions</td><td>1215</td><td>559</td><td class="winner">Mulch 54% less</td></tr>
+          <tr style="--i:1"><td>Resolutions found (of 3)</td><td>3/3</td><td>2/3 or 3/3</td><td>Same or better</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="section-title animate" style="--i:7">3. Style & memory (6 scenarios)</h2>
+  <div class="table-wrap animate" style="--i:8">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr><th>Metric</th><th>Baseline (legacy)</th><th>Mulch</th><th>Winner</th></tr>
+        </thead>
+        <tbody>
+          <tr style="--i:0"><td>Chars to get all 6 answers</td><td>One full file</td><td>Sum of 6 targeted searches</td><td class="winner">Mulch (targeted)</td></tr>
+          <tr style="--i:1"><td>Scenarios found (of 6)</td><td>6/6</td><td>4/6–6/6</td><td>Same or better</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="section-title animate" style="--i:9">4. Projected savings (chars ≈ token proxy)</h2>
+  <div class="table-wrap animate" style="--i:10">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr><th>Scenario</th><th>Baseline (chars)</th><th>Mulch (chars)</th><th>Saving</th><th>Per 100 sessions (tokens ≈ chars/4)</th></tr>
+        </thead>
+        <tbody>
+          <tr style="--i:0"><td>Session (rem + ctx + retrieval)</td><td>2882</td><td>2476</td><td>406 chars (~100 tokens)</td><td>~10k tokens</td></tr>
+          <tr style="--i:1"><td>Troubleshooting (3 errors)</td><td>1215</td><td>559</td><td>656 chars (~164 tokens)</td><td>~16k tokens per 100 troubleshoot rounds</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="subtitle animate" style="--i:11; margin-top: 24px;">Run: <code>docker run --rm mulch-self-improver-test benchmark</code>. Credits: Mulch Self Improver by Austin Dixson; <a href="https://github.com/jayminwest/mulch" style="color:var(--accent)">Mulch</a> by Jaymin West.</p>
+
+</div>
+
+</body>
+</html>

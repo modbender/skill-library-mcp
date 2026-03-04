@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>clawctl</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'cc-bg-0': 'var(--bg-0)',
+            'cc-bg-1': 'var(--bg-1)',
+            'cc-bg-2': 'var(--bg-2)',
+            'cc-border': 'var(--border)',
+            'cc-fg': 'var(--fg)',
+            'cc-fg-dim': 'var(--fg-dim)',
+            'cc-green': 'var(--green)',
+            'cc-green-dim': 'var(--green-dim)',
+            'cc-amber': 'var(--amber)',
+            'cc-cyan': 'var(--cyan)',
+            'cc-cyan-bright': 'var(--cyan-bright)',
+            'cc-red': 'var(--red)',
+            'cc-gray': 'var(--gray)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+/* ═══════════════════════════════════════════
+   1. TOKENS
+   ═══════════════════════════════════════════ */
+:root {
+  --bg-0: #050a05;
+  --bg-1: #0a120a;
+  --bg-2: #0f1a0f;
+  --border: #1a2e1a;
+  --fg: #b0d0b0;
+  --fg-dim: #4a7a4a;
+  --green: #00ff41;
+  --green-dim: #00cc33;
+  --amber: #ffb000;
+  --cyan: #00bfff;
+  --cyan-bright: #00ffcc;
+  --red: #ff3333;
+  --gray: #3a5f3a;
+}
+
+/* ═══════════════════════════════════════════
+   2. BASE / RESET
+   ═══════════════════════════════════════════ */
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+body {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: var(--bg-0);
+  color: var(--fg);
+  overscroll-behavior-y: contain;
+  min-height: 100vh;
+  margin: 0;
+  line-height: 1.5;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-0); }
+::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fg-dim); }
+
+::selection { background: var(--green); color: var(--bg-0); }
+
+/* ═══════════════════════════════════════════
+   3. LAYOUT
+   ═══════════════════════════════════════════ */
+.header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-0);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  z-index: 10;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.header-stats {
+  font-size: 0.75rem;
+  color: var(--fg-dim);
+  margin-top: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.main-board {
+  padding: 1rem 1rem 6rem;
+}
+
+/* ═══════════════════════════════════════════
+   4. COMPONENTS
+   ═══════════════════════════════════════════ */
+
+/* --- Buttons --- */
+.btn-terminal {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.btn-terminal:hover {
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.15);
+}
+
+.btn-terminal:active {
+  background: var(--bg-2);
+}
+
+.btn-terminal.active {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* --- Banners --- */
+.banner {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid;
+  display: none;
+}
+
+.banner.visible { display: block; }
+
+.banner-sse {
+  border-color: var(--green-dim);
+  color: var(--green);
+  background: rgba(0, 255, 65, 0.05);
+}
+
+.banner-warn {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(255, 176, 0, 0.05);
+}
+
+/* --- Section Headers --- */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  min-height: 32px;
+}
+
+.section-bracket {
+  white-space: nowrap;
+}
+
+.section-count {
+  font-size: 0.65rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+}
+
+.section-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-empty {
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+  padding: 0.75rem 0;
+  font-style: italic;
+}
+
+.section-empty-hint {
+  color: var(--gray);
+  font-size: 0.65rem;
+  font-style: normal;
+}
+
+/* --- Task Cards --- */
+.task-card {
+  --accent: var(--fg-dim);
+  position: relative;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  border-left: 3px solid var(--accent);
+  transition: border-color 0.15s, box-shadow 0.15s, opacity 0.3s, transform 0.3s;
+}
+
+.task-card[data-status="pending"]     { --accent: var(--amber); }
+.task-card[data-status="in_progress"],
+.task-card[data-status="claimed"]     { --accent: var(--cyan); }
+.task-card[data-status="blocked"]     { --accent: var(--red); }
+.task-card[data-status="done"]        { --accent: var(--green); }
+
+.task-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.task-card:active {
+  background: var(--bg-2);
+}
+
+.task-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.task-id {
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+}
+
+.task-subject {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg);
+  word-break: break-word;
+}
+
+.task-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.task-priority {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.0625rem 0.3125rem;
+  font-weight: 700;
+  display: inline-block;
+  margin-left: 0.375rem;
+}
+
+.task-priority.crit { color: var(--red); border: 1px solid var(--red); }
+.task-priority.high { color: var(--amber); border: 1px solid var(--amber); }
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+  color: var(--fg-dim);
+  margin-top: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.task-meta-sep {
+  color: var(--gray);
+}
+
+.task-agent {
+  color: var(--green-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.task-tags {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.task-tag {
+  font-size: 0.6rem;
+  color: var(--fg-dim);
+  border: 1px solid var(--gray);
+  padding: 0 0.25rem;
+}
+
+/* --- Agent Dot --- */
+.agent-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.agent-dot.active { background: var(--green); }
+.agent-dot.idle { background: var(--amber); }
+.agent-dot.offline { background: var(--gray); }
+
+/* --- Card entrance animation --- */
+.card-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.card-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Bottom Sheet --- */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 20;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.sheet-backdrop.visible {
+  display: block;
+  opacity: 1;
+}
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-1);
+  border-top: 2px solid var(--green);
+  border-radius: 0.5rem 0.5rem 0 0;
+  z-index: 30;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.sheet.visible {
+  transform: translateY(0);
+}
+
+.sheet-header {
+  padding: 0.75rem 1rem 0;
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sheet-content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.sheet-grid-cell {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.sheet-grid-label {
+  color: var(--fg-dim);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.sheet-grid-value {
+  font-weight: 500;
+}
+
+.sheet-section-title {
+  font-size: 0.75rem;
+  color: var(--fg-dim);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sheet-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.sheet-message {
+  border-left: 2px solid var(--fg-dim);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  background: var(--bg-0);
+}
+
+.sheet-message[data-type="alert"] { border-left-color: var(--amber); }
+.sheet-message[data-type="error"] { border-left-color: var(--red); }
+.sheet-message[data-type="info"] { border-left-color: var(--cyan); }
+
+.sheet-message .msg-type-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.25rem;
+  border: 1px solid var(--fg-dim);
+  margin-right: 0.375rem;
+}
+
+.sheet-message[data-type="alert"] .msg-type-badge { border-color: var(--amber); color: var(--amber); }
+.sheet-message[data-type="error"] .msg-type-badge { border-color: var(--red); color: var(--red); }
+.sheet-message[data-type="info"] .msg-type-badge  { border-color: var(--cyan); color: var(--cyan); }
+
+.sheet-buttons {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-1);
+  padding-bottom: 0.5rem;
+}
+
+.btn-sheet {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-height: 40px;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.btn-sheet:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-sheet.delete {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-sheet.delete:hover {
+  box-shadow: 0 0 8px rgba(255, 51, 51, 0.2);
+}
+
+.btn-sheet.complete {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-sheet.complete:hover {
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+
+.btn-sheet.close-btn {
+  flex: 0;
+  min-width: 60px;
+  border-color: var(--gray);
+  color: var(--fg-dim);
+}
+
+.completed-badge {
+  text-align: center;
+  padding: 0.5rem;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* --- Loading Overlay --- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loading-ascii {
+  color: var(--green);
+  font-size: 0.6rem;
+  line-height: 1.2;
+  white-space: pre;
+  text-align: center;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 3px;
+  background: var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-bar-inner {
+  position: absolute;
+  height: 100%;
+  width: 40%;
+  background: var(--green);
+  animation: loadbar 1s ease-in-out infinite;
+}
+
+@keyframes loadbar {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+
+.loading-text {
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+}
+
+/* --- Skeleton --- */
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(90deg, var(--bg-1) 25%, var(--bg-2) 50%, var(--bg-1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gray);
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Error --- */
+.error-container {
+  border: 1px solid var(--red);
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-label {
+  color: var(--red);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.error-hint {
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════
+   5. EFFECTS (guarded)
+   ═══════════════════════════════════════════ */
+
+/* Scanlines overlay */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+  display: none;
+}
+
+.effects-on .scanlines { display: block; }
+
+/* Glow utilities */
+.effects-on .glow-green { text-shadow: 0 0 6px rgba(0, 255, 65, 0.4); }
+.effects-on .glow-amber { text-shadow: 0 0 6px rgba(255, 176, 0, 0.4); }
+.effects-on .glow-red { text-shadow: 0 0 6px rgba(255, 51, 51, 0.4); }
+.effects-on .glow-cyan { text-shadow: 0 0 6px rgba(0, 191, 255, 0.4); }
+
+/* Matrix canvas */
+#matrix-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0.03;
+  display: none;
+}
+
+.effects-on #matrix-canvas { display: block; }
+
+/* ═══════════════════════════════════════════
+   6. ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.effects-on .agent-dot.active {
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-block {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--green);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+
+.effects-on .cursor-block {
+  animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* ═══════════════════════════════════════════
+   7. ACCESSIBILITY
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scanlines { display: none !important; }
+  #matrix-canvas { display: none !important; }
+  .card-enter { opacity: 1; transform: none; }
+}
+
+/* Focus visible for keyboard nav */
+*:focus-visible {
+  outline: 1px solid var(--green);
+  outline-offset: 2px;
+}
+  </style>
+</head>
+<body>
+
+  <!-- Scanlines overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- Matrix rain canvas -->
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div>
+        <h1 class="header-title">
+          <span style="color: var(--green);" class="glow-green">&gt;_ claw</span><span style="color: var(--fg-dim);">ctl</span><span class="cursor-block" aria-hidden="true"></span>
+        </h1>
+        <p id="header-stats" class="header-stats">$ initializing...</p>
+      </div>
+      <div class="header-right">
+        <button id="effects-toggle" class="btn-terminal" onclick="toggleEffects()" aria-label="Toggle visual effects">
+          FX: <span id="effects-label">OFF</span>
+        </button>
+        <button onclick="fetchBoard()" class="btn-terminal" aria-label="Refresh board">
+          <span id="refresh-icon">&#x21bb;</span> SYNC
+        </button>
+      </div>
+    </div>
+    <div id="sse-banner" class="banner banner-sse">[SSE] Live updates connected</div>
+    <div id="stale-banner" class="banner banner-warn">[WARN] Offline — showing cached data from <span id="stale-time"></span></div>
+  </header>
+
+  <!-- Board -->
+  <main id="board" class="main-board">
+    <!-- Skeleton loading -->
+    <div id="skeleton">
+      <div style="color: var(--fg-dim); font-size: 0.75rem; margin-bottom: 0.75rem;">$ clawctl board --format=json</div>
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="width: 30%;"></div>
+        <div class="skeleton-line" style="width: 60%;"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="width: 45%;"></div>
+        <div class="skeleton-line" style="width: 55%;"></div>
+      </div>
+      <div class="skeleton-card" style="margin-top: 1rem;">
+        <div class="skeleton-line" style="width: 35%;"></div>
+        <div class="skeleton-line" style="width: 50%;"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Sheet Backdrop -->
+  <div id="sheet-backdrop" class="sheet-backdrop" onclick="closeDetail()" aria-hidden="true"></div>
+
+  <!-- Bottom Sheet -->
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-label="Task detail">
+    <div class="sheet-header">
+      <span id="sheet-header-text">$ clawctl show</span>
+      <button onclick="closeDetail()" class="btn-terminal close-btn" style="padding: 0.125rem 0.5rem; font-size: 0.65rem;" aria-label="Close detail">ESC</button>
+    </div>
+    <div id="sheet-content" class="sheet-content">
+      <!-- Task detail rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loading" class="loading-overlay">
+    <div class="loading-ascii">
+ ██████╗██╗      █████╗ ██╗    ██╗
+██╔════╝██║     ██╔══██╗██║    ██║
+██║     ██║     ███████║██║ █╗ ██║
+██║     ██║     ██╔══██║██║███╗██║
+╚██████╗███████╗██║  ██║╚███╔███╔╝
+ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝</div>
+    <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+    <div class="loading-text">$ clawctl dashboard --connect</div>
+  </div>
+
+  <!-- Error overlay -->
+  <div id="error-overlay" class="loading-overlay" style="display: none;">
+    <div class="error-container">
+      <div class="error-label glow-red">[ERROR] <span id="error-message">Connection failed</span></div>
+      <div class="error-hint" style="margin-top: 0.75rem;">$ clawctl dashboard --help</div>
+    </div>
+  </div>
+
+  <script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  tasks: [],
+  agents: [],
+  selectedTask: null,
+  token: new URLSearchParams(location.search).get('token'),
+  sseRetries: 0,
+  eventSource: null,
+  effectsOn: localStorage.getItem('cc_effects') === 'true',
+  matrixRaf: null,
+  sheetFocusTrap: null,
+  previousFocus: null,
+};
+
+// ═══════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════
+const api = {
+  async get(endpoint) {
+    const res = await fetch(`${endpoint}?token=${state.token}`);
+    if (res.status === 401) throw new Error('Unauthorized');
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  },
+  async post(endpoint, body = {}) {
+    const res = await fetch(`${endpoint}?token=${state.token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 401) throw new Error('Unauthorized');
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  }
+};
+
+// ═══════════════════════════════════════════
+// BOARD
+// ═══════════════════════════════════════════
+async function fetchBoard() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('animate-spin');
+
+  try {
+    const data = await api.get('/api/board');
+    state.tasks = data.tasks;
+    state.agents = data.agents;
+    renderBoard();
+    saveCache(data);
+    hideStaleIndicator();
+    document.getElementById('skeleton').style.display = 'none';
+  } catch (e) {
+    console.error('Fetch error:', e);
+    if (e.message === 'Unauthorized') {
+      showError('Invalid or missing token');
+      return;
+    }
+    const cache = loadCache();
+    if (cache) {
+      state.tasks = cache.data.tasks;
+      state.agents = cache.data.agents;
+      renderBoard();
+      showStaleIndicator(cache.timestamp);
+      document.getElementById('skeleton').style.display = 'none';
+    } else {
+      showError('Cannot connect to server');
+    }
+  } finally {
+    icon.classList.remove('animate-spin');
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  const groups = {
+    pending: state.tasks.filter(t => t.status === 'pending' || t.status === 'claimed'),
+    in_progress: state.tasks.filter(t => t.status === 'in_progress'),
+    blocked: state.tasks.filter(t => t.status === 'blocked'),
+    done: state.tasks.filter(t => t.status === 'done')
+  };
+
+  const activeAgents = state.agents.filter(a => a.status === 'busy').length;
+  const statsEl = document.getElementById('header-stats');
+  statsEl.innerHTML = `$ fleet: <span style="color:var(--green)">${state.agents.length} agents</span> <span style="color:var(--fg-dim)">|</span> <span style="color:var(--cyan)">${activeAgents} active</span> <span style="color:var(--fg-dim)">|</span> <span style="color:var(--amber)">${state.tasks.length} tasks</span>`;
+
+  let html = '<div id="skeleton" style="display:none;"></div>';
+  html += renderSection('pending', '[ ]', 'Pending', groups.pending, 'var(--amber)');
+  html += renderSection('in_progress', '[>]', 'In Progress', groups.in_progress, 'var(--cyan)');
+  if (groups.blocked.length > 0) {
+    html += renderSection('blocked', '[X]', 'Blocked', groups.blocked, 'var(--red)');
+  }
+  html += renderSection('done', '[+]', 'Done', groups.done, 'var(--green)', groups.done.length > 3);
+
+  board.innerHTML = html;
+
+  // Animate card entrances
+  if (state.effectsOn && !prefersReducedMotion()) {
+    requestAnimationFrame(() => {
+      const cards = board.querySelectorAll('.card-enter');
+      cards.forEach((card, i) => {
+        const delay = Math.min(i * 30, 500);
+        setTimeout(() => {
+          card.classList.add('card-enter-active');
+        }, delay);
+      });
+    });
+  }
+}
+
+function renderSection(id, bracket, label, tasks, color, collapsed = false) {
+  const count = tasks.length;
+  return `
+    <section style="margin-bottom: 1.5rem;">
+      <div class="section-header">
+        <span class="section-bracket" style="color: ${color};">${bracket}</span>
+        <span style="color: ${color};">${label}</span>
+        <span class="section-count">${count}</span>
+        <div class="section-divider"></div>
+      </div>
+      <div id="section-${id}" ${collapsed ? 'style="display:none;"' : ''}>
+        ${tasks.map((t, i) => renderCard(t, i)).join('')}
+        ${count === 0 ? `<div class="section-empty">-- no tasks --<br><span class="section-empty-hint">$ clawctl add "..."</span></div>` : ''}
+      </div>
+      ${collapsed ? `
+        <button onclick="const s=document.getElementById('section-${id}');s.style.display=s.style.display==='none'?'':'none';this.style.display='none';"
+                class="btn-terminal" style="font-size: 0.7rem; margin-top: 0.25rem;">
+          show ${count} completed
+        </button>
+      ` : ''}
+    </section>
+  `;
+}
+
+function renderCard(task, index) {
+  const agent = state.agents.find(a => a.name === task.owner);
+  const agentStatus = agent ? getAgentStatus(agent) : 'offline';
+  const shouldAnimate = state.effectsOn && !prefersReducedMotion();
+
+  let priorityBadge = '';
+  if (task.priority >= 2) {
+    priorityBadge = '<span class="task-priority crit">CRIT</span>';
+  } else if (task.priority === 1) {
+    priorityBadge = '<span class="task-priority high">HIGH</span>';
+  }
+
+  const tags = task.tags ? (typeof task.tags === 'string' ? task.tags.split(',').map(s=>s.trim()).filter(Boolean) : task.tags) : [];
+  const tagsHtml = tags.length > 0 ? `<div class="task-tags">${tags.map(t => `<span class="task-tag">${escapeHtml(t)}</span>`).join('')}</div>` : '';
+
+  return `
+    <div class="task-card ${shouldAnimate ? 'card-enter' : ''}" data-status="${task.status}"
+         onclick="openDetail(${task.id})" tabindex="0" role="button"
+         onkeydown="if(event.key==='Enter')openDetail(${task.id})">
+      <div class="task-card-top">
+        <div>
+          <span class="task-id">#${task.id}</span>
+          <span class="task-subject">${escapeHtml(task.subject)}</span>
+          ${priorityBadge}
+        </div>
+        <span class="task-badge">${task.status.replace('_', ' ')}</span>
+      </div>
+      <div class="task-meta">
+        ${task.owner ? `
+          <span class="task-agent">
+            <span class="agent-dot ${agentStatus}"></span>
+            ${escapeHtml(task.owner)}
+          </span>
+          <span class="task-meta-sep">//</span>
+        ` : '<span style="color:var(--fg-dim)">unassigned</span><span class="task-meta-sep">//</span>'}
+        <span>${timeAgo(task.updated_at || task.created_at)}</span>
+      </div>
+      ${tagsHtml}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+// DETAIL SHEET
+// ═══════════════════════════════════════════
+async function openDetail(taskId) {
+  state.selectedTask = taskId;
+  state.previousFocus = document.activeElement;
+
+  const sheet = document.getElementById('sheet');
+  const backdrop = document.getElementById('sheet-backdrop');
+  const content = document.getElementById('sheet-content');
+  const headerText = document.getElementById('sheet-header-text');
+
+  headerText.textContent = `$ clawctl show ${taskId}`;
+
+  // Show sheet with loading
+  content.innerHTML = `
+    <div style="color: var(--fg-dim); font-size: 0.75rem; margin-bottom: 0.75rem;">$ clawctl show ${taskId}</div>
+    <div class="loading-bar" style="width: 100%; margin-bottom: 1rem;"><div class="loading-bar-inner"></div></div>
+    <div class="skeleton-card">
+      <div class="skeleton-line" style="width: 60%;"></div>
+      <div class="skeleton-line" style="width: 40%;"></div>
+    </div>
+  `;
+
+  backdrop.classList.add('visible');
+  backdrop.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => {
+    sheet.classList.add('visible');
+  });
+
+  // Focus trap
+  setupFocusTrap(sheet);
+
+  try {
+    const data = await api.get(`/api/task/${taskId}`);
+    content.innerHTML = renderDetail(data.task, data.messages);
+    // Focus the first interactive element in the sheet
+    const firstBtn = sheet.querySelector('.btn-sheet');
+    if (firstBtn) firstBtn.focus();
+  } catch (e) {
+    content.innerHTML = `
+      <div class="error-container" style="margin: 1rem auto;">
+        <div class="error-label glow-red">[ERROR] Failed to load task</div>
+        <button onclick="openDetail(${taskId})" class="btn-terminal" style="margin-top: 0.75rem;">RETRY</button>
+      </div>
+    `;
+  }
+}
+
+function renderDetail(task, messages) {
+  const canDelete = task.status !== 'done' && task.status !== 'cancelled';
+  const canComplete = task.status === 'in_progress' || task.status === 'claimed';
+
+  const statusColors = {
+    done: 'var(--green)',
+    in_progress: 'var(--cyan)',
+    claimed: 'var(--cyan)',
+    blocked: 'var(--red)',
+    pending: 'var(--amber)',
+  };
+  const statusColor = statusColors[task.status] || 'var(--fg-dim)';
+
+  let priorityLabel = 'Normal';
+  let priorityColor = 'var(--fg)';
+  if (task.priority >= 2) { priorityLabel = 'CRIT'; priorityColor = 'var(--red)'; }
+  else if (task.priority === 1) { priorityLabel = 'HIGH'; priorityColor = 'var(--amber)'; }
+
+  return `
+    <div>
+      <div style="margin-bottom: 1rem;">
+        <span class="task-id">#${task.id}</span>
+        <span style="font-size: 1rem; font-weight: 600; color: var(--fg);">${escapeHtml(task.subject)}</span>
+      </div>
+
+      <div class="sheet-grid">
+        <div class="sheet-grid-cell">
+          <div class="sheet-grid-label">Status</div>
+          <div class="sheet-grid-value" style="color: ${statusColor};">${task.status.replace('_', ' ')}</div>
+        </div>
+        <div class="sheet-grid-cell">
+          <div class="sheet-grid-label">Owner</div>
+          <div class="sheet-grid-value">${task.owner ? escapeHtml(task.owner) : '<span style="color:var(--fg-dim)">unassigned</span>'}</div>
+        </div>
+        <div class="sheet-grid-cell">
+          <div class="sheet-grid-label">Priority</div>
+          <div class="sheet-grid-value" style="color: ${priorityColor};">${priorityLabel}</div>
+        </div>
+        <div class="sheet-grid-cell">
+          <div class="sheet-grid-label">Created</div>
+          <div class="sheet-grid-value">${timeAgo(task.created_at)}</div>
+        </div>
+      </div>
+
+      ${task.description ? `
+        <div style="margin-bottom: 1rem;">
+          <div class="sheet-section-title"># Description</div>
+          <div style="background: var(--bg-0); border: 1px solid var(--border); padding: 0.75rem; font-size: 0.75rem; white-space: pre-wrap; color: var(--fg);">${escapeHtml(task.description)}</div>
+        </div>
+      ` : ''}
+
+      ${messages && messages.length > 0 ? `
+        <div style="margin-bottom: 1rem;">
+          <div class="sheet-section-title"># Messages (${messages.length})</div>
+          ${messages.map(m => `
+            <div class="sheet-message" data-type="${escapeHtml(m.msg_type || m.type || '')}">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <span>
+                  ${m.msg_type || m.type ? `<span class="msg-type-badge">${escapeHtml(m.msg_type || m.type)}</span>` : ''}
+                  <span style="color: var(--green-dim); font-weight: 500;">${escapeHtml(m.from_agent)}</span>
+                </span>
+                <span style="color: var(--fg-dim); font-size: 0.65rem;">${timeAgo(m.created_at)}</span>
+              </div>
+              <p style="color: var(--fg); margin: 0;">${escapeHtml(m.body)}</p>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <div class="sheet-buttons">
+        ${canComplete ? `
+          <button onclick="completeTask(${task.id})" class="btn-sheet complete" data-primary="true">
+            &gt; COMPLETE
+          </button>
+        ` : ''}
+        ${task.status === 'done' ? `
+          <div class="completed-badge glow-green">[COMPLETED]</div>
+        ` : ''}
+        ${canDelete ? `
+          <button onclick="deleteTask(${task.id})" class="btn-sheet delete">
+            &gt; DELETE
+          </button>
+        ` : ''}
+        <button onclick="closeDetail()" class="btn-sheet close-btn">ESC</button>
+      </div>
+    </div>
+  `;
+}
+
+function closeDetail() {
+  const sheet = document.getElementById('sheet');
+  const backdrop = document.getElementById('sheet-backdrop');
+
+  sheet.classList.remove('visible');
+  backdrop.setAttribute('aria-hidden', 'true');
+
+  setTimeout(() => {
+    backdrop.classList.remove('visible');
+  }, 300);
+
+  removeFocusTrap();
+  if (state.previousFocus) {
+    state.previousFocus.focus();
+    state.previousFocus = null;
+  }
+  state.selectedTask = null;
+}
+
+// ═══════════════════════════════════════════
+// FOCUS TRAP
+// ═══════════════════════════════════════════
+function setupFocusTrap(container) {
+  removeFocusTrap();
+  state.sheetFocusTrap = function(e) {
+    if (e.key === 'Tab') {
+      const focusable = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    if (e.key === 'Enter') {
+      const primary = container.querySelector('[data-primary="true"]');
+      if (primary && document.activeElement === primary) {
+        // Let it through naturally
+      }
+    }
+  };
+  document.addEventListener('keydown', state.sheetFocusTrap);
+}
+
+function removeFocusTrap() {
+  if (state.sheetFocusTrap) {
+    document.removeEventListener('keydown', state.sheetFocusTrap);
+    state.sheetFocusTrap = null;
+  }
+}
+
+// ═══════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && state.selectedTask !== null) {
+    closeDetail();
+  }
+});
+
+// ═══════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════
+async function deleteTask(taskId) {
+  const task = state.tasks.find(t => t.id === taskId);
+  if (task) {
+    task.status = 'cancelled';
+    renderBoard();
+  }
+
+  closeDetail();
+
+  try {
+    await api.post(`/api/task/${taskId}/delete`, { agent: 'dashboard' });
+    await fetchBoard();
+  } catch (e) {
+    console.error('Delete failed:', e);
+    await fetchBoard();
+  }
+}
+
+async function completeTask(taskId) {
+  const task = state.tasks.find(t => t.id === taskId);
+  if (task) {
+    task.status = 'done';
+    renderBoard();
+  }
+
+  closeDetail();
+
+  try {
+    await api.post(`/api/task/${taskId}/complete`, {});
+    await fetchBoard();
+  } catch (e) {
+    console.error('Complete failed:', e);
+    await fetchBoard();
+  }
+}
+
+// ═══════════════════════════════════════════
+// REAL-TIME (SSE)
+// ═══════════════════════════════════════════
+function connectSSE() {
+  if (state.eventSource) {
+    state.eventSource.close();
+  }
+
+  const es = new EventSource(`/api/heartbeat?token=${state.token}`);
+  state.eventSource = es;
+
+  es.onopen = () => {
+    console.log('SSE: Connected');
+    state.sseRetries = 0;
+    showSSEBanner(true);
+  };
+
+  es.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (data.refresh) {
+        fetchBoard();
+      }
+    } catch (err) {
+      console.error('SSE parse error:', err);
+    }
+  };
+
+  es.onerror = () => {
+    es.close();
+    showSSEBanner(false);
+    state.sseRetries++;
+    const delay = Math.min(1000 * (2 ** state.sseRetries), 30000);
+    console.log(`SSE: Reconnecting in ${delay}ms (attempt ${state.sseRetries})`);
+    setTimeout(connectSSE, delay);
+  };
+}
+
+function showSSEBanner(connected) {
+  const banner = document.getElementById('sse-banner');
+  if (connected) {
+    banner.classList.add('visible');
+    setTimeout(() => banner.classList.remove('visible'), 3000);
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    fetchBoard();
+    if (!state.eventSource || state.eventSource.readyState === EventSource.CLOSED) {
+      connectSSE();
+    }
+    // Pause/resume matrix rain
+    if (state.effectsOn) startMatrix();
+  } else {
+    stopMatrix();
+  }
+});
+
+// ═══════════════════════════════════════════
+// EFFECTS TOGGLE
+// ═══════════════════════════════════════════
+function toggleEffects() {
+  state.effectsOn = !state.effectsOn;
+  localStorage.setItem('cc_effects', state.effectsOn);
+  applyEffects();
+}
+
+function applyEffects() {
+  const label = document.getElementById('effects-label');
+  const toggle = document.getElementById('effects-toggle');
+
+  if (state.effectsOn && !prefersReducedMotion()) {
+    document.body.classList.add('effects-on');
+    label.textContent = 'ON';
+    toggle.classList.add('active');
+    startMatrix();
+  } else {
+    document.body.classList.remove('effects-on');
+    label.textContent = 'OFF';
+    toggle.classList.remove('active');
+    stopMatrix();
+  }
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+// ═══════════════════════════════════════════
+// MATRIX RAIN
+// ═══════════════════════════════════════════
+function startMatrix() {
+  if (state.matrixRaf || prefersReducedMotion() || !state.effectsOn) return;
+
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Low resolution, scaled up
+  const scale = 3;
+  const w = Math.floor(window.innerWidth / scale);
+  const h = Math.floor(window.innerHeight / scale);
+  canvas.width = w;
+  canvas.height = h;
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()';
+  const fontSize = 8;
+  const columns = Math.floor(w / fontSize);
+  const drops = new Array(columns).fill(1);
+
+  let lastTime = 0;
+  const interval = 80;
+
+  function draw(time) {
+    if (!state.effectsOn) { state.matrixRaf = null; return; }
+    state.matrixRaf = requestAnimationFrame(draw);
+
+    if (time - lastTime < interval) return;
+    lastTime = time;
+
+    ctx.fillStyle = 'rgba(5, 10, 5, 0.15)';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = '#00ff41';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > h && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  state.matrixRaf = requestAnimationFrame(draw);
+}
+
+function stopMatrix() {
+  if (state.matrixRaf) {
+    cancelAnimationFrame(state.matrixRaf);
+    state.matrixRaf = null;
+  }
+}
+
+// ═══════════════════════════════════════════
+// CACHE
+// ═══════════════════════════════════════════
+function saveCache(data) {
+  try {
+    localStorage.setItem('cc_board', JSON.stringify({
+      data,
+      timestamp: Date.now()
+    }));
+  } catch (e) {
+    console.warn('Cache save failed:', e);
+  }
+}
+
+function loadCache() {
+  try {
+    const cached = localStorage.getItem('cc_board');
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+}
+
+function showStaleIndicator(timestamp) {
+  const banner = document.getElementById('stale-banner');
+  const time = document.getElementById('stale-time');
+  time.textContent = timeAgo(new Date(timestamp).toISOString());
+  banner.classList.add('visible');
+}
+
+function hideStaleIndicator() {
+  document.getElementById('stale-banner').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return 'unknown';
+  const date = new Date(dateStr.replace(' ', 'T') + 'Z');
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+
+  if (seconds < 0) return 'just now';
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+function getAgentStatus(agent) {
+  if (!agent || !agent.last_seen) return 'offline';
+  const lastSeen = new Date(agent.last_seen.replace(' ', 'T') + 'Z');
+  const minutesAgo = (Date.now() - lastSeen.getTime()) / 60000;
+
+  if (minutesAgo > 15) return 'offline';
+  if (agent.status === 'busy') return 'active';
+  return 'idle';
+}
+
+function showError(message) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error-message').textContent = message;
+  document.getElementById('error-overlay').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  if (!state.token) {
+    showError('Missing token in URL');
+    return;
+  }
+
+  applyEffects();
+  fetchBoard();
+  connectSSE();
+
+  // Listen for reduced-motion changes
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => {
+    applyEffects();
+  });
+});
+  </script>
+</body>
+</html>

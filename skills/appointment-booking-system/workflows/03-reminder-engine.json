@@ -1,0 +1,244 @@
+{
+  "name": "Booking — Reminder Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Hourly Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Read Appointments",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst appointments = $input.all().map(i => i.json);\nconst reminders = [];\n\nfor (const apt of appointments) {\n  if (apt.status !== 'confirmed') continue;\n\n  // Parse appointment datetime\n  const aptDate = new Date(`${apt.date}T${apt.time}`);\n  if (isNaN(aptDate.getTime())) continue;\n\n  const hoursUntil = (aptDate - now) / (1000 * 60 * 60);\n\n  // 24-hour reminder (between 23-25 hours before)\n  if (hoursUntil >= 23 && hoursUntil <= 25 && apt.reminder_24h !== 'true' && apt.reminder_24h !== true) {\n    reminders.push({\n      booking_id: apt.booking_id,\n      name: apt.name,\n      email: apt.email,\n      phone: apt.phone,\n      service: apt.service,\n      date: apt.date,\n      time: apt.time,\n      reminder_type: '24h',\n      update_field: 'reminder_24h'\n    });\n  }\n\n  // 2-hour reminder (between 1.5-2.5 hours before)\n  if (hoursUntil >= 1.5 && hoursUntil <= 2.5 && apt.reminder_2h !== 'true' && apt.reminder_2h !== true) {\n    reminders.push({\n      booking_id: apt.booking_id,\n      name: apt.name,\n      email: apt.email,\n      phone: apt.phone,\n      service: apt.service,\n      date: apt.date,\n      time: apt.time,\n      reminder_type: '2h',\n      update_field: 'reminder_2h'\n    });\n  }\n}\n\nif (reminders.length === 0) {\n  return [{ json: { skip: true, message: 'No reminders due' } }];\n}\n\nreturn reminders.map(r => ({ json: r }));"
+      },
+      "id": "n3",
+      "name": "Find Due Reminders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "not-skip",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Has Reminders?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Reminder: {{ $json.service }} appointment {{ $json.reminder_type === '24h' ? 'tomorrow' : 'in 2 hours' }}",
+        "message": "=<h2>Appointment Reminder</h2><p>Hi {{ $json.name }},</p><p>This is a {{ $json.reminder_type === '24h' ? 'reminder that your appointment is tomorrow' : 'final reminder — your appointment is in 2 hours' }}:</p><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Service</strong></td><td>{{ $json.service }}</td></tr><tr><td><strong>Date</strong></td><td>{{ $json.date }}</td></tr><tr><td><strong>Time</strong></td><td>{{ $json.time }}</td></tr></table><p>If you need to reschedule, please contact us at {{ $env.BUSINESS_PHONE || 'YOUR_BUSINESS_PHONE' }}.</p><p>{{ $env.BUSINESS_NAME || 'YOUR_BUSINESS_NAME' }}</p>",
+        "options": {}
+      },
+      "id": "n5",
+      "name": "Send Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        200
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $json.booking_id }}",
+            "reminder_24h": "={{ $json.update_field === 'reminder_24h' ? true : undefined }}",
+            "reminder_2h": "={{ $json.update_field === 'reminder_2h' ? true : undefined }}"
+          },
+          "matchingColumns": [
+            "booking_id"
+          ],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": true
+            },
+            {
+              "id": "reminder_24h",
+              "displayName": "reminder_24h",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "reminder_2h",
+              "displayName": "reminder_2h",
+              "required": false,
+              "defaultMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Mark Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1320,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Hourly Check": {
+      "main": [
+        [
+          {
+            "node": "Read Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Appointments": {
+      "main": [
+        [
+          {
+            "node": "Find Due Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Due Reminders": {
+      "main": [
+        [
+          {
+            "node": "Has Reminders?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Reminders?": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Mark Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

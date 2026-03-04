@@ -1,0 +1,104 @@
+# Follow-Up Reminders Workflow
+# Creates tasks for stale pipelines and contacts without recent activity
+
+name: follow-up-reminders
+description: Create follow-up tasks for stale pipelines and inactive contacts
+enabled: true
+schedule:
+  frequency: daily
+  time: "08:00"
+
+triggers:
+  - type: scheduled
+    cron: "0 8 * * *"
+  - type: manual
+    name: run_now
+
+rules:
+  # Stale Pipeline Follow-ups
+  - name: stale-pipeline-followup
+    description: Create tasks for pipelines with no activity in 7 days
+    target: pipelines
+    conditions:
+      - field: Stage
+        operator: not_in
+        value: ["Closed Won", "Closed Lost"]
+      - field: Last_Activity_Time
+        operator: older_than_days
+        value: 7
+    actions:
+      - type: create_task
+        subject: "Follow up: {{pipeline.name}}"
+        due_date: "+1d"
+        priority: High
+        related_to: "Pipelines:{{pipeline.id}}"
+        assign_to: "{{pipeline.owner}}"
+        description: |
+          This pipeline has had no activity for 7 days.
+          Current stage: {{pipeline.stage}}
+          Amount: {{pipeline.amount}}
+          
+          Suggested actions:
+          - Send follow-up email
+          - Schedule check-in call
+          - Update pipeline stage
+
+  # Contact Follow-ups
+  - name: inactive-contact-followup
+    description: Create tasks for contacts not contacted in 14 days
+    target: contacts
+    conditions:
+      - field: Last_Activity_Time
+        operator: older_than_days
+        value: 14
+    actions:
+      - type: create_task
+        subject: "Re-engage: {{contact.first_name}} {{contact.last_name}}"
+        due_date: "+2d"
+        priority: Normal
+        related_to: "Contacts:{{contact.id}}"
+        assign_to: "{{contact.owner}}"
+        description: |
+          No contact in 14 days. Consider:
+          - Sending value-add content
+          - Inviting to webinar/event
+          - Checking on satisfaction
+
+  # Overdue Task Reminders
+  - name: overdue-task-alert
+    description: Alert owners of overdue tasks
+    target: tasks
+    conditions:
+      - field: Status
+        operator: equals
+        value: "Open"
+      - field: Due_Date
+        operator: before_today
+    actions:
+      - type: create_task
+        subject: "OVERDUE: {{task.subject}}"
+        due_date: "today"
+        priority: High
+        related_to: "{{task.related_module}}:{{task.related_id}}"
+        assign_to: "{{task.owner}}"
+        description: |
+          This task is overdue!
+          Original due date: {{task.due_date}}
+          
+          Please complete or reschedule immediately.
+
+settings:
+  max_tasks_per_run: 100
+  skip_weekends: true
+  business_hours_only: true
+  timezone: "America/New_York"
+
+notifications:
+  on_task_created:
+    email: true
+    in_app: true
+  daily_summary:
+    enabled: true
+    recipients:
+      - manager@company.com
+    time: "09:00"

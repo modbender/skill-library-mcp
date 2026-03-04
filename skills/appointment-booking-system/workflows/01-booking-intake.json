@@ -1,0 +1,342 @@
+{
+  "name": "Booking — Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking/new",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n1",
+      "name": "Booking Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "booking-intake"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst name = (body.name || '').trim();\nconst email = (body.email || '').trim().toLowerCase();\nconst phone = (body.phone || '').trim();\nconst service = (body.service || '').trim();\nconst date = (body.date || '').trim();\nconst time = (body.time || '').trim();\nconst notes = (body.notes || '').trim();\n\nconst errors = [];\nif (!name) errors.push('Name is required');\nif (!email || !email.includes('@')) errors.push('Valid email is required');\nif (!phone) errors.push('Phone is required');\nif (!service) errors.push('Service type is required');\nif (!date) errors.push('Date is required');\nif (!time) errors.push('Time is required');\n\nif (errors.length > 0) {\n  return [{ json: { valid: false, errors } }];\n}\n\n// Generate booking ID\nconst bookingId = 'BK-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\n\nreturn [{\n  json: {\n    valid: true,\n    booking_id: bookingId,\n    name,\n    email,\n    phone,\n    service,\n    date,\n    time,\n    notes,\n    status: 'confirmed',\n    showed_up: '',\n    reminder_24h: false,\n    reminder_2h: false,\n    created_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "n2",
+      "name": "Validate Booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid-check",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n3",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $json.booking_id }}",
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "service": "={{ $json.service }}",
+            "date": "={{ $json.date }}",
+            "time": "={{ $json.time }}",
+            "notes": "={{ $json.notes }}",
+            "status": "={{ $json.status }}",
+            "reminder_24h": "={{ $json.reminder_24h }}",
+            "reminder_2h": "={{ $json.reminder_2h }}",
+            "created_at": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [
+            "booking_id"
+          ],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "reminder_24h",
+              "displayName": "reminder_24h",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "reminder_2h",
+              "displayName": "reminder_2h",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Save to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Booking Confirmed — {{ $json.service }} on {{ $json.date }}",
+        "message": "=<h2>Booking Confirmation</h2><p>Hi {{ $json.name }},</p><p>Your appointment has been confirmed:</p><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Booking ID</strong></td><td>{{ $json.booking_id }}</td></tr><tr><td><strong>Service</strong></td><td>{{ $json.service }}</td></tr><tr><td><strong>Date</strong></td><td>{{ $json.date }}</td></tr><tr><td><strong>Time</strong></td><td>{{ $json.time }}</td></tr></table><p>If you need to reschedule or cancel, please contact us at {{ $env.BUSINESS_PHONE || 'YOUR_BUSINESS_PHONE' }} or reply to this email.</p><p>See you soon!</p><p>{{ $env.BUSINESS_NAME || 'YOUR_BUSINESS_NAME' }}</p>",
+        "options": {}
+      },
+      "id": "n5",
+      "name": "Confirm to Client",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        100
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.STAFF_EMAIL || 'YOUR_NOTIFICATION_EMAIL' }}",
+        "subject": "=New Booking: {{ $json.name }} — {{ $json.service }} on {{ $json.date }} at {{ $json.time }}",
+        "message": "=<h2>New Appointment Booked</h2><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Booking ID</strong></td><td>{{ $json.booking_id }}</td></tr><tr><td><strong>Client</strong></td><td>{{ $json.name }}</td></tr><tr><td><strong>Email</strong></td><td>{{ $json.email }}</td></tr><tr><td><strong>Phone</strong></td><td>{{ $json.phone }}</td></tr><tr><td><strong>Service</strong></td><td>{{ $json.service }}</td></tr><tr><td><strong>Date</strong></td><td>{{ $json.date }}</td></tr><tr><td><strong>Time</strong></td><td>{{ $json.time }}</td></tr><tr><td><strong>Notes</strong></td><td>{{ $json.notes }}</td></tr></table>",
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Notify Staff",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, booking_id: $('Validate Booking').first().json.booking_id, message: 'Booking confirmed' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "n7",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, errors: $json.errors }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "n8",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Booking Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Booking": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Confirm to Client",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm to Client": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

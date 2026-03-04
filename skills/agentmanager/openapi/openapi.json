@@ -1,0 +1,465 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Agent Manager API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Health"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OpenAPI document"
+          }
+        }
+      }
+    },
+    "/v1/capabilities": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Capabilities"
+          }
+        }
+      }
+    },
+    "/v1/tools": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "List tools with current tools_version"
+          }
+        }
+      }
+    },
+    "/v1/tools/register": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Register tools"
+          },
+          "400": {
+            "description": "Invalid tool spec"
+          },
+          "403": {
+            "description": "Tool registration disabled or disallowed"
+          }
+        }
+      }
+    },
+    "/v1/plan": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_request": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "budget_level": {
+                        "type": "string",
+                        "enum": [
+                          "cheap",
+                          "normal",
+                          "thorough"
+                        ]
+                      },
+                      "strategy_hint": {
+                        "type": "string"
+                      },
+                      "goal_type": {
+                        "type": "string",
+                        "enum": [
+                          "answer",
+                          "code",
+                          "analysis",
+                          "tooling"
+                        ]
+                      },
+                      "risk_level": {
+                        "type": "string",
+                        "enum": [
+                          "low",
+                          "medium",
+                          "high"
+                        ]
+                      },
+                      "must_verify": {
+                        "type": "boolean"
+                      },
+                      "tool_preference": {
+                        "type": "string",
+                        "enum": [
+                          "avoid",
+                          "allow",
+                          "prefer"
+                        ]
+                      },
+                      "latency_hint_ms": {
+                        "type": "integer"
+                      },
+                      "max_cost_override": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "user_request"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan"
+          },
+          "400": {
+            "description": "Plan invalid or strategy not found"
+          }
+        }
+      }
+    },
+    "/v1/plan/validate": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Plan valid"
+          },
+          "400": {
+            "description": "Plan invalid"
+          }
+        }
+      }
+    },
+    "/v1/run": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_request": {
+                    "type": "string"
+                  },
+                  "plan": {
+                    "type": "object"
+                  },
+                  "idempotency_key": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "budget_level": {
+                        "type": "string",
+                        "enum": [
+                          "cheap",
+                          "normal",
+                          "thorough"
+                        ]
+                      },
+                      "strategy_hint": {
+                        "type": "string"
+                      },
+                      "max_concurrency": {
+                        "type": "integer"
+                      },
+                      "goal_type": {
+                        "type": "string",
+                        "enum": [
+                          "answer",
+                          "code",
+                          "analysis",
+                          "tooling"
+                        ]
+                      },
+                      "risk_level": {
+                        "type": "string",
+                        "enum": [
+                          "low",
+                          "medium",
+                          "high"
+                        ]
+                      },
+                      "must_verify": {
+                        "type": "boolean"
+                      },
+                      "tool_preference": {
+                        "type": "string",
+                        "enum": [
+                          "avoid",
+                          "allow",
+                          "prefer"
+                        ]
+                      },
+                      "latency_hint_ms": {
+                        "type": "integer"
+                      },
+                      "max_cost_override": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Run enqueued"
+          },
+          "400": {
+            "description": "Request or plan invalid"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run"
+          },
+          "404": {
+            "description": "Run not found"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/cancel": {
+      "post": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run cancelled or already terminal"
+          },
+          "404": {
+            "description": "Run not found"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/events": {
+      "get": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incremental events"
+          },
+          "404": {
+            "description": "Run not found"
+          }
+        }
+      }
+    },
+    "/v1/run/sync": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Synchronous run result"
+          },
+          "400": {
+            "description": "Validation/plan/strategy error"
+          },
+          "408": {
+            "description": "Synchronous wait timeout"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/report": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consolidated run report"
+          },
+          "404": {
+            "description": "Run not found"
+          }
+        }
+      }
+    },
+    "/v1/errors": {
+      "get": {
+        "summary": "List error catalog",
+        "responses": {
+          "200": {
+            "description": "Error catalog"
+          }
+        }
+      }
+    },
+    "/v1/runs": {
+      "get": {
+        "summary": "List runs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run list"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/stream": {
+      "get": {
+        "summary": "Stream run events",
+        "description": "SSE stream with monotonic event ids. Supports Last-Event-ID and after query; heartbeat comments sent at SSE_HEARTBEAT_MS.",
+        "responses": {
+          "200": {
+            "description": "SSE stream"
+          }
+        }
+      }
+    },
+    "/v1/plan/generate": {
+      "post": {
+        "summary": "Generate plan (convenience)",
+        "responses": {
+          "200": {
+            "description": "Plan"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/replay": {
+      "get": {
+        "summary": "Replay run events",
+        "responses": {
+          "200": {
+            "description": "Replay payload"
+          }
+        }
+      }
+    },
+    "/v1/run/{id}/task/{name}/inject": {
+      "post": {
+        "summary": "Inject task result",
+        "responses": {
+          "200": {
+            "description": "Injection accepted"
+          }
+        }
+      }
+    },
+    "/v1/provider-adapter/schema": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Provider adapter request and response schema"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  },
+  "x-notes": [
+    "dry_run responses do not create run records and do not return run_id",
+    "REQUIRE_RUN_TOKEN=1 enforces X-Run-Token against RUN_TOKENS",
+    "HTTP callback tools honor timeout_ms and return TOOL_TIMEOUT on abort",
+    "External AI can submit full plans to /v1/plan for validation + recommendations",
+    "Use /v1/plan/generate only as convenience heuristic generator",
+    "Tool-calling loop appends exactly one tool result message per tool_call_id before next provider round"
+  ],
+  "x-security-env": {
+    "OUTBOUND_ALLOWLIST": "allow outbound provider hosts",
+    "TOOL_CALLBACK_ALLOWLIST": "allow outbound callback hosts",
+    "REDACT_TELEMETRY": "redact replay/report/events/stream payload fields"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "name": "Booking — Daily Schedule Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Morning Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Read Appointments",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const appointments = $input.all().map(i => i.json);\nconst today = new Date().toISOString().split('T')[0];\nconst tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];\n\n// Today's appointments\nconst todayApts = appointments\n  .filter(a => a.date === today && a.status === 'confirmed')\n  .sort((a, b) => (a.time || '').localeCompare(b.time || ''));\n\n// Tomorrow's appointments\nconst tomorrowApts = appointments\n  .filter(a => a.date === tomorrow && a.status === 'confirmed')\n  .sort((a, b) => (a.time || '').localeCompare(b.time || ''));\n\n// Build HTML tables\nfunction buildTable(apts, label) {\n  if (apts.length === 0) return `<p><strong>${label}:</strong> No appointments scheduled.</p>`;\n  let html = `<h3>${label} (${apts.length} appointments)</h3>`;\n  html += '<table border=\"1\" cellpadding=\"8\" cellspacing=\"0\"><tr><th>Time</th><th>Client</th><th>Service</th><th>Phone</th><th>Notes</th></tr>';\n  for (const a of apts) {\n    html += `<tr><td><strong>${a.time}</strong></td><td>${a.name}</td><td>${a.service}</td><td>${a.phone}</td><td>${a.notes || '-'}</td></tr>`;\n  }\n  html += '</table>';\n  return html;\n}\n\nconst todayTable = buildTable(todayApts, `Today (${today})`);\nconst tomorrowTable = buildTable(tomorrowApts, `Tomorrow (${tomorrow})`);\n\n// Weekly stats\nconst weekStart = new Date(Date.now() - new Date().getDay() * 24 * 60 * 60 * 1000).toISOString().split('T')[0];\nconst thisWeek = appointments.filter(a => a.date >= weekStart);\nconst completed = thisWeek.filter(a => a.showed_up === 'true' || a.showed_up === true).length;\nconst noShows = thisWeek.filter(a => a.status === 'no-show').length;\nconst cancelled = thisWeek.filter(a => a.status === 'cancelled').length;\n\nreturn [{\n  json: {\n    today_date: today,\n    today_count: todayApts.length,\n    tomorrow_count: tomorrowApts.length,\n    today_table: todayTable,\n    tomorrow_table: tomorrowTable,\n    week_completed: completed,\n    week_noshows: noShows,\n    week_cancelled: cancelled\n  }\n}];"
+      },
+      "id": "n3",
+      "name": "Build Schedule",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.STAFF_EMAIL || 'YOUR_NOTIFICATION_EMAIL' }}",
+        "subject": "=Daily Schedule — {{ $json.today_date }} ({{ $json.today_count }} appointments)",
+        "message": "=<h2>Daily Schedule Report</h2>{{ $json.today_table }}{{ $json.tomorrow_table }}<h3>This Week's Stats</h3><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Completed</strong></td><td>{{ $json.week_completed }}</td></tr><tr><td><strong>No-Shows</strong></td><td>{{ $json.week_noshows }}</td></tr><tr><td><strong>Cancelled</strong></td><td>{{ $json.week_cancelled }}</td></tr></table><p><em>Report generated at 7:00 AM by {{ $env.BUSINESS_NAME || 'YOUR_BUSINESS_NAME' }} Booking System.</em></p>",
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Send Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Morning Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Appointments": {
+      "main": [
+        [
+          {
+            "node": "Build Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Schedule": {
+      "main": [
+        [
+          {
+            "node": "Send Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

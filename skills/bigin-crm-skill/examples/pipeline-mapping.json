@@ -1,0 +1,110 @@
+{
+  "description": "Pipeline stage mapping for Bigin CRM automation workflows",
+  "default_pipeline": "Standard",
+  "stages": {
+    "Prospecting": {
+      "order": 1,
+      "probability": 10,
+      "color": "#FF9800",
+      "actions": [
+        "Send initial outreach email",
+        "Schedule discovery call"
+      ]
+    },
+    "Qualification": {
+      "order": 2,
+      "probability": 25,
+      "color": "#FFC107",
+      "actions": [
+        "Qualify BANT criteria",
+        "Identify decision makers"
+      ]
+    },
+    "Needs Analysis": {
+      "order": 3,
+      "probability": 40,
+      "color": "#FFEB3B",
+      "actions": [
+        "Conduct needs assessment",
+        "Document requirements"
+      ]
+    },
+    "Value Proposition": {
+      "order": 4,
+      "probability": 50,
+      "color": "#CDDC39",
+      "actions": [
+        "Prepare customized proposal",
+        "Present solution"
+      ]
+    },
+    "Id. Decision Makers": {
+      "order": 5,
+      "probability": 60,
+      "color": "#8BC34A",
+      "actions": [
+        "Map stakeholder influence",
+        "Schedule stakeholder meeting"
+      ]
+    },
+    "Proposal/Price Quote": {
+      "order": 6,
+      "probability": 70,
+      "color": "#4CAF50",
+      "actions": [
+        "Send formal proposal",
+        "Follow up on proposal"
+      ]
+    },
+    "Negotiation/Review": {
+      "order": 7,
+      "probability": 80,
+      "color": "#009688",
+      "actions": [
+        "Address objections",
+        "Negotiate terms"
+      ]
+    },
+    "Closed Won": {
+      "order": 8,
+      "probability": 100,
+      "color": "#00BCD4",
+      "actions": [
+        "Handoff to implementation",
+        "Request testimonial"
+      ]
+    },
+    "Closed Lost": {
+      "order": 9,
+      "probability": 0,
+      "color": "#9E9E9E",
+      "actions": [
+        "Document loss reason",
+        "Schedule follow-up in 6 months"
+      ]
+    }
+  },
+  "automation_rules": {
+    "auto_advance": {
+      "enabled": true,
+      "conditions": [
+        {
+          "from_stage": "Proposal/Price Quote",
+          "after_days": 7,
+          "auto_advance_to": "Negotiation/Review",
+          "requires_activity": false
+        }
+      ]
+    },
+    "stale_reminders": {
+      "enabled": true,
+      "threshold_days": 7,
+      "create_task": true,
+      "task_priority": "High"
+    },
+    "probability_updates": {
+      "enabled": true,
+      "auto_update": true
+    }
+  }
+}

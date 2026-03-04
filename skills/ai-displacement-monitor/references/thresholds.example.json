@@ -1,0 +1,127 @@
+{
+  "name": "AI Displacement Early-Warning Thresholds",
+  "version": "1.0.0",
+  "compositeRules": {
+    "yellow": "TierA >= 2",
+    "orange": "TierA >= 2 AND TierB >= 1",
+    "red": "TierA >= 2 AND TierB >= 1 AND TierC >= 1"
+  },
+  "interpretationNotes": {
+    "weakLinks": "Use weak-links logic: macro output can remain bottlenecked by non-automated tasks even when many tasks are automated.",
+    "policy": "Escalate only when substitution speed clearly exceeds re-absorption speed and bottleneck indicators deteriorate together."
+  },
+  "indicators": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "White-collar job postings YoY",
+      "proxy": "Indeed/major job board postings",
+      "frequency": "weekly",
+      "trigger": "4-week avg YoY < -10% (warning), < -20% (severe)"
+    },
+    {
+      "id": "A2",
+      "tier": "A",
+      "name": "JOLTS openings in professional/business services",
+      "proxy": "US JOLTS",
+      "frequency": "monthly",
+      "trigger": "3-month avg down >15% from 6-month peak"
+    },
+    {
+      "id": "A3",
+      "tier": "A",
+      "name": "AI-job share vs non-AI white-collar share",
+      "proxy": "LinkedIn / platform mix",
+      "frequency": "monthly",
+      "trigger": "Scissor widens for 2 consecutive months"
+    },
+    {
+      "id": "A4",
+      "tier": "A",
+      "name": "Corporate 'AI efficiency + headcount discipline' guidance",
+      "proxy": "Earnings call transcript counts",
+      "frequency": "quarterly",
+      "trigger": "Co-mention ratio rises for 2 consecutive quarters"
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Initial jobless claims (4-week avg)",
+      "proxy": "US labor weekly claims",
+      "frequency": "weekly",
+      "trigger": ">15% above 12-month trough"
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "Continuing claims",
+      "proxy": "US labor continuing claims",
+      "frequency": "weekly",
+      "trigger": "YoY turns positive and rises for 6 weeks"
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "Median unemployment duration",
+      "proxy": "BLS unemployment duration",
+      "frequency": "monthly",
+      "trigger": "Rises for 3 consecutive months"
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "Upper-income consumption proxy",
+      "proxy": "Premium discretionary spend / travel / luxury",
+      "frequency": "monthly",
+      "trigger": "YoY flips negative and worsens for 2 months"
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "Consumer credit delinquency",
+      "proxy": "Credit card / personal loan delinquencies",
+      "frequency": "quarterly",
+      "trigger": "Rises for 2 quarters and > post-2021 mean +1 sigma"
+    },
+    {
+      "id": "C3",
+      "tier": "C",
+      "name": "US high-yield OAS",
+      "proxy": "HY OAS spread",
+      "frequency": "daily",
+      "trigger": ">450 bps (stress), >550 bps (severe)"
+    },
+    {
+      "id": "D1",
+      "tier": "D",
+      "name": "AI-linked capex momentum",
+      "proxy": "Power grid / data center / semis / network capex trend",
+      "frequency": "monthly/quarterly",
+      "trigger": "If broad AI capex growth >20% YoY for 2+ quarters, treat as re-absorption support"
+    },
+    {
+      "id": "D2",
+      "tier": "D",
+      "name": "Real wage purchasing power",
+      "proxy": "Real wage growth vs core service price trend",
+      "frequency": "monthly",
+      "trigger": "If real purchasing power improves for 3+ months, downgrade crisis pressure by one notch"
+    },
+    {
+      "id": "D3",
+      "tier": "D",
+      "name": "Unemployment structure",
+      "proxy": "Share of long-duration unemployment",
+      "frequency": "monthly",
+      "trigger": "If long-duration share rises persistently, confirms structural stress"
+    },
+    {
+      "id": "D4",
+      "tier": "D",
+      "name": "Profit-investment coupling",
+      "proxy": "Corporate margins vs business fixed investment",
+      "frequency": "quarterly",
+      "trigger": "If margins rise without reinvestment, fragility risk rises; if both rise, industrial-transition path is healthier"
+    }
+  ]
+}

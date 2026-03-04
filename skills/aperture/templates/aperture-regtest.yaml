@@ -1,0 +1,36 @@
+# Aperture L402 Reverse Proxy — Regtest Configuration
+#
+# Used with docker-compose-aperture.yml for integration testing.
+# Connects to litd on the litd-regtest Docker network for invoice creation.
+
+# Listen on all interfaces so Docker port mapping works.
+listenaddr: "0.0.0.0:8082"
+
+debuglevel: "debug"
+
+# No TLS — regtest only.
+insecure: true
+
+# SQLite database for token storage.
+dbbackend: "sqlite"
+sqlite:
+  dbfile: "/root/.aperture/aperture.db"
+
+# L402 authenticator — connects to litd's embedded lnd.
+authenticator:
+  network: "regtest"
+  lndhost: "litd:10009"
+  tlspath: "/root/.lnd-creds/tls.cert"
+  macdir: "/root/.lnd-creds"
+
+# Backend service protected by L402.
+services:
+  - name: "test-api"
+    hostregexp: ".*"
+    pathregexp: '^/api/.*$'
+    address: "litd-backend:9999"
+    protocol: http
+    price: 1
+    timeout: 31557600
+    authwhitelistpaths:
+      - '^/health$'
