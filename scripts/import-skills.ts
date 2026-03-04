@@ -1,5 +1,5 @@
-import { readdir, readFile, copyFile, mkdir, stat } from "node:fs/promises";
-import { join, basename, extname } from "node:path";
+import { readdir, readFile, cp, stat } from "node:fs/promises";
+import { join, basename } from "node:path";
 import { findDuplicates, jaccardSimilarity } from "../src/dedup.js";
 import { parseFrontmatter } from "../src/skill-index.js";
 
@@ -183,53 +183,6 @@ async function getExistingDescriptions(
   return existing;
 }
 
-/**
- * Copy a skill directory selectively:
- *   - SKILL.md → target root
- *   - Other .md files → target/resources/
- *   - Everything else is dropped
- */
-async function copySkillDir(srcPath: string, destPath: string): Promise<void> {
-  await mkdir(destPath, { recursive: true });
-
-  const entries = await readdir(srcPath, { withFileTypes: true });
-  const extraMdFiles: string[] = [];
-
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      // Check for .md files in subdirectories (e.g. existing resources/)
-      const subEntries = await readdir(join(srcPath, entry.name)).catch(() => []);
-      for (const sub of subEntries) {
-        if (typeof sub === "string" && extname(sub) === ".md") {
-          extraMdFiles.push(join(entry.name, sub));
-        }
-      }
-      continue;
-    }
-
-    if (!entry.isFile()) continue;
-
-    if (entry.name === "SKILL.md") {
-      await copyFile(join(srcPath, entry.name), join(destPath, entry.name));
-    } else if (extname(entry.name) === ".md") {
-      extraMdFiles.push(entry.name);
-    }
-    // Drop everything else (_meta.json, .js, .py, .json, .sh, etc.)
-  }
-
-  // Move extra .md files into resources/
-  if (extraMdFiles.length > 0) {
-    const resourcesDir = join(destPath, "resources");
-    await mkdir(resourcesDir, { recursive: true });
-    for (const mdFile of extraMdFiles) {
-      const srcFile = join(srcPath, mdFile);
-      // Flatten nested paths: "subdir/file.md" → "subdir-file.md"
-      const destName = mdFile.includes("/") ? mdFile.replace(/\//g, "-") : mdFile;
-      await copyFile(srcFile, join(resourcesDir, destName));
-    }
-  }
-}
-
 async function importSkills(
   sourceDir: string,
   targetDir: string,
@@ -304,7 +257,10 @@ async function importSkills(
     }
 
     if (!dryRun) {
-      await copySkillDir(skill.srcPath, join(targetDir, targetName));
+      await cp(skill.srcPath, join(targetDir, targetName), {
+        recursive: true,
+        filter: (src) => !src.endsWith("_meta.json"),
+      });
     }
     added++;
   }

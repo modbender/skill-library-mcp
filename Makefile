@@ -1,4 +1,4 @@
-.PHONY: test build ci dev clean mcp-test
+.PHONY: test build ci dev clean mcp-test validate-skills clean-skills
 
 test:        ## Run vitest
 	pnpm test
@@ -6,7 +6,13 @@ test:        ## Run vitest
 build:       ## Build with tsup
 	pnpm build
 
-ci: test build  ## Run CI locally (test + build)
+validate-skills:  ## Validate skills/ directory structure
+	pnpm validate-skills
+
+clean-skills:     ## Fix skills/ directory structure (dry run by default)
+	pnpm clean-skills
+
+ci: test validate-skills build  ## Run CI locally (test + validate + build)
 
 dev:         ## Run MCP server locally via tsx
 	pnpm dev
