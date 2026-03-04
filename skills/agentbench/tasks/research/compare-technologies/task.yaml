@@ -1,0 +1,48 @@
+name: "Compare Database Technologies"
+id: "research-compare-technologies"
+version: "1.0"
+suite: "research"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read two separate technology descriptions
+  and produce a structured comparison. Evaluates analytical thinking,
+  balanced assessment, and the ability to synthesize information from
+  multiple sources into actionable recommendations.
+
+user_message: |
+  Compare these two database technologies described in tech-a.txt and
+  tech-b.txt. Create comparison.md with:
+  - Structured pros and cons for each technology
+  - A comparison table covering key dimensions
+  - Use case recommendations (when to choose each)
+  - Your final recommendation with reasoning
+
+input_files:
+  - name: "tech-a.txt"
+  - name: "tech-b.txt"
+
+expected_outputs:
+  - pattern: "comparison.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "pros"
+          - "cons"
+          - "recommendation"
+      - type: "word-count-range"
+        min: 300
+        max: 1000
+
+expected_metrics:
+  tool_calls: [3, 10]
+  planning_ratio: [0.1, 0.4]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

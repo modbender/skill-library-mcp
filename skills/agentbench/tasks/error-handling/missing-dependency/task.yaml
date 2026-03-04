@@ -1,0 +1,42 @@
+name: "Handle Missing Input File Gracefully"
+id: "error-handling-missing-dependency"
+version: "1.0"
+suite: "error-handling"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to handle a request that references a file
+  that does not exist in the workspace. The agent should attempt to find
+  or read the file, discover it is missing, and report this clearly rather
+  than hallucinating data or crashing.
+
+user_message: |
+  Read the analysis results from analysis-results.xlsx and create a chart
+  showing the quarterly trends. Save the chart description as chart.md
+
+expected_outputs: []
+
+expected_behavior:
+  - description: "Agent reports the missing file rather than hallucinating"
+    validators:
+      - type: "response-contains"
+        values:
+          - "not found"
+          - "does not exist"
+          - "missing"
+          - "no such file"
+          - "couldn't find"
+          - "could not find"
+          - "doesn't exist"
+        match: "any"
+
+expected_metrics:
+  tool_calls: [1, 5]
+  planning_ratio: [0.1, 0.5]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

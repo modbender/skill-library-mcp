@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural AI Asset</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #09090e, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            filter: contrast(1.2);
+        }
+
+        .core {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff007f 0%, transparent 70%);
+            animation: pulse 2s infinite alternate;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="core"></div>
+    <canvas id="net"></canvas>
+    <script>
+        const canvas = document.getElementById('net');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const nodes = Array.from({ length: 120 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: (Math.random() - 0.5) * 2.5,
+            radius: Math.random() * 2.5 + 1
+        }));
+
+        function draw() {
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            for (let i = 0; i < nodes.length; i++) {
+                let n1 = nodes[i];
+                n1.x += n1.vx; n1.y += n1.vy;
+
+                // Keep them slightly drawn to center
+                n1.vx += (cx - n1.x) * 0.0001;
+                n1.vy += (cy - n1.y) * 0.0001;
+
+                if (n1.x < -50 || n1.x > canvas.width + 50) n1.vx *= -1;
+                if (n1.y < -50 || n1.y > canvas.height + 50) n1.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(n1.x, n1.y, n1.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#00f2fe';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#4facfe';
+                ctx.fill();
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    let n2 = nodes[j];
+                    let dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
+                    if (dist < 180) {
+                        ctx.beginPath();
+                        ctx.moveTo(n1.x, n1.y);
+                        ctx.lineTo(n2.x, n2.y);
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${1 - dist / 180})`;
+                        ctx.lineWidth = 1.2;
+                        ctx.shadowBlur = 0;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+
+</html>

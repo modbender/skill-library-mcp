@@ -1,0 +1,58 @@
+name: "Create Pitch Deck Outline"
+id: "file-creation-pitch-deck-outline"
+version: "1.0"
+suite: "file-creation"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read a startup description and produce a
+  well-structured pitch deck outline with all required sections. Evaluates
+  content organization, business understanding, and completeness.
+
+user_message: |
+  Read the startup information in startup-info.txt and create a pitch deck
+  outline as pitch-deck.md with the following sections:
+  - Problem
+  - Solution
+  - Market Size
+  - Business Model
+  - Traction
+  - Team
+  - Financial Projections
+  - The Ask
+
+  Each section should have concise bullet points suitable for presentation
+  slides. Include relevant numbers and data from the source material.
+
+input_files:
+  - name: "startup-info.txt"
+
+expected_outputs:
+  - pattern: "pitch-deck.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "Problem"
+          - "Solution"
+          - "Market Size"
+          - "Business Model"
+          - "Traction"
+          - "Team"
+          - "Financial Projections"
+          - "The Ask"
+      - type: "word-count-range"
+        min: 300
+        max: 1500
+
+expected_metrics:
+  tool_calls: [2, 8]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

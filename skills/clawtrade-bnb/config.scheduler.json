@@ -1,0 +1,88 @@
+{
+  "scheduler": {
+    "enabled": true,
+    "execution_interval_seconds": 60,
+    "timezone": "UTC",
+    "max_concurrent_executions": 1,
+    "retry_failed_cycles": true,
+    "retry_delay_seconds": 10
+  },
+  "blockchain": {
+    "rpc_url": "https://data-seed-prebsc-1-b.binance.org:8545",
+    "network": "bsc-testnet",
+    "chain_id": 97
+  },
+  "executor": {
+    "wallet_private_key": "${WALLET_PRIVATE_KEY}",
+    "gas_limit_multiplier": 1.1,
+    "max_gas_price_gwei": 100,
+    "max_retries": 3,
+    "retry_backoff_base_ms": 3000
+  },
+  "reader": {
+    "poll_interval_ms": 5000,
+    "cache_ttl_seconds": 300,
+    "request_timeout_ms": 15000
+  },
+  "notifications": {
+    "enabled": true,
+    "telegram_bot_token": "${TELEGRAM_BOT_TOKEN}",
+    "telegram_chat_id": "${TELEGRAM_CHAT_ID}",
+    "apr_threshold": 1.0,
+    "notify_execution": true,
+    "notify_decision": true,
+    "notify_errors": true,
+    "notify_daily_summary": true,
+    "daily_summary_time": "09:00"
+  },
+  "agent": {
+    "risk_threshold": 0.5,
+    "min_confidence": 0.6,
+    "max_rebalance_risk": 0.3,
+    "rebalance_threshold_percent": 5.0,
+    "apy_change_threshold_percent": 2.0
+  },
+  "logging": {
+    "level": "info",
+    "file": "scheduler.log",
+    "max_file_size_mb": 50,
+    "retention_days": 7,
+    "console_output": true
+  },
+  "vaults": [
+    {
+      "id": "vault_eth_staking_001",
+      "address": "0x588eD88A145144F1E368D624EeFC336577a4276b",
+      "token": "ETH",
+      "apr": 12.5,
+      "fees": 0.25,
+      "risk_score": 0.3,
+      "enabled": true
+    },
+    {
+      "id": "vault_high_risk_001",
+      "address": "0x6E05a63550200e20c9C4F112E337913c32FEBdf0",
+      "token": "1INCH",
+      "apr": 18.2,
+      "fees": 1.5,
+      "risk_score": 0.8,
+      "enabled": true
+    },
+    {
+      "id": "vault_link_oracle_001",
+      "address": "0x0C035842471340599966AA5A3573AC7dB34D14E4",
+      "token": "LINK",
+      "apr": 14.3,
+      "fees": 0.5,
+      "risk_score": 0.25,
+      "enabled": true
+    }
+  ],
+  "alerts": {
+    "high_error_rate_threshold": 0.3,
+    "low_success_rate_threshold": 0.7,
+    "cycle_timeout_seconds": 600,
+    "telegram_on_critical": true,
+    "email_on_critical": false
+  }
+}

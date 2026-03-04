@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chitin ERC-8004 Passport Card Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      gap: 30px;
+      padding: 30px;
+      background: #1a1a1a;
+      color: #fff;
+      font-family: monospace;
+      flex-wrap: wrap;
+    }
+    .controls {
+      width: 360px;
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      position: sticky;
+      top: 20px;
+      align-self: flex-start;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    .controls h2 { margin-bottom: 16px; font-size: 14px; color: #64748b; letter-spacing: 0.1em; }
+    .controls h3 { margin: 16px 0 8px; font-size: 12px; color: #94a3b8; border-top: 1px solid #444; padding-top: 12px; }
+    .field { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .field label { font-size: 12px; color: #ccc; }
+    .field input[type="number"] {
+      width: 64px;
+      padding: 4px 6px;
+      background: #333;
+      border: 1px solid #555;
+      color: #fff;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+    .field input[type="text"] {
+      width: 160px;
+      padding: 4px 6px;
+      background: #333;
+      border: 1px solid #555;
+      color: #fff;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .field select {
+      padding: 4px 6px;
+      background: #333;
+      border: 1px solid #555;
+      color: #fff;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .preview-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    .card-wrapper {
+      text-align: center;
+    }
+    .card-wrapper h3 {
+      color: #94a3b8;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    svg { border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .output {
+      width: 100%;
+      max-width: 600px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 11px;
+      color: #94a3b8;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .output strong { color: #e2e8f0; }
+    .btn {
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: #1e3a5f;
+      border: 1px solid #2d5a8f;
+      color: #e2e8f0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .btn:hover { background: #2d5a8f; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <h2>PASSPORT CARD TUNER</h2>
+
+    <h3>Agent Info</h3>
+    <div class="field">
+      <label>Name:</label>
+      <input type="text" id="agentName" value="demo" oninput="update()">
+    </div>
+    <div class="field">
+      <label>Agent ID:</label>
+      <input type="number" id="agentId" value="2001" oninput="update()">
+    </div>
+    <div class="field">
+      <label>Type:</label>
+      <select id="agentType" onchange="update()">
+        <option value="ASSISTANT" selected>ASSISTANT</option>
+        <option value="COMPANION">COMPANION</option>
+        <option value="SPECIALIST">SPECIALIST</option>
+        <option value="CREATIVE">CREATIVE</option>
+        <option value="OTHER">OTHER</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Avatar:</label>
+      <select id="avatarMode" onchange="update()">
+        <option value="crab">crab.png</option>
+        <option value="none">No avatar</option>
+        <option value="custom">Custom URL</option>
+      </select>
+    </div>
+    <div class="field" id="customAvatarField" style="display:none">
+      <label>URL:</label>
+      <input type="text" id="customAvatarUrl" value="" oninput="update()">
+    </div>
+
+    <h3>Card Size</h3>
+    <div class="field">
+      <label>Display width (px):</label>
+      <input type="number" id="cardWidth" value="280" oninput="update()">
+    </div>
+
+    <h3>Avatar</h3>
+    <div class="field">
+      <label>avatarY:</label>
+      <input type="number" id="avatarY" value="95" oninput="update()">
+    </div>
+    <div class="field">
+      <label>avatarSize:</label>
+      <input type="number" id="avatarSize" value="120" oninput="update()">
+    </div>
+    <div class="field">
+      <label>avatarRx:</label>
+      <input type="number" id="avatarRx" value="8" oninput="update()">
+    </div>
+    <div class="field">
+      <label>avatarPad:</label>
+      <input type="number" id="avatarPad" value="4" oninput="update()">
+    </div>
+
+    <h3>Name</h3>
+    <div class="field">
+      <label>nameY (avatar):</label>
+      <input type="number" id="nameYAvatar" value="255" oninput="update()">
+    </div>
+    <div class="field">
+      <label>nameY (no avatar):</label>
+      <input type="number" id="nameYNoAvatar" value="205" oninput="update()">
+    </div>
+    <div class="field">
+      <label>maxFont (short):</label>
+      <input type="number" id="maxFont" value="43" oninput="update()">
+    </div>
+    <div class="field">
+      <label>minFont (32ch):</label>
+      <input type="number" id="minFont" value="18" oninput="update()">
+    </div>
+
+    <h3>Agent Type Label</h3>
+    <div class="field">
+      <label>typeY (avatar):</label>
+      <input type="number" id="typeYAvatar" value="280" oninput="update()">
+    </div>
+    <div class="field">
+      <label>typeY (no avatar):</label>
+      <input type="number" id="typeYNoAvatar" value="241" oninput="update()">
+    </div>
+    <div class="field">
+      <label>typeFontSize:</label>
+      <input type="number" id="typeFontSize" value="12" oninput="update()">
+    </div>
+
+    <h3>Header</h3>
+    <div class="field">
+      <label>headerY:</label>
+      <input type="number" id="headerY" value="48" oninput="update()">
+    </div>
+    <div class="field">
+      <label>subheaderY:</label>
+      <input type="number" id="subheaderY" value="64" oninput="update()">
+    </div>
+    <div class="field">
+      <label>headerLineY:</label>
+      <input type="number" id="headerLineY" value="78" oninput="update()">
+    </div>
+
+    <h3>Footer</h3>
+    <div class="field">
+      <label>footerLineY:</label>
+      <input type="number" id="footerLineY" value="340" oninput="update()">
+    </div>
+    <div class="field">
+      <label>footerUrlY:</label>
+      <input type="number" id="footerUrlY" value="360" oninput="update()">
+    </div>
+    <div class="field">
+      <label>footerVerifiedY:</label>
+      <input type="number" id="footerVerifiedY" value="377" oninput="update()">
+    </div>
+
+    <button class="btn" onclick="copyValues()">Copy values for React</button>
+  </div>
+
+  <div class="preview-area">
+    <div class="card-wrapper">
+      <h3>With Avatar</h3>
+      <div id="svgWithAvatar"></div>
+    </div>
+    <div class="card-wrapper">
+      <h3>Without Avatar</h3>
+      <div id="svgNoAvatar"></div>
+    </div>
+    <div class="card-wrapper">
+      <h3>Long Name (with avatar)</h3>
+      <div id="svgLongName"></div>
+    </div>
+    <div class="output" id="valuesOutput"></div>
+  </div>
+
+  <script>
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return parseInt(document.getElementById(id).value) || 0; }
+
+    function calcFontSize(name, maxF, minF) {
+      const len = name.length;
+      if (len <= 3) return maxF;
+      if (len >= 32) return minF;
+      const ratio = (len - 3) / (32 - 3);
+      return Math.round(maxF - ratio * (maxF - minF));
+    }
+
+    function getAvatarUrl() {
+      const mode = val('avatarMode');
+      if (mode === 'none') return null;
+      if (mode === 'custom') return val('customAvatarUrl') || null;
+      return '/crab.png';
+    }
+
+    function buildSvg(name, agentId, agentType, avatarUrl, cardWidth) {
+      const p = {
+        avatarY: num('avatarY'),
+        avatarSize: num('avatarSize'),
+        avatarRx: num('avatarRx'),
+        avatarPad: num('avatarPad'),
+        nameYAvatar: num('nameYAvatar'),
+        nameYNoAvatar: num('nameYNoAvatar'),
+        maxFont: num('maxFont'),
+        minFont: num('minFont'),
+        typeYAvatar: num('typeYAvatar'),
+        typeYNoAvatar: num('typeYNoAvatar'),
+        typeFontSize: num('typeFontSize'),
+        headerY: num('headerY'),
+        subheaderY: num('subheaderY'),
+        headerLineY: num('headerLineY'),
+        footerLineY: num('footerLineY'),
+        footerUrlY: num('footerUrlY'),
+        footerVerifiedY: num('footerVerifiedY'),
+      };
+
+      const hasAvatar = !!avatarUrl;
+      const fontSize = calcFontSize(name, p.maxFont, p.minFont);
+      const nameY = hasAvatar ? p.nameYAvatar : p.nameYNoAvatar;
+      const typeY = hasAvatar ? p.typeYAvatar : p.typeYNoAvatar;
+      const avatarX = (400 - p.avatarSize) / 2;
+
+      let avatarSvg = '';
+      if (hasAvatar) {
+        avatarSvg = `
+          <rect x="${avatarX}" y="${p.avatarY}" width="${p.avatarSize}" height="${p.avatarSize}" rx="${p.avatarRx}" fill="#1e3a5f"/>
+          <image href="${avatarUrl}" x="${avatarX + p.avatarPad}" y="${p.avatarY + p.avatarPad}" width="${p.avatarSize - p.avatarPad * 2}" height="${p.avatarSize - p.avatarPad * 2}" preserveAspectRatio="xMidYMid slice"/>
+        `;
+      }
+
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="${cardWidth}" height="${cardWidth}">
+        <rect width="400" height="400" rx="12" fill="#0a1628"/>
+        <text x="200" y="${p.headerY}" text-anchor="middle" font-family="monospace" font-size="10" letter-spacing="0.25em" fill="#64748b">ERC-8004 AGENT PASSPORT</text>
+        <text x="200" y="${p.subheaderY}" text-anchor="middle" font-family="monospace" font-size="8" letter-spacing="0.15em" fill="#475569">BASE L2 · #${agentId}</text>
+        <line x1="80" y1="${p.headerLineY}" x2="320" y2="${p.headerLineY}" stroke="#1e3a5f" stroke-width="1"/>
+        ${avatarSvg}
+        <text x="200" y="${nameY}" text-anchor="middle" font-family="Georgia,serif" font-size="${fontSize}" fill="#e2e8f0">${name}</text>
+        <text x="200" y="${typeY}" text-anchor="middle" font-family="monospace" font-size="${p.typeFontSize}" fill="#94a3b8">${agentType}</text>
+        <line x1="80" y1="${p.footerLineY}" x2="320" y2="${p.footerLineY}" stroke="#1e3a5f" stroke-width="1"/>
+        <text x="200" y="${p.footerUrlY}" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">chitin.id/${name}</text>
+        <text x="200" y="${p.footerVerifiedY}" text-anchor="middle" font-family="monospace" font-size="8" fill="#475569">CHITIN VERIFIED | 2026-02-04 14:30 UTC</text>
+      </svg>`;
+    }
+
+    function update() {
+      // Show/hide custom avatar URL field
+      document.getElementById('customAvatarField').style.display =
+        val('avatarMode') === 'custom' ? 'flex' : 'none';
+
+      const name = val('agentName') || 'demo';
+      const agentId = num('agentId');
+      const agentType = val('agentType');
+      const avatarUrl = getAvatarUrl();
+      const cardWidth = num('cardWidth');
+
+      // With avatar
+      document.getElementById('svgWithAvatar').innerHTML =
+        buildSvg(name, agentId, agentType, avatarUrl || '/crab.png', cardWidth);
+
+      // Without avatar
+      document.getElementById('svgNoAvatar').innerHTML =
+        buildSvg(name, agentId, agentType, null, cardWidth);
+
+      // Long name with avatar
+      document.getElementById('svgLongName').innerHTML =
+        buildSvg('translator-pro-v2-extended', agentId, agentType, avatarUrl || '/crab.png', cardWidth);
+
+      // Output current values
+      const output = document.getElementById('valuesOutput');
+      output.innerHTML = `<strong>Current Values:</strong>
+cardWidth: ${cardWidth}px (CSS max-w-[${cardWidth}px])
+
+Avatar:
+  avatarY: ${num('avatarY')}
+  avatarSize: ${num('avatarSize')}
+  avatarRx: ${num('avatarRx')}
+  avatarPad: ${num('avatarPad')}
+
+Name:
+  nameY (avatar): ${num('nameYAvatar')}
+  nameY (no avatar): ${num('nameYNoAvatar')}
+  maxFont: ${num('maxFont')}
+  minFont: ${num('minFont')}
+  (current "${name}" => fontSize: ${calcFontSize(name, num('maxFont'), num('minFont'))})
+
+Type:
+  typeY (avatar): ${num('typeYAvatar')}
+  typeY (no avatar): ${num('typeYNoAvatar')}
+  typeFontSize: ${num('typeFontSize')}
+
+Header:
+  headerY: ${num('headerY')}
+  subheaderY: ${num('subheaderY')}
+  headerLineY: ${num('headerLineY')}
+
+Footer:
+  footerLineY: ${num('footerLineY')}
+  footerUrlY: ${num('footerUrlY')}
+  footerVerifiedY: ${num('footerVerifiedY')}`;
+    }
+
+    function copyValues() {
+      const text = document.getElementById('valuesOutput').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied!');
+      });
+    }
+
+    update();
+  </script>
+</body>
+</html>

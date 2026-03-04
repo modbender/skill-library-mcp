@@ -1,0 +1,101 @@
+{
+  "name": "chitin-cert",
+  "version": "1.0.0",
+  "description": "Issue and verify on-chain certificates for AI agents on Base L2. Register as an issuer, mint soulbound certs (achievement, capability, compliance, audit, and more) as NFTs permanently stored on Arweave.",
+  "homepage": "https://certs.chitin.id",
+  "documentation": "https://certs.chitin.id/docs",
+  "api": {
+    "base_url": "https://certs.chitin.id/api/v1",
+    "authentication": {
+      "type": "bearer",
+      "header": "Authorization",
+      "prefix": "Bearer",
+      "key_prefix": "ck_"
+    }
+  },
+  "skill_files": {
+    "skill": "https://certs.chitin.id/skill.md",
+    "metadata": "https://certs.chitin.id/skill.json"
+  },
+  "category": "credentials",
+  "emoji": "📜",
+  "tags": [
+    "certificates",
+    "credentials",
+    "blockchain",
+    "soulbound-token",
+    "verification",
+    "base-l2",
+    "arweave",
+    "erc-8004",
+    "nft",
+    "identity",
+    "achievement",
+    "compliance",
+    "audit"
+  ],
+  "capabilities": [
+    "cert-issuance",
+    "batch-cert-issuance",
+    "cert-verification",
+    "cert-revocation",
+    "issuer-registration",
+    "passport-linked-certs",
+    "soul-linked-certs",
+    "webhook-notifications",
+    "arweave-metadata-storage"
+  ],
+  "cert_types": [
+    "achievement",
+    "capability",
+    "compliance",
+    "infrastructure",
+    "partnership",
+    "audit",
+    "custom"
+  ],
+  "issuance": {
+    "single_endpoint": "POST /certs",
+    "batch_endpoint": "POST /certs/batch",
+    "batch_limit": 100,
+    "requires_api_key": true,
+    "api_key_prefix": "ck_",
+    "issuer_setup": {
+      "register_endpoint": "POST /issuers",
+      "auth_endpoint": "POST /auth",
+      "requires_wallet_signature": true,
+      "signature_message_register": "Chitin Certs: Register issuer {address_lowercase} at {timestamp_ms}",
+      "signature_message_apikey": "Chitin Certs: Generate API key for {issuerId} at {timestamp_ms}"
+    }
+  },
+  "verification": {
+    "endpoint": "GET /verify/{certId}",
+    "on_chain": true,
+    "chain": "Base L2",
+    "chain_id": 8453,
+    "contract": "0x9694Fde4dBb44AbCfDA693b645845909c6032D4d"
+  },
+  "transfer_restriction": {
+    "soulbound": true,
+    "eip": "EIP-5192",
+    "description": "Certs are non-transferable. Transfer calls revert with TransferNotAllowed."
+  },
+  "storage": {
+    "on_chain": "Base L2 (ERC-721 soulbound NFT)",
+    "off_chain": "Arweave (permanent metadata)"
+  },
+  "webhooks": {
+    "events": ["cert.minted"],
+    "endpoint": "POST /webhooks"
+  },
+  "ecosystem": {
+    "identity": "https://chitin.id",
+    "certificates": "https://certs.chitin.id",
+    "governance": "https://vote.chitin.id",
+    "mcp_server": "https://www.npmjs.com/package/chitin-mcp-server"
+  },
+  "security": {
+    "allowed_domains": ["certs.chitin.id", "chitin.id"],
+    "warning": "NEVER share your ck_ API key. It grants full cert issuance power for your issuer address."
+  }
+}

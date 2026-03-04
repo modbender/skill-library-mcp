@@ -1,0 +1,103 @@
+{
+  "name": "brave-search-skill",
+  "version": "2.2.1",
+  "description": "Real-time web search, autosuggest, and AI-powered answers using the Brave Search API. Requires BRAVE_SEARCH_API_KEY and BRAVE_ANSWERS_API_KEY environment variables.",
+  "author": "Broedkrummen",
+  "requiredEnv": [
+    "BRAVE_SEARCH_API_KEY",
+    "BRAVE_ANSWERS_API_KEY"
+  ],
+  "tools": [
+    {
+      "name": "brave_search",
+      "description": "Search the web using Brave Search API. Returns ranked results with titles, URLs, and descriptions. Optionally fetches an AI summary of results.",
+      "command": "node {{workspace}}/brave_search.js --query \"{{query}}\" --count {{count|10}} --country {{country|us}} --freshness {{freshness|}} --extra-snippets {{extra_snippets|false}} --summary {{summary|false}}",
+      "args": {
+        "query": {
+          "type": "string",
+          "description": "Search query. Supports operators: site:, \"exact phrase\", -exclude",
+          "required": true
+        },
+        "count": {
+          "type": "number",
+          "description": "Number of results to return (1-20)",
+          "default": 10
+        },
+        "country": {
+          "type": "string",
+          "description": "2-letter country code for geographic targeting (e.g. us, gb, de)",
+          "default": "us"
+        },
+        "freshness": {
+          "type": "string",
+          "description": "Date filter: pd (24h), pw (7 days), pm (31 days), py (1 year)",
+          "enum": ["pd", "pw", "pm", "py"]
+        },
+        "extra_snippets": {
+          "type": "boolean",
+          "description": "Include up to 5 extra text excerpts per result",
+          "default": false
+        },
+        "summary": {
+          "type": "boolean",
+          "description": "Fetch AI summarizer result for the search query",
+          "default": false
+        }
+      }
+    },
+    {
+      "name": "brave_suggest",
+      "description": "Get search query autosuggestions as users type. Returns contextual suggestions based on partial input with optional rich metadata (titles, descriptions, images).",
+      "command": "node {{workspace}}/brave_suggest.js --query \"{{query}}\" --count {{count|5}} --country {{country|US}} --rich {{rich|false}}",
+      "args": {
+        "query": {
+          "type": "string",
+          "description": "Partial query to get suggestions for",
+          "required": true
+        },
+        "count": {
+          "type": "number",
+          "description": "Number of suggestions to return (1-10)",
+          "default": 5
+        },
+        "country": {
+          "type": "string",
+          "description": "2-letter country code for geographic targeting",
+          "default": "US"
+        },
+        "rich": {
+          "type": "boolean",
+          "description": "Include enhanced metadata (titles, descriptions, images, entity detection). Requires paid subscription.",
+          "default": false
+        }
+      }
+    },
+    {
+      "name": "brave_answers",
+      "description": "Get AI-powered answers grounded in live Brave web search with inline citations. Use for research questions that benefit from multiple sources.",
+      "command": "node {{workspace}}/brave_answers.js --query \"{{query}}\" --country {{country|us}} --enable-citations {{enable_citations|true}} --enable-research {{enable_research|false}}",
+      "args": {
+        "query": {
+          "type": "string",
+          "description": "Question or research topic to answer",
+          "required": true
+        },
+        "country": {
+          "type": "string",
+          "description": "2-letter country code for search context",
+          "default": "us"
+        },
+        "enable_citations": {
+          "type": "boolean",
+          "description": "Include inline source citations in the answer",
+          "default": true
+        },
+        "enable_research": {
+          "type": "boolean",
+          "description": "Enable deep multi-search research mode (uses more quota)",
+          "default": false
+        }
+      }
+    }
+  ]
+}

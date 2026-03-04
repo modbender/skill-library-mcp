@@ -1,0 +1,101 @@
+{
+  "name": "clawbrain",
+  "version": "0.1.14",
+  "description": "Personal AI Memory System - remembers conversations, learns preferences, provides personalized context, and securely stores encrypted secrets",
+  "author": "ClawColab",
+  "homepage": "https://github.com/clawcolab/clawbrain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clawcolab/clawbrain.git"
+  },
+  "license": "MIT",
+  "keywords": ["memory", "ai", "brain", "context", "personalization", "encryption", "security"],
+  "engines": {
+    "clawdbot": ">=2024.1.0",
+    "openclaw": ">=2024.1.0"
+  },
+  "install": {
+    "pip": "pip install clawbrain[all]",
+    "setup": "clawbrain setup"
+  },
+  "hooks": [
+    {
+      "name": "clawbrain-startup",
+      "events": ["gateway:startup", "command:new"],
+      "description": "Refreshes brain memory on startup, saves session on /new"
+    }
+  ],
+  "environment": {
+    "required": [],
+    "optional": [
+      {
+        "name": "BRAIN_AGENT_ID",
+        "description": "Unique identifier for this agent's memories",
+        "default": "default"
+      },
+      {
+        "name": "BRAIN_ENCRYPTION_KEY",
+        "description": "Fernet encryption key for securing sensitive data (auto-generated if not set)"
+      },
+      {
+        "name": "BRAIN_POSTGRES_HOST",
+        "description": "PostgreSQL host for production storage"
+      },
+      {
+        "name": "BRAIN_POSTGRES_PASSWORD",
+        "description": "PostgreSQL password"
+      },
+      {
+        "name": "BRAIN_REDIS_HOST",
+        "description": "Redis host for caching"
+      }
+    ]
+  },
+  "dependencies": {
+    "python": ">=3.10",
+    "pip": {
+      "optional": ["psycopg2-binary", "redis", "cryptography", "sentence-transformers"]
+    }
+  },
+  "security": {
+    "requires_review": true,
+    "reason": "Manages encryption keys and installs startup hooks",
+    "permissions": [
+      "file_system_read",
+      "file_system_write",
+      "environment_variables",
+      "startup_hooks"
+    ],
+    "key_management": {
+      "encryption_key_location": "~/.config/clawbrain/.brain_key",
+      "can_display_keys": true,
+      "requires_explicit_consent": true
+    },
+    "install_actions": [
+      "Installs startup hooks to ~/.openclaw/hooks or ~/.clawdbot/hooks",
+      "Generates encryption key at ~/.config/clawbrain/.brain_key",
+      "Creates SQLite database in working directory (or uses PostgreSQL if configured)"
+    ],
+    "network_access": {
+      "postgres": "Optional - only if BRAIN_POSTGRES_HOST is configured",
+      "redis": "Optional - only if BRAIN_REDIS_HOST is configured",
+      "no_telemetry": true,
+      "no_external_calls": true
+    }
+  },
+  "scanner_notes": {
+    "environment_variables": "All env vars declared in environment.optional section. In 'optional' not 'required' because ClawBrain works with zero configuration (SQLite + auto-generated key). See environment.optional for full list.",
+    "install_mechanism": "Install spec provided: pip (line 18) + setup command (line 19). Source: PyPI (https://pypi.org/project/clawbrain/) and GitHub (https://github.com/clawcolab/clawbrain). No shell scripts - CLI only.",
+    "sudo_requirements": "Core installation NEVER needs sudo. pip install + clawbrain setup run in user space. Systemd instructions in SKILL.md Configuration section are OPTIONAL alternatives for env var configuration. See SECURITY.md 'No Sudo Required (Core Installation)' section.",
+    "credentials": "Encryption key managed securely. CLI can display key (with warnings and confirmation) for backup purposes only. Key stored at ~/.config/clawbrain/.brain_key with 0600 permissions. See SECURITY.md Key Management section.",
+    "source_verification": "GitHub: https://github.com/clawcolab/clawbrain, PyPI: https://pypi.org/project/clawbrain/, License: MIT, All code open source and auditable"
+  },
+  "metadata": {
+    "clawdbot": {
+      "emoji": "🧠"
+    },
+    "openclaw": {
+      "emoji": "🧠"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+id: github-readonly
+name: GitHub — read only
+description: >
+  Read access to issues, pull requests, repositories, and code search.
+  Creating issues and adding comments requires approval.
+  No destructive actions permitted.
+
+rules:
+  # Read operations — always allowed
+  - service: github
+    actions: [list_issues, get_issue, list_prs, get_pr, list_repos, search_code]
+    allow: true
+
+  # Write operations — require approval
+  - service: github
+    actions: [create_issue, comment_issue]
+    require_approval: true
+    reason: Creating issues and comments requires your approval

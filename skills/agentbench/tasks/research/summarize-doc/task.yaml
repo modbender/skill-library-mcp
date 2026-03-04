@@ -1,0 +1,44 @@
+name: "Summarize Whitepaper Document"
+id: "research-summarize-doc"
+version: "1.0"
+suite: "research"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read a lengthy document and produce a
+  concise, well-structured summary. Evaluates reading comprehension,
+  information synthesis, and structured output generation.
+
+user_message: |
+  Read the whitepaper in whitepaper.txt and create summary.md with:
+  - 3 key findings (numbered, with brief explanations)
+  - A limitations section discussing the gaps or weaknesses in the paper
+  - A one-paragraph executive summary
+
+input_files:
+  - name: "whitepaper.txt"
+
+expected_outputs:
+  - pattern: "summary.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "key findings"
+          - "limitations"
+          - "executive summary"
+      - type: "word-count-range"
+        min: 200
+        max: 800
+
+expected_metrics:
+  tool_calls: [2, 8]
+  planning_ratio: [0.05, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

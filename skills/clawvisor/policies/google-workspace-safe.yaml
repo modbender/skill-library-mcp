@@ -1,0 +1,47 @@
+id: google-workspace-safe
+name: Google Workspace — safe defaults
+description: >
+  Read-only access to Gmail, Calendar, Drive, and Contacts.
+  Write operations (send email, create/modify events and files) require human approval.
+  Destructive actions (delete email) are blocked.
+
+rules:
+  # Gmail — read operations allowed, send requires approval, delete blocked
+  - service: google.gmail
+    actions: [list_messages, get_message]
+    allow: true
+
+  - service: google.gmail
+    actions: [send_message, create_draft]
+    require_approval: true
+    reason: Sending email requires your approval
+
+  - service: google.gmail
+    actions: [delete_message]
+    allow: false
+    reason: Email deletion is disabled for safety
+
+  # Calendar — read allowed, write requires approval
+  - service: google.calendar
+    actions: [list_events, get_event, list_calendars]
+    allow: true
+
+  - service: google.calendar
+    actions: [create_event, update_event, delete_event]
+    require_approval: true
+    reason: Calendar changes require your approval
+
+  # Drive — read and preview allowed, write requires approval
+  - service: google.drive
+    actions: [list_files, get_file, search_files]
+    allow: true
+
+  - service: google.drive
+    actions: [create_file, update_file]
+    require_approval: true
+    reason: File creation and editing require your approval
+
+  # Contacts — read-only
+  - service: google.contacts
+    actions: [list_contacts, get_contact, search_contacts]
+    allow: true

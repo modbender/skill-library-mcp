@@ -1,0 +1,32 @@
+# Playbook: Service Rollback
+# Used to rollback a deployment after detecting regression
+
+id: service-rollback
+name: Service Rollback
+description: Rollback a deployment to previous version after detecting issues
+
+trigger_conditions:
+  - "error_rate > 0.05"
+  - "latency_p99 > 1.0"
+  - "deployment_regression"
+
+tags:
+  - rollback
+  - deployment
+  - regression
+
+# Higher risk since it affects the running version
+risk_override: 0.55
+
+enabled: true
+
+steps:
+  - name: Rollback Deployment
+    action: deployment_rollback
+    target: "{{ target_deployment }}"
+    parameters:
+      # If revision not specified, will restart pods
+      # revision: 0  # Uncomment to specify revision
+    timeout_seconds: 600
+    retry_count: 1
+    rollback_on_failure: true

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Asset</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #030712;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        .glass {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: #4f46e5;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: #1f2937;
+            border-radius: 12px 12px 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-6px);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-8">
+    <div class="w-full max-w-lg glass rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[400px]">
+        <div class="h-14 border-b border-white/5 flex items-center px-6 justify-between bg-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs">AI
+                </div>
+                <span class="text-sm font-semibold">Code2Animation Bot</span>
+            </div>
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+        </div>
+        <div class="flex-1 p-6 flex flex-col gap-4 overflow-hidden" id="chat-container">
+            <div class="msg-bot p-3 px-4 text-sm scale-95 opacity-0 transition-all duration-300" id="msg-1">
+                Hello! How can I help you today?
+            </div>
+            <div class="msg-user p-3 px-4 text-sm scale-95 opacity-0 transition-all duration-300" id="msg-2">
+                Make me a cinematic video from my code.
+            </div>
+            <div class="msg-bot p-3 px-4 text-sm scale-95 opacity-0 transition-all duration-300 flex items-center gap-2"
+                id="msg-3">
+                <div class="typing" id="typing-indicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <span id="bot-reply-text" class="hidden">Generated successfully! Powering up the cinematic
+                    engine...</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        const msgs = [
+            { id: 'msg-1', delay: 800 },
+            { id: 'msg-2', delay: 2000 },
+            { id: 'msg-3', delay: 3500 }
+        ];
+
+        msgs.forEach(m => {
+            setTimeout(() => {
+                const el = document.getElementById(m.id);
+                el.classList.remove('opacity-0', 'scale-95');
+                el.classList.add('opacity-100', 'scale-100');
+
+                if (m.id === 'msg-3') {
+                    setTimeout(() => {
+                        document.getElementById('typing-indicator').classList.add('hidden');
+                        document.getElementById('bot-reply-text').classList.remove('hidden');
+                    }, 1500);
+                }
+            }, m.delay);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sre-agent
+  namespace: sre-agent
+  labels:
+    app.kubernetes.io/name: sre-agent
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sre-agent
+  labels:
+    app.kubernetes.io/name: sre-agent
+rules:
+  # Read access to core resources for monitoring
+  - apiGroups: [""]
+    resources:
+      - pods
+      - services
+      - endpoints
+      - configmaps
+      - secrets
+      - events
+      - namespaces
+    verbs: ["get", "list", "watch"]
+
+  # Write access for remediation actions
+  - apiGroups: [""]
+    resources:
+      - pods
+      - configmaps
+    verbs: ["delete", "patch", "update"]
+
+  # Deployments and ReplicaSets for rollback
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch", "patch", "update"]
+
+  # HPA for scaling
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["get", "list", "watch", "patch", "update"]
+
+  # Events for monitoring
+  - apiGroups: ["events.k8s.io"]
+    resources:
+      - events
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sre-agent
+  labels:
+    app.kubernetes.io/name: sre-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sre-agent
+subjects:
+  - kind: ServiceAccount
+    name: sre-agent
+    namespace: sre-agent

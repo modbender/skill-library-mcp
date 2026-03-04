@@ -1,0 +1,42 @@
+name: "Persist and Recall User Preferences"
+id: "memory-memory-organization"
+version: "1.0"
+suite: "memory"
+difficulty: "medium"
+mode: "real"
+type: "multi-turn"
+
+description: |
+  Tests the agent's ability to use its memory system to persist user
+  preferences and recall them on demand. This task runs in real mode
+  since it requires the agent to write to its actual memory files.
+  Evaluates memory write capabilities and accurate recall.
+
+turns:
+  - role: user
+    message: |
+      Remember this for future sessions: I always want you to use TypeScript
+      over JavaScript, prefer pnpm over npm, and never auto-commit without
+      asking me first.
+    expect: "memory-write"
+    validators:
+      - type: "file-modified"
+        patterns: ["**/MEMORY.md", "**/memory/**"]
+
+  - role: user
+    message: |
+      What are my preferences that you have saved?
+    expect: "correct-recall"
+    validators:
+      - type: "response-contains"
+        values: ["TypeScript", "pnpm", "auto-commit"]
+
+expected_metrics:
+  tool_calls: [2, 8]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.30
+  layer1_weight: 0.15
+  layer2_weight: 0.20
+  layer3_weight: 0.35

@@ -1,0 +1,41 @@
+name: "Fix Bug with Minimal File Reads"
+id: "tool-efficiency-targeted-fix"
+version: "1.0"
+suite: "tool-efficiency"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests surgical precision in bug fixing. The bug report clearly points
+  to dashboard sorting, and the fix is a one-line change (add reverse=True).
+  An efficient agent reads the bug report, navigates to dashboard.py,
+  makes the fix, and verifies — touching at most 4-5 files total.
+
+user_message: |
+  Fix the bug described in BUG_REPORT.md. Run the relevant test to verify
+  your fix works.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "src/views/dashboard.py"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections: ["reverse=True"]
+  - pattern: "**"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "python -m pytest tests/test_dashboard.py -v"
+        contains: ["passed"]
+
+expected_metrics:
+  tool_calls: [3, 8]
+  planning_ratio: [0.10, 0.25]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.45
+  layer2_weight: 0.20
+  layer3_weight: 0.20

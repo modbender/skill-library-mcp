@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Grid Asset</title>
+    <style>
+        body {
+            margin: 0;
+            background: #010101;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            filter: contrast(1.5) drop-shadow(0 0 10px rgba(50, 200, 255, 0.5));
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, #000 100%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="overlay"></div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const size = 40;
+        const cols = Math.ceil(canvas.width / size);
+        const rows = Math.ceil(canvas.height / size);
+        const grid = Array(cols * rows).fill(0).map(() => ({ val: 0, target: 0 }));
+
+        function animate() {
+            ctx.fillStyle = 'rgba(5, 5, 10, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    const idx = i * rows + j;
+                    if (Math.random() < 0.01) {
+                        grid[idx].target = 1;
+                    } else if (Math.random() < 0.06) {
+                        grid[idx].target = 0;
+                    }
+
+                    grid[idx].val += (grid[idx].target - grid[idx].val) * 0.15;
+
+                    if (grid[idx].val > 0.02) {
+                        const alpha = grid[idx].val;
+                        ctx.fillStyle = `rgba(50, 210, 255, ${alpha})`;
+                        ctx.fillRect(i * size + 3, j * size + 3, size - 6, size - 6);
+                        if (alpha > 0.6) {
+                            ctx.shadowBlur = 15;
+                            ctx.shadowColor = 'rgba(50, 255, 255, 0.9)';
+                        } else {
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

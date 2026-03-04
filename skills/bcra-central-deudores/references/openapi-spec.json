@@ -1,0 +1,318 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Central de Deudores",
+    "description": "El servicio permite obtener un informe consolidado por clave de identificación fiscal (CUIT, CUIL o CDI) para una persona humana o jurídica respecto de financiaciones otorgadas por entidades financieras, fideicomisos financieros, entidades no financieras emisoras de tarjetas de crédito / compra, otros proveedores no financieros de créditos, sociedades de garantía recíproca, fondos de garantía de carácter público y proveedores de servicios de crédito entre particulares a través de plataformas.",
+    "contact": {
+      "name": "API BCRA Consultas Técnicas",
+      "email": "Api@bcra.gob.ar"
+    },
+    "version": "v1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.bcra.gob.ar",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/centraldedeudores/v1.0/Deudas/{Identificacion}": {
+      "get": {
+        "tags": ["Deudas"],
+        "parameters": [
+          {
+            "name": "Identificacion",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeudaResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/centraldedeudores/v1.0/Deudas/Historicas/{Identificacion}": {
+      "get": {
+        "tags": ["Deudas"],
+        "parameters": [
+          {
+            "name": "Identificacion",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HistorialResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/centraldedeudores/v1.0/Deudas/ChequesRechazados/{Identificacion}": {
+      "get": {
+        "tags": ["Deudas"],
+        "parameters": [
+          {
+            "name": "Identificacion",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChequeResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DeudaResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "integer", "format": "int32" },
+          "results": { "$ref": "#/components/schemas/Deuda" }
+        }
+      },
+      "Deuda": {
+        "type": "object",
+        "properties": {
+          "identificacion": { "type": "integer", "format": "int64" },
+          "denominacion": { "type": "string", "nullable": true },
+          "periodos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DeudaPeriodo" },
+            "nullable": true
+          }
+        }
+      },
+      "DeudaPeriodo": {
+        "type": "object",
+        "properties": {
+          "periodo": { "type": "string", "nullable": true },
+          "entidades": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DeudaEntidad" },
+            "nullable": true
+          }
+        }
+      },
+      "DeudaEntidad": {
+        "type": "object",
+        "properties": {
+          "entidad": { "type": "string", "nullable": true },
+          "situacion": { "type": "integer", "format": "int32", "nullable": true },
+          "fechaSit1": { "type": "string", "format": "date", "nullable": true },
+          "monto": { "type": "number", "format": "double", "nullable": true },
+          "diasAtrasoPago": { "type": "number", "format": "double", "nullable": true },
+          "refinanciaciones": { "type": "boolean" },
+          "recategorizacionOblig": { "type": "boolean" },
+          "situacionJuridica": { "type": "boolean" },
+          "irrecDisposicionTecnica": { "type": "boolean" },
+          "enRevision": { "type": "boolean" },
+          "procesoJud": { "type": "boolean" }
+        }
+      },
+      "HistorialResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "integer", "format": "int32" },
+          "results": { "$ref": "#/components/schemas/HistorialDeuda" }
+        }
+      },
+      "HistorialDeuda": {
+        "type": "object",
+        "properties": {
+          "identificacion": { "type": "integer", "format": "int64" },
+          "denominacion": { "type": "string", "nullable": true },
+          "periodos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/HistorialPeriodo" },
+            "nullable": true
+          }
+        }
+      },
+      "HistorialPeriodo": {
+        "type": "object",
+        "properties": {
+          "periodo": { "type": "string", "nullable": true },
+          "entidades": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/HistorialEntidad" },
+            "nullable": true
+          }
+        }
+      },
+      "HistorialEntidad": {
+        "type": "object",
+        "properties": {
+          "entidad": { "type": "string", "nullable": true },
+          "situacion": { "type": "integer", "format": "int32", "nullable": true },
+          "monto": { "type": "number", "format": "double", "nullable": true },
+          "enRevision": { "type": "boolean" },
+          "procesoJud": { "type": "boolean" }
+        }
+      },
+      "ChequeResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "integer", "format": "int32" },
+          "results": { "$ref": "#/components/schemas/ChequeRechazado" }
+        }
+      },
+      "ChequeRechazado": {
+        "type": "object",
+        "properties": {
+          "identificacion": { "type": "integer", "format": "int64" },
+          "denominacion": { "type": "string", "nullable": true },
+          "causales": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChequeCausal" },
+            "nullable": true
+          }
+        }
+      },
+      "ChequeCausal": {
+        "type": "object",
+        "properties": {
+          "causal": { "type": "string", "nullable": true },
+          "entidades": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChequeEntidad" },
+            "nullable": true
+          }
+        }
+      },
+      "ChequeEntidad": {
+        "type": "object",
+        "properties": {
+          "entidad": { "type": "integer", "format": "int64", "nullable": true },
+          "detalle": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChequeDetalle" },
+            "nullable": true
+          }
+        }
+      },
+      "ChequeDetalle": {
+        "type": "object",
+        "properties": {
+          "nroCheque": { "type": "number", "format": "double" },
+          "fechaRechazo": { "type": "string", "format": "date" },
+          "monto": { "type": "number", "format": "double" },
+          "fechaPago": { "type": "string", "format": "date", "nullable": true },
+          "fechaPagoMulta": { "type": "string", "format": "date", "nullable": true },
+          "estadoMulta": { "type": "string", "nullable": true },
+          "ctaPersonal": { "type": "boolean" },
+          "denomJuridica": { "type": "string", "nullable": true },
+          "enRevision": { "type": "boolean" },
+          "procesoJud": { "type": "boolean" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "integer", "format": "int32" },
+          "errorMessages": {
+            "type": "array",
+            "items": { "type": "string" },
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

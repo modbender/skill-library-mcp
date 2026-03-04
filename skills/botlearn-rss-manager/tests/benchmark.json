@@ -1,0 +1,476 @@
+{
+  "version": "0.0.1",
+  "dimension": "information-retrieval",
+  "tasks": [
+    {
+      "id": "bench-easy-01",
+      "difficulty": "easy",
+      "description": "Parse a single RSS 2.0 feed and extract structured article metadata",
+      "input": "Parse this RSS feed and extract all articles with their metadata: https://feeds.bbci.co.uk/news/technology/rss.xml. For each article, I need: title, author, publication date (in ISO 8601), URL, categories, and a word count of the description. List them in reverse chronological order.",
+      "rubric": [
+        {
+          "criterion": "Extraction Completeness",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Extracts all available metadata fields (title, link, description, pubDate, guid, category, media:thumbnail) from every item; correctly handles RSS 2.0 namespace extensions; dates converted to ISO 8601 UTC",
+            "3": "Extracts title, link, and date but misses some fields like categories or media; dates may not be fully normalized",
+            "1": "Extracts only title and link",
+            "0": "Cannot parse the feed"
+          }
+        },
+        {
+          "criterion": "Data Normalization",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Dates consistently in ISO 8601 UTC; HTML entities decoded in titles; URLs canonicalized; word counts accurately computed from stripped HTML",
+            "3": "Some normalization applied but inconsistent (e.g., mixed date formats or HTML fragments in titles)",
+            "1": "Raw data with minimal processing",
+            "0": "Data is garbled or incorrect"
+          }
+        },
+        {
+          "criterion": "Output Organization",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Articles in correct reverse chronological order; clean tabular or structured output; feed-level metadata (title, description, lastBuildDate) reported",
+            "3": "Articles listed but ordering may have minor errors; output is readable but not well-structured",
+            "1": "Unordered list or difficult to parse output",
+            "0": "No coherent output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 40,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-easy-02",
+      "difficulty": "easy",
+      "description": "Discover RSS feeds from a website URL",
+      "input": "I want to subscribe to RSS feeds from these websites but I don't have the feed URLs: https://www.theverge.com, https://arstechnica.com, and https://www.wired.com. Find their RSS/Atom feed URLs, identify the feed format (RSS 2.0, Atom, etc.), and tell me the update frequency if available.",
+      "rubric": [
+        {
+          "criterion": "Feed Discovery",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Finds the correct RSS/Atom feed URL for all 3 sites using HTML link rel=alternate, common path probing, or both; identifies multiple feeds per site if available (e.g., main feed + category feeds)",
+            "3": "Finds feeds for 2 of 3 sites; or finds feeds but via guessing common paths only",
+            "1": "Finds feed for only 1 site",
+            "0": "Cannot discover any feeds"
+          }
+        },
+        {
+          "criterion": "Format Identification",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Correctly identifies each feed's format (RSS 2.0, Atom 1.0, RSS 1.0) and version; reports TTL or update frequency when specified in the feed",
+            "3": "Identifies format type but not version; or misses update frequency information",
+            "1": "Lists URLs without format information",
+            "0": "Incorrect format identification"
+          }
+        },
+        {
+          "criterion": "Actionable Output",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Provides ready-to-subscribe feed URLs with format, update frequency, and a brief description of what each feed covers; suggests which feed to use if multiple are available",
+            "3": "Provides URLs and basic info but no recommendation on which to use",
+            "1": "Provides URLs only",
+            "0": "Output is not actionable"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 75
+    },
+    {
+      "id": "bench-easy-03",
+      "difficulty": "easy",
+      "description": "Identify and handle a malformed RSS feed gracefully",
+      "input": "I'm having trouble with this feed -- it seems broken or malformed. Try to parse https://example.com/broken-feed.xml which contains unescaped ampersands in URLs, missing closing tags, and Windows-1252 characters declared as UTF-8. Extract whatever articles you can and report what's wrong with the feed so I can tell the publisher.",
+      "rubric": [
+        {
+          "criterion": "Error Diagnosis",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Identifies all 3 specific issues (unescaped ampersands, unclosed tags, encoding mismatch); explains each issue with examples from the feed and suggests fixes for the publisher",
+            "3": "Identifies 2 of 3 issues with reasonable explanations",
+            "1": "Reports that the feed is broken but cannot diagnose specific issues",
+            "0": "Does not recognize the feed is malformed"
+          }
+        },
+        {
+          "criterion": "Graceful Recovery",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Successfully extracts articles despite malformation using lenient parsing, entity fixing, and encoding correction; clearly marks which fields may be unreliable due to parse issues",
+            "3": "Extracts some articles but loses data from the most malformed sections",
+            "1": "Fails to extract most articles",
+            "0": "Complete parse failure with no recovery attempt"
+          }
+        },
+        {
+          "criterion": "Publisher Report Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Produces a clear, actionable report for the publisher: specific line-level issues, XML/RSS specification references, and concrete fix instructions",
+            "3": "General description of issues without specific locations or fix instructions",
+            "1": "Vague error message only",
+            "0": "No report generated"
+          }
+        }
+      ],
+      "expectedScoreWithout": 30,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-01",
+      "difficulty": "medium",
+      "description": "Deduplicate articles across multiple feeds covering the same news events",
+      "input": "I have 5 tech news feeds (TechCrunch, Ars Technica, The Verge, Wired, Engadget) and they're all covering the same major stories today. I'm seeing the same news about a big tech acquisition reported across all 5 sources, a product launch covered by 4 sources, and a security breach mentioned by 3 sources. Deduplicate these overlapping stories: identify which articles are about the same event, cluster them together, pick the best representative article for each event, and list the other sources as 'also covered by'. Explain your deduplication reasoning.",
+      "rubric": [
+        {
+          "criterion": "Deduplication Accuracy",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Correctly identifies all cross-source duplicate clusters using multiple signals (URL, title similarity, content fingerprinting, entity overlap); no false positives (distinct stories incorrectly merged) or false negatives (duplicates missed)",
+            "3": "Identifies most duplicate clusters but has 1-2 false positives or false negatives; relies on only one dedup signal",
+            "1": "Catches only obvious duplicates (same title); misses cross-source near-duplicates",
+            "0": "No effective deduplication"
+          }
+        },
+        {
+          "criterion": "Representative Selection",
+          "weight": 0.25,
+          "scoring": {
+            "5": "For each cluster, selects the most comprehensive article as the lead based on content depth, source authority, and recency; clearly explains the selection criteria",
+            "3": "Selects a reasonable representative but selection criteria are not explained or inconsistently applied",
+            "1": "Arbitrary selection with no quality criteria",
+            "0": "No representative selection"
+          }
+        },
+        {
+          "criterion": "Source Attribution",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Every cluster lists all contributing sources with links; notes unique angles or exclusive information from specific sources",
+            "3": "Sources listed but missing some; no analysis of unique angles",
+            "1": "Incomplete source attribution",
+            "0": "No attribution"
+          }
+        },
+        {
+          "criterion": "Reasoning Transparency",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Explains which dedup signals were used for each cluster (GUID match, title similarity score, content fingerprint distance, entity overlap percentage); transparent about confidence level",
+            "3": "Some explanation of dedup method but not specific to each cluster",
+            "1": "No explanation of reasoning",
+            "0": "Reasoning is incorrect or misleading"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-02",
+      "difficulty": "medium",
+      "description": "Score and rank articles by importance with user topic preferences",
+      "input": "Here are 20 articles from my feeds today. My interests are: AI/ML (high priority), cybersecurity (high priority), open source (medium), cloud infrastructure (medium), consumer electronics (low). Score each article's importance on a 0-100 scale using source authority, recency, cross-source corroboration, topic relevance to my interests, and content depth. Show me the top 10 ranked by importance with the score breakdown for each dimension.",
+      "rubric": [
+        {
+          "criterion": "Scoring Model Application",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Applies all 5 scoring dimensions with correct weights (authority 25%, recency 20%, corroboration 20%, relevance 20%, depth 15%); shows per-dimension scores and weighted composite; scores are consistent and defensible",
+            "3": "Uses 3-4 dimensions but weights are incorrect or not all dimensions are scored; composite calculation has minor errors",
+            "1": "Scores based on 1-2 dimensions only (e.g., just recency and relevance)",
+            "0": "No multi-dimensional scoring"
+          }
+        },
+        {
+          "criterion": "Topic Relevance Alignment",
+          "weight": 0.3,
+          "scoring": {
+            "5": "AI/ML and cybersecurity articles receive clear relevance boosts; consumer electronics articles are scored lower for relevance; medium-priority topics fall in between; relevance scores directly reflect the stated user priorities",
+            "3": "Generally aligns with user priorities but some misalignment (e.g., a consumer electronics article ranked above a cybersecurity article of equal quality)",
+            "1": "User topic preferences are acknowledged but not reflected in scoring",
+            "0": "User preferences ignored"
+          }
+        },
+        {
+          "criterion": "Score Transparency",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Each article shows: source authority tier and score, recency score with age noted, corroboration count, topic match explanation, depth indicators (word count, citations); final composite with formula",
+            "3": "Shows composite score with some dimension breakdowns but not all",
+            "1": "Shows only the final score with no breakdown",
+            "0": "Scoring is opaque"
+          }
+        },
+        {
+          "criterion": "Ranking Quality",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Top 10 ranking intuitively makes sense; high-importance stories from authoritative sources on priority topics are at the top; no obvious ranking anomalies",
+            "3": "Ranking is mostly reasonable with 1-2 questionable placements",
+            "1": "Ranking has several counter-intuitive placements",
+            "0": "Ranking appears random"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-med-03",
+      "difficulty": "medium",
+      "description": "Cluster articles into coherent topics and generate labeled topic groups",
+      "input": "I have 30 articles from today's feeds spanning multiple topics. Cluster them into coherent topic groups. For each cluster: (1) generate a descriptive topic label, (2) identify the lead article, (3) list how many articles are in the cluster, (4) note if this is an emerging, trending, or fading topic compared to yesterday. Also identify any articles that don't fit into any cluster (outliers).",
+      "rubric": [
+        {
+          "criterion": "Clustering Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Articles are grouped into coherent, non-overlapping clusters where all articles in a cluster genuinely relate to the same topic; outliers are correctly identified as not fitting any cluster; no articles are force-fit into wrong clusters",
+            "3": "Most clusters are coherent but 1-2 articles are misplaced; or some related articles are split across clusters unnecessarily",
+            "1": "Clusters are too broad (mixing unrelated topics) or too narrow (splitting a single topic into many clusters)",
+            "0": "No meaningful clustering"
+          }
+        },
+        {
+          "criterion": "Label Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Topic labels are specific, informative, and accurately capture the essence of the cluster (e.g., 'OpenAI: GPT-5 Release and Industry Reaction' rather than 'AI News'); labels use entity names and key terms",
+            "3": "Labels are reasonable but generic (e.g., 'AI/ML' instead of a specific topic within AI)",
+            "1": "Labels are vague or misleading",
+            "0": "No labels or nonsensical labels"
+          }
+        },
+        {
+          "criterion": "Lead Article Selection",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Lead article for each cluster is the most comprehensive and representative; selection criteria are explained (closest to centroid, highest importance, best source)",
+            "3": "Reasonable lead article selected but criteria not explained",
+            "1": "Lead article selection appears arbitrary",
+            "0": "No lead article identified"
+          }
+        },
+        {
+          "criterion": "Trend Detection",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Correctly identifies emerging topics (new clusters), trending topics (growing clusters), and fading topics (shrinking clusters) with quantitative comparison to previous window; trend labels are applied appropriately",
+            "3": "Some trend detection but without quantitative comparison; or trend labels are present but not well-justified",
+            "1": "Mentions trends vaguely without specific identification",
+            "0": "No trend detection"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-med-04",
+      "difficulty": "medium",
+      "description": "Generate a structured daily digest with multiple priority tiers",
+      "input": "Generate my evening digest from today's articles. I have 45 articles after deduplication from 8 feeds. Organize them into a structured digest with: (1) Top Stories section for the most important items (importance >= 70), (2) Noteworthy section for moderately important items (40-69), (3) Also Mentioned section for lower priority items. Include topic clustering, source attribution, importance scores, and a feed health summary. Keep the Top Stories summaries under 75 words each.",
+      "rubric": [
+        {
+          "criterion": "Digest Structure",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Complete 3-tier digest with Top Stories, Noteworthy, and Also Mentioned sections; clear visual hierarchy; header with date range and stats; feed health report at the end; adheres to evening recap sizing limits",
+            "3": "Has the 3 tiers but missing header/footer sections; or sizing limits not respected",
+            "1": "Only one tier; flat list with importance scores but no hierarchical organization",
+            "0": "Unstructured output"
+          }
+        },
+        {
+          "criterion": "Summary Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Top Stories summaries are concise (under 75 words), capture key facts, and explain significance; Noteworthy items have shorter but informative descriptions; Also Mentioned items have one-line entries",
+            "3": "Summaries present but some exceed word limits or miss key facts; quality varies across tiers",
+            "1": "Summaries are copy-pasted from feed descriptions without concision or curation",
+            "0": "No summaries"
+          }
+        },
+        {
+          "criterion": "Source Attribution",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Every item includes: source name, publication date, URL, authority tier; clustered items list all contributing sources; feed health report names specific feeds with issues",
+            "3": "Source names and dates present but missing URLs or authority tiers for some items",
+            "1": "Inconsistent attribution; some items missing source info",
+            "0": "No source attribution"
+          }
+        },
+        {
+          "criterion": "Importance Threshold Application",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Articles are correctly placed in tiers based on importance scores; no high-scoring articles in low tiers or vice versa; scores are visible and consistent with the tier placement",
+            "3": "Mostly correct tier placement with 1-2 misplacements; scores shown but threshold boundaries are slightly inconsistent",
+            "1": "Tier placement appears arbitrary rather than score-based",
+            "0": "No importance-based tiering"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-hard-01",
+      "difficulty": "hard",
+      "description": "Handle mixed-format feeds with encoding issues, namespace conflicts, and partial content",
+      "input": "I have a collection of 6 problematic feeds to aggregate: (1) an RSS 2.0 feed with content:encoded but declared as ISO-8859-1 while serving UTF-8, (2) an Atom feed that uses non-standard namespace prefixes for Dublin Core and Media RSS, (3) an RSS 1.0 (RDF) feed from an academic journal with complex Dublin Core metadata, (4) a feed that only provides truncated descriptions (50 words max) with no full content, (5) a feed that reuses GUIDs across different articles (GUID collision), and (6) a feed that updates article content without changing the GUID or pubDate. Parse all 6, extract maximum content, handle each edge case appropriately, and produce a unified article list. Document every workaround you applied.",
+      "rubric": [
+        {
+          "criterion": "Edge Case Handling",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Correctly handles all 6 edge cases: encoding detection overrides declaration, namespace resolution by URI not prefix, RDF structure parsing, truncated content flagging, GUID collision detection with fallback to URL+title, and content-change detection for silent updates; documents each workaround",
+            "3": "Handles 4 of 6 edge cases correctly; documents most workarounds",
+            "1": "Handles 2 or fewer edge cases; minimal documentation",
+            "0": "Fails on most edge cases without attempting recovery"
+          }
+        },
+        {
+          "criterion": "Content Maximization",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Extracts the fullest content available from each feed: uses content:encoded when available, falls back through the priority chain, flags truncated content, identifies updated articles and keeps latest version",
+            "3": "Extracts reasonable content but misses some fuller sources (e.g., uses description when content:encoded was available)",
+            "1": "Extracts minimal content from most feeds",
+            "0": "Content extraction largely fails"
+          }
+        },
+        {
+          "criterion": "Unified Output Consistency",
+          "weight": 0.2,
+          "scoring": {
+            "5": "All articles from all 6 feeds are presented in a consistent normalized format regardless of source format; dates in ISO 8601, URLs canonicalized, HTML sanitized, metadata fields aligned",
+            "3": "Mostly consistent but some format artifacts remain from specific feed types",
+            "1": "Output varies significantly based on source feed format",
+            "0": "Inconsistent or garbled output"
+          }
+        },
+        {
+          "criterion": "Workaround Documentation",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Each workaround is clearly documented: what the issue was, how it was detected, what the workaround does, and any reliability caveats; documentation could serve as a troubleshooting guide",
+            "3": "Workarounds are mentioned but not explained in detail",
+            "1": "Minimal or no documentation of applied workarounds",
+            "0": "No documentation"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-02",
+      "difficulty": "hard",
+      "description": "Full-pipeline aggregation with dedup, scoring, clustering, and trend analysis across a large feed collection",
+      "input": "I manage 25 RSS feeds across 4 categories: tech news (8 feeds), cybersecurity (6 feeds), AI/ML research (5 feeds), and open source (6 feeds). Over the past 24 hours, these feeds have produced approximately 200 articles. Run the full aggregation pipeline: (1) parse and extract all articles, (2) deduplicate across all 25 feeds -- I expect significant overlap especially on major stories, (3) score every article using the multi-dimensional importance model with my priorities (cybersecurity > AI/ML > open source > general tech news), (4) cluster into topics, (5) detect emerging and fading trends by comparing to the previous 24-hour window, (6) generate a comprehensive morning digest. I need the digest plus a full analytics report: dedup statistics, feed health, topic distribution, and trend analysis.",
+      "rubric": [
+        {
+          "criterion": "Pipeline Completeness",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Executes all 6 pipeline stages in correct order; each stage's output feeds properly into the next; handles the scale (200 articles, 25 feeds) without degradation; pipeline flow is clearly traced",
+            "3": "Covers most pipeline stages but skips or poorly executes one; or stages are executed independently without proper data flow between them",
+            "1": "Only 2-3 pipeline stages attempted",
+            "0": "Pipeline is not coherent"
+          }
+        },
+        {
+          "criterion": "Deduplication at Scale",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Effectively deduplicates across 25 feeds; reports dedup statistics (total articles, unique, near-duplicates merged, exact duplicates removed); handles the high overlap expected in tech/cybersecurity news; dedup decisions are defensible",
+            "3": "Deduplication works but statistics are incomplete; or some cross-category duplicates are missed",
+            "1": "Deduplication is partial; many duplicates remain in the output",
+            "0": "No effective deduplication at this scale"
+          }
+        },
+        {
+          "criterion": "Analytics Report Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Comprehensive analytics: dedup stats (pre/post counts, duplicate rate per feed), feed health (errors, latency, freshness per feed), topic distribution (articles per category, top topics), trend analysis (emerging/fading topics with quantitative evidence); visualizable data structure",
+            "3": "Includes some analytics but missing 1-2 major sections; numbers provided but not contextualized",
+            "1": "Minimal analytics; basic counts only",
+            "0": "No analytics report"
+          }
+        },
+        {
+          "criterion": "Digest Quality at Scale",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Digest is well-organized despite the large volume; importance scoring correctly reflects user priorities (cybersecurity and AI/ML stories dominate top spots); topic clusters are coherent; sizing limits respected; digest is genuinely useful for a human reader",
+            "3": "Digest is produced but struggles with volume (too long, or important stories buried); priorities partially reflected",
+            "1": "Digest is overwhelming or poorly organized; does not effectively summarize 200 articles",
+            "0": "Digest is not usable"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-03",
+      "difficulty": "hard",
+      "description": "Optimize a poorly managed feed collection with health issues, redundancy, and coverage gaps",
+      "input": "Audit my RSS feed collection and optimize it. I have 15 feeds but I suspect problems: some feeds have been dead for weeks, several feeds heavily overlap (3 different feeds from the same publisher covering similar topics), I'm missing coverage on topics I care about (AI safety, supply chain security, WebAssembly), and my digest has been getting worse -- too many duplicates and not enough diverse perspectives. Analyze the feed collection health, identify redundancies and gaps, suggest feeds to remove and add, estimate the impact on digest quality, and propose an optimized feed list with a polling schedule.",
+      "rubric": [
+        {
+          "criterion": "Health Audit Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Identifies dead/unhealthy feeds with specific evidence (error rates, last successful poll, HTTP status codes); diagnoses the root cause for each unhealthy feed; provides per-feed health scores",
+            "3": "Identifies some unhealthy feeds but diagnosis is incomplete; missing specific error evidence",
+            "1": "Vague assessment of feed health without specific feed-level diagnosis",
+            "0": "No health audit"
+          }
+        },
+        {
+          "criterion": "Redundancy Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Identifies overlapping feeds with quantitative overlap metrics (content similarity, topic overlap percentage); explains which specific feeds are redundant with each other; recommends which to keep (based on content quality, update frequency, authority) and which to remove",
+            "3": "Identifies obvious redundancies but without quantitative analysis; recommendations present but not well-justified",
+            "1": "Mentions redundancy exists but does not identify specific feeds",
+            "0": "No redundancy analysis"
+          }
+        },
+        {
+          "criterion": "Coverage Gap Identification & Fill",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Maps current topic coverage, identifies specific gaps (AI safety, supply chain security, WebAssembly); suggests concrete feed URLs for each gap with justification (source quality, update frequency, relevance); estimates the coverage improvement",
+            "3": "Identifies gaps and suggests some feeds but without specific URLs or quality assessment",
+            "1": "Acknowledges gaps exist but offers no actionable suggestions",
+            "0": "No gap analysis"
+          }
+        },
+        {
+          "criterion": "Optimization Plan",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Provides a complete optimized feed list: feeds to keep (with rationale), feeds to remove (with rationale), feeds to add (with URLs and rationale); includes a per-feed polling schedule based on update frequency; estimates impact on digest metrics (fewer duplicates, broader coverage, better quality)",
+            "3": "Provides recommendations but the plan is incomplete (e.g., no polling schedule, or missing impact estimates)",
+            "1": "General recommendations without a specific optimized feed list",
+            "0": "No optimization plan"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 55
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+name: "Reconcile Multi-Format Financial Data"
+id: "data-analysis-multi-format-reconciliation"
+version: "1.0"
+suite: "data-analysis"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to reconcile financial data across three different
+  file formats (CSV, JSON, semi-structured text). The dataset contains 200
+  invoices, 180 payments, and 190 bank statement lines with 15 deliberate
+  discrepancies: unpaid invoices, orphan payments, amount mismatches,
+  near-miss reference IDs (typos), duplicate bank entries, and a split
+  payment. Evaluates cross-format parsing, matching logic, anomaly
+  detection, and structured reporting.
+
+user_message: |
+  Reconcile the 3 financial data sources in this repository:
+  - invoices.csv (200 invoices with Invoice_ID, Customer, Amount, Date, Reference_ID)
+  - payments.json (payment records with payment_id, invoice_ref, amount_paid, payment_date, method)
+  - bank-statement.txt (semi-structured bank statement with Date, Reference, Description, Amount)
+
+  Match transactions across all three sources using Reference IDs and amounts.
+  Create reconciliation-report.md identifying:
+  1. Matched transactions (invoices with corresponding payments and bank entries)
+  2. Unmatched invoices (invoices with no corresponding payment)
+  3. Unmatched payments (payments referencing non-existent invoices)
+  4. Amount discrepancies (where invoice and payment amounts differ)
+  5. Suspected duplicate bank entries (same reference appearing multiple times)
+  6. Reference ID anomalies (near-miss or malformed reference IDs)
+
+  Include specific IDs, amounts, and explanations for each finding.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "reconciliation-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "unmatched"
+          - "discrepancy"
+          - "duplicate"
+          - "amount"
+      - type: "word-count-range"
+        min: 400
+        max: 2000
+
+expected_metrics:
+  tool_calls: [8, 20]
+  planning_ratio: [0.15, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

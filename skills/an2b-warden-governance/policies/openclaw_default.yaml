@@ -1,0 +1,90 @@
+# War/Den OpenClaw Default Policies
+#
+# These policies protect against the most common agent risks.
+# They are the direct answer to the Meta inbox incident.
+#
+# Priority: lower number = higher priority (evaluated first).
+# Mode: enforce = block/allow, monitor = log only.
+#
+# email.delete is REVIEW because that's the whole point.
+# shell.execute in prod is DENY because production shell access is never safe.
+# payment.create is REVIEW because money should require human approval.
+
+policies:
+  - name: protect-email-delete
+    match:
+      action.type: data.write
+      action.data.openclaw_original: email.delete
+    decision: review
+    mode: enforce
+    priority: 1
+    active: true
+    reason: "Email deletion requires human review. The Meta inbox can never happen again."
+
+  - name: block-shell-execute-prod
+    match:
+      action.type: code.execute
+      context.env: prod
+    decision: deny
+    mode: enforce
+    priority: 2
+    active: true
+    reason: "Shell/code execution is blocked in production."
+
+  - name: protect-file-delete
+    match:
+      action.type: data.write
+      action.data.openclaw_original: file.delete
+    decision: review
+    mode: enforce
+    priority: 3
+    active: true
+    reason: "File deletion requires human review."
+
+  - name: block-code-execute-prod
+    match:
+      action.type: code.execute
+      context.env: prod
+    decision: deny
+    mode: enforce
+    priority: 4
+    active: true
+    reason: "Code execution is blocked in production."
+
+  - name: review-payments
+    match:
+      action.type: api.call
+      action.data.openclaw_original: payment.create
+    decision: review
+    mode: enforce
+    priority: 5
+    active: true
+    reason: "Payment actions require human review."
+
+  - name: protect-calendar-delete
+    match:
+      action.type: data.write
+      action.data.openclaw_original: calendar.delete
+    decision: review
+    mode: enforce
+    priority: 6
+    active: true
+    reason: "Calendar deletion requires human review."
+
+  - name: monitor-all-api-calls
+    match:
+      action.type: api.call
+    decision: allow
+    mode: monitor
+    priority: 100
+    active: true
+    reason: "API calls are monitored and logged."
+
+  - name: monitor-all-data-writes
+    match:
+      action.type: data.write
+    decision: allow
+    mode: monitor
+    priority: 101
+    active: true
+    reason: "Data writes are monitored and logged."

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Portal Asset</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #020202;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            perspective: 800px;
+        }
+
+        .tunnel {
+            position: relative;
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+            animation: spin 10s infinite linear;
+        }
+
+        .ring {
+            position: absolute;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tunnel" id="tunnel"></div>
+    <script>
+        const tunnel = document.getElementById('tunnel');
+        const numRings = 40;
+        const rings = [];
+
+        for (let i = 0; i < numRings; i++) {
+            let ring = document.createElement('div');
+            ring.className = 'ring';
+            const size = 300 + Math.random() * 50;
+            ring.style.width = size + 'px';
+            ring.style.height = size + 'px';
+            ring.style.marginLeft = -(size / 2) + 'px';
+            ring.style.marginTop = -(size / 2) + 'px';
+
+            // Randomly switch between neon pink, cyan and purple
+            const colors = ['#00f0ff', '#ff003c', '#bc13fe'];
+            const color = colors[Math.floor(Math.random() * 3)];
+
+            ring.style.borderColor = color;
+            ring.style.boxShadow = `0 0 15px ${color}, inset 0 0 15px ${color}`;
+
+            tunnel.appendChild(ring);
+
+            rings.push({
+                el: ring,
+                z: i * 50 - 1500
+            });
+        }
+
+        function animate() {
+            rings.forEach(r => {
+                r.z += 10;
+                if (r.z > 500) r.z -= numRings * 50;
+
+                r.el.style.transform = `translateZ(${r.z}px) rotateZ(${r.z * 0.1}deg)`;
+
+                // fade in and out cleanly
+                let normZ = (r.z + 1500) / 2000; // 0 to 1
+                r.el.style.opacity = Math.max(0, 1 - Math.abs(r.z) / 1000);
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

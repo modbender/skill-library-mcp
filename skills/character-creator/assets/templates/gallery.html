@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{CHARACTER_NAME}} · 多角度参考</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent: #c9a961;
+            --border: #2a2a2a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            padding: 80px 40px 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        .header-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 24px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        .hero {
+            display: flex;
+            gap: 48px;
+            margin-bottom: 80px;
+            padding-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-portrait {
+            flex-shrink: 0;
+            width: 320px;
+        }
+        .hero-portrait img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .hero-info {
+            flex: 1;
+            padding-top: 20px;
+        }
+        .hero-label {
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+        }
+        .hero-name {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            margin-bottom: 24px;
+        }
+        .hero-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        }
+        .card-image {
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card:hover .card-image img {
+            transform: scale(1.05);
+        }
+        .card-label {
+            padding: 14px 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-label span {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-image {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lightbox-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .lightbox-close:hover { color: var(--text-primary); }
+        .footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+        @media (max-width: 768px) {
+            .header { padding: 60px 20px 40px; }
+            .header-title { font-size: 1.75rem; }
+            .main { padding: 40px 20px; }
+            .hero { flex-direction: column; }
+            .hero-portrait { width: 100%; max-width: 280px; margin: 0 auto; }
+            .hero-info { text-align: center; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-badge">CHARACTER REFERENCE</div>
+        <h1 class="header-title">{{CHARACTER_NAME}}</h1>
+        <p class="header-subtitle">多角度参考图</p>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <div class="hero-portrait">
+                <img src="{{PORTRAIT_URL}}" alt="{{CHARACTER_NAME}}">
+            </div>
+            <div class="hero-info">
+                <p class="hero-label">主肖像</p>
+                <h2 class="hero-name">{{CHARACTER_NAME}}</h2>
+                <p class="hero-desc">{{CHARACTER_DESCRIPTION}}</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">多角度参考</h2>
+            <div class="grid">
+                {{GALLERY_ITEMS}}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">{{CHARACTER_NAME}} · 角色参考图 · {{GENERATED_TIME}}</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">关闭</span>
+        <img class="lightbox-image" id="lightbox-img" src="" alt="">
+    </div>
+
+    <script>
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+    </script>
+</body>
+</html>

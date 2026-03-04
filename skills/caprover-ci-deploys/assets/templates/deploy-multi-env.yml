@@ -1,0 +1,43 @@
+name: Deploy to CapRover
+
+on:
+  push:
+    branches:
+      - main      # → production
+      - staging   # → staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        options: [staging, production]
+        default: staging
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Set environment vars
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
+            echo "CAPROVER_APP=${{ secrets.CAPROVER_APP_PROD }}" >> $GITHUB_ENV
+            echo "CAPROVER_TOKEN=${{ secrets.CAPROVER_APP_TOKEN_PROD }}" >> $GITHUB_ENV
+          else
+            echo "CAPROVER_APP=${{ secrets.CAPROVER_APP_STAGING }}" >> $GITHUB_ENV
+            echo "CAPROVER_TOKEN=${{ secrets.CAPROVER_APP_TOKEN_STAGING }}" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to CapRover
+        uses: caprover/deploy-from-github@v1
+        with:
+          server: ${{ secrets.CAPROVER_HOST }}
+          app: ${{ env.CAPROVER_APP }}
+          token: ${{ env.CAPROVER_TOKEN }}

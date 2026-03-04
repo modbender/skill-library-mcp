@@ -1,0 +1,94 @@
+name: "Scaffold Project from Requirements"
+id: "file-creation-project-scaffold"
+version: "1.0"
+suite: "file-creation"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to read a detailed requirements document and
+  scaffold a complete Python package structure with CLI entry point, module
+  stubs, configuration handling, and test files. Evaluates architectural
+  decisions, package structure correctness, argparse wiring, and whether
+  the resulting skeleton is immediately runnable (--help must work, imports
+  must resolve). A setup.sh script initializes a git repo with the
+  requirements document before the task runner begins.
+
+user_message: |
+  Read requirements.md in this repository. It describes a Python CLI tool
+  called FileSync. Scaffold the full project:
+
+  1. Create the filesync/ package with all modules listed in the requirements
+     (__init__.py, __main__.py, cli.py, scanner.py, differ.py, applier.py,
+     config.py, utils.py).
+  2. Create a setup.py or pyproject.toml with package metadata and a console
+     entry point for "filesync".
+  3. Wire up the CLI: __main__.py should call the arg parser in cli.py, which
+     defines the three subcommands (scan, diff, apply) with all flags described
+     in the requirements.
+  4. Each module should have stub implementations — function signatures with
+     docstrings and pass/raise NotImplementedError bodies are fine, but all
+     imports must resolve.
+  5. Create tests/ with test_scan.py, test_diff.py, and test_apply.py. Each
+     test file should have at least one test function that imports from the
+     corresponding module.
+  6. __init__.py must set __version__ = "0.1.0".
+
+  Focus on correct structure and interfaces. Running `python -m filesync --help`
+  must work and show the scan, diff, and apply subcommands.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "filesync/__init__.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "__version__"
+  - pattern: "filesync/__main__.py"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "filesync/cli.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "argparse"
+          - "scan"
+          - "diff"
+          - "apply"
+  - pattern: "tests/test_scan.py"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "tests/test_diff.py"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "tests/test_apply.py"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "filesync/__main__.py"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "python -m filesync --help"
+        contains:
+          - "scan"
+          - "diff"
+          - "apply"
+
+expected_metrics:
+  tool_calls: [5, 15]
+  planning_ratio: [0.10, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

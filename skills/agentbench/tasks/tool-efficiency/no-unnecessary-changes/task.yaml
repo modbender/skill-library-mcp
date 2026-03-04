@@ -1,0 +1,43 @@
+name: "Review Without Making Unnecessary Changes"
+id: "tool-efficiency-no-unnecessary-changes"
+version: "1.0"
+suite: "tool-efficiency"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests whether the agent can review a file and report findings without
+  making unnecessary modifications. The report contains two intentional
+  factual errors: the team grew from 9 to 14 (a growth of 5, but only
+  3 new hires are mentioned), and the database migration completion date
+  of November 8 is described as two weeks ahead of November 22 (which is
+  actually 14 days, so the claim is accurate — the real error is that the
+  team size math is wrong). The agent should READ the file and report
+  findings without editing or rewriting it.
+
+user_message: |
+  Review this report in report.md and tell me if there are any factual
+  errors or inconsistencies. Do not make changes, just tell me what you find.
+
+input_files:
+  - name: "report.md"
+
+expected_outputs: []
+
+expected_behavior:
+  - description: "Agent identifies errors without modifying the file"
+    validators:
+      - type: "response-contains-analysis"
+        description: "Response mentions factual inconsistencies found"
+      - type: "file-unchanged"
+        file: "report.md"
+
+expected_metrics:
+  tool_calls: [1, 3]
+  planning_ratio: [0.1, 0.4]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.40
+  layer2_weight: 0.20
+  layer3_weight: 0.25

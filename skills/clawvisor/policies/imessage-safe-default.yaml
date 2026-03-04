@@ -1,0 +1,21 @@
+id: imessage-safe-default
+name: iMessage — read only (default)
+description: >
+  Read-only access to iMessage conversations.
+  Sending messages is explicitly blocked and requires a policy change to enable.
+  Even with an allow policy, send_message ALWAYS requires human approval at request time.
+
+rules:
+  # Read operations — allowed
+  - service: apple.imessage
+    actions: [search_messages, list_threads, get_thread]
+    allow: true
+
+  # Sending — blocked by default; must be explicitly enabled and always requires approval
+  - service: apple.imessage
+    actions: [send_message]
+    allow: false
+    reason: >
+      Sending iMessages is disabled by default.
+      To enable it, change this rule to require_approval: true.
+      Note: send_message always requires human approval regardless of policy.

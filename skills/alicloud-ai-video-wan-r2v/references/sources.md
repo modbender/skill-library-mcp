@@ -1,0 +1,2 @@
+- https://help.aliyun.com/zh/model-studio/wan-video-to-video-api-reference
+- https://help.aliyun.com/zh/model-studio/newly-released-models

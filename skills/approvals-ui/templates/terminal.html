@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Terminal - OpenClaw</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+        
+        .terminal-header {
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .subtitle {
+            opacity: 0.7;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff5c5c;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.connected {
+            background: #24e08a;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        #terminal {
+            flex: 1;
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        /* xterm.js custom styling */
+        .xterm {
+            height: 100%;
+            padding: 8px;
+        }
+        
+        .xterm-viewport {
+            background-color: #000 !important;
+        }
+        
+        .xterm-screen {
+            background-color: #000 !important;
+        }
+        
+        .xterm-cursor-layer {
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="header-left">
+                <a href="/dashboard" style="display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:13px;margin-bottom:8px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">← Back to Dashboard</a>
+                <h1>Terminal</h1>
+                <div class="subtitle">
+                    <span class="status-indicator" id="status-indicator"></span>
+                    <span id="status-text">Connecting...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="terminal"></div>
+    </div>
+
+    <script>
+        // Initialize xterm.js terminal
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+            theme: {
+                background: '#000000',
+                foreground: '#ffffff',
+                cursor: '#ffffff',
+                black: '#000000',
+                red: '#ff5c5c',
+                green: '#24e08a',
+                yellow: '#ffd700',
+                blue: '#5c9eff',
+                magenta: '#ff5cff',
+                cyan: '#5cffff',
+                white: '#ffffff',
+                brightBlack: '#808080',
+                brightRed: '#ff8080',
+                brightGreen: '#80ff80',
+                brightYellow: '#ffff80',
+                brightBlue: '#8080ff',
+                brightMagenta: '#ff80ff',
+                brightCyan: '#80ffff',
+                brightWhite: '#ffffff'
+            }
+        });
+
+        // Add fit addon for responsive sizing
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+
+        // Wait for DOM element to exist (needed when loaded via AJAX)
+        function initTerminal() {
+            const terminalElement = document.getElementById('terminal');
+            if (!terminalElement) {
+                console.error('Terminal element not found, retrying...');
+                setTimeout(initTerminal, 100);
+                return;
+            }
+            
+            console.log('Opening terminal in element');
+            term.open(terminalElement);
+            fitAddon.fit();
+            console.log('Terminal initialized, size:', term.cols, 'x', term.rows);
+        }
+        
+        // Wrap everything in IIFE to avoid conflicts
+        (function() {
+            console.log('Terminal script starting...');
+            
+            // Initialize terminal - wait a bit for AJAX content to be inserted
+            setTimeout(initTerminal, 300);
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                fitAddon.fit();
+                if (socket && socket.connected) {
+                    socket.emit('terminal_resize', {
+                        cols: term.cols,
+                        rows: term.rows
+                    });
+                }
+            });
+
+            // Socket.IO connection
+            const socketUrl = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+            console.log('Initializing SocketIO connection to:', socketUrl);
+            
+            const socket = io(socketUrl, {
+                transports: ['polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 5
+            });
+
+            let terminalReady = false;
+
+        socket.on('connect', function() {
+            console.log('Socket connected, session ID:', socket.id);
+            updateStatus(true, 'Connecting to terminal...');
+            
+            // Small delay to ensure connection is fully established
+            setTimeout(function() {
+                // Request terminal connection
+                console.log('Requesting terminal connection...');
+                socket.emit('terminal_connect');
+            }, 100);
+        });
+        
+        socket.on('connect_error', function(error) {
+            console.error('Socket connection error:', error);
+            updateStatus(false, 'Connection failed: ' + (error.message || 'Unknown error'));
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Socket disconnected');
+            updateStatus(false, 'Disconnected');
+            terminalReady = false;
+        });
+
+        socket.on('terminal_ready', function() {
+            console.log('Terminal ready');
+            updateStatus(true, 'Connected');
+            terminalReady = true;
+            
+            // Send initial resize
+            setTimeout(function() {
+                socket.emit('terminal_resize', {
+                    cols: term.cols,
+                    rows: term.rows
+                });
+            }, 100);
+        });
+
+        socket.on('terminal_output', function(data) {
+            if (data && data.data) {
+                term.write(data.data);
+            }
+        });
+
+        socket.on('terminal_error', function(data) {
+            console.error('Terminal error:', data);
+            const errorMsg = data && data.message ? data.message : 'Unknown error';
+            term.writeln('\r\n\x1b[31mError: ' + errorMsg + '\x1b[0m');
+            updateStatus(false, 'Error: ' + errorMsg);
+        });
+
+        // Handle terminal input
+        term.onData(function(data) {
+            if (terminalReady && socket.connected) {
+                socket.emit('terminal_input', { data: data });
+            }
+        });
+
+        // Update status indicator
+        function updateStatus(connected, text) {
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (indicator) {
+                if (connected) {
+                    indicator.classList.add('connected');
+                } else {
+                    indicator.classList.remove('connected');
+                }
+            }
+            
+            if (statusText) {
+                statusText.textContent = text;
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (socket && socket.connected) {
+                socket.emit('terminal_disconnect');
+            }
+        });
+
+        // Handle cleanup when navigating away (for dashboard tabs)
+        window.addEventListener('visibilitychange', function() {
+            if (document.hidden && socket && socket.connected) {
+                // Don't disconnect, just pause output handling if needed
+            }
+        });
+        })(); // End IIFE
+    </script>
+</body>
+</html>

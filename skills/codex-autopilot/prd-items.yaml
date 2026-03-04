@@ -1,0 +1,184 @@
+# PRD Engine Template
+# This file is the source of truth for machine-readable PRD progress.
+#
+# Status lifecycle:
+#   todo -> in_progress -> implemented_unverified -> verified
+#   blocked can be used for temporarily paused items.
+#
+# Types:
+#   feature  : normal PRD capability item
+#   bugfix   : regression fix and guardrail item
+#
+# Check types supported by scripts/prd-verify.sh:
+#   file_exists
+#   file_contains
+#   command
+#   json_field_equals
+#
+# Versioning model:
+#   - Each version can `extends` a previous version.
+#   - Use `item_updates` / `bugfix_updates` to evolve existing items.
+#   - New bug fixes can be added under `bugfixes`.
+
+meta:
+  schema_version: 1
+  project: autopilot
+  owner: wes
+  default_version: v1.0.0
+  strict_mode_default: false
+
+versions:
+  - id: v1.0.0
+    status: active
+    title: "Autopilot stability baseline"
+    description: "Baseline PRD verification for merged review fixes."
+    iterations:
+      - id: sprint-2026w06
+        title: "Merged review closure"
+        goal: "Close M-10 ~ M-16 with verifiable checks."
+        start_date: "2026-02-10"
+        end_date: "2026-02-16"
+    items:
+      - id: M-10
+        type: feature
+        priority: P2
+        title: "Low-context threshold consistency"
+        iteration: sprint-2026w06
+        status: verified
+        owner: autopilot
+        paths:
+          - scripts/autopilot-constants.sh
+          - scripts/watchdog.sh
+          - scripts/codex-status.sh
+          - scripts/monitor-all.sh
+        checks:
+          - id: constants-threshold
+            type: file_contains
+            path: scripts/autopilot-constants.sh
+            pattern: "LOW_CONTEXT_THRESHOLD:=25"
+            literal: true
+          - id: watchdog-threshold-link
+            type: file_contains
+            path: scripts/watchdog.sh
+            pattern: 'LOW_CONTEXT_THRESHOLD="${LOW_CONTEXT_THRESHOLD:-25}"'
+            literal: true
+          - id: codex-status-threshold-link
+            type: file_contains
+            path: scripts/codex-status.sh
+            pattern: 'LOW_CONTEXT_THRESHOLD="${LOW_CONTEXT_THRESHOLD:-25}"'
+            literal: true
+
+      - id: M-11
+        type: feature
+        priority: P2
+        title: "Layer2 file list cap no longer limits review scope"
+        iteration: sprint-2026w06
+        status: verified
+        owner: autopilot
+        paths:
+          - scripts/consume-review-trigger.sh
+        checks:
+          - id: review-range-present
+            type: file_contains
+            path: scripts/consume-review-trigger.sh
+            pattern: 'review_range='
+            literal: true
+          - id: full-scope-message
+            type: file_contains
+            path: scripts/consume-review-trigger.sh
+            pattern: "请按完整范围审查，不要只看预览列表"
+            literal: true
+
+      - id: M-12
+        type: feature
+        priority: P2
+        title: "tsc timeout protection"
+        iteration: sprint-2026w06
+        status: verified
+        owner: autopilot
+        checks:
+          - id: timeout-wrapper
+            type: file_contains
+            path: scripts/consume-review-trigger.sh
+            pattern: "run_with_timeout"
+            literal: true
+          - id: tsc-timeout-constant
+            type: file_contains
+            path: scripts/autopilot-constants.sh
+            pattern: "TSC_TIMEOUT_SECONDS:=30"
+            literal: true
+
+    bugfixes:
+      - id: BUG-IDLE-001
+        type: bugfix
+        severity: high
+        title: "Idle false positive mitigation"
+        status: verified
+        iteration: sprint-2026w06
+        introduced_in: v1.0.0
+        fixed_in: v1.0.0
+        root_cause: "Snapshot-only detection + short threshold + narrow regex."
+        regression_checks:
+          - id: idle-threshold-updated
+            type: file_contains
+            path: scripts/autopilot-constants.sh
+            pattern: "IDLE_THRESHOLD:=300"
+            literal: true
+          - id: idle-confirm-updated
+            type: file_contains
+            path: scripts/autopilot-constants.sh
+            pattern: "IDLE_CONFIRM_PROBES:=3"
+            literal: true
+          - id: inertia-updated
+            type: file_contains
+            path: scripts/autopilot-constants.sh
+            pattern: "WORKING_INERTIA_SECONDS:=90"
+            literal: true
+          - id: regex-accept-thinking
+            type: file_contains
+            path: scripts/codex-status.sh
+            pattern: "Thinking"
+            literal: true
+
+  - id: v1.0.1
+    extends: v1.0.0
+    status: planning
+    title: "Autopilot PRD engine hardening"
+    description: "Versioned iteration for next stabilization round."
+    iterations:
+      - id: sprint-2026w07
+        title: "Engine hardening"
+        goal: "Promote pending items and add regression guards."
+        start_date: "2026-02-17"
+        end_date: "2026-02-23"
+    item_updates:
+      - id: M-12
+        status: verified
+        notes: "Timeout guard validated on projects with tsconfig."
+      - id: M-13
+        type: feature
+        priority: P2
+        title: "Review history file should not be overwritten daily"
+        status: verified
+        iteration: sprint-2026w07
+        checks:
+          - id: timestamped-review-file
+            type: file_contains
+            path: scripts/consume-review-trigger.sh
+            pattern: "date '+%Y-%m-%d-%H%M%S'"
+            literal: true
+    bugfixes:
+      - id: BUG-PRD-ENGINE-001
+        type: bugfix
+        severity: medium
+        title: "Prevent missing-check silent pass"
+        status: in_progress
+        iteration: sprint-2026w07
+        introduced_in: v1.0.1
+        root_cause: "Items without checks can hide implementation gaps."
+        regression_checks:
+          - id: strict-flag-support
+            type: command
+            command: "scripts/prd-verify.sh --help"
+            expect_exit: [0]
+            timeout_sec: 10

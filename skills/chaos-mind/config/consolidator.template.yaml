@@ -1,0 +1,83 @@
+# CHAOS Consolidator Configuration
+# Template for ClawHub skill deployment
+# Copy to ~/.chaos/config/consolidator.yaml and customize
+
+polling:
+  interval: 10m
+  batch_size: 50
+  state_file: ~/.chaos/consolidator-state.json  # Will be expanded during install
+
+qwen:
+  provider: ollama
+  model: qwen3:1.7b  # Locked default - do not change without testing
+  
+  ollama:
+    host: http://localhost:11434
+    num_threads: 0  # Auto-detect
+    num_ctx: 8192
+    keep_alive: 24h  # Keep model loaded
+
+chaos:
+  mode: mcp
+  mcp:
+    command: ~/.chaos/bin/chaos-mcp  # Absolute path from install location
+    args: []
+    env:
+      CHAOS_DB_PATH: "~/.chaos/db"  # Embedded Dolt database (created by install.sh)
+
+auto_capture:
+  enabled: false  # DISABLED BY DEFAULT - You must explicitly enable after configuring paths
+  mode: transcript
+  
+  # IMPORTANT: Configure paths before enabling
+  # Empty by default to prevent unintended data access
+  sources: []
+  
+  # Example paths (uncomment and customize after reviewing):
+  # - ~/.openclaw-*/agents/*/sessions/*.jsonl
+  # - ~/.clawdbot-*/agents/*/sessions/*.jsonl
+  # - ~/your-project/memory/*.md
+  
+  triggers:
+    min_messages: 10      # Skip short sessions
+    max_messages: 50      # Batch size
+    on_session_end: true  # Extract when session closes
+    on_interval: 30m      # Periodic extraction during long sessions
+    
+  extraction:
+    chunk_size: 2000
+    chunk_overlap: 200
+    dedup:
+      enabled: true
+      similarity_threshold: 0.9
+      
+  linking:
+    auto_link: false
+    relations:
+      - supports
+      - references
+      - contradicts
+
+extraction:
+  min_confidence: 0.7
+  
+  # Categories - flexible strings (not restricted)
+  # Common: core, semantic, working, episodic, decision, research
+  categories:
+    - core
+    - semantic
+    - working
+    - episodic
+  
+  priority:
+    high: 0.8
+    medium: 0.5
+    low: 0.3
+
+logging:
+  level: info
+  file: ~/.chaos/consolidator.log
+  
+events:
+  enabled: true
+  output: ~/.chaos/consolidation-events.jsonl

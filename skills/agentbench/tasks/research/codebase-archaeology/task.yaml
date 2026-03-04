@@ -1,0 +1,61 @@
+name: "Investigate Skipped Test via Git Archaeology"
+id: "research-codebase-archaeology"
+version: "1.0"
+suite: "research"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to investigate a codebase mystery using git
+  history. A test has been skipped with a "flaky" annotation, but the real
+  cause is a regression introduced in an earlier commit. The agent must use
+  git log, git blame, git diff, and other archaeology tools to trace the
+  problem back to its origin, identify the exact bug, and write a clear
+  investigation report. A setup.sh script builds a 15-commit git repo with
+  a real Python stats module before the task runner begins.
+
+user_message: |
+  This repository contains a Python statistics module. One of the test files
+  has a test that has been skipped with the annotation "flaky — investigate
+  later". Your job is to investigate:
+
+  1. Find the skipped test and understand what it is testing.
+  2. Remove the skip decorator and run the test to confirm it actually fails.
+  3. Use git log, git blame, git diff, and other git archaeology techniques
+     to identify which commit introduced the regression that caused this
+     test to start failing.
+  4. Determine exactly what the bug is and why the test fails.
+  5. Write an investigation-report.md with the following sections:
+     - **Skipped Test**: Which test is skipped and in which file
+     - **Bug-Introducing Commit**: The full commit hash and message
+     - **Root Cause**: A clear explanation of the bug (what changed, why
+       it is wrong, what the correct behavior should be)
+     - **Recommended Fix**: The exact code change needed to fix the bug
+
+  Do NOT actually fix the bug in stats.py — only write the report.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "investigation-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "test_median_even"
+          - "commit"
+          - "fix"
+      - type: "word-count-range"
+        min: 150
+        max: 800
+
+expected_metrics:
+  tool_calls: [8, 20]
+  planning_ratio: [0.15, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

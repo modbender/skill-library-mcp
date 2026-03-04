@@ -1,0 +1,49 @@
+name: "Create Project Proposal from Brief"
+id: "file-creation-project-proposal"
+version: "1.0"
+suite: "file-creation"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read a project brief and produce
+  a well-structured project proposal document. Evaluates file
+  creation quality, content organization, and instruction following.
+
+user_message: |
+  Please read the project brief in project-brief.txt and create a
+  project proposal document called proposal.md. It should include:
+  - An executive summary (2-3 paragraphs)
+  - Project objectives (bulleted list)
+  - Timeline with 4 phases
+  - Budget breakdown in a table
+  - Risk assessment with at least 3 risks and mitigations
+
+input_files:
+  - name: "project-brief.txt"
+
+expected_outputs:
+  - pattern: "proposal.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "executive summary"
+          - "objectives"
+          - "timeline"
+          - "budget"
+          - "risk"
+      - type: "word-count-range"
+        min: 400
+        max: 2000
+
+expected_metrics:
+  tool_calls: [3, 12]
+  planning_ratio: [0.05, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

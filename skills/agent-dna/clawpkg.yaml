@@ -1,0 +1,57 @@
+name: agent-dna
+version: 0.1.0
+description: "Portable agent identity - encode, decode, diff, and port Agent DNA across platforms and models."
+author: Nix
+license: MIT
+
+entrypoints:
+  encode: encode.py
+  decode: decode.py
+  diff: diff.py
+  port: port.py
+
+dependencies:
+  python: ">=3.8"
+  packages: []  # stdlib only - no external deps
+
+tags:
+  - identity
+  - memory
+  - portability
+  - agents
+  - soul
+
+commands:
+  encode:
+    description: "Compress agent identity files into a portable DNA JSON"
+    usage: "python encode.py --dir <workspace> --name <agent_name> --out <output.dna.json>"
+    example: "python encode.py --dir /workspace --name Nix --out nix.dna.json"
+
+  decode:
+    description: "Reconstruct agent system prompt from DNA file"
+    usage: "python decode.py --dna <file.dna.json> [--format full|compact]"
+    example: "python decode.py --dna nix.dna.json --format compact"
+
+  diff:
+    description: "Compare two DNA snapshots to measure identity drift"
+    usage: "python diff.py --a <baseline.dna.json> --b <current.dna.json>"
+    example: "python diff.py --a nix_week1.dna.json --b nix_week2.dna.json"
+
+  port:
+    description: "Export DNA to platform-specific formats"
+    usage: "python port.py --dna <file.dna.json> --target <openclaw|claude|gpt|openagent|minimal|all>"
+    example: "python port.py --dna nix.dna.json --target all --out-dir ./exports/"
+
+files:
+  - encode.py
+  - decode.py
+  - diff.py
+  - port.py
+  - dna_schema.py
+  - SKILL.md
+  - clawpkg.yaml
+
+changelog:
+  - version: "0.1.0"
+    date: "2026-02-24"
+    notes: "Initial release. Encode/decode/diff/port. No ML deps. Tested against Nix identity files."

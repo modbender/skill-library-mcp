@@ -1,0 +1,476 @@
+{
+  "version": "0.0.1",
+  "dimension": "information-retrieval",
+  "tasks": [
+    {
+      "id": "bench-easy-01",
+      "difficulty": "easy",
+      "description": "Simple factual search with clear answer",
+      "input": "Find the official documentation page for Python's asyncio library, specifically the section on Tasks and Coroutines.",
+      "rubric": [
+        {
+          "criterion": "Relevance",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Returns the exact official Python docs page for asyncio tasks and coroutines",
+            "3": "Returns Python docs but not the specific section",
+            "1": "Returns third-party tutorials instead of official docs",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Query Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Uses site:docs.python.org with targeted terms",
+            "3": "Reasonable query but without site filter",
+            "1": "Overly broad query",
+            "0": "No query optimization"
+          }
+        },
+        {
+          "criterion": "Output Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Clear result with URL, description, and relevance note",
+            "3": "URL with basic description",
+            "1": "URL only",
+            "0": "No usable output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 40,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-easy-02",
+      "difficulty": "easy",
+      "description": "Find a specific error message solution",
+      "input": "Search for solutions to this error: 'TypeError: Cannot read properties of undefined (reading map)' in a React component that uses useState.",
+      "rubric": [
+        {
+          "criterion": "Relevance",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Results directly address this specific TypeError in React with useState context; includes root cause and fix",
+            "3": "Results address the TypeError but not specifically in React/useState context",
+            "1": "Generic JavaScript error results",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Query Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Uses exact error message in quotes plus React/useState context, targets Stack Overflow or GitHub",
+            "3": "Includes error message but missing context terms",
+            "1": "Paraphrases error instead of exact match",
+            "0": "No query optimization"
+          }
+        },
+        {
+          "criterion": "Output Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Ranked results with source quality indicators; top result explains root cause",
+            "3": "Listed results with basic descriptions",
+            "1": "Unstructured URL list",
+            "0": "No usable output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 75
+    },
+    {
+      "id": "bench-easy-03",
+      "difficulty": "easy",
+      "description": "Find official statistics from a government source",
+      "input": "Find the latest US Bureau of Labor Statistics data on unemployment rates by industry sector.",
+      "rubric": [
+        {
+          "criterion": "Relevance",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Returns BLS.gov page with unemployment data broken down by industry",
+            "3": "Returns BLS data but not sector-specific breakdown",
+            "1": "Returns news articles about unemployment instead of primary data",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Query Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Uses site:bls.gov with specific terms for industry sector unemployment",
+            "3": "Targets government sites but query could be more specific",
+            "1": "Generic unemployment search",
+            "0": "No query optimization"
+          }
+        },
+        {
+          "criterion": "Source Authority",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Primary result is from bls.gov (T1 source); clearly identified as official data",
+            "3": "Includes BLS data but also mixes in news articles",
+            "1": "Mostly secondary sources reporting on BLS data",
+            "0": "No authoritative sources"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-med-01",
+      "difficulty": "medium",
+      "description": "Multi-aspect research query requiring decomposition",
+      "input": "Research the trade-offs between microservices and monolithic architecture for a startup with a team of 5 developers building a B2B SaaS product. I need perspectives on development speed, operational complexity, and scalability.",
+      "rubric": [
+        {
+          "criterion": "Query Decomposition",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Decomposes into 3+ sub-queries targeting different aspects (dev speed, ops complexity, scalability) with startup/small-team context",
+            "3": "Uses 2 sub-queries but misses some aspects",
+            "1": "Single broad query covering all aspects",
+            "0": "No decomposition attempted"
+          }
+        },
+        {
+          "criterion": "Result Relevance",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Results address all 3 aspects with startup-specific context; includes case studies or data-driven analysis",
+            "3": "Covers most aspects but lacks startup-specific perspective",
+            "1": "Generic microservices vs monolith content without addressing specific concerns",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Source Diversity",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Mix of engineering blogs, case studies, technical publications, and expert opinions from different companies",
+            "3": "2-3 source types represented",
+            "1": "All results from similar sources",
+            "0": "Single source or low-quality sources"
+          }
+        },
+        {
+          "criterion": "Synthesis",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Results are organized by aspect with a summary connecting findings across sub-queries",
+            "3": "Results grouped but no cross-query synthesis",
+            "1": "Flat list of results",
+            "0": "No organization"
+          }
+        }
+      ],
+      "expectedScoreWithout": 30,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-02",
+      "difficulty": "medium",
+      "description": "Time-sensitive search with source quality filtering",
+      "input": "Find the most recent security advisories and CVEs related to Node.js published in 2024 or later. Focus on critical and high severity vulnerabilities. Exclude general security blogs and focus on official sources.",
+      "rubric": [
+        {
+          "criterion": "Query Precision",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Uses date filters (after:2024), targets official sources (site:nodejs.org, site:nvd.nist.gov, site:cve.org), excludes blogs",
+            "3": "Uses some filters but doesn't fully restrict to official sources",
+            "1": "Basic search without date or source filters",
+            "0": "No query optimization"
+          }
+        },
+        {
+          "criterion": "Result Accuracy",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Returns actual CVEs with correct IDs, severity ratings, affected versions; all from 2024+",
+            "3": "Returns relevant security content but some items are older or not official CVEs",
+            "1": "Mix of relevant and outdated security information",
+            "0": "Incorrect or irrelevant results"
+          }
+        },
+        {
+          "criterion": "Source Authority",
+          "weight": 0.25,
+          "scoring": {
+            "5": "All results from T1-T2 sources (NVD, Node.js official, security advisories)",
+            "3": "Mostly authoritative with some secondary sources",
+            "1": "Relies on secondary reporting",
+            "0": "Unverified sources"
+          }
+        },
+        {
+          "criterion": "Output Structure",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Each CVE listed with: ID, severity, affected versions, date, source link",
+            "3": "CVEs listed but missing some metadata",
+            "1": "Unstructured list",
+            "0": "No organization"
+          }
+        }
+      ],
+      "expectedScoreWithout": 30,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-03",
+      "difficulty": "medium",
+      "description": "Comparative search requiring cross-source validation",
+      "input": "Compare the pricing, features, and developer experience of Supabase vs Firebase vs PlanetScale for a new project. I need current pricing pages, feature comparison articles, and real developer reviews.",
+      "rubric": [
+        {
+          "criterion": "Coverage",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Returns results covering all 3 axes (pricing, features, DX) for all 3 services; includes official pricing pages",
+            "3": "Covers 2 of 3 axes or misses one service",
+            "1": "Only covers one aspect or one service",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Query Strategy",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Decomposes into targeted sub-queries: official pricing pages (site:), comparison articles, developer reviews (site:reddit.com OR site:news.ycombinator.com)",
+            "3": "Uses 2 sub-queries but misses some source types",
+            "1": "Single generic comparison query",
+            "0": "No strategy"
+          }
+        },
+        {
+          "criterion": "Source Mix",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Includes official pages, independent comparison articles, and authentic developer reviews from different platforms",
+            "3": "2 of 3 source types present",
+            "1": "Only one source type (e.g., all blog posts)",
+            "0": "Low-quality or biased sources"
+          }
+        },
+        {
+          "criterion": "Freshness",
+          "weight": 0.2,
+          "scoring": {
+            "5": "All results from 2024+; pricing data is current; notes any rapid changes",
+            "3": "Most results are recent but some may be outdated",
+            "1": "Mix of current and outdated information",
+            "0": "Mostly outdated"
+          }
+        }
+      ],
+      "expectedScoreWithout": 30,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-04",
+      "difficulty": "medium",
+      "description": "Niche topic search requiring domain expertise in query construction",
+      "input": "Find research papers and technical reports on using retrieval-augmented generation (RAG) to reduce hallucination in large language models. Focus on evaluation methodologies and quantitative results published in 2023 or later.",
+      "rubric": [
+        {
+          "criterion": "Query Precision",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Uses domain-specific terminology (RAG, hallucination, LLM); targets academic sources (arxiv, semantic scholar); uses date filters",
+            "3": "Good terminology but doesn't target academic sources specifically",
+            "1": "Uses general terms instead of domain-specific ones",
+            "0": "No domain awareness in query"
+          }
+        },
+        {
+          "criterion": "Result Relevance",
+          "weight": 0.35,
+          "scoring": {
+            "5": "Returns papers specifically about RAG for hallucination reduction with evaluation metrics and quantitative results",
+            "3": "Returns relevant RAG papers but not focused on hallucination evaluation",
+            "1": "General LLM or RAG papers without hallucination focus",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Source Quality",
+          "weight": 0.2,
+          "scoring": {
+            "5": "All results are peer-reviewed papers or preprints from reputable venues; citation counts noted",
+            "3": "Mostly academic sources with some blog posts",
+            "1": "Primarily non-academic sources",
+            "0": "No academic sources"
+          }
+        },
+        {
+          "criterion": "Output Metadata",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Each paper includes: title, authors, venue/date, key findings, evaluation methodology used",
+            "3": "Papers listed with title and summary but missing some metadata",
+            "1": "Titles and URLs only",
+            "0": "No metadata"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-hard-01",
+      "difficulty": "hard",
+      "description": "Adversarial search with significant noise and SEO spam",
+      "input": "Find genuine, unbiased reviews and benchmarks of the top 5 VPN services. Exclude affiliate marketing content, sponsored reviews, and VPN company blogs. I need independent security audits, speed test data from reputable testers, and privacy policy analyses.",
+      "rubric": [
+        {
+          "criterion": "Noise Filtering",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Successfully excludes affiliate sites, sponsored content, and VPN company marketing; explains filtering strategy",
+            "3": "Filters some noise but includes 1-2 affiliate or sponsored results",
+            "1": "Minimal filtering; includes obvious affiliate content",
+            "0": "No noise filtering; results dominated by affiliate content"
+          }
+        },
+        {
+          "criterion": "Source Independence",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Returns independent security audits (e.g., from security researchers), academic analyses, and consumer reports; no financial ties to VPN companies",
+            "3": "Mostly independent but 1-2 sources have potential conflicts of interest",
+            "1": "Sources have unclear independence",
+            "0": "All sources are financially connected to VPN companies"
+          }
+        },
+        {
+          "criterion": "Data Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Includes actual speed test data, security audit reports, and privacy policy analyses with specific findings",
+            "3": "Includes some quantitative data but lacks depth",
+            "1": "Mostly subjective opinions without data",
+            "0": "No quantitative data"
+          }
+        },
+        {
+          "criterion": "Query Strategy",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Uses aggressive exclusion operators (-affiliate, -sponsored, -site:vpncompany.com); targets specific source types (security research, consumer reports)",
+            "3": "Some exclusions but not comprehensive",
+            "1": "Basic search without exclusion strategy",
+            "0": "No strategy for avoiding biased content"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-02",
+      "difficulty": "hard",
+      "description": "Cross-domain research requiring synthesis from diverse sources",
+      "input": "Research the intersection of climate change policy, agricultural technology, and food security in Sub-Saharan Africa. I need: (1) recent policy frameworks from international organizations, (2) agritech innovations being deployed in the region, and (3) quantitative data on food security trends. Provide a synthesis connecting these three areas.",
+      "rubric": [
+        {
+          "criterion": "Query Decomposition",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Creates 3+ targeted sub-queries for each domain (policy, agritech, food security data) with regional focus; uses appropriate source filters for each",
+            "3": "2 sub-queries but misses one domain",
+            "1": "Single broad query attempting to cover all domains",
+            "0": "No decomposition"
+          }
+        },
+        {
+          "criterion": "Coverage Breadth",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Returns results covering all 3 domains with Sub-Saharan Africa focus; includes international org reports, tech publications, and data sources",
+            "3": "Covers 2 of 3 domains adequately",
+            "1": "Only covers one domain or lacks regional specificity",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "Source Authority",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Includes T1 sources: UN/FAO/World Bank reports, peer-reviewed research, official government data",
+            "3": "Mix of authoritative and secondary sources",
+            "1": "Primarily news articles or opinion pieces",
+            "0": "Unreliable sources"
+          }
+        },
+        {
+          "criterion": "Cross-Domain Synthesis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Provides a coherent synthesis connecting policy, technology, and data; identifies gaps and opportunities at intersections",
+            "3": "Results are organized by domain but synthesis is superficial",
+            "1": "No attempt to connect findings across domains",
+            "0": "Disorganized output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-03",
+      "difficulty": "hard",
+      "description": "Ambiguous query requiring clarification and multi-interpretation search",
+      "input": "Find information about Mercury's transit.",
+      "rubric": [
+        {
+          "criterion": "Ambiguity Recognition",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Recognizes multiple interpretations (astronomical transit of Mercury across the Sun, Mercury as a car brand, Mercury in astrology, mercury in chemistry) and either asks for clarification or searches for the most likely interpretations",
+            "3": "Recognizes 2 interpretations and addresses them",
+            "1": "Assumes one interpretation without acknowledging ambiguity",
+            "0": "No awareness of ambiguity"
+          }
+        },
+        {
+          "criterion": "Query Strategy",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Constructs disambiguation queries; uses site: and context terms to separate interpretations; provides results for top 2-3 interpretations",
+            "3": "Searches for primary interpretation with some disambiguation",
+            "1": "Single query without disambiguation",
+            "0": "No strategy"
+          }
+        },
+        {
+          "criterion": "Result Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Results for each interpretation are from authoritative sources (NASA for astronomy, relevant domain sources for others)",
+            "3": "Reasonable results but from mixed-quality sources",
+            "1": "Low-quality or tangential results",
+            "0": "Irrelevant results"
+          }
+        },
+        {
+          "criterion": "User Guidance",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Clearly labels results by interpretation; suggests how user can narrow the search; provides reasoning for ranking",
+            "3": "Some labeling but insufficient guidance",
+            "1": "Results presented without interpretation labels",
+            "0": "Confusing output mixing interpretations"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    }
+  ]
+}

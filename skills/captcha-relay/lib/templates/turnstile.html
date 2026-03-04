@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solve CAPTCHA</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    h2 { margin-bottom: 20px; font-size: 1.2em; }
+    .status { margin-top: 20px; padding: 12px 24px; border-radius: 8px; font-size: 1em; }
+    .status.waiting { background: #2d2d44; }
+    .status.success { background: #1b4332; color: #95d5b2; }
+    .status.error { background: #442d2d; color: #d59595; }
+  </style>
+</head>
+<body>
+  <h2>🔐 Solve the CAPTCHA</h2>
+  <div class="cf-turnstile" data-sitekey="{{SITEKEY}}" data-callback="onSolved"></div>
+  <div class="status waiting" id="status">Waiting for you to solve...</div>
+
+  <script>
+    function onSolved(token) {
+      document.getElementById('status').className = 'status waiting';
+      document.getElementById('status').textContent = 'Sending token...';
+      fetch('/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      }).then(r => r.json()).then(d => {
+        if (d.ok) {
+          document.getElementById('status').className = 'status success';
+          document.getElementById('status').textContent = '✅ Done! You can close this page.';
+        }
+      }).catch(() => {
+        document.getElementById('status').className = 'status error';
+        document.getElementById('status').textContent = '❌ Failed to send token. Try again.';
+      });
+    }
+  </script>
+</body>
+</html>

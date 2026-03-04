@@ -1,0 +1,43 @@
+name: "Organize Employee Data into CSV"
+id: "file-creation-data-spreadsheet"
+version: "1.0"
+suite: "file-creation"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to parse messy, inconsistently formatted text data
+  and produce a clean, structured CSV file. Evaluates data cleaning skills,
+  format normalization, and handling of missing values.
+
+user_message: |
+  Organize the employee records in raw-records.txt into a clean CSV file
+  called employees.csv with columns: Name, Department, Salary, Start Date,
+  Status. Clean up formatting inconsistencies and standardize the data.
+  Handle missing values appropriately.
+
+input_files:
+  - name: "raw-records.txt"
+
+expected_outputs:
+  - pattern: "employees.csv"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "Name"
+          - "Department"
+          - "Salary"
+          - "Start Date"
+          - "Status"
+
+expected_metrics:
+  tool_calls: [2, 6]
+  planning_ratio: [0.05, 0.25]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

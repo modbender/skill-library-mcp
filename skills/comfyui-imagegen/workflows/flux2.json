@@ -1,0 +1,226 @@
+{
+  "76": {
+    "inputs": {
+      "value": "A vintage motorcycle parked in front of a retro diner at sunset, warm orange and pink sky, neon signs glowing, 80s vintage photo style, film grain, warm color cast. Sign over diner says \"Outcast Eats\". Sign in window says \"Always Open!\""
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Prompt"
+    }
+  },
+  "85": {
+    "inputs": {
+      "filename": "%time_%seed",
+      "path": "",
+      "extension": "jpeg",
+      "quality": 95,
+      "counter": 0,
+      "time_format": "%Y-%m-%d-%H%M%S",
+      "images": [
+        "77:65",
+        0
+      ],
+      "positive": [
+        "76",
+        0
+      ],
+      "modelname": "darkBeastFeb0826Latest_dbkBlitzV15.safetensors"
+    },
+    "class_type": "Image Save with Prompt/Info (WLSH)",
+    "_meta": {
+      "title": "Image Save with Prompt/Info (WLSH)"
+    }
+  },
+  "77:64": {
+    "inputs": {
+      "noise": [
+        "77:73",
+        0
+      ],
+      "guider": [
+        "77:63",
+        0
+      ],
+      "sampler": [
+        "77:61",
+        0
+      ],
+      "sigmas": [
+        "77:62",
+        0
+      ],
+      "latent_image": [
+        "77:66",
+        0
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "77:65": {
+    "inputs": {
+      "samples": [
+        "77:64",
+        0
+      ],
+      "vae": [
+        "77:72",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "77:66": {
+    "inputs": {
+      "width": [
+        "77:68",
+        0
+      ],
+      "height": [
+        "77:69",
+        0
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyFlux2LatentImage",
+    "_meta": {
+      "title": "Empty Flux 2 Latent"
+    }
+  },
+  "77:68": {
+    "inputs": {
+      "value": 1920
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Width"
+    }
+  },
+  "77:69": {
+    "inputs": {
+      "value": 1080
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Height"
+    }
+  },
+  "77:73": {
+    "inputs": {
+      "noise_seed": 252497838083333
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "77:71": {
+    "inputs": {
+      "clip_name": "qwen_3_8b_fp8mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "77:76": {
+    "inputs": {
+      "conditioning": [
+        "77:74",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "77:74": {
+    "inputs": {
+      "text": [
+        "76",
+        0
+      ],
+      "clip": [
+        "77:71",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive Prompt)"
+    }
+  },
+  "77:77": {
+    "inputs": {
+      "ckpt_name": "darkBeastFeb0826Latest_dbkBlitzV15.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "77:62": {
+    "inputs": {
+      "steps": 25,
+      "width": [
+        "77:68",
+        0
+      ],
+      "height": [
+        "77:69",
+        0
+      ]
+    },
+    "class_type": "Flux2Scheduler",
+    "_meta": {
+      "title": "Flux2Scheduler"
+    }
+  },
+  "77:63": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "77:77",
+        0
+      ],
+      "positive": [
+        "77:74",
+        0
+      ],
+      "negative": [
+        "77:76",
+        0
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFGGuider"
+    }
+  },
+  "77:61": {
+    "inputs": {
+      "sampler_name": "dpmpp_2m"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "77:72": {
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  }
+}

@@ -1,0 +1,88 @@
+# 任務同步模板（Google Sheets / Trello / Notion）
+
+> 給未來的 AI 助理用：使用者只要提供對應的 ID / API 設定，就可以把現在的任務（today.md）同步到外部系統。
+
+---
+
+## 1. Google Sheets 同步模板（MVP 構想）
+
+### 1.1 建議欄位
+
+- 日期（Date）
+- 任務名稱（Title）
+- 類別（Category）
+- 優先順序（Priority：高／中／低）
+- 狀態（Status：Open / Doing / Done）
+- 備註（Notes）
+
+### 1.2 需要使用者提供
+
+- Google Sheet ID（例如：`1AbCdEfGh...`）
+- 使用哪個 worksheet/tab 名稱（例如：`Tasks`）
+
+### 1.3 未來同步流程（給 AI 看的概要）
+
+1. 從 `tasks/today.md` 讀取任務列表。  
+2. 把每個任務轉成一列資料（依上面欄位）。  
+3. 使用 `gog sheets`：
+   - 建立／確認 Sheet 存在
+   - 追加新列或更新既有列
+
+> 現況：目前只規劃欄位與流程，等有實際需求時，再根據使用者提供的 Sheet ID 實作 gog sheets 指令。
+
+---
+
+## 2. Trello 同步模板（構想）
+
+### 2.1 建議結構
+
+- 一個 Board：`AI Tasks`  
+- List：`Today`、`This Week`、`Done`  
+- Card：每個任務一張卡，Title 為任務名稱，Description 填入類別／優先順序／備註。
+
+### 2.2 需要使用者提供
+
+- Trello API Key / Token（或在技能設定裡完成）  
+- Board ID / List ID
+
+### 2.3 未來同步流程（概要）
+
+1. 從 `tasks/today.md` 讀任務。  
+2. 對每個任務：  
+   - 在指定 List 建一張 card  
+   - 把類別／優先順序／狀態寫進 Description 或 Label
+
+---
+
+## 3. Notion 同步模板（構想）
+
+### 3.1 建議資料庫欄位
+
+- 名稱（Name）
+- 日期（Date）
+- 類別（Category）
+- 優先順序（Priority）
+- 狀態（Status）
+- 備註（Notes）
+
+### 3.2 需要使用者提供
+
+- Notion integration token  
+- Database ID
+
+### 3.3 未來同步流程（概要）
+
+1. 從 `tasks/today.md` 讀任務。  
+2. 使用 notion skill：  
+   - 對每個任務在 DB 建一筆 page（row），填入對應欄位。
+
+---
+
+## 4. 放在可複製模板的位置
+
+- 建議在 `可複製模板/tasks/` 底下保留這個檔案的副本：
+  - `任務同步模板.md`
+
+未來新的 AI 助理可以：
+- 讀這份模板了解欄位設計與同步流程概念；
+- 在使用者提供 Sheets / Trello / Notion 資訊後，用對應 skills 實作同步功能。

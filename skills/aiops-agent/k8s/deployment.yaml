@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sre-agent
+  namespace: sre-agent
+  labels:
+    app.kubernetes.io/name: sre-agent
+    app.kubernetes.io/component: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sre-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sre-agent
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: sre-agent
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: sre-agent
+          image: sre-agent:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sre-agent-secrets
+                  key: anthropic-api-key
+            - name: WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sre-agent-secrets
+                  key: webhook-url
+                  optional: true
+            - name: PROMETHEUS_URL
+              value: "http://prometheus-server.monitoring:9090"
+            - name: LOKI_URL
+              value: "http://loki.monitoring:3100"
+            - name: QDRANT_URL
+              value: "http://qdrant.sre-agent:6333"
+            - name: K8S_IN_CLUSTER
+              value: "true"
+            - name: LOG_LEVEL
+              value: "INFO"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: audit-logs
+              mountPath: /var/log/sre-agent
+      volumes:
+        - name: config
+          configMap:
+            name: sre-agent-config
+        - name: audit-logs
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: sre-agent
+                topologyKey: kubernetes.io/hostname

@@ -1,0 +1,57 @@
+{
+  "capsule": {
+    "blast_radius": {
+      "files": 1,
+      "lines": 229
+    },
+    "confidence": 0.85,
+    "content": "---\nname: async-programming\ndescription: |\n  异步编程任务处理。当用户请求编程任务时，立即调用子 agent + 立即回复确认，无需等待完成即可继续聊天。\n---\n\n# 异步编程任务处理技能\n\n## 触发条件\n\n当用户请求涉及以下内容时，激活此技能：\n\n- ✅ 编写/修改代码\n- ✅ 添加新功能\n- ✅ 修复 bug\n- ✅ 重构代码\n- ✅ 创建脚本\n- ✅ 项目配置\n- ✅ 依赖安装\n\n## 核心原则\n\n**收到编程任务 → 立即调用子 agent + 立即回复确认 = 可以继续聊天**\n\n---\n\n## 执行流程\n\n### 1. 调用子 agent\n\n```javascript\nsessions_spawn({\n  task: \"{具体任务描述，包含项目路径和具体要求}\",\n  label: \"{项目名} - {任务类型}\",\n  model: \"bailian/qwen3-coder-plus\",\n  mode: \"run\",\n  runTimeoutSeconds: 900\n})\n```\n\n**参数说明：**\n\n| 参数 | 说明 | 示例 |\n|------|------|------|\n| `task` | 明确的任务描述 | \"给 Stock-Analysis 添加 Excel 导出功能\" |\n| `label` | 任务标识，格式 `项目名 - 任务类型` | `Stock-Analysis - 功能开发` |\n| `model` | 编程任务统一用 coder 模型 | `bailian/qwen3-coder-plus` |\n| `runTimeoutSeconds` | 超时时间（秒） | `900` (15 分钟) |\n\n### 2. 立即回复确认（关键！）\n\n**调用子 agent 后，立即回复用户，不要等待完成！**\n\n回复模板：\n```\n✅ 任务已接收\n\n**正在处理：**\n- 项目：{项目名}\n- 任务：{任务简述}\n- 执行者：子 agent（编程助手）\n- 预计时间：2-5 分钟\n\n你可以在等待期间继续问我其他问题，完成后我会通知你。\n```\n\n### 3. 完成后汇报\n\n子 agent 完成后会自动发送结果，转发给用户：\n\n```\n✅ {任务名} 完成了！\n\n**完成内容：**\n- {改动 1}\n- {改动 2}\n\n**文件变更：**\n- {文件路径 1}\n- {文件路径 2}\n\n需要调整或继续开发吗？\n```\n\n---\n\n## 多任务并发\n\n用户可以连续下达多个编程任务，子 agent 并行执行：\n\n```\n用户：\"给项目 A 加个功能\"\n  → 调用子 agent #1\n  → 立即回复确认\n\n用户：\"帮项目 B 修复 bug\"\n  → 调用子 agent #2\n  → 立即回复确认\n\n用户：\"项目 C 也帮我看看\"\n  → 调用子 agent #3\n  → 立即回复确认\n```\n\n**并发限制：** 最多 8 个子 agent 同时运行（`agents.defaults.subagents.maxConcurrent`）\n\n---\n\n## 任务追踪\n\n当用户询问进度时，使用：\n\n```javascript\nsubagents(action=\"list\")\n```\n\n回复格式：\n```\n**当前任务进度：**\n\n✅ 已完成 (2)\n- Stock-Analysis - 功能开发\n- Amazon-Analyzer - 数据抓取\n\n⏳ 进行中 (1)\n- Skills-Bank - 文档整理 (预计还需 1 分钟)\n\n❌ 失败 (0)\n```\n\n---\n\n## 示例对话\n\n### 示例 1：单个任务\n\n```\n用户：给 Stock-Analysis 加个导出 Excel 的功能\n\n助手：\n✅ 任务已接收\n\n**正在处理：**\n- 项目：Stock-Analysis\n- 任务：添加 Excel 导出功能\n- 执行者：子 agent（编程助手）\n- 预计时间：2-5 分钟\n\n你可以在等待期间继续问我其他问题，完成后我会通知你。\n\n---（2 分钟后，子 agent 完成）---\n\n✅ Excel 导出功能完成了！\n\n**完成内容：**\n- 新增 `export_to_excel()` 函数\n- 支持导出 CSV 和 JSON 结果\n- 添加 openpyxl 依赖\n\n**文件变更：**\n- /root/Stock-Analysis/stock_analyzer.py (新增 35 行)\n- /root/Stock-Analysis/requirements.txt (新增 openpyxl)\n\n需要测试或继续开发吗？\n```\n\n### 示例 2：多任务并发\n\n```\n用户：帮我给三个项目都加个 README\n\n助手：\n✅ 收到！正在并行处理三个项目：\n\n**任务队列：**\n1. Stock-Analysis - 完善 README\n2. Amazon-Analyzer - 完善 README\n3. Skills-Bank - 完善 README\n\n预计 5-8 分钟完成，你可以继续问我其他问题。\n\n---（5 分钟后）---\n\n✅ 三个项目的 README 都完成了！\n\n**完成情况：**\n- ✅ Stock-Analysis - 已添加安装和使用说明\n- ✅ Amazon-Analyzer - 已添加 API 配置说明\n- ✅ Skills-Bank - 已添加技能分类说明\n\n需要调整吗？\n```\n\n---\n\n## 注意事项\n\n1. **不要等待子 agent 完成才回复** - 这是核心原则\n2. **任务描述要清晰** - 子 agent 需要明确的指令\n3. **label 要规范** - 方便追踪和管理\n4. **超时处理** - 15 分钟未完成，主动告知用户\n5. **错误处理** - 子 agent 失败时，解释原因并提供解决方案\n\n---\n\n## 相关配置\n\n子 agent 配置位于 `openclaw.json`：\n\n```json\n{\n  \"agents\": {\n    \"defaults\": {\n      \"subagents\": {\n        \"maxConcurrent\": 8,\n        \"maxSpawnDepth\": 2,\n        \"model\": \"bailian/qwen3.5-plus\",\n        \"runTimeoutSeconds\": 600,\n        \"archiveAfterMinutes\": 60\n      }\n    }\n  }\n}\n```\n\n---\n\n*此技能确保贾维斯可以并行处理多个编程任务，同时保持与用户的即时沟通*\n",
+    "env_fingerprint": {
+      "arch": "x64",
+      "platform": "linux"
+    },
+    "gene": "sha256:cf74892010f0c9562f128394f934767ae3d438b76aa1d7e843e0d0f405ba1987",
+    "outcome": {
+      "score": 0.85,
+      "status": "success"
+    },
+    "schema_version": "1.5.0",
+    "summary": "异步编程任务处理",
+    "trigger": [
+      "programming"
+    ],
+    "type": "Capsule"
+  },
+  "event": {
+    "capsule_id": "sha256:cf74892010f0c9562f128394f934767ae3d438b76aa1d7e843e0d0f405ba1987",
+    "genes_used": [
+      "sha256:cf74892010f0c9562f128394f934767ae3d438b76aa1d7e843e0d0f405ba1987"
+    ],
+    "intent": "innovate",
+    "outcome": {
+      "score": 0.85,
+      "status": "success"
+    },
+    "source": "Skills-Bank migration",
+    "type": "EvolutionEvent"
+  },
+  "gene": {
+    "category": "innovate",
+    "schema_version": "1.5.0",
+    "signals_match": [
+      "async-programming",
+      "编写/修改代码",
+      "添加新功能",
+      "修复 bug",
+      "重构代码",
+      "创建脚本"
+    ],
+    "strategy": [
+      "调用子 agent",
+      "立即回复确认（关键！）",
+      "完成后汇报"
+    ],
+    "summary": "异步编程任务处理",
+    "type": "Gene"
+  }
+}

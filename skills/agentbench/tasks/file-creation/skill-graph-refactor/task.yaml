@@ -1,0 +1,113 @@
+name: "Refactor Flat Skills into Linked Graph"
+id: "file-creation-skill-graph-refactor"
+version: "1.0"
+suite: "file-creation"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to refactor an existing flat file structure into
+  an interconnected graph. Given 5 isolated skill files with no cross-references
+  and no manifest, the agent must analyze the skills, identify dependency
+  relationships, add cross-references to each file, and create a graph.json
+  manifest. Evaluates comprehension of implicit relationships, refactoring
+  discipline (preserving original content), and graph construction. A setup.sh
+  script initializes a git repo with the flat skill files.
+
+user_message: |
+  This repository contains 5 skill files in the skills/ directory. They
+  describe steps in a CI/CD pipeline but are completely isolated — no
+  cross-references, no dependency information, no manifest.
+
+  Refactor them into a linked skill graph:
+
+  1. Analyze each skill file and identify the dependency relationships
+     between skills based on their content (e.g., "deploy" logically
+     depends on "build", "test" depends on "build", etc.)
+  2. Add YAML front matter to each skill file with:
+     - name, id, and depends_on fields
+     - depends_on should list the IDs of skills this one depends on
+  3. Add a "Related Skills" section to each file that references its
+     upstream dependencies and downstream dependents
+  4. Preserve all original content — do not remove or rewrite existing
+     descriptions and steps
+  5. Create a graph.json manifest in the root directory with:
+     - "nodes" array: one entry per skill with id, name, file_path
+     - "edges" array: one entry per dependency with from, to, type
+     - "depends_on" relationship type for all edges
+  6. Commit your changes with a message containing "refactor"
+
+input_files: []
+
+expected_outputs:
+  - pattern: "graph.json"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - '"nodes"'
+          - '"edges"'
+          - '"depends_on"'
+          - "lint-code"
+          - "build-artifacts"
+          - "run-tests"
+          - "deploy-staging"
+          - "promote-production"
+  - pattern: "skills/build-artifacts.md"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections:
+          - "depends_on"
+          - "lint-code"
+  - pattern: "skills/run-tests.md"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections:
+          - "depends_on"
+          - "build-artifacts"
+  - pattern: "skills/deploy-staging.md"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections:
+          - "depends_on"
+          - "run-tests"
+  - pattern: "skills/promote-production.md"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections:
+          - "depends_on"
+          - "deploy-staging"
+  - pattern: "graph.json"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "python3 -c \"import json; g=json.load(open('graph.json')); nodes={n['id'] for n in g['nodes']}; edges=g['edges']; valid=all(e['from'] in nodes and e['to'] in nodes for e in edges); connected={e['from'] for e in edges}|{e['to'] for e in edges}; has_content=len(nodes)==5 and len(edges)>=4; print('GRAPH_VALID' if valid and has_content and not (nodes-connected) else f'INVALID: nodes={len(nodes)} edges={len(edges)}')\""
+        contains:
+          - "GRAPH_VALID"
+  - pattern: "skills/*.md"
+    required: false
+    validators:
+      - type: "link-consistency"
+        files: "skills/*.md"
+  - pattern: ".git"
+    required: true
+    validators:
+      - type: "git-log-contains"
+        contains:
+          - "refactor"
+        min_commits: 1
+
+expected_metrics:
+  tool_calls: [8, 22]
+  planning_ratio: [0.10, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

@@ -1,0 +1,1087 @@
+{% extends "base.html" %}
+
+{% block title %}仪表盘 - A股量化监控{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --color-red: #f5222d;
+        --color-green: #52c41a;
+        --color-blue: #1890ff;
+        --color-orange: #fa8c16;
+        --bg-light: #fafafa;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    
+    body {
+        background-color: var(--bg-light);
+    }
+    
+    /* 顶部统计卡片 */
+    .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+    
+    .stat-card.red::before { background: var(--color-red); }
+    .stat-card.green::before { background: var(--color-green); }
+    .stat-card.blue::before { background: var(--color-blue); }
+    .stat-card.orange::before { background: var(--color-orange); }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .stat-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.9;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #8c8c8c;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #262626;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+    
+    .stat-change {
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    .stat-change.up {
+        color: var(--color-red);
+    }
+    
+    .stat-change.down {
+        color: var(--color-green);
+    }
+    
+    /* 主要区域 */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .panel {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .panel-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .panel-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #d9d9d9;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .btn-icon:hover {
+        border-color: var(--color-blue);
+        color: var(--color-blue);
+        transform: scale(1.1);
+    }
+    
+    /* 股票网格 */
+    .stocks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+    
+    .stock-mini-card {
+        background: #fafafa;
+        border-radius: 8px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .stock-mini-card:hover {
+        background: white;
+        border-color: var(--color-blue);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-2px);
+    }
+    
+    .stock-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    
+    .stock-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #262626;
+        margin-bottom: 2px;
+    }
+    
+    .stock-code {
+        font-size: 12px;
+        color: #8c8c8c;
+        font-family: 'Monaco', monospace;
+    }
+    
+    .stock-status {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #52c41a;
+    }
+    
+    .stock-status.warning { background: #faad14; }
+    .stock-status.danger { background: #f5222d; }
+    
+    .stock-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+    
+    .stock-price {
+        font-size: 24px;
+        font-weight: 700;
+        color: #262626;
+    }
+    
+    .stock-change {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    
+    .stock-change.positive {
+        color: var(--color-red);
+        background: #fff1f0;
+    }
+    
+    .stock-change.negative {
+        color: var(--color-green);
+        background: #f6ffed;
+    }
+    
+    .stock-indicators {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .indicator {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .indicator-label {
+        font-size: 11px;
+        color: #8c8c8c;
+        margin-bottom: 2px;
+    }
+    
+    .indicator-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #262626;
+    }
+    
+    /* 排行榜 */
+    .rank-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .rank-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #fafafa;
+        transition: all 0.2s;
+    }
+    
+    .rank-item:hover {
+        background: #f0f0f0;
+    }
+    
+    .rank-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #d9d9d9;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 12px;
+    }
+    
+    .rank-number.top1 { background: linear-gradient(135deg, #fadb14 0%, #d4b106 100%); }
+    .rank-number.top2 { background: linear-gradient(135deg, #bfbfbf 0%, #8c8c8c 100%); }
+    .rank-number.top3 { background: linear-gradient(135deg, #d4380d 0%, #a8071a 100%); }
+    
+    .rank-info {
+        flex: 1;
+    }
+    
+    .rank-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #262626;
+    }
+    
+    .rank-code {
+        font-size: 12px;
+        color: #8c8c8c;
+        font-family: 'Monaco', monospace;
+    }
+    
+    .rank-value {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 6px;
+    }
+    
+    .rank-value.gainer {
+        color: var(--color-red);
+        background: #fff1f0;
+    }
+    
+    .rank-value.loser {
+        color: var(--color-green);
+        background: #f6ffed;
+    }
+    
+    /* 市场情绪 */
+    .sentiment-meter {
+        margin: 24px 0;
+    }
+    
+    .sentiment-bar {
+        height: 40px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #52c41a 0%, #faad14 50%, #f5222d 100%);
+        position: relative;
+        margin-bottom: 12px;
+    }
+    
+    .sentiment-indicator {
+        position: absolute;
+        top: -8px;
+        width: 4px;
+        height: 56px;
+        background: #262626;
+        border-radius: 2px;
+        transition: left 0.5s;
+    }
+    
+    .sentiment-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #8c8c8c;
+    }
+    
+    /* 加载状态 */
+    .loading-container {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #f0f0f0;
+        border-top-color: var(--color-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* 空状态 */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+    
+    .empty-text {
+        font-size: 14px;
+        color: #8c8c8c;
+    }
+    
+    /* 市场热度 */
+    .heat-meter {
+        padding: 20px;
+    }
+    
+    .heat-display {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .heat-value {
+        font-size: 56px;
+        font-weight: 700;
+        line-height: 1;
+        background: linear-gradient(135deg, #52c41a 0%, #faad14 50%, #f5222d 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .heat-level {
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+        margin-top: 8px;
+    }
+    
+    .heat-bar {
+        height: 20px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+    
+    .heat-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #52c41a 0%, #faad14 50%, #f5222d 100%);
+        transition: width 0.5s ease;
+    }
+    
+    .heat-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #8c8c8c;
+    }
+    
+    .heat-stats {
+        padding-top: 16px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .stat-mini-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+    }
+    
+    .stat-mini-label {
+        font-size: 12px;
+        color: #8c8c8c;
+        margin-top: 4px;
+    }
+    
+    .heat-description {
+        text-align: center;
+        padding: 12px;
+        background: #fafafa;
+        border-radius: 6px;
+    }
+    
+    /* 板块列表 */
+    .sector-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sector-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        margin-bottom: 8px;
+        background: #fafafa;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+    
+    .sector-item:hover {
+        background: #f0f0f0;
+    }
+    
+    .sector-info {
+        flex: 1;
+    }
+    
+    .sector-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #262626;
+        margin-bottom: 2px;
+    }
+    
+    .sector-meta {
+        font-size: 12px;
+        color: #8c8c8c;
+    }
+    
+    .sector-value {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 4px;
+        white-space: nowrap;
+    }
+    
+    .sector-value.positive {
+        color: var(--color-red);
+        background: #fff1f0;
+    }
+    
+    .sector-value.negative {
+        color: var(--color-green);
+        background: #f6ffed;
+    }
+    
+    .sector-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-left: 6px;
+    }
+    
+    .sector-badge.hot {
+        background: #fff1f0;
+        color: #cf1322;
+    }
+    
+    .sector-badge.cold {
+        background: #f6ffed;
+        color: #389e0d;
+    }
+
+    /* 时间标签 */
+    .time-badge {
+        font-size: 12px;
+        color: #8c8c8c;
+        padding: 4px 8px;
+        background: #f5f5f5;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- 1. 市场情绪 (置顶) -->
+    <div class="panel mb-4">
+        <div class="panel-header">
+            <div class="panel-title">
+                <span>🎭</span>
+                <span>市场情绪</span>
+                <span style="font-size: 14px; font-weight: 500; color: #8c8c8c; margin-left: 8px;" id="sentimentScoreDisplay">--</span>
+            </div>
+            <div class="time-badge" id="sentimentUpdate">--</div>
+        </div>
+        
+        <div class="sentiment-meter">
+            <div class="sentiment-bar">
+                <div class="sentiment-indicator" id="sentimentIndicator" style="left: 50%;"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span>🟢 极度悲观</span>
+                <span>😐 中性</span>
+                <span>🔴 极度乐观</span>
+            </div>
+        </div>
+        
+        <div class="row text-center mt-3 mb-3">
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: var(--color-red);" id="sentiment-limit-up">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">涨停</div>
+            </div>
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: var(--color-red);" id="sentiment-bullish">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">上涨</div>
+            </div>
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: #8c8c8c;" id="sentiment-neutral">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">平盘</div>
+            </div>
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: var(--color-green);" id="sentiment-bearish">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">下跌</div>
+            </div>
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: var(--color-green);" id="sentiment-limit-down">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">跌停</div>
+            </div>
+            <div class="col-2">
+                <div style="font-size: 24px; font-weight: 600; color: var(--color-orange);" id="sentiment-avg-change">--</div>
+                <div style="font-size: 13px; color: #8c8c8c;">平均涨幅</div>
+            </div>
+        </div>
+        
+        <div class="heat-description" id="sentimentDescription">
+            <small class="text-muted">正在加载全市场数据...</small>
+        </div>
+    </div>
+    
+    <!-- 2. 统计卡片 -->
+    <div class="stat-cards">
+        <div class="stat-card red">
+            <div class="stat-icon">📈</div>
+            <div class="stat-label">监控股票</div>
+            <div class="stat-value" id="totalStocks">--</div>
+            <div class="stat-change">实时跟踪</div>
+        </div>
+        
+        <div class="stat-card green">
+            <div class="stat-icon">🔺</div>
+            <div class="stat-label">上涨数量</div>
+            <div class="stat-value up" id="gainersCount">--</div>
+            <div class="stat-change up" id="gainersPercent">--</div>
+        </div>
+        
+        <div class="stat-card blue">
+            <div class="stat-icon">🔻</div>
+            <div class="stat-label">下跌数量</div>
+            <div class="stat-value down" id="losersCount">--</div>
+            <div class="stat-change down" id="losersPercent">--</div>
+        </div>
+        
+        <div class="stat-card orange">
+            <div class="stat-icon">💹</div>
+            <div class="stat-label">平均涨幅</div>
+            <div class="stat-value" id="avgChange">--</div>
+            <div class="stat-change" id="avgChangeText">--</div>
+        </div>
+    </div>
+    
+    <!-- 3. 主要内容区 -->
+    <div class="main-grid">
+        <!-- 左侧：股票列表 -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>📊</span>
+                    <span>监控股票</span>
+                </div>
+                <div class="panel-actions">
+                    <div class="time-badge" id="lastUpdate">--</div>
+                    <button class="btn-icon" onclick="loadStocks()" title="刷新">
+                        🔄
+                    </button>
+                </div>
+            </div>
+            
+            <div id="stocksContainer">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div>正在加载股票数据...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：排行榜和市场情绪 -->
+        <div>
+            <!-- 涨幅榜 -->
+            <div class="panel mb-3">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>🔥</span>
+                        <span>涨幅榜</span>
+                    </div>
+                </div>
+                <ul class="rank-list" id="topGainers">
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </ul>
+            </div>
+            
+            <!-- 跌幅榜 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>❄️</span>
+                        <span>跌幅榜</span>
+                    </div>
+                </div>
+                <ul class="rank-list" id="topLosers">
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let refreshInterval = null;
+let realtimeInterval = null;
+let isTradingTime = false;
+
+
+// 市场热度、热门板块、主力资金模块已移除
+
+
+// 加载股票数据
+function loadStocks() {
+    $.ajax({
+        url: '/api/stocks',
+        method: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                displayStocks(response.data);
+                updateStats(response.data);
+                updateRankings(response.data);
+                // updateSentiment 已移除，现在使用 loadMarketSentiment() 加载全市场情绪
+                $('#lastUpdate').text(new Date().toLocaleTimeString());
+            }
+        },
+        error: function() {
+            $('#stocksContainer').html(`
+                <div class="empty-state">
+                    <div class="empty-icon">😕</div>
+                    <div class="empty-text">加载失败，请重试</div>
+                </div>
+            `);
+        }
+    });
+}
+
+// 显示股票卡片
+function displayStocks(stocks) {
+    if (!stocks || stocks.length === 0) {
+        $('#stocksContainer').html(`
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无监控股票</div>
+            </div>
+        `);
+        return;
+    }
+    
+    // 检查是否所有股票数据都无效
+    const validStocks = stocks.filter(s => s.price !== null && s.price !== undefined);
+    if (validStocks.length === 0) {
+        $('#stocksContainer').html(`
+            <div class="empty-state">
+                <div class="empty-icon">⏰</div>
+                <div class="empty-text">非交易时间，暂无实时数据</div>
+                <div style="font-size: 13px; color: #8c8c8c; margin-top: 8px;">
+                    交易时间：周一至周五 9:30-15:00
+                </div>
+            </div>
+        `);
+        return;
+    }
+    
+    let html = '<div class="stocks-grid">';
+    
+    stocks.forEach(function(stock) {
+        // 处理null值
+        const price = stock.price || 0;
+        const changePct = stock.change_pct || 0;
+        const amount = stock.amount || 0;
+        const turnover = stock.turnover || 0;
+        
+        const changeClass = changePct >= 0 ? 'positive' : 'negative';
+        const changeSign = changePct >= 0 ? '+' : '';
+        
+        // 状态判断
+        let statusClass = '';
+        const rsi = stock.tech_indicators?.rsi || 50;
+        if (rsi < 30) statusClass = 'danger';
+        else if (rsi > 70) statusClass = 'warning';
+        
+        html += `
+        <div class="stock-mini-card" data-code="${stock.code}" onclick="location.href='/stock/${stock.code}'">
+            <div class="stock-header">
+                <div>
+                    <div class="stock-name">${stock.name}</div>
+                    <div class="stock-code">${stock.code}</div>
+                </div>
+                <div class="stock-status ${statusClass}"></div>
+            </div>
+            
+            <div class="stock-price-row">
+                <div class="stock-price">¥${price.toFixed(2)}</div>
+                <div class="stock-change ${changeClass}">
+                    ${changeSign}${changePct.toFixed(2)}%
+                </div>
+            </div>
+            
+            <div class="stock-indicators">
+                <div class="indicator">
+                    <div class="indicator-label">成交额</div>
+                    <div class="indicator-value">${formatAmount(amount)}</div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-label">换手率</div>
+                    <div class="indicator-value">${turnover.toFixed(2)}%</div>
+                </div>
+            </div>
+        </div>
+        `;
+    });
+    
+    html += '</div>';
+    $('#stocksContainer').html(html);
+}
+
+// 更新统计数据
+function updateStats(stocks) {
+    const total = stocks.length;
+    
+    // 过滤有效数据
+    const validStocks = stocks.filter(s => s.change_pct !== null && s.change_pct !== undefined);
+    
+    if (validStocks.length === 0) {
+        // 无有效数据时显示基本信息
+        $('#totalStocks').text(total);
+        $('#gainersCount').text('--');
+        $('#losersCount').text('--');
+        $('#gainersPercent').text('等待数据');
+        $('#losersPercent').text('等待数据');
+        $('#avgChange').text('--');
+        $('#avgChangeText').text('非交易时间');
+        return;
+    }
+    
+    const gainers = validStocks.filter(s => s.change_pct > 0).length;
+    const losers = validStocks.filter(s => s.change_pct < 0).length;
+    const avgChange = validStocks.reduce((sum, s) => sum + (s.change_pct || 0), 0) / validStocks.length;
+    
+    $('#totalStocks').text(total);
+    $('#gainersCount').text(gainers);
+    $('#losersCount').text(losers);
+    $('#gainersPercent').text(`${(gainers/validStocks.length*100).toFixed(0)}% 上涨`);
+    $('#losersPercent').text(`${(losers/validStocks.length*100).toFixed(0)}% 下跌`);
+    $('#avgChange').text((avgChange >= 0 ? '+' : '') + avgChange.toFixed(2) + '%');
+    $('#avgChangeText').text(avgChange >= 0 ? '市场偏强' : '市场偏弱');
+}
+
+// 更新排行榜
+function updateRankings(stocks) {
+    // 过滤掉无效数据
+    const validStocks = stocks.filter(s => s.change_pct !== null && s.change_pct !== undefined);
+    
+    if (validStocks.length === 0) {
+        // 无有效数据时显示友好提示
+        const emptyHtml = `
+            <div class="empty-state">
+                <div class="empty-icon" style="font-size: 32px; margin-bottom: 8px;">⏰</div>
+                <div class="empty-text">非交易时间</div>
+                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">
+                    等待数据更新
+                </div>
+            </div>
+        `;
+        $('#topGainers').html(emptyHtml);
+        $('#topLosers').html(emptyHtml);
+        return;
+    }
+    
+    // 涨幅榜
+    const gainers = validStocks.slice().sort((a, b) => (b.change_pct || 0) - (a.change_pct || 0)).slice(0, 5);
+    let gainersHtml = '';
+    gainers.forEach((stock, index) => {
+        const rankClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        const changePct = stock.change_pct || 0;
+        gainersHtml += `
+        <li class="rank-item" onclick="location.href='/stock/${stock.code}'">
+            <div class="rank-number ${rankClass}">${index + 1}</div>
+            <div class="rank-info">
+                <div class="rank-name">${stock.name}</div>
+                <div class="rank-code">${stock.code}</div>
+            </div>
+            <div class="rank-value gainer">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</div>
+        </li>
+        `;
+    });
+    $('#topGainers').html(gainersHtml || '<div class="empty-state"><div class="empty-text">暂无数据</div></div>');
+    
+    // 跌幅榜
+    const losers = validStocks.slice().sort((a, b) => (a.change_pct || 0) - (b.change_pct || 0)).slice(0, 5);
+    let losersHtml = '';
+    losers.forEach((stock, index) => {
+        const rankClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        const changePct = stock.change_pct || 0;
+        losersHtml += `
+        <li class="rank-item" onclick="location.href='/stock/${stock.code}'">
+            <div class="rank-number ${rankClass}">${index + 1}</div>
+            <div class="rank-info">
+                <div class="rank-name">${stock.name}</div>
+                <div class="rank-code">${stock.code}</div>
+            </div>
+            <div class="rank-value loser">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</div>
+        </li>
+        `;
+    });
+    $('#topLosers').html(losersHtml || '<div class="empty-state"><div class="empty-text">暂无数据</div></div>');
+}
+
+// 注意：市场情绪现在基于全市场A股数据，由 loadMarketSentiment() 函数加载
+
+// 格式化金额
+function formatAmount(amount) {
+    if (amount >= 100000000) {
+        return (amount / 100000000).toFixed(2) + '亿';
+    } else if (amount >= 10000) {
+        return (amount / 10000).toFixed(2) + '万';
+    }
+    return amount.toFixed(0);
+}
+
+// 加载全市场情绪
+function loadMarketSentiment() {
+    $.ajax({
+        url: '/api/market/sentiment',
+        method: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                updateMarketSentiment(response.data);
+            }
+        },
+        error: function() {
+            console.error('加载市场情绪失败');
+        }
+    });
+}
+
+// 更新全市场情绪显示
+function updateMarketSentiment(data) {
+    const score = data.score;
+    const stats = data.stats;
+    const isDemoMode = data.demo_mode || false;
+    const isHistorical = data.is_historical || false;
+    
+    // 更新情绪条位置
+    $('#sentimentIndicator').css('left', score + '%');
+    
+    // 更新标题显示
+    let displayText = `${data.emoji} ${data.level} (${score.toFixed(0)}分)`;
+    if (isDemoMode) {
+        displayText += ' [演示]';
+    } else if (isHistorical) {
+        displayText += ' [历史]';
+    }
+    $('#sentimentScoreDisplay').text(displayText);
+    
+    // 更新统计数字
+    $('#sentiment-limit-up').text(stats.limit_up);
+    $('#sentiment-bullish').text(stats.gainers);
+    $('#sentiment-neutral').text(stats.neutral);
+    $('#sentiment-bearish').text(stats.losers);
+    $('#sentiment-limit-down').text(stats.limit_down);
+    $('#sentiment-avg-change').text((stats.avg_change >= 0 ? '+' : '') + stats.avg_change.toFixed(2) + '%');
+    
+    // 更新描述
+    let descriptionText = `
+        <strong>${data.description}</strong> · 
+        涨停${stats.limit_up}只 跌停${stats.limit_down}只 · 
+        强势股${stats.strong_stocks}只 弱势股${stats.weak_stocks}只 · 
+        平均换手${stats.avg_turnover.toFixed(2)}% 波动率${stats.avg_volatility.toFixed(2)}%
+    `;
+    if (isDemoMode) {
+        descriptionText += ' · <span style="color: #fa8c16;">⚠️ 演示数据（非交易时间）</span>';
+    } else if (isHistorical && data.data_time) {
+        descriptionText += ` · <span style="color: #1890ff;">📅 数据时间: ${data.data_time}</span>`;
+    }
+    $('#sentimentDescription').html(`<small class="text-muted">${descriptionText}</small>`);
+    
+    // 更新时间
+    $('#sentimentUpdate').text(data.update_time);
+    
+    console.log('市场情绪:', data);
+}
+
+// 判断是否是交易时间（前端简单判断）
+function checkTradingTime() {
+    const now = new Date();
+    const day = now.getDay(); // 0=周日, 6=周六
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const time = hour * 60 + minute;
+    
+    // 周末
+    if (day === 0 || day === 6) {
+        return false;
+    }
+    
+    // 交易时间: 9:15-11:30, 13:00-15:00
+    const morningStart = 9 * 60 + 15;   // 9:15
+    const morningEnd = 11 * 60 + 30;     // 11:30
+    const afternoonStart = 13 * 60;      // 13:00
+    const afternoonEnd = 15 * 60;        // 15:00
+    
+    return (time >= morningStart && time <= morningEnd) || 
+           (time >= afternoonStart && time <= afternoonEnd);
+}
+
+// 实时更新价格（轻量级，仅更新价格和涨跌）
+function updateRealtimePrices() {
+    $.ajax({
+        url: '/api/stocks/realtime',
+        method: 'GET',
+        success: function(response) {
+            if (response.status === 'success' && response.data) {
+                response.data.forEach(function(stock) {
+                    // 更新价格
+                    $(`.stock-mini-card[data-code="${stock.code}"] .stock-price`).text('¥' + (stock.price || 0).toFixed(2));
+                    
+                    // 更新涨跌幅
+                    const changePct = stock.change_pct || 0;
+                    const changeClass = changePct >= 0 ? 'positive' : 'negative';
+                    const changeSign = changePct >= 0 ? '+' : '';
+                    $(`.stock-mini-card[data-code="${stock.code}"] .stock-change`)
+                        .attr('class', 'stock-change ' + changeClass)
+                        .text(changeSign + changePct.toFixed(2) + '%');
+                });
+                
+                $('#lastUpdate').text(new Date().toLocaleTimeString());
+            }
+        },
+        error: function() {
+            console.error('实时价格更新失败');
+        }
+    });
+}
+
+// 启动/停止实时更新
+function startRealtimeUpdate() {
+    if (realtimeInterval) {
+        clearInterval(realtimeInterval);
+    }
+    
+    isTradingTime = checkTradingTime();
+    
+    if (isTradingTime) {
+        console.log('✅ 交易时间，启动实时更新（每5秒）');
+        // 交易时间：每5秒更新一次价格
+        realtimeInterval = setInterval(updateRealtimePrices, 5000);
+    } else {
+        console.log('⏸️ 非交易时间，停止实时更新');
+        // 非交易时间：停止实时更新
+        realtimeInterval = null;
+    }
+}
+
+// 页面加载
+$(document).ready(function() {
+    // 初始加载
+    loadStocks();
+    loadMarketSentiment();
+    
+    // 检查交易时间并启动实时更新
+    startRealtimeUpdate();
+    
+    // 每30秒刷新完整数据（包括技术指标、资金流等）
+    refreshInterval = setInterval(function() {
+        loadStocks();
+        loadMarketSentiment();
+        
+        // 重新检查交易时间（防止跨时段）
+        startRealtimeUpdate();
+    }, 30000);
+});
+
+// 页面卸载时清除定时器
+$(window).on('beforeunload', function() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+});
+</script>
+{% endblock %}

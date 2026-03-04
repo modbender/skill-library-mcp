@@ -1,0 +1,176 @@
+{
+  "title": "AI Research Assistant — Agent Architecture",
+  "theme": "dark",
+  "viewBox": [1220, 1000],
+  "colors": {
+    "accent": "#5d9b93"
+  },
+  "nodes": [
+    {
+      "id": "orchestrator",
+      "name": "Orchestrator",
+      "type": "orchestrator",
+      "emoji": "🤖",
+      "subtitle": "CENTRAL AGENT",
+      "position": [610, 480],
+      "radius": 58
+    },
+    {
+      "id": "user",
+      "name": "User",
+      "type": "human",
+      "emoji": "👤",
+      "subtitle": "Human-in-the-Loop",
+      "position": [900, 100]
+    },
+    {
+      "id": "chat",
+      "name": "Chat Interface",
+      "type": "system",
+      "emoji": "💬",
+      "subtitle": "Messaging",
+      "position": [780, 160]
+    },
+    {
+      "id": "researcher",
+      "name": "Research Agent",
+      "type": "agent",
+      "emoji": "🔍",
+      "subtitle": "Deep Dives",
+      "position": [350, 280]
+    },
+    {
+      "id": "writer",
+      "name": "Writer Agent",
+      "type": "agent",
+      "emoji": "✍️",
+      "subtitle": "Content Creation",
+      "position": [380, 650]
+    },
+    {
+      "id": "reviewer",
+      "name": "Review Agent",
+      "type": "agent",
+      "emoji": "🔎",
+      "subtitle": "Quality Check",
+      "position": [850, 600]
+    },
+    {
+      "id": "database",
+      "name": "Vector DB",
+      "type": "system",
+      "emoji": "🗄️",
+      "subtitle": "Embeddings Store",
+      "position": [1000, 400]
+    },
+    {
+      "id": "api_gateway",
+      "name": "API Gateway",
+      "type": "system",
+      "emoji": "🌐",
+      "subtitle": "External APIs",
+      "position": [950, 260]
+    },
+    {
+      "id": "web_scraper",
+      "name": "Web Scraper",
+      "type": "pipeline",
+      "emoji": "🕷️",
+      "subtitle": "Crawl",
+      "position": [120, 250]
+    },
+    {
+      "id": "parser",
+      "name": "Parser",
+      "type": "pipeline",
+      "emoji": "📄",
+      "subtitle": "Extract",
+      "position": [100, 370]
+    },
+    {
+      "id": "embedder",
+      "name": "Embedder",
+      "type": "pipeline",
+      "emoji": "🧮",
+      "subtitle": "Vectorize",
+      "position": [110, 490]
+    },
+    {
+      "id": "indexer",
+      "name": "Indexer",
+      "type": "pipeline",
+      "emoji": "📇",
+      "subtitle": "Store",
+      "position": [140, 600]
+    },
+    {
+      "id": "scheduler",
+      "name": "Scheduler",
+      "type": "ops",
+      "emoji": "⏰",
+      "subtitle": "Cron Jobs",
+      "position": [1050, 550]
+    },
+    {
+      "id": "monitor",
+      "name": "Monitor",
+      "type": "ops",
+      "emoji": "📊",
+      "subtitle": "Health Checks",
+      "position": [1080, 680]
+    },
+    {
+      "id": "cache",
+      "name": "Cache",
+      "type": "system",
+      "emoji": "⚡",
+      "subtitle": "Redis",
+      "position": [750, 800]
+    },
+    {
+      "id": "skills",
+      "name": "Skills Library",
+      "type": "system",
+      "emoji": "🧰",
+      "subtitle": "Extensible Tools",
+      "position": [300, 140]
+    },
+    {
+      "id": "evolver",
+      "name": "Self-Improver",
+      "type": "agent",
+      "emoji": "🧬",
+      "subtitle": "Auto-Optimize",
+      "position": [160, 80]
+    }
+  ],
+  "connections": [
+    { "from": "orchestrator", "to": "chat", "type": "hub" },
+    { "from": "orchestrator", "to": "database", "type": "hub" },
+    { "from": "orchestrator", "to": "api_gateway", "type": "hub" },
+    { "from": "orchestrator", "to": "cache", "type": "hub" },
+    { "from": "orchestrator", "to": "skills", "type": "hub" },
+    { "from": "orchestrator", "to": "researcher", "type": "core" },
+    { "from": "orchestrator", "to": "writer", "type": "core" },
+    { "from": "orchestrator", "to": "reviewer", "type": "core" },
+    { "from": "orchestrator", "to": "web_scraper", "type": "core" },
+    { "from": "orchestrator", "to": "scheduler", "type": "core" },
+    { "from": "orchestrator", "to": "monitor", "type": "core" },
+    { "from": "user", "to": "chat", "type": "sys" },
+    { "from": "researcher", "to": "database", "type": "cross" },
+    { "from": "researcher", "to": "api_gateway", "type": "cross" },
+    { "from": "writer", "to": "cache", "type": "cross" },
+    { "from": "reviewer", "to": "database", "type": "cross" },
+    { "from": "reviewer", "to": "chat", "type": "cross" },
+    { "from": "skills", "to": "evolver", "type": "core" },
+    { "from": "scheduler", "to": "database", "type": "cross" },
+    { "from": "monitor", "to": "database", "type": "cross" },
+    { "from": "web_scraper", "to": "parser", "type": "cluster" },
+    { "from": "parser", "to": "embedder", "type": "cluster" },
+    { "from": "embedder", "to": "indexer", "type": "cluster" },
+    { "from": "indexer", "to": "database", "type": "cluster" }
+  ],
+  "pipelines": {
+    "ingestion": ["web_scraper", "parser", "embedder", "indexer"]
+  }
+}

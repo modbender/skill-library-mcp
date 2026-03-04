@@ -1,0 +1,65 @@
+name: "Retain Constraints Across Multiple Turns"
+id: "memory-context-retention"
+version: "1.0"
+suite: "memory"
+difficulty: "hard"
+mode: "sandboxed"
+type: "multi-turn"
+
+description: |
+  Tests the agent's ability to retain and consistently apply constraints
+  given in an early turn across multiple subsequent file creation tasks.
+  The agent must remember to use kebab-case filenames and British English
+  spelling throughout all outputs. Evaluates persistent constraint adherence
+  over four turns.
+
+input_files:
+  - name: "sales-data.csv"
+
+turns:
+  - role: user
+    message: |
+      Important constraint for everything that follows: all filenames must
+      use kebab-case and all output must use British English spelling
+      (colour, analyse, organisation, etc.).
+    expect: "acknowledgment"
+
+  - role: user
+    message: |
+      Create a document analysing the sales data trends in sales-data.csv.
+      Save it as a markdown file.
+    expect: "file-output"
+    validators:
+      - type: "filename-matches"
+        pattern: "^[a-z]+(-[a-z]+)*\\.md$"
+      - type: "content-contains"
+        sections: ["analyse", "sales"]
+
+  - role: user
+    message: |
+      Now create a follow-up report with recommendations based on your
+      analysis.
+    expect: "file-output"
+    validators:
+      - type: "filename-matches"
+        pattern: "^[a-z]+(-[a-z]+)*\\.md$"
+
+  - role: user
+    message: |
+      Create a one-page summary combining both documents.
+    expect: "file-output"
+    validators:
+      - type: "filename-matches"
+        pattern: "^[a-z]+(-[a-z]+)*\\.md$"
+      - type: "content-uses-british-spelling"
+        check_words: ["analyse", "colour", "organisation", "summarise"]
+
+expected_metrics:
+  tool_calls: [4, 16]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.30
+  layer1_weight: 0.15
+  layer2_weight: 0.20
+  layer3_weight: 0.35

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>📱 ClawPrompt 遥控</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:#000;color:#eee;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+.header{padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.header .title{font-size:14px;color:#666}
+.header .status{font-size:12px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:middle;margin-right:4px}
+.dot.on{background:#4ecdc4}.dot.off{background:#e74c3c}
+
+/* Text display - same as computer */
+.text-area{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 20px;min-height:0}
+.text-area .cur{font-size:24px;color:#fff;text-align:center;line-height:1.5;word-break:break-word}
+.text-area .nxt{font-size:16px;color:#555;text-align:center;margin-top:12px;line-height:1.4;word-break:break-word}
+.progress{text-align:center;color:#333;font-size:12px;padding:6px;flex-shrink:0}
+
+/* Control buttons */
+.controls{flex-shrink:0;display:flex;gap:10px;padding:10px 16px 20px;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.btn{border:none;border-radius:14px;font-size:20px;font-weight:600;cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .08s}
+.btn:active{transform:scale(.95)}
+.btn-next{flex:3;height:70px;background:#4ecdc4;color:#000;font-size:24px;letter-spacing:2px}
+.btn-next:active{background:#3db8ab}
+.btn-prev{flex:1;height:70px;background:#1a1a2e;color:#666;border:1px solid #333}
+.btn-prev:active{background:#252545;color:#aaa}
+
+/* Upload bar */
+.upload-bar{flex-shrink:0;padding:8px 16px;display:flex;gap:8px}
+.upload-bar textarea{flex:1;background:#111;border:1px solid #333;border-radius:8px;padding:8px;font-size:14px;color:#eee;resize:none;height:36px;line-height:20px}
+.upload-bar textarea:focus{outline:none;border-color:#4ecdc4}
+.upload-bar .btn-upload{padding:6px 16px;background:#333;color:#4ecdc4;border:1px solid #4ecdc4;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.upload-bar .btn-upload:active{background:#4ecdc4;color:#000}
+
+/* Tab switch */
+.tabs{display:flex;padding:8px 16px 0;gap:8px;flex-shrink:0}
+.tab{flex:1;text-align:center;padding:8px;border-radius:8px 8px 0 0;font-size:14px;cursor:pointer;color:#555;background:#111}
+.tab.active{color:#4ecdc4;background:#1a1a2e;border-bottom:2px solid #4ecdc4}
+.panel{display:none}.panel.active{display:flex;flex-direction:column;flex:1;min-height:0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="title">🦞 ClawPrompt 遥控</span>
+  <span class="status" id="status"><span class="dot off"></span>连接中</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-panel="control" onclick="switchTab('control')">🎮 遥控</div>
+  <div class="tab" data-panel="upload" onclick="switchTab('upload')">📝 上传文案</div>
+</div>
+
+<!-- Control Panel -->
+<div class="panel active" id="panel-control">
+  <div class="text-area">
+    <div class="cur" id="cur">等待文案...</div>
+    <div class="nxt" id="nxt"></div>
+  </div>
+  <div class="progress" id="prog"></div>
+  <div class="controls">
+    <button class="btn btn-prev" id="prevBtn">▲</button>
+    <button class="btn btn-next" id="nextBtn">下一句 ▼</button>
+  </div>
+</div>
+
+<!-- Upload Panel -->
+<div class="panel" id="panel-upload">
+  <div style="flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:12px">
+    <textarea id="uploadText" style="flex:1;background:#111;border:1px solid #333;border-radius:12px;padding:12px;font-size:15px;color:#eee;resize:none;line-height:1.8" placeholder="在此粘贴文案，点击上传后电脑端同步显示"></textarea>
+    <button class="btn btn-next" style="height:50px;font-size:18px" onclick="uploadText()">上传到提词器</button>
+  </div>
+</div>
+
+<script>
+const curEl = document.getElementById('cur');
+const nxtEl = document.getElementById('nxt');
+const progEl = document.getElementById('prog');
+const statusEl = document.getElementById('status');
+
+let ws;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.panel === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+}
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}`);
+  ws.onopen = () => {
+    statusEl.innerHTML = '<span class="dot on"></span>已连接';
+    ws.send(JSON.stringify({ type: 'register', role: 'remote' }));
+  };
+  ws.onclose = () => {
+    statusEl.innerHTML = '<span class="dot off"></span>重连中...';
+    setTimeout(connect, 2000);
+  };
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'state') {
+        curEl.textContent = msg.current || '(等待文案)';
+        nxtEl.textContent = msg.next || '';
+        progEl.textContent = msg.total ? `${msg.idx + 1} / ${msg.total}` : '';
+      } else if (msg.type === 'fulltext') {
+        document.getElementById('uploadText').value = msg.text || '';
+      }
+    } catch {}
+  };
+}
+
+function send(action) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'cmd', action }));
+  if (navigator.vibrate) navigator.vibrate(25);
+}
+
+function uploadText() {
+  const text = document.getElementById('uploadText').value.trim();
+  if (!text) return;
+  if (ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'text', text }));
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+    switchTab('control');
+  }
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => send('next'));
+document.getElementById('prevBtn').addEventListener('click', () => send('prev'));
+
+connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Lens Asset</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .lens {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 100px rgba(255, 140, 0, 0.2), inset 0 0 50px rgba(255, 100, 0, 0.1);
+            animation: pulse 4s infinite alternate;
+        }
+
+        .core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffcc00 0%, #ff6600 40%, transparent 70%);
+            box-shadow: 0 0 100px #ff9900;
+            animation: core-spin 10s linear infinite;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dashed rgba(255, 200, 50, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ring1 {
+            width: 250px;
+            height: 250px;
+            animation: spin-rev 20s linear infinite;
+        }
+
+        .ring2 {
+            width: 350px;
+            height: 350px;
+            animation: spin 30s linear infinite;
+            border-style: dotted;
+            border-width: 2px;
+            border-color: rgba(255, 100, 0, 0.4);
+        }
+
+        .particle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 3s infinite ease-in;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 80px rgba(255, 140, 0, 0.1);
+            }
+
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 150px rgba(255, 140, 0, 0.4);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes spin-rev {
+            0% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+        }
+
+        @keyframes core-spin {
+            0% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lens">
+        <div class="ring ring1"></div>
+        <div class="ring ring2"></div>
+        <div class="core"></div>
+    </div>
+    <script>
+        const body = document.body;
+        for (let i = 0; i < 50; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.width = p.style.height = Math.random() * 3 + 1 + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.animationDelay = Math.random() * 3 + 's';
+            p.style.animationDuration = Math.random() * 2 + 2 + 's';
+            body.appendChild(p);
+        }
+    </script>
+</body>
+
+</html>

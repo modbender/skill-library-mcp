@@ -1,0 +1,33 @@
+# Playbook: HPA Scale Up
+# Used to scale up replicas when load increases
+
+id: hpa-scale-up
+name: HPA Scale Up
+description: Increase HPA min/max replicas to handle increased load
+
+trigger_conditions:
+  - "cpu_usage > 0.8"
+  - "request_latency_p99 > 0.5"
+  - "queue_depth > 1000"
+
+tags:
+  - scale
+  - hpa
+  - load
+  - performance
+
+# Medium risk since it affects resource allocation
+risk_override: 0.35
+
+enabled: true
+
+steps:
+  - name: Scale Up HPA
+    action: hpa_scale
+    target: "{{ target_hpa }}"
+    parameters:
+      scale_factor: 1.5
+      max_replicas: 10
+    timeout_seconds: 300
+    retry_count: 2
+    rollback_on_failure: true

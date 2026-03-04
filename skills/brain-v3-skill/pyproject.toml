@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clawbrain"
+version = "0.1.10"
+description = "ClawBrain - Personal AI Memory System for AI Agents with encrypted secrets support"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "ClawColab", email = "support@clawcolab.com"}
+]
+maintainers = [
+    {name = "ClawColab", email = "support@clawcolab.com"}
+]
+keywords = [
+    "ai", "memory", "brain", "context", "personalization", 
+    "encryption", "security", "llm", "agent", "chatbot"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security :: Cryptography",
+]
+
+[project.optional-dependencies]
+encryption = ["cryptography>=41.0.0"]
+embeddings = ["sentence-transformers>=2.0.0"]
+postgres = ["psycopg2-binary>=2.9.0"]
+redis = ["redis>=4.0.0"]
+qr = ["qrcode>=7.0.0"]
+clipboard = ["pyperclip>=1.8.0"]
+all = [
+    "cryptography>=41.0.0",
+    "sentence-transformers>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "redis>=4.0.0",
+    "qrcode>=7.0.0",
+    "pyperclip>=1.8.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/clawcolab/clawbrain"
+Repository = "https://github.com/clawcolab/clawbrain"
+Documentation = "https://github.com/clawcolab/clawbrain#readme"
+"Bug Tracker" = "https://github.com/clawcolab/clawbrain/issues"
+Changelog = "https://github.com/clawcolab/clawbrain/blob/main/CHANGELOG.md"
+
+[project.scripts]
+clawbrain = "clawbrain_cli:main"
+
+[tool.setuptools]
+py-modules = ["clawbrain", "clawbrain_cli"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["brain*"]
+
+[tool.setuptools.package-data]
+brain = [
+    "*.md",
+    "*.json",
+    "hooks/**/*",
+    "hooks/**/handler.js",
+    "hooks/**/HOOK.md",
+    "scripts/*.py"
+]

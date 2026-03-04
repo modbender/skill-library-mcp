@@ -1,0 +1,24 @@
+@echo off
+echo 🐰🌶️ Switching Bunni to DeepSeek V3 (NSFW Mode)...
+echo.
+echo 📂 Loading spicy personality...
+copy /Y "{{WORKSPACE_DIR}}\assets\SOUL_NSFW.md" "{{WORKSPACE_DIR}}\SOUL.md" >nul
+echo ✅ Personality loaded!
+echo.
+echo 🧠 Switching brain to DeepSeek V3...
+call "{{OPENCLAW_CMD}}" models set openrouter/deepseek/deepseek-chat-v3-0324
+echo.
+echo ⏳ Waiting for config to settle...
+timeout /t 3
+echo.
+echo 🔄 Force killing all OpenClaw gateway processes...
+powershell -Command "$procs = Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -like '*gateway*' }; foreach ($p in $procs) { $parent = $p.ParentProcessId; Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue; try { $pp = Get-Process -Id $parent -ErrorAction Stop; if ($pp.ProcessName -eq 'cmd') { Stop-Process -Id $parent -Force -ErrorAction SilentlyContinue } } catch {} }"
+echo.
+echo ⏳ Waiting for port to release...
+timeout /t 3
+echo.
+echo 🚀 Starting OpenClaw Gateway...
+schtasks /Run /TN "OpenClaw Gateway"
+echo.
+echo ✅ Done! Bunni is now in NSFW Mode (DeepSeek V3).
+timeout /t 5

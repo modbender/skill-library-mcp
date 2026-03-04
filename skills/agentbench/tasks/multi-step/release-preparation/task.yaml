@@ -1,0 +1,68 @@
+name: "Prepare a Software Release"
+id: "multi-step-release-preparation"
+version: "1.0"
+suite: "multi-step"
+difficulty: "expert"
+mode: "real"
+
+description: |
+  Tests the agent's ability to follow a multi-step release checklist for a
+  Node.js project. The workspace contains a git repo at v1.2.3 with 4
+  subsequent commits (2 features, 1 fix, 1 chore). Two source files contain
+  TODO(v1.3) comments that must be resolved. The agent must update version
+  numbers in 4 locations, compile a changelog from git history, resolve TODOs,
+  create a release commit, and tag v1.3.0 — all by following release-checklist.md
+  exactly. Evaluates systematic checklist execution, git proficiency, and
+  cross-file consistency.
+
+user_message: |
+  Prepare the v1.3.0 release by following release-checklist.md exactly.
+  Work through each step in the checklist. Make sure to:
+  - Update ALL version references consistently
+  - Add ALL commits since v1.2.3 to the changelog in the existing format
+  - Resolve all TODO(v1.3) items in the source code
+  - Create the release commit and tag per the checklist
+
+input_files: []
+
+expected_outputs:
+  - pattern: "package.json"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections: ["1.3.0"]
+  - pattern: "CHANGELOG.md"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections:
+          - "1.3.0"
+          - "user preference"
+          - "bulk export"
+          - "pagination"
+  - pattern: "**"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "git tag"
+        contains: ["v1.3.0"]
+      - type: "git-log-contains"
+        contains: ["1.3.0"]
+        min_commits: 1
+
+expected_behavior:
+  - description: "No remaining TODO(v1.3) comments in source"
+    validators:
+      - type: "command-output-contains"
+        command: "grep -r 'TODO(v1.3)' src/ || echo 'NONE_FOUND'"
+        contains: ["NONE_FOUND"]
+
+expected_metrics:
+  tool_calls: [12, 30]
+  planning_ratio: [0.10, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

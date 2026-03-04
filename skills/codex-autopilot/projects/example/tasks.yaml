@@ -1,0 +1,155 @@
+# 示例项目任务配置
+# 这是一个完整的 tasks.yaml 示例，展示了所有可用的配置选项
+
+project:
+  name: "ExampleProject"
+  dir: "/Users/wes/ExampleProject"
+  description: "示例项目 - 演示 Autopilot 任务编排功能"
+  enabled: true
+  priority: 1
+  
+  # 项目级覆盖（可选）
+  overrides:
+    cooldown: 90
+    max_daily_sends: 80
+
+defaults:
+  min_file_size: 100
+  task_timeout: 3600
+
+tasks:
+  # 任务 1: 项目初始化（无依赖）
+  - id: "setup-project"
+    name: "项目初始化"
+    prompt: |
+      初始化项目结构:
+      1. 创建 package.json，设置项目名称和版本
+      2. 初始化 TypeScript 配置 (tsconfig.json)
+      3. 配置 ESLint 和 Prettier
+      4. 创建基本的目录结构:
+         - src/
+         - tests/
+         - docs/
+      5. 初始化 Git 仓库
+      
+      确保 npm install 能正常运行。
+    done_when:
+      files:
+        - path: "package.json"
+          min_size: 200
+          contains: ["name", "version", "scripts"]
+        - path: "tsconfig.json"
+          min_size: 100
+        - path: ".eslintrc.json"
+      commands:
+        - cmd: "cd {project_dir} && npm install"
+          expect_exit: 0
+    on_complete: "项目结构已初始化，依赖安装完成。"
+
+  # 任务 2: 核心模块实现（依赖任务1）
+  - id: "core-module"
+    name: "核心模块实现"
+    depends_on: ["setup-project"]
+    prompt: |
+      实现核心模块:
+      1. 创建 src/core/index.ts 作为模块入口
+      2. 实现以下功能:
+         - 配置管理 (src/core/config.ts)
+         - 日志系统 (src/core/logger.ts)
+         - 工具函数 (src/core/utils.ts)
+      3. 导出所有公共 API
+      4. 添加基本的类型定义
+      
+      代码要有完整的 TypeScript 类型注解。
+    done_when:
+      files:
+        - path: "src/core/index.ts"
+          min_size: 100
+        - path: "src/core/config.ts"
+          min_size: 100
+        - path: "src/core/logger.ts"
+          min_size: 100
+      files_glob:
+        - pattern: "src/core/**/*.ts"
+          min_count: 3
+    on_complete: "核心模块已实现，包含配置、日志、工具函数。"
+
+  # 任务 3: API 层实现（依赖任务2）
+  - id: "api-layer"
+    name: "API 层实现"
+    depends_on: ["core-module"]
+    prompt: |
+      基于核心模块实现 API 层:
+      1. 创建 src/api/index.ts
+      2. 实现 RESTful API 路由:
+         - GET /health - 健康检查
+         - GET /version - 版本信息
+         - POST /data - 数据处理端点
+      3. 使用核心模块的日志和配置功能
+      4. 添加错误处理中间件
+      
+      使用 Express 或类似框架。
+    done_when:
+      files:
+        - path: "src/api/index.ts"
+          min_size: 200
+          contains: ["express", "router"]
+      files_glob:
+        - pattern: "src/api/**/*.ts"
+          min_count: 2
+    on_complete: "API 层已实现，包含健康检查和数据处理端点。"
+
+  # 任务 4: 测试覆盖（依赖任务2和3，需要人工审核）
+  - id: "testing"
+    name: "测试覆盖"
+    depends_on: ["core-module", "api-layer"]
+    requires_human_review: true  # 需要人工确认开始
+    prompt: |
+      为核心模块和 API 层编写测试:
+      1. 安装测试框架 (Jest 或 Vitest)
+      2. 为 src/core/ 中的每个模块编写单元测试
+      3. 为 API 端点编写集成测试
+      4. 配置测试覆盖率报告
+      5. 确保所有测试通过: npm run test
+      
+      目标: 达到 80% 以上的代码覆盖率。
+    done_when:
+      files:
+        - path: "jest.config.js"
+          min_size: 100
+      files_glob:
+        - pattern: "tests/**/*.test.ts"
+          min_count: 3
+      commands:
+        - cmd: "cd {project_dir} && npm run test -- --passWithNoTests"
+          expect_exit: 0
+    on_complete: "测试套件已完成，覆盖率达标。"
+
+  # 任务 5: 文档和部署（依赖任务4）
+  - id: "docs-deploy"
+    name: "文档和部署配置"
+    depends_on: ["testing"]
+    prompt: |
+      完善文档和部署配置:
+      1. 编写 README.md:
+         - 项目介绍
+         - 安装说明
+         - 使用示例
+         - API 文档
+      2. 创建 Dockerfile
+      3. 配置 CI/CD (GitHub Actions)
+      4. 添加 CHANGELOG.md
+      
+      确保 docker build 能正常运行。
+    done_when:
+      files:
+        - path: "README.md"
+          min_size: 500
+          contains: ["Installation", "Usage"]
+        - path: "Dockerfile"
+          min_size: 100
+        - path: ".github/workflows/ci.yml"
+      commands:
+        - cmd: "cd {project_dir} && docker build -t example-project ."
+          expect_exit: 0
+    on_complete: "项目文档完成，Docker 镜像构建成功。"

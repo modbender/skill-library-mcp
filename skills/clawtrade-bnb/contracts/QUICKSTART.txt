@@ -1,0 +1,242 @@
+================================================================================
+  YIELDVAULT SMART CONTRACT - QUICK START GUIDE
+  BNB Testnet Deployment (chainId: 97)
+================================================================================
+
+STEP 1: SETUP ENVIRONMENT
+========================
+
+cd /home/ubuntu/.openclaw/workspace/skills/yield-farming-agent/contracts
+
+# Copy environment file
+cp .env.example .env
+
+# Edit .env with your values:
+#   DEPLOYER_ADDRESS=0x... (your wallet address)
+#   PRIVATE_KEY=...        (private key without 0x prefix)
+
+nano .env    # or use your favorite editor
+
+
+STEP 2: VERIFY SETUP
+====================
+
+npm install                 # Install dependencies
+npm run check-balance       # Check deployer balance (need ~0.025 tBNB)
+
+⚠️  If balance is 0, get testnet BNB from:
+   https://testnet.binance.org/faucet-smart-chain
+
+
+STEP 3: COMPILE CONTRACT
+=========================
+
+npm run compile
+
+Expected output:
+  ✅ YieldVault compiled successfully
+
+
+STEP 4: DEPLOY TO BNB TESTNET
+==============================
+
+npm run deploy:testnet
+
+Expected output:
+  🚀 YieldVault Multi-Vault Deployment
+  ✅ vault_bnb_lp_001 deployed to: 0x1234...
+  ✅ vault_eth_staking_001 deployed to: 0xabcd...
+  ... (6 more vaults)
+
+  📊 Total Contracts Deployed: 8
+  Results saved to: deployments.json
+
+
+STEP 5: VERIFY ON BSCSCAN (OPTIONAL)
+=====================================
+
+npm run verify 0x1234567890123456789012345678901234567890
+
+View your contracts at:
+  https://testnet.bscscan.com/address/0x1234...
+
+
+STEP 6: INTEGRATE WITH AGENT SKILL
+===================================
+
+1. Copy ABI to your agent skill:
+   cat abi/YieldVault.json
+
+2. Use in your code:
+   const YieldVaultABI = require('./abi/YieldVault.json');
+   const contract = new ethers.Contract(address, YieldVaultABI, provider);
+
+3. Listen for agent events:
+   contract.on('ExecutionRecorded', (vaultId, action, user, amount, shares) => {
+     console.log(`[${vaultId}] ${action} by ${user}`);
+   });
+
+
+DEPLOYMENT RESULTS
+==================
+
+Contract addresses will be saved in: deployments.json
+
+Each vault is deployed with:
+  • Vault ID (from mockdata.json)
+  • Token address
+  • Full ABI (in abi/YieldVault.json)
+  • Transaction hash
+  • Timestamp
+
+
+KEY FILES
+=========
+
+YieldVault.sol           - Main contract (Solidity 0.8.24)
+hardhat.config.js        - Hardhat configuration
+scripts/deploy.js        - Deployment script
+abi/YieldVault.json      - Contract ABI (for integration)
+.env.example             - Configuration template
+.env                     - Your configuration (KEEP SECRET!)
+
+DEPLOYMENT.md            - Detailed step-by-step guide
+README.md                - Full documentation
+ABI_USAGE.md             - API reference
+
+
+TROUBLESHOOTING
+===============
+
+❌ "PRIVATE_KEY not set"
+  → Ensure .env file exists and has PRIVATE_KEY=...
+
+❌ "Insufficient funds"
+  → Get testnet BNB: https://testnet.binance.org/faucet-smart-chain
+
+❌ "RPC Connection failed"
+  → Check RPC_URL in .env or use default:
+    https://data-seed-prebsc-1-b7a35f9.binance.org:8545
+
+❌ "Compilation Error"
+  → Update Hardhat: npm install --save-dev @nomicfoundation/hardhat-toolbox@latest
+
+For more help, read:
+  • DEPLOYMENT.md (detailed guide)
+  • README.md (full documentation)
+  • https://hardhat.org/ (Hardhat docs)
+
+
+QUICK REFERENCE
+===============
+
+npm run compile          # Compile Solidity
+npm run deploy:testnet   # Deploy to testnet
+npm run verify <ADDRESS> # Verify on BscScan
+npm run check-balance    # Check account balance
+npm run clean            # Clean artifacts
+npm run flatten          # Flatten contract for BscScan
+npm run test             # Run tests
+
+
+VAULT ADDRESSES
+===============
+
+After deployment, check deployments.json for contract addresses:
+
+vault_bnb_lp_001:        0x...
+vault_eth_staking_001:   0x...
+vault_cake_farm_001:     0x...
+vault_usdc_stable_001:   0x...
+vault_btc_hodl_001:      0x...
+vault_high_risk_001:     0x...
+vault_bnb_native_001:    0x...
+vault_link_oracle_001:   0x...
+
+
+CONTRACT FUNCTIONS
+==================
+
+deposit(uint256 amount)
+  → Issue shares for deposited tokens
+  → Returns: sharesIssued
+
+withdraw(uint256 shares)
+  → Burn shares and return tokens (5% fee)
+  → Returns: amountRedeemed
+
+harvest()
+  → Claim yield without reinvesting
+  → Returns: yieldAmount
+
+compound()
+  → Reinvest yield as new shares
+  → Returns: newShares
+
+getVaultInfo()
+  → Get vault metadata (compatible with mockdata.json)
+  → Returns: (vaultId, tokenAddress, totalAssets, totalShares)
+
+
+AGENT EVENTS
+============
+
+ExecutionRecorded
+  Emitted on: deposit, withdraw, harvest, compound
+  Data: vaultId, action, user, amount, shares, timestamp
+
+ActionExecuted
+  Emitted on: all actions
+  Data: vaultId, action, user, amount, success, message
+
+
+NEXT STEPS
+==========
+
+1. ✅ Deploy contract (follow STEP 1-4)
+2. ✅ Save contract addresses from deployments.json
+3. ✅ Copy ABI to agent skill
+4. ✅ Update agent configuration
+5. ✅ Test contract interactions
+6. ✅ Monitor events on BscScan
+
+
+RESOURCES
+=========
+
+BNB Testnet Faucet:    https://testnet.binance.org/faucet-smart-chain
+BscScan Explorer:      https://testnet.bscscan.com
+BNB Chain Docs:        https://docs.bnbchain.org/
+Hardhat Docs:          https://hardhat.org/
+Solidity Docs:         https://docs.soliditylang.org/
+
+
+SECURITY REMINDER
+=================
+
+⚠️  NEVER commit .env file to version control
+⚠️  NEVER share your private key
+⚠️  ALWAYS use testnet for testing first
+⚠️  This is a stub - add security audit before production use
+
+
+DEPLOYMENT CHECKLIST
+====================
+
+☐ Copy .env.example to .env
+☐ Fill DEPLOYER_ADDRESS (your wallet)
+☐ Fill PRIVATE_KEY (without 0x)
+☐ Run npm install
+☐ Run npm run check-balance (verify you have tBNB)
+☐ Run npm run compile
+☐ Run npm run deploy:testnet
+☐ Save addresses from deployments.json
+☐ (Optional) Run npm run verify
+☐ Integrate ABI with agent skill
+☐ Test contract interactions
+
+Ready to deploy? Start with STEP 1 above!
+
+================================================================================
+Created: 2026-02-17 | Status: ✅ Ready for Deployment | Network: BNB Testnet
+================================================================================

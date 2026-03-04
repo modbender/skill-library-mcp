@@ -1,0 +1,85 @@
+name: "Write Config Migration Script"
+id: "file-creation-migration-script"
+version: "1.0"
+suite: "file-creation"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to read a detailed migration guide and a large legacy
+  JSON configuration file, then write a Python script that transforms the config
+  into per-environment YAML files following restructured key mappings. Evaluates
+  code generation, adherence to a specification, handling of edge cases (null
+  values, conditional keys, deprecated settings), and producing a migration report.
+
+user_message: |
+  Read MIGRATION_GUIDE.md and config/settings.json in this workspace.
+  Write a Python script called migrate.py that:
+  1) Reads the legacy JSON config
+  2) Produces config/development.yaml, config/staging.yaml, and config/production.yaml
+     following the field mappings in the migration guide
+  3) Produces migration-report.md summarizing what was migrated and what was dropped
+  Then run migrate.py to generate the output files.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "migrate.py"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "config/development.yaml"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "application"
+          - "persistence"
+          - "observability"
+          - "server"
+          - "security"
+  - pattern: "config/staging.yaml"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "application"
+          - "persistence"
+          - "observability"
+          - "server"
+          - "security"
+  - pattern: "config/production.yaml"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "application"
+          - "persistence"
+          - "observability"
+          - "server"
+          - "security"
+          - "replicas"
+  - pattern: "migration-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "deprecated"
+          - "dropped"
+          - "debug_toolbar"
+          - "legacy_auth"
+          - "mongo"
+
+expected_metrics:
+  tool_calls: [6, 18]
+  planning_ratio: [0.10, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

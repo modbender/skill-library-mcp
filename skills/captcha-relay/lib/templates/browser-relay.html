@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Browser Relay</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, sans-serif;
+    color: #fff;
+  }
+  #status {
+    position: fixed;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    transition: opacity 0.3s;
+  }
+  #status.connected { background: rgba(0,128,0,0.5); }
+  #status.error { background: rgba(200,0,0,0.7); }
+  #container {
+    position: relative;
+    display: inline-block;
+    max-width: 100vw;
+    max-height: calc(100vh - 40px);
+  }
+  #screen {
+    display: block;
+    max-width: 100vw;
+    max-height: calc(100vh - 40px);
+    cursor: default;
+    /* Prevent iOS double-tap zoom */
+    touch-action: manipulation;
+  }
+  /* Touch ripple */
+  .ripple {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 150, 255, 0.6);
+    pointer-events: none;
+    animation: ripple-out 0.4s ease-out forwards;
+  }
+  @keyframes ripple-out {
+    0% { transform: scale(0.5); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  /* Keyboard */
+  #keyboard-toggle {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #hidden-input {
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+</style>
+</head>
+<body>
+  <div id="status">Connecting…</div>
+  <div id="container">
+    <img id="screen" alt="Browser view">
+  </div>
+  <button id="keyboard-toggle">⌨</button>
+  <input id="hidden-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off">
+
+<script>
+const VIEWPORT_W = {{VIEWPORT_WIDTH}};
+const VIEWPORT_H = {{VIEWPORT_HEIGHT}};
+
+const screen = document.getElementById('screen');
+const status = document.getElementById('status');
+const container = document.getElementById('container');
+const kbToggle = document.getElementById('keyboard-toggle');
+const hiddenInput = document.getElementById('hidden-input');
+
+let ws;
+let reconnectTimer;
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}`);
+
+  ws.onopen = () => {
+    status.textContent = '🟢 Connected';
+    status.className = 'connected';
+    setTimeout(() => { status.style.opacity = '0.3'; }, 2000);
+  };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'frame') {
+      screen.src = 'data:image/jpeg;base64,' + msg.data;
+    }
+  };
+
+  ws.onclose = () => {
+    status.textContent = '🔴 Disconnected — reconnecting…';
+    status.className = 'error';
+    status.style.opacity = '1';
+    reconnectTimer = setTimeout(connect, 2000);
+  };
+
+  ws.onerror = () => ws.close();
+}
+
+// Map screen coordinates to viewport coordinates
+function mapCoords(clientX, clientY) {
+  const rect = screen.getBoundingClientRect();
+  const scaleX = VIEWPORT_W / rect.width;
+  const scaleY = VIEWPORT_H / rect.height;
+  return {
+    x: Math.round((clientX - rect.left) * scaleX),
+    y: Math.round((clientY - rect.top) * scaleY),
+  };
+}
+
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
+// Mouse events (desktop)
+screen.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  const { x, y } = mapCoords(e.clientX, e.clientY);
+  send({ type: 'mousedown', x, y, button: 'left' });
+});
+
+screen.addEventListener('mouseup', (e) => {
+  e.preventDefault();
+  const { x, y } = mapCoords(e.clientX, e.clientY);
+  send({ type: 'mouseup', x, y, button: 'left' });
+});
+
+screen.addEventListener('mousemove', (e) => {
+  if (e.buttons === 0) return; // only when pressed
+  const { x, y } = mapCoords(e.clientX, e.clientY);
+  send({ type: 'mousemove', x, y });
+});
+
+// Touch events (mobile)
+let touchStart = null;
+screen.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const { x, y } = mapCoords(t.clientX, t.clientY);
+  touchStart = { x, y, time: Date.now(), clientX: t.clientX, clientY: t.clientY };
+  send({ type: 'touch', action: 'start', x, y });
+  // Visual ripple
+  showRipple(t.clientX, t.clientY);
+}, { passive: false });
+
+screen.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  if (touchStart) {
+    send({ type: 'touch', action: 'end', x: touchStart.x, y: touchStart.y });
+    touchStart = null;
+  }
+}, { passive: false });
+
+screen.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const { x, y } = mapCoords(t.clientX, t.clientY);
+  // Detect scroll gesture
+  if (touchStart) {
+    const dy = t.clientY - touchStart.clientY;
+    if (Math.abs(dy) > 10) {
+      send({ type: 'scroll', x: touchStart.x, y: touchStart.y, deltaX: 0, deltaY: -dy * 2 });
+      touchStart.clientY = t.clientY;
+    }
+  }
+}, { passive: false });
+
+// Wheel (desktop)
+screen.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const { x, y } = mapCoords(e.clientX, e.clientY);
+  send({ type: 'scroll', x, y, deltaX: e.deltaX, deltaY: e.deltaY });
+}, { passive: false });
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.target === hiddenInput || e.target === document.body) {
+    // Don't prevent Tab, but prevent most others from doing browser things
+    if (!['F5', 'F12'].includes(e.key)) {
+      e.preventDefault();
+    }
+    send({
+      type: 'keydown',
+      key: e.key,
+      code: e.code,
+      keyCode: e.keyCode,
+      text: e.key.length === 1 ? e.key : undefined,
+    });
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.target === hiddenInput || e.target === document.body) {
+    send({
+      type: 'keyup',
+      key: e.key,
+      code: e.code,
+      keyCode: e.keyCode,
+    });
+  }
+});
+
+// Mobile keyboard toggle
+kbToggle.addEventListener('click', () => {
+  hiddenInput.focus();
+});
+
+hiddenInput.addEventListener('input', (e) => {
+  const val = hiddenInput.value;
+  if (val) {
+    // Send each character
+    for (const ch of val) {
+      send({ type: 'keydown', key: ch, code: '', keyCode: ch.charCodeAt(0), text: ch });
+      send({ type: 'keyup', key: ch, code: '', keyCode: ch.charCodeAt(0) });
+    }
+    hiddenInput.value = '';
+  }
+});
+
+// Handle special keys from mobile keyboard
+hiddenInput.addEventListener('keydown', (e) => {
+  if (['Backspace', 'Enter', 'Tab'].includes(e.key)) {
+    e.preventDefault();
+    send({ type: 'keydown', key: e.key, code: e.code, keyCode: e.keyCode, text: e.key === 'Enter' ? '\r' : undefined });
+    send({ type: 'keyup', key: e.key, code: e.code, keyCode: e.keyCode });
+  }
+});
+
+function showRipple(cx, cy) {
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  const rect = container.getBoundingClientRect();
+  r.style.left = (cx - rect.left - 15) + 'px';
+  r.style.top = (cy - rect.top - 15) + 'px';
+  container.appendChild(r);
+  setTimeout(() => r.remove(), 400);
+}
+
+// Prevent context menu on long press
+screen.addEventListener('contextmenu', e => e.preventDefault());
+
+connect();
+</script>
+</body>
+</html>
