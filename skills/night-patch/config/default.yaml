@@ -1,0 +1,121 @@
+# NightPatch 默认配置
+# 基于「夜间自动修补」帖子理念设计
+
+# 调度配置
+schedule:
+  enabled: true
+  time: "03:00"           # 执行时间（24小时制，UTC）
+  timezone: "UTC"         # 时区设置
+  max_runtime_minutes: 10 # 最大运行时间
+  
+# 安全配置
+safety:
+  max_changes_per_night: 1     # 每晚最多改动数
+  require_rollback: true       # 必须可回滚
+  skip_production: true        # 跳过生产环境
+  dry_run_first: true          # 首次运行只做dry-run
+  
+  # 变更限制
+  change_limits:
+    max_files: 2               # 最多修改文件数
+    max_lines: 200             # 最多修改行数
+    max_commands: 3            # 最多执行命令数
+    
+# 检测器配置
+detectors:
+  # Shell别名检测
+  shell_alias:
+    enabled: true
+    min_usage_count: 3         # 最少使用次数
+    command_history_file: "~/.bash_history"
+    alias_file: "~/.bash_aliases"
+    
+  # 笔记整理检测
+  note_organization:
+    enabled: true
+    max_scattered_files: 5     # 最多允许的散落文件数
+    target_directories: ["notes", "docs", "memories"]
+    file_extensions: [".md", ".txt", ".json"]
+    
+  # 日志优化检测
+  log_optimization:
+    enabled: true
+    log_directories: ["logs", "var/log"]
+    common_patterns: ["error", "warning", "info", "debug"]
+    max_log_age_days: 7        # 最多保留日志天数
+    
+  # 数据准备检测
+  data_preparation:
+    enabled: true
+    data_sources: ["api", "database", "files"]
+    preparation_time: "before_09:00"  # 需要在9点前准备好的数据
+    
+# 执行器配置
+executors:
+  # Shell别名执行器
+  shell_alias:
+    enabled: true
+    alias_format: "alias {name}='{command}'"
+    backup_original: true
+    
+  # 文件整理执行器
+  file_organization:
+    enabled: true
+    create_backup: true
+    preserve_timestamps: true
+    
+  # 日志清理执行器
+  log_cleanup:
+    enabled: true
+    keep_minimum: true
+    compress_old_logs: true
+    
+# 报告配置
+reporting:
+  enabled: true
+  format: "markdown"           # 报告格式：markdown/text/html
+  include_details: true        # 包含详细信息
+  include_rollback: true       # 包含回滚指令
+  delivery_methods:
+    - "file"                   # 保存到文件
+    - "console"                # 输出到控制台
+    
+  # 报告文件配置
+  file_report:
+    path: "reports/night-patch"
+    filename_format: "night-patch-report-{date}.md"
+    max_reports: 30            # 最多保留报告数
+    
+# 日志配置
+logging:
+  level: "info"                # 日志级别：debug/info/warn/error
+  file_enabled: true
+  file_path: "logs/night-patch.log"
+  max_file_size_mb: 10
+  max_files: 5
+  
+  # 审计日志
+  audit_enabled: true
+  audit_file: "logs/night-patch-audit.log"
+  
+# 性能配置
+performance:
+  max_memory_mb: 256
+  timeout_seconds: 300         # 5分钟超时
+  concurrent_tasks: 1          # 并发任务数
+  
+# 开发配置
+development:
+  debug_mode: false
+  verbose_logging: false
+  simulate_execution: false    # 模拟执行，不实际修改
+  
+# 通知配置（未来扩展）
+notifications:
+  enabled: false
+  methods: []
+  
+# 监控配置（未来扩展）
+monitoring:
+  enabled: false
+  metrics: []

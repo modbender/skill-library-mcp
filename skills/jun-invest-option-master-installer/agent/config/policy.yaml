@@ -1,0 +1,57 @@
+version: 1
+owner: shengge
+base_currency: USD
+capital_usd: 150000
+
+universe:
+  core_etf:
+    - SPY
+    - QQQ
+  aux:
+    - gold_related
+    - bitcoin_related
+  notes: "标的池可动态调整；团队仅关注研究股票池标的。"
+
+time_horizon:
+  core_etf: long_term
+  single_stocks: swing
+
+risk:
+  max_drawdown_pct: 30
+  leverage_allowed: false
+  permanent_cash_buffer_pct: 25
+  concentration:
+    single_stock_max_pct: 8
+    aux_single_ticker_max_pct: 5
+
+allocation_targets:
+  core_etf:
+    SPY_pct: 30
+    QQQ_pct: 30
+  tactical_pct: 15
+
+options_policy:
+  allowed_strategies:
+    - cash_secured_put
+    - covered_call
+  preferred_dte_days: [30, 45]
+  forbidden:
+    - naked_calls
+    - spreads
+    - margin_short_puts
+    - leverage
+
+approval:
+  required_for_all_trades: true
+  execution: "human_only"
+
+communication:
+  ask_human_only_when:
+    - trade_approval
+    - risk_limit_breach
+    - permission_or_access_change
+    - ambiguous_or_missing_critical_info
+  do_not_ask_for:
+    - naming
+    - cosmetic_formatting
+    - low_impact_defaults

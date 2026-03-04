@@ -1,0 +1,677 @@
+{
+  "providers": {
+    "aws": {
+      "name": "AWS",
+      "terraformProvider": "hashicorp/aws",
+      "defaultVersion": "~> 5.0",
+      "regions": [
+        "us-east-1", "us-east-2", "us-west-1", "us-west-2",
+        "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1",
+        "ap-southeast-1", "ap-southeast-2", "ap-northeast-1"
+      ],
+      "resourceTypes": {
+        "ec2": {
+          "terraformType": "aws_instance",
+          "apiService": "EC2",
+          "discoveryMethod": "describeInstances",
+          "primaryKey": "InstanceId",
+          "attributes": {
+            "id": "InstanceId",
+            "ami": "ImageId",
+            "instanceType": "InstanceType",
+            "availabilityZone": "Placement.AvailabilityZone",
+            "subnetId": "SubnetId",
+            "vpcSecurityGroupIds": "SecurityGroups",
+            "privateIp": "PrivateIpAddress",
+            "publicIp": "PublicIpAddress",
+            "keyName": "KeyName",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "instance_type": "string",
+            "ami_id": "string",
+            "key_name": "string",
+            "vpc_security_group_ids": "list(string)",
+            "subnet_id": "string",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["ami", "instance_type"],
+          "supportsCount": true
+        },
+        "vpc": {
+          "terraformType": "aws_vpc",
+          "apiService": "EC2",
+          "discoveryMethod": "describeVpcs",
+          "primaryKey": "VpcId",
+          "attributes": {
+            "id": "VpcId",
+            "cidrBlock": "CidrBlock",
+            "instanceTenancy": "InstanceTenancy",
+            "isDefault": "IsDefault",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "cidr_block": "string",
+            "instance_tenancy": "string",
+            "enableDnsHostnames": "bool",
+            "enableDnsSupport": "bool",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["cidr_block"]
+        },
+        "subnet": {
+          "terraformType": "aws_subnet",
+          "apiService": "EC2",
+          "discoveryMethod": "describeSubnets",
+          "primaryKey": "SubnetId",
+          "attributes": {
+            "id": "SubnetId",
+            "vpcId": "VpcId",
+            "cidrBlock": "CidrBlock",
+            "availabilityZone": "AvailabilityZone",
+            "mapPublicIpOnLaunch": "MapPublicIpOnLaunch",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "vpc_id": "string",
+            "cidr_block": "string",
+            "availability_zone": "string",
+            "map_public_ip_on_launch": "bool",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["vpc_id", "cidr_block"]
+        },
+        "securityGroup": {
+          "terraformType": "aws_security_group",
+          "apiService": "EC2",
+          "discoveryMethod": "describeSecurityGroups",
+          "primaryKey": "GroupId",
+          "attributes": {
+            "id": "GroupId",
+            "vpcId": "VpcId",
+            "groupName": "GroupName",
+            "description": "Description",
+            "ingress": "IpPermissions",
+            "egress": "IpPermissionsEgress",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "name": "string",
+            "description": "string",
+            "vpc_id": "string",
+            "ingress": "list(object)",
+            "egress": "list(object)",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["name", "vpc_id"]
+        },
+        "rds": {
+          "terraformType": "aws_db_instance",
+          "apiService": "RDS",
+          "discoveryMethod": "describeDBInstances",
+          "primaryKey": "DBInstanceIdentifier",
+          "attributes": {
+            "id": "DBInstanceIdentifier",
+            "engine": "Engine",
+            "engineVersion": "EngineVersion",
+            "instanceClass": "DBInstanceClass",
+            "allocatedStorage": "AllocatedStorage",
+            "storageType": "StorageType",
+            "availabilityZone": "AvailabilityZone",
+            "dbSubnetGroupId": "DBSubnetGroup.DBSubnetGroupId",
+            "vpcSecurityGroups": "VpcSecurityGroups[].VpcSecurityGroupId",
+            "multiAz": "MultiAZ",
+            "publiclyAccessible": "PubliclyAccessible",
+            "tags": "TagList"
+          },
+          "variableTypes": {
+            "identifier": "string",
+            "engine": "string",
+            "engine_version": "string",
+            "instance_class": "string",
+            "allocated_storage": "number",
+            "storage_type": "string",
+            "username": "string",
+            "password": "string",
+            "db_subnet_group_id": "string",
+            "vpc_security_group_ids": "list(string)",
+            "multi_az": "bool",
+            "skip_final_snapshot": "bool"
+          },
+          "requiredArgs": ["identifier", "engine", "instance_class", "username", "password"]
+        },
+        "s3": {
+          "terraformType": "aws_s3_bucket",
+          "apiService": "S3",
+          "discoveryMethod": "listBuckets",
+          "primaryKey": "Name",
+          "attributes": {
+            "id": "Name",
+            "region": "Region",
+            "creationDate": "CreationDate"
+          },
+          "variableTypes": {
+            "bucket": "string",
+            "acl": "string",
+            "versioning": "object",
+            "serverSideEncryption": "object",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["bucket"],
+          "note": "S3 bucket configurations require additional API calls for full property discovery"
+        },
+        "elasticLoadBalancer": {
+          "terraformType": "aws_lb",
+          "apiService": "ElasticLoadBalancingV2",
+          "discoveryMethod": "describeLoadBalancers",
+          "primaryKey": "LoadBalancerArn",
+          "attributes": {
+            "id": "LoadBalancerArn",
+            "name": "LoadBalancerName",
+            "dnsName": "DNSName",
+            "scheme": "Scheme",
+            "type": "Type",
+            "vpcId": "VpcId",
+            "subnetIds": "AvailabilityZones[].SubnetId",
+            "securityGroups": "SecurityGroups",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "name": "string",
+            "internal": "bool",
+            "loadBalancerType": "string",
+            "vpc_id": "string",
+            "subnet_ids": "list(string)",
+            "security_groups": "list(string)",
+            "enableDeletionProtection": "bool",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["name", "subnet_ids", "security_groups"]
+        },
+        "ebs": {
+          "terraformType": "aws_ebs_volume",
+          "apiService": "EC2",
+          "discoveryMethod": "describeVolumes",
+          "primaryKey": "VolumeId",
+          "attributes": {
+            "id": "VolumeId",
+            "size": "Size",
+            "volumeType": "VolumeType",
+            "iops": "Iops",
+            "throughput": "Throughput",
+            "availabilityZone": "AvailabilityZone",
+            "encrypted": "Encrypted",
+            "snapshotId": "SnapshotId",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "availability_zone": "string",
+            "size": "number",
+            "volume_type": "string",
+            "iops": "number",
+            "throughput": "number",
+            "encrypted": "bool",
+            "snapshot_id": "string",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["availability_zone", "size"]
+        },
+        "iamRole": {
+          "terraformType": "aws_iam_role",
+          "apiService": "IAM",
+          "discoveryMethod": "listRoles",
+          "primaryKey": "RoleName",
+          "attributes": {
+            "id": "RoleId",
+            "name": "RoleName",
+            "arn": "Arn",
+            "path": "Path",
+            "description": "Description",
+            "assumeRolePolicyDocument": "AssumeRolePolicyDocument",
+            "maxSessionDuration": "MaxSessionDuration",
+            "tags": "Tags"
+          },
+          "variableTypes": {
+            "name": "string",
+            "path": "string",
+            "description": "string",
+            "assume_role_policy": "string",
+            "max_session_duration": "number",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["name", "assume_role_policy"]
+        }
+      }
+    },
+    "azure": {
+      "name": "Azure",
+      "terraformProvider": "hashicorp/azurerm",
+      "defaultVersion": "~> 4.0",
+      "subscriptionScoped": true,
+      "resourceTypes": {
+        "virtualMachine": {
+          "terraformType": "azurerm_linux_virtual_machine",
+          "apiService": "Microsoft.Compute",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "size": "hardwareProfile.vmSize",
+            "adminUsername": "osProfile.adminUsername",
+            "networkInterfaceIds": "networkProfile.networkInterfaces[].id",
+            "osDisk": "storageProfile.osDisk",
+            "imageReference": "storageProfile.imageReference",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "virtual_machine_name": "string",
+            "resource_group_name": "string",
+            "location": "string",
+            "size": "string",
+            "admin_username": "string",
+            "admin_password": "string",
+            "network_interface_ids": "list(string)",
+            "os_disk": "object",
+            "image_reference": "object",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["virtual_machine_name", "resource_group_name", "location", "size", "admin_username", "admin_password", "network_interface_ids", "os_disk", "image_reference"],
+          "supportsLinux": true,
+          "supportsWindows": true
+        },
+        "virtualNetwork": {
+          "terraformType": "azurerm_virtual_network",
+          "apiService": "Microsoft.Network",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "addressSpace": "addressSpace",
+            "dnsServers": "dhcpOptions.dnsServers",
+            "subnets": "subnets",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "virtual_network_name": "string",
+            "resource_group_name": "string",
+            "location": "string",
+            "address_space": "list(string)",
+            "dns_servers": "list(string)",
+            "subnets": "list(object)",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["virtual_network_name", "resource_group_name", "location", "address_space"]
+        },
+        "subnet": {
+          "terraformType": "azurerm_subnet",
+          "apiService": "Microsoft.Network",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "resourceGroupName": "resourceGroupName",
+            "virtualNetworkName": "virtualNetworkName",
+            "addressPrefixes": "addressPrefixes",
+            "serviceEndpoints": "serviceEndpoints",
+            "delegations": "delegations",
+            "privateEndpointNetworkPolicies": "privateEndpointNetworkPolicies"
+          },
+          "variableTypes": {
+            "subnet_name": "string",
+            "resource_group_name": "string",
+            "virtual_network_name": "string",
+            "address_prefixes": "list(string)",
+            "service_endpoints": "list(string)",
+            "delegations": "list(object)",
+            "private_endpoint_network_policies": "string"
+          },
+          "requiredArgs": ["subnet_name", "resource_group_name", "virtual_network_name", "address_prefixes"]
+        },
+        "networkSecurityGroup": {
+          "terraformType": "azurerm_network_security_group",
+          "apiService": "Microsoft.Network",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "securityRules": "securityRules",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "network_security_group_name": "string",
+            "resource_group_name": "string",
+            "location": "string",
+            "security_rules": "list(object)",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["network_security_group_name", "resource_group_name", "location"]
+        },
+        "sqlDatabase": {
+          "terraformType": "azurerm_mssql_database",
+          "apiService": "Microsoft.Sql",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "serverName": "serverName",
+            "collation": "collation",
+            "maxSizeBytes": "maxSizeBytes",
+            "readScale": "readScale",
+            "zoneRedundant": "zoneRedundant",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "database_name": "string",
+            "resource_group_name": "string",
+            "server_name": "string",
+            "collation": "string",
+            "max_size_gb": "number",
+            "read_scale": "bool",
+            "zone_redundant": "bool",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["database_name", "resource_group_name", "server_name"]
+        },
+        "storageAccount": {
+          "terraformType": "azurerm_storage_account",
+          "apiService": "Microsoft.Storage",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "accountTier": "sku.tier",
+            "accountReplicationType": "sku.name",
+            "accessTier": "accessTier",
+            "isHttpsTrafficOnly": "enableHttpsTrafficOnly",
+            "blobProperties": "blobProperties",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "storage_account_name": "string",
+            "resource_group_name": "string",
+            "location": "string",
+            "account_tier": "string",
+            "account_replication_type": "string",
+            "access_tier": "string",
+            "enable_https_traffic_only": "bool",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["storage_account_name", "resource_group_name", "location", "account_tier", "account_replication_type"],
+          "nameConstraints": "Must be globally unique, 3-24 characters, lowercase alphanumeric"
+        },
+        "loadBalancer": {
+          "terraformType": "azurerm_lb",
+          "apiService": "Microsoft.Network",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "resourceGroupName": "resourceGroupName",
+            "sku": "sku.name",
+            "frontendIpConfigurations": "frontendIpConfigurations",
+            "backendAddressPools": "backendAddressPools",
+            "loadBalancingRules": "loadBalancingRules",
+            "probes": "probes",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "load_balancer_name": "string",
+            "resource_group_name": "string",
+            "location": "string",
+            "sku": "string",
+            "frontend_ip_configuration": "object",
+            "backend_address_pools": "list(object)",
+            "load_balancing_rules": "list(object)",
+            "health_probes": "list(object)",
+            "tags": "map(string)"
+          },
+          "requiredArgs": ["load_balancer_name", "resource_group_name", "location", "sku", "frontend_ip_configuration", "backend_address_pools"]
+        }
+      }
+    },
+    "gcp": {
+      "name": "Google Cloud Platform",
+      "terraformProvider": "hashicorp/google",
+      "defaultVersion": "~> 5.0",
+      "projectScoped": true,
+      "resourceTypes": {
+        "computeInstance": {
+          "terraformType": "google_compute_instance",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "zone": "zone",
+            "machineType": "machineType",
+            "canIpForward": "canIpForward",
+            "networkInterfaces": "networkInterfaces",
+            "disks": "disks",
+            "metadata": "metadata",
+            "tags": "tags"
+          },
+          "variableTypes": {
+            "name": "string",
+            "zone": "string",
+            "machine_type": "string",
+            "can_ip_forward": "bool",
+            "network_interfaces": "list(object)",
+            "boot_disk": "object",
+            "metadata": "map(string)",
+            "tags": "list(string)"
+          },
+          "requiredArgs": ["name", "zone", "machine_type", "network_interfaces", "boot_disk"]
+        },
+        "vpcNetwork": {
+          "terraformType": "google_compute_network",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "autoCreateSubnetworks": "autoCreateSubnetworks",
+            "routingConfig": "routingConfig",
+            "description": "description",
+            "mtu": "mtu"
+          },
+          "variableTypes": {
+            "name": "string",
+            "auto_create_subnetworks": "bool",
+            "routing_mode": "string",
+            "description": "string",
+            "mtu": "number"
+          },
+          "requiredArgs": ["name"]
+        },
+        "subnetwork": {
+          "terraformType": "google_compute_subnetwork",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "region": "region",
+            "network": "network",
+            "ipCidrRange": "ipCidrRange",
+            "privateIpGoogleAccess": "privateIpGoogleAccess",
+            "secondaryIpRanges": "secondaryIpRanges",
+            "stackType": "stackType"
+          },
+          "variableTypes": {
+            "name": "string",
+            "region": "string",
+            "network": "string",
+            "ip_cidr_range": "string",
+            "private_ip_google_access": "bool",
+            "secondary_ip_ranges": "list(object)",
+            "stack_type": "string"
+          },
+          "requiredArgs": ["name", "region", "network", "ip_cidr_range"]
+        },
+        "firewall": {
+          "terraformType": "google_compute_firewall",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "network": "network",
+            "direction": "direction",
+            "priority": "priority",
+            "sourceRanges": "sourceRanges",
+            "destinationRanges": "destinationRanges",
+            "allowed": "allowed",
+            "denied": "denied",
+            "sourceTags": "sourceTags",
+            "targetTags": "targetTags"
+          },
+          "variableTypes": {
+            "name": "string",
+            "network": "string",
+            "direction": "string",
+            "priority": "number",
+            "source_ranges": "list(string)",
+            "destination_ranges": "list(string)",
+            "allowed": "list(object)",
+            "denied": "list(object)",
+            "source_tags": "list(string)",
+            "target_tags": "list(string)"
+          },
+          "requiredArgs": ["name", "network", "direction", "priority", "allowed"]
+        },
+        "cloudSql": {
+          "terraformType": "google_sql_database_instance",
+          "apiService": "sqladmin",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "region": "region",
+            "settings": "settings",
+            "databaseVersion": "databaseVersion",
+            "state": "state",
+            "connectionName": "connectionName",
+            "serverCaCert": "serverCaCert"
+          },
+          "variableTypes": {
+            "name": "string",
+            "region": "string",
+            "database_version": "string",
+            "tier": "string",
+            "settings": "object",
+            "backup_configuration": "object",
+            "ip_configuration": "object",
+            "deletion_protection": "bool"
+          },
+          "requiredArgs": ["name", "region", "settings", "database_version"]
+        },
+        "cloudStorage": {
+          "terraformType": "google_storage_bucket",
+          "apiService": "storage",
+          "discoveryMethod": "list",
+          "primaryKey": "id",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "location": "location",
+            "storageClass": "storageClass",
+            "cors": "cors",
+            "versioning": "versioning",
+            "encryption": "encryption",
+            "labels": "labels"
+          },
+          "variableTypes": {
+            "name": "string",
+            "location": "string",
+            "storage_class": "string",
+            "uniform_bucket_level_access": "bool",
+            "versioning": "object",
+            "encryption": "object",
+            "cors": "list(object)",
+            "labels": "map(string)"
+          },
+          "requiredArgs": ["name", "location"]
+        },
+        "cloudDisk": {
+          "terraformType": "google_compute_disk",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "zone": "zone",
+            "sizeGb": "sizeGb",
+            "type": "type",
+            "labels": "labels",
+            "sourceSnapshot": "sourceSnapshot",
+            "sourceImage": "sourceImage"
+          },
+          "variableTypes": {
+            "name": "string",
+            "zone": "string",
+            "size": "number",
+            "type": "string",
+            "source_image": "string",
+            "source_snapshot": "string",
+            "labels": "map(string)"
+          },
+          "requiredArgs": ["name", "zone", "size"]
+        },
+        "loadBalancer": {
+          "terraformType": "google_compute_global_address",
+          "apiService": "compute",
+          "discoveryMethod": "list",
+          "primaryKey": "selfLink",
+          "attributes": {
+            "id": "id",
+            "name": "name",
+            "region": "region",
+            "ipVersion": "ipVersion",
+            "addressType": "addressType",
+            "ipAddress": "address"
+          },
+          "variableTypes": {
+            "name": "string",
+            "region": "string",
+            "ip_version": "string",
+            "address_type": "string"
+          },
+          "requiredArgs": ["name", "region"],
+          "note": "Full load balancer includes forwarding rule, target proxy, backend service, URL map. This generates only the IP address resource."
+        }
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-02-25",
+    "supportedProviders": ["aws", "azure", "gcp"],
+    "totalResourceTypes": 25,
+    "schemaUrl": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs",
+    "notes": "This schema defines the mapping between cloud provider APIs and Terraform resource types. Each entry includes discovery methods, attribute mappings, and variable type hints for code generation."
+  }
+}

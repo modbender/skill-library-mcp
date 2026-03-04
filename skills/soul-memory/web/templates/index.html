@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Soul Memory Web UI</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=3.0.1">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🧠 Soul Memory System</h1>
+            <div class="status-row">
+                <div class="status-badge" id="system-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Loading...</span>
+                </div>
+                <div class="status-badge task-count" id="task-count" style="display: none;">
+                    <span>📋 <span id="active-tasks">0</span> tasks</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Left Panel: Dashboard -->
+            <section class="panel dashboard">
+                <h2>📊 Dashboard</h2>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-segments">-</div>
+                        <div class="stat-label">Total Segments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-categories">-</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="version">-</div>
+                        <div class="stat-label">Version</div>
+                    </div>
+                </div>
+
+                <!-- Priority Distribution -->
+                <div class="chart-section">
+                    <h3>📈 Priority Distribution</h3>
+                    <div class="priority-bars">
+                        <div class="priority-bar">
+                            <span class="priority-label">[C] Critical</span>
+                            <div class="bar-container">
+                                <div class="bar critical" id="bar-critical"></div>
+                            </div>
+                            <span class="priority-count" id="count-critical">0</span>
+                        </div>
+                        <div class="priority-bar">
+                            <span class="priority-label">[I] Important</span>
+                            <div class="bar-container">
+                                <div class="bar important" id="bar-important"></div>
+                            </div>
+                            <span class="priority-count" id="count-important">0</span>
+                        </div>
+                        <div class="priority-bar">
+                            <span class="priority-label">[N] Normal</span>
+                            <div class="bar-container">
+                                <div class="bar normal" id="bar-normal"></div>
+                            </div>
+                            <span class="priority-count" id="count-normal">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="rebuildIndex()">
+                        🔄 Rebuild Index
+                    </button>
+                </div>
+            </section>
+
+            <!-- Center Panel: Search -->
+            <section class="panel search-panel">
+                <h2>🔍 Search Memory</h2>
+                
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search memory..." onkeypress="handleSearchKey(event)">
+                    <button class="btn btn-search" onclick="doSearch()">🔍</button>
+                </div>
+
+                <div class="search-results" id="search-results">
+                    <p class="placeholder-text">Enter a query to search memory...</p>
+                </div>
+            </section>
+
+            <!-- Right Panel: Task List -->
+            <section class="panel tasks-panel">
+                <h2>📋 Task List</h2>
+                
+                <div class="tasks-list" id="tasks-list">
+                    <p class="placeholder-text">No active tasks</p>
+                </div>
+
+                <div class="task-actions">
+                    <button class="btn btn-small" onclick="refreshTasks()">🔄 Refresh</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>Soul Memory Web UI v1.0</span>
+            <span id="timestamp"></span>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1111 @@
+# NIMA Core — Complete Documentation
+> Version 3.1.0 | What it really does, not what we dreamed it could do.
+
+## 1. Overview
+
+**nima-core** is an OpenClaw plugin package that gives AI agents persistent memory.
+
+### What It Actually Is
+- **3 OpenClaw hooks** that fire on conversation events
+- **Python library** for memory processing, emotion tracking, and consolidation
+- **SQLite database** (primary) with optional LadybugDB backend
+- **Local-first** — embeddings work offline, no API keys required for core features
+
+### What It Actually Does
+1. **Captures conversations** — 3-layer extraction (input/contemplation/output) with 4-phase noise filtering
+2. **Recalls relevant memories** — hybrid FTS5 + vector search, token-budgeted injection
+3. **Tracks emotions** — VADER sentiment → Panksepp 7-affect state with personality archetypes
+4. **Consolidates memories overnight** — dream engine extracts patterns and insights via LLM
+5. **Prunes old memories** — distills input/output turns into semantic gists
+6. **Deduplicates** — Darwinian selection ghosts near-identical memories
+7. **Shares memory across agents** — Hive mind via shared LadybugDB
+8. **Predicts needs** — Precognition pre-loads memories based on temporal patterns
+9. **Surfaces forgotten memories** — Lucid moments spontaneously recall emotionally-resonant old memories
+
+### What It Does NOT Do
+- **No sparse VSA** (Vector Symbolic Architecture) in nima-core — that's in lilu_core only
+- **No consciousness measurement (Φ)** — that was a research experiment
+- **No holographic memory or Modern Hopfield networks**
+- **No 6-layer Resonance Core** — that's Lilu's personal cognitive substrate
+- **No Bayesian schema extraction**
+- **No `NimaCore` class with `.capture()` and `.recall()` methods** — memory is handled via hooks, not a class API
+
+---
+
+## 2. Installation
+
+### Quick Install (30 seconds)
+```bash
+cd /path/to/nima-core
+./install.sh
+openclaw gateway restart
+```
+
+### What Gets Created
+```
+~/.nima/
+├── memory/
+│   ├── graph.sqlite      # Primary SQLite database (10 tables)
+│   ├── ladybug.lbug      # Optional LadybugDB (if --with-ladybug)
+│   ├── suppression_registry.json  # Pruned memory IDs
+│   └── embedding_index.npy        # Pre-computed embeddings
+├── affect/
+│   ├── affect_state.json # Current 7-affect state
+│   └── conversations/    # Per-conversation affect snapshots
+├── dreams/
+│   ├── insights.json     # Extracted insights
+│   ├── patterns.json     # Detected patterns
+│   └── dream_log.json    # Dream run history
+└── logs/                 # Debug logs
+
+~/.openclaw/extensions/
+├── nima-memory/          # Captures conversations (agent_end)
+├── nima-recall-live/     # Injects memories (before_agent_start)
+└── nima-affect/          # Tracks emotions (message_received)
+```
+
+### The 3 Hooks
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| **nima-memory** | `agent_end` | Extract 3 layers, noise filter, calculate FE score, store to DB |
+| **nima-recall-live** | `before_agent_start` | Hybrid search, ecology scoring, token-budgeted injection |
+| **nima-affect** | `message_received` | VADER sentiment → Panksepp 7-affect state update |
+
+### Configuration
+
+Add to `~/.openclaw/openclaw.json`:
+```json
+{
+  "plugins": {
+    "entries": {
+      "nima-memory": {
+        "enabled": true,
+        "identity_name": "your_bot_name",
+        "skip_subagents": true,
+        "skip_heartbeats": true,
+        "free_energy": { "min_threshold": 0.2 }
+      },
+      "nima-recall-live": {
+        "enabled": true,
+        "skipSubagents": true
+      },
+      "nima-affect": {
+        "enabled": true,
+        "identity_name": "your_bot_name",
+        "baseline": "guardian",
+        "skipSubagents": true
+      }
+    }
+  }
+}
+```
+
+**Replace `your_bot_name`** with your agent's identity (e.g., "lilu", "assistant").
+
+---
+
+## 3. How Memory Capture Works
+
+### Hook: nima-memory (agent_end event)
+
+The capture hook extracts **3 layers** from the conversation:
+
+| Layer | Source | Description |
+|-------|--------|-------------|
+| **input** | User message | What was said to the agent |
+| **contemplation** | Agent thinking | The agent's reasoning process |
+| **output** | Agent response | What the agent replied |
+
+### 4-Phase Noise Filtering
+
+Before storing, memories pass through a noise filter:
+
+1. **Heartbeat filtering** — Skip messages matching heartbeat patterns (`HEARTBEAT_OK`, etc.)
+2. **System message filtering** — Skip system-level messages (tool results, internal events)
+3. **Short exchange filtering** — Skip very short inputs/outputs (< 10 chars)
+4. **Free Energy threshold** — Skip low-FE memories (default: < 0.2)
+
+### Free Energy (FE) Score
+
+FE measures how "novel" an experience is. Range: 0.0 (monotonous) to 1.0 (highly novel).
+
+**Factors:**
+- Affect variance (emotional dynamism)
+- Text length (very short = likely monotonous)
+- Repetition detection (similar to recent memories)
+
+```javascript
+// From index.js calculateFEScore()
+function calculateFEScore(input, contemplation, output, affect) {
+  let fe = 0.5;
+  
+  // Factor 1: Affect variance
+  if (affect && Object.keys(affect).length > 0) {
+    const values = Object.values(affect);
+    const variance = Math.max(...values) - Math.min(...values);
+    fe += variance * 0.3;
+  }
+  
+  // Factor 2: Text richness
+  const totalLen = input.length + (output?.length || 0);
+  if (totalLen > 500) fe += 0.15;
+  if (totalLen < 50) fe -= 0.2;
+  
+  return Math.max(0, Math.min(1, fe));
+}
+```
+
+### Dual-Write Storage
+
+Memories are written to **both** databases:
+
+1. **SQLite** (`~/.nima/memory/graph.sqlite`) — Primary, always enabled
+2. **LadybugDB** (`~/.nima/memory/ladybug.lbug`) — Optional, for graph queries
+
+**From ladybug_store.py:**
+```python
+def store_memory(data: dict) -> dict:
+    """Store to LadybugDB + dual-write to SQLite."""
+    # LadybugDB primary
+    conn.execute("CREATE (n:MemoryNode {...})")
+    
+    # SQLite secondary (non-fatal)
+    _dual_write_sqlite(data, input_id, contemplation_id, output_id)
+```
+
+### Embeddings (Optional)
+
+If `VOYAGE_API_KEY` is set, embeddings are generated on capture:
+
+```python
+# From ladybug_store.py
+def _get_embedding(text: str):
+    client = voyageai.Client(api_key=api_key)
+    result = client.embed([text[:2000]], model="voyage-3-lite")
+    return struct.pack(f'{len(vec)}f', *vec)  # 512 dimensions
+```
+
+**Embedding providers:**
+- `local` (default, 384 dim, free)
+- `voyage` (512 dim, $0.12/1M tokens)
+- `openai` (1536 dim, $0.13/1M tokens)
+- `ollama` (varies by model, free)
+
+---
+
+## 4. How Memory Recall Works
+
+### Hook: nima-recall-live (before_agent_start event)
+
+Before each agent response, relevant memories are injected as context.
+
+### Hybrid Search Algorithm
+
+1. **FTS5 text search** — Fast keyword matching
+2. **Vector similarity** — Semantic search via cosine similarity
+3. **Results merged and deduplicated**
+
+**From lazy_recall.py:**
+```python
+def hybrid_search(query: str, top_k: int = 7) -> List[Dict]:
+    # Phase 1: FTS5 text search
+    fts_results = fts_search(query, top_k * 2)
+    
+    # Phase 2: Vector similarity (if embedding available)
+    query_vec = get_embedding(query)
+    vec_results = vector_search(query_vec, top_k * 2)
+    
+    # Phase 3: Merge + deduplicate by ID
+    return merge_results(fts_results, vec_results, top_k)
+```
+
+### Ecology Scoring
+
+Memories are scored by 4 factors:
+
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| **Similarity** | 0.5 | How well it matches the query |
+| **Strength** | 0.2 | Memory strength (decays over time) |
+| **Recency** | 0.2 | How recently it was accessed |
+| **Surprise** | 0.1 | How unexpected the match is |
+
+**From ladybug_recall.py:**
+```python
+W_SIMILARITY = 0.5
+W_STRENGTH = 0.2
+W_RECENCY = 0.2
+W_SURPRISE = 0.1
+
+def ecology_score(memory, query_vec, query_time):
+    similarity = cosine_similarity(memory.embedding, query_vec)
+    strength = calculate_current_strength(
+        memory.strength, memory.decay_rate, 
+        memory.last_accessed, memory.timestamp
+    )
+    recency = 1.0 / (1.0 + (query_time - memory.timestamp) / 86400000)
+    surprise = 1.0 - memory.dismissal_count / 10.0
+    
+    return (
+        W_SIMILARITY * similarity +
+        W_STRENGTH * strength +
+        W_RECENCY * recency +
+        W_SURPRISE * surprise
+    )
+```
+
+### Token Budget
+
+Default: **3000 tokens** injected per recall.
+
+Memories are ranked by ecology score, then added until budget is exhausted.
+
+### Ghost Filtering
+
+Memories with `is_ghost = true` are excluded from recall. Ghosting happens via:
+- Darwinian deduplication (near-duplicates)
+- Memory pruning (distilled gists)
+
+### Precognition (Optional Pre-loading)
+
+If enabled, the precognition system pre-loads memories based on temporal patterns:
+
+```python
+# From precognition.py
+class NimaPrecognition:
+    def inject(self, task: str) -> str:
+        """Inject relevant precognitions into task prompt."""
+        predictions = self.get_active_predictions()
+        relevant = [p for p in predictions if self.is_relevant(p, task)]
+        if relevant:
+            return f"[PRECOGNITION]\n{format_predictions(relevant)}\n\n{task}"
+        return task
+```
+
+---
+
+## 5. How Affect/Emotion Works
+
+### Hook: nima-affect (message_received event)
+
+### VADER Sentiment Analysis
+
+Emotions are detected using a VADER-inspired lexicon with 450+ words:
+
+```javascript
+// From vader-affect.js
+const AFFECT_LEXICON = {
+  "happy": { PLAY: 0.7, SEEKING: 0.3 },
+  "angry": { RAGE: 0.8 },
+  "scared": { FEAR: 0.8 },
+  "love": { CARE: 0.8, LUST: 0.3 },
+  "curious": { SEEKING: 0.7 },
+  "lonely": { PANIC: 0.6, SEEKING: 0.3 },
+  // ... 450+ words
+};
+```
+
+### Panksepp 7-Affect Model
+
+| Affect | Index | Description |
+|--------|-------|-------------|
+| SEEKING | 0 | Curiosity, exploration, anticipation |
+| RAGE | 1 | Anger, frustration, boundary violation |
+| FEAR | 2 | Threat detection, anxiety |
+| LUST | 3 | Desire, attraction, passion |
+| CARE | 4 | Nurturing, love, protection |
+| PANIC | 5 | Separation distress, grief, loss |
+| PLAY | 6 | Joy, humor, social bonding |
+
+### Personality Archetypes
+
+Archetypes define the baseline affect state:
+
+| Archetype | High Traits | Low Traits |
+|-----------|-------------|------------|
+| **guardian** | CARE, FEAR | RAGE, LUST |
+| **explorer** | SEEKING, PLAY | FEAR, PANIC |
+| **trickster** | PLAY, SEEKING | CARE, FEAR |
+| **empath** | CARE, PANIC | RAGE, SEEKING |
+| **sage** | SEEKING, CARE | PLAY, LUST |
+
+### State Persistence
+
+Affect state is persisted to `~/.nima/affect/affect_state.json`:
+
+```json
+{
+  "values": [0.5, 0.1, 0.1, 0.1, 0.5, 0.1, 0.4],
+  "timestamp": 1732598400.0,
+  "source": "detected"
+}
+```
+
+### Decay and Momentum
+
+Affect decays toward baseline over time:
+
+```python
+# From dynamic_affect.py
+BASELINE_PULL_STRENGTH = 0.02
+
+def decay(self, dt_seconds: float):
+    """Decay affect toward baseline."""
+    self.values = self.values + (self.baseline - self.values) * BASELINE_PULL_STRENGTH
+    self.values = np.clip(self.values, 0.0, 1.0)
+```
+
+---
+
+## 6. Database Schema (ACTUAL)
+
+### SQLite Tables (10 tables)
+
+#### `memory_nodes` — Core memory storage
+```sql
+CREATE TABLE memory_nodes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp INTEGER NOT NULL,           -- Unix timestamp (ms)
+    layer TEXT NOT NULL,                  -- 'input', 'contemplation', 'output'
+    text TEXT NOT NULL,                   -- Original text (max 3000 chars)
+    summary TEXT NOT NULL,                -- Summarized version (max 500 chars)
+    who TEXT DEFAULT '',                  -- Speaker identifier
+    affect_json TEXT DEFAULT '{}',        -- JSON of emotional state
+    session_key TEXT DEFAULT '',          -- Session identifier
+    conversation_id TEXT DEFAULT '',      -- Conversation identifier
+    turn_id TEXT DEFAULT '',              -- Turn identifier
+    created_at TEXT DEFAULT (datetime('now')),
+    embedding BLOB DEFAULT NULL,          -- Vector embedding (512 floats)
+    fe_score REAL DEFAULT 0.5,            -- Free Energy score (0.0-1.0)
+    strength REAL DEFAULT 1.0,            -- Memory strength
+    decay_rate REAL DEFAULT 0.01,         -- Decay rate
+    last_accessed INTEGER DEFAULT 0,      -- Last access timestamp
+    is_ghost INTEGER DEFAULT 0,           -- Ghosted (duplicate) flag
+    dismissal_count INTEGER DEFAULT 0     -- Times dismissed
+);
+```
+
+#### `memory_edges` — Relationships between memories
+```sql
+CREATE TABLE memory_edges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id INTEGER NOT NULL,
+    target_id INTEGER NOT NULL,
+    relation TEXT NOT NULL,
+    weight REAL DEFAULT 1.0,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (source_id) REFERENCES memory_nodes(id) ON DELETE CASCADE,
+    FOREIGN KEY (target_id) REFERENCES memory_nodes(id) ON DELETE CASCADE
+);
+```
+
+#### `memory_turns` — Conversation turn structure
+```sql
+CREATE TABLE memory_turns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    turn_id TEXT UNIQUE NOT NULL,
+    input_node_id INTEGER,
+    contemplation_node_id INTEGER,
+    output_node_id INTEGER,
+    timestamp INTEGER NOT NULL,
+    affect_json TEXT DEFAULT '{}',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (input_node_id) REFERENCES memory_nodes(id) ON DELETE SET NULL,
+    FOREIGN KEY (contemplation_node_id) REFERENCES memory_nodes(id) ON DELETE SET NULL,
+    FOREIGN KEY (output_node_id) REFERENCES memory_nodes(id) ON DELETE SET NULL
+);
+```
+
+#### `memory_fts` — Full-text search (FTS5 virtual table)
+```sql
+CREATE VIRTUAL TABLE memory_fts USING fts5(
+    text, summary, who, layer,
+    content=memory_nodes,
+    content_rowid=id
+);
+```
+
+#### `nima_insights` — Dream consolidation insights
+```sql
+CREATE TABLE nima_insights (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,                   -- 'pattern', 'connection', 'question', 'emotion_shift'
+    content TEXT NOT NULL,
+    confidence REAL DEFAULT 0.5,
+    sources TEXT DEFAULT '[]',            -- JSON array of memory IDs
+    domains TEXT DEFAULT '[]',            -- JSON array of domains
+    timestamp TEXT NOT NULL,
+    importance REAL DEFAULT 0.5,
+    bot_name TEXT DEFAULT '',
+    validated INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+```
+
+#### `nima_patterns` — Detected patterns
+```sql
+CREATE TABLE nima_patterns (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    occurrences INTEGER DEFAULT 1,
+    domains TEXT DEFAULT '[]',
+    examples TEXT DEFAULT '[]',
+    first_seen TEXT NOT NULL,
+    last_seen TEXT NOT NULL,
+    strength REAL DEFAULT 0.5,
+    bot_name TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+);
+```
+
+#### `nima_dream_runs` — Dream cycle history
+```sql
+CREATE TABLE nima_dream_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,
+    started_at TEXT NOT NULL,
+    ended_at TEXT NOT NULL,
+    hours REAL DEFAULT 24,
+    memories_processed INTEGER DEFAULT 0,
+    patterns_found INTEGER DEFAULT 0,
+    insights_generated INTEGER DEFAULT 0,
+    top_domains TEXT DEFAULT '[]',
+    dominant_emotion TEXT DEFAULT '',
+    narrative TEXT DEFAULT '',
+    bot_name TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+);
+```
+
+#### `nima_suppressed_memories` — Pruned memories
+```sql
+CREATE TABLE nima_suppressed_memories (
+    memory_id TEXT PRIMARY KEY,
+    suppressed_at TEXT DEFAULT '',
+    reason TEXT DEFAULT 'distilled',
+    distillate TEXT DEFAULT '',
+    expires TEXT DEFAULT ''
+);
+```
+
+#### `nima_pruner_runs` — Pruner history
+```sql
+CREATE TABLE nima_pruner_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    suppressed INTEGER DEFAULT 0,
+    distilled INTEGER DEFAULT 0,
+    total_registry_size INTEGER DEFAULT 0,
+    bot_name TEXT DEFAULT ''
+);
+```
+
+#### `nima_lucid_moments` — Spontaneous memory surfacing
+```sql
+CREATE TABLE nima_lucid_moments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    memory_id INTEGER,
+    surfaced_at TEXT DEFAULT '',
+    bot_name TEXT DEFAULT ''
+);
+```
+
+### LadybugDB Schema (Optional)
+
+**Node Types:**
+- `MemoryNode` — 24 fields (same as SQLite + additional metadata)
+- `Turn` — Links input/contemplation/output nodes
+- `InsightNode` — Dream consolidation insights
+- `PatternNode` — Detected patterns
+- `DreamNode` — Dream run records
+
+**Edge Types:**
+- `relates_to` — General relationship
+- `temporal_next` — Sequential ordering
+
+---
+
+## 7. Dream Consolidation
+
+### What It Does
+
+Runs nightly (or on-demand) to extract patterns and insights from recent memories.
+
+**CLI:**
+```bash
+nima-dream                        # consolidate last 24h
+nima-dream --hours 48             # custom window
+nima-dream --dry-run              # preview without writing
+nima-dream --insights             # show recent insights
+```
+
+### Process Flow
+
+1. **Load recent memories** — Fetch from SQLite (last 24h by default)
+2. **Group by emotion patterns** — Cluster by dominant affect
+3. **Extract patterns** — Find recurring themes, domains, temporal co-occurrences
+4. **Generate insights** — Cross-domain connections, domain gaps, emotion shifts
+5. **Optional narrative** — LLM-generated dream journal entry
+6. **Write outputs** — JSON files + SQLite tables + LadybugDB sync
+
+### Key Functions
+
+```python
+# From dream_consolidation.py
+class DreamConsolidator:
+    def consolidate(self, hours: int = 24, dry_run: bool = False) -> DreamSession:
+        """Run consolidation cycle."""
+        memories = self._load_memories(hours)
+        
+        # Extract patterns
+        patterns = self._detect_patterns(memories)
+        
+        # Generate insights
+        insights = self._generate_insights(memories, patterns)
+        
+        # Optional: dream narrative via LLM
+        if self.llm_key:
+            narrative = self._generate_dream_narrative(memories, theme)
+        
+        return DreamSession(patterns=patterns, insights=insights, narrative=narrative)
+```
+
+### Output Files
+
+| File | Purpose |
+|------|---------|
+| `~/.nima/dreams/insights.json` | Extracted insights |
+| `~/.nima/dreams/patterns.json` | Detected patterns |
+| `~/.nima/dreams/dream_log.json` | Run history |
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NIMA_DREAM_HOURS` | `24` | Lookback window |
+| `NIMA_DREAM_MAX_MEMORIES` | `500` | Max memories to process |
+| `NIMA_MAX_INSIGHTS` | `500` | Max insights to keep |
+| `NIMA_MAX_PATTERNS` | `200` | Max patterns to keep |
+| `NIMA_LLM_KEY` | — | API key for narrative generation |
+| `NIMA_LLM_MODEL` | `gpt-4o-mini` | Model for narrative |
+
+---
+
+## 8. Memory Pruner
+
+### What It Does
+
+Distills old input/output turns into semantic gists to reduce memory bloat.
+
+### Process Flow
+
+1. **Find candidates** — Input/output memories older than threshold (default 7 days)
+2. **Group into sessions** — By timestamp proximity (4-hour gap = new session)
+3. **Distill via LLM** — Summarize each session into 2-4 sentence gist
+4. **Capture gist** — Store as new contemplation memory
+5. **Suppress originals** — Add to `suppression_registry.json` (30-day limbo)
+
+### Key Functions
+
+```python
+# From memory_pruner.py
+def run_pruner(min_age_days=7, dry_run=True):
+    """Run memory pruning cycle."""
+    candidates = get_candidates(min_age_days=min_age_days)
+    sessions = group_by_session(candidates, gap_hours=4)
+    
+    for session in sessions:
+        gist = distill_session_llm(session, dry_run=dry_run)
+        if gist:
+            capture_distillate(gist, session, dry_run=dry_run)
+            add_to_registry([m['id'] for m in session], reason='distilled', distillate=gist)
+```
+
+### Suppression Registry
+
+Pruned memories are added to `~/.nima/memory/suppression_registry.json`:
+
+```json
+{
+  "12345": {
+    "suppressed_at": "2026-02-26T10:00:00",
+    "reason": "distilled",
+    "distillate": "Session Feb 20, 2026 (12 turns): Discussed database schema changes...",
+    "expires": "2026-03-28T10:00:00"
+  }
+}
+```
+
+**Limbo period:** 30 days (configurable). After expiry, memories are permanently filtered from recall.
+
+### LLM Distillation
+
+Uses Claude Haiku by default:
+
+```python
+# From memory_pruner.py
+def distill_session_llm(session, dry_run=False):
+    prompt = """Distill this conversation from {date} into a compact memory summary (2-4 sentences).
+
+Include: decisions made, things built, important context.
+Exclude: routine greetings, trivial exchanges, repetitive content.
+
+Conversation:
+{transcript}
+
+Summary:"""
+    
+    # Call Anthropic API
+    response = anthropic.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=200,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text
+```
+
+**Fallback:** If no API key, uses extractive distillation (truncated concatenation).
+
+---
+
+## 9. Darwinian Memory Selection
+
+### What It Does
+
+Finds near-duplicate memories and ghosts the losers, keeping only the best version.
+
+### Process Flow
+
+1. **Find clusters** — Cosine similarity > 0.85 threshold
+2. **Verify with LLM** — Ask LLM if cluster members are true duplicates (not just similar)
+3. **Select survivor** — Highest fitness (strength + completeness)
+4. **Absorb context** — Survivor gains context from losers
+5. **Ghost losers** — Set `is_ghost = true`
+
+### Key Functions
+
+```python
+# From darwinism.py
+class NimaDarwinism:
+    SIMILARITY_THRESHOLD = 0.85
+    
+    def run_selection(self):
+        """Run Darwinian selection cycle."""
+        clusters = self._find_similar_clusters()
+        
+        for cluster in clusters:
+            if len(cluster) < 2:
+                continue
+            
+            # LLM verify
+            duplicate_groups = llm_verify_duplicates(cluster)
+            
+            for group in duplicate_groups:
+                survivor = self._select_survivor(group)
+                losers = [m for m in group if m['id'] != survivor['id']]
+                
+                # Ghost losers
+                for loser in losers:
+                    self._ghost_memory(loser['id'])
+```
+
+### Configuration
+
+| Env Var | Default | Description |
+|---------|---------|-------------|
+| `DARWIN_THRESHOLD` | `0.85` | Cosine similarity threshold |
+| `DARWIN_MAX_CLUSTER` | `5` | Max cluster size |
+| `DARWIN_MIN_TEXT` | `20` | Min text length to consider |
+| `DARWIN_LLM_MODEL` | `gemini-3-flash-preview` | LLM for verification |
+
+---
+
+## 10. Hive Mind
+
+### What It Does
+
+Shares memory context across multiple agents and captures their results back.
+
+### Two Core Functions
+
+```python
+# From hive_mind.py
+class HiveMind:
+    def build_agent_context(self, task: str, agent_name: str) -> str:
+        """Build enriched task with relevant memory context."""
+        keywords = _extract_keywords(task)
+        memories = self._query_relevant_memories(keywords)
+        
+        context = "## HIVE CONTEXT\n"
+        context += f"Relevant memories for: {task}\n\n"
+        for mem in memories[:self.max_context_memories]:
+            context += f"- [{mem['layer']}] {mem['summary']}\n"
+        
+        return f"{context}\n\n## YOUR TASK\n{task}"
+    
+    def capture_agent_result(self, agent_label: str, result_summary: str, 
+                             model: str, importance: float = 0.7):
+        """Capture sub-agent result as memory."""
+        self._store_memory(
+            layer="contemplation",
+            text=result_summary,
+            who=agent_label,
+            metadata={"model": model},
+            importance=importance
+        )
+```
+
+### Usage
+
+```python
+from nima_core.hive_mind import HiveMind
+
+hive = HiveMind(db_path="~/.nima/memory/ladybug.lbug")
+
+# 1. Before spawning sub-agent
+enriched_task = hive.build_agent_context(
+    task="Research transformer attention mechanisms",
+    agent_name="researcher"
+)
+
+# 2. Spawn agent with enriched_task
+result = spawn_agent(enriched_task)
+
+# 3. After agent completes
+hive.capture_agent_result(
+    agent_label="researcher",
+    result_summary=result[:500],
+    model="gpt-4o",
+    importance=0.8
+)
+```
+
+### Multi-Agent Shared Memory
+
+For shared memory across agents, point all agents to the same LadybugDB:
+
+```python
+# Agent 1
+hive1 = HiveMind(db_path="/shared/ladybug.lbug")
+
+# Agent 2
+hive2 = HiveMind(db_path="/shared/ladybug.lbug")
+```
+
+---
+
+## 11. Precognition
+
+### What It Does
+
+Mines temporal patterns from memory access logs and pre-loads memories likely needed.
+
+### Process Flow
+
+1. **Mine temporal patterns** — Time-of-day, day-of-week patterns
+2. **Generate predictions** — Via LLM synthesis
+3. **Store predictions** — In `~/.nima/memory/precognitions.sqlite`
+4. **Inject on recall** — Add relevant predictions to context
+
+### Key Functions
+
+```python
+# From precognition.py
+class NimaPrecognition:
+    def run_mining_cycle(self):
+        """Mine patterns and generate predictions."""
+        patterns = self._mine_temporal_patterns()
+        predictions = self._generate_predictions(patterns)
+        self._store_predictions(predictions)
+    
+    def inject(self, task: str) -> str:
+        """Inject relevant precognitions into task."""
+        predictions = self.get_active_predictions()
+        relevant = [p for p in predictions if self._is_relevant(p, task)]
+        
+        if relevant:
+            header = "[PRECOGNITION]\n"
+            for p in relevant[:3]:
+                header += f"- {p['content']}\n"
+            return f"{header}\n{task}"
+        
+        return task
+```
+
+---
+
+## 12. Lucid Moments
+
+### What It Does
+
+Spontaneously surfaces emotionally-resonant old memories (3-30 days old).
+
+### Selection Criteria
+
+- **Age:** 3-30 days old (configurable)
+- **Layer:** `contemplation` > `episodic` > `semantic`
+- **Content:** Emotional richness, not recently surfaced
+- **Safety:** No trauma keywords, positive/warm affect only
+
+### Safety Features
+
+- **Trauma filtering** — Keywords like "death", "abuse", "trauma" excluded
+- **Quiet hours** — No surfacing during quiet hours (default 23:00-09:00)
+- **Daily cap** — Max N surfacings per day
+- **Min gap** — At least 4 hours between surfacings
+
+### Key Functions
+
+```python
+# From lucid_moments.py
+class LucidMoments:
+    _TRAUMA_KEYWORDS = [
+        "died", "death", "dead", "abuse", "trauma", "ptsd", 
+        "depressed", "suicide", "self-harm", ...
+    ]
+    
+    def maybe_surface(self) -> Optional[str]:
+        """Maybe surface a memory, if conditions are right."""
+        # Check quiet hours
+        if self._is_quiet_hours():
+            return None
+        
+        # Check daily cap
+        if self._daily_count() >= self.daily_cap:
+            return None
+        
+        # Find candidate
+        candidates = self._find_candidates()
+        if not candidates:
+            return None
+        
+        # Enrich via LLM
+        memory = random.choice(candidates)
+        message = self._enrich_memory(memory)
+        
+        # Deliver
+        self.delivery_callback(message)
+        self._record_surfacing(memory['id'])
+        
+        return message
+```
+
+---
+
+## 13. Memory Git
+
+### What It Does
+
+Git-tracks memory file changes with emoji-tagged commits.
+
+### Tracked Files
+
+By default: `MEMORY.md`, `LILU_STATUS.md` (configurable via `NIMA_TRACKED_FILES`)
+
+### Source Emojis
+
+| Source | Emoji | Description |
+|--------|-------|-------------|
+| `capture` | 🧬 | New memory captured |
+| `dream` | 🌙 | Dream consolidation |
+| `reflection` | 🪞 | Reflection agent |
+| `consolidation` | ♻️ | Consolidation pass |
+| `heartbeat` | 💓 | Heartbeat update |
+| `user` | 👤 | User-triggered |
+| `defrag` | 🧹 | Memory cleanup |
+| `init` | 🌱 | Initialization |
+| `manual` | ✍️ | Manual edit |
+
+### Key Functions
+
+```python
+# From memory_git.py
+def commit_memory(source: str, message: str) -> bool:
+    """Commit memory file changes with emoji-tagged message."""
+    emoji = SOURCE_EMOJI.get(source, "📝")
+    full_message = f"{emoji} {source}: {message}"
+    
+    subprocess.run(["git", "add", "."], cwd=NIMA_MEMORY_DIR)
+    subprocess.run(["git", "commit", "-m", full_message], cwd=NIMA_MEMORY_DIR)
+    
+def get_log(n: int = 10) -> List[Dict]:
+    """Get recent commit log."""
+    result = subprocess.run(
+        ["git", "log", f"-{n}", "--pretty=format:%h %s %ci"],
+        cwd=NIMA_MEMORY_DIR,
+        capture_output=True, text=True
+    )
+    return parse_log(result.stdout)
+```
+
+---
+
+## 14. Configuration Reference
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NIMA_HOME` | `~/.nima` | Base data directory |
+| `NIMA_DATA_DIR` | `~/.nima` | Alias for NIMA_HOME |
+| `NIMA_DB_PATH` | `~/.nima/memory/ladybug.lbug` | LadybugDB path |
+| `NIMA_SQLITE_DB` | `~/.nima/memory/graph.sqlite` | SQLite path |
+| `NIMA_BOT_NAME` | `bot` | Bot identity |
+| `NIMA_EMBEDDER` | `local` | Embedding provider |
+| `VOYAGE_API_KEY` | — | Required for Voyage embeddings |
+| `OPENAI_API_KEY` | — | Required for OpenAI embeddings |
+| `NIMA_LOG_LEVEL` | `INFO` | Logging verbosity |
+| `NIMA_DEBUG_RECALL` | — | Set to `1` for recall debugging |
+
+### openclaw.json Plugin Config
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "nima-memory": {
+        "enabled": true,
+        "identity_name": "your_bot",
+        "skip_subagents": true,
+        "skip_heartbeats": true,
+        "free_energy": {
+          "min_threshold": 0.2
+        },
+        "noise_filtering": {
+          "filter_system_noise": true,
+          "filter_heartbeat_mechanics": true
+        },
+        "database": {
+          "backend": "sqlite"
+        }
+      },
+      "nima-recall-live": {
+        "enabled": true,
+        "skipSubagents": true,
+        "maxTokens": 3000,
+        "maxResults": 7
+      },
+      "nima-affect": {
+        "enabled": true,
+        "identity_name": "your_bot",
+        "baseline": "guardian",
+        "skipSubagents": true
+      }
+    }
+  }
+}
+```
+
+---
+
+## 15. LOAD VECTOR — Critical LadybugDB Requirement
+
+### The Problem
+
+LadybugDB requires `LOAD VECTOR` to be called before any `CREATE`, `SET`, or `DELETE` operations on tables with `FLOAT[512]` columns (like `MemoryNode`).
+
+**Without it:** `SIGSEGV` (segmentation fault) crash in the Kùzu engine.
+
+### The Fix
+
+All code that opens LadybugDB connections must call:
+
+```python
+conn = lb.Connection(db)
+try:
+    conn.execute("LOAD VECTOR")
+except Exception:
+    pass  # May not exist yet (read-only is fine)
+```
+
+### Where This Is Handled
+
+- `ladybug_store.py` — `_get_ladybug_conn()`
+- `ladybug_recall.py` — `_open_db_safe()`
+- `dream_db_sync.py` — `_get_ladybug_conn()`
+- `memory_pruner.py` — `get_conn()`
+- `darwinism.py` — Connection initialization
+
+### Recovery
+
+If you see `SIGSEGV` or crashes:
+
+1. Ensure you're using the latest `real-ladybug` package
+2. Verify `LOAD VECTOR` is called before mutations
+3. **Fallback:** Use SQLite instead (remove `database.backend: "ladybugdb"`)
+
+---
+
+## 16. Troubleshooting
+
+### "No memories being captured"
+
+**Check:**
+1. Is `nima-memory` enabled in `openclaw.json`?
+2. Did you run `openclaw gateway restart`?
+3. Check logs: `tail -f ~/.nima/logs/nima-*.log`
+4. Is database writable?
+   ```bash
+   sqlite3 ~/.nima/memory/graph.sqlite "SELECT COUNT(*) FROM memory_nodes"
+   ```
+
+### "Recall not injecting context"
+
+**Check:**
+1. Is `nima-recall-live` enabled?
+2. Are there memories in the database?
+   ```bash
+   sqlite3 ~/.nima/memory/graph.sqlite "SELECT COUNT(*) FROM memory_nodes WHERE is_ghost = 0"
+   ```
+3. Is the hook firing? Look for `[NIMA RECALL]` in logs
+
+### "LadybugDB SIGSEGV / crash"
+
+**Cause:** `LOAD VECTOR` not called before vector write
+
+**Fix:**
+1. Use latest `real-ladybug` package
+2. Check initialization calls `LOAD VECTOR`
+3. **Fallback:** Use SQLite (default)
+
+### "Database locked"
+
+**Cause:** Multiple processes accessing SQLite without WAL mode
+
+**Fix:**
+```bash
+# Check WAL mode is enabled
+sqlite3 ~/.nima/memory/graph.sqlite "PRAGMA journal_mode"
+# Should return: wal
+
+# If not, enable it
+sqlite3 ~/.nima/memory/graph.sqlite "PRAGMA journal_mode=WAL"
+```
+
+### "Hook not loading"
+
+**Check:**
+1. Hooks exist at `~/.openclaw/extensions/nima-*/`
+2. Each hook has `openclaw.plugin.json`
+3. `openclaw.json` has correct plugin entries
+4. Run `openclaw gateway restart`
+
+### "Embeddings not working"
+
+**Check:**
+1. Is `VOYAGE_API_KEY` set? (for Voyage)
+2. Is `sentence-transformers` installed? (for local)
+3. Check `NIMA_EMBEDDER` env var matches desired provider
+
+---
+
+## Summary
+
+**nima-core** is a practical memory system for AI agents. It works out of the box with SQLite, captures 3-layer conversations with noise filtering, recalls via hybrid search, tracks emotions via VADER/Panksepp, and provides overnight consolidation via dream cycles.
+
+**Key design principles:**
+- Local-first (no API keys required for core features)
+- Graceful degradation (works without LadybugDB, without embeddings, without LLM)
+- Practical (documented above is what the code actually does, not what we wish it did)

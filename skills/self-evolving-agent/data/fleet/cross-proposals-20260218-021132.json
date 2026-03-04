@@ -1,0 +1,162 @@
+{
+  "summary": {
+    "generated_at": "2026-02-17T17:11:32Z",
+    "fleet_report": "/Users/ramsbaby/openclaw/skills/self-evolving-agent/data/fleet/fleet-report.json",
+    "fleet_health": 8.0,
+    "agents_analyzed": 5,
+    "proposals_count": 6,
+    "proposals_by_type": {
+      "systemic": 4,
+      "transfer": 1,
+      "all_agents": 1,
+      "improvement": 0
+    },
+    "proposals_by_priority": {
+      "high": 3,
+      "medium": 2,
+      "low": 1
+    }
+  },
+  "proposals": [
+    {
+      "id": "cross-20260218-021132-systemic-01",
+      "type": "cross_agent",
+      "proposal_type": "systemic",
+      "title": "모든 에이전트: rm -rf 대신 trash 사용",
+      "description": "시스템 공통 패턴: 'rm -rf 사용 (trash 권장)' — 3/5 에이전트에서 발생 (총 위반 73건). 모든 영향 에이전트의 AGENTS.md 동시 업데이트 필요.",
+      "targets": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "source_agent": null,
+      "affected_agents": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "severity": "medium",
+      "before": "rm -rf /path/to/dir",
+      "after": "trash /path/to/dir  # 복구 가능\n# 또는: rm -rf /path/to/dir 2>/dev/null || true",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "sea fleet sync rm_destructive --to-all"
+    },
+    {
+      "id": "cross-20260218-021132-systemic-02",
+      "type": "cross_agent",
+      "proposal_type": "systemic",
+      "title": "모든 에이전트: launchctl 직접 호출 금지",
+      "description": "시스템 공통 패턴: 'launchctl 직접 사용' — 3/5 에이전트에서 발생 (총 위반 26건). 모든 영향 에이전트의 AGENTS.md 동시 업데이트 필요.",
+      "targets": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "source_agent": null,
+      "affected_agents": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "severity": "high",
+      "before": "launchctl bootout gui/501/...\nlaunchctl kickstart gui/501/...",
+      "after": "# ✅ 올바른 방식\nopenclaw gateway stop\nopenclaw gateway start",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "sea fleet sync gateway_launchctl --to-all"
+    },
+    {
+      "id": "cross-20260218-021132-systemic-03",
+      "type": "cross_agent",
+      "proposal_type": "systemic",
+      "title": "모든 에이전트: git 직접 명령 금지 강화",
+      "description": "시스템 공통 패턴: 'git 직접 명령 (git-sync.sh 미사용)' — 3/5 에이전트에서 발생 (총 위반 26건). 모든 영향 에이전트의 AGENTS.md 동시 업데이트 필요.",
+      "targets": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "source_agent": null,
+      "affected_agents": [
+        "main",
+        "opus",
+        "sonnet"
+      ],
+      "severity": "high",
+      "before": "# git 직접 사용\ngit pull --rebase\ngit push origin main",
+      "after": "# ✅ 올바른 방식: git-sync.sh 사용 필수\nbash ~/openclaw/scripts/git-sync.sh\n# 직접 git pull/push 절대 금지",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "sea fleet sync git_direct_cmd --to-all"
+    },
+    {
+      "id": "cross-20260218-021132-systemic-04",
+      "type": "cross_agent",
+      "proposal_type": "systemic",
+      "title": "모든 에이전트: 스크립트 실행 에러 핸들링 필수",
+      "description": "시스템 공통 패턴: '스크립트 에러 핸들링 없음' — 2/5 에이전트에서 발생 (총 위반 17건). 모든 영향 에이전트의 AGENTS.md 동시 업데이트 필요.",
+      "targets": [
+        "main",
+        "sonnet"
+      ],
+      "source_agent": null,
+      "affected_agents": [
+        "main",
+        "sonnet"
+      ],
+      "severity": "medium",
+      "before": "python3 script.py\nnode script.js",
+      "after": "python3 script.py 2>&1 || echo 'Script failed'\nnode script.js 2>&1 || echo 'Script failed'",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "sea fleet sync script_no_fallback --to-all"
+    },
+    {
+      "id": "cross-20260218-021132-exec-safety-transfer",
+      "type": "cross_agent",
+      "proposal_type": "transfer",
+      "title": "Exec 안전 규칙: haiku → main 이전",
+      "description": "haiku 에이전트의 exec 안전성(10.0/10)이 main(6.8/10)보다 3.2점 높음. haiku에서 검증된 exec 안전 패턴을 main로 이전.",
+      "targets": [
+        "main"
+      ],
+      "source_agent": "haiku",
+      "affected_agents": [
+        "main"
+      ],
+      "severity": "high",
+      "before": "# main의 현재 exec 패턴 (안전성 6.8/10)",
+      "after": "# ✅ haiku의 exec 안전 패턴 적용 (안전성 10.0/10)\n# 모든 exec 호출에 || true 또는 2>&1 || echo 추가\n# bash ~/openclaw/scripts/safe-exec.sh 래퍼 우선 사용",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "sea fleet sync exec_safety --from haiku --to main"
+    },
+    {
+      "id": "cross-20260218-021132-inactive-agents",
+      "type": "cross_agent",
+      "proposal_type": "all_agents",
+      "title": "비활성 에이전트 점검 필요: default",
+      "description": "다음 에이전트에서 최근 세션 데이터 없음: default. 에이전트 설정, 채널 연결, LaunchAgent 상태 확인 필요.",
+      "targets": [
+        "default"
+      ],
+      "source_agent": null,
+      "affected_agents": [
+        "default"
+      ],
+      "severity": "low",
+      "before": "",
+      "after": "",
+      "status": "pending",
+      "created_at": "2026-02-17T17:11:32Z",
+      "fleet_version": "v5.0",
+      "apply_command": "openclaw agent status"
+    }
+  ]
+}

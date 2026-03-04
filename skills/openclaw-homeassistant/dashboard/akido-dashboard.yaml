@@ -1,0 +1,572 @@
+title: Akido Dashboard
+views:
+  # ── HOME OVERVIEW ──────────────────────────────────────────
+  - title: Home
+    path: home
+    icon: mdi:home
+    type: sections
+    sections:
+      # Quick Status
+      - type: grid
+        cards:
+          - type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+            show_forecast: true
+
+          - type: entity
+            entity: person.emre
+            name: Emre
+            icon: mdi:account
+
+          - type: entity
+            entity: calendar.muellabfuhr_2
+            name: Müllabfuhr
+            icon: mdi:trash-can
+
+      # Room Temperatures
+      - type: grid
+        title: Temperaturen
+        cards:
+          - type: sensor
+            entity: sensor.wohnzimmer_temperatur
+            name: Wohnzimmer
+            graph: line
+
+          - type: sensor
+            entity: sensor.kuche_temperatur
+            name: Küche
+            graph: line
+
+          - type: sensor
+            entity: sensor.badezimmer_temperatur
+            name: Badezimmer
+            graph: line
+
+          - type: sensor
+            entity: sensor.indoormodul_temperature
+            name: Netatmo Indoor
+            graph: line
+
+          - type: sensor
+            entity: sensor.indoormodul_indoormodul_indoormodul_outdoormodul_temperature
+            name: Außen
+            graph: line
+
+      # Air Quality
+      - type: grid
+        title: Luftqualität
+        cards:
+          - type: sensor
+            entity: sensor.indoormodul_co2
+            name: CO2
+            graph: line
+
+          - type: sensor
+            entity: sensor.indoormodul_humidity
+            name: Luftfeuchtigkeit
+            graph: line
+
+          - type: sensor
+            entity: sensor.indoormodul_pressure
+            name: Luftdruck
+
+          - type: sensor
+            entity: sensor.indoormodul_noise
+            name: Lärmpegel
+
+  # ── LIGHTS ─────────────────────────────────────────────────
+  - title: Lichter
+    path: lights
+    icon: mdi:lightbulb-group
+    type: sections
+    sections:
+      - type: grid
+        title: Wohnzimmer
+        cards:
+          - type: light
+            entity: light.wohnzimmer
+            name: Wohnzimmer
+
+          - type: light
+            entity: light.tv_play_left
+            name: TV Play Links
+
+          - type: light
+            entity: light.tv_play_right
+            name: TV Play Rechts
+
+          - type: light
+            entity: light.pc_play_left
+            name: PC Play Links
+
+          - type: light
+            entity: light.pc_play_right
+            name: PC Play Rechts
+
+          - type: light
+            entity: light.drucker_hue_play_left
+            name: Drucker Links
+
+          - type: light
+            entity: light.drucker_hue_play_right
+            name: Drucker Rechts
+
+      - type: grid
+        title: Andere Räume
+        cards:
+          - type: light
+            entity: light.flur
+            name: Flur
+
+          - type: light
+            entity: light.kuche_2
+            name: Küche
+
+          - type: light
+            entity: light.schlafzimmer
+            name: Schlafzimmer
+
+      - type: grid
+        title: Szenen
+        cards:
+          - type: button
+            entity: scene.wohnzimmer_entspannen
+            name: Entspannen
+            icon: mdi:sofa
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_entspannen
+
+          - type: button
+            entity: scene.wohnzimmer_konzentrieren
+            name: Konzentrieren
+            icon: mdi:head-lightbulb
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_konzentrieren
+
+          - type: button
+            entity: scene.wohnzimmer_lesen
+            name: Lesen
+            icon: mdi:book-open-variant
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_lesen
+
+          - type: button
+            entity: scene.wohnzimmer_nachtlicht
+            name: Nachtlicht
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_nachtlicht
+
+          - type: button
+            entity: scene.wohnzimmer_nordlichter
+            name: Nordlichter
+            icon: mdi:aurora
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_nordlichter
+
+          - type: button
+            entity: scene.wohnzimmer_honolulu
+            name: Honolulu
+            icon: mdi:palm-tree
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_honolulu
+
+          - type: button
+            entity: scene.wohnzimmer_tropendammerung
+            name: Tropendämmerung
+            icon: mdi:weather-sunset
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_tropendammerung
+
+          - type: button
+            entity: scene.home_hell
+            name: Alles Hell
+            icon: mdi:brightness-7
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.home_hell
+
+          - type: button
+            entity: scene.home_gedimmt
+            name: Alles Gedimmt
+            icon: mdi:brightness-4
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.home_gedimmt
+
+  # ── CLIMATE ────────────────────────────────────────────────
+  - title: Klima
+    path: climate
+    icon: mdi:thermostat
+    type: sections
+    sections:
+      - type: grid
+        title: Heizung (Tado)
+        cards:
+          - type: thermostat
+            entity: climate.wohnzimmer
+            name: Wohnzimmer
+
+          - type: thermostat
+            entity: climate.badezimmer
+            name: Badezimmer
+
+          - type: thermostat
+            entity: climate.kuche
+            name: Küche
+
+      - type: grid
+        title: Raumklima
+        cards:
+          - type: sensor
+            entity: sensor.wohnzimmer_luftfeuchtigkeit
+            name: WZ Feuchtigkeit
+            graph: line
+
+          - type: sensor
+            entity: sensor.badezimmer_luftfeuchtigkeit
+            name: Bad Feuchtigkeit
+            graph: line
+
+          - type: sensor
+            entity: sensor.kuche_luftfeuchtigkeit
+            name: Küche Feuchtigkeit
+            graph: line
+
+          - type: sensor
+            entity: sensor.emre_kohler_aussentemperatur
+            name: Außen (Tado)
+            graph: line
+
+      - type: grid
+        title: Heizungs-Status
+        cards:
+          - type: entity
+            entity: sensor.wohnzimmer_heizung
+            name: WZ Heizleistung
+            icon: mdi:fire
+
+          - type: entity
+            entity: sensor.badezimmer_heizung
+            name: Bad Heizleistung
+            icon: mdi:fire
+
+          - type: entity
+            entity: sensor.kuche_heizung
+            name: Küche Heizleistung
+            icon: mdi:fire
+
+          - type: entity
+            entity: sensor.emre_kohler_solarprozentsatz
+            name: Solar
+            icon: mdi:solar-power
+
+  # ── MEDIA ──────────────────────────────────────────────────
+  - title: Media
+    path: media
+    icon: mdi:multimedia
+    type: sections
+    sections:
+      - type: grid
+        title: Player
+        cards:
+          - type: media-control
+            entity: media_player.55pus7303_12_3
+            name: Philips TV
+
+          - type: media-control
+            entity: media_player.apple_tv
+            name: Apple TV
+
+      - type: grid
+        title: Sonos
+        cards:
+          - type: entity
+            entity: number.fernsehzimmer_balance
+            name: Fernsehzimmer Balance
+
+          - type: entity
+            entity: number.flur_lautstarke
+            name: Flur Lautstärke
+
+          - type: entity
+            entity: number.wohnzimmer_lautstarke
+            name: WZ Lautstärke
+
+      - type: grid
+        title: TV Fernbedienung
+        cards:
+          - type: button
+            entity: remote.55pus7303_12_fernbedienung
+            name: Philips TV
+            icon: mdi:remote
+            show_state: true
+
+          - type: button
+            entity: remote.apple_tv
+            name: Apple TV
+            icon: mdi:apple
+            show_state: true
+
+  # ── GERÄTE ─────────────────────────────────────────────────
+  - title: Geräte
+    path: devices
+    icon: mdi:devices
+    type: sections
+    sections:
+      - type: grid
+        title: Roborock QV 35S
+        cards:
+          - type: entity
+            entity: vacuum.roborock_qv_35s
+            name: Roborock
+            icon: mdi:robot-vacuum
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_batterie
+            name: Batterie
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_aktueller_raum
+            name: Aktueller Raum
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_status
+            name: Status
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_reinigungsbereich
+            name: Bereich (m²)
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_reinigungszeit
+            name: Zeit (min)
+
+          - type: entity
+            entity: sensor.roborock_qv_35s_gesamtzahl_reinigungen
+            name: Gesamt Reinigungen
+
+          - type: button
+            entity: button.roborock_qv_35s_saugen_komplett
+            name: Komplett saugen
+            icon: mdi:vacuum
+            tap_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.roborock_qv_35s_saugen_komplett
+
+          - type: button
+            entity: button.roborock_qv_35s_grundlich_wischen
+            name: Gründlich wischen
+            icon: mdi:broom
+            tap_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.roborock_qv_35s_grundlich_wischen
+
+      - type: grid
+        title: Drucker
+        cards:
+          - type: entity
+            entity: sensor.mfc_j6947dw_status
+            name: Status
+
+          - type: entity
+            entity: sensor.mfc_j6947dw_verbleibende_schwarz_tinte
+            name: Schwarz
+            icon: mdi:water
+
+          - type: entity
+            entity: sensor.mfc_j6947dw_verbleibende_cyan_tinte
+            name: Cyan
+            icon: mdi:water
+
+          - type: entity
+            entity: sensor.mfc_j6947dw_verbleibende_magenta_tinte
+            name: Magenta
+            icon: mdi:water-alert
+
+          - type: entity
+            entity: sensor.mfc_j6947dw_verbleibende_gelb_tinte
+            name: Gelb
+            icon: mdi:water
+
+          - type: entity
+            entity: sensor.mfc_j6947dw_seitenzahler
+            name: Seiten gesamt
+
+      - type: grid
+        title: Kameras
+        cards:
+          - type: picture-entity
+            entity: camera.flur_live_ansicht
+            name: Flur
+            show_state: false
+
+          - type: picture-entity
+            entity: camera.wohnzimmer_live_ansicht
+            name: Wohnzimmer
+            show_state: false
+
+  # ── STROM & NETZWERK ───────────────────────────────────────
+  - title: Energie
+    path: energy
+    icon: mdi:flash
+    type: sections
+    sections:
+      - type: grid
+        title: Stromverbrauch
+        cards:
+          - type: sensor
+            entity: sensor.tv_nas_derzeitiger_verbrauch
+            name: TV & NAS (Watt)
+            graph: line
+
+          - type: sensor
+            entity: sensor.tv_nas_heutiger_verbrauch
+            name: TV & NAS heute (kWh)
+
+          - type: sensor
+            entity: sensor.schlafzimmer_derzeitiger_verbrauch
+            name: Schlafzimmer (Watt)
+            graph: line
+
+          - type: sensor
+            entity: sensor.badezimmer_derzeitiger_verbrauch
+            name: Badezimmer (Watt)
+            graph: line
+
+      - type: grid
+        title: Steckdosen
+        cards:
+          - type: entity
+            entity: switch.tv_nas
+            name: TV & NAS
+
+          - type: entity
+            entity: switch.badezimmer
+            name: Badezimmer
+
+          - type: entity
+            entity: switch.schlafzimmer
+            name: Schlafzimmer
+
+  # ── INFRASTRUKTUR ──────────────────────────────────────────
+  - title: Infra
+    path: infra
+    icon: mdi:server-network
+    type: sections
+    sections:
+      - type: grid
+        title: Synology Cloud (NAS)
+        cards:
+          - type: sensor
+            entity: sensor.cloud_cpu_auslastung_gesamt
+            name: CPU
+            graph: line
+
+          - type: sensor
+            entity: sensor.cloud_speichernutzung_real
+            name: RAM (%)
+
+          - type: sensor
+            entity: sensor.cloud_temperatur
+            name: Temperatur
+
+          - type: sensor
+            entity: sensor.cloud_volume_1_verwendetes_volumen
+            name: Volume 1 (%)
+
+          - type: sensor
+            entity: sensor.cloud_download_durchsatz
+            name: Download (KB/s)
+            graph: line
+
+          - type: sensor
+            entity: sensor.cloud_upload_durchsatz
+            name: Upload (KB/s)
+            graph: line
+
+      - type: grid
+        title: Synology VT-STO-01
+        cards:
+          - type: sensor
+            entity: sensor.vt_sto_01_cpu_auslastung_gesamt
+            name: CPU
+            graph: line
+
+          - type: sensor
+            entity: sensor.vt_sto_01_speichernutzung_real
+            name: RAM (%)
+
+          - type: sensor
+            entity: sensor.vt_sto_01_temperatur
+            name: Temperatur
+
+          - type: sensor
+            entity: sensor.vt_sto_01_volume_1_verwendetes_volumen
+            name: Volume 1 (%)
+
+      - type: grid
+        title: Netzwerk
+        cards:
+          - type: entity
+            entity: sensor.fritz_box_fon_wlan_7360_sl_ui_externe_ip
+            name: Externe IP
+
+          - type: sensor
+            entity: sensor.fritz_box_fon_wlan_7360_sl_ui_download_geschwindigkeit
+            name: Download (Mbit/s)
+            graph: line
+
+          - type: sensor
+            entity: sensor.fritz_box_fon_wlan_7360_sl_ui_upload_geschwindigkeit
+            name: Upload (Mbit/s)
+            graph: line
+
+      - type: grid
+        title: System-Updates
+        cards:
+          - type: entity
+            entity: update.home_assistant_core_update
+            name: HA Core
+
+          - type: entity
+            entity: update.home_assistant_operating_system_update
+            name: HA OS
+
+          - type: entity
+            entity: update.home_assistant_supervisor_update
+            name: HA Supervisor
+
+          - type: entity
+            entity: update.hacs_update
+            name: HACS

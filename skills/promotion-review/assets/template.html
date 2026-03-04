@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #555;
+    --accent: #4361ee;
+    --red: #e63946;
+    --orange: #f4a261;
+    --green: #2a9d8f;
+    --border: #e8e8e8;
+    --tag-red-bg: #fef2f2; --tag-red-text: #dc2626;
+    --tag-orange-bg: #fff7ed; --tag-orange-text: #ea580c;
+    --tag-green-bg: #f0fdf4; --tag-green-text: #16a34a;
+    --tag-blue-bg: #eff6ff; --tag-blue-text: #2563eb;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.8; padding: 0;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+    color: white; padding: 48px 24px 40px; text-align: center;
+  }
+  .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .hero .subtitle { font-size: 15px; opacity: 0.85; margin-bottom: 16px; }
+  .hero .meta { display: inline-flex; gap: 16px; font-size: 13px; opacity: 0.7; }
+
+  /* --- Layout --- */
+  .container { max-width: 780px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  /* --- Summary Card --- */
+  .summary-card {
+    background: var(--card); border-radius: 12px; padding: 24px;
+    margin: -32px auto 24px; max-width: 780px; position: relative;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08); border-left: 4px solid var(--accent);
+  }
+  .summary-card .verdict { font-size: 16px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .summary-card p { font-size: 14px; color: var(--text-secondary); }
+
+  /* --- Section --- */
+  .section {
+    background: var(--card); border-radius: 12px; padding: 24px;
+    margin-bottom: 20px; box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .section-header .icon { font-size: 22px; }
+  .section-header h2 { font-size: 18px; font-weight: 600; }
+
+  /* --- Tags --- */
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle;
+  }
+  .tag-red { background: var(--tag-red-bg); color: var(--tag-red-text); }
+  .tag-orange { background: var(--tag-orange-bg); color: var(--tag-orange-text); }
+  .tag-green { background: var(--tag-green-bg); color: var(--tag-green-text); }
+  .tag-blue { background: var(--tag-blue-bg); color: var(--tag-blue-text); }
+
+  /* --- Issues --- */
+  .issue { margin-bottom: 20px; }
+  .issue:last-child { margin-bottom: 0; }
+  .issue h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .issue p, .issue li { font-size: 14px; color: var(--text-secondary); line-height: 1.75; }
+  .issue ul { padding-left: 20px; margin-top: 6px; }
+  .issue li { margin-bottom: 4px; }
+
+  /* --- Questions --- */
+  .question-list { counter-reset: q; }
+  .question-item {
+    padding: 12px 16px 12px 44px; background: #f8f9fa; border-radius: 8px;
+    margin-bottom: 10px; font-size: 14px; position: relative;
+  }
+  .question-item::before {
+    counter-increment: q; content: "Q" counter(q);
+    position: absolute; left: 12px; top: 12px;
+    font-size: 12px; font-weight: 700; color: var(--accent);
+  }
+  .question-item .q-text { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .question-item .q-why { font-size: 13px; color: var(--text-secondary); }
+  .badge-must {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px; background: var(--red); color: white;
+    margin-left: 6px; vertical-align: middle;
+  }
+  .badge-likely {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px; background: var(--orange); color: white;
+    margin-left: 6px; vertical-align: middle;
+  }
+
+  /* --- Advice --- */
+  .advice-item {
+    padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border);
+  }
+  .advice-item h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--green); }
+  .advice-item p, .advice-item li { font-size: 14px; color: var(--text-secondary); line-height: 1.75; }
+  .advice-item ul { padding-left: 20px; margin-top: 6px; }
+
+  /* --- Structure Box --- */
+  .structure-box {
+    background: #f1f5f9; border-radius: 8px; padding: 16px 20px;
+    font-size: 14px; line-height: 2; margin-top: 12px;
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+  .structure-box .num { color: var(--accent); font-weight: 700; }
+
+  /* --- Highlight --- */
+  .highlight-box {
+    background: linear-gradient(135deg, #4361ee08 0%, #7209b708 100%);
+    border: 1px solid #4361ee20; border-radius: 10px; padding: 20px 24px; margin-top: 20px;
+  }
+  .highlight-box h3 { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .highlight-box p { font-size: 14px; color: var(--text-secondary); }
+
+  .footer { text-align: center; padding: 24px 16px; font-size: 12px; color: #aaa; }
+  strong { color: var(--text); }
+
+  @media (max-width: 480px) {
+    .hero { padding: 36px 16px 32px; }
+    .hero h1 { font-size: 22px; }
+    .summary-card { margin: -24px 12px 20px; padding: 20px; }
+    .section { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO: Customize title, subtitle, date -->
+<div class="hero">
+  <h1>{{TITLE}}</h1>
+  <div class="subtitle">{{CANDIDATE}} · {{TARGET_LEVEL}} · {{VERSION}}</div>
+  <div class="meta">
+    <span>📅 {{DATE}}</span>
+    <span>📄 评审 + 辅导建议</span>
+  </div>
+</div>
+
+<!-- SUMMARY: One-sentence verdict -->
+<div class="summary-card">
+  <div class="verdict">⚡ 一句话判断</div>
+  <p>{{VERDICT}}</p>
+</div>
+
+<div class="container">
+
+<!-- CRITICAL ISSUES -->
+<div class="section">
+  <div class="section-header">
+    <span class="icon">🔴</span>
+    <h2>致命问题</h2>
+    <span class="tag tag-red">必须修改</span>
+  </div>
+  <!-- Repeat .issue blocks -->
+  <div class="issue">
+    <h3>1. {{ISSUE_TITLE}}</h3>
+    <p>{{ISSUE_BODY}}</p>
+  </div>
+</div>
+
+<!-- MEDIUM ISSUES -->
+<div class="section">
+  <div class="section-header">
+    <span class="icon">🟡</span>
+    <h2>中等问题</h2>
+    <span class="tag tag-orange">建议修改</span>
+  </div>
+  <div class="issue">
+    <h3>{{N}}. {{ISSUE_TITLE}}</h3>
+    <ul>
+      <li>{{POINT}}</li>
+    </ul>
+  </div>
+</div>
+
+<!-- INTERVIEW QUESTIONS -->
+<div class="section">
+  <div class="section-header">
+    <span class="icon">❓</span>
+    <h2>评委可能的追问</h2>
+    <span class="tag tag-blue">答辩准备</span>
+  </div>
+  <div class="question-list">
+    <div class="question-item">
+      <div class="q-text">"{{QUESTION}}" <span class="badge-must">必问</span></div>
+      <div class="q-why">{{WHY}}</div>
+    </div>
+    <div class="question-item">
+      <div class="q-text">"{{QUESTION}}" <span class="badge-likely">高概率</span></div>
+      <div class="q-why">{{WHY}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- COACHING ADVICE -->
+<div class="section">
+  <div class="section-header">
+    <span class="icon">✏️</span>
+    <h2>优化建议</h2>
+    <span class="tag tag-green">辅导方向</span>
+  </div>
+  <div class="advice-item">
+    <h3>🎯 核心策略转变</h3>
+    <p>{{STRATEGY}}</p>
+  </div>
+  <div class="advice-item">
+    <h3>{{N}}. {{ADVICE_TITLE}}</h3>
+    <ul>
+      <li>{{POINT}}</li>
+    </ul>
+  </div>
+
+  <!-- Structure recommendation -->
+  <div class="advice-item">
+    <h3>建议结构调整</h3>
+    <div class="structure-box">
+      <span class="num">1.</span> {{SECTION}}<br>
+      <span class="num">2.</span> {{SECTION}}<br>
+    </div>
+  </div>
+
+  <!-- Highlight: best area to polish -->
+  <div class="highlight-box">
+    <h3>💡 最值得打磨的亮点</h3>
+    <p>{{HIGHLIGHT}}</p>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  评审反馈 · 仅供内部参考 · {{DATE}}
+</div>
+
+</body>
+</html>

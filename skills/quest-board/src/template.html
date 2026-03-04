@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>__TITLE__</title>
+<style>
+:root{--bg:#0a0a0b;--sf:#131316;--sf2:#1a1a1f;--bd:#1e1e24;--bdh:#2e2e38;--tx:#e4e4e7;--dm:#a1a1aa;--mt:#52525b;--ac:#6366f1;--red:#ef4444;--yel:#eab308;--grn:#22c55e;--blu:#3b82f6;--pur:#a855f7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);line-height:1.5}
+.app{max-width:900px;margin:0 auto;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.logo{font-size:1.3em;font-weight:800;letter-spacing:-0.03em}
+.logo span{background:linear-gradient(135deg,var(--ac),var(--pur));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.clock{font-size:11px;color:var(--mt);font-variant-numeric:tabular-nums}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+@media(max-width:640px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.k{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 10px;text-align:center;position:relative;overflow:hidden}
+.k::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;border-radius:1px}
+.k.kr::after{background:var(--red)}.k.ky::after{background:var(--yel)}.k.kg::after{background:var(--grn)}.k.kp::after{background:var(--pur)}
+.kn{font-size:1.5em;font-weight:800}.kl{font-size:10px;color:var(--mt);margin-top:1px}
+.search{width:100%;padding:9px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;margin-bottom:14px;transition:border .2s}
+.search:focus{outline:none;border-color:var(--ac)}
+.sec{margin-bottom:22px}
+.sec-h{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd)}
+.sec-t{font-size:12px;font-weight:700;color:var(--dm);text-transform:uppercase;letter-spacing:0.05em}
+.sec-c{font-size:10px;color:var(--mt);background:var(--sf2);padding:1px 6px;border-radius:4px}
+.q{background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:5px;overflow:hidden;transition:border .15s;cursor:pointer}
+.q:hover{border-color:var(--bdh)}
+.qb{width:3px;float:left;min-height:100%}
+.qbr{background:var(--red)}.qby{background:var(--yel)}.qbg{background:var(--grn)}.qbm{background:var(--mt)}.qbb{background:var(--blu)}.qbp{background:var(--pur)}
+.qi{margin-left:3px;padding:10px 12px}
+.qh{display:flex;justify-content:space-between;align-items:center}
+.qt{font-size:13px;font-weight:600}
+.qr{display:flex;gap:5px;align-items:center}
+.bg{padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
+.bgd{background:rgba(239,68,68,.12);color:var(--red)}
+.bga{background:rgba(234,179,8,.1);color:var(--yel)}
+.bgc{background:rgba(34,197,94,.1);color:var(--grn)}
+.bgp{background:rgba(113,113,122,.1);color:var(--mt)}
+.bgi{background:rgba(99,102,241,.1);color:var(--ac)}
+.bgr{background:rgba(168,85,247,.1);color:var(--pur)}
+.pri{font-size:9px;font-weight:800;color:var(--mt);background:rgba(255,255,255,.05);padding:1px 4px;border-radius:2px}
+.qd{display:none;padding-top:8px;margin-top:8px;border-top:1px solid var(--bd)}
+.q.open .qd{display:block}
+.desc{font-size:12px;color:var(--dm);line-height:1.6;margin-bottom:6px}
+.dl{font-size:11px;color:var(--red);font-weight:600;margin-bottom:4px}
+.prog{height:3px;background:var(--sf2);border-radius:2px;margin:6px 0;overflow:hidden}
+.prog-f{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--ac),var(--pur))}
+.prog-l{font-size:10px;color:var(--mt);text-align:right}
+.fs{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.fgrp{display:inline-flex;align-items:center;gap:0;border-radius:4px;overflow:hidden;border:1px solid rgba(99,102,241,.15)}
+.fl{display:inline-flex;align-items:center;gap:3px;background:rgba(99,102,241,.06);padding:3px 8px;font-size:10px;color:var(--ac);font-family:'SF Mono',Consolas,monospace;cursor:pointer;border:none;transition:background .15s}
+.fl:hover{background:rgba(99,102,241,.15)}
+.fbtn{display:inline-flex;align-items:center;padding:3px 6px;font-size:10px;cursor:pointer;border:none;border-left:1px solid rgba(99,102,241,.15);transition:background .15s}
+.fbtn-copy{background:rgba(99,102,241,.04);color:var(--ac)}
+.fbtn-copy:hover{background:rgba(99,102,241,.2)}
+.fbtn-dir{background:rgba(168,85,247,.04);color:var(--pur)}
+.fbtn-dir:hover{background:rgba(168,85,247,.2)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ac);color:#fff;padding:5px 14px;border-radius:6px;font-size:11px;opacity:0;transition:all .25s;pointer-events:none;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;color:var(--mt);font-size:12px;padding:40px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top">
+  <div class="logo">📋 <span>__TITLE__</span></div>
+  <div class="clock" id="clock"></div>
+</div>
+<div class="kpi">
+  <div class="k kr"><div class="kn" id="kd">-</div><div class="kl">Decision</div></div>
+  <div class="k ky"><div class="kn" id="ka">-</div><div class="kl">Active</div></div>
+  <div class="k kg"><div class="kn" id="kc">-</div><div class="kl">Completed</div></div>
+  <div class="k kp"><div class="kn" id="kp">-</div><div class="kl">Paused</div></div>
+</div>
+<input class="search" type="text" placeholder="🔍 Search projects, files, keywords..." id="search" aria-label="Search projects">
+<div id="content"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const WS='__WORKSPACE__';
+const REG=__REGISTRY_DATA__;
+
+const toast=document.getElementById('toast');
+const searchEl=document.getElementById('search');
+
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),1400);
+}
+
+function copyPath(f,e){
+  e.stopPropagation();
+  navigator.clipboard.writeText(WS+f).then(()=>showToast('📋 Copied: '+f));
+}
+
+function openDir(f,e){
+  e.stopPropagation();
+  const full=WS+f;
+  const dir=full.substring(0,full.lastIndexOf('/')+1);
+  window.open('file://'+dir,'_blank');
+  showToast('📂 Opening: '+dir.split('/').slice(-2).join('/'));
+}
+
+function fileButtons(f){
+  const short=f.split('/').pop();
+  return '<div class="fgrp">'
+    +'<button class="fl" onclick="copyPath(\''+f+'\',event)" title="'+f+'">📄 '+short+'</button>'
+    +'<button class="fbtn fbtn-copy" onclick="copyPath(\''+f+'\',event)" title="Copy full path">📋</button>'
+    +'<button class="fbtn fbtn-dir" onclick="openDir(\''+f+'\',event)" title="Open containing folder">📂</button>'
+    +'</div>';
+}
+
+const secs=[
+  {id:'decision',icon:'🎯',title:'Main Quests',filter:p=>p.status==='decision',bar:'qbr',bg:'bgd',label:'Decision'},
+  {id:'active',icon:'📋',title:'Side Quests',filter:p=>p.status==='active',bar:'qby',bg:'bga',label:'Active'},
+  {id:'done',icon:'✅',title:'Completed',filter:p=>p.status==='done',bar:'qbg',bg:'bgc',label:'Done'},
+  {id:'paused',icon:'💤',title:'Icebox',filter:p=>p.status==='paused',bar:'qbm',bg:'bgp',label:'Paused'},
+];
+
+function matchesQuery(p, q) {
+  if (!q) return true;
+  const haystack = (p.name+' '+p.desc+' '+(p.files||[]).join(' ')+' '+p.key).toLowerCase();
+  return haystack.includes(q);
+}
+
+function render(){
+  const projects=Object.entries(REG.projects||{}).map(([k,v])=>({...v,key:k}));
+  const q=searchEl.value.toLowerCase();
+
+  // KPI counts
+  const counts={decision:0,active:0,done:0,paused:0};
+  projects.forEach(p=>{if(counts[p.status]!==undefined)counts[p.status]++});
+  document.getElementById('kd').textContent=counts.decision;
+  document.getElementById('ka').textContent=counts.active;
+  document.getElementById('kc').textContent=counts.done;
+  document.getElementById('kp').textContent=counts.paused;
+
+  const ct=document.getElementById('content');
+  ct.innerHTML='';
+
+  // Project sections
+  secs.forEach(s=>{
+    const items=projects.filter(s.filter).filter(p=>matchesQuery(p,q));
+    if(!items.length)return;
+
+    const div=document.createElement('div');
+    div.className='sec';
+    div.innerHTML='<div class="sec-h"><span>'+s.icon+'</span><span class="sec-t">'+s.title+'</span><span class="sec-c">'+items.length+'</span></div>';
+
+    items.forEach(p=>{
+      const el=document.createElement('div');
+      el.className='q';
+      const hp=p.progress!==undefined && p.progress!==null;
+      el.innerHTML='<div class="qb '+s.bar+'"></div><div class="qi">'
+        +'<div class="qh"><span class="qt">'+p.name+'</span>'
+        +'<div class="qr">'+(p.priority?'<span class="pri">'+p.priority+'</span>':'')
+        +'<span class="bg '+s.bg+'">'+s.label+'</span></div></div>'
+        +'<div class="qd">'
+        +(p.deadline?'<div class="dl">⏰ '+p.deadline+'</div>':'')
+        +(hp?'<div class="prog"><div class="prog-f" style="width:'+p.progress+'%"></div></div><div class="prog-l">'+p.progress+'%</div>':'')
+        +'<div class="desc">'+(p.desc||'')+'</div>'
+        +((p.files||[]).length?'<div class="fs">'+p.files.map(f=>fileButtons(f)).join('')+'</div>':'')
+        +'</div></div>';
+      el.onclick=()=>el.classList.toggle('open');
+      div.appendChild(el);
+    });
+    ct.appendChild(div);
+  });
+
+  // Infrastructure section
+  if(REG.infra && Object.keys(REG.infra).length && !q){
+    const div=document.createElement('div');
+    div.className='sec';
+    const items=Object.values(REG.infra);
+    div.innerHTML='<div class="sec-h"><span>🔧</span><span class="sec-t">Infrastructure</span><span class="sec-c">'+items.length+'</span></div>';
+    items.forEach(i=>{
+      const el=document.createElement('div');
+      el.className='q';
+      el.innerHTML='<div class="qb qbb"></div><div class="qi">'
+        +'<div class="qh"><span class="qt">'+i.name+'</span><span class="bg bgi">'+(i.status||'')+'</span></div>'
+        +'<div class="qd"><div class="desc">'+i.desc+'</div></div></div>';
+      el.onclick=()=>el.classList.toggle('open');
+      div.appendChild(el);
+    });
+    ct.appendChild(div);
+  }
+
+  // Research section
+  if(REG.research && Object.keys(REG.research).length && !q){
+    const div=document.createElement('div');
+    div.className='sec';
+    const items=Object.values(REG.research);
+    div.innerHTML='<div class="sec-h"><span>📊</span><span class="sec-t">Research</span><span class="sec-c">'+items.length+'</span></div>';
+    items.forEach(r=>{
+      const el=document.createElement('div');
+      el.className='q';
+      el.innerHTML='<div class="qb qbp"></div><div class="qi">'
+        +'<div class="qh"><span class="qt">'+r.name+'</span><span class="bg bgr">'+(r.date||'')+'</span></div>'
+        +'<div class="qd"><div class="desc">'+r.desc+'</div>'
+        +(r.file?'<div class="fs">'+fileButtons(r.file)+'</div>':'')
+        +'</div></div>';
+      el.onclick=()=>el.classList.toggle('open');
+      div.appendChild(el);
+    });
+    ct.appendChild(div);
+  }
+
+  // Empty state
+  if(!ct.children.length){
+    ct.innerHTML='<div class="empty">No projects found.</div>';
+  }
+}
+
+searchEl.addEventListener('input',render);
+
+function tick(){
+  document.getElementById('clock').textContent=new Date().toLocaleString('en-US',{
+    month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  });
+}
+setInterval(tick,1000);
+tick();
+render();
+</script>
+</body>
+</html>

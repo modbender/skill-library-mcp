@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dev-board</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <main class="layout">
+      <header class="hero">
+        <div class="hero-main">
+          <p class="eyebrow">DEV BOARD</p>
+          <h1>开发进度指挥台</h1>
+          <p class="sub">3 秒内识别运行态、异常态与待处理任务。</p>
+          <div class="signal-strip">
+            <span id="generatedAt" class="muted"></span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <div class="action-row">
+            <button id="refreshBtn">立即刷新</button>
+            <label class="toggle">
+              <input id="autoRefresh" type="checkbox" checked />
+              <span>自动刷新</span>
+            </label>
+            <label class="toggle">
+              <input id="freezeLog" type="checkbox" />
+              <span>冻结日志</span>
+            </label>
+          </div>
+          <div class="filter-row">
+            <input id="searchInput" type="search" placeholder="搜索 agent / status / repo / branch / 任务" />
+            <select id="agentFilter"></select>
+            <select id="repoFilter"></select>
+            <select id="statusFilter"></select>
+          </div>
+        </div>
+      </header>
+
+      <section class="panel queue-panel">
+        <div class="panel-title-row">
+          <h2>team-dev 队列</h2>
+          <span class="muted">排队 / 已领取 / 执行中</span>
+        </div>
+        <div id="queueView" class="queue-view">
+          <div class="queue-loading muted">加载中…</div>
+        </div>
+      </section>
+
+      <section class="panel overview">
+        <div class="panel-title-row">
+          <h2>主 Agent 概览</h2>
+          <span class="muted">关键指标 + 待处理任务</span>
+        </div>
+        <div id="kpiGrid" class="kpi-grid"></div>
+        <div class="overview-split">
+          <div>
+            <h3>需关注列表</h3>
+            <div id="attentionList" class="attention-list"></div>
+          </div>
+          <div>
+            <h3>编排者信息</h3>
+            <pre id="orchestratorMeta" class="meta-box"></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="board">
+        <section class="panel tasks-panel">
+          <div class="panel-title-row">
+            <div>
+              <h2>任务分组</h2>
+              <span id="taskCount" class="muted"></span>
+            </div>
+            <div class="inline-controls">
+              <button data-action="collapse-all">全部折叠</button>
+              <button data-action="expand-all">全部展开</button>
+            </div>
+          </div>
+          <div id="groupChips" class="filter-chips">
+          </div>
+          <div class="chip-row">
+            <span class="chip-row-label">视图</span>
+            <div id="viewModeChips" class="filter-chips"></div>
+          </div>
+          <div class="chip-row">
+            <span class="chip-row-label">快捷筛选</span>
+            <div id="quickFocusChips" class="filter-chips"></div>
+          </div>
+          <div id="taskList" class="task-groups"></div>
+        </section>
+
+        <section class="panel detail-panel">
+          <div class="panel-title-row">
+            <div>
+              <h2 id="detailTitle">任务详情</h2>
+              <span id="detailSubtitle" class="muted"></span>
+            </div>
+            <div class="inline-controls">
+              <button id="pinTaskBtn" data-action="pin-task">固定任务</button>
+              <button data-action="copy-branch">复制分支</button>
+              <button data-action="copy-pr">复制 PR 链接</button>
+              <button data-action="copy-repo">复制仓库</button>
+            </div>
+          </div>
+          <div id="taskDetail" class="detail-grid"></div>
+
+          <div id="opsPanel" class="ops-panel"></div>
+
+          <div class="log-block">
+            <div class="panel-title-row">
+              <h3 id="logTitle">日志查看器</h3>
+              <div class="inline-controls">
+                <select id="logSource">
+                  <option value="task">当前任务日志</option>
+                  <option value="cron">编排者监控日志 (cron)</option>
+                  <option value="cleanup">编排者清理日志 (cleanup)</option>
+                </select>
+                <select id="lineCount">
+                  <option value="100">100 行</option>
+                  <option value="200" selected>200 行</option>
+                  <option value="500">500 行</option>
+                </select>
+              </div>
+            </div>
+            <div id="logMeta" class="log-meta"></div>
+            <pre id="logContent" class="log-box log-empty">选择任务或切换日志来源。</pre>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

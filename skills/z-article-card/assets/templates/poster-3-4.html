@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--
+  Template: image-3-4
+  Ratio: 3:4  (900×1200)
+  用途: 3:4 比例通用封面配图
+  Parameters (replaced via script before rendering):
+    {{MAIN_TEXT_LINE1}}     — 第一行文字
+    {{MAIN_TEXT_LINE2}}     — 第二行文字（可为空）
+    {{MAIN_TEXT_LINE3}}     — 第三行文字（可为空）
+    {{LINE1_CLASS}}         — "highlight" 或 "" 
+    {{LINE2_CLASS}}         — "highlight" 或 ""
+    {{LINE3_CLASS}}         — "highlight" 或 ""
+    {{HIGHLIGHT_COLOR}}     — 高亮色 hex，默认 #22a854
+    {{BG_COLOR}}            — 背景色 hex，默认 #e6f5ef
+    {{FOOTER_TEXT}}         — 底部版权/来源文字
+    {{ICON_PATH}}           — 顶部图标绝对路径
+-->
+<style>
+  @font-face {
+    font-family: "AlimamaShuHeiTi";
+    src: url("{{FONT_PATH}}") format("truetype");
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 900px;
+    height: 1200px;
+    background-color: {{BG_COLOR}};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 90px;
+    font-family: "AlimamaShuHeiTi", "PingFang SC", sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .deco-top {
+    margin-bottom: 80px;
+    align-self: flex-start;
+  }
+  .deco-top img {
+    width: 108px;
+    height: 108px;
+  }
+  .text-block { margin-top: 0; align-self: flex-start; }
+  .line {
+    font-size: 108px;
+    font-weight: 900;
+    line-height: 1.15;
+    color: #1a1a1a;
+    letter-spacing: -2px;
+  }
+  .line.highlight { color: {{HIGHLIGHT_COLOR}}; }
+  .highlight { color: {{HIGHLIGHT_COLOR}}; }
+  .watermark {
+    margin-top: 80px;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.55;
+  }
+  .watermark img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .watermark span {
+    font-size: 24px;
+    color: #555;
+    font-family: "AlimamaShuHeiTi", "PingFang SC", sans-serif;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="deco-top">
+    <img src="{{ICON_PATH}}" alt="icon">
+  </div>
+  <div class="text-block">
+    <div class="line {{LINE1_CLASS}}" id="l1">{{MAIN_TEXT_LINE1}}</div>
+    <div class="line {{LINE2_CLASS}}" id="l2">{{MAIN_TEXT_LINE2}}</div>
+    <div class="line {{LINE3_CLASS}}" id="l3">{{MAIN_TEXT_LINE3}}</div>
+  </div>
+  <script>
+    ['l1','l2','l3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.textContent.trim()) el.style.display = 'none';
+    });
+  </script>
+  <div class="watermark">
+    <img src="{{AVATAR_PATH}}" alt="Jinx">
+    <span>✦ made by Jinx · {{FOOTER_TEXT}}</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "gitea.workflow_dispatch",
+  "slug": "gitea-workflow-dispatch",
+  "version": "0.1.0",
+  "description": "Trigger a Gitea/Forgejo Actions workflow_dispatch via API.",
+  "entry": "index.js",
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "owner": { "type": "string" },
+      "repo": { "type": "string" },
+      "workflow": { "type": "string" },
+      "ref": { "type": "string", "default": "master" },
+      "inputs": { "type": "object", "default": {} },
+      "dryRun": { "type": "boolean", "default": false }
+    },
+    "required": ["owner", "repo", "workflow"]
+  },
+  "outputs": {
+    "type": "object",
+    "properties": {
+      "ok": { "type": "boolean" },
+      "status": { "type": "integer" },
+      "response": { "type": ["string", "null"] },
+      "request": { "type": "object" }
+    },
+    "required": ["ok", "status", "request"]
+  }
+}

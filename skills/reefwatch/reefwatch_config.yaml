@@ -1,0 +1,139 @@
+# ReefWatch Configuration
+# Copy this file and adjust to your environment
+
+# General
+general:
+  log_file: "~/.openclaw/logs/reefwatch.log"
+  log_level: "INFO"                    # DEBUG, INFO, WARNING, ERROR
+  log_max_bytes: 10485760              # 10 MB — max log file size before rotation
+  log_backup_count: 5                  # Number of rotated log files to keep
+  pid_file: "~/.openclaw/reefwatch.pid"
+  status_file: "~/.openclaw/reefwatch_status.json"
+  alerts_history: "~/.openclaw/workspace/skills/reefwatch/scripts/alerts_history.json"
+  max_alerts_history: 500              # Max alerts to keep in history
+
+# Webhook (OpenClaw integration)
+webhook:
+  url: "http://127.0.0.1:18789/hooks/wake"
+  token: ""                            # Set via OPENCLAW_HOOKS_TOKEN env var (preferred)
+  retry_attempts: 3
+  retry_delay_seconds: 5
+  allow_external: false                # Set true to allow non-localhost webhooks (HTTPS required)
+
+# Alert deduplication
+alerting:
+  dedup_window_seconds: 300            # Don't re-alert same rule within this window
+  min_severity: "MEDIUM"               # Only alert on MEDIUM, HIGH, CRITICAL
+  batch_alerts: true                   # Group multiple alerts in one message
+  batch_window_seconds: 30             # Wait this long to batch before sending
+
+# Collectors
+collectors:
+  logs:
+    enabled: true
+    interval_seconds: 10
+    sources:
+      linux:
+        - "/var/log/auth.log"
+        - "/var/log/syslog"
+        - "/var/log/kern.log"
+        - "/var/log/daemon.log"
+      darwin:
+        - "/var/log/system.log"
+        - "/var/log/install.log"
+    # Also uses journalctl on Linux if available
+    use_journald: true
+    # Also uses macOS unified log (log show) on Darwin
+    use_unified_log: true
+
+  files:
+    enabled: true
+    watched_paths:
+      common:
+        - "~/.openclaw/"               # Protect OpenClaw config from tampering
+        - "~/.ssh/"
+        - "/etc/passwd"
+        - "/etc/shadow"
+        - "/etc/sudoers"
+        - "/etc/crontab"
+        - "/etc/hosts"
+      linux:
+        - "/etc/systemd/system/"
+        - "/etc/init.d/"
+        - "/usr/local/bin/"
+      darwin:
+        - "~/Library/LaunchAgents/"
+        - "/Library/LaunchDaemons/"
+        - "/usr/local/bin/"
+    # File extensions to YARA-scan when changed
+    scan_extensions:
+      - ".py"
+      - ".sh"
+      - ".js"
+      - ".rb"
+      - ".pl"
+      - ".php"
+      - ".exe"
+      - ".elf"
+      - ".mach-o"
+      - ".dmg"
+      - ".pkg"
+    # Files smaller than this (KB) get SHA256 integrity checks
+    hash_threshold_kb: 512
+
+  processes:
+    enabled: true
+    interval_seconds: 30
+    # Alert on processes matching these patterns
+    suspicious_patterns:
+      - "nc -l"                        # Netcat listener
+      - "ncat -l"
+      - "socat"
+      - "cryptominer"
+      - "xmrig"
+      - "minerd"
+      - "cpuminer"
+    # Alert if any single process exceeds this CPU % for sustained period
+    cpu_threshold_percent: 90
+    cpu_sustained_seconds: 120
+
+  network:
+    enabled: true
+    interval_seconds: 60
+    # Alert on connections to these port ranges (common C2)
+    suspicious_ports:
+      - 4444                           # Metasploit default
+      - 4443
+      - 5555
+      - 8443
+      - 1337
+      - 31337
+    # Max new outbound connections per minute before alert
+    connection_rate_threshold: 50
+    # Known bad IPs/domains (loaded from rules/custom/ioc_blocklist.txt)
+    ioc_blocklist: "rules/custom/ioc_blocklist.txt"
+
+# Detection Engines
+engines:
+  yara:
+    enabled: true
+    rules_dir: "rules/yara/"
+    # Scan changed files only (via file watcher) vs full scan
+    mode: "on_change"                  # "on_change" (scan changed files) or "scheduled" (full periodic scan)
+    scheduled_interval_hours: 24       # If mode=scheduled
+    max_file_size_mb: 50               # Skip files larger than this
+    timeout_seconds: 30                # Per-file scan timeout
+
+  sigma:
+    enabled: true
+    rules_dir: "rules/sigma/"
+    # Which log sources to apply sigma rules against
+    log_sources:
+      - "auth"
+      - "syslog"
+      - "process_creation"
+
+  custom:
+    enabled: true
+    rules_dir: "rules/custom/"
+    integrity_interval_seconds: 300    # OpenClaw integrity check interval

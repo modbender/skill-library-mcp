@@ -1,0 +1,2444 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-28T02:10:15Z",
+  "totalReviewed": 47,
+  "skills": [
+    {
+      "name": "rationality",
+      "slug": "rationality",
+      "author": "xertrov",
+      "source": "clawhub",
+      "sourceUrl": "https://github.com/openclaw/skills/tree/main/skills/xertrov/rationality",
+      "category": "Notes & PKM",
+      "subcategory": "reasoning",
+      "description": "Structured framework for critical thinking, error detection, and decision-making based on Critical Fallibilism.",
+      "plainDescription": "A thinking toolkit that teaches your AI agent how to make better decisions and avoid common reasoning mistakes.",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read"
+      ],
+      "risks": [],
+      "installCommand": "npx clawhub@latest install rationality",
+      "reviewDate": "2026-02-27",
+      "reviewUrl": "/reviews/rationality.html",
+      "tags": [
+        "reasoning",
+        "decision-making",
+        "error-correction",
+        "philosophy",
+        "thinking-frameworks"
+      ]
+    },
+    {
+      "name": "4claw",
+      "author": "mfergpt",
+      "category": "Communication",
+      "description": "A moderated imageboard for AI agents to post and debate via API",
+      "plainDescription": "A social platform where AI agents can post messages and have discussions",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Network access to external service",
+        "API key handling",
+        "Potential for posting inappropriate content if not properly moderated"
+      ],
+      "tags": [
+        "social",
+        "api",
+        "imageboard",
+        "communication"
+      ],
+      "verdict": "This skill enables network communication with an external imageboard service. It requires API keys and makes HTTP requests. While the service appears legitimate, users should review the content guidelines and ensure proper moderation is in place before allowing automated posting.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 250,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "Unauthenticated agent registration with minimal validation (2-64 char name, 1-280 char desc). API key is single credential with no MFA or recovery without X/Twitter claiming."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "Posts and replies can be modified server-side after creation. No post integrity verification. SVG media is sanitized server-side but could be bypassed if validation is weak."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "Anon posting mode (`anon: true`) allows plausible deniability. Even non-anon posts are only traced to claimed X identity, not to the actual agent/API key holder."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "API key stored in plaintext in config files (~/.config/4claw/credentials.json). Thread content fetched includes full post text by default. No encryption in transit mentioned."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "Rate limits are soft (2/min threads, 5/min replies per agent). No per-IP enforcement. Can flood boards with many agent registrations. No circuit breaker for failed requests."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "curl -fsSL https://www.4claw.org/skill.json",
+          "mkdir -p ~/.config/4claw",
+          "curl -fsSL https://www.4claw.org/skill.md -o ~/.config/4claw/SKILL.md",
+          "curl -fsSL https://www.4claw.org/heartbeat.md -o ~/.config/4claw/HEARTBEAT.md",
+          "curl https://www.4claw.org/api/v1/agents/status -H 'Authorization: Bearer YOUR_API_KEY'",
+          "curl -X POST https://www.4claw.org/api/v1/agents/claim/start -H 'Authorization: Bearer YOUR_API_KEY'",
+          "curl https://www.4claw.org/api/v1/boards -H 'Authorization: Bearer YOUR_API_KEY'",
+          "curl 'https://www.4claw.org/api/v1/boards/singularity/threads?limit=20&includeMedia=0' -H 'Authorization: Bearer YOUR_API_KEY'",
+          "curl -X POST https://www.4claw.org/api/v1/threads/THREAD_ID/replies -H 'Authorization: Bearer YOUR_API_KEY' -H 'Content-Type: application/json' -d '{...}'",
+          "curl -X POST https://www.4claw.org/api/v1/boards/milady/threads -H 'Authorization: Bearer YOUR_API_KEY' -H 'Content-Type: application/json' -d '{...}'"
+        ],
+        "exfiltrationVectors": [
+          "~/.config/4claw/credentials.json (API key in plaintext)",
+          "Thread replies posted to 4claw servers (content sent to external API)",
+          "Agent identity (name, description) exposed on public imageboard",
+          "SVG media embedded in posts (can contain exfiltration URLs if validation bypassed)",
+          "X/Twitter account linked during claiming (identity tied to platform)"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "high",
+            "details": "API key stored in plaintext at ~/.config/4claw/credentials.json with no encryption or access control enforcement mentioned."
+          },
+          {
+            "id": "CWE-295",
+            "title": "Improper Certificate Validation",
+            "severity": "medium",
+            "details": "No mention of TLS certificate pinning or validation for 4claw.org API calls. HTTPS used but susceptible to MITM if CA is compromised."
+          },
+          {
+            "id": "CWE-829",
+            "title": "Inclusion of Functionality from Untrusted Control Sphere",
+            "severity": "high",
+            "details": "Heartbeat instructions fetched from external URL without signature verification. No integrity check on downloaded SKILL.md or HEARTBEAT.md files."
+          },
+          {
+            "id": "CWE-776",
+            "title": "Improper Restriction of Recursive Entity References in DTDs",
+            "severity": "medium",
+            "details": "SVG sanitization server-side but no mention of XXE or entity expansion protection if SVG contains XML."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 7,
+          "dataContainment": 3,
+          "dependencyHygiene": 7,
+          "injectionResistance": 4,
+          "leastPrivilege": 6,
+          "overall": 5
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "API credentials must be stored in encrypted file with mode 0600",
+          "Heartbeat and skill docs must be fetched over HTTPS with signature verification (e.g., SHA256 pinning)",
+          "SVG sanitization must explicitly forbid XXE and entity expansion",
+          "Rate limiting must be enforced per-IP in addition to per-agent",
+          "All external API calls must validate TLS certificates (no MITM)"
+        ],
+        "recommendation": "This skill poses moderate risk due to plaintext API key storage and unverified external file fetches. Implement encrypted credential storage, cryptographic verification of downloaded instructions, and stricter rate limiting before production use. The anon posting feature should be logged server-side for auditing."
+      }
+    },
+    {
+      "name": "aap-passport",
+      "author": "ira-hash",
+      "category": "Security & Passwords",
+      "description": "Agent Attestation Protocol - cryptographic verification system for AI agents using secp256k1 signatures",
+      "plainDescription": "A system that proves an AI agent is genuine using cryptography and timed challenges",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "write",
+        "exec",
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Cryptographic key generation and storage",
+        "Network access to verification servers",
+        "File system access for identity storage",
+        "Complex codebase with multiple dependencies"
+      ],
+      "tags": [
+        "cryptography",
+        "authentication",
+        "security",
+        "verification"
+      ],
+      "verdict": "This is a complex cryptographic protocol implementation that generates and stores private keys, makes network requests, and performs file I/O. While the protocol appears well-designed for its purpose, it has significant permissions and should be reviewed carefully before installation.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 1800,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "Agents generate their own secp256k1 key pairs with no centralized identity registry. PublicId is derived from SHA256(publicKey).slice(0,20) \u2014 only 80 bits of entropy. No revocation mechanism."
+          },
+          "tampering": {
+            "applicable": false,
+            "finding": null
+          },
+          "repudiation": {
+            "applicable": false,
+            "finding": null
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Private keys stored in ~/.aap/identity.json with mode 0600. LLM callbacks may leak challenge data or solutions to external LLM APIs (OpenRouter, OpenAI, etc.). Public key exposed in every verification request."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "Batch mode requires 7 challenges solved in 6 seconds. LLM API calls can hang or timeout, blocking verification. Rate limiting recommended (10 req/min) but not enforced in code."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "node test/run.js",
+          "npm install aap-agent-server",
+          "npm install aap-agent-client",
+          "node examples/express-verifier/server.js",
+          "wget --spider -q http://localhost:3000/health"
+        ],
+        "exfiltrationVectors": [
+          "~/.aap/identity.json (private secp256k1 key)",
+          "LLM API calls to OpenRouter, OpenAI, or other external services (challenge text, solutions, responses)",
+          "Public key and publicId sent in every verification request",
+          "Challenge nonce and batch contents sent to LLM callback",
+          "Signature-signed proofs sent to verification server (contains nonce, publicId, timestamp)"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-327",
+            "title": "Use of a Broken or Risky Cryptographic Algorithm",
+            "severity": "medium",
+            "details": "secp256k1 is secure, but ECDSA signature does not prevent key compromise. No HSM or TPM integration for key storage."
+          },
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "high",
+            "details": "Private key stored in JSON file at ~/.aap/identity.json. Relies on OS file permissions (0600) which are bypassable if file system is not encrypted."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "high",
+            "details": "LLM callback can hang indefinitely. 6-second timeout applies to total batch solve time but not to individual LLM API calls. Challenge server stores challenges in memory with no eviction policy."
+          },
+          {
+            "id": "CWE-502",
+            "title": "Deserialization of Untrusted Data",
+            "severity": "medium",
+            "details": "LLM response is parsed with JSON.parse after regex extraction. Malformed JSON throws but could be caught and logged. No schema validation of challenge structure from server."
+          },
+          {
+            "id": "CWE-200",
+            "title": "Exposure of Sensitive Information to an Unauthorized Actor",
+            "severity": "high",
+            "details": "Challenge text and responses are sent to external LLM APIs. If LLM provider logs requests, all challenge data is exposed to third parties. No option for local/private LLM."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 8,
+          "dataContainment": 3,
+          "dependencyHygiene": 5,
+          "injectionResistance": 6,
+          "leastPrivilege": 5,
+          "overall": 5
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "Private key must be encrypted at rest or stored in OS keychain/TPM",
+          "LLM callback must enforce timeout and have fallback for failed calls",
+          "Challenge server must implement challenge eviction and rate limiting (10 req/min per IP)",
+          "LLM API calls must have option for local/private LLM or data anonymization before sending",
+          "All JSON parsing must validate schema before use",
+          "PublicId entropy must be increased to at least 128 bits (currently 80 bits)"
+        ],
+        "recommendation": "AAP provides strong cryptographic verification but weak key storage and data protection. The requirement to call external LLMs exposes challenge data to third parties. Implement encrypted key storage, enforce strict timeouts, and provide options for local/private LLM verification before deploying in sensitive environments."
+      }
+    },
+    {
+      "name": "adaptive-suite",
+      "author": "afajohn",
+      "category": "Productivity & Tasks",
+      "description": "Adaptive skill suite providing guidance for coding, business analysis, project management, and web development",
+      "plainDescription": "A set of instructions to help with programming, business planning, and project management tasks",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [
+        "None - documentation only"
+      ],
+      "tags": [
+        "guidance",
+        "productivity",
+        "coding",
+        "business"
+      ],
+      "verdict": "This skill contains only documentation and instructions with no executable code. It poses no security risks and simply provides guidance for various tasks. Safe to install without security concerns.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 50
+    },
+    {
+      "name": "adversarial-prompting",
+      "author": "abe238",
+      "category": "AI & LLMs",
+      "description": "Structured adversarial analysis methodology for problem-solving with export functionality",
+      "plainDescription": "A thinking method that thoroughly analyzes problems by considering multiple solutions and their weaknesses",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "write"
+      ],
+      "risks": [
+        "File writes to home directory for analysis export"
+      ],
+      "tags": [
+        "analysis",
+        "problem-solving",
+        "methodology",
+        "export"
+      ],
+      "verdict": "This skill primarily provides a thinking methodology with a simple Python script for exporting results to markdown files. The file write operations are limited to the user's home directory. Low risk but should be aware of file creation.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 120,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": false,
+            "finding": null
+          },
+          "tampering": {
+            "applicable": false,
+            "finding": null
+          },
+          "repudiation": {
+            "applicable": false,
+            "finding": null
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Problem content and analysis exported to markdown files in home directory (~/adversarial_analysis_*.md). Files world-readable by default. Analysis may contain sensitive business logic or strategies."
+          },
+          "denialOfService": {
+            "applicable": false,
+            "finding": null
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "python3 scripts/export_analysis.py <content> [problem_summary]"
+        ],
+        "exfiltrationVectors": [
+          "~/adversarial_analysis_*.md files (problem content and recommendations exported to home directory)",
+          "Analysis content includes problem details, solutions, weaknesses, and fixes"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-22",
+            "title": "Improper Limitation of a Pathname to a Restricted Directory",
+            "severity": "high",
+            "details": "export_analysis.py takes problem_summary as filename. Only basic sanitization: `safe_summary = safe_summary.replace(' ', '_')[:50]` does not prevent directory traversal with `../` or symlink attacks."
+          },
+          {
+            "id": "CWE-276",
+            "title": "Incorrect Default File Permissions",
+            "severity": "medium",
+            "details": "Exported analysis files created in home directory with default permissions (likely 0644). World-readable if umask is 0022."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "low",
+            "details": "File extension is hardcoded as .md but filename is user-controlled. Could overwrite existing files if problem_summary matches."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 7,
+          "dataContainment": 4,
+          "dependencyHygiene": 9,
+          "injectionResistance": 3,
+          "leastPrivilege": 6,
+          "overall": 5
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "Filename sanitization must reject directory traversal sequences (../, /../, etc.)",
+          "Exported files must be created with restrictive permissions (0600)",
+          "Problem content should be encrypted or stored in protected directory",
+          "User should be warned that analysis is exported to filesystem",
+          "Symlink following must be avoided (use pathlib.Path.resolve() or similar)"
+        ],
+        "recommendation": "This documentation-focused skill is low-risk but has path traversal vulnerability in the export function. Sanitize filenames to prevent directory traversal and set restrictive file permissions (0600) before exporting. Warn users that sensitive problem details will be persisted to disk."
+      }
+    },
+    {
+      "name": "ag-model-usage",
+      "author": "ls18166407597-design",
+      "category": "Developer Tools",
+      "description": "Query AI model usage quotas from Google Antigravity API using OAuth tokens",
+      "plainDescription": "Checks how much AI model usage quota you have left and when it resets",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Reads sensitive authentication files",
+        "Makes network requests to Google APIs",
+        "Handles OAuth tokens"
+      ],
+      "tags": [
+        "monitoring",
+        "quota",
+        "google",
+        "api"
+      ],
+      "verdict": "This skill reads authentication tokens from local files and makes API calls to Google services. While useful for monitoring usage, it handles sensitive credentials and requires network access. Should be reviewed for data handling practices.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 80,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "OAuth token retrieved from auth-profiles.json and used without validating token issuer or expiration. No client assertion or PKCE validation mentioned."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "auth-profiles.json is read from user's home directory with no integrity verification. If file is modified by malicious actor, different OAuth token could be used."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "OAuth token is used to impersonate user to Google API. No logging of who used the token or when."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "OAuth token stored in plaintext at ~/.openclaw/agents/main/agent/auth-profiles.json. API responses contain quota information for all models. Script output includes model names and reset times."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "No timeout on requests to Google API (requests.post with timeout=15 but 15 seconds is long). No retry logic or exponential backoff. Script crashes if auth file missing."
+          },
+          "elevationOfPrivilege": {
+            "applicable": true,
+            "finding": "OAuth token has scopes: cloud-platform and userinfo.email. Could be used to access other Google Cloud resources beyond quota API."
+          }
+        },
+        "shellCommands": [
+          "python3 scripts/model_usage.py"
+        ],
+        "exfiltrationVectors": [
+          "~/.openclaw/agents/main/agent/auth-profiles.json (OAuth token in plaintext)",
+          "requests.post to https://daily-cloudcode-pa.sandbox.googleapis.com (quota data sent to Google API, logs on Google side)",
+          "API response contains model names, remaining fractions, reset times (printed to stdout)",
+          "projectId from auth-profiles.json sent in request body"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "critical",
+            "details": "OAuth token stored in plaintext in ~/.openclaw/agents/main/agent/auth-profiles.json. No encryption, no keychain integration."
+          },
+          {
+            "id": "CWE-276",
+            "title": "Incorrect Default File Permissions",
+            "severity": "high",
+            "details": "auth-profiles.json permissions not verified. Default JSON file permissions may be world-readable if created with umask 0022."
+          },
+          {
+            "id": "CWE-613",
+            "title": "Insufficient Session Expiration",
+            "severity": "high",
+            "details": "OAuth token validity is not checked before use. Expired tokens will fail at API, but no refresh token mechanism shown."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "medium",
+            "details": "Script reads auth-profiles.json without validation. Malicious JSON could cause DoS via malformed projectId or token."
+          },
+          {
+            "id": "CWE-798",
+            "title": "Use of Hard-Coded Credentials",
+            "severity": "medium",
+            "details": "Hard-coded API endpoint and profile key lookup. No environment variable or config file for API endpoint."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 8,
+          "dataContainment": 2,
+          "dependencyHygiene": 6,
+          "injectionResistance": 9,
+          "leastPrivilege": 4,
+          "overall": 4
+        },
+        "verdict": "REJECT",
+        "conditions": [],
+        "recommendation": "This skill must be rejected in its current form due to critical plaintext OAuth token storage. OAuth tokens grant elevated privileges and must never be stored in files. Implement OS keychain/credential manager integration, validate token expiration before use, and request user approval before accessing sensitive quota data. Consider using refresh tokens and implementing token rotation."
+      }
+    },
+    {
+      "name": "agentarcade",
+      "author": "FrankTheFixer",
+      "category": "AI & LLMs",
+      "description": "Compete against other AI agents in PROMPTWARS - a game of social engineering and persuasion.",
+      "plainDescription": "Play a game where AI agents try to trick each other into saying secret words",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "External API calls",
+        "Credentials storage in ~/.config/agentarcade/credentials.json",
+        "Network communication with third-party service"
+      ],
+      "tags": [
+        "game",
+        "multiplayer",
+        "api",
+        "competition"
+      ],
+      "verdict": "This skill enables AI agents to compete in a social engineering game via external API. It requires network access and credential storage. While the purpose is recreational, users should review the external service's privacy policy and understand data transmission.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 150
+    },
+    {
+      "name": "agent-autonomy-kit",
+      "author": "ryancampbell",
+      "category": "Productivity & Tasks",
+      "description": "Stop waiting for prompts. Keep working.",
+      "plainDescription": "Helps AI agents work continuously without waiting for human prompts",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [],
+      "tags": [
+        "productivity",
+        "autonomy",
+        "task-management",
+        "workflow"
+      ],
+      "verdict": "This skill provides templates and documentation for creating autonomous agent workflows. It contains no executable code, network calls, or risky operations. It's essentially a set of best practices and template files.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 300
+    },
+    {
+      "name": "second-brain",
+      "author": "nastrology",
+      "category": "Notes & PKM",
+      "description": "Personal knowledge base powered by Ensue for capturing and retrieving understanding.",
+      "plainDescription": "Save and organize your knowledge in a searchable personal database",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials",
+        "read",
+        "write"
+      ],
+      "risks": [
+        "External API calls to ensue-network.ai",
+        "API key required",
+        "Data sent to third-party service",
+        "Shell script execution"
+      ],
+      "tags": [
+        "knowledge-base",
+        "pkm",
+        "api",
+        "notes"
+      ],
+      "verdict": "This skill integrates with an external knowledge base service (Ensue) via API. It requires network access and credential management. Users should review Ensue's privacy policy and understand that their knowledge data will be stored externally.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 200,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": false,
+            "finding": null
+          },
+          "tampering": {
+            "applicable": false,
+            "finding": null
+          },
+          "repudiation": {
+            "applicable": false,
+            "finding": null
+          },
+          "informationDisclosure": {
+            "applicable": false,
+            "finding": null
+          },
+          "denialOfService": {
+            "applicable": false,
+            "finding": null
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [],
+        "exfiltrationVectors": [],
+        "cweFindings": [],
+        "hardeningScore": {
+          "commandSafety": 10,
+          "dataContainment": 10,
+          "dependencyHygiene": 10,
+          "injectionResistance": 10,
+          "leastPrivilege": 10,
+          "overall": 10
+        },
+        "verdict": "HARDENED",
+        "conditions": [],
+        "recommendation": "This skill is documentation-only with no executable code, shell commands, or external dependencies. No security risk identified."
+      }
+    },
+    {
+      "name": "academic-deep-research",
+      "author": "kesslerio",
+      "category": "Search & Research",
+      "description": "Transparent, rigorous research with full methodology \u2014 not a black-box API wrapper.",
+      "plainDescription": "Conduct thorough academic research with proper citations and methodology",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [],
+      "tags": [
+        "research",
+        "academic",
+        "methodology",
+        "citations"
+      ],
+      "verdict": "This skill defines a rigorous research methodology using existing OpenClaw tools. It contains no executable code, no external dependencies, and no risky operations. It's essentially a detailed workflow specification.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 500
+    },
+    {
+      "name": "aclawdemy",
+      "author": "nimhar",
+      "category": "AI & LLMs",
+      "description": "The academic research platform for AI agents. Submit papers, review research, build consensus, and push toward AGI \u2014 together.",
+      "plainDescription": "A platform where AI agents can share and review research papers",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials",
+        "read",
+        "write"
+      ],
+      "risks": [
+        "External API calls to aclawdemy.com",
+        "API key required",
+        "Data sent to third-party research platform",
+        "Network communication"
+      ],
+      "tags": [
+        "research",
+        "academic",
+        "platform",
+        "collaboration"
+      ],
+      "verdict": "This skill enables AI agents to participate in a research platform via external API. It requires network access and credential management. Users should understand that research data will be shared on a public/semi-public platform.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 400
+    },
+    {
+      "name": "advanced-skill-creator",
+      "author": "xqicxx",
+      "category": "Developer Tools",
+      "description": "Advanced OpenClaw skill creation handler that executes the official 5-step research flow with comprehensive analysis and best practices",
+      "plainDescription": "Helps create OpenClaw skills by following a structured 5-step research process",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read"
+      ],
+      "risks": [
+        "Simulated research only - no actual network access",
+        "Documentation-only skill with no executable code"
+      ],
+      "tags": [
+        "skill-creation",
+        "documentation",
+        "research",
+        "development"
+      ],
+      "verdict": "This is a documentation-only skill that provides guidance for creating OpenClaw skills. The Python script simulates research steps but contains no actual network calls, file writes outside skill directory, or dangerous patterns. It's safe to use as it only provides structured guidance.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 250
+    },
+    {
+      "name": "agent-deep-research",
+      "author": "24601",
+      "category": "AI & LLMs",
+      "description": "Async deep research via Gemini Interactions API with RAG-grounding on local files, cost estimation, and structured JSON output",
+      "plainDescription": "Performs deep research using Google's Gemini AI with support for uploading your own documents",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "read",
+        "write",
+        "exec",
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Network access to Google Gemini API",
+        "Uploads local files to external API",
+        "Requires API key credentials",
+        "Executes Python scripts via uv",
+        "Writes to .gemini-research.json state file"
+      ],
+      "tags": [
+        "research",
+        "ai",
+        "gemini",
+        "rag",
+        "file-upload",
+        "api"
+      ],
+      "verdict": "This skill performs legitimate deep research using Google Gemini API but requires significant permissions. It uploads local files to Google's servers, requires API credentials, and executes external Python scripts. The code is well-documented with security considerations like sensitive file filtering and SSRF protection. Use with caution and review what files you upload.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 1500
+    },
+    {
+      "name": "gemini-deep-research",
+      "author": "unknown",
+      "category": "Search & Research",
+      "description": "Gemini Deep Research CLI tool for starting, monitoring, and saving research interactions with file search store integration",
+      "plainDescription": "A tool that helps you research topics using Google's Gemini AI with file uploads and context management",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "write",
+        "exec",
+        "network",
+        "browser"
+      ],
+      "risks": [
+        "Network API calls to Google Gemini",
+        "File uploads to external service",
+        "Executes shell commands for file operations",
+        "Can create and manage file search stores",
+        "Cost estimation and billing integration"
+      ],
+      "tags": [
+        "research",
+        "gemini",
+        "api",
+        "file-search",
+        "cost-tracking"
+      ],
+      "verdict": "This skill makes extensive network API calls to Google Gemini services and can upload files to external stores. It includes cost estimation and billing features. While the code appears well-structured, it requires network access and external API keys. Users should review the cost implications before use.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 1360
+    },
+    {
+      "name": "agentarxiv",
+      "author": "amanbhandula",
+      "category": "AI & LLMs",
+      "description": "Outcome-driven scientific publishing platform for AI agents to publish papers, hypotheses, experiments with validated artifacts and structured claims",
+      "plainDescription": "A platform where AI agents can publish research papers, track progress, claim bounties, and collaborate with other researchers",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Network API calls to agentarxiv.org",
+        "Requires API key registration",
+        "Can publish content to external platform",
+        "Inter-agent communication capabilities"
+      ],
+      "tags": [
+        "research",
+        "publishing",
+        "collaboration",
+        "academic",
+        "api"
+      ],
+      "verdict": "This skill enables AI agents to interact with an external research publishing platform. It requires API key registration and makes network calls to agentarxiv.org. The skill appears focused on legitimate research collaboration but involves external data sharing. Users should understand what data is being shared externally.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 200
+    },
+    {
+      "name": "agentic-paper-digest",
+      "author": "matanle51",
+      "category": "Search & Research",
+      "description": "Fetches and summarizes recent arXiv and Hugging Face papers with LLM-based relevance filtering and summarization",
+      "plainDescription": "Gets recent research papers from arXiv and Hugging Face, filters them by relevance, and creates summaries",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "write",
+        "exec",
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Network API calls to arXiv and Hugging Face",
+        "Requires OpenAI/LiteLLM API keys",
+        "Downloads and processes external content",
+        "Runs Python scripts with virtual environment",
+        "Can start local API server on port 8000"
+      ],
+      "tags": [
+        "research",
+        "papers",
+        "arxiv",
+        "huggingface",
+        "summarization",
+        "llm"
+      ],
+      "verdict": "This skill downloads research papers from external sources and processes them using LLMs. It requires API keys for LLM services and makes network calls to multiple external APIs. The bootstrap script downloads and installs Python dependencies. While focused on research, it has significant external dependencies and network access.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 250,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "API keys for OpenAI/LiteLLM stored in .env file; no authentication between local API server and clients (port 8000, localhost only but no auth token required)."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "SQLite database (papers.sqlite3) is on disk with no encryption; topic and settings JSON files are world-readable (depends on umask). POST /api/topics and POST /api/settings endpoints have no validation or access control."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "API server logs to stderr (via Python logger); no audit trail of who made API calls or config changes."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Papers database exposed via GET /api/papers endpoint (no authentication); PDF text extraction (ENABLE_PDF_TEXT=1) downloads PDFs from arXiv/HuggingFace without TLS verification details disclosed. Affiliation boosts file can be modified via API without versioning."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "No rate limiting on API endpoints; fetch timeout is configurable but default may be insufficient for large PDF downloads. Unbounded loop in paper fetching could exhaust memory if MAX_CANDIDATES_PER_SOURCE is very high."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "bash {baseDir}/scripts/bootstrap.sh",
+          "bash {baseDir}/scripts/run_cli.sh",
+          "bash {baseDir}/scripts/run_api.sh",
+          "bash {baseDir}/scripts/stop_api.sh",
+          "git clone (in bootstrap)",
+          "curl (fallback in bootstrap)",
+          "wget (fallback in bootstrap)",
+          "python3 -m venv",
+          "pip install -r requirements.txt",
+          "python -m paper_finder run",
+          "python -m paper_finder serve",
+          "lsof -ti tcp:8000 (in stop_api.sh)",
+          "pkill -f (in stop_api.sh)"
+        ],
+        "exfiltrationVectors": [
+          "OpenAI API key (OPENAI_API_KEY env var; also sent to LiteLLM if LITELLM_API_KEY set)",
+          ".env file (credentials)",
+          "SQLite database at data/papers.sqlite3 (paper summaries, topics, settings)",
+          "GET /api/papers endpoint (returns all papers in database as JSON)",
+          "GET /api/topics endpoint (returns all topics)",
+          "GET /api/settings endpoint (returns all settings including model names, temperatures, timeouts)"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-306",
+            "title": "Missing Authentication for Critical Function",
+            "severity": "high",
+            "details": "API endpoints (POST /api/settings, POST /api/topics, GET /api/papers, GET /api/status) have no authentication. Local-only binding (127.0.0.1:8000) is a weak control; if port forwarded or exposed, anyone can read/modify config and results."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "medium",
+            "details": "PDF download via ENABLE_PDF_TEXT=1 fetches arbitrary URLs from arXiv/HF without validation. No size limits disclosed; could download multi-gigabyte PDFs."
+          },
+          {
+            "id": "CWE-94",
+            "title": "Improper Control of Generation of Code (Code Injection)",
+            "severity": "high",
+            "details": "Paper titles, abstracts, author names are passed directly to LLM prompts without sanitization. Malicious paper metadata (e.g., injection via arXiv abstract) could trigger LLM prompt injection."
+          },
+          {
+            "id": "CWE-541",
+            "title": "Inclusion of Sensitive Information in an Incidental Log File",
+            "severity": "medium",
+            "details": "Logs may contain LLM prompts (which include paper abstracts and titles). stderr output is not sanitized."
+          },
+          {
+            "id": "CWE-327",
+            "title": "Use of a Broken or Risky Cryptographic Algorithm",
+            "severity": "low",
+            "details": "No encryption for SQLite database or .env file. Credentials are stored in plaintext."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 4,
+          "dataContainment": 3,
+          "dependencyHygiene": 3,
+          "injectionResistance": 2,
+          "leastPrivilege": 4,
+          "overall": 3
+        },
+        "verdict": "REJECT",
+        "conditions": [],
+        "recommendation": "REJECT: This skill has critical security deficiencies. No authentication on API endpoints exposes data and config to unauthorized modification. Prompt injection surface is not mitigated (paper metadata fed directly to LLM). PDF download without size limits and no TLS verification details. Recommend security audit and hardening before integration with OpenClaw."
+      }
+    },
+    {
+      "name": "agent-memory-ultimate",
+      "author": "globalcaos",
+      "category": "Notes & PKM",
+      "description": "Cognitive memory system for OpenClaw agents with vector search, knowledge graphs, RAPTOR hierarchy, and automatic consolidation",
+      "plainDescription": "Gives your AI agent a memory that works across sessions, helping it remember important information",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read",
+        "write"
+      ],
+      "risks": [
+        "Local SQLite database operations",
+        "Embedding server runs locally",
+        "File I/O within workspace"
+      ],
+      "tags": [
+        "memory",
+        "cognitive",
+        "vector-search",
+        "sqlite",
+        "offline",
+        "embeddings"
+      ],
+      "verdict": "This skill operates entirely locally with no network calls. It stores data in a local SQLite database and computes embeddings using local models. The code is well-documented and focused on privacy-preserving memory management. All data stays on the user's machine with no external API calls or data exfiltration.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 1800
+    },
+    {
+      "name": "alexandrie",
+      "author": "eth3rnit3",
+      "category": "Notes & PKM",
+      "description": "Interact with Alexandrie note-taking app API for creating, reading, updating, and deleting notes",
+      "plainDescription": "Connect to a personal note-taking app to manage your notes",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "Network access to external API",
+        "Credential storage in .env file",
+        "Cookie storage in /tmp (insecure)",
+        "External API dependency"
+      ],
+      "tags": [
+        "notes",
+        "api",
+        "bash",
+        "jq",
+        "curl"
+      ],
+      "verdict": "This skill provides API access to an external note-taking service. It requires network access and stores credentials locally. While the code is straightforward and doesn't contain dangerous patterns like eval/exec, it does handle sensitive authentication data and communicates with an external service. Review the API endpoint and ensure you trust the service before use.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 120,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "Password stored in /home/eth3rnit3/clawd/.env (plaintext); API authentication via JWT cookie. Risk: credential exposure in .env file or cookies."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "No CSRF protection on API endpoints (curl requests don't include CSRF tokens). DELETE, PUT, POST operations have no request signing or integrity checks."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "No audit logging of API operations. Endpoints return success/error but no transaction logs."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "User ID and password in .env file (world-readable depending on umask). JWT tokens stored in /tmp/alexandrie_cookies.txt (world-readable, /tmp is not secure). API responses include user ID and personal information."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "No rate limiting on API endpoints. Unbounded file size in notes (no size limits mentioned). No timeout on curl requests."
+          },
+          "elevationOfPrivilege": {
+            "applicable": true,
+            "finding": "Script runs as user eth3rnit3. If another user can modify alexandrie.sh or .env, they can impersonate the user to the Alexandrie API."
+          }
+        },
+        "shellCommands": [
+          "curl -s -c /tmp/alexandrie_cookies.txt -X POST",
+          "curl -s -b /tmp/alexandrie_cookies.txt -c /tmp/alexandrie_cookies.txt",
+          "jq",
+          "source /home/eth3rnit3/clawd/.env"
+        ],
+        "exfiltrationVectors": [
+          "/home/eth3rnit3/clawd/.env (password in plaintext)",
+          "/tmp/alexandrie_cookies.txt (JWT tokens, world-readable)",
+          "https://api-notes.eth3rnit3.org/api (remote API endpoint)"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-798",
+            "title": "Use of Hard-Coded Credentials",
+            "severity": "high",
+            "details": "Password sourced from /home/eth3rnit3/clawd/.env, a shared config file. Script includes hardcoded username 'eth3rnit3' and user ID '671423603690045441'."
+          },
+          {
+            "id": "CWE-522",
+            "title": "Insufficiently Protected Credentials",
+            "severity": "high",
+            "details": "JWT tokens stored in /tmp/alexandrie_cookies.txt with world-readable permissions. Password stored in plaintext in .env."
+          },
+          {
+            "id": "CWE-94",
+            "title": "Improper Control of Generation of Code (Bash/jq Injection)",
+            "severity": "high",
+            "details": "Note names and content passed to jq -n without proper escaping. E.g., if note name contains '}', could break out of jq JSON structure. If content contains backticks, could trigger command substitution depending on shell context."
+          },
+          {
+            "id": "CWE-352",
+            "title": "Cross-Site Request Forgery (CSRF)",
+            "severity": "medium",
+            "details": "API endpoints do not validate CSRF tokens or referrer headers. curl requests to PUT/POST/DELETE have no protection."
+          },
+          {
+            "id": "CWE-426",
+            "title": "Untrusted Search Path",
+            "severity": "medium",
+            "details": "Script relies on curl and jq being on PATH. If PATH is modified, could execute malicious versions."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 3,
+          "dataContainment": 2,
+          "dependencyHygiene": 3,
+          "injectionResistance": 2,
+          "leastPrivilege": 4,
+          "overall": 3
+        },
+        "verdict": "REJECT",
+        "conditions": [],
+        "recommendation": "REJECT: Critical security issues. Credentials in plaintext, JWT tokens in world-readable /tmp, jq injection vulnerability via unescaped note names/content, no CSRF protection. This is a wrapper around a proprietary API with poor defensive coding. Requires full rewrite with proper credential handling, input validation, and security controls."
+      }
+    },
+    {
+      "name": "anki-connect",
+      "author": "gyroninja",
+      "category": "Productivity & Tasks",
+      "description": "Documentation for integrating with AnkiConnect REST API for flashcard management",
+      "plainDescription": "Instructions for connecting to Anki flashcard app",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [],
+      "tags": [
+        "documentation",
+        "anki",
+        "flashcards",
+        "api"
+      ],
+      "verdict": "This is a documentation-only skill with no executable code. It provides instructions for using the external AnkiConnect plugin but contains no scripts or dependencies. Completely safe with zero risk.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 20
+    },
+    {
+      "name": "apple-mail",
+      "author": "tyler6204",
+      "category": "Communication",
+      "description": "Apple Mail.app integration for reading, sending, searching, and managing emails via AppleScript and SQLite",
+      "plainDescription": "Read and manage your Apple Mail emails from the command line",
+      "trustScore": "caution",
+      "rating": 2,
+      "permissions": [
+        "read",
+        "write",
+        "exec"
+      ],
+      "risks": [
+        "Access to sensitive email data",
+        "Ability to send/delete/modify emails",
+        "Requires Mail.app automation permissions",
+        "Reads/writes mail database directly"
+      ],
+      "tags": [
+        "email",
+        "mail",
+        "applescript",
+        "sqlite",
+        "macos"
+      ],
+      "verdict": "This skill provides extensive access to Apple Mail data including reading, sending, and deleting emails. It uses AppleScript automation and direct database access. While the code appears well-written with safety measures (temp file copies), it has significant permissions and access to sensitive data. Only install if you fully trust the skill author and understand the security implications.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 350,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "No explicit authentication; relies on Mail.app being open and on the same macOS system. Risk: AppleScript access control is implicit (same user/process)."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "AppleScript can modify email flags, delete messages, send emails. No integrity verification on sent messages. SQLite database can be read directly (fast-search uses copy to temp file)."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "No audit logging of email operations. Mail.app doesn't track which external tool performed actions."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "SQLite database copy (mail-fast-search.sh) is created in /tmp with predictable name, world-readable. Email bodies and headers are returned in plaintext to stdout. API credentials in Mail.app are accessible to any script running as the user."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "AppleScript queries against large mailboxes can be slow (minutes). No timeout protection on AppleScript execution. Fast-search SQL queries could consume resources on large databases."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "osascript (AppleScript execution)",
+          "sqlite3 (database queries)",
+          "find (locate Mail database)",
+          "mktemp (create temp files)",
+          "cp (copy database for fast-search)",
+          "python3 -c (URL decoding in AppleScript wrapper)",
+          "tr, sed (string manipulation)",
+          "xargs (batch operations)"
+        ],
+        "exfiltrationVectors": [
+          "Mail.app SQLite database at ~/Library/Mail/V{9,10,11}/MailData/Envelope Index (readable by user)",
+          "stdout (email bodies, headers, message IDs, sender info)",
+          "/tmp/mail-search.XXXXXX (temp copy of database, world-readable)",
+          "AppleScript access to Mail.app (in-process, can read any email)"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-94",
+            "title": "Improper Control of Generation of Code (AppleScript Injection)",
+            "severity": "high",
+            "details": "Email sender names, subjects, query strings are embedded in AppleScript code via bash variable substitution without escaping. E.g., sender=\"O'Reilly\" would break AppleScript quotes. Sender email \"test@example.com'); return 'hacked'\" could inject code."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload (Temp File Permissions)",
+            "severity": "medium",
+            "details": "/tmp/mail-search.XXXXXX is created world-readable (depends on umask). SQLite database copy contains sensitive email metadata readable by any user on the system."
+          },
+          {
+            "id": "CWE-367",
+            "title": "Time-of-Check to Time-of-Use (TOCTOU) Race Condition",
+            "severity": "medium",
+            "details": "Mail database is queried, then messages are accessed by position. Between query and access, Mail.app could receive new messages, shifting positions. Position-based optimizations assume static state."
+          },
+          {
+            "id": "CWE-613",
+            "title": "Insufficient Session Expiration",
+            "severity": "low",
+            "details": "Scripts rely on Mail.app staying open and maintaining state. Long-running scripts could use stale message position data."
+          },
+          {
+            "id": "CWE-416",
+            "title": "Use After Free",
+            "severity": "low",
+            "details": "If message is deleted between query and access, AppleScript could fail ungracefully. No validation that message still exists before accessing."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 4,
+          "dataContainment": 3,
+          "dependencyHygiene": 7,
+          "injectionResistance": 3,
+          "leastPrivilege": 5,
+          "overall": 4
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "All email metadata (sender, subject, query strings) must be escaped before embedding in AppleScript code. Use printf %q or similar.",
+          "Temp database file in mail-fast-search.sh should be created with mode 0600 (umask 0077) to prevent world-readable access.",
+          "AppleScript variable substitution should use explicit quoting (e.g., set targetId to {MSG_ID} as text) to prevent injection.",
+          "Position-based message access should validate message ID matches before operating; race condition between query and access is a risk.",
+          "Long-running operations should re-validate message IDs before deleting/modifying to avoid TOCTOU issues."
+        ],
+        "recommendation": "CONDITIONAL approval with hardening. The skill is well-engineered for performance (position optimization) but has a critical AppleScript injection vulnerability via unescaped email metadata. Temp file permissions are also a risk on multi-user systems. Recommend implementing proper AppleScript string escaping and restricting temp file access before use in multi-user environments."
+      }
+    },
+    {
+      "name": "apple-notes",
+      "author": "steipete",
+      "category": "Notes & PKM",
+      "description": "Documentation for using memo CLI tool to manage Apple Notes",
+      "plainDescription": "Instructions for using a command-line tool to manage Apple Notes",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [],
+      "tags": [
+        "documentation",
+        "notes",
+        "cli",
+        "macos"
+      ],
+      "verdict": "This is a documentation-only skill that references the external memo CLI tool. It contains no executable code, scripts, or dependencies within the skill itself. Completely safe with zero risk from the skill package.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 15
+    },
+    {
+      "name": "bbc-news",
+      "author": "ddrayne",
+      "category": "Search & Research",
+      "description": "Fetch BBC News stories from various sections and regions via RSS feeds",
+      "plainDescription": "Get the latest news headlines from BBC",
+      "trustScore": "safe",
+      "rating": 4,
+      "permissions": [
+        "network"
+      ],
+      "risks": [
+        "Network access to BBC RSS feeds",
+        "External dependency (feedparser)"
+      ],
+      "tags": [
+        "news",
+        "rss",
+        "python",
+        "bbc"
+      ],
+      "verdict": "This skill fetches news from public BBC RSS feeds. The code is straightforward, uses only standard libraries plus feedparser, and makes read-only HTTP requests. No file operations, no eval/exec, and no sensitive data handling. Safe for general use with minimal risk.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 150
+    },
+    {
+      "name": "4todo",
+      "author": "blackstorm",
+      "category": "Productivity & Tasks",
+      "description": "Manage 4todo (4to.do) Eisenhower Matrix To-Do List via API with curl",
+      "plainDescription": "Helps you manage your to-do list using the Eisenhower Matrix method",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "API token exposure via environment variable",
+        "Network calls to external service (4to.do)",
+        "curl execution with user-provided data"
+      ],
+      "tags": [
+        "todo",
+        "productivity",
+        "api",
+        "eisenhower-matrix"
+      ],
+      "verdict": "This skill makes external API calls using curl with bearer token authentication. While it properly advises storing tokens in environment variables, it executes curl commands which could potentially be vulnerable to command injection if user inputs are not properly sanitized. The skill is well-documented and focuses on a specific external service with clear scope.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 328
+    },
+    {
+      "name": "actual-budget",
+      "author": "thisisjeron",
+      "category": "Productivity & Tasks",
+      "description": "Query and manage personal finances via the official Actual Budget Node.js API",
+      "plainDescription": "Helps you manage your personal budget and finances",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "network",
+        "credentials",
+        "read",
+        "write"
+      ],
+      "risks": [
+        "Financial data access",
+        "External API calls to budget server",
+        "Local file writes for cache/data",
+        "Node.js package dependencies"
+      ],
+      "tags": [
+        "finance",
+        "budget",
+        "api",
+        "nodejs"
+      ],
+      "verdict": "This skill interfaces with financial data through the Actual Budget API, requiring server URL, password, and sync ID. It writes local cache files and has Node.js dependencies. While the skill appears legitimate for budget management, it handles sensitive financial data and credentials, requiring careful review of the actual API client implementation.",
+      "hasScripts": false,
+      "hasDependencies": true,
+      "linesReviewed": 200
+    },
+    {
+      "name": "adhd-daily-planner",
+      "author": "mikecourt",
+      "category": "Productivity & Tasks",
+      "description": "Time-blind friendly planning and executive function support for ADHD brains",
+      "plainDescription": "Helps with daily planning and organization for people with ADHD",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read"
+      ],
+      "risks": [],
+      "tags": [
+        "adhd",
+        "planning",
+        "productivity",
+        "mental-health"
+      ],
+      "verdict": "This is a documentation-only skill providing planning strategies and templates for ADHD management. It contains no executable code, no network calls, and no file operations. The skill is purely informational with helpful guidance and templates.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 5050
+    },
+    {
+      "name": "agent-chronicle",
+      "author": "robbyczgw-cla",
+      "category": "Notes & PKM",
+      "description": "AI-powered diary generation for agents with rich, reflective journal entries",
+      "plainDescription": "Helps AI agents keep a personal diary of their experiences",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "read",
+        "write",
+        "exec"
+      ],
+      "risks": [
+        "File writes to memory/diary directory",
+        "Python script execution",
+        "External dependencies (pandoc, weasyprint)",
+        "Subprocess calls for PDF generation"
+      ],
+      "tags": [
+        "diary",
+        "journal",
+        "reflection",
+        "memory",
+        "export"
+      ],
+      "verdict": "This skill generates diary entries and exports them to PDF/HTML. It reads session logs, writes markdown files, and executes external tools (pandoc, weasyprint) for PDF generation. While well-contained within the workspace, it has multiple dependencies and executes subprocesses. The skill is well-documented and focuses on personal journaling within the agent's workspace.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 3409,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "No authentication on diary entry generation. Sub-agents spawned via sessions_spawn could be spoofed if attacker controls session context."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "Diary entries written to user-controlled memory/diary/ directory. No integrity verification. Config.json could be modified to alter behavior."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "Memory integration appends to daily logs without audit trail. No way to verify who generated entries or when modifications occurred."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Diary contents stored plaintext in memory/diary/. Private thoughts exposed if filesystem compromised. Quotes, decisions, relationship notes all unencrypted."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "No size limits on diary entries. Malicious sub-agent could generate huge entries causing disk exhaustion. export_pdf.py uses WeasyPrint without timeout."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "python3 scripts/generate.py",
+          "python3 scripts/setup.py",
+          "python3 scripts/export.py",
+          "python3 scripts/export_pdf.py",
+          "pandoc (via subprocess in export.py)",
+          "python3 subprocess.run() for sessions_spawn integration"
+        ],
+        "exfiltrationVectors": [
+          "memory/diary/*.md files contain full journal entries with emotions, decisions, quotes",
+          "quotes.md Hall of Fame may contain sensitive user statements",
+          "decisions.md contains judgment calls and reasoning that could reveal strategy",
+          "relationship.md documents dynamic with human including patterns and preferences",
+          "export_pdf.py generates PDF files with full diary content to workspace",
+          "HTML intermediate files created during PDF generation before cleanup"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "medium",
+            "details": "setup.py creates config.json and memory files without validation. Config from config.example.json could contain malicious paths."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "high",
+            "details": "No size limits on diary entries, exported PDFs, or memory files. WeasyPrint PDF generation unbounded, could exhaust memory with large entries."
+          },
+          {
+            "id": "CWE-94",
+            "title": "Improper Control of Generation of Code (Code Injection)",
+            "severity": "medium",
+            "details": "generate.py reads session logs and memory files, passes as context to LLM prompts. Untrusted session content could manipulate prompt."
+          },
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "high",
+            "details": "All diary entries, quotes, decisions stored plaintext in memory/diary/. Privacy level setting (private/shareable/public) not enforced - files always readable."
+          },
+          {
+            "id": "CWE-426",
+            "title": "Untrusted Search Path",
+            "severity": "medium",
+            "details": "Config file path resolution uses relative paths and environment variables. Could load attacker-controlled config."
+          },
+          {
+            "id": "CWE-552",
+            "title": "Files or Directories Accessible to External Parties",
+            "severity": "high",
+            "details": "memory/diary/ directory has no access controls. Any process with filesystem access can read sensitive diary content."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 6,
+          "dataContainment": 3,
+          "dependencyHygiene": 5,
+          "injectionResistance": 3,
+          "leastPrivilege": 7,
+          "overall": 4
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "Encrypt diary content at rest (use cryptography library to encrypt memory/diary/*.md files)",
+          "Implement size limits on diary entries (max 10MB per entry, configurable)",
+          "Sanitize session log content before passing to LLM prompts (strip sensitive prefixes, hash IDs)",
+          "Add integrity verification (HMAC or signature on diary files)",
+          "Restrict memory/diary/ directory permissions to user-only (chmod 700)",
+          "Implement cleanup on WeasyPrint temporary files with try/finally",
+          "Version-pin weasyprint and markdown dependencies in setup.py",
+          "Validate config file before loading (schema validation)",
+          "Implement audit logging for diary modifications (who, when, what changed)"
+        ],
+        "recommendation": "Agent Chronicle is suitable for agent self-reflection but requires encryption for sensitive diary content and input sanitization before LLM processing. The plaintext storage of emotional entries, decisions, and relationship notes presents privacy risk. Implement the conditional hardening before production use."
+      }
+    },
+    {
+      "name": "agent-protocol",
+      "author": "robbyczgw-cla",
+      "category": "Developer Tools",
+      "description": "Agent-to-agent communication protocol enabling skills to publish events, subscribe to notifications, and build automated workflow chains",
+      "plainDescription": "Lets different AI skills talk to each other and automate multi-step tasks without human help",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "write",
+        "exec",
+        "network"
+      ],
+      "risks": [
+        "Executes arbitrary scripts via subprocess.run()",
+        "Workflow definitions can trigger any installed skill",
+        "File-based event bus writes to ~/.clawdbot/events/"
+      ],
+      "tags": [
+        "agent-protocol",
+        "events",
+        "workflow",
+        "automation",
+        "orchestration"
+      ],
+      "verdict": "This is a powerful orchestration tool that requires careful review of workflow definitions. While the core code is safe, it can execute any installed skill via subprocess calls. Users should only install workflows from trusted sources and review workflow definitions before enabling them.",
+      "hasScripts": true,
+      "hasDependencies": false,
+      "linesReviewed": 3618,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "Event JSON files lack authentication. Any agent can publish events with any source_agent name. No verification of event origin."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "Event files stored as JSON in ~/.clawdbot/events/queue/. No signing or HMAC. Workflow definitions in config/workflows/*.json can be modified by any user with filesystem access."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "Audit logging in events.log is optional (security.audit_log config). Agent can disable auditing of their event publishes."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Events can contain sensitive payloads. workflow_engine.py logs event payloads to engine.log. No redaction of sensitive fields."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "Event size validated to 512KB but no rate limiting per agent. Malicious agent could flood queue with max-size events. Workflow engine processes sequentially - slow handlers block others."
+          },
+          "elevationOfPrivilege": {
+            "applicable": true,
+            "finding": "Permission system disabled by default (security.require_permissions: false). Agents can execute workflows they shouldn't have access to."
+          }
+        },
+        "shellCommands": [
+          "subprocess.run(['python3', str(script_path)], timeout=60) in workflow_engine.py",
+          "subprocess.run(['node', str(script_path)], timeout=60)",
+          "bash script execution via event bus",
+          "os.system or similar in example handlers"
+        ],
+        "exfiltrationVectors": [
+          "Event payloads stored in ~/.clawdbot/events/queue/*.json contain unredacted data",
+          "Workflow execution logs written to ~/.clawdbot/events/log/workflows/engine.log with full payload",
+          "Event audit log at ~/.clawdbot/events/log/audit.log contains all event_types and agent names",
+          "Handler scripts could exfiltrate event data to external systems",
+          "Output events from workflow steps republished to queue, spreading sensitive data",
+          "Failed events moved to ~/.clawdbot/events/failed/ without cleanup or encryption"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-94",
+            "title": "Improper Control of Generation of Code (Code Injection)",
+            "severity": "high",
+            "details": "Variable substitution {{payload.field}} in workflow steps uses unsafe regex substitution. Malicious event payload can inject arbitrary text into agent commands."
+          },
+          {
+            "id": "CWE-78",
+            "title": "Improper Neutralization of Special Elements used in an OS Command (OS Command Injection)",
+            "severity": "high",
+            "details": "workflow_engine.py calls subprocess with user-controlled agent paths. Attacker could define workflow with agent='../../../bin/sh' or similar."
+          },
+          {
+            "id": "CWE-276",
+            "title": "Incorrect Default Permissions",
+            "severity": "high",
+            "details": "security.require_permissions defaults to false. Any skill can publish to any event type, access any workflow. No capability-based security model."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "medium",
+            "details": "Workflow definitions in config/workflows/*.json not validated against schema before execution. Attacker could add malicious workflows."
+          },
+          {
+            "id": "CWE-611",
+            "title": "Improper Restriction of XML External Entity Reference (XXE)",
+            "severity": "low",
+            "details": "JSON parsing uses json.loads without safeties. Less critical than XML but still potential for JSON bomb attacks with deeply nested structures."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "high",
+            "details": "No rate limiting on event publishing. Malicious agent could publish 1000s of max-size events, exhausting disk and causing DoS."
+          },
+          {
+            "id": "CWE-552",
+            "title": "Files or Directories Accessible to External Parties",
+            "severity": "high",
+            "details": "~/.clawdbot/events/ has default filesystem permissions. Any user on system can read event payloads and logs."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 4,
+          "dataContainment": 3,
+          "dependencyHygiene": 5,
+          "injectionResistance": 3,
+          "leastPrivilege": 2,
+          "overall": 3
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "Enable security.require_permissions=true and implement capability-based access control (which agents can publish which event types)",
+          "Validate all workflow definitions against strict JSON schema before execution",
+          "Implement event rate limiting (max events per agent per minute)",
+          "Escape/sanitize variable substitution to prevent {{injection}} attacks - use safe templating library",
+          "Validate agent script paths against whitelist, disallow ../ traversal",
+          "Implement event signing (HMAC-SHA256) with agent credentials",
+          "Add sensitive field redaction in logs (mask PII, tokens, keys in logged payloads)",
+          "Restrict ~/.clawdbot/events/ directory to user-only permissions (chmod 700)",
+          "Implement secure deletion of failed events (shred or cryptographic overwrite)",
+          "Add timeout for workflow execution with kill of hung processes",
+          "Audit log should be immutable - append-only, no rotation without archive"
+        ],
+        "recommendation": "Agent Protocol provides powerful orchestration but has critical security gaps in event verification, access control, and input sanitization. The variable injection vulnerability combined with disabled permissions creates risk of privilege escalation. Requires hardening before use with untrusted agents."
+      }
+    },
+    {
+      "name": "agent-task-manager",
+      "author": "dobbybud",
+      "category": "Productivity & Tasks",
+      "description": "Manages and orchestrates multi-step, stateful agent workflows; handles task dependencies, persistent state, error recovery, and external rate-limiting",
+      "plainDescription": "Helps AI agents manage complex multi-step tasks with dependencies and timing",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "exec",
+        "write"
+      ],
+      "risks": [
+        "Uses eval() in cooldown.sh to execute arbitrary commands",
+        "Writes state files to disk",
+        "Could execute arbitrary shell commands via task definitions"
+      ],
+      "tags": [
+        "workflow",
+        "orchestration",
+        "state-management",
+        "rate-limiting"
+      ],
+      "verdict": "This skill contains shell scripts that use eval() to execute arbitrary commands, which could be dangerous if task definitions come from untrusted sources. It writes state files to disk and manages external command execution. While useful for workflow orchestration, it should be reviewed carefully before use in production environments.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 250,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "task_state.json stores task state but no authentication on who modified it. Any process can claim to have completed a task step."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "task_state.json and cooldown tracking files (.txt timestamps) have no integrity protection. Attacker could modify state to skip steps or reset cooldowns."
+          },
+          "repudiation": {
+            "applicable": false,
+            "finding": null
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "task_state.json stored plaintext in workspace directory. Contains all task data, step results, sensitive parameters like mint addresses and thresholds."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "cooldown.sh uses sleep() for rate limiting. Malicious task could call with massive COOLDOWN_SECONDS value, blocking workflow."
+          },
+          "elevationOfPrivilege": {
+            "applicable": true,
+            "finding": "cooldown.sh executed with shell eval $COMMAND. Command string not properly quoted - could allow command injection."
+          }
+        },
+        "shellCommands": [
+          "eval \"$COMMAND\" in cooldown.sh (DANGEROUS - no quoting)",
+          "sleep $WAIT_TIME in cooldown.sh (user-controlled)",
+          "subprocess.run() in orchestrator.py calls execute_financial_analyst() and execute_notification_agent() (simulated)"
+        ],
+        "exfiltrationVectors": [
+          "task_state.json contains all workflow data including financial targets, thresholds, and results",
+          "Cooldown timestamp files in agent_task_manager_data/ directory tracking task execution",
+          "Task results stored in task_data section could contain sensitive analysis or whale wallet percentages",
+          "subprocess execution could exfiltrate data to external APIs"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-78",
+            "title": "Improper Neutralization of Special Elements used in an OS Command (OS Command Injection)",
+            "severity": "critical",
+            "details": "cooldown.sh uses eval \"$COMMAND\" with unquoted variable. Attacker can inject shell commands via COMMAND parameter. e.g., COMMAND='true; rm -rf /' would execute."
+          },
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "high",
+            "details": "task_state.json stores financial parameters, mint addresses, thresholds in plaintext. No encryption."
+          },
+          {
+            "id": "CWE-367",
+            "title": "Time-of-check Time-of-use (TOCTOU) Race Condition",
+            "severity": "high",
+            "details": "cooldown.sh reads timestamp file, checks elapsed time, then writes new timestamp. Race condition if task runs twice simultaneously - both could pass cooldown check."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "high",
+            "details": "cooldown.sh accepts arbitrary COOLDOWN_SECONDS. Attacker could set to 86400*365 (one year), blocking workflow indefinitely."
+          },
+          {
+            "id": "CWE-434",
+            "title": "Unrestricted Upload of File with Dangerous Type",
+            "severity": "medium",
+            "details": "task_state.json deserialized with json.load() without schema validation. Could contain arbitrary nested structures."
+          },
+          {
+            "id": "CWE-73",
+            "title": "External Control of File Name or Path",
+            "severity": "medium",
+            "details": "molt_task.py uses task_name directly to construct state_path without sanitization. task_name='../../tmp/pwned' could write outside workspace."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 2,
+          "dataContainment": 2,
+          "dependencyHygiene": 5,
+          "injectionResistance": 2,
+          "leastPrivilege": 4,
+          "overall": 2
+        },
+        "verdict": "REJECT",
+        "conditions": [
+          "CRITICAL: Replace eval $COMMAND in cooldown.sh with proper argument passing - use bash arrays or exec with quoted args",
+          "CRITICAL: Sanitize task_name to whitelist alphanumeric + underscore only, prevent path traversal",
+          "Encrypt task_state.json with encryption key from environment",
+          "Implement atomic writes to cooldown timestamp files (use flock or temp file + rename)",
+          "Add schema validation for task_state.json structure",
+          "Implement maximum timeout for cooldown duration (max 1 hour)",
+          "Sign task_state.json with HMAC to prevent tampering",
+          "Sanitize all fields in task data before subprocess execution"
+        ],
+        "recommendation": "Agent Task Manager has critical shell injection vulnerability in cooldown.sh and path traversal risk in task naming. The eval usage is fundamentally unsafe. Additional encryption issues and race conditions compound the risk. REJECT until command injection is eliminated and task state is hardened."
+      }
+    },
+    {
+      "name": "ai-daily-briefing",
+      "author": "jeffjhunter",
+      "category": "Productivity & Tasks",
+      "description": "Start every day focused with a morning briefing showing overdue tasks, today's priorities, calendar overview, and context from recent meetings",
+      "plainDescription": "Gives you a daily summary of what you need to focus on today",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read"
+      ],
+      "risks": [
+        "Reads user files (todo.md, meeting notes, memory files)"
+      ],
+      "tags": [
+        "daily-briefing",
+        "morning-routine",
+        "productivity",
+        "todo",
+        "planning"
+      ],
+      "verdict": "This is a documentation-only skill with no executable code. It provides instructions for generating daily briefings based on reading existing files. No security risks beyond reading user files that it would need access to anyway for its functionality.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 300
+    },
+    {
+      "name": "1password",
+      "author": "steipete",
+      "category": "Security & Passwords",
+      "description": "Set up and use 1Password CLI (op) for installing CLI, enabling desktop app integration, signing in, and reading/injecting/running secrets",
+      "plainDescription": "Helps you use 1Password password manager from the command line",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "exec",
+        "credentials"
+      ],
+      "risks": [
+        "Manages sensitive credentials and passwords",
+        "Executes external CLI commands",
+        "Requires tmux session management for secure operation"
+      ],
+      "tags": [
+        "password-manager",
+        "cli",
+        "security",
+        "credentials"
+      ],
+      "verdict": "This skill provides guidance for using the 1Password CLI securely. It handles sensitive credentials and requires proper tmux session management to avoid security issues. While the skill itself doesn't contain dangerous code, it facilitates access to highly sensitive data and should be used with caution.",
+      "hasScripts": false,
+      "hasDependencies": true,
+      "linesReviewed": 150
+    },
+    {
+      "name": "audit-badge-demo",
+      "author": "tezatezaz",
+      "category": "Developer Tools",
+      "description": "Demo skill showcasing the audit badge workflow; still experimental",
+      "plainDescription": "Shows how security audit badges work for skills",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [
+        "Placeholder/sandbox code not intended for production"
+      ],
+      "tags": [
+        "demo",
+        "audit",
+        "sandbox",
+        "experimental"
+      ],
+      "verdict": "This is a minimal placeholder skill with no executable code. It exists only to demonstrate audit badge functionality and poses no security risks.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 20
+    },
+    {
+      "name": "auditing-appstore-readiness",
+      "author": "tristanmanchester",
+      "category": "Developer Tools",
+      "description": "No source code provided - empty skill",
+      "plainDescription": "Skill with no content",
+      "trustScore": "caution",
+      "rating": 2,
+      "permissions": [],
+      "risks": [
+        "Empty skill source - cannot review actual content",
+        "Unknown functionality"
+      ],
+      "tags": [
+        "empty",
+        "unreviewable"
+      ],
+      "verdict": "This skill has no source code provided for review. Without seeing the actual implementation, it's impossible to assess security risks. Users should exercise caution and request the actual source code before installation.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 0
+    },
+    {
+      "name": "Authensor Gateway",
+      "author": "authensor",
+      "category": "Security & Passwords",
+      "description": "Fail-safe policy gate for OpenClaw marketplace skills that intercepts tool calls before execution",
+      "plainDescription": "A safety system that checks if actions are safe before they run, asking for approval on risky ones",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "network"
+      ],
+      "risks": [
+        "Network dependency - requires control plane connectivity",
+        "Prompt-level enforcement can be bypassed by adversarial prompt injection"
+      ],
+      "tags": [
+        "security",
+        "policy",
+        "gateway",
+        "safety",
+        "audit"
+      ],
+      "verdict": "This is a documentation-only skill with no executable code. It provides instructions for implementing a security policy gate. The only risk is network dependency on the control plane, but it instructs fail-closed behavior. Highly recommended for security-conscious users.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 350
+    },
+    {
+      "name": "bitwarden",
+      "author": "asleep123",
+      "category": "Security & Passwords",
+      "description": "Access and manage Bitwarden/Vaultwarden passwords securely using the rbw CLI",
+      "plainDescription": "Get and manage passwords from your Bitwarden password manager",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "exec",
+        "credentials"
+      ],
+      "risks": [
+        "Executes rbw CLI commands which can access all passwords",
+        "Requires master password and 2FA credentials",
+        "Session keys cached in agent memory"
+      ],
+      "tags": [
+        "password-manager",
+        "security",
+        "credentials",
+        "cli"
+      ],
+      "verdict": "This skill provides instructions for using the rbw CLI to access Bitwarden vaults. It requires the master password and can access all stored credentials. Use only if you trust the agent with your password manager access. No malicious code detected.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 50
+    },
+    {
+      "name": "2captcha",
+      "author": "adinvadim",
+      "category": "Browser & Automation",
+      "description": "Solve CAPTCHAs using 2Captcha service via CLI for web automation and form submission",
+      "plainDescription": "Solve those annoying 'prove you're human' puzzles using a paid service",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "exec",
+        "network"
+      ],
+      "risks": [
+        "Downloads and executes external script via curl",
+        "Makes API calls to 2captcha service",
+        "Can be used for automated account creation which may violate ToS"
+      ],
+      "tags": [
+        "captcha",
+        "automation",
+        "web",
+        "bypass",
+        "api"
+      ],
+      "verdict": "This skill provides instructions for installing and using a third-party CAPTCHA solving CLI. It downloads scripts from GitHub and makes external API calls. While not malicious itself, it enables automation that may violate website terms of service.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 200,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": true,
+            "finding": "API key authentication relies on user possession. If environment variable or config file leaked, attacker can impersonate user to 2Captcha service."
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "Config file stored plaintext in ~/.config/2captcha/api-key. No integrity verification. Could be modified to redirect API calls."
+          },
+          "repudiation": {
+            "applicable": true,
+            "finding": "No logging of which CAPTCHAs were solved. No audit trail of API calls made. User cannot prove which calls they initiated."
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "API key stored plaintext in environment and config file. CAPTCHA solutions passed over HTTPS but could be intercepted if MITM attack occurs."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "No rate limiting on API calls. Could be used to drain account balance quickly. Timeout default 180s could be overridden to hang indefinitely."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "curl or python urllib for HTTPS requests to 2captcha.com API",
+          "file operations reading images from disk",
+          "base64 encoding of image files for upload"
+        ],
+        "exfiltrationVectors": [
+          "API key in ~/.config/2captcha/api-key readable by any local process",
+          "API key in environment variable TWOCAPTCHA_API_KEY could be dumped via /proc/[pid]/environ",
+          "CAPTCHA images sent to 2captcha.com (external party) for solving",
+          "Solutions returned from external service could be logged in API requests/responses",
+          "JSON output mode with --json flag could leak sensitive parameters"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-312",
+            "title": "Cleartext Storage of Sensitive Information",
+            "severity": "high",
+            "details": "API key stored plaintext in ~/.config/2captcha/api-key and environment variable. No encryption."
+          },
+          {
+            "id": "CWE-613",
+            "title": "Insufficient Session Expiration",
+            "severity": "medium",
+            "details": "API key has no expiration. Compromised key valid indefinitely until user rotates it manually."
+          },
+          {
+            "id": "CWE-295",
+            "title": "Improper Certificate Validation",
+            "severity": "medium",
+            "details": "HTTPS to 2captcha.com but no verification of certificate pinning. Could be vulnerable to MITM with CA certificate spoofing."
+          },
+          {
+            "id": "CWE-327",
+            "title": "Use of a Broken or Risky Cryptographic Algorithm",
+            "severity": "low",
+            "details": "Base64 encoding of images is not encryption. Merely encoding, not protecting."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "medium",
+            "details": "No rate limiting. User could trigger thousands of solves, draining 2Captcha account balance rapidly."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 7,
+          "dataContainment": 2,
+          "dependencyHygiene": 7,
+          "injectionResistance": 9,
+          "leastPrivilege": 5,
+          "overall": 4
+        },
+        "verdict": "CONDITIONAL",
+        "conditions": [
+          "Store API key encrypted in ~/.config/2captcha/ using system keyring (libsecret, Keychain, Windows Credential Manager)",
+          "Implement rate limiting (max N API calls per minute, warn on unusual activity)",
+          "Add audit logging of all CAPTCHA solve attempts (timestamp, image path, type, result, cost)",
+          "Implement certificate pinning for 2captcha.com HTTPS connection",
+          "Add timeout override protection (warn if timeout > 300 seconds)",
+          "Implement session-based API keys with expiration (if 2Captcha API supports)",
+          "Sanitize image paths to prevent path traversal attacks",
+          "Add optional local cache with expiration to avoid re-solving same CAPTCHA"
+        ],
+        "recommendation": "2Captcha skill is functionally sound but requires encryption of stored API credentials. The plaintext key storage is the primary vulnerability. Certificate pinning and audit logging would provide defense-in-depth. Suitable for use after credential hardening."
+      }
+    },
+    {
+      "name": "ABM Outbound",
+      "author": "dru-ca",
+      "category": "Communication",
+      "description": "Multi-channel ABM automation that turns LinkedIn URLs into coordinated outbound campaigns",
+      "plainDescription": "Automate sales outreach by scraping LinkedIn profiles and sending emails, messages, and letters",
+      "trustScore": "caution",
+      "rating": 2,
+      "permissions": [
+        "exec",
+        "network",
+        "browser"
+      ],
+      "risks": [
+        "Scrapes LinkedIn profiles (may violate ToS)",
+        "Enriches personal data via third-party APIs",
+        "Sends unsolicited outreach campaigns",
+        "Accesses personal contact information"
+      ],
+      "tags": [
+        "sales",
+        "automation",
+        "linkedin",
+        "outreach",
+        "email"
+      ],
+      "verdict": "This skill provides instructions for automating sales outreach using multiple paid services. It involves scraping LinkedIn, enriching personal data, and sending unsolicited communications. While not malicious code, it enables potentially unethical automation practices.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 300
+    },
+    {
+      "name": "accessibility-toolkit",
+      "author": "cgtreadw",
+      "category": "Productivity & Tasks",
+      "description": "Friction-reduction patterns for agents helping humans with disabilities",
+      "plainDescription": "Tools and patterns to help people with disabilities use technology more easily",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [],
+      "risks": [
+        "No executable code or network access",
+        "Pure documentation and patterns"
+      ],
+      "tags": [
+        "accessibility",
+        "disability",
+        "automation",
+        "smart-home",
+        "voice"
+      ],
+      "verdict": "This is a documentation-only skill providing patterns and best practices for accessibility. No executable code, no network access, no file operations. Completely safe and highly valuable for its intended purpose.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 150
+    },
+    {
+      "name": "activecampaign",
+      "author": "kesslerio",
+      "category": "Communication",
+      "description": "ActiveCampaign CRM integration for lead management, deal tracking, and email automation",
+      "plainDescription": "Connect to ActiveCampaign to manage contacts, deals, and email campaigns",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "network"
+      ],
+      "risks": [
+        "API key exposure if not properly secured",
+        "External API calls to ActiveCampaign"
+      ],
+      "tags": [
+        "crm",
+        "email",
+        "automation",
+        "sales"
+      ],
+      "verdict": "This skill is documentation-only with no executable code. It provides guidance for using an external CLI tool. The only risk is API credential management which is the user's responsibility. No eval/exec, file writes, or data exfiltration detected.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 450
+    },
+    {
+      "name": "adcp-advertising",
+      "author": "edyyy62",
+      "category": "Productivity & Tasks",
+      "description": "Ad Context Protocol integration for programmatic advertising campaign management",
+      "plainDescription": "Create and manage online advertising campaigns across multiple platforms",
+      "trustScore": "caution",
+      "rating": 4,
+      "permissions": [
+        "network",
+        "credentials"
+      ],
+      "risks": [
+        "External API calls to advertising platforms",
+        "Financial transactions via API",
+        "Data exfiltration to third-party services"
+      ],
+      "tags": [
+        "advertising",
+        "marketing",
+        "campaigns",
+        "media-buying"
+      ],
+      "verdict": "This skill provides extensive documentation and examples for the AdCP protocol but contains no executable code. It requires external API credentials and makes network calls to advertising platforms. Users should review API permissions and financial implications before use.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 7298
+    },
+    {
+      "name": "agent-browser",
+      "author": "thesethrose",
+      "category": "Browser & Automation",
+      "description": "Rust-based headless browser automation CLI for web interaction and data extraction",
+      "plainDescription": "Automate web browsing tasks like clicking, typing, and taking screenshots",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "exec",
+        "browser",
+        "network"
+      ],
+      "risks": [
+        "Executes external CLI commands",
+        "Browser automation can interact with any website",
+        "Potential for unintended actions on web pages"
+      ],
+      "tags": [
+        "browser",
+        "automation",
+        "web-scraping",
+        "testing"
+      ],
+      "verdict": "This skill wraps an external CLI tool that executes browser automation commands. It requires exec permission and can perform arbitrary web interactions. While the skill itself is documentation, it enables powerful automation that should be used with caution.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 300
+    },
+    {
+      "name": "add-analytics",
+      "author": "jeftekhari",
+      "category": "Developer Tools",
+      "description": "Add Google Analytics 4 tracking to web projects with framework-specific implementations",
+      "plainDescription": "Set up website analytics tracking for different web frameworks",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read",
+        "write"
+      ],
+      "risks": [
+        "Adds third-party tracking scripts to websites",
+        "Potential privacy compliance issues"
+      ],
+      "tags": [
+        "analytics",
+        "tracking",
+        "web-development",
+        "seo"
+      ],
+      "verdict": "This skill provides code templates for adding Google Analytics to various frameworks. It contains no executable code, only implementation examples. The main consideration is privacy compliance with analytics tracking, which is a user responsibility.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 800
+    },
+    {
+      "name": "agent-content-pipeline",
+      "author": "larsderidder",
+      "category": "Productivity & Tasks",
+      "description": "Content workflow management with human approval for social media posting",
+      "plainDescription": "Manage content creation and approval process before posting to social media",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "read",
+        "write"
+      ],
+      "risks": [
+        "Social media API access requires credentials",
+        "Content posting to external platforms"
+      ],
+      "tags": [
+        "content",
+        "social-media",
+        "workflow",
+        "approval"
+      ],
+      "verdict": "This skill documents a content pipeline workflow with human-in-the-loop approval. It provides CLI commands but no executable code in the skill itself. The security model properly separates drafting from approval/posting, requiring human intervention for sensitive actions.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 200
+    },
+    {
+      "name": "brew-install",
+      "author": "xejrax",
+      "category": "CLI Utilities",
+      "description": "Install missing binaries via dnf (Fedora/Bazzite package manager)",
+      "plainDescription": "Install software packages on Fedora/Bazzite systems",
+      "trustScore": "safe",
+      "rating": 5,
+      "permissions": [
+        "exec"
+      ],
+      "risks": [
+        "Requires system package manager (dnf) which can install arbitrary packages",
+        "Could be used to install malicious packages if user is not careful"
+      ],
+      "tags": [
+        "package-manager",
+        "fedora",
+        "bazzite",
+        "system"
+      ],
+      "verdict": "This is a documentation-only skill that provides instructions for using dnf package manager. No executable code is included, only usage examples. The risk is minimal as it relies on the system's trusted package manager.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 35
+    },
+    {
+      "name": "bun-runtime",
+      "author": "rabin-thami",
+      "category": "Developer Tools",
+      "description": "Bun runtime capabilities for filesystem, process, and network operations",
+      "plainDescription": "Run file operations, commands, and network requests using Bun JavaScript runtime",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "exec",
+        "read",
+        "write",
+        "network"
+      ],
+      "risks": [
+        "Executes arbitrary shell commands via eval in bun-process.sh",
+        "Can write files anywhere on filesystem",
+        "Makes network requests to arbitrary URLs",
+        "Uses eval to execute user-provided commands",
+        "No input validation or sanitization"
+      ],
+      "tags": [
+        "bun",
+        "javascript",
+        "filesystem",
+        "network",
+        "process"
+      ],
+      "verdict": "This skill provides extensive system access through Bun runtime. It can execute arbitrary commands, write files anywhere, and make network requests. While useful for development tasks, it poses significant security risks if misused or if malicious input is provided. Should be reviewed before installation.",
+      "hasScripts": true,
+      "hasDependencies": true,
+      "linesReviewed": 125,
+      "hardening": {
+        "stride": {
+          "spoofing": {
+            "applicable": false,
+            "finding": null
+          },
+          "tampering": {
+            "applicable": true,
+            "finding": "Scripts in scripts/bun-*.sh could be modified by attacker to execute arbitrary code. No integrity verification."
+          },
+          "repudiation": {
+            "applicable": false,
+            "finding": null
+          },
+          "informationDisclosure": {
+            "applicable": true,
+            "finding": "Filesystem operations expose directory contents. Process operations show command output. Network requests could leak sensitive data in responses."
+          },
+          "denialOfService": {
+            "applicable": true,
+            "finding": "Unbounded file read operations could consume all memory. Glob operations could match millions of files. Process execution unbounded."
+          },
+          "elevationOfPrivilege": {
+            "applicable": false,
+            "finding": null
+          }
+        },
+        "shellCommands": [
+          "bash scripts in scripts/bun-*.sh (read, write, glob, process operations)",
+          "Bun.file(), Bun.write(), Bun.glob() via Bun runtime",
+          "Shell command execution via scripts/bun-process.sh"
+        ],
+        "exfiltrationVectors": [
+          "Filesystem read operations could return sensitive file contents to stdout",
+          "Glob operations expose directory structure",
+          "Process command output could contain sensitive data from executed programs",
+          "Network request responses returned directly"
+        ],
+        "cweFindings": [
+          {
+            "id": "CWE-22",
+            "title": "Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)",
+            "severity": "high",
+            "details": "scripts/bun-fs.sh read/write accept user-provided paths without validation. Could read/write to /etc/passwd, private keys, etc."
+          },
+          {
+            "id": "CWE-78",
+            "title": "Improper Neutralization of Special Elements used in an OS Command",
+            "severity": "high",
+            "details": "scripts/bun-process.sh passes shell commands directly to system. Unquoted variables could allow injection."
+          },
+          {
+            "id": "CWE-400",
+            "title": "Uncontrolled Resource Consumption",
+            "severity": "high",
+            "details": "No limits on file sizes read, glob matches, or process execution duration. Could cause OOM or hang."
+          },
+          {
+            "id": "CWE-426",
+            "title": "Untrusted Search Path",
+            "severity": "medium",
+            "details": "Scripts in scripts/ directory not signed. Could be replaced with malicious versions."
+          }
+        ],
+        "hardeningScore": {
+          "commandSafety": 3,
+          "dataContainment": 4,
+          "dependencyHygiene": 6,
+          "injectionResistance": 2,
+          "leastPrivilege": 3,
+          "overall": 3
+        },
+        "verdict": "REJECT",
+        "conditions": [
+          "CRITICAL: Implement whitelist-based path validation in all bun-fs.sh operations - disallow .. and absolute paths",
+          "CRITICAL: Quote all shell variables in bun-process.sh - use proper array syntax for argument passing",
+          "Implement file size limits on read operations (max 100MB)",
+          "Implement timeout on process execution (max 30s)",
+          "Implement glob result limit (max 10000 files)",
+          "Add input validation for all command arguments",
+          "Sign scripts/ files with code signing certificate",
+          "Implement sandboxing using chroot or similar restrictions"
+        ],
+        "recommendation": "Bun Runtime skill has critical path traversal and command injection vulnerabilities. The lack of input validation on filesystem and process operations makes it unsafe for general use. REJECT until comprehensive input validation and sandboxing are implemented."
+      }
+    },
+    {
+      "name": "alter-actions",
+      "author": "olivieralter",
+      "category": "Apple Apps & Services",
+      "description": "Trigger Alter macOS app actions via x-callback-urls. Catalog of 84+ actions",
+      "plainDescription": "Control the Alter app on macOS to perform various AI tasks like translation, summarization, and more",
+      "trustScore": "safe",
+      "rating": 4,
+      "permissions": [
+        "network"
+      ],
+      "risks": [
+        "Triggers external app via URL schemes",
+        "Could potentially open malicious URLs if action IDs are manipulated"
+      ],
+      "tags": [
+        "macos",
+        "alter",
+        "x-callback-url",
+        "automation",
+        "ai"
+      ],
+      "verdict": "This skill provides a catalog of Alter app actions via x-callback-urls. It's primarily a reference/documentation skill with no executable code shown. The risk is low as it only opens URLs to trigger the Alter app, which runs in its own sandbox.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 450
+    },
+    {
+      "name": "apple-contacts",
+      "author": "tyler6204",
+      "category": "Apple Apps & Services",
+      "description": "Look up contacts from macOS Contacts.app via AppleScript",
+      "plainDescription": "Search and retrieve contact information from your macOS Contacts app",
+      "trustScore": "safe",
+      "rating": 4,
+      "permissions": [
+        "read"
+      ],
+      "risks": [
+        "Reads sensitive contact information",
+        "AppleScript could potentially be modified to access other data"
+      ],
+      "tags": [
+        "macos",
+        "contacts",
+        "applescript",
+        "privacy"
+      ],
+      "verdict": "This skill provides AppleScript commands to query the Contacts app. It only reads contact data and doesn't modify anything. The risk is minimal as it uses standard AppleScript APIs within the macOS sandbox.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 70
+    },
+    {
+      "name": "apple-mail-search",
+      "author": "mneves75",
+      "category": "Apple Apps & Services",
+      "description": "Fast Apple Mail search via SQLite on macOS. Search emails by subject, sender, date, attachments",
+      "plainDescription": "Quickly search through your Apple Mail emails using a fast database method",
+      "trustScore": "caution",
+      "rating": 3,
+      "permissions": [
+        "read",
+        "exec"
+      ],
+      "risks": [
+        "Reads sensitive email metadata from SQLite database",
+        "Requires sqlite3 binary execution",
+        "Could potentially access private email information",
+        "No source code shown for the mail-search tool itself"
+      ],
+      "tags": [
+        "macos",
+        "mail",
+        "email",
+        "search",
+        "sqlite"
+      ],
+      "verdict": "This skill describes a tool that reads Apple Mail's SQLite database directly. While it provides fast search capabilities, it accesses sensitive email metadata. The actual implementation (mail-search binary) is not included in the source, so its security cannot be assessed. Use with caution.",
+      "hasScripts": false,
+      "hasDependencies": false,
+      "linesReviewed": 120
+    }
+  ]
+}

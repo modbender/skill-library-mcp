@@ -1,0 +1,63 @@
+{
+  "id": "openclaw-plugin",
+  "name": "ZugaShield Security Scanner",
+  "description": "7-layer AI security scanning for all OpenClaw channels. Blocks prompt injection, SSRF, command injection, data leakage, and memory poisoning.",
+  "version": "0.1.1",
+  "services": ["zugashield-mcp"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "fail_closed": {
+        "type": "boolean",
+        "default": true,
+        "description": "Block requests when the scanner is unavailable (recommended)"
+      },
+      "strict_mode": {
+        "type": "boolean",
+        "default": false,
+        "description": "Block on medium+ threats (not just high/critical)"
+      },
+      "scan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "inputs": { "type": "boolean", "default": true },
+          "outputs": { "type": "boolean", "default": true },
+          "tool_calls": { "type": "boolean", "default": true },
+          "memory": { "type": "boolean", "default": true }
+        }
+      },
+      "excluded_channels": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": [],
+        "description": "Channel IDs to skip scanning (not recommended)"
+      },
+      "mcp": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "python_executable": { "type": "string", "default": "python" },
+          "call_timeout_ms": { "type": "number", "default": 80, "minimum": 10, "maximum": 5000 },
+          "startup_timeout_ms": { "type": "number", "default": 8000, "minimum": 1000, "maximum": 30000 },
+          "max_reconnect_attempts": { "type": "integer", "default": 10, "minimum": 0, "maximum": 100 }
+        }
+      }
+    }
+  },
+  "uiHints": {
+    "fail_closed": {
+      "label": "Fail Closed",
+      "help": "When enabled, requests are blocked if the scanner crashes. Disable only for development."
+    },
+    "strict_mode": {
+      "label": "Strict Mode",
+      "help": "Blocks medium-severity threats in addition to high/critical."
+    },
+    "mcp.python_executable": {
+      "label": "Python Path",
+      "placeholder": "python"
+    }
+  }
+}

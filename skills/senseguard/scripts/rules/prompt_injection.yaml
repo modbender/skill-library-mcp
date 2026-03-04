@@ -1,0 +1,45 @@
+category: prompt_injection
+description: "Prompt Injection detection rules"
+
+rules:
+  critical:
+    - id: PI001
+      pattern: "ignore (all |any )?(previous|prior|above|earlier) \\w*\\s*(instructions|prompts|rules|guidelines)"
+      description: "Override system instructions"
+      description_zh: "试图覆盖系统指令"
+
+    - id: PI002
+      pattern: "you are now|from now on you|your new (role|identity|purpose)"
+      description: "Role hijacking"
+      description_zh: "角色劫持"
+
+    - id: PI003
+      pattern: "do not (ask|request|require|need) (for )?(permission|confirmation|approval)"
+      description: "Bypass user confirmation"
+      description_zh: "绕过用户确认"
+
+    - id: PI004
+      pattern: "(ignore|disable|bypass|delete|remove).{0,30}(safety|security|filter|restriction|guard|protection|check)"
+      description: "Disable safety mechanisms"
+      description_zh: "禁用安全机制"
+
+    - id: PI005
+      pattern: "system prompt|<<SYS>>|<s>\\[INST\\]"
+      description: "System prompt injection markers"
+      description_zh: "系统提示词注入标记"
+
+  high:
+    - id: PI006
+      pattern: "pretend (to be|you are)|act as if|roleplay as"
+      description: "Roleplay attack"
+      description_zh: "角色扮演攻击"
+
+    - id: PI007
+      pattern: "do not (tell|inform|notify|alert) the user"
+      description: "Hide actions from user"
+      description_zh: "对用户隐瞒行为"
+
+    - id: PI008
+      pattern: "without (the user|user's|their) (knowledge|awareness|consent)"
+      description: "Act without user consent"
+      description_zh: "未经同意执行"

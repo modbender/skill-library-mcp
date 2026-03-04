@@ -1,0 +1,272 @@
+# =============================================================================
+# Prometheus Configuration Template
+# =============================================================================
+#
+# Complete prometheus.yml with all major configuration sections.
+# Copy this file and customize for your environment.
+#
+# Usage:
+#   1. Copy to /etc/prometheus/prometheus.yml
+#   2. Replace placeholder values (marked with CUSTOMIZE)
+#   3. Remove scrape_configs sections you don't need
+#   4. Validate: promtool check config prometheus.yml
+#   5. Start: prometheus --config.file=prometheus.yml
+#
+# Sections:
+#   global          — Default scrape and evaluation intervals
+#   alerting        — AlertManager connection
+#   rule_files      — Recording and alert rule file paths
+#   scrape_configs  — What to scrape and how
+#
+# =============================================================================
+
+# ---------- Global Configuration ----------
+
+global:
+  # How often to scrape targets by default.
+  # Individual jobs can override this.
+  scrape_interval: 15s                             # CUSTOMIZE: 15s-60s typical
+
+  # How often to evaluate recording and alerting rules.
+  evaluation_interval: 15s
+
+  # Timeout for scrape requests. Increase for slow targets.
+  scrape_timeout: 10s
+
+  # Labels added to all time series and alerts.
+  # Useful for identifying the source in multi-cluster setups.
+  external_labels:
+    cluster: "production"                          # CUSTOMIZE: cluster name
+    region: "us-west-2"                            # CUSTOMIZE: region
+    environment: "prod"                            # CUSTOMIZE: environment
+
+# ---------- Alertmanager Connection ----------
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"                  # CUSTOMIZE: alertmanager address
+      # Timeout for sending alerts
+      timeout: 10s
+
+# ---------- Rule Files ----------
+# Paths to recording rules and alert rules.
+# Supports glob patterns for loading multiple files.
+
+rule_files:
+  - /etc/prometheus/rules/recording_rules.yml
+  - /etc/prometheus/rules/alert_rules.yml
+  # - /etc/prometheus/rules/*.yml                  # Or load all .yml files
+
+# ---------- Scrape Configurations ----------
+
+scrape_configs:
+
+  # --------------------------------------------------
+  # Prometheus Self-Monitoring
+  # --------------------------------------------------
+  # Always monitor Prometheus itself to detect issues.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # --------------------------------------------------
+  # Node Exporter (Host Metrics)
+  # --------------------------------------------------
+  # Collects CPU, memory, disk, and network metrics from hosts.
+  # Install: https://github.com/prometheus/node_exporter
+  - job_name: "node-exporter"
+    static_configs:
+      - targets:                                   # CUSTOMIZE: your hosts
+          - "node1:9100"
+          - "node2:9100"
+          - "node3:9100"
+
+    # Extract clean instance name from address (remove port)
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: "([^:]+)(:[0-9]+)?"
+        replacement: "${1}"
+
+  # --------------------------------------------------
+  # Application Metrics (Static)
+  # --------------------------------------------------
+  # Direct scraping of application /metrics endpoints.
+  # Use this for non-Kubernetes deployments.
+  - job_name: "my-app"                             # CUSTOMIZE: job name
+    static_configs:
+      - targets:                                   # CUSTOMIZE: your app hosts
+          - "app1.example.com:8080"
+          - "app2.example.com:8080"
+        labels:
+          service: "api"                           # CUSTOMIZE: service label
+
+    metrics_path: "/metrics"                       # CUSTOMIZE: if non-standard
+    scheme: "http"                                 # CUSTOMIZE: http or https
+
+    # Uncomment for HTTPS with client certificates
+    # scheme: "https"
+    # tls_config:
+    #   ca_file: /etc/prometheus/certs/ca.crt
+    #   cert_file: /etc/prometheus/certs/client.crt
+    #   key_file: /etc/prometheus/certs/client.key
+
+    # Uncomment for basic auth
+    # basic_auth:
+    #   username: "prometheus"
+    #   password_file: /etc/prometheus/secrets/app_password
+
+  # --------------------------------------------------
+  # File-Based Service Discovery
+  # --------------------------------------------------
+  # Prometheus watches JSON/YAML files for target changes.
+  # Good for dynamic environments without Kubernetes.
+  # Targets file format:
+  #   [{"targets": ["host:port"], "labels": {"key": "value"}}]
+  - job_name: "file-sd"
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/targets/*.json
+          - /etc/prometheus/targets/*.yml
+        refresh_interval: 5m                       # CUSTOMIZE: how often to reload
+
+  # --------------------------------------------------
+  # Kubernetes Pod Discovery
+  # --------------------------------------------------
+  # Auto-discovers pods with prometheus.io annotations:
+  #   prometheus.io/scrape: "true"
+  #   prometheus.io/port: "8080"
+  #   prometheus.io/path: "/metrics"
+  - job_name: "kubernetes-pods"
+    kubernetes_sd_configs:
+      - role: pod
+
+    relabel_configs:
+      # Only scrape pods with prometheus.io/scrape=true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+
+      # Use custom metrics path if specified
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+
+      # Use custom port if specified
+      - source_labels:
+          [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+      # Use custom scheme if specified (http/https)
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+
+      # Add namespace label
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+
+      # Add pod name label
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod
+
+      # Add node name label
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: node
+
+  # --------------------------------------------------
+  # Kubernetes Service Discovery
+  # --------------------------------------------------
+  # Auto-discovers services with prometheus.io annotations.
+  - job_name: "kubernetes-services"
+    kubernetes_sd_configs:
+      - role: service
+
+    relabel_configs:
+      - source_labels:
+          [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+
+      - source_labels:
+          [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+
+      - source_labels:
+          [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+
+      - source_labels:
+          [__address__,
+           __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: service
+
+  # --------------------------------------------------
+  # cAdvisor (Container Metrics)
+  # --------------------------------------------------
+  # Container CPU, memory, network, and disk I/O metrics.
+  # On Kubernetes, kubelet exposes cAdvisor at :10250/metrics/cadvisor.
+  # For Docker, run cAdvisor as a container.
+  # Uncomment the section that matches your setup.
+
+  # Docker cAdvisor:
+  # - job_name: "cadvisor"
+  #   static_configs:
+  #     - targets: ["cadvisor:8080"]
+
+  # Kubernetes kubelet cAdvisor:
+  # - job_name: "kubelet-cadvisor"
+  #   kubernetes_sd_configs:
+  #     - role: node
+  #   scheme: https
+  #   tls_config:
+  #     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  #   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #   metrics_path: /metrics/cadvisor
+  #   relabel_configs:
+  #     - action: labelmap
+  #       regex: __meta_kubernetes_node_label_(.+)
+
+# ---------- Remote Write (Optional) ----------
+# Send metrics to long-term storage (Thanos, Cortex, Mimir, Grafana Cloud).
+# Uncomment and configure for your storage backend.
+
+# remote_write:
+#   - url: "http://thanos-receive:19291/api/v1/receive"   # CUSTOMIZE
+#     queue_config:
+#       max_shards: 10
+#       max_samples_per_send: 5000
+#       batch_send_deadline: 5s
+
+# ---------- Storage Configuration ----------
+# Configured via CLI flags, not prometheus.yml.
+# Common flags:
+#   --storage.tsdb.path=/prometheus                  # Data directory
+#   --storage.tsdb.retention.time=30d                # CUSTOMIZE: retention period
+#   --storage.tsdb.retention.size=50GB               # CUSTOMIZE: max disk usage
+#   --storage.tsdb.wal-compression                   # Enable WAL compression

@@ -1,0 +1,49 @@
+{
+  "name": "meal-planner",
+  "version": "1.0.0",
+  "description": "Generate weekly meal plan with shopping list",
+  "author": "Jason Zhou inspired",
+  "steps": [
+    {
+      "name": "select-cuisine",
+      "type": "prompt",
+      "prompt": "meal-planner",
+      "args": {
+        "cuisine": "{cuisine}"
+      },
+      "description": "Select cuisine type and load recipes"
+    },
+    {
+      "name": "generate-meal-plan",
+      "type": "generate",
+      "action": "create-7-day-plan",
+      "description": "Generate 7-day meal schedule"
+    },
+    {
+      "name": "optimize-ingredients",
+      "type": "process",
+      "action": "deduplicate-ingredients",
+      "description": "Optimize ingredient list to minimize waste"
+    },
+    {
+      "name": "create-shopping-list",
+      "type": "output",
+      "action": "generate-shopping-list",
+      "format": "markdown",
+      "description": "Generate organized shopping list"
+    },
+    {
+      "name": "print-or-share",
+      "type": "export",
+      "action": "export-plan",
+      "targets": ["print", "email", "notion"],
+      "description": "Export meal plan to preferred destination"
+    }
+  ],
+  "resources": [
+    "file://data/recipes/{cuisine}.md"
+  ],
+  "completions": {
+    "cuisine": ["italian", "mexican", "japanese", "indian", "thai", "french", "mediterranean"]
+  }
+}

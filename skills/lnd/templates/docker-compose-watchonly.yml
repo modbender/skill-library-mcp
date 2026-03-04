@@ -1,0 +1,71 @@
+# Watch-Only litd + Remote Signer — production security architecture.
+#
+# Two containers on a shared Docker network:
+#   litd   — watch-only Lightning Terminal (no private keys)
+#   signer — lnd in signing-only mode (holds seed, signs transactions)
+#
+# The litd node handles networking, channels, and payments. All signing
+# requests are forwarded to the signer container via gRPC.
+#
+# All runtime configuration lives in mounted config files. Use
+# docker-start.sh --watchonly to generate configs from templates.
+#
+# Setup flow:
+#   1. skills/lnd/scripts/docker-start.sh --watchonly
+#   2. Create signer wallet:
+#      skills/lightning-security-module/scripts/setup-signer.sh --container litd-signer
+#   3. Export and import credentials:
+#      skills/lightning-security-module/scripts/export-credentials.sh --container litd-signer
+#   4. Create watch-only wallet on litd:
+#      skills/lnd/scripts/create-wallet.sh --container litd --mode watchonly
+#
+# Ports:
+#   8443  — litd HTTPS (UI + gRPC + REST)
+#   10009 — lnd gRPC
+#   9735  — Lightning P2P
+#   8080  — lnd REST API
+#   10012 — Signer gRPC (internal, for litd->signer communication)
+#   10013 — Signer REST API (for wallet creation)
+
+services:
+  signer:
+    image: ${LND_IMAGE:-lightninglabs/lnd}:${LND_VERSION:-v0.20.0-beta}
+    container_name: litd-signer
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c", "touch /root/.lnd/wallet-password.txt && cp /tmp/lnd.conf /root/.lnd/lnd.conf && exec lnd"]
+    ports:
+      - "${SIGNER_RPC_PORT:-10012}:10012"
+      - "${SIGNER_REST_PORT:-10013}:10013"
+    volumes:
+      - signer-data:/root/.lnd
+      - ${SIGNER_CONF_PATH:-../../lightning-security-module/templates/signer-lnd.conf.template}:/tmp/lnd.conf:ro
+    networks:
+      - litd-watchonly
+
+  litd:
+    image: ${LITD_IMAGE:-lightninglabs/lightning-terminal}:${LITD_VERSION:-v0.16.0-alpha}
+    container_name: litd
+    restart: unless-stopped
+    depends_on:
+      - signer
+    entrypoint: ["/bin/sh", "-c", "touch /root/.lnd/wallet-password.txt && cp /tmp/lit.conf /root/.lit/lit.conf && exec litd"]
+    ports:
+      - "${LITD_HTTPS_PORT:-8443}:8443"
+      - "${LND_GRPC_PORT:-10009}:10009"
+      - "${LND_P2P_PORT:-9735}:9735"
+      - "${LND_REST_PORT:-8080}:8080"
+    volumes:
+      - litd-data:/root/.lnd
+      - litd-lit-data:/root/.lit
+      - ${LITD_CONF_PATH:-./litd-watchonly.conf.template}:/tmp/lit.conf:ro
+    networks:
+      - litd-watchonly
+
+volumes:
+  signer-data:
+  litd-data:
+  litd-lit-data:
+
+networks:
+  litd-watchonly:
+    driver: bridge

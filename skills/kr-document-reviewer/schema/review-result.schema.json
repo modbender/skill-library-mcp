@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "한국 비즈니스 서류 검토 결과",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "검토 메타 정보",
+      "properties": {
+        "reviewDate": { "type": "string", "format": "date", "description": "검토일" },
+        "reviewId": { "type": "string", "description": "검토 고유 ID" },
+        "transaction": {
+          "type": "object",
+          "description": "거래 개요",
+          "properties": {
+            "summary": { "type": "string", "description": "거래 요약" },
+            "buyer": { "type": "string", "description": "매수인/갑" },
+            "supplier": { "type": "string", "description": "매도인/을" },
+            "totalAmount": { "type": "number", "description": "계약 총액 (부가세 별도)" }
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "description": "개별 서류 검토 결과",
+      "items": {
+        "type": "object",
+        "properties": {
+          "docId": { "type": "string", "description": "문서 식별자 (파일명 앞 8자리)" },
+          "docType": {
+            "type": "string",
+            "enum": [
+              "사업자등록증", "통장사본", "견적서", "계약서",
+              "거래명세서", "세금계산서", "검수조서", "이체확인증",
+              "지원금신청서", "사업비요청공문", "결과보고서", "기타"
+            ]
+          },
+          "party": { "type": "string", "description": "해당 서류의 당사자 (갑/을/공통)" },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warning", "fail"],
+            "description": "종합 판정"
+          },
+          "extractedData": {
+            "type": "object",
+            "description": "OCR 추출 핵심 데이터",
+            "properties": {
+              "businessRegNo": { "type": "string", "description": "사업자등록번호" },
+              "companyName": { "type": "string", "description": "상호" },
+              "representative": { "type": "string", "description": "대표자" },
+              "address": { "type": "string", "description": "소재지" },
+              "supplyAmount": { "type": ["number", "null"], "description": "공급가액" },
+              "taxAmount": { "type": ["number", "null"], "description": "세액" },
+              "totalAmount": { "type": ["number", "null"], "description": "합계금액" },
+              "date": { "type": "string", "description": "주요 날짜 (작성일/계약일/이체일 등)" },
+              "bankName": { "type": ["string", "null"], "description": "은행명" },
+              "accountNo": { "type": ["string", "null"], "description": "계좌번호" },
+              "accountHolder": { "type": ["string", "null"], "description": "예금주" },
+              "items": { "type": "string", "description": "품목 요약" }
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "description": "체크리스트 항목별 결과",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item": { "type": "string", "description": "검증 항목명" },
+                "status": { "type": "string", "enum": ["pass", "warning", "fail", "na"] },
+                "value": { "type": "string", "description": "추출된 값 (있으면)" },
+                "note": { "type": "string", "description": "비고/사유" }
+              },
+              "required": ["item", "status"]
+            }
+          }
+        },
+        "required": ["docId", "docType", "status", "extractedData", "checklist"]
+      }
+    },
+    "crossValidation": {
+      "type": "array",
+      "description": "교차검증 결과",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["금액흐름", "당사자정보", "계좌정보", "날짜정합성", "누락서류"],
+            "description": "검증 카테고리"
+          },
+          "item": { "type": "string", "description": "검증 항목" },
+          "status": { "type": "string", "enum": ["pass", "warning", "fail"] },
+          "expected": { "type": "string", "description": "기대값" },
+          "actual": { "type": "string", "description": "실제값" },
+          "docs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "관련 문서 docId 목록"
+          },
+          "note": { "type": "string", "description": "비고" }
+        },
+        "required": ["category", "item", "status"]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "종합 결과",
+      "properties": {
+        "totalDocs": { "type": "integer" },
+        "pass": { "type": "integer" },
+        "warning": { "type": "integer" },
+        "fail": { "type": "integer" },
+        "criticalIssues": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "치명적 문제 목록"
+        },
+        "actionRequired": {
+          "type": "array",
+          "description": "조치 필요 사항",
+          "items": {
+            "type": "object",
+            "properties": {
+              "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+              "action": { "type": "string" },
+              "relatedDocs": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "opinion": { "type": "string", "description": "종합 의견" }
+      }
+    }
+  },
+  "required": ["meta", "documents", "crossValidation", "summary"]
+}

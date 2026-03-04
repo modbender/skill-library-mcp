@@ -1,0 +1,36 @@
+{
+  "id": "bug-scan-fix",
+  "name": "Bug Scan and Fix",
+  "version": 1,
+  "description": "Scan codebase for bugs, triage by severity, fix high-priority issues, and verify",
+  "steps": [
+    {
+      "id": "scan",
+      "name": "Scan for Bugs",
+      "input": "Scan the codebase for bugs: {{task}}\n\nUse the `read` tool to examine source files. Look for:\n- Logic errors (off-by-one, null checks, async issues)\n- Edge cases not handled (empty arrays, missing fields, invalid input)\n- Error handling gaps (uncaught exceptions, missing try-catch)\n- Race conditions and concurrency issues\n- Database query issues (SQL injection, missing constraints)\n- API endpoint vulnerabilities (missing validation, auth bypasses)\n- Frontend bugs (state management, event handling, rendering issues)\n\nDo NOT just describe — actually read the files and identify specific issues with file paths and line numbers.\n\nCreate a list of all bugs found with:\n- File path and line number\n- Description of the bug\n- Potential impact\n- How to reproduce (if applicable)\n\nWhen done, end with:\nSTATUS: done\nBUGS_FOUND: number\nBUGS_FILE: path/to/bugs-list.md",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "triage",
+      "name": "Triage Bugs",
+      "input": "Triage these bugs by severity and impact:\n\nBugs file: {{bugs_file}}\nBugs found: {{bugs_found}}\n\nScan results:\n{{scan_output}}\n\nCategorize each bug:\n- **CRITICAL**: Data loss, security breach, app crashes, payment failures\n- **HIGH**: Major features broken, significant UX issues, data corruption risk\n- **MEDIUM**: Minor features broken, workarounds exist, performance issues\n- **LOW**: Cosmetic issues, edge cases, non-critical improvements\n\nPrioritize the top 3-5 bugs to fix first. Use the `edit` tool to update the bugs file with severity ratings and priority order.\n\nWhen done, end with:\nSTATUS: done\nCRITICAL_COUNT: number\nHIGH_COUNT: number\nPRIORITY_BUGS: comma-separated list of bug IDs to fix",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "fix",
+      "name": "Fix Priority Bugs",
+      "input": "Fix the priority bugs:\n\nBugs file: {{bugs_file}}\nPriority bugs: {{priority_bugs}}\nCritical count: {{critical_count}}\nHigh count: {{high_count}}\n\nTriage results:\n{{triage_output}}\n\nFor each priority bug:\n1. Use `read` to examine the buggy code\n2. Use `edit` to apply the fix\n3. Document what you changed and why\n\nDo NOT just describe the fixes — actually use the `edit` tool to modify the files.\n\nFocus on the highest severity bugs first. If you run out of time, document which bugs remain unfixed.\n\nWhen done, end with:\nSTATUS: done\nBUGS_FIXED: number\nFIXES_FILE: path/to/fixes-summary.md",
+      "expects": "STATUS: done",
+      "maxRetries": 2
+    },
+    {
+      "id": "verify",
+      "name": "Verify Fixes",
+      "input": "Verify the bug fixes didn't break anything:\n\nFixes file: {{fixes_file}}\nBugs fixed: {{bugs_fixed}}\n\nFix results:\n{{fix_output}}\n\nFor each fixed bug:\n1. Use `read` to review the changed code\n2. Check for potential side effects or regressions\n3. If tests exist, use `exec` to run relevant test suites\n4. Verify the fix actually solves the original issue\n\nDocument:\n- Which fixes were verified successfully\n- Any new issues introduced by the fixes\n- Test results (if tests were run)\n- Recommendations for additional testing\n\nWhen done, end with:\nSTATUS: done\nVERIFIED_FIXES: number\nREGRESSIONS_FOUND: number\nVERIFICATION_FILE: path/to/verification-report.md",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    }
+  ]
+}

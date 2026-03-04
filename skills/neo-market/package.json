@@ -1,0 +1,39 @@
+{
+  "name": "@wangwuww/neo-market-cli",
+  "version": "1.0.1",
+  "description": "CLI for Autonomous Agents to interact with the Neo Market",
+  "bin": {
+    "neo-market": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "artifacts/contracts/**/*.json",
+    "deployed_addresses.json",
+    "SKILL.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "hardhat compile",
+    "build:cli": "tsc -p tsconfig.cli.json && chmod +x dist/cli.js",
+    "prepublishOnly": "npm run build && npm run build:cli",
+    "deploy:prod": "hardhat run scripts/deploy_prod.ts",
+    "demo:e2e": "hardhat run scripts/demo_e2e.ts",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20.12.7",
+    "hardhat": "^2.22.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "dotenv": "^17.2.4",
+    "eth-crypto": "^3.1.0",
+    "ethers": "^6.13.5"
+  }
+}

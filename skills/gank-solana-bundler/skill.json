@@ -1,0 +1,76 @@
+{
+  "name": "gank",
+  "version": "1.0.0",
+  "description": "Solana trading terminal for AI agents. Launch tokens on pump.fun, run swarm buys, volume bots, copy trades, and manage multi-wallet operations.",
+  "author": "pissdart",
+  "homepage": "https://gank.dev",
+  "repository": "https://github.com/pissdart/gank-skill",
+  "license": "MIT",
+  "runtime": "clawdis",
+  "skills": [
+    {
+      "id": "launch-token",
+      "name": "Launch Token",
+      "description": "Launch a token on pump.fun with dev buy, bundle wallets, and snipers. Handles IPFS upload and vanity mint reservation."
+    },
+    {
+      "id": "swarm-buy",
+      "name": "Swarm Buy",
+      "description": "Coordinated parallel buys from multiple wallets simultaneously on any pump.fun token."
+    },
+    {
+      "id": "volume-bot",
+      "name": "Volume Bot",
+      "description": "Run automated volume generation sessions with configurable intensity and duration."
+    },
+    {
+      "id": "copy-trade",
+      "name": "Copy Trade",
+      "description": "Mirror another wallet's trades automatically with configurable size limits and delay."
+    },
+    {
+      "id": "wallet-ops",
+      "name": "Wallet Operations",
+      "description": "Transfer, split, consolidate, and drain wallets. Includes privacy swap (SOL→BNB→SOL or SOL→ETH→SOL, ~5 min). XMR route is not available."
+    },
+    {
+      "id": "positions",
+      "name": "Positions",
+      "description": "Monitor token holdings and PnL across all wallets. Sell on target multipliers."
+    },
+    {
+      "id": "market-data",
+      "name": "Market Data",
+      "description": "Token info, OHLCV charts, holders, recent trades, and trader analytics."
+    }
+  ],
+  "config": {
+    "schema": {
+      "apiKey": {
+        "type": "string",
+        "description": "GANK API key (starts with pb_). Get from gank.dev → Settings → API Keys.",
+        "env": "GANK_API_KEY",
+        "required": true,
+        "secret": true
+      }
+    }
+  },
+  "credentials": [
+    {
+      "source": "GANK_API_KEY env or skills.entries.gank.apiKey",
+      "purpose": "API authentication",
+      "required": true
+    }
+  ],
+  "security": {
+    "note": "API keys start with pb_ and authenticate all requests. Wallet private keys are encrypted server-side and never returned by the API. The reserve-mint endpoint returns a mint keypair (the token contract address keypair, not a wallet private key) — pass it back to /launch as reserved_mint_keypair and do not store it. Never expose GANK_API_KEY in logs or LLM context."
+  },
+  "env": [
+    {
+      "name": "GANK_API_KEY",
+      "description": "GANK API key (starts with pb_). Get from gank.dev > settings > api keys.",
+      "required": true,
+      "secret": true
+    }
+  ]
+}

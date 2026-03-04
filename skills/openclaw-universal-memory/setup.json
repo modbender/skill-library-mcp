@@ -1,0 +1,36 @@
+{
+  "setupComplete": false,
+  "prerequisites": {
+    "python": {
+      "required": true,
+      "installed": false,
+      "description": "Python 3.10+"
+    },
+    "packageInstalled": {
+      "required": true,
+      "installed": false,
+      "description": "openclaw-universal-memory installed locally (pip install -e .)"
+    },
+    "psycopg": {
+      "required": true,
+      "installed": false,
+      "description": "Postgres + connector deps installed (pip install -e .)"
+    },
+    "postgresDsn": {
+      "required": true,
+      "configured": false,
+      "description": "Use configure-dsn (recommended), DATABASE_DSN env, or --dsn/--dsn-file"
+    }
+  },
+  "setupInstructions": [
+    "1. Install package: pip install -e .",
+    "2. Install DB driver: pip install \"psycopg[binary]>=3.2\".",
+    "3. Configure DSN securely: run_memory.py --action configure-dsn (or set DATABASE_DSN).",
+    "4. Ensure Postgres has pgvector extension enabled.",
+    "5. Run doctor check: run_memory.py --action doctor.",
+    "6. Initialize schema via run_memory.py --action init-schema.",
+    "7. Configure connectors (google/slack/asana/imessage) per docs/CONNECTOR_SETUP_WALKTHROUGH.md.",
+    "8. Validate each connector before ingestion: run_memory.py --action validate-connector ..."
+  ],
+  "verifySetup": "python skills/openclaw-universal-memory/scripts/run_memory.py --action doctor"
+}

@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{sim_title}}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f0e8;
+      --panel: #fffaf2;
+      --panel-strong: #f0e0c8;
+      --ink: #173247;
+      --muted: #5d6f7d;
+      --accent: #0f7c90;
+      --accent-strong: #0a5a74;
+      --warn: #9b2c2c;
+      --grid: rgba(23, 50, 71, 0.12);
+      --shadow: 0 18px 40px rgba(23, 50, 71, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 124, 144, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(217, 119, 6, 0.14), transparent 22%),
+        linear-gradient(180deg, #fffdf8 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .pill {
+      border: 1px solid rgba(23, 50, 71, 0.12);
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+
+    #statusBanner {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15, 124, 144, 0.1);
+      color: var(--accent-strong);
+      border: 1px solid rgba(15, 124, 144, 0.18);
+      font-weight: 600;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    #statusBanner.warning {
+      background: rgba(155, 44, 44, 0.1);
+      color: var(--warn);
+      border-color: rgba(155, 44, 44, 0.22);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 250, 242, 0.95) 100%);
+      border-radius: var(--radius);
+      padding: 18px;
+      border: 1px solid rgba(23, 50, 71, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 224, 200, 0.55)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+      border-radius: 16px;
+      border: 1px solid rgba(23, 50, 71, 0.1);
+    }
+
+    #simCanvas {
+      aspect-ratio: 16 / 10;
+      min-height: 320px;
+    }
+
+    #plotCanvas {
+      aspect-ratio: 16 / 9;
+      min-height: 220px;
+    }
+
+    .controls-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      box-shadow: 0 10px 22px rgba(15, 124, 144, 0.22);
+    }
+
+    button.secondary {
+      background: rgba(23, 50, 71, 0.08);
+      color: var(--ink);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .slider-group,
+    .readout-row,
+    .summary-list li,
+    .worksheet-section li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .slider-group {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px;
+      background: rgba(23, 50, 71, 0.04);
+      border-radius: 14px;
+    }
+
+    .slider-head {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .readout-list,
+    .summary-list,
+    .worksheet-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .readout-row,
+    .summary-list li {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(23, 50, 71, 0.04);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    details {
+      border-radius: 16px;
+      border: 1px solid rgba(23, 50, 71, 0.08);
+      background: rgba(255, 255, 255, 0.72);
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 16px 18px;
+      font-weight: 700;
+      background: rgba(240, 224, 200, 0.55);
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid rgba(23, 50, 71, 0.08);
+    }
+
+    .worksheet-body {
+      padding: 16px 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .worksheet-section h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .worksheet-section li {
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(23, 50, 71, 0.1);
+    }
+
+    .worksheet-section li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .copy-fallback {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .copy-fallback.visible {
+      display: block;
+    }
+
+    .copy-fallback textarea {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 14px;
+      border: 1px solid rgba(23, 50, 71, 0.12);
+      padding: 12px;
+      font: 0.9rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      resize: vertical;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .shell {
+        padding: 16px;
+      }
+
+      .hero {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body data-sim-id="{{sim_id}}" data-domain="{{domain}}" data-level="{{level}}" data-renderer-kind="{{renderer_kind}}">
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <h1 id="simTitle">{{sim_title}}</h1>
+        <div class="hero-meta">
+          <span class="pill">Domain: <span id="domainLabel">{{domain}}</span></span>
+          <span class="pill">Level: <span id="levelLabel">{{level}}</span></span>
+          <span class="pill">Single-file offline simulation</span>
+        </div>
+      </div>
+      <div id="statusBanner" role="status" aria-live="polite">Ready. Adjust parameters, then press Start.</div>
+    </header>
+
+    <main class="layout">
+      <section class="stack">
+        <article class="card">
+          <h2>Simulation</h2>
+          <canvas id="simCanvas" width="960" height="600"></canvas>
+          <div class="controls-grid">
+            <div class="button-row">
+              <button id="runToggle" type="button">Start</button>
+              <button id="stepBtn" type="button" class="secondary">Step</button>
+              <button id="resetBtn" type="button" class="secondary">Reset</button>
+            </div>
+            <div class="slider-group">
+              <div class="slider-head">
+                <span>Time step dt</span>
+                <span id="dtValue"></span>
+              </div>
+              <input id="dtSlider" type="range">
+            </div>
+            <div id="paramControls" class="stack"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Readouts</h2>
+          <ul id="readouts" class="readout-list"></ul>
+        </article>
+      </section>
+
+      <aside class="stack">
+        <article class="card">
+          <h2>Time-Series Plot</h2>
+          <canvas id="plotCanvas" width="720" height="420"></canvas>
+          <p class="small footer-note" id="plotSummary">Plot updates while the simulation runs.</p>
+        </article>
+
+        <article class="card">
+          <h2>Export</h2>
+          <div class="button-row">
+            <button id="copyJsonBtn" type="button">Copy JSON Snapshot</button>
+            <button id="downloadCsvBtn" type="button" class="secondary">Download CSV</button>
+          </div>
+          <p class="small footer-note">Exports stay local to your browser and work offline.</p>
+          <div id="copyFallback" class="copy-fallback">
+            <p class="small">Clipboard access is unavailable here. The snapshot text is selected below for manual copy.</p>
+            <textarea id="copyFallbackText" spellcheck="false"></textarea>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Success Criteria</h2>
+          <ul id="successCriteria" class="summary-list"></ul>
+        </article>
+
+        <details id="worksheet" class="card" open>
+          <summary>Inquiry Worksheet</summary>
+          <div class="worksheet-body" id="worksheetBody"></div>
+        </details>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const body = document.body;
+      const simCanvas = document.getElementById("simCanvas");
+      const plotCanvas = document.getElementById("plotCanvas");
+      const simCtx = simCanvas.getContext("2d");
+      const plotCtx = plotCanvas.getContext("2d");
+      const runToggle = document.getElementById("runToggle");
+      const stepBtn = document.getElementById("stepBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const dtSlider = document.getElementById("dtSlider");
+      const dtValue = document.getElementById("dtValue");
+      const paramControls = document.getElementById("paramControls");
+      const readouts = document.getElementById("readouts");
+      const statusBanner = document.getElementById("statusBanner");
+      const worksheetBody = document.getElementById("worksheetBody");
+      const successCriteriaList = document.getElementById("successCriteria");
+      const copyJsonBtn = document.getElementById("copyJsonBtn");
+      const downloadCsvBtn = document.getElementById("downloadCsvBtn");
+      const copyFallback = document.getElementById("copyFallback");
+      const copyFallbackText = document.getElementById("copyFallbackText");
+      const plotSummary = document.getElementById("plotSummary");
+
+      const simId = body.dataset.simId || "science-sim";
+      const domain = body.dataset.domain || "mechanics";
+      const level = body.dataset.level || "general";
+      const rendererKind = body.dataset.rendererKind || "trajectory2d";
+      const stateDefs = {{{state_json}}};
+      const paramDefs = {{{params_json}}};
+      const initialState = {{{initial_json}}};
+      const equations = {{{equations_json}}};
+      const outputs = {{{outputs_json}}};
+      const worksheet = {{{worksheet_json}}};
+      const successCriteria = {{{success_criteria_json}}};
+      const readoutFields = {{{readout_fields_json}}};
+      const dtConfig = {
+        default: Number({{{dt_default}}}),
+        min: Number({{{dt_min}}}),
+        max: Number({{{dt_max}}})
+      };
+
+      const traceOutput = outputs.find((output) => output.type === "trace") || null;
+      const plotOutput = outputs.find((output) => output.type === "plot") || {
+        type: "plot",
+        x: "t",
+        y: stateDefs[0].name,
+        label: stateDefs[0].name + " vs t"
+      };
+      const palette = {
+        main: "#0f7c90",
+        secondary: "#c26a00",
+        tertiary: "#1b7f4a",
+        warn: "#9b2c2c",
+        grid: "rgba(23, 50, 71, 0.12)",
+        ink: "#173247",
+        sky: "#d6eef2"
+      };
+      const limits = {
+        trailCap: 2000,
+        historyCap: 5000
+      };
+
+      let running = false;
+      let dt = clampDt(dtConfig.default);
+      let state = cloneState(initialState);
+      let params = normalizeParams(paramDefs);
+      let time = 0;
+      let lastFrameTime = 0;
+      let accumulator = 0;
+      let lastWarning = "";
+      let trail = [];
+      let samples = [];
+
+      // MODEL
+      function clampDt(value) {
+        const numeric = Number.isFinite(value) ? value : dtConfig.default;
+        return Math.min(dtConfig.max, Math.max(dtConfig.min, numeric));
+      }
+
+      function cloneState(source) {
+        return stateDefs.reduce((acc, def) => {
+          acc[def.name] = Number(source[def.name]);
+          return acc;
+        }, {});
+      }
+
+      function stateVector(snapshot) {
+        return stateDefs.map((def) => Number(snapshot[def.name]));
+      }
+
+      function stateFromVector(vector) {
+        return stateDefs.reduce((acc, def, index) => {
+          acc[def.name] = vector[index];
+          return acc;
+        }, {});
+      }
+
+      function normalizeParams(defs) {
+        return defs.reduce((acc, def) => {
+          acc[def.name] = Number(def.value);
+          return acc;
+        }, {});
+      }
+
+      function derivativeKeyFor(name) {
+        return "d" + name;
+      }
+
+      function getDerivativeValue(derivatives, stateName) {
+        const canonicalKey = derivativeKeyFor(stateName);
+        if (Number.isFinite(derivatives[canonicalKey])) {
+          return derivatives[canonicalKey];
+        }
+        if (Number.isFinite(derivatives[stateName])) {
+          return derivatives[stateName];
+        }
+        return 0;
+      }
+
+      function computeDerivatives(snapshot, currentParams, currentTime) {
+        const t = currentTime;
+        const state = snapshot;
+        const params = currentParams;
+        {{{model_step_logic_js}}}
+      }
+
+      function derivativeVector(snapshot, currentParams, currentTime) {
+        const derivatives = computeDerivatives(snapshot, currentParams, currentTime) || {};
+        return stateDefs.map((def) => Number(getDerivativeValue(derivatives, def.name)));
+      }
+
+      function eulerStep(snapshot, currentParams, stepSize, currentTime) {
+        const y = stateVector(snapshot);
+        const k1 = derivativeVector(snapshot, currentParams, currentTime);
+        return stateFromVector(y.map((value, index) => value + (k1[index] * stepSize)));
+      }
+
+      function rk4Step(snapshot, currentParams, stepSize, currentTime) {
+        const y = stateVector(snapshot);
+        const k1 = derivativeVector(snapshot, currentParams, currentTime);
+        const s2 = stateFromVector(y.map((value, index) => value + (k1[index] * stepSize * 0.5)));
+        const k2 = derivativeVector(s2, currentParams, currentTime + (stepSize * 0.5));
+        const s3 = stateFromVector(y.map((value, index) => value + (k2[index] * stepSize * 0.5)));
+        const k3 = derivativeVector(s3, currentParams, currentTime + (stepSize * 0.5));
+        const s4 = stateFromVector(y.map((value, index) => value + (k3[index] * stepSize)));
+        const k4 = derivativeVector(s4, currentParams, currentTime + stepSize);
+        return stateFromVector(y.map((value, index) => {
+          return value + (stepSize / 6) * (k1[index] + (2 * k2[index]) + (2 * k3[index]) + k4[index]);
+        }));
+      }
+
+      function isFiniteState(snapshot) {
+        return stateDefs.every((def) => Number.isFinite(snapshot[def.name]));
+      }
+
+      function makeSnapshot() {
+        return {
+          sim_id: simId,
+          title: document.getElementById("simTitle").textContent,
+          domain,
+          level,
+          renderer_kind: rendererKind,
+          t: time,
+          dt,
+          state: cloneState(state),
+          params: { ...params },
+          plot: plotOutput,
+          trace: traceOutput
+        };
+      }
+
+      // ENGINE
+      function setStatus(message, warning) {
+        statusBanner.textContent = message;
+        statusBanner.classList.toggle("warning", Boolean(warning));
+      }
+
+      function setRunning(nextValue) {
+        running = nextValue;
+        runToggle.textContent = running ? "Pause" : "Start";
+      }
+
+      function pushTracePoint(snapshot) {
+        const point = {
+          t: time,
+          values: cloneState(snapshot)
+        };
+        trail.push(point);
+        if (trail.length > limits.trailCap) {
+          trail.shift();
+        }
+      }
+
+      function pushSample(snapshot) {
+        const sample = { t: time };
+        stateDefs.forEach((def) => {
+          sample[def.name] = snapshot[def.name];
+        });
+        samples.push(sample);
+        if (samples.length > limits.historyCap) {
+          samples.shift();
+        }
+      }
+
+      function resetHistory() {
+        trail = [];
+        samples = [];
+        pushTracePoint(state);
+        pushSample(state);
+      }
+
+      function stepSimulation(stepSize, integrator) {
+        const nextStep = clampDt(stepSize);
+        const nextState = integrator === "euler"
+          ? eulerStep(state, params, nextStep, time)
+          : rk4Step(state, params, nextStep, time);
+        if (!isFiniteState(nextState)) {
+          setRunning(false);
+          lastWarning = "Simulation paused because the state became NaN or Infinity.";
+          setStatus(lastWarning, true);
+          return false;
+        }
+        state = nextState;
+        time += nextStep;
+        pushTracePoint(state);
+        pushSample(state);
+        return true;
+      }
+
+      function resetSimulation() {
+        state = cloneState(initialState);
+        time = 0;
+        accumulator = 0;
+        lastWarning = "";
+        resetHistory();
+        setRunning(false);
+        setStatus("Simulation reset. Press Start to run again.", false);
+        render();
+      }
+
+      function animationLoop(frameTime) {
+        if (!lastFrameTime) {
+          lastFrameTime = frameTime;
+        }
+        const elapsed = Math.min((frameTime - lastFrameTime) / 1000, 0.1);
+        lastFrameTime = frameTime;
+        if (running) {
+          accumulator += elapsed;
+          while (accumulator >= dt) {
+            const ok = stepSimulation(dt, "rk4");
+            accumulator -= dt;
+            if (!ok) {
+              accumulator = 0;
+              break;
+            }
+          }
+        }
+        render();
+        window.requestAnimationFrame(animationLoop);
+      }
+
+      // VIEW
+      function resizeCanvasToDisplaySize(canvas) {
+        const ratio = window.devicePixelRatio || 1;
+        const width = Math.floor(canvas.clientWidth * ratio);
+        const height = Math.floor(canvas.clientHeight * ratio);
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
+      }
+
+      function sceneCoordinatesFor(snapshotPoint) {
+        const values = snapshotPoint.values || snapshotPoint;
+        if (rendererKind === "trajectory2d") {
+          return { x: values.x || 0, y: values.y || 0 };
+        }
+        if (rendererKind === "oscillator1d") {
+          return { x: values.x || 0, y: 0 };
+        }
+        if (rendererKind === "circuit_rc") {
+          const chargeLike = Number.isFinite(values.vc) ? values.vc : (Number.isFinite(values.q) ? values.q : 0);
+          return { x: snapshotPoint.t || time, y: chargeLike };
+        }
+        return { x: 0, y: 0 };
+      }
+
+      function getBounds(points) {
+        if (!points.length) {
+          return { minX: -1, maxX: 1, minY: -1, maxY: 1 };
+        }
+        const bounds = points.reduce((acc, point) => {
+          acc.minX = Math.min(acc.minX, point.x);
+          acc.maxX = Math.max(acc.maxX, point.x);
+          acc.minY = Math.min(acc.minY, point.y);
+          acc.maxY = Math.max(acc.maxY, point.y);
+          return acc;
+        }, {
+          minX: Infinity,
+          maxX: -Infinity,
+          minY: Infinity,
+          maxY: -Infinity
+        });
+        const padX = Math.max(1, (bounds.maxX - bounds.minX) * 0.15);
+        const padY = Math.max(1, (bounds.maxY - bounds.minY) * 0.15);
+        return {
+          minX: bounds.minX - padX,
+          maxX: bounds.maxX + padX,
+          minY: bounds.minY - padY,
+          maxY: bounds.maxY + padY
+        };
+      }
+
+      function mapToCanvas(point, bounds, width, height, padding) {
+        const innerWidth = Math.max(1, width - (padding * 2));
+        const innerHeight = Math.max(1, height - (padding * 2));
+        const xRatio = (point.x - bounds.minX) / Math.max(1e-9, bounds.maxX - bounds.minX);
+        const yRatio = (point.y - bounds.minY) / Math.max(1e-9, bounds.maxY - bounds.minY);
+        return {
+          x: padding + (xRatio * innerWidth),
+          y: height - padding - (yRatio * innerHeight)
+        };
+      }
+
+      function drawAxes(ctx, bounds, width, height, padding, xLabel, yLabel) {
+        ctx.save();
+        ctx.strokeStyle = palette.grid;
+        ctx.fillStyle = palette.ink;
+        ctx.lineWidth = 1;
+
+        const zeroX = bounds.minX <= 0 && bounds.maxX >= 0
+          ? mapToCanvas({ x: 0, y: bounds.minY }, bounds, width, height, padding).x
+          : padding;
+        const zeroY = bounds.minY <= 0 && bounds.maxY >= 0
+          ? mapToCanvas({ x: bounds.minX, y: 0 }, bounds, width, height, padding).y
+          : height - padding;
+
+        ctx.beginPath();
+        ctx.moveTo(zeroX, padding);
+        ctx.lineTo(zeroX, height - padding);
+        ctx.moveTo(padding, zeroY);
+        ctx.lineTo(width - padding, zeroY);
+        ctx.stroke();
+
+        ctx.font = `${Math.max(12, width * 0.016)}px sans-serif`;
+        ctx.fillText(xLabel, width - padding - 56, height - 10);
+        ctx.save();
+        ctx.translate(16, padding + 24);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+        ctx.restore();
+      }
+
+      function drawTrajectoryScene(ctx, width, height) {
+        const points = trail.map(sceneCoordinatesFor);
+        const currentPoint = sceneCoordinatesFor({ values: state, t: time });
+        const bounds = getBounds(points.concat([currentPoint, { x: 0, y: 0 }]));
+        const padding = 48;
+
+        ctx.fillStyle = palette.sky;
+        ctx.fillRect(0, 0, width, height);
+        drawAxes(ctx, bounds, width, height, padding, "x", "y");
+
+        ctx.strokeStyle = palette.main;
+        ctx.lineWidth = Math.max(2, width * 0.004);
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const mapped = mapToCanvas(point, bounds, width, height, padding);
+          if (index === 0) {
+            ctx.moveTo(mapped.x, mapped.y);
+          } else {
+            ctx.lineTo(mapped.x, mapped.y);
+          }
+        });
+        ctx.stroke();
+
+        const mappedCurrent = mapToCanvas(currentPoint, bounds, width, height, padding);
+        ctx.fillStyle = palette.secondary;
+        ctx.beginPath();
+        ctx.arc(mappedCurrent.x, mappedCurrent.y, Math.max(7, width * 0.012), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawOscillatorScene(ctx, width, height) {
+        const centerY = height * 0.5;
+        const centerX = width * 0.5;
+        const currentX = Number(state.x) || 0;
+        const span = Math.max(1, ...trail.map((point) => Math.abs((point.values || {}).x || 0)), Math.abs(currentX));
+        const scale = (width * 0.32) / Math.max(1, span);
+        const blockX = centerX + (currentX * scale);
+        const trailPoints = trail.map((point) => centerX + (((point.values || {}).x || 0) * scale));
+
+        ctx.fillStyle = "#fef7ec";
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = palette.grid;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(width * 0.08, centerY);
+        ctx.lineTo(width * 0.92, centerY);
+        ctx.stroke();
+
+        ctx.setLineDash([6, 8]);
+        ctx.beginPath();
+        ctx.moveTo(centerX, height * 0.18);
+        ctx.lineTo(centerX, height * 0.82);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.strokeStyle = palette.main;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        const springStart = width * 0.12;
+        const springEnd = blockX - 38;
+        const coils = 10;
+        ctx.moveTo(springStart, centerY);
+        for (let i = 1; i <= coils; i += 1) {
+          const x = springStart + ((springEnd - springStart) * i / coils);
+          const y = centerY + ((i % 2 === 0 ? -1 : 1) * 18);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(springEnd, centerY);
+        ctx.stroke();
+
+        ctx.strokeStyle = palette.secondary;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        trailPoints.forEach((x, index) => {
+          const y = height * 0.78 - ((trailPoints.length - index - 1) / Math.max(1, trailPoints.length)) * 60;
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+
+        ctx.fillStyle = palette.secondary;
+        ctx.fillRect(blockX - 38, centerY - 32, 76, 64);
+      }
+
+      function drawCircuitScene(ctx, width, height) {
+        const vc = Number.isFinite(state.vc) ? state.vc : (Number.isFinite(state.q) && Number.isFinite(params.C) ? state.q / params.C : 0);
+        const sourceVoltage = Number.isFinite(params.Vsource) ? params.Vsource : Math.max(vc, 1);
+        const chargeRatio = Math.max(0, Math.min(1.15, vc / Math.max(1e-9, sourceVoltage)));
+        const padding = 60;
+
+        ctx.fillStyle = "#f7fbff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = palette.ink;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(padding, height * 0.25);
+        ctx.lineTo(width * 0.38, height * 0.25);
+        ctx.lineTo(width * 0.38, height * 0.44);
+        ctx.moveTo(width * 0.38, height * 0.56);
+        ctx.lineTo(width * 0.38, height * 0.75);
+        ctx.lineTo(padding, height * 0.75);
+        ctx.lineTo(padding, height * 0.25);
+        ctx.moveTo(width * 0.38, height * 0.5);
+        ctx.lineTo(width * 0.58, height * 0.5);
+        ctx.lineTo(width * 0.7, height * 0.5);
+        ctx.lineTo(width * 0.82, height * 0.5);
+        ctx.stroke();
+
+        ctx.fillStyle = palette.main;
+        ctx.fillRect(width * 0.58, height * 0.36, 12, height * 0.28);
+        ctx.fillRect(width * 0.64, height * 0.42, 12, height * 0.16);
+
+        ctx.strokeStyle = palette.secondary;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        const resistorStart = width * 0.12;
+        const resistorEnd = width * 0.32;
+        const zigzags = 7;
+        ctx.moveTo(resistorStart, height * 0.25);
+        for (let i = 1; i <= zigzags; i += 1) {
+          const x = resistorStart + ((resistorEnd - resistorStart) * i / zigzags);
+          const y = height * 0.25 + ((i % 2 === 0 ? -1 : 1) * 18);
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(15, 124, 144, 0.18)";
+        ctx.fillRect(width * 0.72, height * 0.2, width * 0.16, height * 0.6);
+        ctx.fillStyle = palette.main;
+        ctx.fillRect(width * 0.72, height * (0.8 - (0.6 * Math.min(1, chargeRatio))), width * 0.16, height * 0.6 * Math.min(1, chargeRatio));
+
+        ctx.fillStyle = palette.ink;
+        ctx.font = `${Math.max(14, width * 0.018)}px sans-serif`;
+        ctx.fillText("R", width * 0.22, height * 0.15);
+        ctx.fillText("C", width * 0.62, height * 0.25);
+        ctx.fillText(`Charge ${(chargeRatio * 100).toFixed(0)}%`, width * 0.69, height * 0.88);
+      }
+
+      function drawScene() {
+        resizeCanvasToDisplaySize(simCanvas);
+        const width = simCanvas.width;
+        const height = simCanvas.height;
+        simCtx.clearRect(0, 0, width, height);
+
+        if (rendererKind === "trajectory2d") {
+          drawTrajectoryScene(simCtx, width, height);
+        } else if (rendererKind === "oscillator1d") {
+          drawOscillatorScene(simCtx, width, height);
+        } else if (rendererKind === "circuit_rc") {
+          drawCircuitScene(simCtx, width, height);
+        }
+
+        const ctx = simCtx;
+        const currentState = state;
+        const currentParams = params;
+        const currentTime = time;
+        {{{scene_draw_js}}}
+      }
+
+      // PLOT
+      function getSampleValue(sample, key) {
+        if (key === "t") {
+          return sample.t;
+        }
+        return Number(sample[key]);
+      }
+
+      function drawPlot() {
+        resizeCanvasToDisplaySize(plotCanvas);
+        const width = plotCanvas.width;
+        const height = plotCanvas.height;
+        const padding = 44;
+        plotCtx.clearRect(0, 0, width, height);
+        plotCtx.fillStyle = "#ffffff";
+        plotCtx.fillRect(0, 0, width, height);
+
+        const selected = downsample(samples, Math.max(30, Math.floor(width / 2)));
+        const series = selected
+          .map((sample) => ({ x: getSampleValue(sample, plotOutput.x), y: getSampleValue(sample, plotOutput.y) }))
+          .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+        const bounds = getBounds(series.length ? series : [{ x: 0, y: 0 }, { x: 1, y: 1 }]);
+
+        drawAxes(plotCtx, bounds, width, height, padding, plotOutput.x, plotOutput.y);
+        plotCtx.strokeStyle = palette.main;
+        plotCtx.lineWidth = Math.max(2, width * 0.004);
+        plotCtx.beginPath();
+        series.forEach((point, index) => {
+          const mapped = mapToCanvas(point, bounds, width, height, padding);
+          if (index === 0) {
+            plotCtx.moveTo(mapped.x, mapped.y);
+          } else {
+            plotCtx.lineTo(mapped.x, mapped.y);
+          }
+        });
+        plotCtx.stroke();
+        plotSummary.textContent = plotOutput.label || `${plotOutput.y} vs ${plotOutput.x}`;
+      }
+
+      function downsample(values, maxPoints) {
+        if (values.length <= maxPoints) {
+          return values;
+        }
+        const step = values.length / maxPoints;
+        const output = [];
+        for (let i = 0; i < maxPoints; i += 1) {
+          output.push(values[Math.floor(i * step)]);
+        }
+        return output;
+      }
+
+      // UI
+      function formatNumber(value) {
+        if (!Number.isFinite(value)) {
+          return "NaN";
+        }
+        const magnitude = Math.abs(value);
+        if (magnitude >= 1000 || (magnitude > 0 && magnitude < 0.001)) {
+          return value.toExponential(3);
+        }
+        return value.toFixed(3);
+      }
+
+      function derivedStep(definition) {
+        if (Number.isFinite(definition.step) && definition.step > 0) {
+          return Number(definition.step);
+        }
+        const span = Math.abs(Number(definition.max) - Number(definition.min));
+        if (!Number.isFinite(span) || span === 0) {
+          return 0.01;
+        }
+        const raw = span / 100;
+        if (raw >= 1) {
+          return Number(raw.toFixed(2));
+        }
+        if (raw >= 0.1) {
+          return Number(raw.toFixed(3));
+        }
+        return Number(raw.toPrecision(2));
+      }
+
+      function buildParamControls() {
+        paramControls.innerHTML = "";
+        paramDefs.forEach((definition) => {
+          const wrapper = document.createElement("label");
+          wrapper.className = "slider-group";
+
+          const head = document.createElement("div");
+          head.className = "slider-head";
+
+          const name = document.createElement("span");
+          name.textContent = definition.unit ? `${definition.name} (${definition.unit})` : definition.name;
+
+          const value = document.createElement("span");
+          value.id = `param-value-${definition.name}`;
+          value.textContent = formatNumber(params[definition.name]);
+
+          head.appendChild(name);
+          head.appendChild(value);
+
+          const input = document.createElement("input");
+          input.type = "range";
+          input.min = String(definition.min);
+          input.max = String(definition.max);
+          input.step = String(derivedStep(definition));
+          input.value = String(params[definition.name]);
+          input.addEventListener("input", () => {
+            params[definition.name] = Number(input.value);
+            value.textContent = formatNumber(params[definition.name]);
+            if (!running) {
+              render();
+            }
+          });
+
+          wrapper.appendChild(head);
+          if (definition.desc) {
+            const note = document.createElement("span");
+            note.className = "small";
+            note.textContent = definition.desc;
+            wrapper.appendChild(note);
+          }
+          wrapper.appendChild(input);
+          paramControls.appendChild(wrapper);
+        });
+      }
+
+      function buildReadoutItems() {
+        const snapshot = makeSnapshot();
+        const snapshotState = snapshot.state;
+        const snapshotParams = snapshot.params;
+        const snapshotTime = snapshot.t;
+        const defaultItems = readoutFields.map((field) => {
+          const key = field.key;
+          const label = field.label || key;
+          const unit = field.unit ? ` ${field.unit}` : "";
+          const value = key === "t" ? snapshotTime : snapshotState[key];
+          return {
+            label,
+            value: `${formatNumber(Number(value))}${unit}`
+          };
+        });
+        const state = snapshotState;
+        const params = snapshotParams;
+        const t = snapshotTime;
+        const customItems = (() => {
+          {{{readout_map_js}}}
+        })();
+        return Array.isArray(customItems) && customItems.length ? customItems : defaultItems;
+      }
+
+      function renderReadouts() {
+        readouts.innerHTML = "";
+        buildReadoutItems().forEach((item) => {
+          const row = document.createElement("li");
+          row.className = "readout-row";
+          const label = document.createElement("span");
+          label.textContent = item.label;
+          const value = document.createElement("strong");
+          value.textContent = item.value;
+          row.appendChild(label);
+          row.appendChild(value);
+          readouts.appendChild(row);
+        });
+      }
+
+      function renderWorksheet() {
+        worksheetBody.innerHTML = "";
+        const sections = [
+          ["Predict", worksheet.predict || []],
+          ["Test", worksheet.test || []],
+          ["Explain", worksheet.explain || []],
+          ["Misconceptions", worksheet.misconceptions || []]
+        ];
+        sections.forEach(([label, prompts]) => {
+          const section = document.createElement("section");
+          section.className = "worksheet-section";
+          const heading = document.createElement("h3");
+          heading.textContent = label;
+          section.appendChild(heading);
+          const list = document.createElement("ul");
+          list.className = "worksheet-list";
+          prompts.forEach((prompt) => {
+            const item = document.createElement("li");
+            item.textContent = prompt;
+            list.appendChild(item);
+          });
+          section.appendChild(list);
+          worksheetBody.appendChild(section);
+        });
+      }
+
+      function renderSuccessCriteria() {
+        successCriteriaList.innerHTML = "";
+        successCriteria.forEach((criterion) => {
+          const item = document.createElement("li");
+          item.textContent = criterion;
+          successCriteriaList.appendChild(item);
+        });
+      }
+
+      function updateDtUi() {
+        dt = clampDt(Number(dtSlider.value));
+        dtSlider.value = String(dt);
+        dtValue.textContent = dt.toFixed(3) + " s";
+      }
+
+      // WORKSHEET
+      renderWorksheet();
+      renderSuccessCriteria();
+
+      // EXPORT
+      async function copySnapshot() {
+        const text = JSON.stringify(makeSnapshot(), null, 2);
+        copyFallback.classList.remove("visible");
+        if (navigator.clipboard && window.isSecureContext && location.protocol !== "file:") {
+          try {
+            await navigator.clipboard.writeText(text);
+            setStatus("JSON snapshot copied to the clipboard.", false);
+            return;
+          } catch (error) {
+            // Fall through to manual copy.
+          }
+        }
+        copyFallbackText.value = text;
+        copyFallback.classList.add("visible");
+        copyFallbackText.focus();
+        copyFallbackText.select();
+        setStatus("Clipboard access is unavailable here. Copy the selected snapshot manually.", true);
+      }
+
+      function downloadCsv() {
+        const headers = ["t"].concat(stateDefs.map((def) => def.name));
+        const lines = [headers.join(",")];
+        samples.forEach((sample) => {
+          lines.push(headers.map((header) => formatCsvValue(sample[header])).join(","));
+        });
+        const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${simId}_timeseries.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        setStatus("CSV download started.", false);
+      }
+
+      function formatCsvValue(value) {
+        if (typeof value === "number") {
+          return Number.isFinite(value) ? value.toString() : "";
+        }
+        if (typeof value === "string" && /[,"\n]/.test(value)) {
+          return `"${value.replace(/"/g, "\"\"")}"`;
+        }
+        return value ?? "";
+      }
+
+      function render() {
+        if (!lastWarning) {
+          setStatus(running ? "Running simulation." : "Paused. Adjust parameters or step through the model.", false);
+        }
+        drawScene();
+        drawPlot();
+        renderReadouts();
+      }
+
+      function init() {
+        dtSlider.min = String(dtConfig.min);
+        dtSlider.max = String(dtConfig.max);
+        dtSlider.step = String(Math.max(0.001, (dtConfig.max - dtConfig.min) / 100));
+        dtSlider.value = String(dt);
+        updateDtUi();
+        buildParamControls();
+        resetHistory();
+        render();
+
+        runToggle.addEventListener("click", () => {
+          lastWarning = "";
+          setRunning(!running);
+          render();
+        });
+        stepBtn.addEventListener("click", () => {
+          lastWarning = "";
+          setRunning(false);
+          const ok = stepSimulation(dt, "rk4");
+          if (ok) {
+            setStatus("Advanced by one RK4 step.", false);
+            render();
+          }
+        });
+        resetBtn.addEventListener("click", resetSimulation);
+        dtSlider.addEventListener("input", () => {
+          updateDtUi();
+          render();
+        });
+        copyJsonBtn.addEventListener("click", copySnapshot);
+        downloadCsvBtn.addEventListener("click", downloadCsv);
+        window.addEventListener("resize", render);
+        window.requestAnimationFrame(animationLoop);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

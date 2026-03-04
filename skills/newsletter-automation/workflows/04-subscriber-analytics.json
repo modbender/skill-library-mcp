@@ -1,0 +1,128 @@
+{
+  "name": "Newsletter — Subscriber Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SUBSCRIBERS_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Subscribers",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Read Subscribers",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const subscribers = $input.all().map(i => i.json);\nconst now = new Date();\nconst oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);\nconst sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);\nconst thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);\n\nconst total = subscribers.length;\nconst confirmed = subscribers.filter(s =>\n  s.status === 'confirmed' || s.confirmed === 'true' || s.confirmed === true\n).length;\nconst pending = subscribers.filter(s => s.status === 'pending').length;\nconst unsubscribed = subscribers.filter(s => s.status === 'unsubscribed').length;\n\n// Growth metrics\nconst newToday = subscribers.filter(s => {\n  const d = new Date(s.subscribed_at);\n  return d >= oneDayAgo;\n}).length;\n\nconst newThisWeek = subscribers.filter(s => {\n  const d = new Date(s.subscribed_at);\n  return d >= sevenDaysAgo;\n}).length;\n\nconst newThisMonth = subscribers.filter(s => {\n  const d = new Date(s.subscribed_at);\n  return d >= thirtyDaysAgo;\n}).length;\n\nconst confirmationRate = total > 0 ? Math.round((confirmed / total) * 100) : 0;\n\n// Top sources\nconst sourceCounts = {};\nfor (const s of subscribers) {\n  const src = s.source || 'unknown';\n  sourceCounts[src] = (sourceCounts[src] || 0) + 1;\n}\nconst topSources = Object.entries(sourceCounts)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([source, count]) => `${source}: ${count}`)\n  .join(', ');\n\nreturn [{\n  json: {\n    total,\n    confirmed,\n    pending,\n    unsubscribed,\n    new_today: newToday,\n    new_this_week: newThisWeek,\n    new_this_month: newThisMonth,\n    confirmation_rate: confirmationRate,\n    top_sources: topSources,\n    report_date: now.toISOString().split('T')[0]\n  }\n}];"
+      },
+      "id": "n3",
+      "name": "Calculate Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NEWSLETTER_ADMIN_EMAIL || 'YOUR_NOTIFICATION_EMAIL' }}",
+        "subject": "=Newsletter Analytics — {{ $json.report_date }}",
+        "message": "=<h2>Newsletter Subscriber Report</h2><p><strong>Date:</strong> {{ $json.report_date }}</p><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Total Subscribers</strong></td><td>{{ $json.total }}</td></tr><tr><td><strong>Confirmed</strong></td><td>{{ $json.confirmed }}</td></tr><tr><td><strong>Pending</strong></td><td>{{ $json.pending }}</td></tr><tr><td><strong>Unsubscribed</strong></td><td>{{ $json.unsubscribed }}</td></tr><tr><td><strong>Confirmation Rate</strong></td><td>{{ $json.confirmation_rate }}%</td></tr></table><h3>Growth</h3><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>New Today</strong></td><td>{{ $json.new_today }}</td></tr><tr><td><strong>New This Week</strong></td><td>{{ $json.new_this_week }}</td></tr><tr><td><strong>New This Month</strong></td><td>{{ $json.new_this_month }}</td></tr></table><h3>Top Sources</h3><p>{{ $json.top_sources }}</p>",
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Calculate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

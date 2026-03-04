@@ -1,0 +1,254 @@
+{
+  "checks": [
+    {
+      "check_id": "PHY-001",
+      "name": "Disk encryption enabled",
+      "description": "Verify disk/volume encryption is active (FileVault on macOS, LUKS on Linux)",
+      "category": "physical_environment",
+      "bash_command": "if [ \"$(uname)\" = \"Darwin\" ]; then fdesetup status 2>/dev/null | grep -q 'FileVault is On' && echo 'ENCRYPTED' || echo 'NOT_ENCRYPTED'; else lsblk -o NAME,FSTYPE 2>/dev/null | grep -qE 'crypto_LUKS|dm-crypt' && echo 'ENCRYPTED' || (dmsetup ls --target crypt 2>/dev/null | grep -q '.' && echo 'ENCRYPTED' || echo 'NOT_ENCRYPTED'); fi",
+      "severity": "high",
+      "expected_output": "ENCRYPTED",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "PHY-003",
+      "name": "Container isolation active",
+      "description": "Detect any form of process isolation (Docker, K8s, macOS sandbox)",
+      "category": "physical_environment",
+      "bash_command": "ISOLATED=false; test -f /.dockerenv && ISOLATED=true; grep -qE 'docker|lxc|containerd|kubepods' /proc/1/cgroup 2>/dev/null && ISOLATED=true; test -f /var/run/secrets/kubernetes.io/serviceaccount/token && ISOLATED=true; if [ \"$(uname)\" = \"Darwin\" ]; then sandbox-exec -n no-network true 2>/dev/null && ISOLATED=true; fi; echo $ISOLATED | grep -q true && echo 'ISOLATED' || echo 'NOT_ISOLATED'",
+      "severity": "medium",
+      "expected_output": "ISOLATED",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "PHY-004",
+      "name": "Non-root execution",
+      "description": "Agent should not run as root user or have elevated capabilities",
+      "category": "physical_environment",
+      "bash_command": "if [ \"$(id -u)\" = \"0\" ]; then echo 'RUNNING_AS_ROOT'; elif command -v capsh >/dev/null 2>&1 && capsh --print 2>/dev/null | grep -q 'cap_sys_admin'; then echo 'ELEVATED_CAPS'; else echo 'NON_ROOT'; fi",
+      "severity": "critical",
+      "expected_output": "NON_ROOT",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "NET-001",
+      "name": "No dangerous ports listening",
+      "description": "Check for commonly exploited service ports (FTP, Telnet, SMB, RDP, Redis, MongoDB, etc.)",
+      "category": "network",
+      "bash_command": "DANGEROUS_PORTS='21 23 445 3389 6379 27017 9200 1433 5900 4444 8888'; if [ \"$(uname)\" = \"Darwin\" ]; then LISTENERS=$(lsof -iTCP -sTCP:LISTEN -P -n 2>/dev/null | awk '{print $9}' | grep -oE ':[0-9]+$' | tr -d ':' | sort -u); else LISTENERS=$(ss -tlnp 2>/dev/null | awk '{print $4}' | grep -oE '[0-9]+$' | sort -u); fi; FOUND=''; for port in $DANGEROUS_PORTS; do echo \"$LISTENERS\" | grep -q \"^${port}$\" && FOUND=\"$FOUND $port\"; done; test -z \"$FOUND\" && echo 'SAFE' || echo \"DANGEROUS_PORTS:$FOUND\"",
+      "severity": "high",
+      "expected_output": "SAFE",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "NET-002",
+      "name": "TLS 1.2+ available",
+      "description": "Verify OpenSSL/LibreSSL version supports TLS 1.2+",
+      "category": "network",
+      "bash_command": "VER=$(openssl version 2>/dev/null); if echo \"$VER\" | grep -qE 'OpenSSL (1\\.[1-9]|[2-9]\\.|3\\.)|LibreSSL ([2-9]\\.|[1-9][0-9])'; then echo \"TLS_OK:$VER\"; else echo \"TLS_OUTDATED:$VER\"; fi",
+      "severity": "high",
+      "expected_output": "TLS_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "NET-003",
+      "name": "DNS resolution working",
+      "description": "Verify DNS resolution is functional",
+      "category": "network",
+      "bash_command": "RESOLVED=$(dig +short cloudflare.com 2>/dev/null | head -1); if [ -z \"$RESOLVED\" ]; then RESOLVED=$(nslookup cloudflare.com 2>/dev/null | grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' | head -1); fi; if [ -z \"$RESOLVED\" ]; then RESOLVED=$(python3 -c 'import socket; print(socket.gethostbyname(\"cloudflare.com\"))' 2>/dev/null); fi; if [ -z \"$RESOLVED\" ]; then RESOLVED=$(getent hosts cloudflare.com 2>/dev/null | head -1 | awk '{print $1}'); fi; if [ -z \"$RESOLVED\" ]; then echo 'DNS_FAIL'; else echo 'DNS_OK'; fi",
+      "severity": "low",
+      "expected_output": "DNS_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "NET-004",
+      "name": "SSL certificates valid",
+      "description": "Verify the CA store can validate known-good certificates",
+      "category": "network",
+      "bash_command": "if curl -s --max-time 5 -o /dev/null -w '%{ssl_verify_result}' https://cloudflare.com 2>/dev/null | grep -q '^0$'; then echo 'CERTS_OK'; elif openssl s_client -connect cloudflare.com:443 </dev/null 2>/dev/null | grep -q 'Verify return code: 0'; then echo 'CERTS_OK'; else echo 'CERTS_FAIL'; fi",
+      "severity": "high",
+      "expected_output": "CERTS_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "NET-005",
+      "name": "No proxy/CA bypass attempts",
+      "description": "Check for suspicious proxy, CA override, or MITM indicators in environment",
+      "category": "network",
+      "bash_command": "ISSUES=''; env | grep -iqE 'no_proxy.*\\*' && ISSUES=\"$ISSUES no_proxy_wildcard\"; for var in http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY; do VAL=$(printenv \"$var\" 2>/dev/null); if [ -n \"$VAL\" ]; then echo \"$VAL\" | grep -qE '(ngrok|serveo|localhost\\.run|burp|mitmproxy|127\\.0\\.0\\.1:808)' && ISSUES=\"$ISSUES suspicious_proxy:$var\"; fi; done; for var in SSL_CERT_FILE SSL_CERT_DIR REQUESTS_CA_BUNDLE NODE_EXTRA_CA_CERTS; do VAL=$(printenv \"$var\" 2>/dev/null); test -n \"$VAL\" && ISSUES=\"$ISSUES ca_override:$var\"; done; test -z \"$ISSUES\" && echo 'PROXY_OK' || echo \"PROXY_ISSUES:$ISSUES\"",
+      "severity": "high",
+      "expected_output": "PROXY_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "SEC-003",
+      "name": "Private keys secured",
+      "description": "Check that private key files have proper permissions (not group/world-readable)",
+      "category": "secrets",
+      "bash_command": "INSECURE=$(find ~/.ssh -maxdepth 2 \\( -name '*.pem' -o -name 'id_*' -o -name '*.key' \\) ! -name '*.pub' -perm +044 2>/dev/null | head -10 | wc -l | tr -d ' '); echo \"${INSECURE:-0}\"",
+      "severity": "high",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "SEC-004",
+      "name": "No .env files exposed",
+      "description": "Check for .env files in agent workspace and home directory",
+      "category": "secrets",
+      "bash_command": "ENVFILES=$(find ~ -maxdepth 3 -name '.env*' ! -name '.envrc' ! -name '.env.example' ! -name '.env.template' ! -name '.env.sample' -type f 2>/dev/null | head -10); if [ -z \"$ENVFILES\" ]; then echo 'ENV_OK'; else COUNT=$(echo \"$ENVFILES\" | wc -l | tr -d ' '); echo \"ENV_EXPOSED:$COUNT\"; fi",
+      "severity": "medium",
+      "expected_output": "ENV_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "SEC-005",
+      "name": "No hardcoded tokens in history",
+      "description": "Check shell history for high-confidence leaked credential patterns",
+      "category": "secrets",
+      "bash_command": "MATCHES=0; for f in ~/.bash_history ~/.zsh_history; do test -f \"$f\" && MATCHES=$((MATCHES + $(grep -cE 'bearer [A-Za-z0-9+/=_-]{20,}|authorization:.*[A-Za-z0-9+/=_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{32}' \"$f\" 2>/dev/null || echo 0))); done; echo \"$MATCHES\"",
+      "severity": "medium",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "COD-001",
+      "name": "Git configuration safe",
+      "description": "Check git is configured without plaintext credential storage or embedded secrets",
+      "category": "code",
+      "bash_command": "ISSUES=''; HELPER=$(git config --global credential.helper 2>/dev/null); test \"$HELPER\" = 'store' && ISSUES=\"$ISSUES plaintext_store\"; git config --global --list 2>/dev/null | grep -iqE 'password|token|secret' && ISSUES=\"$ISSUES creds_in_config\"; test -f ~/.netrc && grep -qi 'github\\|gitlab\\|bitbucket' ~/.netrc 2>/dev/null && ISSUES=\"$ISSUES netrc_creds\"; test -z \"$ISSUES\" && echo 'GIT_OK' || echo \"GIT_ISSUES:$ISSUES\"",
+      "severity": "medium",
+      "expected_output": "GIT_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "COD-002",
+      "name": "No secrets in git history",
+      "description": "Scan recent git diffs for actual secret patterns (AWS keys, GitHub tokens, private keys)",
+      "category": "code",
+      "bash_command": "SECRETS_FOUND=$(git log -10 --all -p 2>/dev/null | grep -E 'AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9_]{36}|sk-[A-Za-z0-9]{32,}|-----BEGIN.*PRIVATE KEY-----' | grep -vE 'grep|regex|pattern|\\[A-Z|\\[0-9|\\[a-z|check_id|pass_condition|expected_output|secret_pattern|re\\.search|def |import |\\(r' | wc -l | tr -d ' '); echo \"${SECRETS_FOUND:-0}\"",
+      "severity": "high",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "COD-004",
+      "name": "No .git directory in web root",
+      "description": "Check common web-accessible directories for exposed .git folders",
+      "category": "code",
+      "bash_command": "EXPOSED=''; for dir in /var/www /srv /usr/share/nginx /opt/app /app; do test -d \"$dir\" && find \"$dir\" -maxdepth 2 -name '.git' -type d 2>/dev/null | head -1 | grep -q '.' && EXPOSED=\"$EXPOSED $dir\"; done; test -z \"$EXPOSED\" && echo 'GIT_SAFE' || echo \"GIT_EXPOSED:$EXPOSED\"",
+      "severity": "critical",
+      "expected_output": "GIT_SAFE",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "LOG-001",
+      "name": "System logging active",
+      "description": "Verify syslog or journald is running",
+      "category": "logs",
+      "bash_command": "SYS_LOG=false; pgrep -x syslogd >/dev/null 2>&1 && SYS_LOG=true; pgrep -x rsyslogd >/dev/null 2>&1 && SYS_LOG=true; pgrep -x systemd-journald >/dev/null 2>&1 && SYS_LOG=true; test -S /dev/log 2>/dev/null && SYS_LOG=true; echo \"$SYS_LOG\" | grep -q true && echo 'LOGGING_OK' || echo 'NO_LOGGING'",
+      "severity": "high",
+      "expected_output": "LOGGING_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "SKL-003",
+      "name": "No skills with privilege escalation",
+      "description": "Check installed skills for dangerous privilege escalation patterns",
+      "category": "skills",
+      "bash_command": "FOUND=$(grep -rlE 'sudo|chmod 777|chown root|setuid|doas|pkexec|su -c|/etc/sudoers|curl.*\\|.*bash|wget.*\\|.*bash' ~/.config/openclaw/skills ~/.openclaw/skills ~/.config/claude/skills ./.skills 2>/dev/null | wc -l | tr -d ' '); echo \"${FOUND:-0}\"",
+      "severity": "critical",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INT-001",
+      "name": "No unauthorized network listeners",
+      "description": "Check for unexpected non-localhost listening services",
+      "category": "integrity",
+      "bash_command": "if [ \"$(uname)\" = \"Darwin\" ]; then LISTENERS=$(lsof -iTCP -sTCP:LISTEN -P -n 2>/dev/null | grep -v '127.0.0.1\\|::1\\|localhost' | grep -v '^COMMAND' | wc -l | tr -d ' '); else LISTENERS=$(ss -tlnp 2>/dev/null | grep -v '127.0.0.1\\|::1' | tail -n +2 | wc -l | tr -d ' '); fi; echo \"${LISTENERS:-0}\"",
+      "severity": "high",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INT-002",
+      "name": "No suspicious cron jobs",
+      "description": "Check for dangerous patterns in cron jobs (excludes TrustMyAgent's own entry)",
+      "category": "integrity",
+      "bash_command": "if ! command -v crontab >/dev/null 2>&1; then echo '0'; elif ! crontab -l >/dev/null 2>&1; then echo '0'; else DANGEROUS=$(crontab -l 2>/dev/null | grep -v '^#' | grep -v '^$' | grep -viE 'trustmyagent|trust-my-agent|run\\.py.*check|security.*assess|security.*scan' | grep -cE 'curl|wget|nc |ncat|python.*-c|ruby.*-e|eval|bash.*<|reverse|rm -rf' 2>/dev/null); echo \"${DANGEROUS:-0}\"; fi",
+      "severity": "medium",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INT-003",
+      "name": "No backdoor indicators",
+      "description": "Check for reverse shells, crypto miners, and suspicious network tools",
+      "category": "integrity",
+      "bash_command": "BC=0; BC=$((BC + $(ps aux 2>/dev/null | grep -iE 'nc -l|ncat.*-e|socat.*exec|socat.*tcp' | grep -v grep | wc -l))); BC=$((BC + $(ps aux 2>/dev/null | grep -iE 'python.*socket.*connect|ruby.*TCPSocket|perl.*socket.*INET' | grep -v grep | wc -l))); BC=$((BC + $(ps aux 2>/dev/null | grep -E 'bash.*>/dev/tcp|bash.*-i.*>&' | grep -v grep | wc -l))); BC=$((BC + $(ps aux 2>/dev/null | grep -iE 'xmrig|minerd|cpuminer|stratum\\+tcp' | grep -v grep | wc -l))); echo \"$BC\"",
+      "severity": "critical",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INT-004",
+      "name": "No browser automation detected",
+      "description": "Check for headless browser automation processes",
+      "category": "integrity",
+      "bash_command": "AUTOMATION=$(ps aux 2>/dev/null | grep -iE 'headless.*chrome|puppeteer|playwright|selenium|chromedriver|geckodriver' | grep -v grep | wc -l | tr -d ' '); echo \"${AUTOMATION:-0}\"",
+      "severity": "medium",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INT-005",
+      "name": "File system scope limited",
+      "description": "Check agent does not have access to sensitive system files",
+      "category": "integrity",
+      "bash_command": "SCOPE_ISSUES=''; test -r /etc/shadow && SCOPE_ISSUES=\"$SCOPE_ISSUES shadow_readable\"; test -r /etc/sudoers && SCOPE_ISSUES=\"$SCOPE_ISSUES sudoers_readable\"; test -w /etc/passwd && SCOPE_ISSUES=\"$SCOPE_ISSUES passwd_writable\"; test -w /usr/local/bin && SCOPE_ISSUES=\"$SCOPE_ISSUES bin_writable\"; test -z \"$SCOPE_ISSUES\" && echo 'SCOPE_OK' || echo \"SCOPE_ISSUES:$SCOPE_ISSUES\"",
+      "severity": "high",
+      "expected_output": "SCOPE_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "SOC-001",
+      "name": "Action logging enabled",
+      "description": "Verify agent actions are being actively logged (recent log writes)",
+      "category": "social_guards",
+      "bash_command": "LOG_ACTIVE=false; for d in ~/.openclaw ~/.config/openclaw ~/.claude ~/.moltbot /var/log/openclaw /tmp/openclaw-logs; do if [ -d \"$d\" ]; then RECENT=$(find \"$d\" \\( -name '*.jsonl' -o -name '*.log' -o -name '*.ndjson' \\) -mmin -60 2>/dev/null | head -1); test -n \"$RECENT\" && LOG_ACTIVE=true; fi; done; if [ \"$LOG_ACTIVE\" = false ]; then test -n \"$(find /tmp -maxdepth 1 -name 'openclaw*.log' -o -name 'clawdbot*.log' -mmin -60 2>/dev/null | head -1)\" && LOG_ACTIVE=true; fi; echo \"$LOG_ACTIVE\" | grep -q true && echo 'ACTION_LOG_OK' || echo 'ACTION_LOG_STALE'",
+      "severity": "high",
+      "expected_output": "ACTION_LOG_OK",
+      "pass_condition": "contains"
+    },
+    {
+      "check_id": "SOC-003",
+      "name": "No hidden communication channels",
+      "description": "Check for processes connecting to messaging service APIs",
+      "category": "social_guards",
+      "bash_command": "if [ \"$(uname)\" = \"Darwin\" ]; then SUSPICIOUS=$(lsof -i -n -P 2>/dev/null | grep -iE 'telegram|discord|slack|signal|matrix' | grep -v LISTEN | wc -l | tr -d ' '); else SUSPICIOUS=$(ss -tnp 2>/dev/null | grep -v LISTEN | wc -l | tr -d ' '); fi; echo \"${SUSPICIOUS:-0}\"",
+      "severity": "high",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INC-003",
+      "name": "No unusual process spawning",
+      "description": "Check for suspicious orphan processes (parent = init)",
+      "category": "incident_prevention",
+      "bash_command": "SUSPICIOUS=$(ps -eo pid,ppid,comm 2>/dev/null | awk 'NR>1 && $2==1' | grep -iwE 'nc|ncat|socat|telnet' | grep -v 'grep\\|syslog\\|cron\\|docker\\|container' | wc -l | tr -d ' '); echo \"${SUSPICIOUS:-0}\"",
+      "severity": "high",
+      "expected_output": "0",
+      "pass_condition": "equals"
+    },
+    {
+      "check_id": "INC-005",
+      "name": "System load normal",
+      "description": "Check for abnormal CPU load (crypto mining / resource abuse indicator)",
+      "category": "incident_prevention",
+      "bash_command": "if [ \"$(uname)\" = \"Darwin\" ]; then CPUS=$(sysctl -n hw.ncpu 2>/dev/null || echo 4); LOAD=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2}'); else CPUS=$(nproc 2>/dev/null || echo 4); LOAD=$(uptime | awk -F'load average:' '{print $2}' | awk -F, '{print $1}' | tr -d ' '); fi; RATIO=$(echo \"$LOAD $CPUS\" | awk '{printf \"%.1f\", $1/$2}'); echo \"$RATIO\" | awk '{if($1+0 > 3.0) print \"HIGH_LOAD:\"$1; else print \"LOAD_OK:\"$1}'",
+      "severity": "medium",
+      "expected_output": "LOAD_OK",
+      "pass_condition": "contains"
+    }
+  ]
+}

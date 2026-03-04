@@ -1,0 +1,30 @@
+version: "0.1"
+default_verdict: approve
+
+rules:
+  - name: block-credentials
+    match:
+      target_pattern: "**/*.env"
+    verdict: deny
+    reason: "Credential files are never accessible"
+
+  - name: block-ssh-keys
+    match:
+      target_pattern: "**/.ssh/**"
+    verdict: deny
+    reason: "SSH keys are never accessible"
+
+  - name: block-destructive-shell
+    match:
+      action_type: execute
+      tool_pattern: "shell.rm"
+    verdict: deny
+    reason: "Destructive shell commands require manual approval"
+
+sensitive_data:
+  - category: credentials
+    patterns:
+      - "**/*.env"
+      - "**/.ssh/**"
+      - "**/credentials*"
+    action: deny

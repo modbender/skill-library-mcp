@@ -1,0 +1,116 @@
+# Qwen Code CI/CD 集成示例
+# GitHub Actions 工作流配置
+
+name: Qwen Code CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install Qwen Code CLI
+      run: npm install -g @qwen-code/qwen-code@latest
+    
+    - name: Configure Qwen Code
+      env:
+        DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      run: echo "API Key configured"
+    
+    - name: Code Review - Changed Files
+      env:
+        DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      run: |
+        git diff --name-only HEAD~1 HEAD | while read file; do
+          if [[ "$file" == *.ts || "$file" == *.js || "$file" == *.py ]]; then
+            echo "Reviewing: $file"
+            qwen -p "审查这个文件的代码质量和潜在问题" "$file" --output-format json >> review-results.jsonl
+          fi
+        done
+    
+    - name: Upload Review Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-review-results
+        path: review-results.jsonl
+
+  auto-fix:
+    runs-on: ubuntu-latest
+    needs: code-review
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install Qwen Code CLI
+      run: npm install -g @qwen-code/qwen-code@latest
+    
+    - name: Auto Fix Common Issues
+      env:
+        DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      run: |
+        # 自动修复常见问题（需要人工确认）
+        qwen -p "自动修复代码中的常见问题：1) 未使用的变量 2) 缺少错误处理 3) 代码格式问题" \
+          --auto-fix \
+          --dry-run \
+          --output-format json > fix-suggestions.json
+        
+        echo "修复建议已生成，请在 PR 中查看"
+    
+    - name: Create PR Comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🤖 Qwen Code 已完成代码审查，修复建议已生成。请查看 Artifacts 下载 review-results.jsonl'
+          })
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install Qwen Code CLI
+      run: npm install -g @qwen-code/qwen-code@latest
+    
+    - name: Security Scan
+      env:
+        DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      run: |
+        # 安全扫描
+        find src -type f \( -name "*.ts" -o -name "*.js" -o -name "*.py" \) | while read file; do
+          qwen -p "安全审查：检查 SQL 注入、XSS、敏感信息泄露等安全问题" "$file" \
+            --output-format json >> security-results.jsonl
+        done
+    
+    - name: Upload Security Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-results
+        path: security-results.jsonl

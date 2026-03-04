@@ -1,0 +1,70 @@
+[project]
+name = "linear-todos"
+version = "1.0.1"
+description = "A powerful todo management system built on Linear with smart date parsing"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "OpenClaw"}
+]
+keywords = ["linear", "todos", "cli", "task-management"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "click>=8.3.1",
+    "dateparser>=1.3.0",
+    "requests>=2.32.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "responses>=0.25.8",
+]
+
+[project.scripts]
+linear-todo = "linear_todos.cli:main"
+linear-todo-setup = "linear_todos.setup_wizard:setup"
+linear-todo-review = "linear_todos.cli:review"
+linear-todo-digest = "linear_todos.cli:digest"
+
+[project.urls]
+Homepage = "https://github.com/openclaw/linear-todos"
+Repository = "https://github.com/openclaw/linear-todos"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/linear_todos"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--cov=linear_todos --cov-report=term-missing --cov-report=html"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src/linear_todos"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

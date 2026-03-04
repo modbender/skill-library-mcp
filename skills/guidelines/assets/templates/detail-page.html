@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容管理 - 文章详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ft-brand-color: #005DEB;
+            --ft-brand-color-hover: #267DFF;
+            --ft-brand-color-active: #004BBF;
+            --ft-brand-color-bg: #EFF0FA;
+            --ft-grey-0: #FFFFFF;
+            --ft-grey-1: #F7F8FA;
+            --ft-grey-2: #F2F3F5;
+            --ft-grey-3: #E6E8EC;
+            --ft-grey-4: #D1D5DB;
+            --ft-grey-5: #9CA3AF;
+            --ft-grey-6: #6B7280;
+            --ft-grey-7: #39485E;
+            --ft-grey-8: #1F2937;
+            --ft-grey-9: #111827;
+            --ft-success-color: #10B981;
+            --ft-warning-color: #F59E0B;
+            --ft-error-color: #EF4444;
+            --ft-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --ft-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --ft-radius-sm: 2px;
+            --ft-radius-md: 4px;
+            --ft-sidebar-width: 240px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--ft-grey-1);
+            color: var(--ft-grey-7);
+            line-height: 1.5;
+        }
+
+        /* Sidebar */
+        .ft-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--ft-sidebar-width);
+            height: 100vh;
+            background: var(--ft-grey-0);
+            border-right: 1px solid var(--ft-grey-3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ft-sidebar-logo {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ft-brand-color);
+            border-bottom: 1px solid var(--ft-grey-2);
+        }
+
+        .ft-sidebar-logo i { margin-right: 8px; font-size: 24px; }
+
+        .ft-sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .ft-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--ft-grey-7);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .ft-menu-item i { margin-right: 12px; font-size: 18px; }
+        .ft-menu-item:hover { background-color: var(--ft-grey-1); color: var(--ft-brand-color); }
+        .ft-menu-item.active {
+            background-color: var(--ft-brand-color-bg);
+            color: var(--ft-brand-color);
+            font-weight: 500;
+        }
+        .ft-menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 16px;
+            background-color: var(--ft-brand-color);
+        }
+
+        .ft-menu-group {
+            margin-top: 16px;
+            padding: 0 24px 8px;
+            font-size: 12px;
+            color: var(--ft-grey-5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Content */
+        .ft-main {
+            margin-left: var(--ft-sidebar-width);
+            min-height: 100vh;
+        }
+
+        .ft-page-header {
+            background: var(--ft-grey-0);
+            padding: 24px;
+            border-bottom: 1px solid var(--ft-grey-2);
+        }
+
+        .ft-page-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ft-page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ft-grey-9);
+            margin-bottom: 8px;
+        }
+
+        .ft-breadcrumb {
+            font-size: 14px;
+            color: var(--ft-grey-5);
+        }
+
+        .ft-breadcrumb span:last-child { color: var(--ft-grey-8); font-weight: 500; }
+
+        .ft-page-content {
+            padding: 24px;
+            max-width: 1200px;
+        }
+
+        .ft-card {
+            background: var(--ft-grey-0);
+            border-radius: var(--ft-radius-sm);
+            padding: 32px;
+            box-shadow: var(--ft-shadow-sm);
+            border: 1px solid var(--ft-grey-2);
+            margin-bottom: 24px;
+        }
+
+        /* Buttons */
+        .ft-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            padding: 0 15px;
+            font-size: 14px;
+            border-radius: var(--ft-radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--ft-grey-7);
+            user-select: none;
+            text-decoration: none;
+        }
+
+        .ft-btn-primary {
+            background: var(--ft-brand-color);
+            color: #fff;
+            border-color: var(--ft-brand-color);
+        }
+        .ft-btn-primary:hover { background: var(--ft-brand-color-hover); border-color: var(--ft-brand-color-hover); }
+
+        .ft-btn-default {
+            background: #fff;
+            border-color: var(--ft-grey-3);
+            color: var(--ft-grey-7);
+        }
+        .ft-btn-default:hover { color: var(--ft-brand-color); border-color: var(--ft-brand-color); }
+
+        .ft-btn i { margin-right: 4px; }
+
+        /* Tag */
+        .ft-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 22px;
+            font-size: 12px;
+            border-radius: 2px;
+            border: 1px solid var(--ft-grey-3);
+            background: var(--ft-grey-1);
+            color: var(--ft-grey-7);
+        }
+
+        .ft-tag-success { background: #ECFDF5; border-color: #10B981; color: #10B981; }
+
+        /* Detail Info */
+        .ft-detail-header {
+            border-bottom: 1px solid var(--ft-grey-2);
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+
+        .ft-detail-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--ft-grey-9);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .ft-detail-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .ft-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--ft-grey-6);
+        }
+
+        .ft-meta-item i {
+            color: var(--ft-grey-5);
+        }
+
+        /* Info Grid */
+        .ft-info-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .ft-info-label {
+            font-size: 14px;
+            color: var(--ft-grey-6);
+            font-weight: 500;
+        }
+
+        .ft-info-value {
+            font-size: 14px;
+            color: var(--ft-grey-8);
+        }
+
+        /* Content */
+        .ft-detail-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--ft-grey-7);
+        }
+
+        .ft-detail-content h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--ft-grey-9);
+            margin: 32px 0 16px;
+        }
+
+        .ft-detail-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ft-grey-8);
+            margin: 24px 0 12px;
+        }
+
+        .ft-detail-content p {
+            margin-bottom: 16px;
+        }
+
+        .ft-detail-content ul {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .ft-detail-content li {
+            margin-bottom: 8px;
+        }
+
+        .ft-detail-content code {
+            background: var(--ft-grey-1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--ft-error-color);
+        }
+
+        /* Cover Image */
+        .ft-cover-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, var(--ft-brand-color-bg) 0%, var(--ft-grey-2) 100%);
+            border-radius: var(--ft-radius-md);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ft-grey-4);
+            font-size: 48px;
+        }
+
+        /* Tags List */
+        .ft-tags-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="ft-sidebar">
+        <div class="ft-sidebar-logo">
+            <i class="ri-box-3-fill"></i>
+            <span>内容管理系统</span>
+        </div>
+        <nav class="ft-sidebar-menu">
+            <div class="ft-menu-group">主菜单</div>
+            <a href="#" class="ft-menu-item"><i class="ri-dashboard-line"></i>工作台</a>
+            <a href="cms-list.html" class="ft-menu-item active"><i class="ri-file-list-3-line"></i>文章管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-folder-line"></i>分类管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-user-line"></i>用户管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-settings-3-line"></i>系统设置</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ft-main">
+        <!-- Page Header -->
+        <div class="ft-page-header">
+            <div class="ft-breadcrumb">
+                <span>首页</span>
+                <span style="margin: 0 8px;">/</span>
+                <span>文章管理</span>
+                <span style="margin: 0 8px;">/</span>
+                <span>文章详情</span>
+            </div>
+            <div class="ft-page-header-top">
+                <div class="ft-page-title">文章详情</div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="cms-form.html" class="ft-btn ft-btn-primary">
+                        <i class="ri-edit-line"></i>编辑
+                    </a>
+                    <a href="cms-list.html" class="ft-btn ft-btn-default">
+                        <i class="ri-arrow-left-line"></i>返回列表
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="ft-page-content">
+            <!-- 基本信息卡片 -->
+            <div class="ft-card">
+                <div class="ft-detail-header">
+                    <div class="ft-detail-title">如何构建高性能的前端应用</div>
+                    <div class="ft-detail-meta">
+                        <div class="ft-meta-item">
+                            <i class="ri-user-line"></i>
+                            <span>张三</span>
+                        </div>
+                        <div class="ft-meta-item">
+                            <i class="ri-time-line"></i>
+                            <span>2024-02-05 10:30</span>
+                        </div>
+                        <div class="ft-meta-item">
+                            <i class="ri-eye-line"></i>
+                            <span>1,234 浏览</span>
+                        </div>
+                        <span class="ft-tag ft-tag-success">已发布</span>
+                    </div>
+                </div>
+
+                <div class="ft-info-grid">
+                    <div class="ft-info-label">文章ID：</div>
+                    <div class="ft-info-value">1001</div>
+
+                    <div class="ft-info-label">分类：</div>
+                    <div class="ft-info-value">技术文章</div>
+
+                    <div class="ft-info-label">标签：</div>
+                    <div class="ft-info-value">
+                        <div class="ft-tags-list">
+                            <span class="ft-tag">前端</span>
+                            <span class="ft-tag">性能优化</span>
+                            <span class="ft-tag">React</span>
+                        </div>
+                    </div>
+
+                    <div class="ft-info-label">创建时间：</div>
+                    <div class="ft-info-value">2024-02-01 09:30:00</div>
+
+                    <div class="ft-info-label">最后更新：</div>
+                    <div class="ft-info-value">2024-02-05 10:30:00</div>
+
+                    <div class="ft-info-label">排序权重：</div>
+                    <div class="ft-info-value">100</div>
+                </div>
+
+                <div style="border-top: 1px solid var(--ft-grey-2); padding-top: 24px;">
+                    <div class="ft-info-label" style="margin-bottom: 8px;">摘要：</div>
+                    <p style="color: var(--ft-grey-6); line-height: 1.6;">
+                        本文介绍了如何通过代码分割、懒加载、缓存策略等技术手段构建高性能的前端应用。我们将从打包优化、资源加载、运行时性能等多个维度进行深入探讨。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 文章内容卡片 -->
+            <div class="ft-card">
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: var(--ft-grey-8);">正文内容</h3>
+                
+                <!-- 封面图占位 -->
+                <div class="ft-cover-image">
+                    <i class="ri-image-line"></i>
+                </div>
+
+                <!-- 文章正文 -->
+                <div class="ft-detail-content">
+                    <h2>引言</h2>
+                    <p>在现代前端开发中，性能优化是一个永恒的话题。随着应用复杂度的提升，如何在保证功能完整性的同时提供流畅的用户体验，成为了开发者需要面对的重要挑战。</p>
+
+                    <h2>打包优化</h2>
+                    <h3>1. 代码分割（Code Splitting）</h3>
+                    <p>代码分割是提升应用加载速度的关键技术。通过将代码拆分成多个小块，我们可以实现按需加载，减少首屏加载时间。</p>
+                    <ul>
+                        <li>使用动态 <code>import()</code> 语法进行路由级别的分割</li>
+                        <li>利用 Webpack 的 <code>SplitChunksPlugin</code> 提取公共依赖</li>
+                        <li>合理设置 chunk 大小，避免过度拆分</li>
+                    </ul>
+
+                    <h3>2. Tree Shaking</h3>
+                    <p>Tree Shaking 可以移除未使用的代码，减小最终打包体积。确保使用 ES6 模块语法，并在生产环境开启优化。</p>
+
+                    <h2>资源加载优化</h2>
+                    <h3>1. 懒加载策略</h3>
+                    <p>对于非关键资源，采用懒加载策略可以显著提升首屏加载速度：</p>
+                    <ul>
+                        <li>图片懒加载：使用 Intersection Observer API</li>
+                        <li>组件懒加载：React.lazy() 和 Suspense</li>
+                        <li>第三方库按需引入</li>
+                    </ul>
+
+                    <h3>2. 缓存策略</h3>
+                    <p>合理的缓存策略可以大幅减少重复请求。推荐使用内容哈希命名静态资源，配合长期缓存策略。</p>
+
+                    <h2>运行时性能</h2>
+                    <p>除了加载性能，运行时性能也至关重要。关注以下几点：</p>
+                    <ul>
+                        <li>避免不必要的重渲染（React.memo、useMemo、useCallback）</li>
+                        <li>使用虚拟滚动处理长列表</li>
+                        <li>防抖和节流优化高频事件</li>
+                        <li>Web Worker 处理密集计算</li>
+                    </ul>
+
+                    <h2>总结</h2>
+                    <p>前端性能优化是一个系统工程，需要从打包、加载、运行等多个环节入手。本文介绍的技术手段可以帮助您构建更快、更流畅的前端应用。在实际项目中，建议结合性能监控工具（如 Lighthouse、Chrome DevTools）进行持续优化。</p>
+                </div>
+            </div>
+
+            <!-- 操作历史卡片 -->
+            <div class="ft-card">
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: var(--ft-grey-8);">操作历史</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; gap: 16px; padding: 12px; background: var(--ft-grey-1); border-radius: 4px;">
+                        <div style="color: var(--ft-grey-5); font-size: 13px; min-width: 140px;">2024-02-05 10:30</div>
+                        <div style="font-size: 14px; color: var(--ft-grey-7);"><strong>张三</strong> 更新了文章内容</div>
+                    </div>
+                    <div style="display: flex; gap: 16px; padding: 12px; background: var(--ft-grey-1); border-radius: 4px;">
+                        <div style="color: var(--ft-grey-5); font-size: 13px; min-width: 140px;">2024-02-01 15:20</div>
+                        <div style="font-size: 14px; color: var(--ft-grey-7);"><strong>张三</strong> 发布了文章</div>
+                    </div>
+                    <div style="display: flex; gap: 16px; padding: 12px; background: var(--ft-grey-1); border-radius: 4px;">
+                        <div style="color: var(--ft-grey-5); font-size: 13px; min-width: 140px;">2024-02-01 09:30</div>
+                        <div style="font-size: 14px; color: var(--ft-grey-7);"><strong>张三</strong> 创建了文章</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

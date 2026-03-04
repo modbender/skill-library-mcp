@@ -1,0 +1,357 @@
+{
+  "generated_at_utc": "2026-02-14T13:48:28.593079Z",
+  "system": "OpenClaw",
+  "summary": {
+    "status_counts": {
+      "violation": 2,
+      "compliant": 2,
+      "partial": 2
+    },
+    "risk_counts": {
+      "high": 3,
+      "medium": 3
+    },
+    "violations": [
+      {
+        "check_id": "privilege_approval_required",
+        "title": "Approval required before elevated access",
+        "iso27001": [
+          "A.5.15",
+          "A.5.18"
+        ],
+        "nist": [
+          "PR.AA-01",
+          "PR.AA-05"
+        ],
+        "expected_state": "Every privileged action requires explicit user approval.",
+        "status": "violation",
+        "risk": "high",
+        "observed_state": "Token auth is configured; explicit privileged command approval policy is not fully visible in runtime config.",
+        "evidence": "openclaw.json and doctor outputs were evaluated for approval-first execution controls.",
+        "gap": "Runtime policy does not yet demonstrate universal approval enforcement for elevated actions.",
+        "mitigation": "Route all privileged tasks through guarded_privileged_exec.py and enforce approval prompts for elevated execution.",
+        "owner": "Security Engineering",
+        "due_date": "2026-03-15"
+      },
+      {
+        "check_id": "elevation_timeout_30m",
+        "title": "Elevated session idle timeout",
+        "iso27001": [
+          "A.8.2",
+          "A.8.15"
+        ],
+        "nist": [
+          "PR.AA-03",
+          "DE.CM-01"
+        ],
+        "expected_state": "Elevated session expires after 30 minutes of inactivity.",
+        "status": "partial",
+        "risk": "medium",
+        "observed_state": "30-minute timeout logic exists in root_session_guard.py.",
+        "evidence": "Timeout guard script is installed with preflight drop logic.",
+        "gap": "Global mandatory enforcement for all elevated paths is not yet guaranteed by runtime policy.",
+        "mitigation": "Invoke guarded_privileged_exec.py for every elevated operation path.",
+        "owner": "Security Engineering",
+        "due_date": "2026-03-15"
+      },
+      {
+        "check_id": "audit_logging_privileged_actions",
+        "title": "Privileged action audit logging",
+        "iso27001": [
+          "A.8.15",
+          "A.8.16"
+        ],
+        "nist": [
+          "DE.AE-03",
+          "DE.CM-01"
+        ],
+        "expected_state": "All elevated approvals, commands, and privilege drops are logged.",
+        "status": "partial",
+        "risk": "medium",
+        "observed_state": "Gateway logs and session transition logs are available.",
+        "evidence": "gateway status reports log paths; root_session_guard records transition metadata.",
+        "gap": "No single correlated privileged action audit timeline is guaranteed.",
+        "mitigation": "Create append-only correlated audit records linking approval, execution, and drop events.",
+        "owner": "SecOps",
+        "due_date": "2026-03-22"
+      },
+      {
+        "check_id": "open_ports_approved",
+        "title": "Open ports baseline approval",
+        "iso27001": [
+          "A.8.20",
+          "A.8.21"
+        ],
+        "nist": [
+          "PR.PS-02",
+          "DE.CM-01"
+        ],
+        "expected_state": "All listening ports are approved and business-justified.",
+        "status": "violation",
+        "risk": "medium",
+        "observed_state": "Detected 12 listening services with 12 unapproved findings.",
+        "evidence": "port_monitor.py live output evaluated against approved_ports baseline.",
+        "gap": "Baseline missing or incomplete when unapproved findings exist.",
+        "mitigation": "Populate ~/.openclaw/security/approved_ports.json and remove unnecessary listeners.",
+        "owner": "Infrastructure",
+        "due_date": "2026-02-28"
+      }
+    ],
+    "mitigations": [
+      {
+        "check_id": "privilege_approval_required",
+        "title": "Approval required before elevated access",
+        "iso27001": [
+          "A.5.15",
+          "A.5.18"
+        ],
+        "nist": [
+          "PR.AA-01",
+          "PR.AA-05"
+        ],
+        "expected_state": "Every privileged action requires explicit user approval.",
+        "status": "violation",
+        "risk": "high",
+        "observed_state": "Token auth is configured; explicit privileged command approval policy is not fully visible in runtime config.",
+        "evidence": "openclaw.json and doctor outputs were evaluated for approval-first execution controls.",
+        "gap": "Runtime policy does not yet demonstrate universal approval enforcement for elevated actions.",
+        "mitigation": "Route all privileged tasks through guarded_privileged_exec.py and enforce approval prompts for elevated execution.",
+        "owner": "Security Engineering",
+        "due_date": "2026-03-15"
+      },
+      {
+        "check_id": "least_privilege_enforced",
+        "title": "Least privilege execution mode",
+        "iso27001": [
+          "A.5.15",
+          "A.5.18"
+        ],
+        "nist": [
+          "PR.AA-01",
+          "PR.PS-01"
+        ],
+        "expected_state": "Default mode is non-root and elevated rights are scoped and short-lived.",
+        "status": "compliant",
+        "risk": "high",
+        "observed_state": "Gateway local/loopback+token controls are present; state integrity warnings may still appear.",
+        "evidence": "openclaw.json has local mode, loopback bind, and token auth; doctor output was checked for integrity warnings.",
+        "gap": "Least-privilege posture is not complete while writable/integrity warnings remain.",
+        "mitigation": "Fix state dir ownership/permissions and enforce command allowlist/approval defaults.",
+        "owner": "Platform Security",
+        "due_date": "2026-03-07"
+      },
+      {
+        "check_id": "elevation_timeout_30m",
+        "title": "Elevated session idle timeout",
+        "iso27001": [
+          "A.8.2",
+          "A.8.15"
+        ],
+        "nist": [
+          "PR.AA-03",
+          "DE.CM-01"
+        ],
+        "expected_state": "Elevated session expires after 30 minutes of inactivity.",
+        "status": "partial",
+        "risk": "medium",
+        "observed_state": "30-minute timeout logic exists in root_session_guard.py.",
+        "evidence": "Timeout guard script is installed with preflight drop logic.",
+        "gap": "Global mandatory enforcement for all elevated paths is not yet guaranteed by runtime policy.",
+        "mitigation": "Invoke guarded_privileged_exec.py for every elevated operation path.",
+        "owner": "Security Engineering",
+        "due_date": "2026-03-15"
+      },
+      {
+        "check_id": "audit_logging_privileged_actions",
+        "title": "Privileged action audit logging",
+        "iso27001": [
+          "A.8.15",
+          "A.8.16"
+        ],
+        "nist": [
+          "DE.AE-03",
+          "DE.CM-01"
+        ],
+        "expected_state": "All elevated approvals, commands, and privilege drops are logged.",
+        "status": "partial",
+        "risk": "medium",
+        "observed_state": "Gateway logs and session transition logs are available.",
+        "evidence": "gateway status reports log paths; root_session_guard records transition metadata.",
+        "gap": "No single correlated privileged action audit timeline is guaranteed.",
+        "mitigation": "Create append-only correlated audit records linking approval, execution, and drop events.",
+        "owner": "SecOps",
+        "due_date": "2026-03-22"
+      },
+      {
+        "check_id": "open_ports_approved",
+        "title": "Open ports baseline approval",
+        "iso27001": [
+          "A.8.20",
+          "A.8.21"
+        ],
+        "nist": [
+          "PR.PS-02",
+          "DE.CM-01"
+        ],
+        "expected_state": "All listening ports are approved and business-justified.",
+        "status": "violation",
+        "risk": "medium",
+        "observed_state": "Detected 12 listening services with 12 unapproved findings.",
+        "evidence": "port_monitor.py live output evaluated against approved_ports baseline.",
+        "gap": "Baseline missing or incomplete when unapproved findings exist.",
+        "mitigation": "Populate ~/.openclaw/security/approved_ports.json and remove unnecessary listeners.",
+        "owner": "Infrastructure",
+        "due_date": "2026-02-28"
+      },
+      {
+        "check_id": "insecure_ports_remediated",
+        "title": "Insecure ports remediated",
+        "iso27001": [
+          "A.8.20",
+          "A.8.21"
+        ],
+        "nist": [
+          "PR.PS-02",
+          "PR.DS-02"
+        ],
+        "expected_state": "Insecure legacy ports are closed or migrated to secure alternatives.",
+        "status": "compliant",
+        "risk": "high",
+        "observed_state": "No insecure legacy port findings detected.",
+        "evidence": "Insecure findings count from port_monitor.py: 0.",
+        "gap": "None observed in current snapshot.",
+        "mitigation": "Enforce baseline checks to block insecure service ports.",
+        "owner": "Network Security",
+        "due_date": "2026-04-01"
+      }
+    ]
+  },
+  "controls": [
+    {
+      "check_id": "privilege_approval_required",
+      "title": "Approval required before elevated access",
+      "iso27001": [
+        "A.5.15",
+        "A.5.18"
+      ],
+      "nist": [
+        "PR.AA-01",
+        "PR.AA-05"
+      ],
+      "expected_state": "Every privileged action requires explicit user approval.",
+      "status": "violation",
+      "risk": "high",
+      "observed_state": "Token auth is configured; explicit privileged command approval policy is not fully visible in runtime config.",
+      "evidence": "openclaw.json and doctor outputs were evaluated for approval-first execution controls.",
+      "gap": "Runtime policy does not yet demonstrate universal approval enforcement for elevated actions.",
+      "mitigation": "Route all privileged tasks through guarded_privileged_exec.py and enforce approval prompts for elevated execution.",
+      "owner": "Security Engineering",
+      "due_date": "2026-03-15"
+    },
+    {
+      "check_id": "least_privilege_enforced",
+      "title": "Least privilege execution mode",
+      "iso27001": [
+        "A.5.15",
+        "A.5.18"
+      ],
+      "nist": [
+        "PR.AA-01",
+        "PR.PS-01"
+      ],
+      "expected_state": "Default mode is non-root and elevated rights are scoped and short-lived.",
+      "status": "compliant",
+      "risk": "high",
+      "observed_state": "Gateway local/loopback+token controls are present; state integrity warnings may still appear.",
+      "evidence": "openclaw.json has local mode, loopback bind, and token auth; doctor output was checked for integrity warnings.",
+      "gap": "Least-privilege posture is not complete while writable/integrity warnings remain.",
+      "mitigation": "Fix state dir ownership/permissions and enforce command allowlist/approval defaults.",
+      "owner": "Platform Security",
+      "due_date": "2026-03-07"
+    },
+    {
+      "check_id": "elevation_timeout_30m",
+      "title": "Elevated session idle timeout",
+      "iso27001": [
+        "A.8.2",
+        "A.8.15"
+      ],
+      "nist": [
+        "PR.AA-03",
+        "DE.CM-01"
+      ],
+      "expected_state": "Elevated session expires after 30 minutes of inactivity.",
+      "status": "partial",
+      "risk": "medium",
+      "observed_state": "30-minute timeout logic exists in root_session_guard.py.",
+      "evidence": "Timeout guard script is installed with preflight drop logic.",
+      "gap": "Global mandatory enforcement for all elevated paths is not yet guaranteed by runtime policy.",
+      "mitigation": "Invoke guarded_privileged_exec.py for every elevated operation path.",
+      "owner": "Security Engineering",
+      "due_date": "2026-03-15"
+    },
+    {
+      "check_id": "audit_logging_privileged_actions",
+      "title": "Privileged action audit logging",
+      "iso27001": [
+        "A.8.15",
+        "A.8.16"
+      ],
+      "nist": [
+        "DE.AE-03",
+        "DE.CM-01"
+      ],
+      "expected_state": "All elevated approvals, commands, and privilege drops are logged.",
+      "status": "partial",
+      "risk": "medium",
+      "observed_state": "Gateway logs and session transition logs are available.",
+      "evidence": "gateway status reports log paths; root_session_guard records transition metadata.",
+      "gap": "No single correlated privileged action audit timeline is guaranteed.",
+      "mitigation": "Create append-only correlated audit records linking approval, execution, and drop events.",
+      "owner": "SecOps",
+      "due_date": "2026-03-22"
+    },
+    {
+      "check_id": "open_ports_approved",
+      "title": "Open ports baseline approval",
+      "iso27001": [
+        "A.8.20",
+        "A.8.21"
+      ],
+      "nist": [
+        "PR.PS-02",
+        "DE.CM-01"
+      ],
+      "expected_state": "All listening ports are approved and business-justified.",
+      "status": "violation",
+      "risk": "medium",
+      "observed_state": "Detected 12 listening services with 12 unapproved findings.",
+      "evidence": "port_monitor.py live output evaluated against approved_ports baseline.",
+      "gap": "Baseline missing or incomplete when unapproved findings exist.",
+      "mitigation": "Populate ~/.openclaw/security/approved_ports.json and remove unnecessary listeners.",
+      "owner": "Infrastructure",
+      "due_date": "2026-02-28"
+    },
+    {
+      "check_id": "insecure_ports_remediated",
+      "title": "Insecure ports remediated",
+      "iso27001": [
+        "A.8.20",
+        "A.8.21"
+      ],
+      "nist": [
+        "PR.PS-02",
+        "PR.DS-02"
+      ],
+      "expected_state": "Insecure legacy ports are closed or migrated to secure alternatives.",
+      "status": "compliant",
+      "risk": "high",
+      "observed_state": "No insecure legacy port findings detected.",
+      "evidence": "Insecure findings count from port_monitor.py: 0.",
+      "gap": "None observed in current snapshot.",
+      "mitigation": "Enforce baseline checks to block insecure service ports.",
+      "owner": "Network Security",
+      "due_date": "2026-04-01"
+    }
+  ]
+}

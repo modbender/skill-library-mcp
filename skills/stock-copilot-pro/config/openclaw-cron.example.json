@@ -1,0 +1,38 @@
+{
+  "_comment": "OpenClaw cron.add payload examples. Do not write into ~/.openclaw/cron/jobs.json. Create each job via CLI (openclaw cron add) or Gateway cron tool; set delivery.channel and delivery.to for your channel (e.g. feishu).",
+  "jobs": [
+    {
+      "name": "Stock morning brief",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 1-5", "tz": "Asia/Shanghai" },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Use stock-copilot-pro to generate morning brief: run brief --type morning --max-items 8 --format chat and give an actionable plan for today."
+      },
+      "delivery": { "mode": "announce", "bestEffort": true }
+    },
+    {
+      "name": "Stock evening brief",
+      "schedule": { "kind": "cron", "expr": "0 17 * * 1-5", "tz": "Asia/Shanghai" },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Use stock-copilot-pro to generate evening brief: run brief --type evening --max-items 8 --format chat and give tomorrow's plan and thesis check."
+      },
+      "delivery": { "mode": "announce", "bestEffort": true }
+    },
+    {
+      "name": "Stock daily radar",
+      "schedule": { "kind": "cron", "expr": "30 8 * * 1-5", "tz": "Asia/Shanghai" },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Use stock-copilot-pro to run industry radar: run radar --market GLOBAL --limit 10 --format markdown and summarize 3–5 investable themes with recommendations."
+      },
+      "delivery": { "mode": "none" }
+    }
+  ]
+}

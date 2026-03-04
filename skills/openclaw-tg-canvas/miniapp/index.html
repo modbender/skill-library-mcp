@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>OpenClaw Canvas</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="/miniapp/style.css" />
+    <!-- xterm.js (loaded lazily by app.js when terminal mode is activated) -->
+    <link id="xtermCss" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div class="title-wrap">
+          <div class="title">OpenClaw Canvas</div>
+          <div id="lastUpdated" class="subtitle">Last updated —</div>
+        </div>
+        <div class="status" role="status" aria-live="polite">
+          <span id="connDot" class="conn-dot" aria-hidden="true"></span>
+          <span id="connText" class="conn-text">Connecting…</span>
+        </div>
+        <div class="topbar-actions">
+          <button id="openTerminalBtn" class="button" style="padding:6px 10px;">Terminal</button>
+          <button id="openControlBtn" class="button" style="padding:6px 10px;">Control</button>
+        </div>
+      </header>
+
+      <main id="content" class="content" role="main">
+        <div class="content-inner">
+          <!-- Dynamic content rendered here -->
+        </div>
+      </main>
+
+      <!-- Terminal overlay — sits on top of canvas, canvas state preserved underneath -->
+      <div id="terminal-pane" class="terminal-pane" style="display:none" aria-label="Terminal">
+        <div class="terminal-topbar">
+          <span class="terminal-topbar-title">Terminal</span>
+          <button id="closeTerminalBtn" class="terminal-close-btn" aria-label="Close terminal">✕</button>
+        </div>
+        <div id="terminal-container"></div>
+      </div>
+    </div>
+
+    <script>
+      // Ensure Telegram WebApp is ready and expanded to full height
+      if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+      }
+    </script>
+    <script src="/miniapp/app.js"></script>
+  </body>
+</html>

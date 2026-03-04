@@ -1,0 +1,30 @@
+version: risk_rules.v2
+pass_min_elements: 3
+risk_levels:
+  PASS: 提交基础具备
+  WARN: 需补强后提交
+  FAIL: 仅输出目录与核查信息
+risk_level_thresholds:
+  avg_A_min: 85.0
+  min_dim_A_min: 75.0
+  avg_B_min: 68.0
+  avg_C_min: 55.0
+anchor_degrade:
+  both_g5_g6_if_anchor_ok: C
+  both_g5_g6_if_anchor_not_ok: D
+  one_of_g5_g6_if_anchor_ok: B
+  one_of_g5_g6_if_anchor_not_ok: C
+hard_fail_level: E
+submission_level_groups:
+  pass:
+    - A
+    - B
+  strengthen:
+    - C
+    - D
+decision_text:
+  A: 可直接提交
+  B: 可提交（建议补强）
+  C: 补强后提交
+  D: 谨慎提交（高风险）
+  E: 暂缓提交

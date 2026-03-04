@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SentimentPriorityInput",
+  "type": "object",
+  "properties": {
+    "leads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/lead"
+      }
+    },
+    "scoring_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timezone": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "leads",
+    "scoring_time"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "lead": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset_mode": {
+          "type": "string",
+          "enum": [
+            "broker_group",
+            "buyer_inquiry",
+            "mixed"
+          ]
+        },
+        "record_type": {
+          "type": "string",
+          "enum": [
+            "inventory_listing",
+            "buyer_requirement"
+          ]
+        },
+        "urgency": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "city_canonical": {
+          "type": "string"
+        },
+        "locality_canonical": {
+          "type": "string"
+        },
+        "micro_market": {
+          "type": "string"
+        },
+        "raw_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "lead_id",
+        "record_type",
+        "urgency",
+        "raw_text",
+        "created_at"
+      ],
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,122 @@
+domain:
+  name: "세금/절세"
+  emoji: "💰"
+  disclaimer: |
+    ⚠️ 본 내용은 일반 세금 정보 제공 목적이며, 세무 자문이 아닙니다.
+    구체적인 사안은 반드시 세무사 또는 국세청 상담(☎126)을 받으시기 바랍니다.
+  beginner_alias:
+    - "처음인데"
+    - "모르겠어"
+    - "쉽게"
+    - "기초"
+    - "초보"
+    - "개념"
+    - "어려워"
+
+intents:
+  - id: quick_tax_check
+    label: "Quick Tax Check"
+    triggers: ["세금 내야 해?", "세금 얼마야?", "과세 대상이야?", "세금 붙어?"]
+    output: "과세 여부 판단 + 세율 Flash"
+    min_data: ["소득/거래 종류", "금액"]
+    depth: flash
+
+  - id: year_end_settlement
+    label: "Year-end Settlement"
+    triggers: ["연말정산", "13월의 월급", "환급", "소득공제", "세액공제"]
+    output: "연말정산 절차 + 공제 항목 가이드"
+    min_data: ["근로자 여부", "주요 지출 내역"]
+    depth: both
+
+  - id: income_tax_filing
+    label: "Income Tax Filing"
+    triggers: ["종합소득세", "5월 신고", "프리랜서 세금", "사업소득 신고"]
+    output: "신고 절차 + 납부 세액 계산 가이드"
+    min_data: ["소득 유형", "소득 금액"]
+    depth: both
+
+  - id: tax_deduction
+    label: "Tax Deduction"
+    triggers: ["절세", "세금 줄이는 법", "공제 받으려면", "IRP", "연금저축", "세액공제"]
+    output: "절세 수단 목록 + 효과 비교 Flash"
+    min_data: ["소득 수준", "현재 활용 중인 절세 수단"]
+    depth: both
+
+  - id: vat_guide
+    label: "VAT Guide"
+    triggers: ["부가세", "부가가치세", "사업자 세금", "매입세액", "간이과세"]
+    output: "부가세 계산 + 신고 절차 Flash"
+    min_data: ["사업자 유형 (일반/간이)", "매출 금액"]
+    depth: both
+
+  - id: property_tax
+    label: "Property Tax"
+    triggers: ["재산세", "종합부동산세", "종부세", "보유세"]
+    output: "보유세 계산 + 납부 일정 Flash"
+    min_data: ["공시가격", "보유 부동산 수"]
+    depth: both
+
+  - id: inheritance_gift_tax
+    label: "Inheritance / Gift Tax"
+    triggers: ["상속세", "증여세", "상속 계획", "증여 계획", "가족 간 돈 이체"]
+    output: "상속/증여세 계산 + 절세 전략 Flash"
+    min_data: ["재산 유형", "금액", "관계"]
+    depth: both
+
+  - id: withholding_tax
+    label: "Withholding Tax"
+    triggers: ["원천징수", "4대보험", "사업소득 3.3%", "기타소득세"]
+    output: "원천징수 세율 + 납부 절차 Flash"
+    min_data: ["소득 유형"]
+    depth: flash
+
+  - id: tax_dispute
+    label: "Tax Dispute"
+    triggers: ["세금 이의신청", "과세 불복", "국세청 심판", "세금 더 낸 것 같아"]
+    output: "불복 절차 + 기한 안내 Flash"
+    min_data: ["처분 유형", "처분 날짜"]
+    depth: both
+
+  - id: beginner_guide
+    label: "Beginner Guide"
+    triggers: ["세금 처음인데", "세금 개념", "세금 종류", "세금이 뭐야"]
+    output: "세금 구조 입문 Flash (초보자 모드 강제)"
+    min_data: []
+    depth: flash
+
+data_sources:
+  primary:
+    - "법제처 API (law-search 스킬) — 소득세법, 부가가치세법, 상속세 및 증여세법"
+    - "국세청 공개 자료 (홈택스 FAQ 정적 지식베이스)"
+    - "공공데이터포털 세율표 (파일데이터)"
+  secondary:
+    - "web_search: 국세청 연말정산 가이드"
+    - "web_search: 국세청 세금 납부 일정"
+
+flash:
+  max_lines: 40
+  always: true
+
+deep_dive:
+  trigger: request
+  trigger_intents:
+    - year_end_settlement
+    - income_tax_filing
+    - tax_deduction
+    - vat_guide
+    - property_tax
+    - inheritance_gift_tax
+    - tax_dispute
+
+beginner_mode:
+  max_table_rows: 5
+  conclusion_first: true
+  glossary:
+    소득공제: "세금을 매기는 기준 소득을 줄여주는 것. 공제액만큼 과세 대상 소득이 낮아짐"
+    세액공제: "계산된 세금 자체를 직접 깎아주는 것. 소득공제보다 절세 효과 큼"
+    원천징수: "소득을 줄 때 세금을 미리 떼어서 국가에 납부하는 방식"
+    종합소득세: "1년 동안 번 모든 소득을 합산해서 5월에 신고·납부하는 세금"
+    부가가치세: "물건이나 서비스를 팔 때 붙는 세금 (보통 10%). 사업자가 대신 걷어서 납부"
+    공시가격: "정부가 발표하는 부동산 기준 가격. 재산세·종부세 계산의 기준"
+    연말정산: "1년 동안 미리 낸 세금(원천징수)을 연말에 정확히 계산해 더 낸 건 돌려주고 덜 낸 건 추가납부"
+    간이과세자: "연 매출 1억400만원 이하 소규모 사업자. 부가세 계산·신고 방식이 간단"

@@ -1,0 +1,224 @@
+// ═══════════════════════════════════════════════════════════════
+// FRONTEND STATE & WIRING CHANGES
+// These are modifications to existing files (not full replacements).
+// The full controller and view files are provided separately.
+// ═══════════════════════════════════════════════════════════════
+
+
+// ── app-view-state.ts ────────────────────────────────────────
+// Add these properties to the AppViewState interface:
+
+  recentArchivedSessions: Array<{
+    sessionId: string; sessionKey: string;
+    displayName?: string; firstMessage?: string; updatedAt: number;
+  }> | null;
+  archivedSessionsLoading: boolean;
+  archivedSessionsResult: import("./controllers/sessions.ts").ArchivedSessionsResult | null;
+  archivedSessionsError: string | null;
+  archivedSessionsSearch: string;
+  liveSessionsPage: number;
+  liveSessionsPageSize: number;
+  archivedSessionsPage: number;
+  archivedSessionsPageSize: number;
+
+
+// ── app.ts ───────────────────────────────────────────────────
+// Add these @state() decorated properties to the OpenClawApp class:
+
+  @state() recentArchivedSessions: Array<{ sessionId: string; sessionKey: string; displayName?: string; firstMessage?: string; updatedAt: number }> | null = null;
+  @state() archivedSessionsLoading = false;
+  @state() archivedSessionsResult: import("./controllers/sessions.ts").ArchivedSessionsResult | null = null;
+  @state() archivedSessionsError: string | null = null;
+  @state() archivedSessionsSearch = "";
+  @state() liveSessionsPage = 1;
+  @state() liveSessionsPageSize = 10;
+  @state() archivedSessionsPage = 1;
+  @state() archivedSessionsPageSize = 10;
+
+
+// ── app-chat.ts ──────────────────────────────────────────────
+// 1. Add import:
+import { loadSessions, loadRecentArchivedSessions } from "./controllers/sessions.ts";
+
+// 2. In refreshChat(), add loadRecentArchivedSessions call:
+export async function refreshChat(host: ChatHost, opts?: { scheduleScroll?: boolean }) {
+  await Promise.all([
+    loadChatHistory(host as unknown as OpenClawApp),
+    loadSessions(host as unknown as OpenClawApp, {
+      activeMinutes: CHAT_SESSIONS_ACTIVE_MINUTES,
+    }),
+    loadRecentArchivedSessions(host as unknown as OpenClawApp),  // <── ADD THIS
+    refreshChatAvatar(host),
+  ]);
+  // ...
+}
+
+
+// ── app-settings.ts ──────────────────────────────────────────
+// 1. Add import:
+import { loadSessions, loadArchivedSessions } from "./controllers/sessions.ts";
+
+// 2. In the sessions tab loader, add archived sessions load with pagination:
+  if (host.tab === "sessions") {
+    await loadSessions(host as unknown as OpenClawApp);
+    const app = host as unknown as OpenClawApp;
+    await loadArchivedSessions(app, undefined, undefined, app.archivedSessionsPageSize, 0);
+  }
+
+
+// ── app-render.ts ────────────────────────────────────────────
+// 1. Add imports:
+import {
+  deleteSessionAndRefresh, loadSessions, patchSession,
+  loadArchivedSessions, resumeSession, renameSession, deleteArchivedSession
+} from "./controllers/sessions.ts";
+
+// 2. In the renderSessions() call (tab === "sessions"), add all these props:
+
+                // Live sessions pagination
+                livePageSize: state.liveSessionsPageSize,
+                livePage: state.liveSessionsPage,
+                onLivePageSizeChange: (size: number) => {
+                  state.liveSessionsPageSize = size;
+                  state.liveSessionsPage = 1;
+                },
+                onLivePageChange: (page: number) => {
+                  state.liveSessionsPage = page;
+                },
+                // Archive active session
+                onArchive: async (key) => {
+                  const confirmed = window.confirm(`Archive session "${key}"?\n\nThis will deactivate the session and move it to session history.`);
+                  if (!confirmed) return;
+                  try {
+                    await state.client?.request("sessions.archive", { key });
+                    await loadSessions(state);
+                    await loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (state.archivedSessionsPage - 1) * state.archivedSessionsPageSize);
+                  } catch (err) {
+                    state.sessionsError = String(err);
+                  }
+                },
+                // Archived sessions
+                archivedLoading: state.archivedSessionsLoading,
+                archivedResult: state.archivedSessionsResult,
+                archivedError: state.archivedSessionsError,
+                archivedSearch: state.archivedSessionsSearch,
+                archivedPageSize: state.archivedSessionsPageSize,
+                archivedPage: state.archivedSessionsPage,
+                onArchivedSearchChange: (search: string) => {
+                  state.archivedSessionsSearch = search;
+                  state.archivedSessionsPage = 1;
+                  void loadArchivedSessions(state, undefined, search, state.archivedSessionsPageSize, 0);
+                },
+                onArchivedRefresh: () => {
+                  void loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (state.archivedSessionsPage - 1) * state.archivedSessionsPageSize);
+                },
+                onArchivedPageSizeChange: (size: number) => {
+                  state.archivedSessionsPageSize = size;
+                  state.archivedSessionsPage = 1;
+                  void loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, size, 0);
+                },
+                onArchivedPageChange: (page: number) => {
+                  state.archivedSessionsPage = page;
+                  void loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (page - 1) * state.archivedSessionsPageSize);
+                },
+                onResumeSession: async (sessionId: string) => {
+                  await resumeSession(state, sessionId);
+                  await loadSessions(state);
+                  await loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (state.archivedSessionsPage - 1) * state.archivedSessionsPageSize);
+                },
+                onRenameSession: (sessionId: string, name: string) => {
+                  void renameSession(state, sessionId, name);
+                },
+                onDeleteArchivedSession: (sessionId: string) => {
+                  void deleteArchivedSession(state, sessionId);
+                },
+
+
+// ── app-render.helpers.ts ────────────────────────────────────
+
+// 1. In resolveSessionOptions(), add isUserSession filter to exclude cron/subagent/openai:
+
+  const isUserSession = (key: string) => {
+    return !key.includes(":cron:") && !key.includes(":subagent:") && !key.includes(":openai:");
+  };
+
+  // Then in the sessions loop, add isUserSession check:
+  if (sessions?.sessions) {
+    const filtered = sessions.sessions
+      .filter((s) => matchesAgent(s.key) && isUserSession(s.key))  // <── ADD isUserSession
+      .toSorted((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
+    // ...
+  }
+
+// 2. Add renderRecentArchivedOptions function (uses sessionId, not sessionKey):
+
+function renderRecentArchivedOptions(
+  state: AppViewState,
+  _activeOptions: Array<{ key: string }>,
+) {
+  const archived = state.recentArchivedSessions;
+  if (!archived || archived.length === 0) {
+    return html`
+      <option disabled>──────────</option>
+      <option value="__view_all_sessions__">📋 View All Sessions</option>
+    `;
+  }
+  // Use __archived__:{sessionId} as value since all share the same sessionKey
+  return html`
+    <optgroup label="Recent Sessions">
+      ${archived.slice(0, 10).map((s) => {
+        const name = s.displayName
+          || (s.firstMessage ? s.firstMessage.slice(0, 40) + (s.firstMessage.length > 40 ? "…" : "") : s.sessionId);
+        return html`<option value=${"__archived__:" + s.sessionId} title=${s.sessionId}>${name}</option>`;
+      })}
+    </optgroup>
+    <option disabled>──────────</option>
+    <option value="__view_all_sessions__">📋 View All Sessions</option>
+  `;
+}
+
+// 3. In the session <select> @change handler, add archived session handling:
+
+            // Navigate to Sessions tab
+            if (next === "__view_all_sessions__") {
+              (e.target as HTMLSelectElement).value = state.sessionKey;
+              window.location.hash = "";
+              window.location.href = pathForTab("sessions", state.basePath);
+              return;
+            }
+            // Resume archived session and switch to it
+            if (next.startsWith("__archived__:")) {
+              const sessionId = next.slice("__archived__:".length);
+              const app = state as unknown as OpenClawApp;
+              (e.target as HTMLSelectElement).value = state.sessionKey;
+              app.client
+                ?.request("sessions.resume", { sessionId })
+                .then((res: unknown) => {
+                  const result = res as { sessionKey?: string } | undefined;
+                  const restoredKey = result?.sessionKey || state.sessionKey;
+                  state.sessionKey = restoredKey;
+                  state.chatMessage = "";
+                  state.chatStream = null;
+                  app.chatStreamStartedAt = null;
+                  state.chatRunId = null;
+                  app.resetToolStream();
+                  app.resetChatScroll();
+                  state.applySettings({
+                    ...state.settings,
+                    sessionKey: restoredKey,
+                    lastActiveSessionKey: restoredKey,
+                  });
+                  void state.loadAssistantIdentity();
+                  syncUrlWithSessionKey(
+                    state as unknown as Parameters<typeof syncUrlWithSessionKey>[0],
+                    restoredKey,
+                    true,
+                  );
+                  void loadChatHistory(state as unknown as ChatState);
+                })
+                .catch(() => {});
+              return;
+            }
+
+// 4. After the repeat() of sessionOptions in the <select>, add:
+          ${renderRecentArchivedOptions(state, sessionOptions)}

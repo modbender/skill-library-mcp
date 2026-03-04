@@ -1,0 +1,281 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "k-cinema-bridge",
+    "description": "한국 멀티플렉스(롯데시네마, CGV, 메가박스) 영화 데이터 통합 JSON API. KOBIS 영화진흥위원회 데이터로 보강된 박스오피스 및 상영예정작 정보를 제공합니다.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://uyeong.github.io/k-cinema-bridge"
+    }
+  ],
+  "paths": {
+    "/api/boxoffice.json": {
+      "get": {
+        "operationId": "getAllBoxOffice",
+        "summary": "전체 소스 박스오피스 종합",
+        "description": "롯데시네마, CGV, 메가박스의 박스오피스 데이터를 소스별로 그룹화하여 반환합니다.",
+        "responses": {
+          "200": {
+            "description": "소스별 박스오피스 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "lotte": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/BoxOfficeMovie" }
+                    },
+                    "cgv": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/BoxOfficeMovie" }
+                    },
+                    "megabox": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/BoxOfficeMovie" }
+                    }
+                  },
+                  "required": ["lotte", "cgv", "megabox"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxoffice/{source}.json": {
+      "get": {
+        "operationId": "getBoxOfficeBySource",
+        "summary": "소스별 박스오피스",
+        "description": "특정 멀티플렉스의 박스오피스 데이터를 반환합니다.",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "path",
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/CinemaSource" },
+            "description": "멀티플렉스 소스"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "박스오피스 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BoxOfficeMovie" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upcoming.json": {
+      "get": {
+        "operationId": "getAllUpcoming",
+        "summary": "전체 소스 상영예정작 종합",
+        "description": "롯데시네마, CGV, 메가박스의 상영예정작 데이터를 소스별로 그룹화하여 반환합니다.",
+        "responses": {
+          "200": {
+            "description": "소스별 상영예정작 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "lotte": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/UpcomingMovie" }
+                    },
+                    "cgv": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/UpcomingMovie" }
+                    },
+                    "megabox": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/UpcomingMovie" }
+                    }
+                  },
+                  "required": ["lotte", "cgv", "megabox"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upcoming/{source}.json": {
+      "get": {
+        "operationId": "getUpcomingBySource",
+        "summary": "소스별 상영예정작",
+        "description": "특정 멀티플렉스의 상영예정작 데이터를 반환합니다.",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "path",
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/CinemaSource" },
+            "description": "멀티플렉스 소스"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "상영예정작 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/UpcomingMovie" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CinemaSource": {
+        "type": "string",
+        "enum": ["lotte", "cgv", "megabox"],
+        "description": "멀티플렉스 소스 (lotte: 롯데시네마, cgv: CGV, megabox: 메가박스)"
+      },
+      "BoxOfficeMovie": {
+        "type": "object",
+        "properties": {
+          "source": { "$ref": "#/components/schemas/CinemaSource" },
+          "rank": { "type": "integer", "description": "박스오피스 순위" },
+          "title": { "type": "string", "description": "영화 제목" },
+          "rating": { "type": "string", "description": "관람 등급" },
+          "posterUrl": { "type": "string", "format": "uri", "description": "포스터 이미지 URL" },
+          "info": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/MovieInfo" },
+              { "type": "null" }
+            ],
+            "description": "KOBIS 영화 상세 정보 (매칭 실패 시 null)"
+          }
+        },
+        "required": ["source", "rank", "title", "rating", "posterUrl"]
+      },
+      "UpcomingMovie": {
+        "type": "object",
+        "properties": {
+          "source": { "$ref": "#/components/schemas/CinemaSource" },
+          "title": { "type": "string", "description": "영화 제목" },
+          "rating": { "type": "string", "description": "관람 등급" },
+          "posterUrl": { "type": "string", "format": "uri", "description": "포스터 이미지 URL" },
+          "releaseDate": { "type": "string", "description": "개봉 예정일 (YYYY-MM-DD)" },
+          "info": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/MovieInfo" },
+              { "type": "null" }
+            ],
+            "description": "KOBIS 영화 상세 정보 (매칭 실패 시 null)"
+          }
+        },
+        "required": ["source", "title", "rating", "posterUrl", "releaseDate"]
+      },
+      "MovieInfo": {
+        "type": "object",
+        "description": "KOBIS 영화진흥위원회 영화 상세 정보",
+        "properties": {
+          "code": { "type": "string", "description": "KOBIS 영화 코드" },
+          "title": { "type": "string", "description": "영화 제목 (한글)" },
+          "englishTitle": { "type": "string", "description": "영문 제목" },
+          "originalTitle": { "type": "string", "description": "원제" },
+          "runtime": { "type": "string", "description": "상영 시간 (분)" },
+          "productionYear": { "type": "string", "description": "제작 연도" },
+          "openDate": { "type": "string", "description": "개봉일 (YYYYMMDD)" },
+          "productionStatus": { "type": "string", "description": "제작 상태" },
+          "type": { "type": "string", "description": "영화 유형 (장편, 단편 등)" },
+          "nations": { "type": "array", "items": { "type": "string" }, "description": "제작 국가" },
+          "genres": { "type": "array", "items": { "type": "string" }, "description": "장르" },
+          "directors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "englishName": { "type": "string" }
+              },
+              "required": ["name", "englishName"]
+            },
+            "description": "감독"
+          },
+          "actors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "englishName": { "type": "string" },
+                "role": { "type": "string" },
+                "roleEnglish": { "type": "string" }
+              },
+              "required": ["name", "englishName", "role", "roleEnglish"]
+            },
+            "description": "출연 배우"
+          },
+          "showTypes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "group": { "type": "string" },
+                "name": { "type": "string" }
+              },
+              "required": ["group", "name"]
+            },
+            "description": "상영 형태 (2D, IMAX 등)"
+          },
+          "companies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "string" },
+                "name": { "type": "string" },
+                "englishName": { "type": "string" },
+                "part": { "type": "string" }
+              },
+              "required": ["code", "name", "englishName", "part"]
+            },
+            "description": "관련 회사 (배급사, 제작사 등)"
+          },
+          "audits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "number": { "type": "string" },
+                "grade": { "type": "string" }
+              },
+              "required": ["number", "grade"]
+            },
+            "description": "심의 정보"
+          },
+          "staff": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "englishName": { "type": "string" },
+                "role": { "type": "string" }
+              },
+              "required": ["name", "englishName", "role"]
+            },
+            "description": "스태프"
+          }
+        },
+        "required": ["code", "title", "englishTitle", "originalTitle", "runtime", "productionYear", "openDate", "productionStatus", "type", "nations", "genres", "directors", "actors", "showTypes", "companies", "audits", "staff"]
+      }
+    }
+  }
+}

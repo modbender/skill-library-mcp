@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windfall — Smart Inference Routing for AI Agents</title>
+<meta name="description" content="Your agent doesn't need Claude at 3am. Windfall auto-routes every LLM call to the right model, at the right price, on the cleanest energy. Two lines to switch. 100 free requests.">
+<meta property="og:title" content="Windfall — Your agent doesn't need Claude at 3am">
+<meta property="og:description" content="Smart inference routing. Auto-selects the right model, routes to cheapest energy, caches repeated calls. Two lines to switch.">
+<meta property="og:image" content="https://windfall.ecofrontiers.xyz/assets/og-image.jpg">
+<meta property="og:url" content="https://windfall.ecofrontiers.xyz">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://windfall.ecofrontiers.xyz">
+<link rel="stylesheet" href="/assets/shared.css">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html { scroll-behavior: smooth; }
+.glow { box-shadow: 0 0 40px rgba(74, 153, 87, 0.12); }
+.code-block { background: #1A1714; color: #68B078; font-family: 'DM Mono', monospace; position: relative; }
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 0.35rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: #6B6358;
+  line-height: 0;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.12); color: #68B078; }
+.copy-btn.copied { color: #68B078; opacity: 1; }
+.code-block:hover .copy-btn,
+.terminal-chrome:hover .copy-btn { opacity: 1; }
+.model-pill { transition: all 0.2s; }
+.model-pill:hover { transform: translateY(-1px); }
+.hero-bg {
+  position: relative;
+  background: #FDFBF7;
+}
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/hero-bg.webp');
+  background-size: cover;
+  background-position: 80% 35%;
+  filter: saturate(0.35) brightness(1.1) contrast(0.95);
+  z-index: 0;
+}
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(253,251,247,0.92) 0%, rgba(253,251,247,0.7) 40%, rgba(253,251,247,0.05) 65%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(253,251,247,0.3) 70%, rgba(253,251,247,1) 100%);
+  z-index: 1;
+}
+.hero-bg > * {
+  position: relative;
+  z-index: 2;
+}
+.terminal-chrome {
+  background: #1A1714;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(26,23,20,0.18), 0 0 0 1px rgba(94,132,98,0.1);
+}
+.terminal-bar {
+  background: #252119;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.terminal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.terminal-dot.red { background: #E8655A; }
+.terminal-dot.yellow { background: #E5C148; }
+.terminal-dot.green { background: #64B565; }
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6875rem;
+  color: #6B6358;
+  margin-right: 2.5rem;
+}
+.terminal-body {
+  padding: 1.25rem 1.5rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+.trust-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.trust-chip {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.625rem;
+  background: var(--bg-card);
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #4A9957, #68B078);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3A8548;
+  border: 3px solid #FDFBF7;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3A8548;
+  border: 3px solid #FDFBF7;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+
+
+/* CTA section illustrated background */
+.cta-bg {
+  position: relative;
+  overflow: hidden;
+}
+.cta-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/cta-bg.webp');
+  background-size: cover;
+  background-position: center 0%;
+  filter: hue-rotate(60deg) saturate(0.6) brightness(0.5);
+  opacity: 0.16;
+  z-index: 0;
+}
+.cta-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* V7: How-it-works step indicators & flow lines */
+.hiw-card {
+  position: relative;
+}
+.hiw-step {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(74, 153, 87, 0.08);
+  color: #68B078;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+}
+.hiw-grid {
+  position: relative;
+}
+/* Horizontal connectors between col 1 and col 2 — desktop only */
+@media (min-width: 768px) {
+  .hiw-grid::before {
+    content: '';
+    position: absolute;
+    top: calc(50% / 2);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1.5rem;
+    height: 1px;
+    background: repeating-linear-gradient(to right, #68B078 0, #68B078 4px, transparent 4px, transparent 8px);
+    opacity: 0.35;
+    z-index: 2;
+  }
+  .hiw-grid::after {
+    content: '';
+    position: absolute;
+    bottom: calc(50% / 2);
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 1.5rem;
+    height: 1px;
+    background: repeating-linear-gradient(to right, #68B078 0, #68B078 4px, transparent 4px, transparent 8px);
+    opacity: 0.35;
+    z-index: 2;
+  }
+}
+
+/* Vertical connector down the left column (between row 1 and row 2, left side) -- uses a wrapper span */
+.hiw-vline-left,
+.hiw-vline-right {
+  display: none;
+}
+@media (min-width: 768px) {
+  .hiw-vline-left,
+  .hiw-vline-right {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: repeating-linear-gradient(to bottom, #68B078 0, #68B078 4px, transparent 4px, transparent 8px);
+    opacity: 0.35;
+    z-index: 2;
+  }
+  .hiw-vline-left {
+    left: 25%;
+  }
+  .hiw-vline-right {
+    left: 75%;
+  }
+}
+@media (max-width: 640px) {
+  .terminal-body { font-size: 0.6875rem; line-height: 1.5; padding: 1rem; }
+  .terminal-body pre { white-space: pre-wrap; word-break: break-all; }
+}
+@media (max-width: 640px) {
+  .code-block { font-size: 0.6875rem; }
+  .code-block pre { white-space: pre-wrap; word-break: break-all; }
+}
+</style>
+</head>
+<body class="bg-warm-50 text-warm-800 font-sans" data-page="home">
+
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-sage-600 focus:text-white focus:px-4 focus:py-2 focus:rounded focus:z-50">Skip to content</a>
+
+<!-- Hero -->
+<main id="main-content" class="hero-bg pt-32 pb-20 px-6">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
+
+    <!-- Left: messaging + CTA -->
+    <div class="pt-2">
+      <h1 class="font-serif text-4xl sm:text-5xl font-bold text-sage-700 leading-tight mb-6">
+        Your agent doesn't need Claude at 3am.
+      </h1>
+      <p class="text-lg text-warm-700 mb-4 leading-relaxed max-w-lg">
+        Most agents use the same expensive model for everything — midnight batch jobs, repeated lookups, simple status checks. Windfall auto-routes each call to the right model, caches what it's seen before, and <span class="text-sage-600 font-semibold">runs it on the cleanest energy available</span>.
+      </p>
+      <p class="text-base text-warm-500 mb-8">
+        Two lines to switch. Up to 100 free requests. Every call attested onchain.
+      </p>
+      <a href="#start" class="inline-block px-6 py-3 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 transition-colors">Get free requests</a>
+    </div>
+
+    <!-- Right: terminal -->
+    <div class="pt-2">
+      <!-- Request: the 2-line switch -->
+      <div class="terminal-chrome">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">agent.py</span>
+        </div>
+        <div class="terminal-body">
+          <div><span style="color:#6B6358"># Change two lines. Everything else stays the same.</span></div>
+          <div class="mt-2"><span style="color:#A8A093">client</span> <span style="color:#6B6358">=</span> <span style="color:#A8A093">OpenAI</span><span style="color:#6B6358">(</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">base_url</span><span style="color:#6B6358">=</span><span style="color:#68B078">"https://windfall.ecofrontiers.xyz/v1"</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">api_key</span><span style="color:#6B6358">=</span><span style="color:#68B078">"wf_your_key_here"</span></div>
+          <div><span style="color:#6B6358">)</span></div>
+        </div>
+      </div>
+      <!-- Response: the payoff -->
+      <div class="terminal-chrome mt-3">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">response.windfall</span>
+        </div>
+        <div class="terminal-body text-xs" style="line-height:1.6">
+          <div><span style="color:#6B6358">{</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"node"</span><span style="color:#6B6358">:</span> <span style="color:#68B078">"nbg1"</span><span style="color:#6B6358">,</span> <span style="color:#A8A093">"location"</span><span style="color:#6B6358">:</span> <span style="color:#68B078">"Nuremberg, DE"</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"renewablePercent"</span><span style="color:#6B6358">:</span> <span style="color:#C4A35A">72.3</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"carbonIntensityGCO2"</span><span style="color:#6B6358">:</span> <span style="color:#C4A35A">128</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"costUsd"</span><span style="color:#6B6358">:</span> <span style="color:#C4A35A">0.004</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"cached"</span><span style="color:#6B6358">:</span> <span style="color:#C4A35A">false</span><span style="color:#6B6358">,</span></div>
+          <div><span style="color:#6B6358">  </span><span style="color:#A8A093">"engagement"</span><span style="color:#6B6358">:</span> <span style="color:#68B078">"warm"</span></div>
+          <div><span style="color:#6B6358">}</span></div>
+        </div>
+      </div>
+      <div class="trust-chips">
+        <span class="trust-chip">OpenAI SDK compatible</span>
+        <span class="trust-chip">200+ models</span>
+        <span class="trust-chip">Base L2</span>
+        <span class="trust-chip">EAS attested</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Before / After -->
+<section class="py-16 px-6">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="font-serif text-3xl font-bold text-warm-900 text-center mb-10">What changes</h2>
+
+    <div class="relative grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Connecting arrow (desktop only) -->
+      <div class="hidden md:flex absolute inset-0 items-center justify-center z-10 pointer-events-none">
+        <div class="w-10 h-10 rounded-full bg-warm-200 border border-warm-300 flex items-center justify-center shadow-sm">
+          <span class="text-warm-500 text-lg leading-none">&rarr;</span>
+        </div>
+      </div>
+
+      <!-- Before -->
+      <div class="bg-warm-100 rounded-xl p-6 border border-warm-300">
+        <div class="flex items-center gap-2 mb-5">
+          <span class="w-2 h-2 rounded-full bg-red-400"></span>
+          <span class="text-sm font-semibold text-red-500/70 uppercase tracking-wide">Before</span>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div class="flex items-start gap-3">
+            <span class="text-warm-400 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Every call goes to Claude at <strong class="text-warm-800">$3/M tokens</strong></span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-warm-400 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Low-priority batch job? <strong class="text-warm-800">Same price.</strong></span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-warm-400 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Repeated prompt? <strong class="text-warm-800">Same price.</strong></span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-warm-400 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Unknown carbon footprint</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex md:hidden justify-center -my-2 relative z-10">
+        <div class="w-8 h-8 rounded-full bg-warm-200 border border-warm-300 flex items-center justify-center shadow-sm">
+          <span class="text-warm-500 text-lg leading-none">&darr;</span>
+        </div>
+      </div>
+
+      <!-- After -->
+      <div class="bg-white rounded-xl p-6 border border-sage-400/40" style="box-shadow: 0 0 60px rgba(74, 153, 87, 0.18), 0 0 20px rgba(74, 153, 87, 0.08);">
+        <div class="flex items-center gap-2 mb-5">
+          <span class="w-2 h-2 rounded-full bg-sage-500"></span>
+          <span class="text-sm font-semibold text-sage-600 uppercase tracking-wide">After</span>
+          <span class="ml-auto text-sage-600 text-xs font-medium flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Better
+          </span>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div class="flex items-start gap-3">
+            <span class="text-sage-500 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Auto-selects <strong class="text-sage-700">DeepSeek V3 (91% cheaper)</strong> — or specify any model you want</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-sage-500 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Repeated prompt &#8594; <strong class="text-sage-700">Cache hit ($0)</strong></span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-sage-500 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600">Every call routed to <strong class="text-sage-700">cleanest energy available</strong></span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-sage-500 mt-0.5 flex-shrink-0">&#8594;</span>
+            <span class="text-warm-600"><strong class="text-sage-700">Carbon intensity attested</strong> onchain via EAS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Savings Calculator -->
+
+<section id="savings" class="py-16 px-6">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="font-serif text-3xl font-bold text-warm-900 text-center mb-3">What you'd save*</h2>
+    <p class="text-center text-warm-500 mb-8">Drag the slider to your agent's monthly volume.</p>
+
+    <div class="bg-white rounded-xl p-8 border border-warm-200 glow">
+      <div class="mb-6">
+        <label for="calc-slider" class="block text-sm font-medium text-warm-700 mb-2">Monthly requests</label>
+        <input type="range" id="calc-slider" min="100" max="100000" value="25000" step="100" class="w-full accent-sage-600">
+        <div class="flex justify-between text-xs text-warm-500 mt-1">
+          <span>100</span>
+          <span id="calc-value" class="text-warm-800 font-semibold text-base">25,000</span>
+          <span>100,000</span>
+        </div>
+      </div>
+
+      <div class="bg-sage-600/5 rounded-lg p-5 text-center mb-6">
+        <div class="text-xs text-warm-500 mb-1">Your effective monthly cost with Windfall</div>
+        <div id="calc-effective" class="text-3xl font-bold text-sage-700">$70.00/mo</div>
+        <div class="text-xs text-warm-500 mt-1">Smart routing + ~30% cache hit rate (cache hits are free)</div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-xs text-warm-500 mb-1">Claude direct</div>
+          <div id="calc-claude" class="text-lg font-bold text-warm-400 line-through">$150.00</div>
+        </div>
+        <div>
+          <div class="text-xs text-warm-500 mb-1">Windfall (before cache)</div>
+          <div id="calc-windfall" class="text-lg font-bold text-warm-700">$100.00</div>
+        </div>
+        <div>
+          <div class="text-xs text-warm-500 mb-1">Total saved</div>
+          <div id="calc-saved" class="text-lg font-bold text-sage-600">$80.00/mo</div>
+        </div>
+        <div>
+          <div class="text-xs text-warm-500 mb-1">Carbon avoided</div>
+          <div id="calc-carbon" class="text-lg font-bold text-green-700">3.0 kg</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-warm-500 mt-3">
+      Based on $0.006/req Claude direct vs $0.004/req Windfall default (DeepSeek V3). Premium models at $0.008/req.
+    </p>
+    <p class="text-xs text-warm-500 mt-4 text-center">
+      *Estimates based on current pricing. Actual savings depend on model mix, cache hit rate, and request volume. See <a href="/terms" class="text-sage-600 hover:underline">/terms</a> for details.
+    </p>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section id="start" class="py-16 px-6">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="font-serif text-3xl font-bold text-warm-900 text-center mb-8">Get started in 60 seconds</h2>
+
+    <div class="space-y-6">
+      <div class="flex gap-4">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sage-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+        <div class="flex-1">
+          <div class="font-semibold text-warm-900 mb-2">Get your API key</div>
+          <div class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+            <pre>curl -X POST https://windfall.ecofrontiers.xyz/api/keys \
+  -H "Content-Type: application/json" \
+  -d '{"label": "my-agent"}'</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sage-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+        <div class="flex-1">
+          <div class="font-semibold text-warm-900 mb-2">Point your agent at Windfall</div>
+          <div class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+            <pre><span style="color:#9A9285"># In your .env</span>
+OPENAI_BASE_URL=https://windfall.ecofrontiers.xyz/v1
+OPENAI_API_KEY=wf_your_key_here</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sage-600 text-white flex items-center justify-center text-sm font-bold">3</div>
+        <div class="flex-1">
+          <div class="font-semibold text-warm-900 mb-2">That's it. Windfall handles the rest.</div>
+          <p class="text-sm text-warm-600">Up to 100 free requests to start — more if you link a Base wallet or Basename. Auto-selects models, routes to cleanest energy, caches responses. Check your savings at <a href="/dashboard" class="text-sage-600 underline">/dashboard</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 code-block rounded-lg p-4 text-sm overflow-x-auto">
+      <div class="mb-2"><span style="color:#9A9285"># Or use curl directly — specify any model</span></div>
+      <pre>curl -X POST https://windfall.ecofrontiers.xyz/v1/chat/completions \
+  -H "Authorization: Bearer wf_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "anthropic/claude-sonnet-4-5-20250929",
+    "messages": [{"role": "user", "content": "Hello from Windfall"}]
+  }'</pre>
+    </div>
+    <p class="text-xs text-warm-500 mt-2 text-center">
+      Omit <code class="bg-warm-200 px-1 rounded font-mono text-xs">model</code> to let Windfall auto-select. Add <code class="bg-warm-200 px-1 rounded font-mono text-xs">X-Priority: low</code> for background tasks.
+    </p>
+  </div>
+</section>
+
+<!-- How it works (merged: engagement + energy + caching + attestation) -->
+<section id="how" class="py-16 px-6">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="font-serif text-3xl font-bold text-warm-900 text-center mb-2">How it works</h2>
+    <p class="text-warm-500 text-center mb-10 max-w-xl mx-auto">Every request flows through four stages — from classification to verifiable proof.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 hiw-grid">
+      <!-- Vertical connectors -->
+      <span class="hiw-vline-left"></span>
+      <span class="hiw-vline-right"></span>
+
+      <div class="bg-white rounded-xl p-6 border border-warm-200 hiw-card">
+        <span class="hiw-step">1</span>
+        <svg class="w-6 h-6 text-sage-600 mb-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        <div class="font-semibold text-warm-900 mb-2">Engagement classifier</div>
+        <p class="text-sm text-warm-600">Analyzes message frequency, conversation depth, and prompt complexity to classify each request as hot, warm, or cold. Cold requests get routed to cheaper models automatically. No configuration needed.</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-warm-200 hiw-card">
+        <span class="hiw-step">2</span>
+        <svg class="w-6 h-6 text-green-600 mb-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="font-semibold text-warm-900 mb-2">Energy oracle</div>
+        <p class="text-sm text-warm-600">Polls Electricity Maps every 5 minutes for real-time energy prices, carbon intensity, and renewable percentages across all nodes. Routes requests to wherever power is cheapest or greenest — you choose the mode.</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-warm-200 hiw-card">
+        <span class="hiw-step">3</span>
+        <svg class="w-6 h-6 text-blue-600 mb-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>
+        <div class="font-semibold text-warm-900 mb-2">Response cache</div>
+        <p class="text-sm text-warm-600">SHA-256 hash of your messages. If Windfall has seen this exact prompt before, you get an instant cached response at zero cost and zero latency. Agents repeat themselves more than you'd think.</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-warm-200 hiw-card">
+        <span class="hiw-step">4</span>
+        <svg class="w-6 h-6 text-warm-600 mb-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div class="font-semibold text-warm-900 mb-2">Onchain attestation</div>
+        <p class="text-sm text-warm-600">Every batch of requests gets an EAS attestation on Base — proving where the compute ran, the energy price, and the carbon intensity at that moment. Verifiable green inference, not just a claim.</p>
+      </div>
+    </div>
+
+    <!-- Model selection (merged from Models section) -->
+    <div class="mt-10 rounded-xl p-6 border border-dashed border-warm-300 text-center" style="background: rgba(248, 244, 237, 0.6);">
+      <div class="font-semibold text-warm-900 mb-3">Any model. Your choice.</div>
+      <div class="flex flex-wrap gap-2 justify-center mb-4">
+        <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-warm-800 border border-warm-200">DeepSeek V3 <span class="text-warm-500 font-normal">default</span></span>
+        <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-warm-800 border border-warm-200">Claude 4.5 Sonnet</span>
+        <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-warm-800 border border-warm-200">GPT-4o</span>
+        <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-warm-800 border border-warm-200">Claude Opus 4</span>
+        <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-warm-800 border border-warm-200">Llama 3.3 70B</span>
+        <span class="px-3 py-1 bg-warm-50 rounded-full text-sm text-warm-500 border border-warm-200">+ 200 more via OpenRouter</span>
+      </div>
+      <p class="text-sm text-warm-600 max-w-xl mx-auto">Windfall picks the cheapest model that fits each request. Most of the time that's DeepSeek V3 at 91% less than Claude. When you need a specific model, just pass it — <code class="bg-warm-200 px-1 rounded text-sm font-mono">model: "anthropic/claude-sonnet-4"</code> — and Windfall routes it through.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Live Energy Routing -->
+<section class="py-16 px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="font-serif text-3xl font-bold text-sage-600 mb-3">Green by default</h2>
+      <p class="text-sage-700 max-w-2xl mx-auto">Every call routes through the cleanest energy available. Not because you configured it — because the oracle does it automatically. Real-time data from Electricity Maps, updated every 5 minutes.</p>
+    </div>
+
+    <!-- Routing modes (pill row) -->
+    <div class="flex flex-wrap justify-center gap-3 mb-8">
+      <div class="flex items-center gap-2 px-4 py-2.5 bg-sage-600/8 border border-sage-500/20 rounded-full">
+        <svg class="w-4 h-4 text-sage-600" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span class="text-sm font-semibold text-sage-700">Cheapest</span>
+        <span class="text-xs text-warm-500">lowest $/kWh</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2.5 bg-green-600/8 border border-green-500/20 rounded-full">
+        <svg class="w-4 h-4 text-green-600" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5.1 10.2A7 7 0 0111 20z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+        <span class="text-sm font-semibold text-green-700">Greenest</span>
+        <span class="text-xs text-warm-500">highest renewable %</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2.5 bg-blue-600/8 border border-blue-500/20 rounded-full">
+        <svg class="w-4 h-4 text-blue-600" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span class="text-sm font-semibold text-blue-700">Balanced</span>
+        <span class="text-xs text-warm-500">cost + carbon</span>
+      </div>
+    </div>
+
+    <div id="oracle-display" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <!-- Live: Nuremberg -->
+      <div id="nbg1-card" class="bg-white rounded-xl p-6 border border-warm-200 glow">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-sm font-medium text-warm-500">DE</span>
+          <span class="font-semibold text-warm-900">Nuremberg</span>
+          <span id="nbg1-badge" class="ml-auto px-2 py-0.5 text-xs rounded-full bg-warm-100 text-warm-500">loading...</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <div id="nbg1-price" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">$/kWh</div>
+          </div>
+          <div>
+            <div id="nbg1-carbon" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">gCO2/kWh</div>
+          </div>
+          <div>
+            <div id="nbg1-renewable" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">% renewable</div>
+          </div>
+        </div>
+      </div>
+      <!-- Live: Helsinki -->
+      <div id="hel1-card" class="bg-white rounded-xl p-6 border border-warm-200 glow">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-sm font-medium text-warm-500">FI</span>
+          <span class="font-semibold text-warm-900">Helsinki</span>
+          <span id="hel1-badge" class="ml-auto px-2 py-0.5 text-xs rounded-full bg-warm-100 text-warm-500">loading...</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <div id="hel1-price" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">$/kWh</div>
+          </div>
+          <div>
+            <div id="hel1-carbon" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">gCO2/kWh</div>
+          </div>
+          <div>
+            <div id="hel1-renewable" class="text-xl font-bold text-warm-900">—</div>
+            <div class="text-xs text-warm-500">% renewable</div>
+          </div>
+        </div>
+      </div>
+      <!-- Coming soon: Reykjavik -->
+      <div class="hidden sm:block bg-white/60 rounded-xl p-6 border border-dashed border-warm-300 opacity-50 select-none">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-sm font-medium text-warm-400">IS</span>
+          <span class="font-semibold text-warm-500">Reykjavik</span>
+          <span class="ml-auto px-2 py-0.5 text-xs rounded-full bg-warm-100 text-warm-400">scouting</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">$/kWh</div></div>
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">gCO2/kWh</div></div>
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">% renewable</div></div>
+        </div>
+      </div>
+      <!-- Coming soon: Virginia -->
+      <div class="hidden sm:block bg-white/60 rounded-xl p-6 border border-dashed border-warm-300 opacity-50 select-none">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-sm font-medium text-warm-400">US</span>
+          <span class="font-semibold text-warm-500">Virginia</span>
+          <span class="ml-auto px-2 py-0.5 text-xs rounded-full bg-warm-100 text-warm-400">scouting</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">$/kWh</div></div>
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">gCO2/kWh</div></div>
+          <div><div class="text-xl font-bold text-warm-400">—</div><div class="text-xs text-warm-400">% renewable</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Run a node CTA -->
+    <div class="rounded-xl p-6 border border-sage-500/25 text-center mb-8" style="background: rgba(74, 153, 87, 0.06);">
+      <div class="font-semibold text-sage-700 mb-1">We're hunting for green energy</div>
+      <p class="text-sm text-sage-700/80 max-w-lg mx-auto mb-3">Have a GPU server powered by renewables? We're actively expanding to locations with cheap, clean energy. Run a node and join the mesh — more nodes means better routing for everyone.</p>
+      <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="inline-block px-4 py-2 bg-sage-600 text-white rounded-lg text-sm font-medium hover:bg-sage-700 transition-colors">Get in touch</button>
+    </div>
+
+    <p class="text-center text-xs text-warm-500 mt-2">Choose your mode per-request with the <code class="bg-warm-200 px-1 rounded font-mono text-xs">X-Routing-Mode</code> header. Default: greenest. ~120 gCO2 saved per 1,000 requests vs US-East.</p>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-6 bg-sage-600 cta-bg">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">Start routing smarter.</h2>
+    <p class="text-sage-400/90 text-lg mb-8" style="color: rgba(255,255,255,0.75);">Up to 100 free requests. No credit card. Works with any OpenAI SDK client.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="#start" class="inline-block px-6 py-3 bg-white text-sage-700 rounded-lg font-medium hover:bg-warm-50 transition-colors">Get your API key</a>
+      <a href="/status" class="inline-block px-6 py-3 bg-transparent text-white border border-white/40 rounded-lg font-medium hover:bg-white/10 transition-colors">View live status</a>
+    </div>
+  </div>
+</section>
+
+<!-- Scripts -->
+<script src="/assets/shared.js" defer></script>
+<script>
+// Live oracle
+async function fetchStatus() {
+  try {
+    const res = await fetch('/status');
+    const data = await res.json();
+    if (data.oracle && data.oracle.locations) {
+      for (const [nodeId, info] of Object.entries(data.oracle.locations)) {
+        const el = (id) => document.getElementById(id);
+        if (el(nodeId + '-price')) {
+          el(nodeId + '-price').textContent = '$' + info.pricePerKwh.toFixed(4);
+          el(nodeId + '-carbon').textContent = Math.round(info.carbonIntensity);
+          el(nodeId + '-renewable').textContent = info.renewablePercent.toFixed(1);
+
+          const badge = el(nodeId + '-badge');
+          const badges = [];
+          if (data.oracle.cheapestLocation === nodeId) badges.push('CHEAPEST');
+          if (data.oracle.greenestLocation === nodeId) badges.push('GREENEST');
+          if (info.curtailmentActive) badges.push('CURTAILMENT');
+
+          // Highlight card border if greenest
+          const card = el(nodeId + '-card');
+          if (card) {
+            if (data.oracle.greenestLocation === nodeId) {
+              card.style.borderColor = '#4A9957';
+            } else {
+              card.style.borderColor = '';
+            }
+          }
+
+          if (badges.length > 0) {
+            badge.textContent = badges.join(' + ');
+            badge.className = 'ml-auto px-2 py-0.5 text-xs rounded-full bg-sage-600/10 text-sage-700 font-medium';
+          } else {
+            badge.textContent = 'active';
+            badge.className = 'ml-auto px-2 py-0.5 text-xs rounded-full bg-warm-100 text-warm-500';
+          }
+        }
+      }
+    }
+  } catch (e) { console.error('Status fetch failed:', e); }
+}
+fetchStatus();
+setInterval(fetchStatus, 60000);
+
+// Savings calculator
+const slider = document.getElementById('calc-slider');
+const calcValue = document.getElementById('calc-value');
+const calcClaude = document.getElementById('calc-claude');
+const calcWindfall = document.getElementById('calc-windfall');
+const calcSaved = document.getElementById('calc-saved');
+const calcEffective = document.getElementById('calc-effective');
+const calcCarbon = document.getElementById('calc-carbon');
+
+function updateCalc() {
+  const requests = parseInt(slider.value);
+  const claudeCost = requests * 0.006;
+  const windfallCost = requests * 0.004;
+  const cacheRate = 0.30;
+  const effectiveCost = windfallCost * (1 - cacheRate);
+  const totalSaved = claudeCost - effectiveCost;
+  // ~0.12g CO2 saved per request vs US-East default
+  const carbonKg = (requests * 0.00012).toFixed(1);
+
+  calcValue.textContent = requests.toLocaleString();
+  calcClaude.textContent = '$' + claudeCost.toFixed(2);
+  calcWindfall.textContent = '$' + windfallCost.toFixed(2);
+  calcSaved.textContent = '$' + totalSaved.toFixed(2) + '/mo';
+  calcEffective.textContent = '$' + effectiveCost.toFixed(2) + '/mo';
+  calcCarbon.textContent = carbonKg + ' kg';
+}
+
+slider.addEventListener('input', updateCalc);
+updateCalc();
+</script>
+
+<!-- Contact Modal -->
+<div id="contact-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+  <div class="absolute inset-0 bg-warm-900/40 backdrop-blur-sm" onclick="document.getElementById('contact-modal').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-warm-200">
+    <button onclick="document.getElementById('contact-modal').classList.add('hidden')" aria-label="Close modal" class="absolute top-4 right-4 text-warm-400 hover:text-warm-600 text-xl leading-none">&times;</button>
+    <h3 class="font-serif text-xl font-bold text-warm-900 mb-1">Run a node with us</h3>
+    <p class="text-sm text-warm-500 mb-5">Tell us about your setup. We're looking for GPU servers powered by renewable energy.</p>
+    <form id="contact-form" class="space-y-4">
+      <div>
+        <label for="contact-name" class="block text-sm font-medium text-warm-700 mb-1">Name</label>
+        <input type="text" id="contact-name" name="name" required class="w-full px-3 py-2 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500">
+      </div>
+      <div>
+        <label for="contact-email" class="block text-sm font-medium text-warm-700 mb-1">Email</label>
+        <input type="email" id="contact-email" name="email" required class="w-full px-3 py-2 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500">
+      </div>
+      <div>
+        <label for="contact-location" class="block text-sm font-medium text-warm-700 mb-1">Server location</label>
+        <input type="text" id="contact-location" name="location" placeholder="e.g. Iceland, Quebec, Norway" class="w-full px-3 py-2 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500">
+      </div>
+      <div>
+        <label for="contact-message" class="block text-sm font-medium text-warm-700 mb-1">Tell us more</label>
+        <textarea id="contact-message" name="message" rows="3" placeholder="GPU type, energy source, capacity..." class="w-full px-3 py-2 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500 resize-none"></textarea>
+      </div>
+      <p class="text-xs text-warm-500 leading-relaxed">By submitting, you agree to our <a href="/privacy" class="text-sage-600 hover:underline">privacy policy</a>. We store your name, email, and message for up to 12 months to respond to your inquiry. You can request deletion at info@ecofrontiers.xyz.</p>
+      <button type="submit" id="contact-submit" class="w-full py-2.5 bg-sage-600 text-white rounded-lg text-sm font-medium hover:bg-sage-700 transition-colors">Send</button>
+      <div id="contact-status" class="text-center text-sm hidden"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('contact-submit');
+  const status = document.getElementById('contact-status');
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  status.classList.add('hidden');
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      form.reset();
+      status.textContent = 'Sent! We\'ll be in touch.';
+      status.className = 'text-center text-sm text-sage-600';
+      status.classList.remove('hidden');
+      btn.textContent = 'Sent';
+      setTimeout(() => {
+        document.getElementById('contact-modal').classList.add('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Send';
+        status.classList.add('hidden');
+      }, 2000);
+    } else {
+      throw new Error('Failed');
+    }
+  } catch {
+    status.textContent = 'Something went wrong. Try info@ecofrontiers.xyz instead.';
+    status.className = 'text-center text-sm text-red-500';
+    status.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = 'Send';
+  }
+});
+
+// Focus trapping for contact modal
+(function() {
+  var modal = document.getElementById('contact-modal');
+  var triggerEl = null;
+
+  function getFocusable() {
+    return modal.querySelectorAll('button, input, textarea, a[href], [tabindex]:not([tabindex="-1"])');
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    var els = getFocusable();
+    if (!els.length) return;
+    var first = els[0], last = els[els.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', onKeydown);
+    if (triggerEl) triggerEl.focus();
+  }
+
+  function openModal(trigger) {
+    triggerEl = trigger;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', onKeydown);
+    var first = getFocusable()[0];
+    if (first) setTimeout(function() { first.focus(); }, 50);
+  }
+
+  // Set initial aria state
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('aria-label', 'Run a node with us');
+
+  // Replace inline onclick triggers
+  document.querySelectorAll('[onclick*="contact-modal"]').forEach(function(el) {
+    var isOpen = el.getAttribute('onclick').includes('remove');
+    el.removeAttribute('onclick');
+    if (isOpen) {
+      el.addEventListener('click', function() { openModal(this); });
+    } else {
+      el.addEventListener('click', closeModal);
+    }
+  });
+
+  // Backdrop close
+  modal.querySelector('.absolute.inset-0').addEventListener('click', closeModal);
+})();
+</script>
+
+<script>
+// V9: Copy buttons on code blocks
+const clipSvg = '<svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+const checkSvg = '<svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+
+function addCopyBtn(container, getText) {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.setAttribute('aria-label', 'Copy to clipboard');
+  btn.innerHTML = clipSvg;
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(getText());
+      btn.innerHTML = checkSvg;
+      btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = clipSvg; btn.classList.remove('copied'); }, 1500);
+    } catch {}
+  });
+  container.style.position = 'relative';
+  container.appendChild(btn);
+}
+
+// Terminal chrome blocks (hero)
+document.querySelectorAll('.terminal-chrome').forEach(el => {
+  const body = el.querySelector('.terminal-body');
+  if (body) addCopyBtn(el, () => body.textContent.trim());
+});
+
+// Code blocks (quick start)
+document.querySelectorAll('.code-block').forEach(el => {
+  addCopyBtn(el, () => el.textContent.trim());
+});
+</script>
+
+</body>
+</html>

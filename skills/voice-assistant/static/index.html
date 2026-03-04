@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Voice Assistant</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 480px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        /* Mic Button */
+        .mic-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 2rem;
+        }
+
+        .mic-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid #222;
+            transition: all 0.3s ease;
+        }
+
+        .mic-ring.active {
+            border-color: #ef4444;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+        }
+
+        .mic-ring.thinking {
+            border-color: #f59e0b;
+            animation: pulse-think 1.5s ease-in-out infinite;
+        }
+
+        .mic-ring.speaking {
+            border-color: #22c55e;
+            animation: pulse-speak 0.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-think {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1); }
+            50% { box-shadow: 0 0 50px rgba(245, 158, 11, 0.3); }
+        }
+
+        @keyframes pulse-speak {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); transform: scale(1); }
+            50% { box-shadow: 0 0 50px rgba(34, 197, 94, 0.3); transform: scale(1.02); }
+        }
+
+        .mic-btn {
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            background: #151520;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .mic-btn:hover { background: #1a1a28; }
+        .mic-btn:active { background: #0f0f18; }
+
+        .mic-btn svg {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: #666;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.2s;
+        }
+
+        .mic-btn.active svg { stroke: #ef4444; }
+        .mic-btn.thinking svg { stroke: #f59e0b; }
+        .mic-btn.speaking svg { stroke: #22c55e; }
+
+        /* Status */
+        .status {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 2rem;
+            min-height: 1.4em;
+            transition: color 0.2s;
+        }
+
+        .status.active { color: #ef4444; }
+        .status.thinking { color: #f59e0b; }
+        .status.speaking { color: #22c55e; }
+
+        /* Transcript */
+        .transcript-area {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 1rem;
+            background: #111118;
+            border-radius: 12px;
+            border: 1px solid #1a1a25;
+        }
+
+        .transcript-line {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .transcript-line .role {
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+
+        .transcript-line .role.user { color: #818cf8; }
+        .transcript-line .role.assistant { color: #34d399; }
+
+        /* Config bar */
+        .config-bar {
+            position: fixed;
+            bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #444;
+        }
+
+        .config-badge {
+            padding: 0.3rem 0.7rem;
+            background: #111118;
+            border-radius: 6px;
+            border: 1px solid #1a1a25;
+        }
+
+        /* Visualizer */
+        .visualizer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            height: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .visualizer .bar {
+            width: 3px;
+            background: #333;
+            border-radius: 2px;
+            transition: height 0.05s ease;
+            height: 4px;
+        }
+
+        .visualizer.active .bar { background: #ef4444; }
+        .visualizer.speaking .bar { background: #22c55e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OpenClaw Voice</h1>
+        <p class="subtitle">Talk to your agent</p>
+
+        <div class="visualizer" id="visualizer">
+            <!-- bars generated by JS -->
+        </div>
+
+        <div class="mic-container">
+            <div class="mic-ring" id="micRing"></div>
+            <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+            </button>
+        </div>
+
+        <p class="status" id="status">Click the mic to start</p>
+
+        <div class="transcript-area" id="transcript"></div>
+    </div>
+
+    <div class="config-bar" id="configBar">
+        <span class="config-badge" id="sttBadge">STT: —</span>
+        <span class="config-badge" id="ttsBadge">TTS: —</span>
+        <span class="config-badge" id="latencyBadge">Latency: —</span>
+    </div>
+
+    <script>
+        // ---- State ----
+        let isActive = false;
+        let ws = null;
+        let audioContext = null;
+        let micStream = null;
+        let scriptNode = null;
+        let playbackQueue = [];
+        let isPlaying = false;
+        let currentState = "idle"; // idle, listening, thinking, speaking
+
+        const SAMPLE_RATE = 16000;
+
+        // ---- Visualizer Setup ----
+        const vizEl = document.getElementById("visualizer");
+        const NUM_BARS = 24;
+        for (let i = 0; i < NUM_BARS; i++) {
+            const bar = document.createElement("div");
+            bar.className = "bar";
+            vizEl.appendChild(bar);
+        }
+        const bars = vizEl.querySelectorAll(".bar");
+
+        // ---- UI Updates ----
+        function setState(state) {
+            currentState = state;
+            const btn = document.getElementById("micBtn");
+            const ring = document.getElementById("micRing");
+            const statusEl = document.getElementById("status");
+
+            btn.className = "mic-btn" + (state !== "idle" ? " " + state : "");
+            ring.className = "mic-ring" + (state !== "idle" ? " " + state : "");
+            statusEl.className = "status" + (state !== "idle" ? " " + state : "");
+            vizEl.className = "visualizer" + (state === "listening" ? " active" : state === "speaking" ? " speaking" : "");
+
+            const labels = {
+                idle: "Click the mic to start",
+                listening: "Listening...",
+                thinking: "Thinking...",
+                speaking: "Speaking..."
+            };
+            statusEl.textContent = labels[state] || state;
+        }
+
+        function addTranscript(role, text) {
+            const el = document.getElementById("transcript");
+            const line = document.createElement("div");
+            line.className = "transcript-line";
+            line.innerHTML = `<span class="role ${role}">${role === "user" ? "You" : "Agent"}:</span>${text}`;
+            el.appendChild(line);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        // ---- Audio Playback ----
+        function playAudioChunk(pcmBase64) {
+            playbackQueue.push(pcmBase64);
+            if (!isPlaying) drainQueue();
+        }
+
+        async function drainQueue() {
+            if (playbackQueue.length === 0) {
+                isPlaying = false;
+                if (currentState === "speaking") setState("listening");
+                return;
+            }
+            isPlaying = true;
+
+            const b64 = playbackQueue.shift();
+            const raw = atob(b64);
+            const bytes = new Uint8Array(raw.length);
+            for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+
+            // Convert Int16 PCM to Float32
+            const int16 = new Int16Array(bytes.buffer);
+            const float32 = new Float32Array(int16.length);
+            for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 32768.0;
+
+            const buffer = audioContext.createBuffer(1, float32.length, SAMPLE_RATE);
+            buffer.getChannelData(0).set(float32);
+
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.onended = () => drainQueue();
+            source.start();
+
+            // Update visualizer with audio energy
+            updateVizFromAudio(float32);
+        }
+
+        function updateVizFromAudio(samples) {
+            const chunkSize = Math.floor(samples.length / NUM_BARS);
+            for (let i = 0; i < NUM_BARS; i++) {
+                let sum = 0;
+                for (let j = 0; j < chunkSize; j++) {
+                    sum += Math.abs(samples[i * chunkSize + j] || 0);
+                }
+                const avg = sum / chunkSize;
+                const height = Math.max(4, Math.min(24, avg * 200));
+                bars[i].style.height = height + "px";
+            }
+        }
+
+        // ---- Mic Input ----
+        async function startMic() {
+            audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
+            micStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    sampleRate: SAMPLE_RATE,
+                    channelCount: 1,
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                }
+            });
+
+            const source = audioContext.createMediaStreamSource(micStream);
+            scriptNode = audioContext.createScriptProcessor(4096, 1, 1);
+
+            scriptNode.onaudioprocess = (e) => {
+                if (!ws || ws.readyState !== WebSocket.OPEN) return;
+                const float32 = e.inputBuffer.getChannelData(0);
+
+                // Convert to Int16 PCM
+                const int16 = new Int16Array(float32.length);
+                for (let i = 0; i < float32.length; i++) {
+                    const s = Math.max(-1, Math.min(1, float32[i]));
+                    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                }
+
+                ws.send(int16.buffer);
+
+                // Update visualizer from mic input
+                if (currentState === "listening") {
+                    for (let i = 0; i < NUM_BARS; i++) {
+                        const idx = Math.floor(i * float32.length / NUM_BARS);
+                        const h = Math.max(4, Math.abs(float32[idx]) * 120);
+                        bars[i].style.height = h + "px";
+                    }
+                }
+            };
+
+            source.connect(scriptNode);
+            scriptNode.connect(audioContext.destination);
+        }
+
+        function stopMic() {
+            if (scriptNode) { scriptNode.disconnect(); scriptNode = null; }
+            if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+            if (audioContext) { audioContext.close(); audioContext = null; }
+        }
+
+        // ---- WebSocket ----
+        function connectWS() {
+            const proto = location.protocol === "https:" ? "wss:" : "ws:";
+            ws = new WebSocket(`${proto}//${location.host}/ws/voice`);
+
+            ws.onopen = () => {
+                setState("listening");
+                fetchConfig();
+            };
+
+            ws.onmessage = (evt) => {
+                const msg = JSON.parse(evt.data);
+
+                if (msg.type === "audio") {
+                    if (currentState !== "speaking") setState("speaking");
+                    playAudioChunk(msg.data);
+                }
+                else if (msg.type === "status") {
+                    if (msg.status === "thinking") setState("thinking");
+                    else if (msg.status === "listening") {
+                        if (currentState !== "speaking") setState("listening");
+                    }
+                }
+                else if (msg.type === "transcript") {
+                    addTranscript(msg.role, msg.text);
+                }
+            };
+
+            ws.onclose = () => {
+                setState("idle");
+                isActive = false;
+            };
+
+            ws.onerror = (err) => {
+                console.error("WebSocket error:", err);
+                setState("idle");
+                isActive = false;
+            };
+        }
+
+        async function fetchConfig() {
+            try {
+                const resp = await fetch("/health");
+                const data = await resp.json();
+                document.getElementById("sttBadge").textContent = `STT: ${data.stt_provider}`;
+                document.getElementById("ttsBadge").textContent = `TTS: ${data.tts_provider}`;
+            } catch (e) {}
+        }
+
+        // ---- Toggle ----
+        async function toggleMic() {
+            if (isActive) {
+                isActive = false;
+                if (ws) ws.close();
+                stopMic();
+                setState("idle");
+                playbackQueue = [];
+                isPlaying = false;
+            } else {
+                isActive = true;
+                await startMic();
+                connectWS();
+            }
+        }
+
+        // Reset visualizer bars periodically when idle
+        setInterval(() => {
+            if (currentState === "idle" || currentState === "thinking") {
+                bars.forEach(b => b.style.height = "4px");
+            }
+        }, 200);
+    </script>
+</body>
+</html>

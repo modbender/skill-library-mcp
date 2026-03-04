@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; }
+  html, body {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    background: transparent;
+    user-select: none;
+  }
+  canvas { display: block; }
+  #hitbox {
+    position: fixed;
+    top: 0; left: 0;
+    width: 200px;
+    height: 200px;
+    z-index: 10;
+  }
+  .bubble {
+    position: fixed;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30,30,30,0.9);
+    color: #fff;
+    font-family: 'Menlo', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    z-index: 20;
+  }
+  .bubble.show { opacity: 1; }
+  .bubble .tail {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(30,30,30,0.9);
+  }
+</style>
+</head>
+<body>
+<div id="hitbox"></div>
+<div class="bubble" id="bubble"></div>
+<canvas id="c" width="200" height="200"></canvas>
+
+<script>
+const { ipcRenderer } = require('electron');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const hitbox = document.getElementById('hitbox');
+const bubble = document.getElementById('bubble');
+
+const S = 3; // pixel scale
+
+// Colors
+const R = '#CC2200', D = '#991800', O = '#FF6622', B = '#111', W = '#FFF';
+const T = '#DD4422', C = '#EE3311', L = '#AA1100';
+
+function px(x, y, w, h, c) { return { x, y, w: w||1, h: h||1, c }; }
+
+function lobsterBase(clawOff, legFrame) {
+  const p = [];
+  // Tail
+  p.push(px(4,22,3,2,T), px(6,21,2,3,T), px(8,20,2,4,T), px(10,19,2,4,D));
+  // Body
+  for (let i = 0; i < 10; i++) p.push(px(12+i, 17, 1, 7, i%3===0 ? O : R));
+  // Body top
+  p.push(px(14,15,6,2,R), px(16,14,3,1,O));
+  // Segments
+  p.push(px(14,19,1,5,D), px(17,19,1,5,D), px(20,19,1,5,D));
+  // Head
+  p.push(px(22,16,5,7,R), px(24,15,3,1,R), px(27,17,1,4,O));
+  // Eyes
+  p.push(px(24,14,2,2,B), px(24,14,1,1,W));
+  p.push(px(27,14,2,2,B), px(27,14,1,1,W));
+  // Antennae
+  p.push(px(25,11,1,3,D), px(24,9,1,2,D));
+  p.push(px(28,11,1,3,D), px(29,9,1,2,D));
+  // Top claw
+  const cy = 16 + clawOff;
+  p.push(px(28,cy,3,2,C), px(31,cy-1,3,1,C), px(31,cy+1,3,1,C));
+  p.push(px(34,cy-1,1,1,O), px(34,cy+1,1,1,O));
+  // Bottom claw
+  p.push(px(28,cy+3,2,2,C), px(30,cy+3,2,1,C), px(30,cy+5,2,1,C));
+  // Legs
+  const lo = [0,1,0,-1];
+  for (let i = 0; i < 4; i++) {
+    const lx = 13 + i * 2;
+    const ly = 24 + (legFrame ? lo[(i+1)%4] : lo[i]);
+    p.push(px(lx, ly, 1, 3, L));
+    p.push(px(lx, ly+3, 2, 1, L));
+  }
+  return p;
+}
+
+function closedEyes() {
+  return [px(24,14,2,1,D), px(27,14,2,1,D)];
+}
+
+// Front-facing lobster (looking at user)
+function lobsterFront(clawOff) {
+  const p = [];
+  // Body (centered, wider)
+  p.push(px(14,20,12,8,R));
+  p.push(px(15,18,10,2,R));
+  p.push(px(17,16,6,2,O));
+  // Segments
+  p.push(px(16,22,1,5,D), px(20,22,1,5,D), px(24,22,1,5,D));
+  // Head
+  p.push(px(16,12,8,5,R));
+  p.push(px(17,11,6,1,R));
+  p.push(px(18,10,4,1,O));
+  // Eyes (bigger, facing user)
+  p.push(px(17,12,3,3,B), px(17,12,1,1,W), px(18,13,1,1,W));
+  p.push(px(21,12,3,3,B), px(21,12,1,1,W), px(22,13,1,1,W));
+  // Antennae
+  p.push(px(17,8,1,3,D), px(16,6,1,2,D));
+  p.push(px(22,8,1,3,D), px(23,6,1,2,D));
+  // Left claw
+  const cy = 16 + (clawOff||0);
+  p.push(px(8,cy,4,2,C), px(6,cy-1,3,2,C), px(6,cy+1,3,2,C));
+  p.push(px(5,cy-1,1,1,O), px(5,cy+2,1,1,O));
+  // Right claw
+  p.push(px(28,cy,4,2,C), px(31,cy-1,3,2,C), px(31,cy+1,3,2,C));
+  p.push(px(34,cy-1,1,1,O), px(34,cy+2,1,1,O));
+  // Tail (behind, barely visible)
+  p.push(px(17,28,6,2,T), px(18,30,4,1,D));
+  // Legs
+  p.push(px(14,27,2,3,L), px(13,30,2,1,L));
+  p.push(px(24,27,2,3,L), px(25,30,2,1,L));
+  p.push(px(16,28,1,2,L), px(23,28,1,2,L));
+  return p;
+}
+
+function laptopPx() {
+  return [
+    px(29,24,6,4,'#888'), px(30,25,4,2,'#66BBFF'),
+    px(28,28,8,1,'#AAA'),
+    px(31,25,2,1,'#4F4'), px(31,26,3,1,'#FFF'),
+  ];
+}
+
+// State
+let state = { mode: 'idle', frame: 0, statusText: '', walkDir: 0, walkTimer: 0, actionTimer: 0 };
+let frameCount = 0;
+let bubbleTimer = null;
+
+function showBubble(text, dur) {
+  bubble.innerHTML = text + '<div class="tail"></div>';
+  bubble.classList.add('show');
+  if (bubbleTimer) clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bubble.classList.remove('show'), dur || 3000);
+}
+
+// Movement: move the actual window in 2D
+let walkDX = 0, walkDY = 0;
+let walkSteps = 0;
+let surface = 'floor'; // floor, leftWall, rightWall, ceiling
+const screenSize = ipcRenderer.sendSync('get-screen-size');
+
+// Avoidance: find a safe direction away from cursor and active window
+function getSafeDirection() {
+  const pos = ipcRenderer.sendSync('get-position');
+  const avoid = ipcRenderer.sendSync('get-avoidance');
+  const mx = pos.x + 100; // lobster center
+  const my = pos.y + 100;
+  
+  let fleeX = 0, fleeY = 0;
+  
+  // Flee from cursor (strong force within 250px)
+  const cdx = mx - avoid.cursor.x;
+  const cdy = my - avoid.cursor.y;
+  const cdist = Math.sqrt(cdx*cdx + cdy*cdy);
+  if (cdist < 250 && cdist > 0) {
+    const strength = (250 - cdist) / 250;
+    fleeX += (cdx / cdist) * strength * 3;
+    fleeY += (cdy / cdist) * strength * 3;
+  }
+  
+  // Avoid active window (moderate force if overlapping or close)
+  if (avoid.frontWindow) {
+    const fw = avoid.frontWindow;
+    const wcx = fw.x + fw.w / 2;
+    const wcy = fw.y + fw.h / 2;
+    // Check if lobster is inside or near the window
+    const insideX = mx > fw.x - 50 && mx < fw.x + fw.w + 50;
+    const insideY = my > fw.y - 50 && my < fw.y + fw.h + 50;
+    if (insideX && insideY) {
+      const dx = mx - wcx;
+      const dy = my - wcy;
+      const d = Math.sqrt(dx*dx + dy*dy) || 1;
+      fleeX += (dx / d) * 2;
+      fleeY += (dy / d) * 2;
+    }
+  }
+  
+  return { fleeX, fleeY, pos };
+}
+
+// Check if current position overlaps something we should avoid
+function shouldFlee() {
+  const { fleeX, fleeY } = getSafeDirection();
+  return Math.abs(fleeX) > 0.5 || Math.abs(fleeY) > 0.5;
+}
+
+function pickAction() {
+  if (state.mode === 'working' || state.mode === 'sleeping') return;
+  
+  // Priority: flee if too close to cursor or active window
+  if (shouldFlee()) {
+    state.mode = 'fleeing';
+    walkSteps = 40 + Math.floor(Math.random() * 60);
+    return;
+  }
+  
+  const r = Math.random();
+  if (r < 0.3) {
+    // Walk along current surface
+    state.mode = 'walking';
+    walkSteps = 80 + Math.floor(Math.random() * 250);
+    if (surface === 'floor') {
+      walkDX = (Math.random() > 0.5 ? 1 : -1) * 2;
+      walkDY = 0;
+      state.walkDir = walkDX > 0 ? 1 : -1;
+    } else if (surface === 'ceiling') {
+      walkDX = (Math.random() > 0.5 ? 1 : -1) * 2;
+      walkDY = 0;
+      state.walkDir = walkDX > 0 ? 1 : -1;
+    } else if (surface === 'leftWall') {
+      walkDX = 0;
+      walkDY = (Math.random() > 0.5 ? 1 : -1) * 2;
+      state.walkDir = 1;
+    } else if (surface === 'rightWall') {
+      walkDX = 0;
+      walkDY = (Math.random() > 0.5 ? 1 : -1) * 2;
+      state.walkDir = -1;
+    }
+  } else if (r < 0.45) {
+    // Climb! Transition to a wall or ceiling
+    state.mode = 'climbing';
+    walkSteps = 60 + Math.floor(Math.random() * 150);
+    if (surface === 'floor') {
+      // Go up a wall
+      const goLeft = Math.random() > 0.5;
+      walkDX = goLeft ? -2 : 2;
+      walkDY = -1;
+      state.walkDir = goLeft ? -1 : 1;
+    } else if (surface === 'leftWall' || surface === 'rightWall') {
+      // Go to ceiling or back to floor
+      walkDX = 0;
+      walkDY = Math.random() > 0.5 ? -2 : 2;
+      state.walkDir = surface === 'leftWall' ? 1 : -1;
+    } else if (surface === 'ceiling') {
+      // Come back down
+      walkDX = (Math.random() > 0.5 ? 1 : -1) * 2;
+      walkDY = 1;
+      state.walkDir = walkDX > 0 ? 1 : -1;
+    }
+  } else if (r < 0.7) {
+    // Idle
+    state.mode = 'idle';
+    state.actionTimer = performance.now() + 2000 + Math.random() * 4000;
+  } else {
+    // Snap claws
+    state.mode = 'snapping';
+    state.actionTimer = performance.now() + 800;
+  }
+}
+
+function draw(now) {
+  frameCount++;
+  ctx.clearRect(0, 0, 200, 200);
+  
+  const legFrame = Math.floor(frameCount / 6) % 2;
+  let pixels;
+  let flip = state.walkDir < 0;
+  
+  switch (state.mode) {
+    case 'idle':
+      pixels = lobsterBase(Math.round(Math.sin(now/500)*0.5), 0);
+      // Check for danger every 30 frames even while idling
+      if (frameCount % 30 === 0 && shouldFlee()) {
+        state.mode = 'fleeing';
+        walkSteps = 40;
+      } else if (now > state.actionTimer) {
+        pickAction();
+      }
+      break;
+    case 'walking':
+    case 'climbing':
+      pixels = lobsterBase(0, legFrame);
+      ipcRenderer.send('move-window', walkDX, walkDY);
+      walkSteps--;
+      if (walkSteps <= 0) {
+        state.mode = 'idle';
+        state.actionTimer = now + 1500 + Math.random() * 3000;
+      }
+      break;
+    case 'fleeing':
+      pixels = lobsterBase(0, legFrame);
+      const safe = getSafeDirection();
+      const fx = Math.round(Math.max(-3, Math.min(3, safe.fleeX)));
+      const fy = Math.round(Math.max(-3, Math.min(3, safe.fleeY)));
+      state.walkDir = fx >= 0 ? 1 : -1;
+      ipcRenderer.send('move-window', fx, fy);
+      walkSteps--;
+      // Keep fleeing if still in danger, otherwise stop
+      if (walkSteps <= 0) {
+        if (shouldFlee()) {
+          walkSteps = 30;
+        } else {
+          state.mode = 'idle';
+          state.actionTimer = now + 1000 + Math.random() * 2000;
+        }
+      }
+      break;
+    case 'snapping':
+      const snap = Math.floor((now * 0.005)) % 2;
+      pixels = lobsterBase(snap ? -2 : 0, 0);
+      if (now > state.actionTimer) {
+        state.mode = 'idle';
+        state.actionTimer = now + 2000 + Math.random() * 3000;
+      }
+      break;
+    case 'working':
+      pixels = lobsterBase(Math.round(Math.sin(now/300)*0.3), Math.floor(now/150)%2);
+      pixels = pixels.concat(laptopPx());
+      // Sparkles
+      for (let i = 0; i < 3; i++) {
+        const st = ((now/400)+i*1.3)%3;
+        if (st < 1) {
+          pixels.push(px(Math.floor(30+Math.sin(i*2)*4), Math.floor(10-st*8), 1, 1, i%2?'#FFD700':'#44FFAA'));
+        }
+      }
+      break;
+    case 'thinking':
+      pixels = lobsterBase(Math.round(Math.sin(now/800)*1.5), 0);
+      const dots = Math.floor(now/500) % 4;
+      for (let i = 0; i < Math.min(dots,3); i++) {
+        pixels.push(px(30+i*3, 8-i*2, 2, 2, '#FFF'));
+      }
+      break;
+    case 'talking':
+      // Face the user, gentle claw wave
+      pixels = lobsterFront(Math.round(Math.sin(now/400)*1.5));
+      flip = false;
+      break;
+    case 'sleeping':
+      pixels = lobsterBase(0, 0);
+      pixels = pixels.concat(closedEyes());
+      const zp = (now/1000) % 3;
+      for (let i = 0; i < 3; i++) {
+        const zt = (zp+i*0.8) % 3;
+        if (zt < 2) pixels.push(px(Math.floor(30+i*2+zt*2), Math.floor(8-zt*5), 1+Math.floor(zt*0.5), 1, '#FFF'));
+      }
+      break;
+  }
+  
+  // Update surface based on actual window position
+  if (frameCount % 10 === 0) {
+    const pos = ipcRenderer.sendSync('get-position');
+    const margin = 30;
+    if (pos.y <= margin) surface = 'ceiling';
+    else if (pos.x <= margin) surface = 'leftWall';
+    else if (pos.x >= pos.screenW - 200 - margin) surface = 'rightWall';
+    else surface = 'floor';
+  }
+  
+  // Shadow (only on floor)
+  if (surface === 'floor') {
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(100, 175, 45, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+  
+  // Detect which surface we're near (check window position via movement)
+  // We track surface based on where the lobster has ended up
+  
+  // Draw pixels with rotation based on surface
+  ctx.save();
+  ctx.translate(100, 100); // center of canvas
+  
+  // Rotate for surface
+  if (surface === 'ceiling') ctx.rotate(Math.PI);
+  else if (surface === 'leftWall') ctx.rotate(Math.PI / 2);
+  else if (surface === 'rightWall') ctx.rotate(-Math.PI / 2);
+  
+  const offX = -85;
+  const offY = 10;
+  if (flip) {
+    ctx.scale(-1, 1);
+  }
+  for (const p of pixels) {
+    ctx.fillStyle = p.c;
+    ctx.fillRect(offX + p.x * S, offY + p.y * S, p.w * S, p.h * S);
+  }
+  ctx.restore();
+  
+  requestAnimationFrame(draw);
+}
+
+// Mouse events
+hitbox.addEventListener('mouseenter', () => ipcRenderer.send('set-ignore-mouse', false));
+hitbox.addEventListener('mouseleave', () => ipcRenderer.send('set-ignore-mouse', true));
+
+hitbox.addEventListener('click', () => {
+  if (state.mode === 'sleeping') {
+    setState('idle');
+    showBubble('*yawn* ...sup');
+  } else if (state.mode === 'working') {
+    showBubble("busy! 🦞");
+  } else {
+    const r = ["yo","🦞","*snap snap*","sup","need something?","heya baby"];
+    showBubble(r[Math.floor(Math.random()*r.length)]);
+    state.mode = 'snapping';
+    state.actionTimer = performance.now() + 600;
+  }
+});
+
+hitbox.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const menu = document.createElement('div');
+  menu.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;background:rgba(30,30,30,0.95);border-radius:8px;padding:4px 0;font-family:Menlo,monospace;font-size:11px;color:#eee;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4);min-width:130px;`;
+  const items = [
+    ['🦞 Wake Up', () => setState('idle','*stretches*')],
+    ['💻 Work', () => setState('working','on it')],
+    ['🤔 Think', () => setState('thinking','hmm...')],
+    ['😴 Sleep', () => setState('sleeping','zzz...')],
+    ['---'],
+    ['❌ Quit', () => ipcRenderer.send('quit-app')],
+  ];
+  for (const item of items) {
+    if (item[0] === '---') { const hr = document.createElement('div'); hr.style.cssText='height:1px;background:#444;margin:4px 8px;'; menu.appendChild(hr); continue; }
+    const btn = document.createElement('div');
+    btn.textContent = item[0];
+    btn.style.cssText = 'padding:5px 12px;cursor:pointer;';
+    btn.onmouseenter = () => btn.style.background = 'rgba(255,255,255,0.1)';
+    btn.onmouseleave = () => btn.style.background = 'transparent';
+    btn.onclick = () => { item[1](); menu.remove(); };
+    menu.appendChild(btn);
+  }
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener('click', function rm(e2) { if (!menu.contains(e2.target)) { menu.remove(); document.removeEventListener('click', rm); }}, 10));
+});
+
+let talkTimeout = null;
+function setState(mode, statusText, duration) {
+  if (talkTimeout) clearTimeout(talkTimeout);
+  state.mode = mode;
+  state.statusText = statusText || '';
+  state.vx = 0;
+  if (statusText) {
+    // Scale bubble duration to text length
+    const bubbleDur = Math.max(3000, Math.min(8000, statusText.length * 120));
+    showBubble(statusText, duration || bubbleDur);
+  }
+  if (mode === 'idle') state.actionTimer = performance.now() + 3000;
+  if (mode === 'talking') {
+    // Return to idle after bubble fades
+    const returnDelay = duration || Math.max(4000, Math.min(10000, (statusText||'').length * 120 + 1000));
+    talkTimeout = setTimeout(() => {
+      state.mode = 'idle';
+      state.actionTimer = performance.now() + 2000;
+    }, returnDelay);
+  }
+}
+
+window.getState = () => ({ state: state.mode, statusText: state.statusText });
+window.setState = setState;
+
+state.actionTimer = performance.now() + 2000;
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

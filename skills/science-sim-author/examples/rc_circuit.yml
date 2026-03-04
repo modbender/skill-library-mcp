@@ -1,0 +1,56 @@
+id: rc_circuit
+title: RC Charging Circuit
+domain: electromagnetism
+level: high_school
+dt:
+  default: 0.02
+  min: 0.001
+  max: 0.05
+state:
+  - name: vc
+    unit: V
+params:
+  - name: R
+    unit: ohm
+    value: 10
+    min: 1
+    max: 50
+    desc: Resistance in the circuit
+  - name: C
+    unit: F
+    value: 1
+    min: 0.2
+    max: 5
+    desc: Capacitance of the capacitor
+  - name: Vsource
+    unit: V
+    value: 5
+    min: 1
+    max: 12
+    desc: Source voltage
+initial:
+  vc: 0
+equations:
+  dvc: (Vsource - vc) / (R * C)
+outputs:
+  - type: plot
+    x: t
+    y: vc
+    label: Capacitor voltage vs time
+worksheet:
+  predict:
+    - Predict how the time to reach about 63 percent of the final voltage changes when resistance increases.
+    - If capacitance doubles while resistance stays fixed, predict how the curve shape changes.
+    - Predict what the final capacitor voltage should be if the source voltage is increased.
+  test:
+    - Keep the source voltage fixed and compare two runs with different resistances using the voltage-time plot.
+    - Hold resistance fixed and compare a small capacitance run with a large capacitance run.
+  explain:
+    - Explain why the charging curve becomes flatter as the capacitor voltage approaches the source voltage.
+    - Explain why changing resistance changes the charging speed without changing the final voltage.
+  misconceptions:
+    - Does a larger resistance produce a larger final capacitor voltage, or only a slower approach to that voltage?
+    - Does the capacitor voltage increase linearly with time throughout the run?
+success_criteria:
+  - Increasing either R or C increases the time constant of the charging curve.
+  - The capacitor voltage approaches the source voltage asymptotically.

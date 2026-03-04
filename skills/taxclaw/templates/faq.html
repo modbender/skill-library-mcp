@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row" style="justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
+    <div>
+      <h1 style="margin:0; font-size: 26px;">📖 FAQ</h1>
+      <div class="muted" style="margin-top:6px;">Answers to common questions about TaxClaw.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">Getting started</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What does TaxClaw actually do?</div>
+      <div class="muted" style="margin-top:4px;">TaxClaw reads common tax PDFs/images (W-2s, 1099s, K-1s) and extracts the key boxes into structured data you can review and export. It's built to save you from manual re-typing.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">How do I install it?</div>
+      <div class="muted" style="margin-top:4px;">Install TaxClaw as an OpenClaw skill, then open the local app at http://localhost:8421. You'll also need Ollama running for Local mode.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What tax forms does it support?</div>
+      <div class="muted" style="margin-top:4px;">W-2, 1099-NEC, 1099-INT, 1099-DIV, 1099-DA, 1099-B, 1099-MISC, 1099-OID, K-1, and consolidated-1099.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">Does it work on Windows / Linux / Mac?</div>
+      <div class="muted" style="margin-top:4px;">Yes-any OS that can run OpenClaw + Ollama should work. Local performance depends on your CPU/GPU and the OCR model you choose.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">Privacy &amp; data</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">Does my tax data leave my computer?</div>
+      <div class="muted" style="margin-top:4px;">In Local mode, no-everything stays on your machine. In Cloud mode, the document is sent to Claude for extraction.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What's the difference between Local and Cloud mode?</div>
+      <div class="muted" style="margin-top:4px;">Local mode uses Ollama (recommended: <code>glm-ocr</code>) and keeps data fully private, but accuracy can vary by scan quality. Cloud mode is typically more accurate, but requires an API key and a privacy acknowledgment.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">Where is my data stored?</div>
+      <div class="muted" style="margin-top:4px;">Locally, in the TaxClaw/OpenClaw workspace on your computer (plus whatever exports you download). Cloud mode still saves your results locally, but the uploaded document is processed by the cloud provider.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">Extraction quality</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">Why are all my fields empty after uploading?</div>
+      <div class="muted" style="margin-top:4px;">Most often the OCR model isn't running/selected, or the document is a low-quality scan (blurry, skewed, tiny text). Switch to <code>glm-ocr</code>, re-run extraction, and try a cleaner PDF/image if you can.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What's the best local model to use?</div>
+      <div class="muted" style="margin-top:4px;">Use <code>glm-ocr</code> in Ollama-it's the best default balance of OCR + form understanding for TaxClaw. If you're not getting text, confirm Ollama is running and the model is actually installed.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What do the confidence scores mean? (🟢🟡🔴)</div>
+      <div class="muted" style="margin-top:4px;">They're a quick "how sure is the model" signal for each field. 🟢 = likely correct, 🟡 = plausible but check it, 🔴 = treat as a guess.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What does "Needs review" mean?</div>
+      <div class="muted" style="margin-top:4px;">TaxClaw flags a doc as "Needs review" when one or more important fields are missing or low-confidence. It's not an error-just a heads-up to eyeball the highlighted fields.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">My doc was classified wrong - how do I fix it?</div>
+      <div class="muted" style="margin-top:4px;">Change the document type (e.g., 1099-INT vs 1099-DIV) and re-run extraction. Classification matters because each form has different boxes and field rules.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">Can I edit extracted fields if they're wrong?</div>
+      <div class="muted" style="margin-top:4px;">Yes-edit the fields in the review UI, then export again. Your edits are what get exported.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">1099-DA &amp; crypto</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">I uploaded a 1099-DA. What do I do next?</div>
+      <div class="muted" style="margin-top:4px;">Use TaxClaw to extract the proceeds and transaction details, then reconcile cost basis in a crypto tax tool (we recommend Koinly). Export your data and use it as your starting point.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What is cost basis and why do I need it?</div>
+      <div class="muted" style="margin-top:4px;">Cost basis is what you originally paid for the asset (plus certain fees/adjustments). You need it to calculate gains/losses-proceeds alone only tells you the sale side.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">TaxClaw extracted my proceeds but not cost basis - is that normal?</div>
+      <div class="muted" style="margin-top:4px;">Yes-many 1099-DA forms don't include complete cost basis, or the broker reports it separately/partially. That's why cost basis reconciliation (e.g., in Koinly) is usually still required.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">Exporting &amp; filing</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">How do I export my data?</div>
+      <div class="muted" style="margin-top:4px;">Go to Exports and choose CSV (wide or long), JSON, or download the original ZIP. Export after you've reviewed and corrected any flagged fields.</div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What's the difference between the export formats?</div>
+      <div class="muted" style="margin-top:4px;">CSV (wide) = one row per document with lots of columns; CSV (long) = one row per field/value (better for analytics and pipelines). JSON preserves structure and is easiest for developers; ZIP is the original files.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">Can I share exports with my tax preparer?</div>
+      <div class="muted" style="margin-top:4px;">Yes-CSV is usually the easiest for a preparer to scan, and the ZIP is helpful if they want the originals. Always spot-check totals and key IDs (SSN/EIN, payer name, amounts) before you send.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">Pro &amp; roadmap</div>
+
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight:700;">What's TaxClaw Pro?</div>
+      <div class="muted" style="margin-top:4px;">We're building a Pro plan and would love your input on what it should include. If you have feature requests or ideas, <a href="/contact">let us know</a> - it directly shapes what we prioritize.</div>
+    </div>
+
+    <div>
+      <div style="font-weight:700;">How do I support the project?</div>
+      <div class="muted" style="margin-top:4px;">Star the repo, <a href="/contact">send feature requests</a>, tell someone who dreads tax season, and if you're doing 1099-DA work, using the Koinly link helps fund ongoing development.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:700; font-size: 14px; margin-bottom: 10px;">🙋 Still have questions?</div>
+    <div class="muted" style="margin-bottom: 12px;">Send us a note - bug reports and feature requests are welcome.</div>
+    <a class="btn" href="/contact">📬 Contact →</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+Endpoint: POST /api/openclaw/integrations/search-actions
+Auth: X-Org-Token header (org service token)
+CORS: Enabled (OPTIONS preflight supported)
+
+Purpose: Discover available actions/tools across one or more third-party integrations via Composio.
+
+Request Headers:
+  X-Org-Token: <org-service-token>
+  Content-Type: application/json
+
+Request Body:
+  integrations (required, string[]): Array of integration slugs to search (e.g. ["gmail", "slack", "github"])
+  toolkit (optional, string): If provided, overrides integrations and searches only this single toolkit
+  search (optional, string): Keyword filter for action names
+
+Behavior:
+  - Validates org token against database
+  - Iterates over each integration (or single toolkit) and calls Composio tools.list() with limit=100
+  - Groups results by toolkit slug
+  - Silently skips any toolkit that fails to load
+
+Response 200:
+  {
+    "total": 12,
+    "actions": {
+      "gmail": [
+        { "slug": "GMAIL_SEND_EMAIL", "name": "Send Email" },
+        { "slug": "GMAIL_CREATE_DRAFT", "name": "Create Draft" }
+      ],
+      "slack": [
+        { "slug": "SLACK_SEND_MESSAGE", "name": "Send Message" }
+      ]
+    }
+  }
+
+Error Responses:
+  401 - Missing or invalid X-Org-Token
+  400 - integrations array is required
+  500 - Server error

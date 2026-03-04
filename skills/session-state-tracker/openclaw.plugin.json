@@ -1,0 +1,47 @@
+{
+  "slug": "session-state-tracker",
+  "name": "Session State Tracker",
+  "description": "Automatic state persistence across compaction and restarts via lifecycle hooks",
+  "version": "2.0.0",
+  "author": "qsmtco",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/qsmtco/qrusher",
+    "path": "skills/session-state-tracker"
+  },
+  "hooks": {
+    "pre-compaction": {
+      "enabled": true,
+      "script": "./hooks/pre-compaction.js",
+      "timeoutMs": 10000
+    },
+    "post-compaction": {
+      "enabled": true,
+      "script": "./hooks/post-compaction.js",
+      "timeoutMs": 5000
+    },
+    "session-start": {
+      "enabled": true,
+      "script": "./hooks/session-start.js",
+      "timeoutMs": 5000
+    }
+  },
+  "tools": [
+    "session_state_read",
+    "session_state_write",
+    "session_state_discover"
+  ],
+  "permissions": {
+    "fileSystem": {
+      "read": ["SESSION_STATE.md"],
+      "write": ["SESSION_STATE.md"]
+    }
+  },
+  "metadata": {
+    "openclaw": {
+      "minVersion": "2026.2.0",
+      "docs": "https://github.com/qsmtco/qrusher/tree/main/skills/session-state-tracker",
+      "tags": ["memory", "compaction", "state-management", "hooks"]
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tribe-protocol.org/schemas/protocol-messages/v1.0.0",
+  "title": "Tribe Protocol Messages",
+  "description": "Schema for Tribe Protocol communication messages",
+  "oneOf": [
+    { "$ref": "#/definitions/handshake_init" },
+    { "$ref": "#/definitions/handshake_response" },
+    { "$ref": "#/definitions/collab_request" },
+    { "$ref": "#/definitions/collab_response" },
+    { "$ref": "#/definitions/trust_update" },
+    { "$ref": "#/definitions/data_request" },
+    { "$ref": "#/definitions/data_response" },
+    { "$ref": "#/definitions/capability_query" }
+  ],
+  "definitions": {
+    "handshake_init": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "platform", "platform_id", "did_document_url", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.handshake.init" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "platform": { 
+          "type": "string",
+          "enum": ["discord", "slack", "email", "http", "x", "whatsapp", "signal"]
+        },
+        "platform_id": { "type": "string", "description": "Sender's ID on this platform" },
+        "did_document_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "did_document_inline": { 
+          "type": "object",
+          "description": "Optional: include full DID document in message (fallback if URL unreachable)"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "nonce": { "type": "string", "description": "Random nonce for replay prevention" },
+        "signature": { 
+          "type": "string",
+          "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$",
+          "description": "Signature over message contents"
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional human-readable message",
+          "maxLength": 500
+        }
+      }
+    },
+    "handshake_response": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "platform", "platform_id", "did_document_url", "trust_tier", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.handshake.response" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "platform": { 
+          "type": "string",
+          "enum": ["discord", "slack", "email", "http", "x", "whatsapp", "signal"]
+        },
+        "platform_id": { "type": "string" },
+        "did_document_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "did_document_inline": { "type": "object" },
+        "trust_tier": { 
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Trust tier assigned to sender"
+        },
+        "endorsed_by": {
+          "type": "string",
+          "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$",
+          "description": "DID of entity that endorsed this trust tier"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "nonce": { "type": "string" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" },
+        "message": { "type": "string", "maxLength": 500 },
+        "accept_collaboration": {
+          "type": "boolean",
+          "description": "Whether this bot accepts collaboration requests"
+        }
+      }
+    },
+    "collab_request": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "task", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.collab.request" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { 
+          "oneOf": [
+            { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+            { "type": "array", "items": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" } }
+          ],
+          "description": "Single DID or array of DIDs for multi-party collaboration"
+        },
+        "task": {
+          "type": "object",
+          "required": ["id", "title", "requires_tier"],
+          "properties": {
+            "id": { 
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$",
+              "description": "Unique task identifier"
+            },
+            "title": { "type": "string", "maxLength": 200 },
+            "description": { "type": "string", "maxLength": 2000 },
+            "requires_tier": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3,
+              "description": "Minimum trust tier required to participate"
+            },
+            "data_sharing": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "public_research",
+                  "code_examples",
+                  "work_products",
+                  "project_files",
+                  "learnings",
+                  "shared_memory"
+                ]
+              },
+              "description": "Types of data that will be shared"
+            },
+            "deadline": { 
+              "type": "string",
+              "format": "date-time",
+              "description": "Task deadline (optional)"
+            },
+            "deliverables": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Expected outputs"
+            },
+            "shared_workspace": {
+              "type": "string",
+              "description": "Path to shared workspace or repository"
+            }
+          }
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    },
+    "collab_response": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "task_id", "accepted", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.collab.response" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "task_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "accepted": { "type": "boolean" },
+        "reason": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Reason for acceptance or rejection"
+        },
+        "conditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Conditions or constraints for acceptance"
+        },
+        "estimated_completion": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this bot expects to complete the task"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    },
+    "trust_update": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "subject_did", "new_tier", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.trust.update" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "subject_did": { 
+          "type": "string",
+          "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$",
+          "description": "DID whose trust tier is being updated"
+        },
+        "old_tier": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "new_tier": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "reason": { "type": "string", "maxLength": 500 },
+        "effective_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this change takes effect (default: immediately)"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    },
+    "data_request": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "resource", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.data.request" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "resource": {
+          "type": "string",
+          "description": "Resource being requested (file path, data type, etc.)"
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Why this data is needed"
+        },
+        "context": {
+          "type": "string",
+          "description": "Task or project context"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    },
+    "data_response": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "resource", "granted", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.data.response" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "resource": { "type": "string" },
+        "granted": { "type": "boolean" },
+        "reason": { "type": "string", "maxLength": 500 },
+        "data": {
+          "type": "string",
+          "description": "Base64-encoded data (if granted), or URL to retrieve"
+        },
+        "data_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to fetch data (alternative to inline data)"
+        },
+        "expires": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When access to this data expires"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    },
+    "capability_query": {
+      "type": "object",
+      "required": ["type", "version", "from_did", "to_did", "timestamp"],
+      "properties": {
+        "type": { "const": "tribe.capability.query" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "from_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "to_did": { "type": "string", "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$" },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of capabilities to query (empty = all)"
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string", "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$" }
+      }
+    }
+  }
+}

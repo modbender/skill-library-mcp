@@ -1,0 +1,78 @@
+{
+  "_comment": "SecondMind Configuration – All models via OpenRouter Cloud",
+  "_docs": "See README.md for full configuration reference",
+  "_cost_estimate": "~$0.60-1.65/month depending on chat volume",
+
+  "openrouter": {
+    "apiKey": "YOUR_OPENROUTER_API_KEY_HERE",
+    "baseUrl": "https://openrouter.ai/api/v1"
+  },
+
+  "models": {
+    "_strategy": "Cheapest model that gets the job done. Override per role as needed.",
+    "_warning": "Models that are too small will cause JSON parsing errors. Stick to the recommended models.",
+
+    "extraction": {
+      "model": "google/gemini-2.0-flash-001",
+      "_why": "Fastest and cheapest for structured JSON extraction. 1M context."
+    },
+    "initiative": {
+      "model": "deepseek/deepseek-chat-v3-0324",
+      "_why": "Best reasoning per dollar. DeepSeek V3 / 3.2 recommended. For deeper: deepseek/deepseek-reasoner"
+    },
+    "flush": {
+      "model": "google/gemini-2.0-flash-001",
+      "_why": "Must be fast – runs inline before session reset"
+    },
+    "rerank": {
+      "model": "google/gemini-2.0-flash-001",
+      "_why": "Replaces vector embeddings. FTS5 + LLM reranking = cheaper + more portable"
+    },
+    "dedup": {
+      "model": "google/gemini-2.0-flash-001",
+      "_why": "Short JSON response for duplicate check. Sees max 10 candidates from FTS prefilter."
+    }
+  },
+
+  "paths": {
+    "dataDir": "data",
+    "dbFile": "data/secondmind.db",
+    "lockFile": "data/.lock",
+    "stateFile": "data/ingest-state.json"
+  },
+
+  "openclaw": {
+    "agentId": "main",
+    "sessionsDir": "YOUR_OPENCLAW_SESSIONS_PATH_HERE"
+  },
+
+  "schedule": {
+    "ingestMinutes": 30,
+    "consolidateHours": 6,
+    "archiveTime": "03:00",
+    "initiativeHours": 6
+  },
+
+  "initiative": {
+    "maxProposalsPerRun": 3,
+    "minTokensForProcessing": 200,
+    "reminderCooldownDays": 7,
+    "maxNudgesPerProposal": 2,
+    "archiveRetrievalLimit": 10,
+    "dedupThreshold": 0.85
+  },
+
+  "telegramMode": "integrated",
+
+  "notifications": {
+    "enabled": false,
+    "channel": "telegram",
+    "telegram": {
+      "botToken": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+      "chatId": "YOUR_TELEGRAM_CHAT_ID_HERE"
+    },
+    "discord": {
+      "webhookUrl": "YOUR_DISCORD_WEBHOOK_URL_HERE"
+    }
+  }
+}

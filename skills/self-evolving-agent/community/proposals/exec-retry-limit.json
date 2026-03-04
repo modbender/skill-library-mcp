@@ -1,0 +1,16 @@
+{
+  "id": "exec-retry-limit",
+  "title": "Exec Retry Limit Rule",
+  "description": "Prevents infinite retry loops by capping consecutive exec retries at 3. Without this rule, agents enter a failure spiral where each retry attempts the same broken command, burning tokens and time with zero marginal progress.",
+  "severity": "high",
+  "category": "safety",
+  "tags": ["exec", "loop", "safety", "retry", "runaway"],
+  "before": "<!-- No retry limit defined. Agent retries failing commands indefinitely. -->",
+  "after": "## Exec Retry Limit\n\nNever retry the same exec command more than **3 times** in a row.\n\nIf a command fails 3 consecutive times:\n1. Stop retrying immediately\n2. Log the failure with context\n3. Report to user with specific error message\n4. Do NOT attempt creative workarounds that call the same underlying command\n\nSigns you're in a retry loop:\n- Same command, same arguments, same error — stop.\n- Counter-based loops over exec — add a max iteration guard.\n- Polling loops without backoff — add exponential backoff (1s → 2s → 4s → give up).",
+  "evidence": "Discovered 119 consecutive retries in production. Agent attempted `git pull --rebase` in a loop for 47 minutes. Zero successful retries. ~$4.20 in wasted API tokens. The root cause (merge conflict) required manual resolution — no amount of retrying would fix it.",
+  "effectiveness": "97% reduction in runaway retry events after 1 week. Remaining 3% were legitimate intermittent network failures resolved within 3 attempts.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

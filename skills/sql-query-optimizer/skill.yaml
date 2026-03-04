@@ -1,0 +1,36 @@
+# Skill: sql_query_optimizer
+
+optimize_sql(query: string, db_type: string) => object
+
+## Trigger Patterns
+- SQL优化
+- 查询优化
+- sql optimization
+
+## Implementation
+
+分析并优化 SQL 查询。
+
+```javascript
+function optimizeSql(query, dbType = 'mysql') {
+  const suggestions = [];
+  
+  // 检测常见问题
+  if (query.toLowerCase().includes('select *')) {
+    suggestions.push('避免使用 SELECT *，只查询需要的列');
+  }
+  
+  if (!query.toLowerCase().includes('where') && !query.toLowerCase().includes('limit')) {
+    suggestions.push('建议添加 WHERE 条件和 LIMIT');
+  }
+  
+  if (query.toLowerCase().includes('like \'%')) {
+    suggestions.push('避免 LIKE \'%xxx\' 前导通配符');
+  }
+  
+  return {
+    original: query,
+    suggestions,
+    optimized: applySuggestions(query, suggestions)
+  };
+}

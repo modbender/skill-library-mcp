@@ -1,0 +1,52 @@
+{
+  "agents": {
+    "codex": {
+      "command": "codex",
+      "args": ["exec", "--dangerously-bypass-approvals-and-sandbox"],
+      "cwdArg": "-C",
+      "modelArg": "--model",
+      "defaultModel": null,
+      "capabilities": ["backend", "bugfix", "refactor", "api", "debug", "tests"],
+      "description": "Codex - 后端逻辑、复杂 bug、多文件重构"
+    },
+    "claude": {
+      "command": "claude",
+      "args": ["--dangerously-skip-permissions", "-p"],
+      "cwdArg": null,
+      "modelArg": "--model",
+      "defaultModel": null,
+      "capabilities": ["frontend", "ui", "ux", "git", "rapid", "docs"],
+      "description": "Claude Code - 前端、git 操作、快速任务"
+    },
+    "gemini": {
+      "command": "gemini",
+      "args": ["--approval-mode", "yolo", "--allowed-tools", "run_shell_command,write_file,read_file,grep_search", "-p"],
+      "cwdArg": null,
+      "modelArg": null,
+      "defaultModel": null,
+      "capabilities": ["design", "ux", "spec", "copy", "prototype"],
+      "description": "Gemini - UI 设计、生成规范"
+    },
+    "cursor": {
+      "command": "cursor",
+      "args": ["agent", "-f", "-p"],
+      "cwdArg": "--workspace",
+      "modelArg": "--model",
+      "defaultModel": "composer-1.5",
+      "capabilities": ["frontend", "ui", "ide", "product", "polish"],
+      "description": "Cursor - 备用代理、IDE 集成"
+    }
+  },
+  "defaults": {
+    "maxAgents": 5,
+    "retry": {
+      "maxAttempts": 3,
+      "delaySeconds": 60
+    }
+  },
+  "routing": {
+    "defaultAgent": "codex",
+    "enableAutoFallback": true,
+    "preferHealthyAgents": true
+  }
+}

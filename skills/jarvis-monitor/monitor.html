@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050508;
+            --bg-card: #0f0f1a;
+            --border: #1a1a2e;
+            --text-primary: #e0e0e0;
+            --text-dim: #6b7280;
+            --accent-cyan: #00f5ff;
+            --accent-magenta: #ff00ff;
+            --accent-green: #00ff88;
+            --accent-orange: #ff8800;
+            --accent-red: #ff3366;
+            --glow-cyan: rgba(0, 245, 255, 0.4);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                linear-gradient(180deg, var(--bg-deep) 0%, #0d0d15 100%),
+                radial-gradient(ellipse at 10% 20%, rgba(0, 245, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(ellipse at 90% 80%, rgba(255, 0, 255, 0.03) 0%, transparent 40%);
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.15) 1px, rgba(0, 0, 0, 0.15) 2px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 24px;
+            background: linear-gradient(90deg, rgba(0, 245, 255, 0.05), transparent);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-cyan);
+        }
+        
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--bg-deep);
+            box-shadow: 0 0 30px var(--glow-cyan);
+        }
+        
+        .logo-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-text .subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+        
+        .btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 8px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta), transparent);
+        }
+        
+        .card-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+        
+        .card-body { padding: 16px; }
+        
+        .stat-card { text-align: center; padding: 20px; }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value.cyan { color: var(--accent-cyan); text-shadow: 0 0 20px var(--glow-cyan); }
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.orange { color: var(--accent-orange); }
+        .stat-value.red { color: var(--accent-red); }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .graph {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 80px;
+            padding: 10px;
+            gap: 4px;
+        }
+        
+        .graph-bar {
+            width: 12px;
+            background: linear-gradient(180deg, var(--accent-cyan), transparent);
+            border-radius: 2px 2px 0 0;
+            animation: barGrow 1s ease-out forwards;
+            transform-origin: bottom;
+        }
+        
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        
+        .progress-item { margin-bottom: 12px; }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #0a0a12;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+            background: linear-gradient(90deg, var(--accent-cyan), rgba(0, 245, 255, 0.5));
+        }
+        
+        .data-table {
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+        
+        .data-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #0a0a12;
+            color: var(--accent-cyan);
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .data-table tr:hover td {
+            background: rgba(0, 245, 255, 0.05);
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-dot.online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        
+        .log-container { max-height: 200px; overflow-y: auto; }
+        
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+        }
+        
+        .log-time { color: var(--accent-magenta); min-width: 70px; }
+        .log-type { color: var(--accent-cyan); min-width: 60px; }
+        .log-msg { color: var(--text-dim); }
+        
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 600px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 16px; }
+        }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0a0a12; }
+        ::-webkit-scrollbar-thumb { background: var(--border); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">
+                <h1>MONITOR</h1>
+                <div class="subtitle">SYSTEM DASHBOARD</div>
+            </div>
+        </div>
+        <button class="btn" onclick="toggleLang()">中文</button>
+    </header>
+    
+    <div class="main-grid">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-value cyan" id="systemStatus">ONLINE</div>
+                <div class="stat-label">STATUS</div>
+            </div>
+        </div>
+        
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-value green" id="gatewayStatus">98%</div>
+                <div class="stat-label">GATEWAY</div>
+            </div>
+        </div>
+        
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-value orange" id="lastActivity">12s</div>
+                <div class="stat-label">LAST ACT</div>
+            </div>
+        </div>
+        
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-value red" id="responseTime">45ms</div>
+                <div class="stat-label">RESP TIME</div>
+            </div>
+        </div>
+        
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <span class="card-title">PERFORMANCE</span>
+            </div>
+            <div class="card-body">
+                <div class="graph" id="performanceGraph"></div>
+            </div>
+        </div>
+        
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <span class="card-title">SYSTEM LOAD</span>
+            </div>
+            <div class="card-body">
+                <div class="progress-item">
+                    <div class="progress-label"><span>CPU</span><span id="cpuValue">45%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="cpuBar" style="width: 45%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label"><span>MEMORY</span><span id="memValue">62%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="memBar" style="width: 62%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label"><span>NETWORK</span><span id="netValue">28%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="netBar" style="width: 28%"></div></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <span class="card-title">SERVICES</span>
+            </div>
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>SERVICE</th><th>STATUS</th><th>LATENCY</th><th>UPTIME</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Service 1</td><td><span class="status-dot online"></span>ONLINE</td><td>12ms</td><td>7d 2h</td></tr>
+                        <tr><td>Service 2</td><td><span class="status-dot online"></span>CONNECTED</td><td>8ms</td><td>7d 2h</td></tr>
+                        <tr><td>Service 3</td><td><span class="status-dot online"></span>READY</td><td>45ms</td><td>7d 2h</td></tr>
+                        <tr><td>Service 4</td><td><span class="status-dot online"></span>ONLINE</td><td>25ms</td><td>7d 2h</td></tr>
+                        <tr><td>Service 5</td><td><span class="status-dot online"></span>RUNNING</td><td>2ms</td><td>7d 2h</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <span class="card-title">ACTIVITY LOG</span>
+            </div>
+            <div class="card-body">
+                <div class="log-container" id="activityLog">
+                    <div class="log-entry">
+                        <span class="log-time">09:24:15</span>
+                        <span class="log-type">EVENT</span>
+                        <span class="log-msg">Gateway tick received</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">09:24:05</span>
+                        <span class="log-type">HEALTH</span>
+                        <span class="log-msg">Health check passed</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">09:23:55</span>
+                        <span class="log-type">EVENT</span>
+                        <span class="log-msg">Agent heartbeat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        SYSTEM MONITOR v3.0 | All systems operational
+    </div>
+    
+    <script>
+        // CONFIG: Change this to your API endpoint
+        const API_ENDPOINT = 'http://192.168.31.19:8000/healthz';
+        
+        function initGraph() {
+            const container = document.getElementById('performanceGraph');
+            const values = [65, 45, 78, 52, 88, 42, 71, 55, 83, 47, 76, 58];
+            container.innerHTML = values.map((v, i) => 
+                `<div class="graph-bar" style="height: ${v}px; animation-delay: ${i * 0.05}s"></div>`
+            ).join('');
+        }
+        
+        function updateData() {
+            const cpu = Math.floor(Math.random() * 40) + 30;
+            const mem = Math.floor(Math.random() * 30) + 50;
+            const net = Math.floor(Math.random() * 40) + 10;
+            
+            document.getElementById('cpuValue').textContent = cpu + '%';
+            document.getElementById('cpuBar').style.width = cpu + '%';
+            document.getElementById('memValue').textContent = mem + '%';
+            document.getElementById('memBar').style.width = mem + '%';
+            document.getElementById('netValue').textContent = net + '%';
+            document.getElementById('netBar').style.width = net + '%';
+            
+            document.getElementById('lastActivity').textContent = Math.floor(Math.random() * 30) + 5 + 's';
+            document.getElementById('responseTime').textContent = Math.floor(Math.random() * 50) + 20 + 'ms';
+            
+            initGraph();
+        }
+        
+        initGraph();
+        setInterval(updateData, 3000);
+    </script>
+</body>
+</html>

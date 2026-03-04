@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Default: Test skill integration
+  skill-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PREDICATE_API_KEY=${PREDICATE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./test-output:/app/test-output
+    tty: true
+    stdin_open: true
+    command: npx ts-node test-skill.ts
+
+  # Test with OpenClaw's full runtime
+  openclaw-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PREDICATE_API_KEY=${PREDICATE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./test-output:/app/test-output
+    tty: true
+    stdin_open: true
+    command: bash /app/test-openclaw-integration.sh
+
+  # Run the login demo (SDK-level)
+  demo-login:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PREDICATE_API_KEY=${PREDICATE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - HEADLESS=true
+    volumes:
+      - ./test-output:/app/test-output
+    tty: true
+    stdin_open: true
+    command: npm run demo:login
+
+  # Run with visible browser (requires X11/VNC)
+  demo-headed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PREDICATE_API_KEY=${PREDICATE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - HEADLESS=false
+      - DISPLAY=:99
+    volumes:
+      - ./test-output:/app/test-output
+    tty: true
+    stdin_open: true
+    command: >
+      bash -c "Xvfb :99 -screen 0 1920x1080x24 &
+               sleep 2 &&
+               npm run demo:login"

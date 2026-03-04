@@ -1,0 +1,17 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y shellcheck shfmt jq
+      - run: |
+          shfmt -d -i 2 -ci scripts/massive tests/test_massive.sh
+      - run: shellcheck scripts/massive tests/test_massive.sh
+      - run: bash tests/test_massive.sh

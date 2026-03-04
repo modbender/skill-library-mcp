@@ -1,0 +1,117 @@
+# Main configuration for Solana Memecoin Guardian v2
+skill_name: solana_memecoin_guardian_v2
+chain: solana
+
+engines:
+  copy_trade: true
+  ai_trade: true
+
+sources:
+  pumpfun:
+    enabled: true
+    mode: ["new", "trending", "graduating"]
+    poll_seconds: 30
+  dexscreener:
+    enabled: true
+    poll_seconds: 20
+
+bags:
+  enabled: true
+  mode: ["smart_wallet_holdings", "internal_watchlist"]
+
+smart_wallets:
+  enabled: true
+  min_trades: 30
+  min_winrate: 0.55
+  min_profit_factor: 1.30
+  copy_delay_sec_min: 30
+  copy_delay_sec_max: 120
+  max_price_chase_pct: 20
+
+risk_budget_split:
+  copy_trade_pct: 60
+  ai_trade_pct: 40
+
+risk_gates:
+  min_liquidity_usd: 50000
+  max_entry_slippage_pct: 1.5
+  max_price_impact_pct: 1.8
+  cooldown_token_age_min: 15
+  reject_if_mint_authority: true
+  reject_if_freeze_authority: true
+  max_single_holder_pct: 12
+  max_top10_holders_pct: 50
+  reject_if_tx_anomaly: true
+
+copy_trade_rules:
+  min_age_min: 20
+  max_wallet_buys_per_hour: 8
+  require_trade_count_5m: 80
+
+ai_signal:
+  stability_window_min: 20
+  min_tx5m: 100
+  max_vol_per_tx_usd: 1200
+  max_price_change_5m_pct: 15
+  require_liq_non_decreasing: true
+  riskScore_threshold: 30
+
+portfolio:
+  bankroll_usd: 1000
+  max_open_positions: 3
+  max_trades_per_day: 4
+  daily_loss_limit_pct: 2.5
+  risk_per_trade_pct_copy: 0.5
+  risk_per_trade_pct_ai: 0.35
+  max_position_liquidity_pct: 1.0 # sizeUsd <= 1% liquidityUsd
+
+exits:
+  stop_loss_pct: 10
+  tp1_pct: 20
+  tp1_sell_pct: 35
+  tp2_pct: 60
+  tp2_sell_pct: 35
+  trailing_stop_pct: 12
+
+rug_alarms:
+  lp_drop_pct: 25
+  lp_drop_window_min: 5
+  holder_spike_pct: 6
+  price_impact_spike_pct: 3.0
+
+monitor:
+  poll_seconds: 10
+
+execution:
+  mode_default: paper # paper|live
+  router: jupiter
+  confirm_level: confirmed
+  quote_retries: 2
+
+execution_live:
+  default_input_mint: So11111111111111111111111111111111111111112 # wSOL
+  slippage_bps: 80
+  restrict_intermediate_tokens: true
+  only_direct_routes: false
+
+ignore_mints:
+  - So11111111111111111111111111111111111111112
+  - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+
+narrative:
+  enabled: true
+  x_stream:
+    enabled: true
+    rules_from_config: true
+    extra_rules:
+      - "from:elonmusk -is:retweet"
+    reconnect_min_seconds: 5
+    reconnect_max_seconds: 60
+
+  scoring:
+    min_hype_score: 10
+    hot_window_minutes: 60
+    max_hot_mints: 20
+
+  # Narrative signals only influence candidate selection and scoring.
+  # All trades still must pass Risk Gate.

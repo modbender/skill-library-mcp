@@ -1,0 +1,40 @@
+# Skill: test_case_generator
+
+generate_tests(code: string, framework: string) => string
+
+## Trigger Patterns
+- 生成测试
+- 测试用例
+- unit test
+- generate test
+
+## Implementation
+
+根据代码自动生成单元测试用例。
+
+```javascript
+function generateTests(code, framework = 'jest') {
+  const functions = extractFunctions(code);
+  const tests = [];
+  
+  for (const fn of functions) {
+    const testTemplate = {
+      jest: `test('${fn.name} should work', () => {
+  const result = ${fn.name}(${fn.params.map(p => 'mock' + p).join(', ')});
+  expect(result).toBe();
+});`,
+      pytest: `def test_${fn.name}():
+    result = ${fn.name}(${fn.params.join(', ')})
+    assert result is not None`,
+      mocha: `it('${fn.name}', () => {
+  const result = ${fn.name}(${fn.params.join(', ')});
+  assert(result);
+});`
+    };
+    
+    tests.push(testTemplate[framework] || testTemplate.jest);
+  }
+  
+  return tests.join('\n\n');
+}
+```

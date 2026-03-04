@@ -1,0 +1,18 @@
+{
+  "name": "Creator Monitor + Transcripts",
+  "description": "Single job that checks creator feeds and pulls transcripts from new uploads. No chaining needed.",
+  "schedule": {
+    "kind": "cron",
+    "expr": "0 7 * * *",
+    "tz": "America/Chicago"
+  },
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Use yoinkit to check for new uploads from these creators:\n- YouTube: @MrBeast, @mkbhd, @ali-abdaal\n- TikTok: @garyvee\n\nFor each creator, pull their recent feed. For anything posted in the last 24 hours:\n1. Note the title, view count, and URL\n2. Pull the transcript\n3. Summarize the video in 3-4 bullet points (main topic, key takeaways, hooks used)\n4. Suggest one content idea I could create in response\n\nIf no new uploads, just say so.",
+    "timeoutSeconds": 300
+  },
+  "sessionTarget": "isolated",
+  "delivery": {
+    "mode": "announce"
+  }
+}

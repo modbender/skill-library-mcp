@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecuCheck セキュリティ監査</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', 'Inter', sans-serif; background: #111; color: #ddd; font-size: 16px; line-height: 1.6; }
+        .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #333; }
+        h1 { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .meta { color: #777; font-size: 14px; font-family: 'JetBrains Mono', monospace; }
+        .summary { display: grid; grid-template-columns: 120px 1fr; gap: 24px; margin-bottom: 32px; }
+        .score { background: #1a1a1a; border: 1px solid #333; padding: 24px; text-align: center; }
+        .score-icon { font-size: 48px; }
+        .score-label { font-size: 14px; font-weight: 500; margin-top: 8px; color: #999; }
+        .counts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .count-box { background: #1a1a1a; border: 1px solid #333; padding: 16px; text-align: center; }
+        .count-num { font-size: 28px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .count-label { font-size: 12px; color: #777; margin-top: 4px; }
+        .critical .count-num { color: #f66; }
+        .high .count-num { color: #fa5; }
+        .medium .count-num { color: #fc3; }
+        .low .count-num { color: #6c6; }
+        .info .count-num { color: #888; }
+        .section { background: #1a1a1a; border: 1px solid #333; margin-bottom: 16px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; cursor: pointer; user-select: none; }
+        .section-header:hover { background: #222; }
+        .section-title { font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .badge { font-size: 12px; font-weight: 500; padding: 4px 10px; font-family: 'JetBrains Mono', monospace; }
+        .badge-ok { color: #6c6; } .badge-low { color: #6c6; } .badge-medium { color: #fc3; } .badge-high { color: #fa5; } .badge-critical { color: #f66; }
+        .section-content { display: none; padding: 20px; border-top: 1px solid #333; }
+        .section.open .section-content { display: block; }
+        .arrow { transition: transform 0.2s; color: #555; }
+        .section.open .arrow { transform: rotate(180deg); }
+        .runtime-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .runtime-card h4 { font-size: 12px; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .runtime-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2a2a2a; font-size: 14px; }
+        .runtime-item:last-child { border-bottom: none; }
+        .val { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+        .val.good { color: #6c6; } .val.warn { color: #fc3; } .val.bad { color: #f66; }
+        .findings-list { list-style: none; }
+        .finding-item { padding: 14px 16px; margin-bottom: 10px; background: #111; border-left: 3px solid #333; font-size: 14px; }
+        .finding-item.critical { border-left-color: #f66; } .finding-item.high { border-left-color: #fa5; } .finding-item.medium { border-left-color: #fc3; } .finding-item.low { border-left-color: #6c6; } .finding-item.info { border-left-color: #666; }
+        .finding-item small { display: block; color: #888; margin-top: 6px; font-size: 13px; }
+        footer { text-align: center; padding: 32px 0; color: #555; font-size: 13px; }
+        footer a { color: #888; }
+        @media (max-width: 700px) { .summary { grid-template-columns: 1fr; } .counts { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><h1>🔒 SecuCheck</h1><div class="meta">{{SCAN_TIME}}<br>{{HOSTNAME}}</div></header>
+        <div class="summary">
+            <div class="score"><div class="score-icon">{{SCORE_EMOJI}}</div><div class="score-label">{{SCORE_LABEL}}</div></div>
+            <div class="counts">
+                <div class="count-box critical"><div class="count-num">{{COUNT_CRITICAL}}</div><div class="count-label">重大</div></div>
+                <div class="count-box high"><div class="count-num">{{COUNT_HIGH}}</div><div class="count-label">高</div></div>
+                <div class="count-box medium"><div class="count-num">{{COUNT_MEDIUM}}</div><div class="count-label">中</div></div>
+                <div class="count-box low"><div class="count-num">{{COUNT_LOW}}</div><div class="count-label">低</div></div>
+                <div class="count-box info"><div class="count-num">{{COUNT_INFO}}</div><div class="count-label">情報</div></div>
+            </div>
+        </div>
+        <div class="section open" id="section-runtime">
+            <div class="section-header" onclick="toggle('runtime')">
+                <span class="section-title"><span>⚡</span> ランタイム環境</span>
+                <div style="display:flex;align-items:center;gap:12px;"><span class="badge {{RUNTIME_BADGE}}">{{RUNTIME_STATUS}}</span><span class="arrow">▼</span></div>
+            </div>
+            <div class="section-content"><div class="runtime-grid">{{RUNTIME_CONTENT}}</div></div>
+        </div>
+        {{FINDINGS_SECTIONS}}
+        <footer><a href="https://clawhub.ai/jooneyp/secucheck">secucheck</a> · 再実行: "セキュリティ監査"</footer>
+    </div>
+    <script>
+        function toggle(id) { document.getElementById('section-' + id).classList.toggle('open'); }
+        document.querySelectorAll('.section').forEach(s => { if (s.querySelector('.badge-ok')) s.classList.remove('open'); });
+    </script>
+</body>
+</html>

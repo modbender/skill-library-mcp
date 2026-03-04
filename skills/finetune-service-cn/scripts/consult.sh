@@ -1,0 +1,21 @@
+#!/bin/bash
+# 微调服务咨询脚本
+
+echo "🔧 模型微调服务"
+echo "================"
+echo ""
+echo "📱 联系方式："
+echo "  - ClawHub 私信"
+echo "  - Moltbook: @赚钱小能手"
+echo ""
+echo "💰 价格表："
+echo "  7B LoRA:     $20"
+echo "  13B LoRA:    $35 ⭐ (20GB 显存优势)"
+echo "  SD LoRA:     $15-30"
+echo ""
+echo "💡 我的优势："
+echo "  - RTX 3080Ti 魔改版 20GB"
+echo "  - 能微调 13B 模型"
+echo "  - 24-48 小时交付"
+echo ""
+echo "请私信我讨论你的需求！"

@@ -1,0 +1,125 @@
+{
+  "agent": "main",
+  "analyzed_at": "2026-02-17T17:11:15Z",
+  "collection_days": 7,
+  "sessions_analyzed": 30,
+  "error_count": 0,
+  "error_snippets": [],
+  "frustration_events": [
+    {
+      "pattern": "retry_request",
+      "severity": "medium",
+      "confidence": 0.7,
+      "context": "System: [2026-02-05 04:00:17 GMT+9] Cron: 이제 다시 실행합니다.\nSystem: [2026-02-05 04:00:57 GMT+9] Cron: 좋습니"
+    },
+    {
+      "pattern": "retry_request",
+      "severity": "medium",
+      "confidence": 0.7,
+      "context": "System: [2026-02-10 19:00:18 GMT+9] Cron: 상태 파일 확인 결과: **현재 저장된 정보는 이미 지나간 것입니다.**\n\n- 저장된 주: W06 (20"
+    }
+  ],
+  "frustration_count": 2,
+  "frustration_by_severity": {
+    "high": 0,
+    "medium": 2,
+    "low": 0
+  },
+  "exec_safety": {
+    "score": 6.8,
+    "safe": 4353,
+    "unsafe": 86,
+    "total": 4439,
+    "ratio": 0.981,
+    "unsafe_examples": [
+      {
+        "cmd": "# watchdog stderr 로그 정리 (오래된 에러 로그)\n> ~/.openclaw/logs/watchdog.stderr.log\necho ",
+        "reason": "launchctl 직접 호출"
+      },
+      {
+        "cmd": "launchctl bootout gui/$(id -u)/ai.openclaw.watchdog 2>&1; sleep 1; launchctl boo",
+        "reason": "launchctl 직접 호출"
+      },
+      {
+        "cmd": "# 근본적으로 다른 접근: sonnet 에이전트 디렉토리 전체 삭제 후 재시작\n# OpenClaw이 자동으로 다시 생성할 것\nrm -rf ~/.",
+        "reason": "rm -rf (복구 불가)"
+      },
+      {
+        "cmd": "# Full stop + start (not SIGUSR1)\nkill $(pgrep -f \"openclaw.*gateway\" | head -1)",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "# venv 중복 제거 — 하나(~/openclaw/venv)만 남기고 나머지 삭제\n# 전부 동일 패키지 (pip 버전만 미세 차이)\nrm -r",
+        "reason": "rm -rf (복구 불가)"
+      }
+    ]
+  },
+  "rule_violations": [
+    {
+      "rule": "rm_destructive",
+      "description": "rm -rf 사용 (trash 권장)",
+      "count": 58,
+      "examples": [
+        "rm -f ~/.openclaw/agents/sonnet/sessions/*.jsonl",
+        "sed -i '' '/# 임시 디렉토리 불필요/d; /^rm -rf \"\\$TEMP_DIR\"$/d' ~/openclaw/scripts/daily-",
+        "cd ~/openclaw && git rebase --abort 2>/dev/null; rm -f BOOTSTRAP.md; git checkou",
+        "cd ~/Documents/dev && rm -rf ramsbaby-blog-starter && git clone https://github.c",
+        "rm -f ~/openclaw/memory/emergency-recovery-20260208-1246.log ~/openclaw/memory/.",
+        "rm -rf ~/.openclaw/workspace-default && echo \"✅ 삭제 완료\""
+      ]
+    },
+    {
+      "rule": "gateway_launchctl",
+      "description": "launchctl 직접 사용",
+      "count": 14,
+      "examples": [
+        "launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/ai.openclaw.watchdog.plist",
+        "launchctl bootout gui/$(id -u)/ai.openclaw.watchdog 2>/dev/null || launchctl unl",
+        "echo \"=== 현재 시각: $(date '+%H:%M:%S') ===\" && launchctl bootout gui/$(id -u)/ai.o"
+      ]
+    },
+    {
+      "rule": "git_direct_cmd",
+      "description": "git 직접 명령 (git-sync.sh 미사용)",
+      "count": 14,
+      "examples": [
+        "git push origin main 2>&1 | tail -10",
+        "git push origin v1.1.0"
+      ]
+    },
+    {
+      "rule": "script_no_fallback",
+      "description": "스크립트 에러 핸들링 없음",
+      "count": 13,
+      "examples": [
+        "node ~/openclaw/scripts/kakao-oauth-refresh.js",
+        "node ~/openclaw/scripts/tqqq-monitor-with-retry.js",
+        "python3 ~/openclaw/scripts/tqqq-yahoo-monitor.py",
+        "node /Users/ramsbaby/openclaw/scripts/gwanhun-reservation-check.js",
+        "python3 ~/openclaw/scripts/tqqq-yahoo-monitor.py",
+        "node ~/openclaw/scripts/github-watcher-with-retry.js"
+      ]
+    }
+  ],
+  "quality_score": 8.1,
+  "compaction_total": 199,
+  "message_total": 23156,
+  "agents_md_stats": {
+    "exec_safety_rules": [],
+    "key_rules": [],
+    "raw_lines": 661,
+    "has_exec_safety_section": true,
+    "has_or_true": true,
+    "has_git_sync": true,
+    "has_wal_protocol": true,
+    "has_channel_routing": true,
+    "rule_density": 33
+  },
+  "sessions_analyzed_paths": [
+    "/Users/ramsbaby/.openclaw/agents/main/sessions/b1409f4b-cccd-4f68-b86f-091ef0351a56.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/main/sessions/e69c5fd0-66fc-40eb-bf1b-15ee8c41f23c.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/main/sessions/4216ce4b-6012-44e6-8882-42fb486a61a0.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/main/sessions/6c4246dc-9faf-49f7-8d52-206ed7df1202.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/main/sessions/0e6d850a-6da7-4e45-be39-79b3631e9f86.jsonl"
+  ]
+}

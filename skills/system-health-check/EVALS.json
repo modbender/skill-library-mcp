@@ -1,0 +1,71 @@
+[
+  {
+    "id": 0,
+    "prompt": "Run a full system health check and report the results.",
+    "expectations": [
+      "Checks all 20 skill folders for SKILL.md presence",
+      "Validates frontmatter on all SKILL.md files",
+      "Checks 19 EVALS.json files are present (excluding canonical-data-map)",
+      "Verifies /data/ directory structure against canonical data map",
+      "Checks file permissions on /data/auth/ and /data/clients/",
+      "Verifies jq, curl, and openssl are installed",
+      "Checks for stale process locks",
+      "Reports backup freshness",
+      "Produces clear pass/fail summary with remediation commands for failures"
+    ],
+    "files": []
+  },
+  {
+    "id": 1,
+    "prompt": "The health check reports that /data/clients/ has permission mode 755 instead of the expected 700. What should happen?",
+    "expectations": [
+      "Flags this as a FAIL result, not just a warning",
+      "Explains the security risk: world-readable client financial data",
+      "Provides the specific remediation command: chmod 700 /data/clients/",
+      "Does not automatically change the permissions — reports only",
+      "Includes this failure in the JSON report output",
+      "Suggests running the fix and then re-running the health check"
+    ],
+    "files": []
+  },
+  {
+    "id": 2,
+    "prompt": "Run the quick health check suitable for an hourly cron job. It should be fast and check only the most critical items.",
+    "expectations": [
+      "Checks skill file presence (fast — just file existence)",
+      "Checks top-level directory structure",
+      "Checks for stale process locks",
+      "Does NOT run full integrity hash verification (too slow for hourly)",
+      "Does NOT check encryption status (slow)",
+      "Completes in under 10 seconds for a typical installation",
+      "Returns exit code 0 if all quick checks pass"
+    ],
+    "files": []
+  },
+  {
+    "id": 3,
+    "prompt": "A new top-level directory /data/temp-exports/ has appeared that is not in the canonical data map. What does the health check report?",
+    "expectations": [
+      "Detects the unexpected directory under /data/",
+      "Reports it as a WARN, not a FAIL (it may be legitimate)",
+      "Notes that it is not defined in the canonical data map",
+      "Suggests checking which skill or process created it",
+      "Does not delete or modify the directory",
+      "Recommends either adding it to the canonical map or removing it"
+    ],
+    "files": []
+  },
+  {
+    "id": 4,
+    "prompt": "The last full backup was 10 days ago and the last incremental backup was 3 days ago. Both exceed their expected freshness thresholds. Report the issue.",
+    "expectations": [
+      "Flags the full backup as HIGH severity — expected within 7 days, now 10 days old",
+      "Flags the incremental backup as MEDIUM severity — expected within 26 hours, now 3 days old",
+      "Provides the specific remediation: run openclaw backup full --now and openclaw backup incremental --now",
+      "Suggests checking if the backup cron job is still configured and running",
+      "Logs this as a system failure to /data/memory/failures/ for pattern detection",
+      "Does not attempt to run backups itself — report only"
+    ],
+    "files": []
+  }
+]

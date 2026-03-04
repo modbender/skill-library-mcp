@@ -1,0 +1,50 @@
+# OpenClaw OTP Challenger Configuration Template
+# Copy relevant sections to your ~/.openclaw/config.yaml file
+
+security:
+  # Time-based One-Time Password (TOTP) Configuration
+  # Used for 6-digit authenticator app codes (Google Authenticator, Authy, etc.)
+  otp:
+    # Base32-encoded secret key (generate with: ./generate-secret.sh)
+    # Required for TOTP verification
+    secret: "YOUR_BASE32_SECRET_HERE"
+
+    # Account name shown in authenticator app
+    # Optional - defaults to "user@example.com"
+    accountName: "your-account@example.com"
+
+    # Issuer name shown in authenticator app
+    # Optional - defaults to "OpenClaw"
+    issuer: "OpenClaw"
+
+    # How long verification remains valid (in hours)
+    # Optional - defaults to 24 hours
+    intervalHours: 24
+
+  # YubiKey OTP Configuration
+  # Used for 44-character YubiKey OTP codes
+  yubikey:
+    # Client ID from Yubico API (get from https://upgrade.yubico.com/getapikey/)
+    # Required for YubiKey verification
+    clientId: "YOUR_CLIENT_ID_HERE"
+
+    # Base64-encoded secret key from Yubico API
+    # Required for YubiKey verification
+    secretKey: "YOUR_BASE64_SECRET_KEY_HERE"
+
+# NOTE: Operational settings like maxFailures, auditLog, and failureHook
+# are configured via environment variables, not YAML.
+# See env-template.sh for these settings:
+#   OTP_MAX_FAILURES, OTP_AUDIT_LOG, OTP_FAILURE_HOOK
+
+# Example configuration for complete setup:
+#
+# security:
+#   otp:
+#     secret: "JBSWY3DPEHPK3PXP"
+#     accountName: "admin@mycompany.com"
+#     issuer: "MyCompany OpenClaw"
+#     intervalHours: 12
+#   yubikey:
+#     clientId: "12345"
+#     secretKey: "dGhpcyBpcyBhIHRlc3Qga2V5"

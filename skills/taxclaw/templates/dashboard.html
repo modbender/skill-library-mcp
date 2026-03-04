@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="card" style="padding: 14px 16px; margin-bottom: 14px;">
+    <div class="row" style="justify-content: space-between; align-items: baseline; gap: 10px;">
+      <div class="row" style="gap:10px; align-items: baseline;">
+        <div style="font-size: 20px; font-weight: 800;">🧾🦀 TaxClaw</div>
+        <span class="pill {{ status_pill_class }}" id="status-pill">{{ status_label }}</span>
+      </div>
+      <div class="muted" style="font-size: 13px;">Your taxes. Your machine. Your data.</div>
+    </div>
+
+    <div class="row" style="margin-top: 10px; gap: 10px;">
+      <span class="pill" title="Total documents">
+        <span class="muted">docs</span> <strong id="stat-total">{{ stats.total }}</strong>
+      </span>
+      <span class="pill warn" title="Needs review">
+        <span class="muted">need review</span> <strong id="stat-needs-review">{{ stats.needs_review }}</strong>
+      </span>
+      <span class="pill ok" title="Processed">
+        <span class="muted">processed</span> <strong id="stat-processed">{{ stats.processed }}</strong>
+      </span>
+      <span class="pill" title="Ready to export">
+        <span class="muted">ready to export</span> <strong id="stat-ready">{{ stats.ready_to_export }}</strong>
+      </span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div class="row" style="justify-content: space-between;">
+      <h2 style="margin:0; font-size: 16px;">Workflow</h2>
+      <span class="muted" style="font-size: 13px;">4 steps. Local-first by default.</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px;">
+      <div class="card" style="padding: 14px;">
+        <div style="font-weight: 800; margin-bottom: 6px;">① Upload</div>
+        <div class="muted" style="font-size: 13px; margin-bottom: 10px;">Drop your PDF</div>
+        <a href="/upload"><button style="width: 100%;">Upload now</button></a>
+      </div>
+
+      <div class="card" style="padding: 14px;">
+        <div style="font-weight: 800; margin-bottom: 6px;">② Extract</div>
+        <div class="muted" style="font-size: 13px;">AI reads the form fields automatically.</div>
+        <div class="muted" style="font-size: 12px; margin-top: 10px;">No action needed.</div>
+      </div>
+
+      <div class="card" style="padding: 14px;">
+        <div style="font-weight: 800; margin-bottom: 6px;">③ Review</div>
+        <div class="muted" style="font-size: 13px; margin-bottom: 10px;">Verify fields and flag anything for your CPA.</div>
+        <a href="/review"><button style="width: 100%;">Review queue</button></a>
+      </div>
+
+      <div class="card" style="padding: 14px;">
+        <div style="font-weight: 800; margin-bottom: 6px;">④ Export</div>
+        <div class="muted" style="font-size: 13px; margin-bottom: 10px;">Export extracted data or all original files.</div>
+        <div class="row" style="gap: 8px; flex-wrap: wrap;">
+          <a href="/export.wide.csv?csrf={{ csrf_token }}" class="muted">📊 Spreadsheet</a>
+          <a href="/export.originals.zip?csrf={{ csrf_token }}" class="muted">📦 All originals (.zip)</a>
+          <details style="display:inline-block;">
+            <summary class="muted" style="list-style:none; cursor:pointer;">Advanced ▾</summary>
+            <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px; font-size:13px;">
+              <a href="/export.long.csv?csrf={{ csrf_token }}" class="muted">🗃 Data Analysis CSV</a>
+              <a href="/export.json?csrf={{ csrf_token }}" class="muted">🛠 JSON</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      @media (max-width: 900px) {
+        .main div[style*="grid-template-columns: repeat(4"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+      }
+      @media (max-width: 520px) {
+        .main div[style*="grid-template-columns: repeat(4"] { grid-template-columns: 1fr !important; }
+      }
+    </style>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px; border-color: rgba(96,165,250,0.35); background: rgba(17,24,39,0.92);">
+    <div class="row" style="justify-content: space-between;">
+      <h2 style="margin:0; font-size: 16px;">🤖 Your agent can do this too</h2>
+      <span class="pill" style="border-color: rgba(96,165,250,0.35); color: var(--accent);">Agent-friendly</span>
+    </div>
+
+    <div class="muted" style="margin-top: 10px; line-height: 1.5;">
+      You don't need to open this UI at all.
+      Just send your agent a tax document and say: <span style="color: var(--text);">“Add this to TaxClaw”</span> or <span style="color: var(--text);">“Extract this 1099”</span>.
+    </div>
+
+    <div class="muted" style="margin-top: 10px; line-height: 1.5;">
+      Your agent will call:
+    </div>
+
+    <pre style="margin-top: 10px;"><code>taxclaw ingest &lt;file&gt; --filer &lt;you&gt; --year 2025</code></pre>
+
+    <div class="muted" style="margin-top: 10px; line-height: 1.5;">
+      Everything lands here automatically. You review, your agent extracted. Local. Private. Fast.
+    </div>
+  </div>
+
+  {% if stats.crypto_docs and stats.crypto_docs > 0 %}
+    <div class="card" style="margin-bottom: 14px; border-color: rgba(96,165,250,0.35); background: rgba(17,24,39,0.92);">
+      <div class="row" style="justify-content: space-between; gap: 10px;">
+        <div>
+          <div style="font-weight: 800;">🪙 You have {{ stats.crypto_docs }} crypto tax document(s).</div>
+          <div class="muted" style="margin-top: 6px;">Cost basis reconciliation may be needed.</div>
+        </div>
+        <div><a href="/digital_assets" class="btn">Learn about your options →</a></div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card" style="margin-bottom:14px; border-color:rgba(245,158,11,0.45); background:rgba(245,158,11,0.05);">
+    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">⚠️ New 1099&#8209;DA? Don't file without cost basis.</div>
+    <div class="muted" style="margin-bottom:10px;">TaxClaw extracts proceeds (step 1). Cost basis is step 2 — and it's what most crypto filers are missing.</div>
+    <a href="/digital_assets" class="btn">Check cost basis →</a>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content: space-between;">
+      <h2 style="margin:0; font-size: 16px;">Recent documents</h2>
+      <a href="/documents" class="muted">View all →</a>
+    </div>
+
+    {% if recent_docs|length == 0 %}
+      <div class="muted" style="margin-top: 10px;">No documents yet — upload your first PDF or send one to your agent.</div>
+      <div style="margin-top: 12px;"><a href="/upload"><button>Upload</button></a></div>
+    {% else %}
+      <div style="margin-top: 12px; overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Type</th>
+              <th>Filer</th>
+              <th>Year</th>
+              <th>Status</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in recent_docs %}
+              <tr>
+                <td>
+                  <a href="/doc/{{ d.id }}">
+                    {% if d.display_name %}
+                      <div style="font-weight: 700;">{{ d.display_name }}</div>
+                      <div class="muted" style="font-size: 12px; margin-top: 2px;">{{ d.id[:8] }}</div>
+                    {% else %}
+                      {{ d.id[:8] }}
+                    {% endif %}
+                  </a>
+                </td>
+                <td>{{ d.doc_type or 'unknown' }}</td>
+                <td>{{ d.filer or '' }}</td>
+                <td>{{ d.tax_year or '' }}</td>
+                <td>
+                  {% if d.status == 'processed' %}
+                    <span class="pill ok">processed</span>
+                  {% elif d.status == 'needs_review' %}
+                    <span class="pill warn">needs_review</span>
+                  {% else %}
+                    <span class="pill">{{ d.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="muted">{{ '%.2f'|format(d.overall_confidence or 0) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    async function refreshStats() {
+      try {
+        const r = await fetch('/api/stats', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) return;
+        const data = await r.json();
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = String(v ?? 0); };
+        set('stat-total', data.total);
+        set('stat-needs-review', data.needs_review);
+        set('stat-processed', data.processed);
+        set('stat-ready', data.ready_to_export);
+      } catch (e) {
+        // best-effort
+      }
+    }
+    refreshStats();
+    setInterval(refreshStats, 30000);
+  </script>
+{% endblock %}

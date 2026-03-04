@@ -1,0 +1,63 @@
+{
+  "name": "openclaw-memvid-logger",
+  "version": "1.2.5",
+  "description": "Dual-output conversation logger with full context capture. Stores to JSONL (backup) and Memvid (semantic search) for long-term memory",
+  "author": "stackBlock",
+  "license": "MIT",
+  "category": ["memory", "logging", "search"],
+  "tags": ["memvid", "conversation", "memory", "logging", "semantic-search", "long-term-memory", "dual-storage", "jsonl"],
+  "homepage": "https://github.com/stackBlock/openclaw-memvid-logger",
+  "repository": "https://github.com/stackBlock/openclaw-memvid-logger",
+  "entry": "tools/log.py",
+  "requirements": {
+    "python": ">=3.8",
+    "external": ["memvid >=2.0"]
+  },
+  "env": {
+    "MEMVID_MODE": {
+      "description": "Storage mode: 'single' (one file) or 'monthly' (rotation)",
+      "required": false,
+      "default": "monthly"
+    },
+    "MEMVID_PATH": {
+      "description": "Path to memvid .mv2 memory file (default: ~/.openclaw/workspace/memory.mv2)",
+      "required": false
+    },
+    "JSONL_LOG_PATH": {
+      "description": "Path to JSONL backup log file (default: ~/.openclaw/workspace/conversation_log.jsonl)",
+      "required": false
+    },
+    "MEMVID_BIN": {
+      "description": "Path to memvid CLI binary (auto-detected if not set)",
+      "required": false
+    }
+  },
+  "credentials": [
+    {
+      "name": "MEMVID_API_KEY",
+      "description": "Memvid API key for cloud/paid tier access. NOT REQUIRED for free local mode. Only needed if using API mode with remote storage.",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "permissions": [
+    {
+      "name": "file_write",
+      "reason": "Write conversation logs to JSONL files and create Memvid .mv2 memory files in user's workspace"
+    },
+    {
+      "name": "exec_subprocess",
+      "reason": "Call memvid CLI to append frames to memory files"
+    }
+  ],
+  "warnings": [
+    {
+      "type": "privacy",
+      "message": "This skill captures ALL OpenClaw activity including user messages, assistant responses, sub-agent conversations, tool outputs, and system events. Data is stored locally by default (JSONL + .mv2 files). API mode requires explicit MEMVID_API_KEY and sends data to memvid.com cloud service."
+    },
+    {
+      "type": "data_retention",
+      "message": "Logs persist until manually deleted. Consider log rotation and file permissions for sensitive data."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "alerts": {
+    "cpiCritical": 0.85,
+    "cpiWarning": 0.95,
+    "spiCritical": 0.80,
+    "spiWarning": 0.90,
+    "tcpiUnrealistic": 1.20
+  },
+  "formulas": {
+    "CV": "EV - AC",
+    "SV": "EV - PV",
+    "CPI": "EV / AC",
+    "SPI": "EV / PV",
+    "EAC_typical": "BAC / CPI",
+    "EAC_atypical": "AC + (BAC - EV)",
+    "EAC_combined": "AC + ((BAC - EV) / (CPI * SPI))",
+    "ETC": "EAC - AC",
+    "VAC": "BAC - EAC",
+    "TCPI_bac": "(BAC - EV) / (BAC - AC)",
+    "TCPI_eac": "(BAC - EV) / (EAC - AC)"
+  },
+  "interpretationMatrix": [
+    {"cpi": ">1", "spi": ">1", "status": "GREEN", "meaning": "Under budget, ahead of schedule"},
+    {"cpi": ">1", "spi": "<1", "status": "AMBER", "meaning": "Efficient but behind schedule"},
+    {"cpi": "<1", "spi": ">1", "status": "AMBER", "meaning": "Ahead of schedule but over budget"},
+    {"cpi": "<1", "spi": "<1", "status": "RED", "meaning": "Over budget and behind schedule"}
+  ]
+}

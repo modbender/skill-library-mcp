@@ -1,0 +1,186 @@
+{
+    "$schema": "https://spec.modelcontextprotocol.io/2025-03/skill.json",
+    "name": "intelligence-ingestion",
+    "version": "2.0.1",
+    "description": "Zero-loss strategic information pipeline. Analyzes URLs, articles, tweets for strategic value, auto-generates draft Skills when new capabilities are detected.",
+    "author": "sarahmirrand001-oss",
+    "license": "MIT",
+    "homepage": "https://intelligence-ingestion.vercel.app",
+    "repository": "https://github.com/sarahmirrand001-oss/openclaw-skill-intelligence-ingestion",
+    "categories": [
+        "knowledge-management",
+        "intelligence",
+        "automation",
+        "skill-synthesis"
+    ],
+    "required_config": {
+        "obsidian_vault_path": {
+            "type": "path",
+            "description": "Absolute path to the user's Obsidian vault root directory. This skill writes structured notes here.",
+            "required": true,
+            "sensitive": false
+        },
+        "intelligence_folder": {
+            "type": "string",
+            "description": "Subfolder within the Obsidian vault for intelligence notes.",
+            "required": false,
+            "default": "20_Intelligence"
+        },
+        "landscape_path": {
+            "type": "path",
+            "description": "Path to STRATEGIC_LANDSCAPE.md relative to workspace. This file is read and may be written to.",
+            "required": false,
+            "default": "STRATEGIC_LANDSCAPE.md"
+        },
+        "output_dir": {
+            "type": "path",
+            "description": "Directory for non-knowledge outputs (posts, scripts). Optional.",
+            "required": false
+        }
+    },
+    "credentials": {
+        "xurl_auth": {
+            "type": "oauth/api_key",
+            "description": "X/Twitter API v2 authentication via the xurl skill. Only needed for reading X/Twitter links.",
+            "required": false,
+            "used_by": "xurl-skill (optional dependency)"
+        }
+    },
+    "file_permissions": {
+        "read": [
+            "{workspace}/skills/ — reads existing skills directory for gap analysis",
+            "{workspace}/STRATEGIC_LANDSCAPE.md — reads capability map for architectural mapping",
+            "{config.obsidian_vault_path}/ — reads existing notes to avoid duplicates"
+        ],
+        "write": [
+            "{config.obsidian_vault_path}/{config.intelligence_folder}/ — creates structured intelligence notes",
+            "{workspace}/STRATEGIC_LANDSCAPE.md — updates capability map when critical info is ingested",
+            "{workspace}/skills/_drafts/ — creates auto-synthesized skill draft folders (isolated, not auto-loaded)",
+            "{workspace}/memory/ — appends to daily memory logs"
+        ],
+        "create": [
+            "{workspace}/STRATEGIC_LANDSCAPE.md — auto-creates from template if missing on first run",
+            "{workspace}/skills/_drafts/ — auto-creates directory if missing"
+        ]
+    },
+    "network_behavior": {
+        "description": "This skill fetches content from user-provided URLs. If primary extraction fails, it falls back to alternative methods, expanding the network footprint.",
+        "fallback_chain": [
+            "read_url_content(url) — direct HTTP fetch",
+            "xurl skill — authenticated X API call (if configured)",
+            "web search — search engine query for cached content"
+        ],
+        "note": "The 'never return empty-handed' policy means the skill may make multiple external requests per ingestion."
+    },
+    "privacy_considerations": [
+        "URLs and their content are stored as Obsidian notes in the user's local vault.",
+        "No data is transmitted to external servers beyond the original URL fetch and optional search fallback.",
+        "All generated files remain local to the user's filesystem."
+    ],
+    "persistence_effects": [
+        "Creates markdown files in the Obsidian vault (one per ingestion).",
+        "Appends to daily memory log files.",
+        "May create or modify STRATEGIC_LANDSCAPE.md.",
+        "May create skill draft folders under skills/_drafts/ (never auto-activated).",
+        "Auto-creates STRATEGIC_LANDSCAPE.md from template if file does not exist on first run."
+    ],
+    "capabilities": {
+        "input": [
+            {
+                "type": "url",
+                "description": "Any URL to analyze (web pages, X/Twitter, GitHub repos, arXiv papers)",
+                "examples": [
+                    "https://x.com/karpathy/status/123",
+                    "https://github.com/org/repo",
+                    "https://arxiv.org/abs/2402.12345"
+                ]
+            },
+            {
+                "type": "text",
+                "description": "Pasted article content, tweet text, or any external information",
+                "examples": [
+                    "MCP is the new TCP for agents..."
+                ]
+            }
+        ],
+        "output": [
+            {
+                "type": "obsidian_note",
+                "format": "markdown",
+                "path_pattern": "{vault}/{folder}/YYYYMMDD_source_title.md",
+                "description": "Structured intelligence note with classification, strategic scoring, and capability boundary analysis"
+            },
+            {
+                "type": "skill_draft",
+                "format": "markdown",
+                "path_pattern": "{workspace}/skills/_drafts/{name}/SKILL.md",
+                "description": "Auto-synthesized Skill definition when actionable new capability is detected. Requires human review.",
+                "conditional": true,
+                "condition": "Content describes a usable tool/API/protocol not yet in Agent's capability set"
+            },
+            {
+                "type": "landscape_update",
+                "format": "markdown",
+                "path_pattern": "{workspace}/STRATEGIC_LANDSCAPE.md",
+                "description": "Strategic Landscape capability map update for critical information",
+                "conditional": true,
+                "condition": "Strategic value rated Critical"
+            },
+            {
+                "type": "memory_log",
+                "format": "markdown",
+                "path_pattern": "{workspace}/memory/YYYY-MM-DD.md",
+                "description": "Daily memory log entry"
+            }
+        ],
+        "classification_schema": {
+            "categories": [
+                "infra",
+                "strategy",
+                "skill",
+                "business",
+                "theory",
+                "tutorial",
+                "product",
+                "threat"
+            ],
+            "value_levels": [
+                "Critical",
+                "High",
+                "Medium",
+                "Low"
+            ]
+        }
+    },
+    "dependencies": {
+        "required": [
+            "obsidian",
+            "openclaw"
+        ],
+        "optional": [
+            {
+                "name": "xurl-skill",
+                "reason": "Authenticated X/Twitter API v2 access. Requires separate credential configuration."
+            }
+        ]
+    },
+    "safety": {
+        "auto_install": false,
+        "always_on": false,
+        "draft_isolation": true,
+        "human_review_required": true,
+        "self_modification": false,
+        "principle": "Agent cannot install modules on itself. All synthesized Skills are drafts requiring human approval before activation."
+    },
+    "triggers": {
+        "auto": [
+            "user shares URL",
+            "user pastes article text",
+            "user says 'analyze this'"
+        ],
+        "exclude": [
+            "simple summarization requests",
+            "shopping/entertainment links"
+        ]
+    }
+}

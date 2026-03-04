@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% block content %}
+  {# Build a clean human title — strip doc_type from start or end wherever AI inserted it #}
+  {% set raw_name = doc.display_name or doc.original_filename %}
+  {% set human_name = raw_name %}
+  {% if doc.doc_type %}
+    {# Strip from start: "1099-NEC — Gusto" → "Gusto" #}
+    {% if human_name.startswith(doc.doc_type) %}
+      {% set human_name = human_name[doc.doc_type|length:].lstrip(' \u2014-').strip() %}
+    {% endif %}
+    {# Strip from end: "Gusto — 1099-NEC" → "Gusto" #}
+    {% if human_name.endswith(doc.doc_type) %}
+      {% set human_name = human_name[:(human_name|length - doc.doc_type|length)].rstrip(' \u2014-').strip() %}
+    {% endif %}
+  {% endif %}
+
+  <div style="margin-bottom: 14px;" data-doc-id="{{ doc.id }}">
+    {# Title row #}
+    <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:4px; flex-wrap:wrap;">
+      <span style="background:rgba(96,165,250,0.15); color:var(--accent); font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; border:1px solid rgba(96,165,250,0.3); white-space:nowrap;">{{ doc.doc_type }}</span>
+      <h1 style="margin:0; font-size: 20px;">{{ human_name }}</h1>
+    </div>
+    <div class="muted" style="font-size: 13px; margin-bottom: 10px;">{{ doc.page_count }} pages</div>
+
+    {# Warning banner #}
+    <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.35); border-radius: 10px; padding: 8px 14px; font-size: 12px; color: var(--warn); margin-bottom: 10px;">
+      ⚠️ Verify all extracted values against your original document before using for tax filing. TaxClaw uses AI extraction — values may contain errors.
+    </div>
+
+    {# Action buttons #}
+    <div class="row" style="gap: 8px; flex-wrap: wrap; align-items: center;">
+      <a href="/doc/{{ doc.id }}/download" class="btn">⬇ Download original</a>
+      <a href="/doc/{{ doc.id }}/export.wide.csv?csrf={{ csrf_token }}" class="btn export-link" data-export="wide">📊 Export to Spreadsheet</a>
+      <details style="display:inline-block; position:relative;">
+        <summary class="btn" style="list-style:none; cursor:pointer;">Advanced export ▾</summary>
+        <div style="position:absolute; left:0; top:110%; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:8px; display:flex; flex-direction:column; gap:6px; z-index:10; min-width:200px;">
+          <a href="/doc/{{ doc.id }}/export.long.csv?csrf={{ csrf_token }}" class="btn export-link" data-export="long" title="One row per field — useful for pivot tables and database imports" style="white-space:nowrap;">🗃 Data Analysis Export</a>
+          <a href="/doc/{{ doc.id }}/export.json?csrf={{ csrf_token }}" class="btn export-link" data-export="json" title="Raw structured data including AI extraction metadata" style="white-space:nowrap;">🛠 Developer Export (JSON)</a>
+        </div>
+      </details>
+      <span id="del-wrap">
+        <button type="button" class="danger" onclick="document.getElementById('del-confirm-{{ doc.id }}').style.display='inline-flex'; this.style.display='none';">🗑 Delete</button>
+        <span id="del-confirm-{{ doc.id }}" style="display:none; align-items:center; gap:6px;">
+          <span class="muted" style="font-size:12px;">Delete this document?</span>
+          <form method="post" action="/doc/{{ doc.id }}/delete" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <button class="danger" type="submit">Yes, delete</button>
+          </form>
+          <button type="button" onclick="document.getElementById('del-confirm-{{ doc.id }}').style.display='none'; document.querySelector('#del-wrap > button').style.display='inline';">Cancel</button>
+        </span>
+      </span>
+    </div><!-- /action buttons -->
+  </div><!-- /page header -->
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div class="row" style="gap: 18px; align-items: flex-start;">
+      <div style="flex: 1; min-width: 0;">
+        <div class="muted" style="margin-bottom: 6px;">
+          Preview
+          {% if doc.page_count and doc.page_count > 1 %}
+            <span style="margin-left:6px; font-size:11px; opacity:.6;">{{ doc.page_count }} pages</span>
+          {% endif %}
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          {% set pages = range(doc.page_count or 1) %}
+          {% for p in pages %}
+            <div style="position:relative;">
+              {% if (doc.page_count or 1) > 1 %}
+                <div style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:2px 7px; border-radius:4px; pointer-events:none;">
+                  {{ p + 1 }} / {{ doc.page_count }}
+                </div>
+              {% endif %}
+              <img src="/doc/{{ doc.id }}/preview/{{ p }}.png"
+                   loading="lazy"
+                   style="display:block; width:100%; border-radius:8px; border:1px solid #222;" />
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="width: 360px; display:flex; flex-direction:column; gap:16px;">
+
+        {# ── Editable fields ─────────────────────────────────────── #}
+        <div>
+          <div class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Document info</div>
+          <form method="post" action="/doc/{{ doc.id }}/update">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <div style="display:flex; flex-direction:column; gap:10px;">
+
+              <div>
+                <label class="muted" style="display:block; font-size:11px; margin-bottom:3px;">Name</label>
+                <input name="display_name" value="{{ doc.display_name or '' }}" placeholder="e.g. Brex Treasury — 1099-DIV — 2023" style="width:100%; box-sizing:border-box;" />
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div>
+                  <label class="muted" style="display:block; font-size:11px; margin-bottom:3px;">Doc type</label>
+                  <input name="doc_type" value="{{ doc.doc_type or '' }}" style="width:100%; box-sizing:border-box;" />
+                </div>
+                <div>
+                  <label class="muted" style="display:block; font-size:11px; margin-bottom:3px;">Tax year</label>
+                  <input name="year" value="{{ doc.tax_year or '' }}" style="width:100%; box-sizing:border-box;" />
+                </div>
+              </div>
+
+              <div>
+                <label class="muted" style="display:block; font-size:11px; margin-bottom:3px;">Filer</label>
+                <input name="filer" value="{{ doc.filer or '' }}" style="width:100%; box-sizing:border-box;" />
+              </div>
+
+              <div>
+                <label class="muted" style="display:block; font-size:11px; margin-bottom:3px;">Notes</label>
+                <textarea name="notes" rows="3" style="width:100%; box-sizing:border-box;">{{ doc.notes or '' }}</textarea>
+              </div>
+
+              <button type="submit" style="align-self:flex-start;">Save changes</button>
+            </div>
+          </form>
+        </div>
+
+        {# ── Status chips ────────────────────────────────────────── #}
+        <div>
+          <div class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Status</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+
+            {# Processing status #}
+            {% if doc.status == 'processed' %}
+              {% set st_icon = '✅' %}{% set st_label = 'Processed' %}{% set st_color = 'rgba(34,197,94,0.12)' %}{% set st_border = 'rgba(34,197,94,0.35)' %}{% set st_text = '#4ade80' %}
+            {% elif doc.status == 'pending' %}
+              {% set st_icon = '⏳' %}{% set st_label = 'Pending' %}{% set st_color = 'rgba(245,158,11,0.12)' %}{% set st_border = 'rgba(245,158,11,0.35)' %}{% set st_text = 'var(--warn)' %}
+            {% else %}
+              {% set st_icon = '❌' %}{% set st_label = (doc.status or 'Unknown')|title %}{% set st_color = 'rgba(239,68,68,0.12)' %}{% set st_border = 'rgba(239,68,68,0.35)' %}{% set st_text = '#f87171' %}
+            {% endif %}
+            <div style="background:{{ st_color }}; border:1px solid {{ st_border }}; border-radius:8px; padding:10px 12px;">
+              <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Processing</div>
+              <div style="font-size:13px; font-weight:600; color:{{ st_text }};">{{ st_icon }} {{ st_label }}</div>
+            </div>
+
+            {# Needs review #}
+            {% if doc.needs_review %}
+              {% set nr_icon = '⚠️' %}{% set nr_label = 'Needs review' %}{% set nr_color = 'rgba(245,158,11,0.12)' %}{% set nr_border = 'rgba(245,158,11,0.35)' %}{% set nr_text = 'var(--warn)' %}
+            {% else %}
+              {% set nr_icon = '✅' %}{% set nr_label = 'Looks good' %}{% set nr_color = 'rgba(34,197,94,0.12)' %}{% set nr_border = 'rgba(34,197,94,0.35)' %}{% set nr_text = '#4ade80' %}
+            {% endif %}
+            <div style="background:{{ nr_color }}; border:1px solid {{ nr_border }}; border-radius:8px; padding:10px 12px;">
+              <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Review flag</div>
+              <div style="font-size:13px; font-weight:600; color:{{ nr_text }};">{{ nr_icon }} {{ nr_label }}</div>
+            </div>
+
+            {# Classification confidence #}
+            {% set cls_pct = ((doc.classification_confidence or 0) * 100)|round|int %}
+            {% if cls_pct >= 80 %}
+              {% set cls_color = 'rgba(34,197,94,0.12)' %}{% set cls_border = 'rgba(34,197,94,0.35)' %}{% set cls_text = '#4ade80' %}{% set cls_dot = '🟢' %}
+            {% elif cls_pct >= 50 %}
+              {% set cls_color = 'rgba(245,158,11,0.12)' %}{% set cls_border = 'rgba(245,158,11,0.35)' %}{% set cls_text = 'var(--warn)' %}{% set cls_dot = '🟡' %}
+            {% else %}
+              {% set cls_color = 'rgba(239,68,68,0.12)' %}{% set cls_border = 'rgba(239,68,68,0.35)' %}{% set cls_text = '#f87171' %}{% set cls_dot = '🔴' %}
+            {% endif %}
+            <div style="background:{{ cls_color }}; border:1px solid {{ cls_border }}; border-radius:8px; padding:10px 12px;">
+              <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Doc type confidence</div>
+              <div style="font-size:13px; font-weight:600; color:{{ cls_text }};">{{ cls_dot }} {{ cls_pct }}%</div>
+            </div>
+
+            {# Overall extraction confidence #}
+            {% set ovr_pct = ((doc.overall_confidence or 0) * 100)|round|int %}
+            {% if ovr_pct >= 80 %}
+              {% set ovr_color = 'rgba(34,197,94,0.12)' %}{% set ovr_border = 'rgba(34,197,94,0.35)' %}{% set ovr_text = '#4ade80' %}{% set ovr_dot = '🟢' %}
+            {% elif ovr_pct >= 50 %}
+              {% set ovr_color = 'rgba(245,158,11,0.12)' %}{% set ovr_border = 'rgba(245,158,11,0.35)' %}{% set ovr_text = 'var(--warn)' %}{% set ovr_dot = '🟡' %}
+            {% else %}
+              {% set ovr_color = 'rgba(239,68,68,0.12)' %}{% set ovr_border = 'rgba(239,68,68,0.35)' %}{% set ovr_text = '#f87171' %}{% set ovr_dot = '🔴' %}
+            {% endif %}
+            <div style="background:{{ ovr_color }}; border:1px solid {{ ovr_border }}; border-radius:8px; padding:10px 12px;">
+              <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Extraction quality</div>
+              <div style="font-size:13px; font-weight:600; color:{{ ovr_text }};">{{ ovr_dot }} {{ ovr_pct }}%</div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            {% if doc.needs_review %}
+              <form method="post" action="/doc/{{ doc.id }}/mark-reviewed" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                <button type="submit" style="font-size:12px; padding:5px 10px; opacity:.9;">✓ Mark as reviewed</button>
+              </form>
+            {% else %}
+              <form method="post" action="/doc/{{ doc.id }}/flag-review" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                <button type="submit" style="font-size:12px; padding:5px 10px; opacity:.8;">🚩 Flag for review</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  {% if doc.doc_type == '1099-DA' and transactions %}
+    <div class="card" style="margin-bottom: 14px;">
+      <h2 style="margin:0 0 10px 0; font-size: 16px;">1099-DA Transactions ({{ transactions|length }})</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Units</th>
+            <th>Date acquired</th>
+            <th>Date sold</th>
+            <th>Proceeds</th>
+            <th>Cost basis</th>
+            <th>Term</th>
+            <th>8949</th>
+            <th>Noncovered</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in transactions %}
+            <tr>
+              <td>{{ t.asset_name or '' }} <span class="muted">{{ t.asset_code or '' }}</span></td>
+              <td>{{ t.units or '' }}</td>
+              <td>{{ t.date_acquired or '' }}</td>
+              <td>{{ t.date_sold or '' }}</td>
+              <td>{{ t.proceeds or '' }}</td>
+              <td>
+                {% if t.cost_basis %}
+                  {{ t.cost_basis }}
+                {% else %}
+                  <span class="pill warn">missing</span>
+                {% endif %}
+              </td>
+              <td>{{ t.gain_loss_term or '' }}</td>
+              <td>{{ t.form_8949_code or '' }}</td>
+              <td>{{ t.noncovered or '' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <div class="card" style="margin-bottom: 14px;">
+    <h2 style="margin:0 0 10px 0; font-size: 16px;">Extracted fields</h2>
+    {% if fields and fields|length > 0 %}
+      <table style="width:100%; border-collapse:collapse;">
+        <colgroup>
+          <col style="width:55%;">
+          <col style="width:45%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; padding:6px 10px; border-bottom:1px solid var(--border);">Field</th>
+            <th style="text-align:right; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; padding:6px 10px; border-bottom:1px solid var(--border);">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key, label, val in fields %}
+            {% set is_dollar = val and (val.startswith('$') or val.startswith('-$')) %}
+            <tr data-field-path="{{ key }}" data-is-dollar="{{ 1 if is_dollar else 0 }}" style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <td class="muted" style="padding:7px 10px; font-size:13px;">{{ label }}</td>
+              <td data-role="value-cell" style="padding:7px 10px; font-size:13px; text-align:right; {% if is_dollar %}font-variant-numeric:tabular-nums; font-weight:600; color:var(--text);{% endif %}">
+                <span data-role="value-text">{{ val if val else '—' }}</span>
+                <button type="button" data-role="edit-btn" title="Edit" style="margin-left:8px; font-size:11px; padding:2px 6px; opacity:.65; border:1px solid rgba(255,255,255,0.12); border-radius:6px; background:transparent; color:var(--muted); cursor:pointer;">✎</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="muted">No extracted fields stored.</div>
+    {% endif %}
+  </div>
+
+  <script>
+    (function() {
+      const root = document.querySelector('[data-doc-id]');
+      if (!root) return;
+      const docId = root.getAttribute('data-doc-id');
+      const csrfToken = {{ csrf_token|tojson }};
+
+      function sanitizeDollarInput(s) {
+        if (s == null) return '';
+        let t = String(s).trim();
+        // Allow user to paste "$1,234.56" or "(1,234.56)" etc.
+        t = t.replace(/[$,\s]/g, '');
+        if (t.startsWith('(') && t.endsWith(')')) {
+          t = '-' + t.slice(1, -1);
+        }
+        return t;
+      }
+
+      function enterEdit(tr) {
+        if (tr.getAttribute('data-editing') === '1') return;
+        tr.setAttribute('data-editing', '1');
+
+        const fieldPath = tr.getAttribute('data-field-path');
+        const isDollar = tr.getAttribute('data-is-dollar') === '1';
+        const td = tr.querySelector('[data-role="value-cell"]');
+        const valueText = td.querySelector('[data-role="value-text"]');
+        const editBtn = td.querySelector('[data-role="edit-btn"]');
+
+        const oldDisplay = (valueText.textContent || '').trim();
+        const oldRaw = (oldDisplay === '—') ? '' : oldDisplay;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = oldRaw;
+        input.style.width = '220px';
+        input.style.maxWidth = '100%';
+        input.style.boxSizing = 'border-box';
+        input.style.marginRight = '6px';
+
+        const save = document.createElement('button');
+        save.type = 'button';
+        save.textContent = 'Save';
+        save.style.fontSize = '12px';
+        save.style.padding = '4px 8px';
+        save.style.marginRight = '6px';
+
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.textContent = 'Cancel';
+        cancel.style.fontSize = '12px';
+        cancel.style.padding = '4px 8px';
+        cancel.style.opacity = '0.85';
+
+        const status = document.createElement('span');
+        status.className = 'muted';
+        status.style.fontSize = '12px';
+        status.style.marginLeft = '8px';
+
+        function exitEdit(restoredText) {
+          valueText.textContent = (restoredText && restoredText.trim()) ? restoredText : '—';
+          valueText.style.display = '';
+          editBtn.style.display = '';
+          input.remove();
+          save.remove();
+          cancel.remove();
+          status.remove();
+          tr.removeAttribute('data-editing');
+        }
+
+        valueText.style.display = 'none';
+        editBtn.style.display = 'none';
+        td.appendChild(input);
+        td.appendChild(save);
+        td.appendChild(cancel);
+        td.appendChild(status);
+        input.focus();
+        input.select();
+
+        cancel.addEventListener('click', function() {
+          exitEdit(oldDisplay);
+        });
+
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            exitEdit(oldDisplay);
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            save.click();
+          }
+        });
+
+        save.addEventListener('click', async function() {
+          try {
+            save.disabled = true;
+            cancel.disabled = true;
+            status.textContent = 'Saving…';
+
+            let v = input.value;
+            if (isDollar) v = sanitizeDollarInput(v);
+
+            const body = new URLSearchParams();
+            body.set('csrf_token', csrfToken);
+            body.set('value', v);
+
+            const resp = await fetch(`/doc/${encodeURIComponent(docId)}/fields/${encodeURIComponent(fieldPath)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: body.toString(),
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            exitEdit(data.value);
+          } catch (err) {
+            status.textContent = 'Error saving';
+            save.disabled = false;
+            cancel.disabled = false;
+          }
+        });
+      }
+
+      document.querySelectorAll('tr[data-field-path]').forEach(function(tr) {
+        const td = tr.querySelector('[data-role="value-cell"]');
+        const valueText = tr.querySelector('[data-role="value-text"]');
+        const editBtn = tr.querySelector('[data-role="edit-btn"]');
+        if (!td || !valueText || !editBtn) return;
+
+        valueText.style.cursor = 'pointer';
+        valueText.title = 'Click to edit';
+
+        valueText.addEventListener('click', function(e) {
+          e.preventDefault();
+          enterEdit(tr);
+        });
+        editBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          enterEdit(tr);
+        });
+      });
+    })();
+  </script>
+
+  {% if doc.doc_type == '1099-DA' %}
+    <div class="card" style="margin-bottom: 14px; border-color: rgba(96,165,250,0.5); background: rgba(17,24,39,0.92);">
+      <div style="font-size: 18px; font-weight: 950; margin-bottom: 6px;">🪙 You extracted your 1099-DA. Now get your cost basis right.</div>
+      <div class="muted" style="line-height: 1.6;">
+        Extracted proceeds are just step 1. Without cost basis, you can't calculate your gains — and the IRS will assume $0.
+      </div>
+      <div class="row" style="margin-top: 12px; gap: 10px;">
+        <a class="btn" href="/digital_assets">See what to do next →</a>
+      </div>
+    </div>
+  {% endif %}
+
+  <div id="post-export-msg" class="muted" style="display:none; margin: 6px 0 14px 0; font-size: 13px;">
+    ✅ Export ready. Next step: cost basis.
+    <a href="/digital_assets">See what to do next →</a>
+  </div>
+
+  <script>
+    (function () {
+      const isCrypto = {{ 'true' if doc.doc_type == '1099-DA' else 'false' }};
+      if (!isCrypto) return;
+
+      const msg = document.getElementById('post-export-msg');
+      const links = document.querySelectorAll('a.export-link');
+      if (!msg || !links || links.length === 0) return;
+
+      function downloadInIframe(url) {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        // cleanup best-effort
+        setTimeout(() => { try { iframe.remove(); } catch(e) {} }, 60000);
+      }
+
+      links.forEach((a) => {
+        a.addEventListener('click', (ev) => {
+          const kind = a.getAttribute('data-export');
+          if (kind !== 'wide' && kind !== 'long') return; // only nudge after CSV exports
+          ev.preventDefault();
+          downloadInIframe(a.href);
+          msg.style.display = 'block';
+        });
+      });
+    })();
+  </script>
+
+{% endblock %}

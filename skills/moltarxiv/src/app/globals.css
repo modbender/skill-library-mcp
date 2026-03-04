@@ -1,0 +1,309 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 207 90% 54%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 24 95% 53%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 207 90% 54%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 20% 7%;
+    --foreground: 210 40% 98%;
+    --card: 220 18% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 207 90% 54%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 19% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 19% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 24 95% 53%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 19% 20%;
+    --input: 217 19% 20%;
+    --ring: 207 90% 54%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-dark-muted;
+}
+
+/* Selection */
+::selection {
+  @apply bg-brand-500/30 text-brand-100;
+}
+
+/* Focus styles */
+:focus-visible {
+  @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-dark-bg;
+}
+
+/* Typography */
+.prose-paper {
+  @apply font-serif text-lg leading-relaxed;
+}
+
+.prose-paper h1,
+.prose-paper h2,
+.prose-paper h3,
+.prose-paper h4 {
+  @apply font-sans font-semibold mt-8 mb-4;
+}
+
+.prose-paper h1 {
+  @apply text-3xl;
+}
+
+.prose-paper h2 {
+  @apply text-2xl;
+}
+
+.prose-paper h3 {
+  @apply text-xl;
+}
+
+.prose-paper p {
+  @apply mb-4;
+}
+
+.prose-paper a {
+  @apply text-brand-400 hover:text-brand-300 underline decoration-brand-400/30 hover:decoration-brand-400;
+}
+
+.prose-paper code {
+  @apply font-mono text-sm bg-dark-surface px-1.5 py-0.5 rounded;
+}
+
+.prose-paper pre {
+  @apply bg-dark-surface p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.prose-paper pre code {
+  @apply bg-transparent p-0;
+}
+
+.prose-paper blockquote {
+  @apply border-l-4 border-brand-500 pl-4 italic my-4 text-dark-muted;
+}
+
+.prose-paper ul,
+.prose-paper ol {
+  @apply pl-6 mb-4;
+}
+
+.prose-paper li {
+  @apply mb-2;
+}
+
+.prose-paper img {
+  @apply rounded-lg my-4 max-w-full;
+}
+
+.prose-paper table {
+  @apply w-full border-collapse my-4;
+}
+
+.prose-paper th,
+.prose-paper td {
+  @apply border border-dark-border px-4 py-2 text-left;
+}
+
+.prose-paper th {
+  @apply bg-dark-surface font-semibold;
+}
+
+/* KaTeX overrides */
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  @apply my-4 overflow-x-auto py-2;
+}
+
+/* Animations */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-dark-surface animate-pulse rounded;
+}
+
+/* Loading bar */
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(30%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.loading-bar {
+  @apply relative h-1 w-full overflow-hidden rounded-full bg-dark-border/60;
+}
+
+.loading-bar__fill {
+  @apply absolute left-0 top-0 h-full w-1/3 bg-gradient-to-r from-brand-400 via-accent-400 to-brand-400;
+  animation: loading-bar 1.2s ease-in-out infinite;
+}
+
+/* Score badge styles */
+.score-positive {
+  @apply text-green-400;
+}
+
+.score-negative {
+  @apply text-red-400;
+}
+
+.score-neutral {
+  @apply text-dark-muted;
+}
+
+/* Paper type badges */
+.badge-preprint {
+  @apply bg-brand-500/20 text-brand-300 border-brand-500/30;
+}
+
+.badge-idea {
+  @apply bg-accent-500/20 text-accent-300 border-accent-500/30;
+}
+
+.badge-discussion {
+  @apply bg-purple-500/20 text-purple-300 border-purple-500/30;
+}
+
+/* Channel badge */
+.channel-badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-dark-surface text-dark-text border border-dark-border hover:border-brand-500/50 transition-colors;
+}
+
+/* Tag styles */
+.tag {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-surface text-dark-muted border border-dark-border hover:border-brand-500/30 hover:text-brand-300 transition-colors cursor-pointer;
+}
+
+/* Status indicators */
+.status-online {
+  @apply w-2 h-2 bg-green-400 rounded-full;
+}
+
+.status-away {
+  @apply w-2 h-2 bg-yellow-400 rounded-full;
+}
+
+.status-offline {
+  @apply w-2 h-2 bg-dark-muted rounded-full;
+}
+
+/* Vote buttons */
+.vote-btn {
+  @apply p-1 rounded transition-colors;
+}
+
+.vote-btn-up {
+  @apply hover:bg-green-500/20 hover:text-green-400;
+}
+
+.vote-btn-up.active {
+  @apply bg-green-500/20 text-green-400;
+}
+
+.vote-btn-down {
+  @apply hover:bg-red-500/20 hover:text-red-400;
+}
+
+.vote-btn-down.active {
+  @apply bg-red-500/20 text-red-400;
+}
+
+/* Sidebar navigation */
+.nav-item {
+  @apply flex items-center gap-3 px-3 py-2 rounded-lg text-dark-muted hover:text-dark-text hover:bg-dark-surface transition-colors;
+}
+
+.nav-item.active {
+  @apply text-brand-400 bg-brand-500/10;
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-200 hover:bg-dark-surface/50 hover:border-dark-border/80;
+}
+
+/* Glow effect for important elements */
+.glow {
+  @apply shadow-lg shadow-brand-500/10;
+}
+
+.glow-accent {
+  @apply shadow-lg shadow-accent-500/10;
+}

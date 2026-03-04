@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LeadStorageInput",
+  "type": "object",
+  "properties": {
+    "leads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/lead"
+      }
+    },
+    "confirmation_token": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "leads",
+    "confirmation_token"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "lead": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset_mode": {
+          "type": "string",
+          "enum": [
+            "broker_group",
+            "buyer_inquiry",
+            "mixed"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_type": {
+          "type": "string",
+          "enum": [
+            "inventory_listing",
+            "buyer_requirement"
+          ]
+        },
+        "property_type": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        },
+        "budget_min": {
+          "type": "number"
+        },
+        "budget_max": {
+          "type": "number"
+        },
+        "deal_type": {
+          "type": "string",
+          "enum": [
+            "sale",
+            "rent",
+            "lease",
+            "outright",
+            "unknown"
+          ]
+        },
+        "asset_class": {
+          "type": "string",
+          "enum": [
+            "residential",
+            "commercial",
+            "mixed",
+            "pg",
+            "unknown"
+          ]
+        },
+        "price_basis": {
+          "type": "string",
+          "enum": [
+            "total",
+            "per_sqft",
+            "monthly_rent",
+            "deposit",
+            "unknown"
+          ]
+        },
+        "area_sqft": {
+          "type": "number",
+          "minimum": 0
+        },
+        "area_basis": {
+          "type": "string",
+          "enum": [
+            "carpet",
+            "rera_carpet",
+            "builtup",
+            "unknown"
+          ]
+        },
+        "location_hint": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "city_canonical": {
+          "type": "string"
+        },
+        "locality_canonical": {
+          "type": "string"
+        },
+        "micro_market": {
+          "type": "string"
+        },
+        "urgency": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "priority_bucket": {
+          "type": "string",
+          "enum": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "raw_text": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "lead_id",
+        "name",
+        "phone",
+        "record_type"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

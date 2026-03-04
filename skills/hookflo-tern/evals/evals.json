@@ -1,0 +1,89 @@
+{
+  "skill_name": "hookflo-tern",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I verify a Stripe webhook in Express.js? My signature keeps failing.",
+      "expected_output": "Complete Express.js code using express.raw() body parser and WebhookVerificationService.verifyWithPlatformConfig with 'stripe' platform, including the common mistake explanation about JSON body parsers breaking HMAC.",
+      "files": [],
+      "assertions": [
+        "Uses express.raw({ type: 'application/json' }) — not express.json()",
+        "Calls WebhookVerificationService.verifyWithPlatformConfig with 'stripe' as platform",
+        "Reads secret from environment variable (process.env.STRIPE_WEBHOOK_SECRET)",
+        "Returns HTTP 400 on failed verification, not 500",
+        "Explains WHY the raw body parser is required (HMAC computed over exact bytes)",
+        "Imports from '@hookflo/tern'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to receive GitHub webhooks in a Next.js API route and verify they're legit.",
+      "expected_output": "Next.js App Router route handler (app/api/webhooks/github/route.ts) using POST export, NextRequest, and Tern verification for github platform, with correct header for reading x-github-event.",
+      "files": [],
+      "assertions": [
+        "Shows App Router syntax (export async function POST) not Pages Router",
+        "Uses WebhookVerificationService with 'github' platform",
+        "Reads GITHUB_WEBHOOK_SECRET from environment",
+        "Returns NextResponse.json({ error }) with status 400 on failure",
+        "Shows how to read the x-github-event header from the request",
+        "Does NOT add bodyParser: false config (not needed in App Router)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We use a payment provider called AcmePay. Their webhooks send the signature in a header called x-acme-sig as sha256=<hash> and a timestamp in x-acme-ts. How do I verify these?",
+      "expected_output": "Custom signatureConfig using hmac-sha256, headerFormat prefixed with sha256= prefix, timestampHeader set to x-acme-ts, payloadFormat timestamped.",
+      "files": [],
+      "assertions": [
+        "Uses signatureConfig object (not a built-in platform name)",
+        "Sets algorithm to 'hmac-sha256'",
+        "Sets headerName to 'x-acme-sig'",
+        "Sets headerFormat to 'prefixed' with prefix 'sha256='",
+        "Sets timestampHeader to 'x-acme-ts'",
+        "Sets timestampFormat to 'unix'",
+        "Sets payloadFormat to 'timestamped'",
+        "Uses WebhookVerificationService.verify (not verifyWithPlatformConfig)"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to get a Slack alert every time a new user signs up via Clerk. How do I set this up without writing any code?",
+      "expected_output": "Step-by-step Hookflo setup guide: create webhook in dashboard, paste URL into Clerk webhook settings, configure Slack notification channel, select user.created event type.",
+      "files": [],
+      "assertions": [
+        "Directs user to hookflo.com/dashboard (not Tern/code)",
+        "Explains the 3-step process: create endpoint, paste URL in Clerk, configure Slack channel",
+        "Specifies where in Clerk to paste the URL (Dashboard → Webhooks → Add endpoint)",
+        "Mentions selecting user.created as the event type",
+        "Does NOT tell the user to install npm packages (Hookflo is no-code)",
+        "References docs.hookflo.com/webhook-platforms/clerk for further detail"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "What's a replay attack in the context of webhooks and how does Tern protect against it?",
+      "expected_output": "Explanation of replay attacks (intercepted valid request re-sent later), how timestamp tolerance works, how to configure toleranceInSeconds, and default 300s window.",
+      "files": [],
+      "assertions": [
+        "Explains what a replay attack is in plain terms",
+        "Explains how timestamp inclusion in the signed payload prevents replay",
+        "Mentions toleranceInSeconds parameter and its default (300 seconds / 5 minutes)",
+        "Shows code example setting toleranceInSeconds",
+        "Mentions clock skew as a real-world gotcha in development"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "How do I verify Supabase database webhooks?",
+      "expected_output": "Token-based verification using verifyTokenBased method with SUPABASE_WEBHOOK_ID and SUPABASE_WEBHOOK_TOKEN env vars, plus note that Supabase uses token auth not HMAC.",
+      "files": [],
+      "assertions": [
+        "Uses verifyTokenBased (not verify or verifyWithPlatformConfig)",
+        "Passes webhookId and webhookToken as separate parameters",
+        "Both values read from environment variables",
+        "Explains Supabase uses token-based auth, not HMAC signature",
+        "Points to hookflo.com/dashboard for the no-code Hookflo alternative"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,278 @@
+import { toNumber } from "../format.ts";
+import type { GatewayBrowserClient } from "../gateway.ts";
+import type { SessionsListResult } from "../types.ts";
+
+export type ArchivedSession = {
+  sessionId: string;
+  agentId: string;
+  sessionKey: string;
+  displayName?: string;
+  createdAt: number;
+  updatedAt: number;
+  archivedAt: number;
+  messageCount: number;
+  filePath: string;
+  firstMessage?: string;
+  channel?: string;
+  chatType?: string;
+  totalTokens?: number;
+  status?: string;
+};
+
+export type ArchivedSessionsResult = {
+  sessions: ArchivedSession[];
+  total: number;
+};
+
+export type SessionsState = {
+  client: GatewayBrowserClient | null;
+  connected: boolean;
+  sessionsLoading: boolean;
+  sessionsResult: SessionsListResult | null;
+  sessionsError: string | null;
+  sessionsFilterActive: string;
+  sessionsFilterLimit: string;
+  sessionsIncludeGlobal: boolean;
+  sessionsIncludeUnknown: boolean;
+  // Archived sessions state
+  archivedSessionsLoading: boolean;
+  archivedSessionsResult: ArchivedSessionsResult | null;
+  archivedSessionsError: string | null;
+  archivedSessionsSearch: string;
+  archivedSessionsPageSize: number;
+  archivedSessionsPage: number;
+};
+
+export async function loadSessions(
+  state: SessionsState,
+  overrides?: {
+    activeMinutes?: number;
+    limit?: number;
+    includeGlobal?: boolean;
+    includeUnknown?: boolean;
+  },
+) {
+  if (!state.client || !state.connected) {
+    return;
+  }
+  if (state.sessionsLoading) {
+    return;
+  }
+  state.sessionsLoading = true;
+  state.sessionsError = null;
+  try {
+    const includeGlobal = overrides?.includeGlobal ?? state.sessionsIncludeGlobal;
+    const includeUnknown = overrides?.includeUnknown ?? state.sessionsIncludeUnknown;
+    const activeMinutes = overrides?.activeMinutes ?? toNumber(state.sessionsFilterActive, 0);
+    const limit = overrides?.limit ?? toNumber(state.sessionsFilterLimit, 0);
+    const params: Record<string, unknown> = {
+      includeGlobal,
+      includeUnknown,
+    };
+    if (activeMinutes > 0) {
+      params.activeMinutes = activeMinutes;
+    }
+    if (limit > 0) {
+      params.limit = limit;
+    }
+    const res = await state.client.request<SessionsListResult | undefined>("sessions.list", params);
+    if (res) {
+      state.sessionsResult = res;
+    }
+  } catch (err) {
+    state.sessionsError = String(err);
+  } finally {
+    state.sessionsLoading = false;
+  }
+}
+
+export async function patchSession(
+  state: SessionsState,
+  key: string,
+  patch: {
+    label?: string | null;
+    thinkingLevel?: string | null;
+    verboseLevel?: string | null;
+    reasoningLevel?: string | null;
+  },
+) {
+  if (!state.client || !state.connected) {
+    return;
+  }
+  const params: Record<string, unknown> = { key };
+  if ("label" in patch) {
+    params.label = patch.label;
+  }
+  if ("thinkingLevel" in patch) {
+    params.thinkingLevel = patch.thinkingLevel;
+  }
+  if ("verboseLevel" in patch) {
+    params.verboseLevel = patch.verboseLevel;
+  }
+  if ("reasoningLevel" in patch) {
+    params.reasoningLevel = patch.reasoningLevel;
+  }
+  try {
+    await state.client.request("sessions.patch", params);
+    await loadSessions(state);
+  } catch (err) {
+    state.sessionsError = String(err);
+  }
+}
+
+export async function deleteSession(state: SessionsState, key: string): Promise<boolean> {
+  if (!state.client || !state.connected) {
+    return false;
+  }
+  if (state.sessionsLoading) {
+    return false;
+  }
+  const confirmed = window.confirm(
+    `Delete session "${key}"?\n\nDeletes the session entry and archives its transcript.`,
+  );
+  if (!confirmed) {
+    return false;
+  }
+  state.sessionsLoading = true;
+  state.sessionsError = null;
+  try {
+    await state.client.request("sessions.delete", { key, deleteTranscript: true });
+    return true;
+  } catch (err) {
+    state.sessionsError = String(err);
+    return false;
+  } finally {
+    state.sessionsLoading = false;
+  }
+}
+
+export async function deleteSessionAndRefresh(state: SessionsState, key: string): Promise<boolean> {
+  const deleted = await deleteSession(state, key);
+  if (!deleted) {
+    return false;
+  }
+  await loadSessions(state);
+  return true;
+}
+
+// ── Recent Archived Sessions (for chat dropdown) ────────────────
+
+export async function loadRecentArchivedSessions(
+  state: SessionsState & { recentArchivedSessions: ArchivedSessionsResult["sessions"] | null },
+) {
+  if (!state.client || !state.connected) {
+    return;
+  }
+  try {
+    const res = await state.client.request<ArchivedSessionsResult | undefined>(
+      "sessions.archived",
+      { limit: 10 },
+    );
+    if (res) {
+      state.recentArchivedSessions = res.sessions;
+    }
+  } catch {
+    // Silently fail — dropdown will just show active sessions
+  }
+}
+
+// ── Archived Sessions ────────────────────────────────────────────
+
+export async function loadArchivedSessions(
+  state: SessionsState,
+  agentId?: string,
+  search?: string,
+  limit?: number,
+  offset?: number,
+) {
+  if (!state.client || !state.connected) {
+    return;
+  }
+  if (state.archivedSessionsLoading) {
+    return;
+  }
+  state.archivedSessionsLoading = true;
+  state.archivedSessionsError = null;
+  try {
+    const params: Record<string, unknown> = {};
+    if (agentId) {
+      params.agentId = agentId;
+    }
+    if (search?.trim()) {
+      params.search = search.trim();
+    }
+    if (limit != null) {
+      params.limit = limit;
+    }
+    if (offset != null) {
+      params.offset = offset;
+    }
+    const res = await state.client.request<ArchivedSessionsResult | undefined>(
+      "sessions.archived",
+      params,
+    );
+    if (res) {
+      state.archivedSessionsResult = res;
+    }
+  } catch (err) {
+    state.archivedSessionsError = String(err);
+  } finally {
+    state.archivedSessionsLoading = false;
+  }
+}
+
+export async function resumeSession(state: SessionsState, sessionId: string): Promise<boolean> {
+  if (!state.client || !state.connected) {
+    return false;
+  }
+  try {
+    await state.client.request("sessions.resume", { sessionId });
+    return true;
+  } catch (err) {
+    state.archivedSessionsError = String(err);
+    return false;
+  }
+}
+
+export async function renameSession(
+  state: SessionsState,
+  sessionId: string,
+  name: string,
+): Promise<boolean> {
+  if (!state.client || !state.connected) {
+    return false;
+  }
+  try {
+    await state.client.request("sessions.rename", { sessionId, name });
+    // Reload archived sessions to reflect the change
+    await loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (state.archivedSessionsPage - 1) * state.archivedSessionsPageSize);
+    return true;
+  } catch (err) {
+    state.archivedSessionsError = String(err);
+    return false;
+  }
+}
+
+export async function deleteArchivedSession(
+  state: SessionsState,
+  sessionId: string,
+): Promise<boolean> {
+  if (!state.client || !state.connected) {
+    return false;
+  }
+  const confirmed = window.confirm(
+    `Delete archived session?\n\nThis will permanently delete the session and its transcript.`,
+  );
+  if (!confirmed) {
+    return false;
+  }
+  try {
+    await state.client.request("sessions.deleteArchived", { sessionId });
+    // Reload archived sessions to reflect the change
+    await loadArchivedSessions(state, undefined, state.archivedSessionsSearch || undefined, state.archivedSessionsPageSize, (state.archivedSessionsPage - 1) * state.archivedSessionsPageSize);
+    return true;
+  } catch (err) {
+    state.archivedSessionsError = String(err);
+    return false;
+  }
+}

@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Switchboard v3.0</title>
+<style>
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface2: #1f1f23;
+    --border: #27272a;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --dim: #71717a;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(circle at 20% 0%, #111827 0%, var(--bg) 45%), var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  .header { margin-bottom: 16px; }
+  .title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    background: linear-gradient(135deg, var(--blue), var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+  .safety {
+    border: 1px solid rgba(6, 182, 212, .35);
+    background: linear-gradient(95deg, rgba(59,130,246,.15), rgba(139,92,246,.12));
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #dbeafe;
+    margin-bottom: 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    background: linear-gradient(160deg, rgba(24,24,27,.96), rgba(24,24,27,.86));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s ease, transform .16s ease;
+  }
+  .card:hover { border-color: #3f3f46; }
+  .card.full { grid-column: 1 / -1; }
+
+  .accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    opacity: .9;
+  }
+
+  .label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .65px;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .value {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .value.empty { color: var(--red); font-style: italic; font-weight: 600; }
+  .hint { margin-top: 5px; color: var(--dim); font-size: 12px; }
+  .clickable { cursor: pointer; }
+
+  .roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid #2f2f35;
+    border-radius: 7px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .list-item .ord { color: var(--dim); width: 18px; font-size: 10px; }
+  .xbtn {
+    margin-left: auto;
+    border: 1px solid rgba(239,68,68,.3);
+    background: rgba(239,68,68,.1);
+    color: #fca5a5;
+    border-radius: 6px;
+    padding: 2px 7px;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .add-btn {
+    border: 1px solid rgba(6,182,212,.45);
+    background: rgba(6,182,212,.12);
+    color: var(--cyan);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    width: fit-content;
+  }
+
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .pipe-node {
+    border: 1px solid #35353c;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  .pipe-node .k { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+  .pipe-node .m { font-size: 12px; font-weight: 700; margin-top: 4px; word-break: break-word; }
+  .pipe-node .p { font-size: 10px; color: var(--dim); margin-top: 2px; }
+  .arrow { color: var(--muted); font-weight: 800; }
+  .diversity {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    border: 1px solid transparent;
+  }
+  .diversity.good { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: #86efac; }
+  .diversity.bad { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); color: #fca5a5; }
+
+  .providers {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .provider {
+    background: var(--surface2);
+    border: 1px solid #33333a;
+    border-radius: 8px;
+    padding: 9px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .provider:hover { border-color: var(--blue); transform: translateY(-1px); }
+  .provider .dot { width: 8px; height: 8px; border-radius: 99px; }
+  .provider .dot.on { background: var(--green); box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
+  .provider .dot.off { background: var(--red); }
+  .provider .name { font-size: 12px; font-weight: 700; flex: 1; }
+  .provider .meta { font-size: 10px; color: var(--dim); }
+
+  .channels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .channel {
+    background: var(--surface2);
+    border: 1px solid #33333a;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  .channel:hover { border-color: var(--cyan); }
+  .channel .n { font-size: 13px; font-weight: 700; }
+  .channel .s { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 8px;
+  }
+  .tag {
+    border-radius: 999px;
+    border: 1px solid #34343b;
+    background: var(--surface2);
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .issues { margin-top: 8px; display: grid; gap: 7px; }
+  .issue {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+  .issue.error { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.25); }
+  .issue.warning { background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.25); }
+  .issue.info { background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.25); }
+  .it { font-size: 13px; font-weight: 700; }
+  .id { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .ia { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .btn {
+    border-radius: 6px;
+    border: 1px solid transparent;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn.blue { background: var(--blue); color: white; }
+  .btn.purple { background: rgba(139,92,246,.2); border-color: rgba(139,92,246,.35); color: #ddd6fe; }
+  .btn.cyan { background: rgba(6,182,212,.18); border-color: rgba(6,182,212,.35); color: #a5f3fc; }
+  .btn.red { background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.35); color: #fecaca; }
+  .btn.ghost { background: transparent; border-color: #3f3f46; color: var(--muted); }
+
+  .status {
+    margin-top: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 9px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .status .v { color: #86efac; font-weight: 700; }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.66);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    width: min(760px, 94vw);
+    max-height: 88vh;
+    overflow: auto;
+    background: var(--surface);
+    border: 1px solid #37373f;
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .mh { font-size: 16px; font-weight: 800; margin: 0; }
+  .ms { font-size: 12px; color: var(--muted); margin: 3px 0 10px; }
+  .search {
+    width: 100%;
+    border: 1px solid #34343b;
+    border-radius: 7px;
+    background: var(--surface2);
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .pick-list { margin-top: 8px; display: grid; gap: 6px; }
+  .pick {
+    border: 1px solid #33333a;
+    background: var(--surface2);
+    border-radius: 7px;
+    padding: 7px 9px;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+  }
+  .pick:hover { border-color: var(--blue); }
+  .pick.sel { border-color: var(--green); background: rgba(34,197,94,.12); }
+  .pick .nm { font-size: 12px; font-weight: 700; word-break: break-word; }
+  .pick .cp { font-size: 10px; color: var(--muted); }
+  .pick .au { font-size: 10px; }
+
+  label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 5px; }
+  input, select {
+    width: 100%;
+    border: 1px solid #34343b;
+    border-radius: 7px;
+    background: var(--surface2);
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 18px;
+    padding: 9px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+    z-index: 1300;
+  }
+  .toast.show { opacity: 1; }
+  .toast.ok { background: var(--green); color: black; }
+  .toast.err { background: var(--red); color: white; }
+
+  @media (max-width: 920px) {
+    .grid, .roles-grid, .status { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: 1fr; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1 class="title">Model Switchboard v3.0</h1>
+    <p class="subtitle">OpenClaw model orchestration with transactional config safety</p>
+  </div>
+
+  <div class="safety">🛡️ Every write validates config, creates a backup, writes atomically, health-checks, and auto-rolls back on failure.</div>
+
+  <div class="grid">
+    <div class="card full">
+      <div class="accent" style="background:var(--blue)"></div>
+      <div class="label">Role Grid <span>Click any role to change model</span></div>
+      <div class="roles-grid" id="rolesGrid"></div>
+    </div>
+
+    <div class="card full">
+      <div class="accent" style="background:var(--purple)"></div>
+      <div class="label">Coding Pipeline</div>
+      <div class="pipeline" id="pipeline"></div>
+      <div class="diversity" id="diversityBanner"></div>
+    </div>
+
+    <div class="card full" id="providersCard">
+      <div class="accent" style="background:var(--green)"></div>
+      <div class="label">Provider Auth Status <span>Click provider to add/edit key</span></div>
+      <div class="providers" id="providers"></div>
+    </div>
+
+    <div class="card full">
+      <div class="accent" style="background:var(--cyan)"></div>
+      <div class="label">Channels</div>
+      <div class="channels" id="channels"></div>
+    </div>
+
+    <div class="card">
+      <div class="accent" style="background:var(--amber)"></div>
+      <div class="label">LLM Fallbacks</div>
+      <div id="fallbacks"></div>
+      <button class="add-btn" onclick="openPicker('llm_fallbacks')">+ Add Fallback</button>
+    </div>
+
+    <div class="card">
+      <div class="accent" style="background:var(--amber)"></div>
+      <div class="label">Image Fallbacks</div>
+      <div id="imageFallbacks"></div>
+      <button class="add-btn" onclick="openPicker('image_fallbacks')">+ Add Image Fallback</button>
+    </div>
+
+    <div class="card full">
+      <div class="accent" style="background:var(--cyan)"></div>
+      <div class="label">Model Allowlist</div>
+      <div class="tags" id="allowlist"></div>
+      <button class="add-btn" onclick="openPicker('allowlist')">+ Add Model</button>
+    </div>
+
+    <div class="card full">
+      <div class="accent" style="background:var(--red)"></div>
+      <div class="label">Config Issues <span>Every alert is actionable</span></div>
+      <div class="issues" id="issues"></div>
+    </div>
+  </div>
+
+  <div class="status">
+    <div>Registry <span class="v" id="sReg">-</span></div>
+    <div>Models <span class="v" id="sModels">-</span></div>
+    <div>Providers <span class="v" id="sProviders">-</span></div>
+    <div>Backups <span class="v" id="sBackups">-</span></div>
+    <div>Updated <span class="v" id="sUpdated">-</span></div>
+  </div>
+</div>
+
+<div class="overlay" id="pickerOverlay">
+  <div class="modal">
+    <h3 class="mh" id="pickerTitle">Select Model</h3>
+    <p class="ms" id="pickerSub"></p>
+    <input class="search" id="pickerSearch" placeholder="Search model, provider, capability, cost tier">
+    <div class="pick-list" id="pickerList"></div>
+    <div class="actions">
+      <button class="btn ghost" onclick="closePicker()">Cancel</button>
+      <button class="btn blue" id="pickerSave" onclick="submitPicker()" disabled>Apply</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="providerOverlay">
+  <div class="modal">
+    <h3 class="mh" id="providerTitle">Provider Key</h3>
+    <p class="ms" id="providerSub"></p>
+    <div id="providerBody"></div>
+    <div class="actions">
+      <button class="btn red" id="providerDeleteBtn" onclick="deleteProviderKey()">Remove Key</button>
+      <button class="btn ghost" onclick="closeProvider()">Cancel</button>
+      <button class="btn blue" id="providerSaveBtn" onclick="saveProviderKey()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="tgOverlay">
+  <div class="modal">
+    <h3 class="mh">Telegram Configuration</h3>
+    <p class="ms">Configure bot token, DM policy, allowlist, and group mention behavior</p>
+
+    <div class="row">
+      <div>
+        <label>Enabled</label>
+        <select id="tgEnabled">
+          <option value="false">Disabled</option>
+          <option value="true">Enabled</option>
+        </select>
+      </div>
+      <div>
+        <label>DM Policy</label>
+        <select id="tgPolicy">
+          <option value="disabled">disabled</option>
+          <option value="pairing">pairing</option>
+          <option value="allowlist">allowlist</option>
+          <option value="open">open</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Bot Token (saved as TELEGRAM_BOT_TOKEN)</label>
+    <input id="tgToken" type="password" placeholder="123456:ABC... (leave blank to keep current)">
+
+    <div class="row">
+      <div>
+        <label>Require Mention in Groups</label>
+        <select id="tgMention">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+      </div>
+      <div>
+        <label>Add Allowed User ID</label>
+        <div style="display:flex;gap:8px;">
+          <input id="tgUserId" placeholder="123456789">
+          <button class="btn cyan" onclick="addTelegramUser()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <label>Current allowFrom</label>
+    <div class="tags" id="tgAllowFrom"></div>
+
+    <div class="actions">
+      <button class="btn ghost" onclick="closeTelegram()">Cancel</button>
+      <button class="btn blue" onclick="saveTelegram()">Save Telegram Settings</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin;
+const ROLE_META = [
+  { key: 'primary', icon: '🧠', title: 'Primary LLM', hint: 'Main conversational model' },
+  { key: 'llm_fallbacks', icon: '🔄', title: 'LLM Fallbacks', hint: 'Backup chain for primary LLM' },
+  { key: 'image_model', icon: '👁️', title: 'Image Model', hint: 'Vision processing model' },
+  { key: 'image_fallbacks', icon: '🔄', title: 'Image Fallbacks', hint: 'Vision backup chain' },
+  { key: 'research', icon: '🔬', title: 'Research', hint: 'Deep analysis + synthesis' },
+  { key: 'coding_pass1', icon: '💻', title: 'Coding Pass 1', hint: 'Initial code generation' },
+  { key: 'coding_pass2', icon: '🔍', title: 'Coding Pass 2', hint: 'Code review (different provider)' },
+  { key: 'coding_pass3', icon: '🛡️', title: 'Coding Pass 3', hint: 'Security audit (different provider)' },
+  { key: 'social_media', icon: '📱', title: 'Social Media', hint: 'Creative engagement content' },
+  { key: 'web_ops', icon: '🌐', title: 'Web Ops', hint: 'Search/scrape/crawl capable model' },
+  { key: 'heartbeat', icon: '💓', title: 'Heartbeat', hint: 'Low-cost periodic checks' },
+];
+
+let state = null;
+let pickerCtx = { target: null, selected: null };
+let providerCtx = null;
+
+function esc(v) {
+  const d = document.createElement('div');
+  d.textContent = String(v == null ? '' : v);
+  return d.innerHTML;
+}
+function providerOf(ref) { return (ref || '').includes('/') ? ref.split('/')[0] : ''; }
+
+function toast(msg, ok = true) {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + (ok ? 'ok' : 'err') + ' show';
+  t.textContent = msg;
+  setTimeout(() => { t.className = 'toast'; }, 2600);
+}
+
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const data = await res.json().catch(() => ({ ok: false, error: 'Invalid response' }));
+  if (!res.ok && data && data.error) throw new Error(data.error);
+  if (!res.ok) throw new Error('Request failed');
+  return data;
+}
+
+function roleValue(key) {
+  if (!state) return '';
+  if (key === 'primary') return state.primary || '';
+  if (key === 'image_model') return state.imageModel || '';
+  if (key === 'llm_fallbacks') return (state.fallbacks || []).join(', ');
+  if (key === 'image_fallbacks') return (state.imageFallbacks || []).join(', ');
+  return (state.roles || {})[key] || '';
+}
+
+function renderRoles() {
+  const wrap = document.getElementById('rolesGrid');
+  wrap.replaceChildren();
+
+  ROLE_META.forEach((r) => {
+    const card = document.createElement('div');
+    card.className = 'card clickable';
+    const lbl = document.createElement('div');
+    lbl.className = 'label';
+    lbl.textContent = r.icon + ' ' + r.title;
+    card.appendChild(lbl);
+    const val = document.createElement('div');
+    val.className = 'value' + (roleValue(r.key) ? '' : ' empty');
+    val.textContent = roleValue(r.key) || '(not set)';
+    card.appendChild(val);
+    const hnt = document.createElement('div');
+    hnt.className = 'hint';
+    hnt.textContent = r.hint;
+    card.appendChild(hnt);
+    card.onclick = () => {
+      if (r.key === 'llm_fallbacks' || r.key === 'image_fallbacks') {
+        openPicker(r.key);
+      } else {
+        openPicker(r.key);
+      }
+    };
+    wrap.appendChild(card);
+  });
+}
+
+function renderFallbackList(id, items, image) {
+  const el = document.getElementById(id);
+  el.replaceChildren();
+  if (!items || !items.length) {
+    const empty = document.createElement('div');
+    empty.className = 'value empty';
+    empty.textContent = '(none)';
+    el.appendChild(empty);
+    return;
+  }
+  const list = document.createElement('div');
+  list.className = 'list';
+  items.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    const ord = document.createElement('span');
+    ord.className = 'ord';
+    ord.textContent = '#' + (i + 1);
+    row.appendChild(ord);
+    const name = document.createElement('span');
+    name.textContent = m;
+    row.appendChild(name);
+    const x = document.createElement('button');
+    x.className = 'xbtn';
+    x.textContent = 'remove';
+    x.onclick = async () => {
+      try {
+        await api('/api/config/remove-fallback', 'POST', { model: m, image: !!image });
+        toast('Fallback removed');
+        load();
+      } catch (e) {
+        toast(e.message, false);
+      }
+    };
+    row.appendChild(x);
+    list.appendChild(row);
+  });
+  el.appendChild(list);
+}
+
+function renderPipeline() {
+  const pipe = document.getElementById('pipeline');
+  pipe.replaceChildren();
+  const r = state.roles || {};
+  const c1 = r.coding_pass1 || '';
+  const c2 = r.coding_pass2 || '';
+  const c3 = r.coding_pass3 || '';
+  const values = [c1, c2, c3].filter(Boolean);
+  const providers = values.map(providerOf);
+  const diverse = values.length < 2 ? true : new Set(providers).size === providers.length;
+
+  [['Pass 1', c1], ['Pass 2', c2], ['Pass 3', c3]].forEach((row, idx) => {
+    const node = document.createElement('div');
+    node.className = 'pipe-node clickable';
+    node.onclick = () => openPicker('coding_pass' + (idx + 1));
+    const kDiv = document.createElement('div');
+    kDiv.className = 'k';
+    kDiv.textContent = row[0];
+    node.appendChild(kDiv);
+    const mDiv = document.createElement('div');
+    mDiv.className = 'm' + (row[1] ? '' : ' empty');
+    mDiv.textContent = row[1] || '(not set)';
+    node.appendChild(mDiv);
+    const pDiv = document.createElement('div');
+    pDiv.className = 'p';
+    pDiv.textContent = 'Provider: ' + (providerOf(row[1]) || '-');
+    node.appendChild(pDiv);
+    pipe.appendChild(node);
+    if (idx < 2) {
+      const ar = document.createElement('div');
+      ar.className = 'arrow';
+      ar.textContent = '→';
+      pipe.appendChild(ar);
+    }
+  });
+
+  const b = document.getElementById('diversityBanner');
+  b.className = 'diversity ' + (diverse ? 'good' : 'bad');
+  b.textContent = diverse
+    ? 'Provider diversity check: OK'
+    : 'Provider diversity violation: coding pass providers must all differ';
+}
+
+function renderProviders() {
+  const wrap = document.getElementById('providers');
+  wrap.replaceChildren();
+  const entries = Object.entries(state.providers || {}).sort((a, b) => {
+    if (a[1].hasAuth !== b[1].hasAuth) return a[1].hasAuth ? -1 : 1;
+    return (a[1].displayName || a[0]).localeCompare(b[1].displayName || b[0]);
+  });
+  entries.forEach(([id, p]) => {
+    const d = document.createElement('div');
+    d.className = 'provider';
+    const dot = document.createElement('span');
+    dot.className = 'dot ' + (p.hasAuth ? 'on' : 'off');
+    d.appendChild(dot);
+    const nm = document.createElement('span');
+    nm.className = 'name';
+    nm.textContent = p.displayName || id;
+    d.appendChild(nm);
+    const meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = p.hasAuth ? 'configured' : 'missing';
+    d.appendChild(meta);
+    d.onclick = () => openProvider(id, p);
+    wrap.appendChild(d);
+  });
+}
+
+function renderChannels() {
+  const ch = document.getElementById('channels');
+  ch.replaceChildren();
+  const tg = ((state.channels || {}).telegram) || {};
+
+  const card = document.createElement('div');
+  card.className = 'channel';
+  ['Telegram', 'Enabled: ' + (tg.enabled ? 'yes' : 'no'), 'DM Policy: ' + (tg.dmPolicy || 'disabled'),
+   'Token: ' + (tg.botTokenConfigured ? 'configured' : 'missing'), 'allowFrom: ' + (tg.allowFrom || []).length + ' user(s)'].forEach((text, i) => {
+    const div = document.createElement('div');
+    div.className = i === 0 ? 'n' : 's';
+    div.textContent = text;
+    card.appendChild(div);
+  });
+  card.onclick = () => openTelegram();
+  ch.appendChild(card);
+
+  const pending = document.createElement('div');
+  pending.className = 'channel';
+  const pn1 = document.createElement('div'); pn1.className = 'n'; pn1.textContent = 'Discord (Future)';
+  const ps1 = document.createElement('div'); ps1.className = 's'; ps1.textContent = 'Reserved for upcoming channel integration';
+  pending.appendChild(pn1); pending.appendChild(ps1);
+  ch.appendChild(pending);
+
+  const pending2 = document.createElement('div');
+  pending2.className = 'channel';
+  const pn2 = document.createElement('div'); pn2.className = 'n'; pn2.textContent = 'Signal (Future)';
+  const ps2 = document.createElement('div'); ps2.className = 's'; ps2.textContent = 'Reserved for upcoming channel integration';
+  pending2.appendChild(pn2); pending2.appendChild(ps2);
+  ch.appendChild(pending2);
+}
+
+function renderAllowlist() {
+  const wrap = document.getElementById('allowlist');
+  wrap.replaceChildren();
+  const models = state.allowlist || [];
+  if (!models.length) {
+    const m = document.createElement('span');
+    m.className = 'value empty';
+    m.textContent = '(empty allowlist)';
+    wrap.appendChild(m);
+    return;
+  }
+  models.sort().forEach((m) => {
+    const t = document.createElement('span');
+    t.className = 'tag';
+    const txt = document.createTextNode(m + ' ');
+    t.appendChild(txt);
+    const btn = document.createElement('button');
+    btn.className = 'xbtn';
+    btn.style.padding = '1px 6px';
+    btn.textContent = 'x';
+    btn.dataset.model = m;
+    btn.addEventListener('click', function() { removeAllow(this.dataset.model); });
+    t.appendChild(btn);
+    wrap.appendChild(t);
+  });
+}
+
+async function removeAllow(model) {
+  try {
+    await api('/api/config/remove-allowlist', 'POST', { model });
+    toast('Removed from allowlist');
+    load();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+function levelIcon(level) {
+  if (level === 'error') return '🔴';
+  if (level === 'warning') return '🟡';
+  return '🔵';
+}
+
+function renderIssues() {
+  const wrap = document.getElementById('issues');
+  wrap.replaceChildren();
+  const issues = state.issues || [];
+  if (!issues.length) {
+    const ok = document.createElement('div');
+    ok.className = 'issue info';
+    const okInner = document.createElement('div');
+    const okTitle = document.createElement('div'); okTitle.className = 'it'; okTitle.textContent = '✅ No config issues detected';
+    const okDesc = document.createElement('div'); okDesc.className = 'id'; okDesc.textContent = 'System checks passed';
+    okInner.appendChild(okTitle); okInner.appendChild(okDesc);
+    ok.appendChild(okInner);
+    wrap.appendChild(ok);
+    return;
+  }
+
+  issues.forEach((issue) => {
+    const row = document.createElement('div');
+    row.className = 'issue ' + (issue.severity || 'info');
+
+    const left = document.createElement('div');
+    const itDiv = document.createElement('div'); itDiv.className = 'it'; itDiv.textContent = levelIcon(issue.severity) + ' ' + (issue.title || '');
+    const idDiv = document.createElement('div'); idDiv.className = 'id'; idDiv.textContent = issue.description || '';
+    left.appendChild(itDiv); left.appendChild(idDiv);
+
+    const right = document.createElement('div');
+    right.className = 'ia';
+    (issue.actions || []).forEach((a) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn ' + (a.type === 'auto_fix' ? 'blue' : a.type === 'choose' ? 'cyan' : 'purple');
+      btn.textContent = a.label || 'Fix';
+      btn.onclick = () => onIssueAction(a, issue);
+      right.appendChild(btn);
+    });
+
+    row.appendChild(left);
+    row.appendChild(right);
+    wrap.appendChild(row);
+  });
+}
+
+async function onIssueAction(action, issue) {
+  try {
+    if (action.type === 'auto_fix') {
+      await api('/api/config/auto-fix', 'POST', { issue: action.issue || issue.id });
+      toast('Auto-fix applied');
+      load();
+      return;
+    }
+    if (action.type === 'choose') {
+      openPicker(action.target || issue.target || 'primary');
+      return;
+    }
+    if (action.type === 'provider_key') {
+      const p = (state.providers || {})[action.provider];
+      if (p) openProvider(action.provider, p);
+      return;
+    }
+    if (action.type === 'scroll') {
+      document.getElementById(action.target === 'providers' ? 'providersCard' : 'issues').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (action.type === 'channel') {
+      if (action.channel === 'telegram') openTelegram();
+    }
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+function renderStatus() {
+  document.getElementById('sReg').textContent = state.registryVersion || '-';
+  document.getElementById('sModels').textContent = state.modelCount || 0;
+  document.getElementById('sProviders').textContent = state.providerCount || 0;
+  document.getElementById('sBackups').textContent = state.backupCount || 0;
+  document.getElementById('sUpdated').textContent = state.registryUpdated || '-';
+}
+
+function modelPassesTarget(ref, target) {
+  const model = (state.models || {})[ref] || {};
+  const caps = model.capabilities || [];
+  if (target === 'primary') return caps.includes('llm') && caps.includes('tools');
+  if (target === 'image_model') return caps.includes('vision');
+  if (target === 'llm_fallbacks') return caps.includes('llm') && caps.includes('tools');
+  if (target === 'image_fallbacks') return caps.includes('vision');
+  if (target === 'research') return caps.includes('llm') && caps.includes('reasoning');
+  if (target === 'coding_pass1' || target === 'coding_pass2' || target === 'coding_pass3') return caps.includes('llm') && caps.includes('code');
+  if (target === 'social_media' || target === 'heartbeat') return caps.includes('llm');
+  if (target === 'web_ops') return caps.includes('llm') && (caps.includes('tools') || caps.includes('search'));
+  if (target === 'allowlist') return true;
+  return true;
+}
+
+function pickerSubtitle(target) {
+  const map = {
+    primary: 'Pick a model with llm + tools capability.',
+    image_model: 'Pick a model with vision capability.',
+    llm_fallbacks: 'Pick a fallback model (llm + tools).',
+    image_fallbacks: 'Pick an image fallback model (vision).',
+    research: 'Pick a model with llm + reasoning capabilities.',
+    coding_pass1: 'Pick coding model for pass 1 (llm + code).',
+    coding_pass2: 'Pick coding model for pass 2, provider must differ from pass 1.',
+    coding_pass3: 'Pick coding model for pass 3, provider must differ from pass 1 and pass 2.',
+    social_media: 'Pick a creative llm model.',
+    web_ops: 'Pick a model with llm and tools/search.',
+    heartbeat: 'Pick a low-cost llm model.',
+    allowlist: 'Add any model to allowlist.',
+  };
+  return map[target] || 'Pick a model.';
+}
+
+function openPicker(target) {
+  pickerCtx = { target, selected: null };
+  document.getElementById('pickerTitle').textContent = 'Select Model: ' + target;
+  document.getElementById('pickerSub').textContent = pickerSubtitle(target);
+  document.getElementById('pickerSearch').value = '';
+  document.getElementById('pickerSave').disabled = true;
+  drawPickerList('');
+  document.getElementById('pickerOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('pickerSearch').focus(), 50);
+}
+
+function closePicker() {
+  document.getElementById('pickerOverlay').classList.remove('show');
+}
+
+function drawPickerList(filterText) {
+  const list = document.getElementById('pickerList');
+  list.replaceChildren();
+
+  const target = pickerCtx.target;
+  const f = (filterText || '').toLowerCase();
+  const currentFallbacks = new Set(state.fallbacks || []);
+  const currentImageFallbacks = new Set(state.imageFallbacks || []);
+  const currentAllowlist = new Set(state.allowlist || []);
+
+  let items = Object.entries(state.models || {}).filter(([ref, m]) => {
+    if (m.blocked) return false;
+    if (!modelPassesTarget(ref, target)) return false;
+    if (target === 'llm_fallbacks' && (currentFallbacks.has(ref) || ref === state.primary)) return false;
+    if (target === 'image_fallbacks' && (currentImageFallbacks.has(ref) || ref === state.imageModel)) return false;
+    if (target === 'allowlist' && currentAllowlist.has(ref)) return false;
+
+    const hay = [ref, m.displayName || '', m.costTier || '', (m.capabilities || []).join(' ')].join(' ').toLowerCase();
+    if (f && !hay.includes(f)) return false;
+    return true;
+  });
+
+  items.sort((a, b) => {
+    const pa = (state.providers || {})[providerOf(a[0])] || {};
+    const pb = (state.providers || {})[providerOf(b[0])] || {};
+    if (pa.hasAuth !== pb.hasAuth) return pa.hasAuth ? -1 : 1;
+    const ca = ({ free:0,'very-low':1,low:2,medium:3,high:4,subscription:5,proxy:3 }[a[1].costTier] ?? 3);
+    const cb = ({ free:0,'very-low':1,low:2,medium:3,high:4,subscription:5,proxy:3 }[b[1].costTier] ?? 3);
+    if (ca !== cb) return ca - cb;
+    return a[0].localeCompare(b[0]);
+  });
+
+  if (!items.length) {
+    const emp = document.createElement('div');
+    emp.className = 'id';
+    emp.textContent = 'No matching models.';
+    list.appendChild(emp);
+    return;
+  }
+
+  items.forEach(([ref, m]) => {
+    const pid = providerOf(ref);
+    const p = (state.providers || {})[pid] || {};
+    const row = document.createElement('div');
+    row.className = 'pick' + (pickerCtx.selected === ref ? ' sel' : '');
+    const info = document.createElement('div');
+    const nmDiv = document.createElement('div'); nmDiv.className = 'nm'; nmDiv.textContent = ref;
+    const cpDiv = document.createElement('div'); cpDiv.className = 'cp'; cpDiv.textContent = (m.capabilities || []).join(', ');
+    info.appendChild(nmDiv); info.appendChild(cpDiv);
+    const costDiv = document.createElement('div'); costDiv.className = 'cp'; costDiv.textContent = m.costTier || '-';
+    const auDiv = document.createElement('div'); auDiv.className = 'au'; auDiv.style.color = p.hasAuth ? '#86efac' : '#fca5a5'; auDiv.textContent = p.hasAuth ? 'auth ✓' : 'auth ✗';
+    row.appendChild(info); row.appendChild(costDiv); row.appendChild(auDiv);
+    row.onclick = () => {
+      pickerCtx.selected = ref;
+      drawPickerList(document.getElementById('pickerSearch').value);
+      document.getElementById('pickerSave').disabled = false;
+    };
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('pickerSearch').addEventListener('input', (e) => drawPickerList(e.target.value));
+
+document.getElementById('pickerOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'pickerOverlay') closePicker();
+});
+
+async function submitPicker() {
+  const target = pickerCtx.target;
+  const model = pickerCtx.selected;
+  if (!model) return;
+
+  if (target === 'coding_pass2' || target === 'coding_pass3') {
+    const selectedProvider = providerOf(model);
+    const roles = state.roles || {};
+    const used = new Set();
+    if (roles.coding_pass1) used.add(providerOf(roles.coding_pass1));
+    if (target === 'coding_pass3' && roles.coding_pass2) used.add(providerOf(roles.coding_pass2));
+    if (used.has(selectedProvider)) {
+      toast('Coding pipeline providers must be different', false);
+      return;
+    }
+  }
+
+  try {
+    if (target === 'primary') {
+      await api('/api/config/set-primary', 'POST', { model });
+    } else if (target === 'image_model') {
+      await api('/api/config/set-image-model', 'POST', { model });
+    } else if (target === 'llm_fallbacks') {
+      await api('/api/config/add-fallback', 'POST', { model });
+    } else if (target === 'image_fallbacks') {
+      await api('/api/config/add-image-fallback', 'POST', { model });
+    } else if (target === 'allowlist') {
+      await api('/api/config/add-allowlist', 'POST', { model });
+    } else {
+      await api('/api/config/set-role', 'POST', { role: target, model });
+    }
+    toast('Configuration updated');
+    closePicker();
+    load();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+function openProvider(id, p) {
+  providerCtx = { id, p };
+  document.getElementById('providerTitle').textContent = (p.displayName || id) + ' auth';
+  document.getElementById('providerSub').textContent = 'Auth method: ' + (p.authMethod || 'api-key');
+
+  const body = document.getElementById('providerBody');
+  body.replaceChildren();
+
+  const authEnv = p.authEnvVars || [];
+  const save = document.getElementById('providerSaveBtn');
+  const del = document.getElementById('providerDeleteBtn');
+
+  if (!authEnv.length) {
+    const m = document.createElement('div');
+    m.className = 'id';
+    m.textContent = 'This provider does not use direct API key env vars.';
+    body.appendChild(m);
+    save.style.display = 'none';
+    del.style.display = 'none';
+  } else {
+    save.style.display = '';
+    del.style.display = p.hasAuth ? '' : 'none';
+
+    const lab = document.createElement('label');
+    lab.textContent = 'Env var: ' + authEnv[0];
+    body.appendChild(lab);
+    const inp = document.createElement('input');
+    inp.id = 'providerKeyInput';
+    inp.type = 'password';
+    inp.placeholder = 'Paste API key';
+    body.appendChild(inp);
+
+    if (p.website) {
+      const a = document.createElement('a');
+      a.href = p.website;
+      a.target = '_blank';
+      a.rel = 'noreferrer noopener';
+      a.className = 'id';
+      a.style.display = 'inline-block';
+      a.style.marginTop = '8px';
+      a.style.color = '#93c5fd';
+      a.textContent = 'Get key: ' + p.website;
+      body.appendChild(a);
+    }
+  }
+
+  document.getElementById('providerOverlay').classList.add('show');
+}
+
+function closeProvider() {
+  document.getElementById('providerOverlay').classList.remove('show');
+  providerCtx = null;
+}
+
+async function saveProviderKey() {
+  if (!providerCtx) return;
+  const authEnv = providerCtx.p.authEnvVars || [];
+  if (!authEnv.length) return;
+  const key = authEnv[0];
+  const value = (document.getElementById('providerKeyInput').value || '').trim();
+  if (!value) {
+    toast('Enter key value', false);
+    return;
+  }
+  try {
+    await api('/api/key', 'POST', { key, value });
+    toast('Provider key saved');
+    closeProvider();
+    load();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+async function deleteProviderKey() {
+  if (!providerCtx) return;
+  const authEnv = providerCtx.p.authEnvVars || [];
+  if (!authEnv.length) return;
+  try {
+    await api('/api/key/delete', 'POST', { key: authEnv[0] });
+    toast('Provider key removed');
+    closeProvider();
+    load();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+document.getElementById('providerOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'providerOverlay') closeProvider();
+});
+
+function openTelegram() {
+  const tg = ((state.channels || {}).telegram) || {};
+  document.getElementById('tgEnabled').value = String(!!tg.enabled);
+  document.getElementById('tgPolicy').value = tg.dmPolicy || 'disabled';
+  document.getElementById('tgToken').value = '';
+  document.getElementById('tgMention').value = String(!!((tg.groups || {}).requireMention));
+  document.getElementById('tgUserId').value = '';
+  renderTelegramUsers();
+  document.getElementById('tgOverlay').classList.add('show');
+}
+
+function closeTelegram() {
+  document.getElementById('tgOverlay').classList.remove('show');
+}
+
+document.getElementById('tgOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'tgOverlay') closeTelegram();
+});
+
+function renderTelegramUsers() {
+  const wrap = document.getElementById('tgAllowFrom');
+  wrap.replaceChildren();
+  const users = ((((state || {}).channels || {}).telegram || {}).allowFrom) || [];
+  if (!users.length) {
+    const empty = document.createElement('span');
+    empty.className = 'value empty';
+    empty.textContent = '(none)';
+    wrap.appendChild(empty);
+    return;
+  }
+  users.forEach((u) => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    const txt = document.createTextNode(u + ' ');
+    tag.appendChild(txt);
+    const btn = document.createElement('button');
+    btn.className = 'xbtn';
+    btn.style.padding = '1px 6px';
+    btn.textContent = 'x';
+    btn.dataset.user = u;
+    btn.addEventListener('click', function() { removeTelegramUser(this.dataset.user); });
+    tag.appendChild(btn);
+    wrap.appendChild(tag);
+  });
+}
+
+async function saveTelegram() {
+  const payload = {
+    enabled: document.getElementById('tgEnabled').value === 'true',
+    dmPolicy: document.getElementById('tgPolicy').value,
+    groups: { requireMention: document.getElementById('tgMention').value === 'true' }
+  };
+  const token = (document.getElementById('tgToken').value || '').trim();
+  if (token) payload.botToken = token;
+  try {
+    await api('/api/channels/telegram', 'POST', payload);
+    toast('Telegram updated');
+    closeTelegram();
+    load();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+async function addTelegramUser() {
+  const userId = (document.getElementById('tgUserId').value || '').trim();
+  if (!userId) {
+    toast('Enter user ID', false);
+    return;
+  }
+  try {
+    await api('/api/channels/telegram/add-user', 'POST', { userId });
+    document.getElementById('tgUserId').value = '';
+    toast('User added');
+    load(true);
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+async function removeTelegramUser(userId) {
+  try {
+    await api('/api/channels/telegram/remove-user', 'POST', { userId });
+    toast('User removed');
+    load(true);
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
+function renderAll() {
+  renderRoles();
+  renderFallbackList('fallbacks', state.fallbacks || [], false);
+  renderFallbackList('imageFallbacks', state.imageFallbacks || [], true);
+  renderPipeline();
+  renderProviders();
+  renderChannels();
+  renderAllowlist();
+  renderIssues();
+  renderStatus();
+}
+
+async function load(skipClose = false) {
+  try {
+    const data = await api('/api/status');
+    state = data;
+    renderAll();
+    if (!skipClose) {
+      renderTelegramUsers();
+    }
+  } catch (e) {
+    toast(e.message || 'Failed to load status', false);
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closePicker();
+    closeProvider();
+    closeTelegram();
+  }
+});
+
+load();
+</script>
+</body>
+</html>

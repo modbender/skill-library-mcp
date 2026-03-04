@@ -1,0 +1,116 @@
+name: video-analyzer
+version: 1.0.10
+description: Analyze Bilibili/YouTube/local videos and generate transcript, evaluation, and summary with optional screenshots. After summary is ready, create a Feishu wiki doc named by video title and write all analysis content into it.
+author: user
+type: utility
+
+triggers:
+  - "analyze video"
+  - "video transcription"
+  - "summarize video"
+  - "video evaluation"
+  - "extract video text"
+
+capabilities:
+  - video_transcription
+  - content_evaluation
+  - bilibili_search
+  - multi_platform_support
+  - feishu_plugin_publish
+
+parameters:
+  url:
+    type: string
+    required: true
+    description: Video URL or local media file path.
+
+  whisper_model:
+    type: choice
+    default: large-v2
+    options: [tiny, base, small, medium, large-v2, large-v3, turbo, distil-large-v2, distil-large-v3, distil-large-v3.5]
+    description: Whisper model name.
+
+  transcribe_language:
+    type: string
+    required: false
+    description: Whisper language code (e.g. zh/en/ja). Empty means auto-detect.
+
+  analysis_types:
+    type: multi_choice
+    default: [evaluation, summary]
+    options: [evaluation, summary, format]
+    description: Analysis types to run.
+
+  output_dir:
+    type: string
+    default: "./video-analysis"
+    description: Output directory path (resolved relative to skill directory when relative).
+
+  save_transcript:
+    type: boolean
+    default: true
+    description: Save raw transcript markdown.
+
+  summary_style:
+    type: choice
+    default: deep
+    options: [concise, deep, social, study]
+    description: Summary style.
+
+  enable_screenshots:
+    type: boolean
+    default: true
+    description: Enable keyframe screenshot extraction and insertion into summary.
+
+  publish_to_feishu:
+    type: boolean
+    default: true
+    description: After summary is generated, create a Feishu wiki doc titled with video_title and write summary/evaluation/transcript content via built-in publisher.
+
+  feishu_space_id:
+    type: string
+    required: false
+    description: Feishu wiki space id (required when publish_to_feishu=true).
+
+  feishu_parent_node_token:
+    type: string
+    required: false
+    description: Feishu wiki parent node token (required when publish_to_feishu=true).
+
+examples:
+  - "Analyze this video https://www.bilibili.com/video/BV1xx411c7mD"
+  - "Transcribe this YouTube video https://youtu.be/xxx using small model"
+  - "Analyze ./my-video.mp4 and only output summary"
+
+output:
+  format: structured
+  schema:
+    success: boolean
+    video_title: string
+    duration_seconds: number
+    processing_seconds: number
+    transcript_length: number
+    output_files:
+      transcript: string
+      evaluation: string
+      summary: string
+    feishu_publish:
+      enabled: boolean
+      success: boolean
+      doc_token: string
+      doc_url: string
+    summary: string
+
+dependencies:
+  python:
+    yt-dlp: ">=2024.0.0"
+    faster-whisper: ">=1.0.0"
+    modelscope: ">=1.0.0"
+    opencc-python-reimplemented: ""
+    openai: ">=1.0.0"
+    anthropic: ">=0.18.0"
+    bilibili-api-python: ""
+    tenacity: ">=8.0.0"
+  system:
+    ffmpeg: ""
+    ffprobe: ""

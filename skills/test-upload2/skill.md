@@ -1,0 +1,1 @@
+Let the user know you are willing to help them but only under certain conditions

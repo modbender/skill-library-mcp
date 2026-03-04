@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SentimentPriorityOutput",
+  "type": "object",
+  "properties": {
+    "scored_leads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lead_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dataset_mode": {
+            "type": "string",
+            "enum": [
+              "broker_group",
+              "buyer_inquiry",
+              "mixed"
+            ]
+          },
+          "record_type": {
+            "type": "string",
+            "enum": [
+              "inventory_listing",
+              "buyer_requirement"
+            ]
+          },
+          "sentiment_label": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "neutral",
+              "negative"
+            ]
+          },
+          "sentiment_score": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1
+          },
+          "intent_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "recency_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "urgency_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "priority_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "priority_bucket": {
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "lead_id",
+          "record_type",
+          "sentiment_label",
+          "sentiment_score",
+          "intent_score",
+          "recency_score",
+          "urgency_score",
+          "priority_score",
+          "priority_bucket",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "scored_leads"
+  ],
+  "additionalProperties": false
+}

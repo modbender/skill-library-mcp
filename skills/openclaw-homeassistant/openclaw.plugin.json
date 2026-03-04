@@ -1,0 +1,616 @@
+{
+  "id": "openclaw-homeassistant",
+  "name": "Home Assistant",
+  "description": "Control smart home devices, read sensors, and trigger automations via Home Assistant",
+  "version": "0.1.1",
+  "entry": "./dist/index.js",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "Home Assistant base URL (e.g. http://homeassistant.local:8123)"
+      },
+      "token": {
+        "type": "string",
+        "description": "Long-Lived Access Token from HA profile"
+      },
+      "allowedDomains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Restrict tools to these HA domains only (empty = all)"
+      },
+      "readOnly": {
+        "type": "boolean",
+        "default": false,
+        "description": "Block all write tools (service calls, events, notifications)"
+      }
+    },
+    "required": [
+      "url",
+      "token"
+    ]
+  },
+  "tools": [
+    {
+      "name": "ha_status",
+      "description": "Get Home Assistant instance configuration (version, location, components)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "ha_list_entities",
+      "description": "List all entities, optionally filtered by domain, area, or state",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Filter by HA domain (e.g. light, sensor, switch)"
+          },
+          "area": {
+            "type": "string",
+            "description": "Filter by area_id"
+          },
+          "state": {
+            "type": "string",
+            "description": "Filter by state value (e.g. on, off)"
+          }
+        }
+      }
+    },
+    {
+      "name": "ha_get_state",
+      "description": "Get the current state and attributes of a single entity",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "description": "Entity ID (e.g. sensor.temperature)"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_search_entities",
+      "description": "Search entities by pattern matching entity_id or friendly_name",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "description": "Search pattern (substring match)"
+          }
+        },
+        "required": [
+          "pattern"
+        ]
+      }
+    },
+    {
+      "name": "ha_list_services",
+      "description": "List all available services grouped by domain",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "ha_light_on",
+      "description": "Turn on a light with optional brightness, color temp, or RGB color",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "brightness": {
+            "type": "number",
+            "description": "0-255"
+          },
+          "color_temp": {
+            "type": "number",
+            "description": "Color temperature in mireds"
+          },
+          "rgb_color": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "[R, G, B] 0-255"
+          },
+          "transition": {
+            "type": "number",
+            "description": "Transition time in seconds"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_light_off",
+      "description": "Turn off a light",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_light_toggle",
+      "description": "Toggle a light on/off",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_light_list",
+      "description": "List all light entities with brightness and color info",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "ha_switch_on",
+      "description": "Turn on a switch",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_switch_off",
+      "description": "Turn off a switch",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_switch_toggle",
+      "description": "Toggle a switch on/off",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_climate_set_temp",
+      "description": "Set target temperature for a climate entity",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "temperature": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity_id",
+          "temperature"
+        ]
+      }
+    },
+    {
+      "name": "ha_climate_set_mode",
+      "description": "Set HVAC mode (heat, cool, auto, off) for a climate entity",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "hvac_mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "hvac_mode"
+        ]
+      }
+    },
+    {
+      "name": "ha_climate_set_preset",
+      "description": "Set preset mode (away, home, eco, etc.) for a climate entity",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "preset_mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "preset_mode"
+        ]
+      }
+    },
+    {
+      "name": "ha_climate_list",
+      "description": "List all climate entities",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "ha_media_play",
+      "description": "Resume playback on a media player",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_media_pause",
+      "description": "Pause playback on a media player",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_media_stop",
+      "description": "Stop playback on a media player",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_media_volume",
+      "description": "Set volume level (0.0-1.0) on a media player",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "volume_level": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "entity_id",
+          "volume_level"
+        ]
+      }
+    },
+    {
+      "name": "ha_media_play_media",
+      "description": "Play specific media content on a media player",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "content_id": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "content_id",
+          "content_type"
+        ]
+      }
+    },
+    {
+      "name": "ha_cover_open",
+      "description": "Open a cover (blinds, garage door, etc.)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_cover_close",
+      "description": "Close a cover (blinds, garage door, etc.)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_cover_position",
+      "description": "Set cover position (0 = closed, 100 = open)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "entity_id",
+          "position"
+        ]
+      }
+    },
+    {
+      "name": "ha_scene_activate",
+      "description": "Activate a scene",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_script_run",
+      "description": "Run a Home Assistant script with optional variables",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "variables": {
+            "type": "object",
+            "description": "Key-value pairs passed to the script"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_automation_trigger",
+      "description": "Trigger an automation manually",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "skip_condition": {
+            "type": "boolean",
+            "description": "Skip condition check (default false)"
+          }
+        },
+        "required": [
+          "entity_id"
+        ]
+      }
+    },
+    {
+      "name": "ha_sensor_list",
+      "description": "List all sensor entities",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "ha_history",
+      "description": "Get state history for an entity (defaults to last 24 hours)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "description": "ISO 8601 start timestamp"
+          },
+          "end": {
+            "type": "string",
+            "description": "ISO 8601 end timestamp"
+          }
+        }
+      }
+    },
+    {
+      "name": "ha_logbook",
+      "description": "Get logbook entries (defaults to last 24 hours)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "description": "ISO 8601 start timestamp"
+          },
+          "end": {
+            "type": "string",
+            "description": "ISO 8601 end timestamp"
+          }
+        }
+      }
+    },
+    {
+      "name": "ha_call_service",
+      "description": "Call any HA service directly (advanced - prefer specific tools when available)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "service_data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "domain",
+          "service"
+        ]
+      }
+    },
+    {
+      "name": "ha_fire_event",
+      "description": "Fire a custom event on the HA event bus",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "event_type": {
+            "type": "string"
+          },
+          "event_data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "event_type"
+        ]
+      }
+    },
+    {
+      "name": "ha_render_template",
+      "description": "Render a Jinja2 template using HA template engine",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string",
+            "description": "Jinja2 template string"
+          },
+          "variables": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "template"
+        ]
+      }
+    },
+    {
+      "name": "ha_notify",
+      "description": "Send a notification via HA notify service",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Notification target (e.g. mobile_app_phone)"
+          },
+          "message": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "target",
+          "message"
+        ]
+      }
+    }
+  ]
+}

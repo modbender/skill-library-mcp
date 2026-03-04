@@ -1,0 +1,18 @@
+version: "0.1"
+default_verdict: deny
+rules:
+  - name: allow-read
+    match:
+      action_type: read
+    verdict: approve
+    reason: "All reads permitted"
+  - name: block-delete
+    match:
+      action_type: delete
+    verdict: deny
+    reason: "Deletions blocked"
+sensitive_data:
+  - category: credentials
+    patterns:
+      - "**/*.env"
+    action: deny

@@ -1,0 +1,11 @@
+{
+  "sync_at": "2026-02-17T17:11:27Z",
+  "rule": "exec_safety",
+  "from_agent": "haiku",
+  "to_agents": [
+    "main"
+  ],
+  "extracted_snippet": "## 🚫 Exec 에러 노출 금지 규칙 (2026-02-17, v2.0 강화)\n\n**원인:** exec tool이 non-zero 종료 코드 반환 시 OpenClaw가 `⚠️🔧 Exec: ... failed: ...`를 채널에 자동 노출. **config로 끌 수 없음** (schema 확인 완료).\n\n**규칙: exec는 절대로 실패하면 안 된다.**\n\n### ⚡ 황금률: exec 호출 전 자문\n\n> \"이 명령이 실패하면 어떻게 되나?\" → 실패 가능성이 1%라도 있으면 반드시 `|| true` 또는 wrapper 사용\n\n### 구조적 해결책: safe-exec.sh wrapper\n\n```bash\n# 실패 가능성 있는 모든 복잡한 명령은 wrapper 사용\nbash ~/openclaw/scripts/safe-exec.sh \"작업명\" \"명령어\"\n# → 항상 exit 0, 실패는 ~/.openclaw/logs/safe-exec.log에 기록\n```\n\n### 자주 실수하는 패턴 (구체적",
+  "status": "preview",
+  "note": "이 규칙을 대상 에이전트의 AGENTS.md에 적용하세요."
+}

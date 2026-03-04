@@ -1,0 +1,262 @@
+openapi: 3.1.0
+info:
+  title: LinkedIn Inbox Manager — Linxa API
+  version: 1.1.0
+  description: |
+    **LinkedIn Inbox Manager** powered by Linxa — free AI-driven LinkedIn inbox management,
+    lead tracking, and conversation intelligence.
+
+    Manage your LinkedIn messages with rich filtering (sentiment, intent, labels),
+    get AI-generated next-action summaries, add CRM-style comments to leads,
+    and keep your inbox organized — all through a secure, free API.
+    All features are free — no paid tiers or usage limits.
+
+    **Security**: Token-based authentication only. No LinkedIn passwords,
+    no session cookies, no browser access required. The LINXA_TOKEN environment
+    variable must be set with a valid bearer token.
+
+    **Prerequisites**:
+    1. Install the Linxa Chrome Extension
+    2. Sign in at https://app.uselinxa.com/ with your LinkedIn account
+    3. Generate an access token at https://app.uselinxa.com/setup-mcp
+    4. Set: export LINXA_TOKEN=YOUR_TOKEN
+
+    **Authentication**:
+    Pass your token in the Authorization header: `Authorization: Bearer <LINXA_TOKEN>`.
+
+  contact:
+    name: Linxa
+    url: https://app.uselinxa.com
+
+servers:
+  - url: https://app.uselinxa.com
+    description: Linxa production server
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Bearer token obtained from https://app.uselinxa.com/setup-mcp.
+        Set as LINXA_TOKEN environment variable.
+
+paths:
+  /api/mcp/current-li-user:
+    get:
+      operationId: getCurrentLiUser
+      summary: Verify auth and get current LinkedIn user
+      description: |
+        Verifies the bearer token is valid and returns the authenticated
+        user's LinkedIn profile information. Call this first to confirm
+        authentication is working.
+      responses:
+        "200":
+          description: Current LinkedIn user profile
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized — invalid or expired token
+
+  /api/mcp/conversations:
+    get:
+      operationId: listConversations
+      summary: List and search LinkedIn inbox conversations
+      description: |
+        Retrieve a paginated list of LinkedIn conversations with rich filtering
+        and search capabilities. Supports filtering by label, sentiment,
+        intent direction, primary intent, product interest, and keyword search.
+        Returns conversations with participant info, last message preview,
+        and metadata.
+      parameters:
+        - name: limit
+          in: query
+          description: Max number of conversations to return
+          schema:
+            type: integer
+            default: 50
+        - name: search
+          in: query
+          description: Keyword search in messages and participant names
+          schema:
+            type: string
+        - name: label
+          in: query
+          description: >
+            Filter by label. Available: Hot, Need Follow Up, Personal,
+            Investors, Clients, Inbox, Hiring, Junk, Partnership,
+            archived, scheduled, not-contacted
+          schema:
+            type: string
+            enum:
+              - Hot
+              - Need Follow Up
+              - Personal
+              - Investors
+              - Clients
+              - Inbox
+              - Hiring
+              - Junk
+              - Partnership
+              - archived
+              - scheduled
+              - not-contacted
+        - name: sentiment
+          in: query
+          description: Filter by conversation sentiment
+          schema:
+            type: string
+            enum: [POSITIVE, NEGATIVE, NEUTRAL]
+        - name: primary_intent
+          in: query
+          description: Filter by primary intent (e.g., sales, recruitment, networking)
+          schema:
+            type: string
+        - name: intent_direction
+          in: query
+          description: Filter by intent direction — who initiated
+          schema:
+            type: string
+            enum: [to_me, from_me]
+        - name: product
+          in: query
+          description: Filter by detected product interest
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of conversations with metadata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Conversation/chat ID
+                    participants:
+                      type: array
+                      items:
+                        type: object
+                    lastMessage:
+                      type: object
+                    label:
+                      type: string
+                    sentiment:
+                      type: string
+        "401":
+          description: Unauthorized
+
+  /api/mcp/messages/{chatId}:
+    get:
+      operationId: getMessagesByChatId
+      summary: Get full message thread for a conversation
+      description: |
+        Returns all messages for the specified conversation thread in
+        chronological order. Use the chatId from the conversations list.
+        URL-encode the chatId if it contains special characters.
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The conversation ID (URL-encode if contains special characters)
+      responses:
+        "200":
+          description: Messages in the conversation
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Conversation not found
+
+  /api/mcp/next-actions:
+    post:
+      operationId: generateInboxSummary
+      summary: Generate AI-powered inbox summary and next actions
+      description: |
+        Generates a prioritized summary of recommended next actions across
+        your LinkedIn conversations. Considers conversation history,
+        sentiment, labels, and any comments you've added to leads.
+        Use when the user asks "what should I do next on LinkedIn?" or
+        wants a morning briefing of LinkedIn priorities.
+      responses:
+        "200":
+          description: AI-generated inbox summary with prioritized next actions
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+
+  /api/mcp/comments:
+    post:
+      operationId: addComment
+      summary: Add a CRM-style comment to a LinkedIn lead
+      description: |
+        Attach a note or comment to a LinkedIn lead's profile.
+        Comments influence future next-action recommendations and help
+        track context about each lead. Use when the user says "add a note"
+        or "remember that [person] mentioned X".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - profileId
+                - text
+              properties:
+                profileId:
+                  type: string
+                  description: The LinkedIn profile ID to add a comment to
+                text:
+                  type: string
+                  description: The comment text to attach to this lead
+            example:
+              profileId: "123456789"
+              text: "Follow up after demo on Friday"
+      responses:
+        "200":
+          description: Comment added successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Conversation not found
+
+  /api/mcp/conversations/{chatId}/read:
+    post:
+      operationId: markChatAsRead
+      summary: Mark a LinkedIn conversation as read
+      description: |
+        Marks the specified conversation as read in your LinkedIn inbox.
+        Use when the user wants to clean up their inbox or says
+        "mark this as read".
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The conversation ID to mark as read
+      responses:
+        "200":
+          description: Conversation marked as read
+        "401":
+          description: Unauthorized
+        "404":
+          description: Conversation not found

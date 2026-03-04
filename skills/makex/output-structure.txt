@@ -1,0 +1,33 @@
+Endpoint: POST /api/openclaw/integrations/output-structure
+Auth: X-Org-Token header (org service token)
+CORS: Enabled (OPTIONS preflight supported)
+
+Purpose: Execute an action and return its output structure. Useful for determining the shape of an action's response data.
+
+Request Headers:
+  X-Org-Token: <org-service-token>
+  Content-Type: application/json
+
+Request Body:
+  action_slug (required, string): The action slug to execute (e.g. "GMAIL_SEND_EMAIL")
+  accountId (required, string): The connected account ID (obtained from connected-account endpoint)
+  arguments (optional, object): Arguments to pass to the action
+
+Behavior:
+  - Validates org token against database
+  - Requires COMPOSIO_API_KEY environment variable
+  - Builds payload with connected_account_id, user_id (org.id), and arguments
+  - Calls Composio API: POST https://backend.composio.dev/api/v3/tools/execute/{action_slug}
+  - Returns the success status and data from the execution
+
+Response 200:
+  {
+    "successful": true,
+    "data": { ... }
+  }
+
+Error Responses:
+  401 - Missing or invalid X-Org-Token
+  400 - action_slug is required / accountId is required
+  500 - COMPOSIO_API_KEY not configured / Server error
+  (Composio status) - Forwarded error from Composio API

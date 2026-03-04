@@ -1,0 +1,152 @@
+{
+  "9": {
+    "inputs": {
+      "filename_prefix": "z-image",
+      "images": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "39": {
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "40": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "41": {
+    "inputs": {
+      "width": 1280,
+      "height": 720,
+      "batch_size": 1
+    },
+    "class_type": "EmptySD3LatentImage",
+    "_meta": {
+      "title": "EmptySD3LatentImage"
+    }
+  },
+  "42": {
+    "inputs": {
+      "conditioning": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "43": {
+    "inputs": {
+      "samples": [
+        "44",
+        0
+      ],
+      "vae": [
+        "40",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "44": {
+    "inputs": {
+      "seed": 181294798325377,
+      "steps": 9,
+      "cfg": 1,
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "47",
+        0
+      ],
+      "positive": [
+        "45",
+        0
+      ],
+      "negative": [
+        "42",
+        0
+      ],
+      "latent_image": [
+        "41",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "45": {
+    "inputs": {
+      "text": [
+        "50",
+        0
+      ],
+      "clip": [
+        "39",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "46": {
+    "inputs": {
+      "unet_name": "Z-image\\zimageTurboByStable_labRatV0FP8.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
+    }
+  },
+  "47": {
+    "inputs": {
+      "shift": 3,
+      "model": [
+        "46",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingAuraFlow",
+    "_meta": {
+      "title": "ModelSamplingAuraFlow"
+    }
+  },
+  "50": {
+    "inputs": {
+      "text": "alluring young thailand  idol girl, \nHer long, sandy-brown wavy hair flows in the ocean breeze \n,   slender waist, huge breasts and wide hips, \ntilting_head,Head gently angled ~ curious, playful, or just soaking in the moment.\n一位金发碧眼的年轻女性坐在一张古旧花纹布艺沙发上，她身穿一件白色改良式旗袍，领口系着黑色丝带，胸前和腰部有黑色绑带设计，裙摆开叉至大腿，露出修长双腿，脚踩一双黑色粗跟高跟鞋，姿态优雅而略带挑逗感，右手持一把绘有红梅图案的折扇半遮面，眼神直视镜头，表情冷静而深邃，她的金色长发自然垂落肩头，皮肤白皙细腻，整体造型融合了东方古典美学与现代性感元素，前景是人物主体占据画面中心偏左位置，身体微微侧转，右腿弯曲抬起，左腿伸展，形成优美的S型曲线，背景是一面带有木质格栅的窗户，窗外透入柔和的自然光，窗边摆放一株高大的翠绿竹子，叶片细长，生机盎然，室内光线温暖，主要光源来自右侧窗户，形成从右向左的斜射光，营造出明暗对比强烈的光影效果，左侧隐约可见一个暖黄色灯笼或灯罩，散发出柔和的橙色光晕，为画面增添温馨氛围，沙发上的花纹是复古风格的花卉图案，颜色以米黄和棕褐色为主，纹理清晰但不过于突兀，整体构图采用中景视角，人物占据画面大部分空间，背景元素合理分布，形成前后层次感，视觉引导线由人物的身体线条、折扇的展开方向以及竹子的垂直线条共同构成，将视线引向人物面部和眼神，构图平衡且富有张力，色彩以暖色调为主，白色旗袍与黑色绑带、高跟鞋形成强烈对比，竹叶的绿色成为画面中的点睛之笔，增强视觉活力，整体氛围兼具古典雅致与现代时尚感，仿佛一幅精心构思的艺术肖像作品，又像是用专业相机在安静室内拍摄的高质量人像照片，带有轻微的胶片质感和自然噪点，呈现出一种真实而富有故事性的影像风格，细节丰富，光影过渡自然，人物神态专注，场景布置考究，展现出浓郁的文化气息与个人魅力 \n"
+    },
+    "class_type": "Text Multiline",
+    "_meta": {
+      "title": "Text Multiline"
+    }
+  }
+}

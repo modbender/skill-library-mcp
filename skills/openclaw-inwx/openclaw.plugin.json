@@ -1,0 +1,65 @@
+{
+  "name": "INWX",
+  "version": "0.2.0",
+  "description": "INWX domain registrar management: domain registration, availability check, DNS records, nameservers, DNSSEC, pricing, transfers.",
+  "config": {
+    "username": {
+      "type": "string",
+      "description": "INWX account username",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "description": "INWX account password",
+      "required": true,
+      "secret": true
+    },
+    "otpSecret": {
+      "type": "string",
+      "description": "2FA TOTP secret (if enabled on account)",
+      "secret": true
+    },
+    "environment": {
+      "type": "string",
+      "description": "API environment: 'production' (api.inwx.com) or 'ote' (ote.inwx.com) for testing",
+      "default": "production",
+      "enum": ["production", "ote"]
+    },
+    "readOnly": {
+      "type": "boolean",
+      "description": "If true, only read operations allowed (check, list, info, pricing)",
+      "default": false
+    },
+    "allowedOperations": {
+      "type": "array",
+      "description": "Whitelist of allowed tool names. Empty = all allowed.",
+      "items": { "type": "string" },
+      "default": []
+    }
+  },
+  "tools": [
+    "inwx_domain_check",
+    "inwx_domain_register",
+    "inwx_domain_list",
+    "inwx_domain_info",
+    "inwx_domain_update",
+    "inwx_domain_delete",
+    "inwx_domain_transfer",
+    "inwx_domain_renew",
+    "inwx_domain_pricing",
+    "inwx_nameserver_list",
+    "inwx_nameserver_set",
+    "inwx_dns_record_list",
+    "inwx_dns_record_add",
+    "inwx_dns_record_update",
+    "inwx_dns_record_delete",
+    "inwx_dnssec_list",
+    "inwx_dnssec_enable",
+    "inwx_dnssec_disable",
+    "inwx_contact_list",
+    "inwx_contact_create",
+    "inwx_contact_update",
+    "inwx_whois",
+    "inwx_account_info"
+  ]
+}

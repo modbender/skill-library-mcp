@@ -1,0 +1,22 @@
+{
+  "category": "openclaw_hardening",
+  "version": "1.0.0",
+  "updated": "2026-02-18",
+  "checks": [
+    {"id": "HRD-001", "severity": "critical", "score": 95, "description": "No gateway auth configured", "check": "auth_missing", "path": "auth", "condition": "missing_or_empty"},
+    {"id": "HRD-002", "severity": "high", "score": 85, "description": "Weak or default auth token", "check": "weak_token", "path": "auth.profiles", "condition": "has_default_token"},
+    {"id": "HRD-003", "severity": "high", "score": 80, "description": "No rate limiting configured", "check": "rate_limit_missing", "path": "gateway.rateLimit", "condition": "missing"},
+    {"id": "HRD-004", "severity": "high", "score": 82, "description": "Gateway bound to 0.0.0.0", "check": "bind_all_interfaces", "path": "gateway.host", "condition": "equals_0.0.0.0"},
+    {"id": "HRD-005", "severity": "medium", "score": 70, "description": "No channel restrictions defined", "check": "no_channel_restrictions", "path": "channels", "condition": "missing_or_empty"},
+    {"id": "HRD-006", "severity": "medium", "score": 68, "description": "Missing model allowlist", "check": "no_model_allowlist", "path": "models.allowlist", "condition": "missing"},
+    {"id": "HRD-007", "severity": "medium", "score": 65, "description": "No IP whitelist configured", "check": "no_ip_whitelist", "path": "gateway.ipWhitelist", "condition": "missing"},
+    {"id": "HRD-008", "severity": "medium", "score": 72, "description": "CORS allows all origins", "check": "cors_wildcard", "path": "gateway.cors.origin", "condition": "equals_wildcard"},
+    {"id": "HRD-009", "severity": "low", "score": 50, "description": "Debug mode enabled", "check": "debug_enabled", "path": "debug", "condition": "truthy"},
+    {"id": "HRD-010", "severity": "medium", "score": 68, "description": "No TLS/HTTPS configured", "check": "no_tls", "path": "gateway.tls", "condition": "missing"},
+    {"id": "HRD-011", "severity": "low", "score": 55, "description": "Logging level too verbose", "check": "verbose_logging", "path": "logging.level", "condition": "equals_debug"},
+    {"id": "HRD-012", "severity": "medium", "score": 70, "description": "No session timeout configured", "check": "no_session_timeout", "path": "sessions.timeout", "condition": "missing"},
+    {"id": "HRD-013", "severity": "high", "score": 80, "description": "External tool execution unrestricted", "check": "unrestricted_tools", "path": "tools.restrictions", "condition": "missing"},
+    {"id": "HRD-014", "severity": "medium", "score": 65, "description": "No audit logging configured", "check": "no_audit_log", "path": "logging.audit", "condition": "missing_or_false"},
+    {"id": "HRD-015", "severity": "medium", "score": 60, "description": "Auto-update disabled", "check": "no_auto_update", "path": "updates.auto", "condition": "false"}
+  ]
+}

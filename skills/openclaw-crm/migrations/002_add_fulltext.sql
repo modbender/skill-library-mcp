@@ -1,0 +1,3 @@
+-- Placeholder for FTS (not used in v1 — LIKE-based search instead)
+-- FTS5 requires integer rowid which conflicts with TEXT UUIDs.
+-- Future: add integer rowid alias or use content-based FTS.

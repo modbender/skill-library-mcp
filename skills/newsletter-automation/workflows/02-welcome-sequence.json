@@ -1,0 +1,268 @@
+{
+  "name": "Newsletter — Welcome Drip Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SUBSCRIBERS_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Subscribers",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Read Subscribers",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst subscribers = $input.all().map(i => i.json);\nconst toSend = [];\n\nfor (const sub of subscribers) {\n  if (sub.status !== 'confirmed' && sub.confirmed !== 'true' && sub.confirmed !== true) continue;\n\n  const subscribedAt = new Date(sub.subscribed_at);\n  const daysSince = Math.floor((now - subscribedAt) / (1000 * 60 * 60 * 24));\n  const lastDrip = parseInt(sub.last_drip_day || '0', 10);\n\n  // Drip schedule: Day 0 (welcome), Day 3 (tips), Day 7 (resources)\n  let dripDay = null;\n  let dripType = null;\n\n  if (lastDrip < 0.5 && daysSince >= 0) {\n    dripDay = 0;\n    dripType = 'welcome';\n  } else if (lastDrip < 3 && daysSince >= 3) {\n    dripDay = 3;\n    dripType = 'tips';\n  } else if (lastDrip < 7 && daysSince >= 7) {\n    dripDay = 7;\n    dripType = 'resources';\n  }\n\n  if (dripDay !== null) {\n    toSend.push({\n      email: sub.email,\n      name: sub.name || 'Subscriber',\n      drip_day: dripDay,\n      drip_type: dripType\n    });\n  }\n}\n\nif (toSend.length === 0) {\n  return [{ json: { skip: true, message: 'No drips due' } }];\n}\n\nreturn toSend.map(s => ({ json: s }));"
+      },
+      "id": "n3",
+      "name": "Find Due Drips",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "not-skip",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Has Drips?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst templates = {\n  welcome: {\n    subject: `Welcome aboard, ${item.name}!`,\n    body: `<h2>Welcome to the newsletter!</h2><p>Hi ${item.name},</p><p>Thanks for confirming your subscription. Here's what to expect:</p><ul><li>Weekly insights and tips</li><li>Exclusive resources and guides</li><li>Early access to new content</li></ul><p>Stay tuned — your first tips are coming in a few days.</p>`\n  },\n  tips: {\n    subject: `3 tips to get you started, ${item.name}`,\n    body: `<h2>Quick Start Tips</h2><p>Hi ${item.name},</p><p>Here are 3 tips to get the most from your subscription:</p><ol><li><strong>Reply to any email</strong> — we read every response</li><li><strong>Star our emails</strong> — so they never go to spam</li><li><strong>Share with a friend</strong> — help us grow the community</li></ol><p>More great content coming your way soon!</p>`\n  },\n  resources: {\n    subject: `Your resource pack, ${item.name}`,\n    body: `<h2>Curated Resources</h2><p>Hi ${item.name},</p><p>As promised, here are some of our best resources:</p><ul><li><strong>Getting Started Guide</strong> — Everything you need to know</li><li><strong>Best Practices</strong> — Learn from our experience</li><li><strong>Community</strong> — Connect with other subscribers</li></ul><p>Thanks for being part of our community. Regular newsletters start from next week!</p>`\n  }\n};\n\nconst template = templates[item.drip_type] || templates.welcome;\n\nreturn [{\n  json: {\n    ...item,\n    subject: template.subject,\n    body: template.body\n  }\n}];"
+      },
+      "id": "n5",
+      "name": "Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Send Drip Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        200
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SUBSCRIBERS_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Subscribers",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.email }}",
+            "last_drip_day": "={{ $json.drip_day }}",
+            "last_drip_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": true
+            },
+            {
+              "id": "last_drip_day",
+              "displayName": "last_drip_day",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "last_drip_at",
+              "displayName": "last_drip_at",
+              "required": false,
+              "defaultMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n7",
+      "name": "Update Drip Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1540,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Read Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Find Due Drips",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Due Drips": {
+      "main": [
+        [
+          {
+            "node": "Has Drips?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Drips?": {
+      "main": [
+        [
+          {
+            "node": "Build Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Build Email": {
+      "main": [
+        [
+          {
+            "node": "Send Drip Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Drip Email": {
+      "main": [
+        [
+          {
+            "node": "Update Drip Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

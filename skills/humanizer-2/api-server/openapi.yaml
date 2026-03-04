@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Humanizer API
+  description: AI writing detection and humanization API. Detects 24 patterns of AI-generated text and provides actionable suggestions.
+  version: 2.1.0
+  contact:
+    name: Brandon Wise
+    url: https://github.com/brandonwise/humanizer
+
+servers:
+  - url: https://humanizer.example.com/api
+    description: Production server
+
+paths:
+  /score:
+    post:
+      operationId: scoreText
+      summary: Quick AI score
+      description: Returns a score from 0-100 indicating how AI-like the text appears. 0-25 human, 26-50 light AI, 51-75 moderate, 76-100 heavy AI.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Text to analyze
+      responses:
+        '200':
+          description: Score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                  badge:
+                    type: string
+                    enum: ['🟢', '🟡', '🟠', '🔴']
+                  interpretation:
+                    type: string
+
+  /analyze:
+    post:
+      operationId: analyzeText
+      summary: Full AI analysis
+      description: Complete analysis with pattern matches, category breakdown, and statistical analysis.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Text to analyze
+                verbose:
+                  type: boolean
+                  default: false
+                  description: Include all pattern matches
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                  patternScore:
+                    type: integer
+                  uniformityScore:
+                    type: integer
+                  categories:
+                    type: object
+                  stats:
+                    type: object
+                  findings:
+                    type: array
+                    items:
+                      type: object
+
+  /humanize:
+    post:
+      operationId: humanizeText
+      summary: Get humanization suggestions
+      description: Returns suggestions grouped by priority to make text sound more human, with optional auto-fix.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Text to humanize
+                autofix:
+                  type: boolean
+                  default: false
+                  description: Apply safe mechanical fixes
+      responses:
+        '200':
+          description: Humanization suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  critical:
+                    type: array
+                    items:
+                      type: string
+                  important:
+                    type: array
+                    items:
+                      type: string
+                  guidance:
+                    type: array
+                    items:
+                      type: string
+                  autofix:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+
+  /stats:
+    post:
+      operationId: statsText
+      summary: Statistical analysis only
+      description: Returns burstiness, type-token ratio, sentence variation, and readability metrics.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Statistical analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  burstiness:
+                    type: number
+                  typeTokenRatio:
+                    type: number
+                  sentenceCoV:
+                    type: number
+                  trigramRepetition:
+                    type: number
+                  fleschKincaid:
+                    type: number

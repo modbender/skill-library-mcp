@@ -1,0 +1,81 @@
+{
+  "name": "read_wechat_article",
+  "description": "读取微信公众号文章，自动抓取正文、清洗排版、输出结构化文本",
+  "author": "OpenClaw Team",
+  "version": "1.0.0",
+  "category": "web",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "微信公众号文章 URL，格式如 https://mp.weixin.qq.com/s/xxxxxxx",
+        "pattern": "^https://mp\.weixin\.qq\.com/s/.*"
+      }
+    },
+    "required": ["url"]
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "文章标题"
+      },
+      "author": {
+        "type": "string",
+        "description": "文章作者"
+      },
+      "publish_time": {
+        "type": "string",
+        "description": "文章发布时间"
+      },
+      "content_markdown": {
+        "type": "string",
+        "description": "Markdown格式正文"
+      },
+      "content_text": {
+        "type": "string",
+        "description": "纯文本格式正文"
+      },
+      "images": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "文章中的图片URL列表"
+      },
+      "original_url": {
+        "type": "string",
+        "description": "原始文章URL"
+      }
+    }
+  },
+  "requirements": [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.2",
+    "markdownify>=0.11.6"
+  ],
+  "examples": [
+    {
+      "input": {
+        "url": "https://mp.weixin.qq.com/s/ijZyuHyubiX7Dp1tJrxZOw"
+      },
+      "output": {
+        "title": "未来1500天，影视行业的钱会被这1%的人赚走？",
+        "author": "郑林",
+        "publish_time": "2024-10-12",
+        "content_markdown": "未来1500天，影视行业的钱会被这1%的人赚走？\n\n\nOriginal\n\n 郑林\n\n...",
+        "content_text": "未来1500天，影视行业的钱会被这1%的人赚走？...",
+        "images": [],
+        "original_url": "https://mp.weixin.qq.com/s/ijZyuHyubiX7Dp1tJrxZOw"
+      }
+    }
+  ],
+  "notes": [
+    "仅支持用户主动提供URL的抓取请求",
+    "不允许大规模批量爬取",
+    "遵守微信公众平台使用条款",
+    "避免高频抓取触发限制"
+  ]
+}

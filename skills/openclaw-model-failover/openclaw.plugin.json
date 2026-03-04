@@ -1,0 +1,107 @@
+{
+  "id": "openclaw-model-failover",
+  "name": "OpenClaw Model Failover",
+  "version": "0.2.1",
+  "description": "Auto-detect rate limits/quota errors and switch sessions to fallback LLMs.",
+  "configSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "modelOrder": {
+        "type": "array",
+        "description": "Fallback order of model ids. First entry is preferred.",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "openai-codex/gpt-5.3-codex",
+          "anthropic/claude-opus-4-6",
+          "github-copilot/claude-sonnet-4.6",
+          "google-gemini-cli/gemini-3-pro-preview",
+          "anthropic/claude-sonnet-4-6",
+          "openai-codex/gpt-5.2",
+          "google-gemini-cli/gemini-2.5-pro",
+          "perplexity/sonar-deep-research",
+          "perplexity/sonar-pro",
+          "google-gemini-cli/gemini-2.5-flash",
+          "google-gemini-cli/gemini-3-flash-preview"
+        ]
+      },
+      "cooldownMinutes": {
+        "type": "number",
+        "description": "How long a provider/model is considered limited after a rate-limit error.",
+        "default": 300,
+        "minimum": 1
+      },
+      "unavailableCooldownMinutes": {
+        "type": "number",
+        "description": "How long a model is considered limited after temporary unavailability/cooldown errors (e.g. copilot-proxy cooldown).",
+        "default": 15,
+        "minimum": 1
+      },
+      "stateFile": {
+        "type": "string",
+        "description": "Path to JSON state file (default: <workspace>/memory/model-ratelimits.json)",
+        "default": "~/.openclaw/workspace/memory/model-ratelimits.json"
+      },
+      "patchSessionPins": {
+        "type": "boolean",
+        "description": "If true, patch pinned session models on rate-limit events.",
+        "default": true
+      },
+      "notifyOnSwitch": {
+        "type": "boolean",
+        "description": "If true, send a short message when a switch happens.",
+        "default": true
+      },
+      "debugLogging": {
+        "type": "boolean",
+        "description": "If true, logs detailed model-selection and failover decisions for each turn.",
+        "default": false
+      },
+      "debugLogSampleRate": {
+        "type": "number",
+        "description": "Sampling rate for debug logs from 0.0 to 1.0 (1.0 = log all debug events).",
+        "default": 1,
+        "minimum": 0,
+        "maximum": 1
+      },
+      "forceOverride": {
+        "type": "boolean",
+        "description": "If true, always override the model to the first available in modelOrder. If false (recommended), only override when the currently pinned model is limited.",
+        "default": false
+      },
+      "requireCopilotProxyForCopilotModels": {
+        "type": "boolean",
+        "description": "If true (default), github-copilot/* models are only considered when the stock copilot-proxy plugin is enabled.",
+        "default": true
+      },
+      "restartOnSwitch": {
+        "type": "boolean",
+        "description": "If true (default), run `openclaw gateway restart` after a failover so the gateway reloads the patched session model from disk.",
+        "default": true
+      },
+      "restartDelayMs": {
+        "type": "number",
+        "description": "Milliseconds to wait before issuing the gateway restart (default: 3000). Gives the current turn time to finish.",
+        "default": 3000,
+        "minimum": 0
+      },
+      "metricsEnabled": {
+        "type": "boolean",
+        "description": "If true (default), record failover events to a JSONL metrics log for capacity planning and model order optimization.",
+        "default": true
+      },
+      "metricsFile": {
+        "type": "string",
+        "description": "Path to the JSONL metrics log file.",
+        "default": "~/.openclaw/workspace/memory/model-failover-metrics.jsonl"
+      }
+    }
+  }
+}

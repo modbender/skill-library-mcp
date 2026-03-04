@@ -1,0 +1,146 @@
+name: near-dca
+version: 1.0.0
+description: NEAR Dollar Cost Averaging (DCA) automation skill. Schedule regular NEAR purchases, track history, calculate average cost basis, and manage multiple DCA strategies with execution alerts.
+author: int-eng
+tags:
+  - near
+  - dca
+  - dollar-cost-averaging
+  - trading
+  - automation
+  - defi
+requires:
+  - node: ^16.0.0
+runtime: nodejs
+actions:
+  - name: create-strategy
+    description: Create a new DCA strategy
+    input:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Strategy name
+        amount:
+          type: number
+          description: Amount in USD per purchase
+        frequency:
+          type: string
+          enum: [hourly, daily, weekly, monthly]
+          description: Purchase frequency
+        exchange:
+          type: string
+          enum: [ref-finance, jumbo, bancor, on-chain]
+          description: Where to execute swaps
+        start_date:
+          type: string
+          format: date
+          description: When to start (optional, default: now)
+        end_date:
+          type: string
+          format: date
+          description: When to end (optional)
+      required:
+        - name
+        - amount
+        - frequency
+  - name: list-strategies
+    description: List all DCA strategies
+  - name: get-strategy
+    description: Get details of a specific strategy
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+      required:
+        - strategy_id
+  - name: execute-purchase
+    description: Manually execute a DCA purchase for a strategy
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+      required:
+        - strategy_id
+  - name: pause-strategy
+    description: Pause a DCA strategy
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+      required:
+        - strategy_id
+  - name: resume-strategy
+    description: Resume a paused DCA strategy
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+      required:
+        - strategy_id
+  - name: delete-strategy
+    description: Delete a DCA strategy
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+      required:
+        - strategy_id
+  - name: get-history
+    description: Get DCA execution history
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+          description: Filter by strategy (optional)
+        limit:
+          type: number
+          default: 50
+      required: []
+  - name: calculate-cost-basis
+    description: Calculate average cost basis for a strategy or all strategies
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+          description: Strategy ID (optional, calculates for all if not provided)
+      required: []
+  - name: configure-alerts
+    description: Configure alert settings for DCA executions
+    input:
+      type: object
+      properties:
+        strategy_id:
+          type: string
+          description: Strategy ID (optional, applies to all if not provided)
+        enabled:
+          type: boolean
+        channels:
+          type: array
+          items:
+            type: string
+          description: Alert channels (e.g., discord, telegram, email)
+        on_success:
+          type: boolean
+        on_failure:
+          type: boolean
+      required:
+        - enabled
+triggers:
+  - type: schedule
+    name: dca-executor
+    description: Checks and executes scheduled DCA purchases
+    config:
+      schedule: "*/5 * * * *"
+      action: execute-scheduled-purchases
+config:
+  network: mainnet
+  default_exchange: ref-finance
+  storage_path: ./data/dca_state.json

@@ -1,0 +1,228 @@
+{
+  "name": "Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define services to check\nconst services = [\n  { name: 'API Server', url: 'https://api.example.com/health', expectedStatus: 200 },\n  { name: 'Website', url: 'https://example.com', expectedStatus: 200 },\n  { name: 'Database', url: 'http://localhost:5432/health', expectedStatus: 200 }\n];\n\nreturn services.map(s => ({ json: s }));"
+      },
+      "id": "2",
+      "name": "Service List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "3",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process health check results\nconst input = $input.first();\nconst service = input.json;\n\nconst isHealthy = input.statusCode === service.expectedStatus;\nconst responseTime = input.responseTime || 0;\n\n// Determine status\nlet status = 'healthy';\nlet emoji = '\u2705';\n\nif (!isHealthy) {\n  status = 'unhealthy';\n  emoji = '\ud83d\udea8';\n} else if (responseTime > 2000) {\n  status = 'degraded';\n  emoji = '\u26a0\ufe0f';\n}\n\nreturn [{\n  json: {\n    name: service.name,\n    url: service.url,\n    status: status,\n    statusCode: input.statusCode,\n    responseTime: responseTime,\n    emoji: emoji,\n    timestamp: new Date().toISOString(),\n    needsAlert: status !== 'healthy'\n  }\n}];"
+      },
+      "id": "4",
+      "name": "Process Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.needsAlert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "5",
+      "name": "Needs Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format alert message\nconst results = $input.all();\n\nconst unhealthy = results.filter(r => r.json.status !== 'healthy');\n\nlet message = '${unhealthy[0].json.emoji} *Health Check Alert*\\n\\n';\n\nunhealthy.forEach(s => {\n  message += `*${s.json.name}*\\n`;\n  message += `Status: ${s.json.status.toUpperCase()}\\n`;\n  message += `URL: ${s.json.url}\\n`;\n  message += `Response: ${s.json.statusCode} (${s.json.responseTime}ms)\\n\\n`;\n});\n\nmessage += `\ud83d\udd50 Checked at: ${new Date().toISOString()}`;\n\nreturn [{\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: message,\n    parse_mode: 'Markdown'\n  }\n}];"
+      },
+      "id": "6",
+      "name": "Format Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "options": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "7",
+      "name": "Send Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [1450, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log healthy status\nconst results = $input.all();\nconsole.log(`Health check: ${results.length} services checked, all healthy`);\nreturn [{ json: { checked: results.length, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "8",
+      "name": "Log Healthy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Service List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Service List": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Process Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Result": {
+      "main": [
+        [
+          {
+            "node": "Needs Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Alert?": {
+      "main": [
+        [
+          {
+            "node": "Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Healthy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "id": "1",
+      "name": "health-check",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "monitoring",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "alerting",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    }
+  ]
+}

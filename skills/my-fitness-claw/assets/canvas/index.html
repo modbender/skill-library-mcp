@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Macro Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #1a1a1a; color: white; padding: 20px; box-sizing: border-box; }
+        .main-container { display: flex; width: 100%; max-width: 1100px; gap: 30px; align-items: flex-start; flex-direction: column; }
+        
+        /* Tabs Styling */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+        .tab-btn { background: #333; border: 1px solid #444; color: #888; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .tab-btn.active { background: #36A2EB; color: white; border-color: #36A2EB; }
+        .tab-content { display: none; width: 100%; gap: 30px; }
+        .tab-content.active { display: flex; }
+
+        .chart-section { flex: 1.2; text-align: center; background: #2a2a2a; border-radius: 12px; padding: 30px; }
+        .history-section { flex: 0.8; background: #2a2a2a; border-radius: 12px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+        .goals-section { padding: 18px; background: #1a1a1a; border-radius: 10px; font-size: 0.9rem; border: 1px solid #333; }
+        .goal-bar { height: 10px; background: #333; border-radius: 5px; margin: 8px 0 18px 0; overflow: hidden; border: 1px solid #444; }
+        .progress { height: 100%; background: #4caf50; transition: width 0.5s ease-out; }
+        .progress.over { background: #f44336; }
+        .progress.protein { background: #36A2EB; }
+        h2 { margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #eee; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        h3 { color: #888; margin: 10px 0 25px 0; font-weight: normal; }
+        
+        .val { font-weight: bold; color: #fff; }
+        canvas { max-width: 100%; height: auto !important; }
+        .metric-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .metric-label { font-weight: bold; color: #aaa; }
+        .metric-stats { font-size: 0.8rem; color: #666; }
+        .metric-current { color: #fff; font-weight: bold; font-size: 0.9rem; }
+        .insight-box { background: #1a1a2e; border: 1px solid #36A2EB; padding: 15px; border-radius: 10px; font-size: 0.85rem; color: #ccc; line-height: 1.4; }
+        
+        /* Meals Styling */
+        .meal-item { background: #1a1a1a; padding: 12px; border-radius: 8px; border-left: 4px solid #36A2EB; display: flex; justify-content: space-between; align-items: center; }
+        .meal-info { display: flex; flex-direction: column; gap: 2px; }
+        .meal-name { font-weight: bold; color: #fff; font-size: 0.9rem; }
+        .meal-meta { font-size: 0.75rem; color: #888; }
+        .meal-macros { font-size: 0.8rem; color: #aaa; font-weight: bold; }
+        .meal-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #36A2EB; margin-bottom: 4px; font-weight: bold; }
+
+        /* History Tab Redesign */
+        .history-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
+        .history-card { background: #2a2a2a; border-radius: 12px; padding: 20px; border-left: 4px solid #444; display: flex; flex-direction: column; gap: 12px; border: 1px solid #333; }
+        .history-card.today { border-left-color: #36A2EB; background: #242b36; border-color: #36A2EB; }
+        .history-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .history-date { font-weight: bold; color: #fff; font-size: 1rem; }
+        .history-kcal { color: #36A2EB; font-weight: bold; font-size: 1.1rem; }
+        .history-macros-row { display: flex; gap: 20px; }
+        .h-macro { display: flex; flex-direction: column; gap: 4px; }
+        .h-macro-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .h-macro-val { font-size: 0.9rem; color: #eee; font-weight: bold; }
+
+        .error-state { color: #f44336; padding: 20px; text-align: center; }
+        .empty-state-msg { color: #888; font-style: italic; margin-top: 20px; text-align: center; width: 100%; }
+        
+        @media (max-width: 800px) {
+            .tab-content.active { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard" class="main-container" style="display:none">
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="showTab('daily-tab', this)">Today</button>
+            <button class="tab-btn" onclick="showTab('history-tab', this)">7-Day History</button>
+        </div>
+
+        <div id="daily-tab" class="tab-content active">
+            <div class="history-section">
+                <div class="goals-section">
+                    <h2>Daily Goals</h2>
+                    <div id="goalBars" style="margin-top:15px"></div>
+                </div>
+
+                <div class="insight-box">
+                    <h2 style="border-bottom: none; color: #36A2EB; margin-bottom: 10px; font-size: 0.9rem;">Insights & Tips</h2>
+                    <div id="recommendations">Log your first meal to see AI insights!</div>
+                </div>
+
+                <div id="todayMealsSection" style="margin-top: 10px;">
+                    <h2>Today's Log</h2>
+                    <div id="mealsContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                        <div class="empty-state-msg" style="margin: 0; font-size: 0.8rem;">No meals logged yet.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h2 id="headerDate">Macro Distribution</h2>
+                <h3 id="totalCalories">Loading Data...</h3>
+                <div style="position: relative; margin: auto;">
+                    <canvas id="macroChart"></canvas>
+                </div>
+                
+                <div id="microsSection" style="margin-top: 30px; text-align: left;">
+                    <h2 style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px;">Micronutrients for Today</h2>
+                    <div id="microsGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <!-- Micros injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-tab" class="tab-content">
+            <div class="chart-section" style="flex: 1; text-align: left;">
+                <h2>7-Day History</h2>
+                <div id="historyGrid" class="history-grid">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="emptyMsg" class="empty-state-msg" style="display:none">
+            No logs found for today. Start by logging a meal!
+        </div>
+    </div>
+    
+    <div id="loader" class="error-state">Loading your nutritional data...</div>
+
+    <script src="./offline_data.js"></script>
+
+    <script>
+        // --- DATA LOADERS ---
+        async function init() {
+            let data = window.__OFFLINE_DAILY_MACROS || [];
+            let goals = window.__OFFLINE_TARGETS || { daily_goals: { calories: 2000, protein: 150, carbs: 200, fats: 70 } };
+            let insights = window.__OFFLINE_INSIGHTS || null;
+
+            try {
+                const [dRes, gRes, iRes] = await Promise.all([
+                    fetch('../nutrition/daily_macros.json?v=' + Date.now()),
+                    fetch('../nutrition/targets.json?v=' + Date.now()),
+                    fetch('../nutrition/insights.json?v=' + Date.now())
+                ]);
+                
+                if (dRes.ok) data = await dRes.json();
+                if (gRes.ok) goals = await gRes.json();
+                if (iRes.ok) insights = await iRes.json();
+            } catch (e) { 
+                console.warn("Fetch failed (likely file:// or network), using offline fallback.", e);
+            }
+            
+            renderUI(data, goals, insights);
+        }
+
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        function getMealCategory(timeStr) {
+            if (!timeStr) return "Snack";
+            const hour = parseInt(timeStr.split(':')[0]);
+            if (hour >= 5 && hour < 11) return "Breakfast";
+            if (hour >= 11 && hour < 17) return "Lunch";
+            if (hour >= 17 && hour < 23) return "Dinner";
+            return "Late Snack";
+        }
+
+        function renderUI(data, goalsJson, insights) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+
+            const goals = (goalsJson && goalsJson.daily_goals) ? goalsJson.daily_goals : { calories: 2000, protein: 150, carbs: 200, fats: 70 };
+            
+            const isEmpty = !data || data.length === 0;
+            const todayStr = new Date().toISOString().split('T')[0];
+            const latest = isEmpty ? { date: todayStr, calories: 0, protein: 0, carbs: 0, fats: 0 } : data[data.length - 1];
+            
+            if (isEmpty) {
+                document.getElementById('emptyMsg').style.display = 'block';
+            }
+
+            const curP = latest.protein ?? latest.prot ?? 0;
+            const curC = latest.carbs ?? latest.carb ?? 0;
+            const curF = latest.fats ?? latest.fat ?? 0;
+            const curCal = latest.calories ?? latest.cal ?? 0;
+
+            document.getElementById('headerDate').innerText = `Macro Distribution - ${latest.date}`;
+            document.getElementById('totalCalories').innerText = `Current: ${Math.round(curCal)} / Target: ${goals.calories} kcal`;
+
+            // History Grid
+            const historyGrid = document.getElementById('historyGrid');
+            historyGrid.innerHTML = '';
+            
+            if (!isEmpty) {
+                data.slice(-7).reverse().forEach(entry => {
+                    const isToday = entry.date === todayStr;
+                    const card = document.createElement('div');
+                    card.className = `history-card ${isToday ? 'today' : ''}`;
+                    
+                    const header = document.createElement('div');
+                    header.className = 'history-card-header';
+                    
+                    const date = document.createElement('div');
+                    date.className = 'history-date';
+                    date.textContent = isToday ? "Today (" + entry.date.split('-').slice(1).join('/') + ")" : entry.date.split('-').slice(1).join('/');
+                    
+                    const kcal = document.createElement('div');
+                    kcal.className = 'history-kcal';
+                    kcal.textContent = `${Math.round(entry.calories ?? 0)} kcal`;
+                    
+                    header.appendChild(date);
+                    header.appendChild(kcal);
+                    
+                    const macrosRow = document.createElement('div');
+                    macrosRow.className = 'history-macros-row';
+                    
+                    const addMacro = (lbl, val) => {
+                        const m = document.createElement('div');
+                        m.className = 'h-macro';
+                        const l = document.createElement('div');
+                        l.className = 'h-macro-label';
+                        l.textContent = lbl;
+                        const v = document.createElement('div');
+                        v.className = 'h-macro-val';
+                        v.textContent = `${Math.round(val)}g`;
+                        m.appendChild(l);
+                        m.appendChild(v);
+                        return m;
+                    };
+                    
+                    macrosRow.appendChild(addMacro('Protein', entry.protein ?? 0));
+                    macrosRow.appendChild(addMacro('Carbs', entry.carbs ?? 0));
+                    macrosRow.appendChild(addMacro('Fats', entry.fats ?? entry.fat ?? 0));
+                    
+                    card.appendChild(header);
+                    card.appendChild(macrosRow);
+                    historyGrid.appendChild(card);
+                });
+            }
+
+            // Insights
+            const recs = document.getElementById('recommendations');
+            recs.textContent = '';
+            if (insights && insights.tips && Array.isArray(insights.tips)) {
+                insights.tips.forEach(t => {
+                    const tipDiv = document.createElement('div');
+                    tipDiv.style.marginBottom = '8px';
+                    tipDiv.textContent = t;
+                    recs.appendChild(tipDiv);
+                });
+            } else {
+                recs.textContent = 'Log your first meal to see AI insights!';
+            }
+
+            // Goal Bars
+            const goalBars = document.getElementById('goalBars');
+            goalBars.innerHTML = '';
+            const metrics = [
+                { label: 'Calories', current: curCal, target: goals.calories, class: '' },
+                { label: 'Protein', current: curP, target: goals.protein, class: 'protein' },
+                { label: 'Carbs', current: curC, target: goals.carbs, class: '' },
+                { label: 'Fats', current: curF, target: goals.fats, class: '' }
+            ];
+
+            metrics.forEach(m => {
+                const targetVal = m.target || 1; 
+                const pct = (m.current / targetVal) * 100;
+                const isOver = m.current > targetVal && m.label !== 'Protein' && m.label !== 'Calories';
+                
+                const container = document.createElement('div');
+                const header = document.createElement('div');
+                header.className = 'metric-header';
+                const label = document.createElement('div');
+                label.className = 'metric-label';
+                label.textContent = m.label;
+                const stats = document.createElement('div');
+                stats.className = 'metric-stats';
+                const currentSpan = document.createElement('span');
+                currentSpan.className = 'metric-current';
+                currentSpan.textContent = Math.round(m.current);
+                stats.appendChild(currentSpan);
+                stats.appendChild(document.createTextNode(` / ${m.target}${m.label === 'Calories' ? '' : 'g'}`));
+                header.appendChild(label);
+                header.appendChild(stats);
+                const bar = document.createElement('div');
+                bar.className = 'goal-bar';
+                const progress = document.createElement('div');
+                progress.className = `progress ${m.class} ${isOver ? 'over' : ''}`;
+                progress.style.width = `${Math.min(pct, 100)}%`;
+                bar.appendChild(progress);
+                container.appendChild(header);
+                container.appendChild(bar);
+                goalBars.appendChild(container);
+            });
+
+            // Micronutrients
+            const microsGrid = document.getElementById('microsGrid');
+            microsGrid.innerHTML = '';
+            const microList = [
+                { id: 'vit_d3', label: 'Vitamin D3', unit: 'mcg' },
+                { id: 'magnesium', label: 'Magnesium', unit: 'mg' },
+                { id: 'potassium', label: 'Potassium', unit: 'mg' },
+                { id: 'zinc', label: 'Zinc', unit: 'mg' },
+                { id: 'vit_b6', label: 'Vitamin B6', unit: 'mg' },
+                { id: 'vit_b12', label: 'Vitamin B12', unit: 'mcg' },
+                { id: 'selenium', label: 'Selenium', unit: 'mcg' },
+                { id: 'vit_c', label: 'Vitamin C', unit: 'mg' },
+                { id: 'vit_a', label: 'Vitamin A', unit: 'mcg' },
+                { id: 'vit_e', label: 'Vitamin E', unit: 'mg' }
+            ];
+
+            microList.forEach(m => {
+                const micros = latest.micros || {};
+                const val = micros[m.id] || latest[m.id] || 0;
+                const target = goals[m.id] || 0;
+                const pct = target > 0 ? (val / target) * 100 : 0;
+                
+                const item = document.createElement('div');
+                item.style.cssText = 'background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; display: flex; flex-direction: column; gap: 8px;';
+                
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <div style="font-size: 0.75rem; font-weight: bold; color: #aaa; text-transform: uppercase;">${m.label}</div>
+                        <div style="font-size: 0.8rem; color: #666;">
+                            <span style="color: #fff; font-weight: bold;">${val.toFixed(1)}</span> / ${target}${m.unit}
+                        </div>
+                    </div>
+                    <div style="height: 6px; background: #333; border-radius: 3px; overflow: hidden; border: 1px solid #444;">
+                        <div style="height: 100%; background: #4caf50; width: ${Math.min(pct, 100)}%; transition: width 0.5s ease-out;"></div>
+                    </div>
+                `;
+                microsGrid.appendChild(item);
+            });
+
+            // Today's Meals List
+            const mealsContainer = document.getElementById('mealsContainer');
+            mealsContainer.textContent = '';
+            
+            if (latest.meals && latest.meals.length > 0) {
+                // Group meals by category
+                const groups = {
+                    "Breakfast": [],
+                    "Lunch": [],
+                    "Dinner": [],
+                    "Snack": []
+                };
+
+                latest.meals.forEach(meal => {
+                    const cat = getMealCategory(meal.time);
+                    const key = (cat === "Late Snack") ? "Snack" : cat;
+                    if (groups[key]) groups[key].push(meal);
+                    else groups["Snack"].push(meal);
+                });
+
+                // Render groups
+                Object.keys(groups).forEach(catName => {
+                    const groupMeals = groups[catName];
+                    if (groupMeals.length === 0) return;
+
+                    const groupDiv = document.createElement('div');
+                    groupDiv.style.marginBottom = '20px';
+                    
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'meal-category';
+                    groupHeader.style.fontSize = '0.8rem';
+                    groupHeader.style.borderBottom = '1px solid #333';
+                    groupHeader.style.paddingBottom = '5px';
+                    groupHeader.style.marginBottom = '10px';
+                    groupHeader.textContent = catName;
+                    groupDiv.appendChild(groupHeader);
+
+                    const listDiv = document.createElement('div');
+                    listDiv.style.display = 'flex';
+                    listDiv.style.flexDirection = 'column';
+                    listDiv.style.gap = '8px';
+
+                    groupMeals.forEach(meal => {
+                        const mealDiv = document.createElement('div');
+                        mealDiv.className = 'meal-item';
+                        mealDiv.style.borderLeft = 'none';
+                        mealDiv.style.padding = '10px 12px';
+                        
+                        const infoDiv = document.createElement('div');
+                        infoDiv.className = 'meal-info';
+                        
+                        const name = document.createElement('div');
+                        name.className = 'meal-name';
+                        name.textContent = meal.name;
+                        
+                        const meta = document.createElement('div');
+                        meta.className = 'meal-meta';
+                        meta.textContent = `${meal.time || '--:--'} • ${Math.round(meal.calories ?? 0)} kcal`;
+                        
+                        infoDiv.appendChild(name);
+                        infoDiv.appendChild(meta);
+                        
+                        const macros = document.createElement('div');
+                        macros.className = 'meal-macros';
+                        macros.textContent = `${Math.round(meal.protein ?? 0)}P / ${Math.round(meal.carbs ?? 0)}C / ${Math.round(meal.fats ?? 0)}F`;
+                        
+                        mealDiv.appendChild(infoDiv);
+                        mealDiv.appendChild(macros);
+                        listDiv.appendChild(mealDiv);
+                    });
+                    
+                    groupDiv.appendChild(listDiv);
+                    mealsContainer.appendChild(groupDiv);
+                });
+            } else {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state-msg';
+                empty.textContent = 'No meals logged yet today.';
+                mealsContainer.appendChild(empty);
+            }
+
+            // Pie Chart
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [`Protein (${Math.round(curP)}g)`, `Carbs (${Math.round(curC)}g)`, `Fats (${Math.round(curF)}g)`],
+                    datasets: [{
+                        data: [curP, curC, curF],
+                        backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderColor: '#2a2a2a',
+                        borderWidth: 4,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#aaa', padding: 20, font: { size: 12 } } }
+                    }
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

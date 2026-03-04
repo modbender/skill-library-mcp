@@ -1,0 +1,76 @@
+{
+  "name": "openclaw-protonmail-skill",
+  "version": "0.1.1",
+  "description": "ProtonMail skill for OpenClaw via Proton Mail Bridge",
+  "keywords": [
+    "openclaw",
+    "protonmail",
+    "email",
+    "imap",
+    "smtp",
+    "skill"
+  ],
+  "author": "Jim Staley",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rvacyber/openclaw-protonmail-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rvacyber/openclaw-protonmail-skill/issues"
+  },
+  "homepage": "https://github.com/rvacyber/openclaw-protonmail-skill#readme",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "protonmail": "bin/protonmail"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "SKILL.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "install-skill": "npm run build && mkdir -p ~/.openclaw/skills/protonmail && cp -r src dist bin package.json SKILL.md README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md CODE_OF_CONDUCT.md LICENSE examples tsconfig.json ~/.openclaw/skills/protonmail/ && chmod +x ~/.openclaw/skills/protonmail/bin/protonmail && echo 'Skill installed to ~/.openclaw/skills/protonmail'"
+  },
+  "dependencies": {
+    "imap": "^0.8.19",
+    "nodemailer": "^8.0.1",
+    "mailparser": "^3.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/imap": "^0.8.40",
+    "@types/nodemailer": "^6.4.15",
+    "@types/mailparser": "^3.4.0",
+    "@types/jest": "^29.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts"
+    ]
+  }
+}

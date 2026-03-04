@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术演示文稿</title>
+    <!-- Reveal.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/theme/white.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/highlight/monokai.css">
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* ===== 全局居中（必须） ===== */
+        .reveal .slides { text-align: center; }
+        .reveal .slides section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            font-size: 0.72em;
+        }
+        .reveal .slides section > * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ===== 标题层级 ===== */
+        .reveal h1 { font-size: 2.5em; color: #1a1a2e; }
+        .reveal h2 { font-size: 1.8em; color: #16213e; margin-bottom: 0.5em; }
+        .reveal h3 { font-size: 1.3em; color: #0f3460; }
+
+        /* ===== Grid 布局 ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1700px;
+            width: 100%;
+            text-align: left;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 1700px;
+            width: 100%;
+            text-align: left;
+        }
+
+        /* ===== 对比表格 ===== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #f0f4f8;
+            font-weight: 600;
+        }
+
+        /* ===== 高亮框 ===== */
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        /* ===== 步骤框 ===== */
+        .step-box {
+            background: #e3f2fd;
+            border: 2px solid #1976d2;
+            border-radius: 8px;
+            padding: 8px 16px;
+            margin: 4px 0;
+            font-weight: 500;
+        }
+
+        /* ===== 滚动容器 ===== */
+        .scrollable-container {
+            overflow-y: auto;
+            max-height: 520px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        /* ===== 代码块优化 ===== */
+        .reveal pre { width: 100%; }
+        .reveal pre code {
+            max-height: 450px;
+            font-size: 0.85em;
+        }
+
+        /* ===== AI 模型训练/推理流程专用样式 ===== */
+        .pipeline-header {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .pipeline-header.training {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        .pipeline-header.inference {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 2px solid #2196f3;
+        }
+        .pipeline-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+        .pipeline-step {
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 500;
+            width: 80%;
+            text-align: center;
+        }
+        .pipeline-step.train {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        .pipeline-step.infer {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+        .pipeline-step.shared {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+        }
+        .pipeline-arrow {
+            font-size: 1.2em;
+            color: #888;
+            line-height: 1;
+        }
+        .diff-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+        .diff-badge.train-only {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .diff-badge.infer-only {
+            background: #bbdefb;
+            color: #1565c0;
+        }
+        .diff-badge.both {
+            background: #e1bee7;
+            color: #6a1b9a;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ===== 封面 ===== -->
+            <section>
+                <h1>📌 项目标题</h1>
+                <h3>一句话核心创新点</h3>
+                <p style="color: #666; margin-top: 20px;">作者 &nbsp;|&nbsp; 日期</p>
+                <aside class="notes">
+                    开场先点明核心痛点，让听众知道为什么要关注这个分享。
+                </aside>
+            </section>
+
+            <!-- ===== 整体架构 ===== -->
+            <section>
+                <h2>🏗️ 整体架构</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>系统全景</h3>
+                        <div class="mermaid">
+                            graph TD
+                                A[输入] --> B[模块A]
+                                B --> C[模块B]
+                                C --> D[输出]
+                        </div>
+                    </div>
+                    <div>
+                        <h3>关键模块</h3>
+                        <table class="comparison-table">
+                            <tr><th>模块</th><th>功能</th><th>核心技术</th></tr>
+                            <tr><td>模块A</td><td>特征提取</td><td>CNN/Transformer</td></tr>
+                            <tr><td>模块B</td><td>序列建模</td><td>Attention</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <aside class="notes">
+                    先给全景图建立整体认知，然后再逐个深入。
+                </aside>
+            </section>
+
+            <!-- ===== 核心组件详解模板 ===== -->
+            <section>
+                <h2>🎯 组件名称详解</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>核心作用</h3>
+                        <p>一句话解释作用。</p>
+                        <table class="comparison-table">
+                            <tr><th>方法</th><th>优点</th><th>缺点</th></tr>
+                            <tr><td>传统方法</td><td>...</td><td>...</td></tr>
+                            <tr><td>本方法</td><td>...</td><td>...</td></tr>
+                        </table>
+                    </div>
+                    <div>
+                        <h3>算法流程</h3>
+                        <div class="step-box">Step 1: 输入处理</div>
+                        <div class="step-box">Step 2: 特征变换</div>
+                        <div class="step-box">Step 3: 输出生成</div>
+                        <h4>核心公式</h4>
+                        <p>\[ y = f(W \cdot x + b) \]</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    这里详细解释原理，补充幻灯片上没写出来的背景知识。
+                    重点讲 Why：为什么选这个方案而不是其他的？
+                </aside>
+            </section>
+
+            <!-- ===== AI 模型：训练流程详解（仅 AI 模型算法项目使用） ===== -->
+            <section>
+                <h2>🏋️ 训练流程（Training Pipeline）</h2>
+                <div class="grid-2">
+                    <div>
+                        <span class="pipeline-header training">� 训练阶段</span>
+                        <div class="pipeline-flow">
+                            <div class="pipeline-step train">数据预处理 & 增强<br><small>(B, T, D_in) → (B, T, D_feat)</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step shared">前向传播（Forward）<br><small>模型骨干网络</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step train">Loss 计算<br><small>\( \mathcal{L} = \mathcal{L}_{task} + \lambda \mathcal{L}_{reg} \)</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step train">反向传播 & 参数更新<br><small>Optimizer / Scheduler</small></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>训练关键配置</h3>
+                        <table class="comparison-table">
+                            <tr><th>配置项</th><th>值</th><th>说明</th></tr>
+                            <tr><td>Batch Size</td><td>—</td><td>训练批次大小</td></tr>
+                            <tr><td>Learning Rate</td><td>—</td><td>初始学习率</td></tr>
+                            <tr><td>Optimizer</td><td>—</td><td>优化器类型</td></tr>
+                            <tr><td>Loss Function</td><td>—</td><td>损失函数设计</td></tr>
+                            <tr><td>Epochs</td><td>—</td><td>训练轮次</td></tr>
+                        </table>
+                        <div class="highlight-box">
+                            <strong>训练独有模块：</strong>数据增强、Dropout/正则化、Loss 计算、梯度裁剪等在推理时不参与。
+                        </div>
+                    </div>
+                </div>
+                <aside class="notes">
+                    训练流程的关键在于 Loss 设计和优化策略。
+                    重点讲清楚：为什么选择这个 Loss？学习率调度策略的考量是什么？
+                    哪些模块是训练独有的（如 Dropout、数据增强），推理时会被关闭。
+                </aside>
+            </section>
+
+            <!-- ===== AI 模型：推理流程详解（仅 AI 模型算法项目使用） ===== -->
+            <section>
+                <h2>🚀 推理流程（Inference Pipeline）</h2>
+                <div class="grid-2">
+                    <div>
+                        <span class="pipeline-header inference">🔵 推理阶段</span>
+                        <div class="pipeline-flow">
+                            <div class="pipeline-step infer">输入预处理<br><small>(1, T, D_in) — 无数据增强</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step shared">前向传播（Forward）<br><small>模型骨干网络（eval 模式）</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step infer">后处理 & 解码<br><small>Beam Search / Greedy / Top-k</small></div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-step infer">输出结果<br><small>格式化 & 返回</small></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>推理关键配置</h3>
+                        <table class="comparison-table">
+                            <tr><th>配置项</th><th>值</th><th>说明</th></tr>
+                            <tr><td>Batch Size</td><td>—</td><td>推理批次大小</td></tr>
+                            <tr><td>解码策略</td><td>—</td><td>Greedy/Beam/Sampling</td></tr>
+                            <tr><td>精度</td><td>—</td><td>FP32/FP16/INT8</td></tr>
+                            <tr><td>加速框架</td><td>—</td><td>TensorRT/ONNX 等</td></tr>
+                        </table>
+                        <div class="highlight-box">
+                            <strong>推理独有模块：</strong>解码策略（Beam Search 等）、KV Cache、量化加速等在训练时不参与。
+                        </div>
+                    </div>
+                </div>
+                <aside class="notes">
+                    推理流程关注点与训练完全不同：延迟、吞吐量、精度-速度权衡。
+                    重点讲：推理时哪些模块被关闭了（Dropout、数据增强）？
+                    使用了哪些推理加速技术（KV Cache、量化、算子融合）？
+                    解码策略如何选择？对最终效果有什么影响？
+                </aside>
+            </section>
+
+            <!-- ===== AI 模型：训练 vs 推理对比（仅 AI 模型算法项目使用） ===== -->
+            <section>
+                <h2>⚖️ 训练 vs 推理 关键差异对比</h2>
+                <table class="comparison-table" style="max-width: 1500px;">
+                    <tr>
+                        <th>维度</th>
+                        <th>🟢 训练（Training）</th>
+                        <th>🔵 推理（Inference）</th>
+                    </tr>
+                    <tr>
+                        <td><strong>数据流</strong></td>
+                        <td>带数据增强 + Shuffle</td>
+                        <td>原始输入，无增强</td>
+                    </tr>
+                    <tr>
+                        <td><strong>模型模式</strong></td>
+                        <td><code>model.train()</code> — Dropout/BN 激活</td>
+                        <td><code>model.eval()</code> — Dropout 关闭，BN 冻结</td>
+                    </tr>
+                    <tr>
+                        <td><strong>梯度</strong></td>
+                        <td>计算梯度，反向传播</td>
+                        <td><code>torch.no_grad()</code>，无反向传播</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loss</strong></td>
+                        <td>计算 Loss + 正则化项</td>
+                        <td>无 Loss 计算</td>
+                    </tr>
+                    <tr>
+                        <td><strong>后处理</strong></td>
+                        <td>无（直接算 Loss）</td>
+                        <td>解码策略（Beam Search 等）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>性能关注</strong></td>
+                        <td>收敛速度、显存占用</td>
+                        <td>延迟、吞吐量、精度</td>
+                    </tr>
+                    <tr>
+                        <td><strong>加速手段</strong></td>
+                        <td>混合精度、梯度累积、DDP</td>
+                        <td>量化、KV Cache、TensorRT</td>
+                    </tr>
+                </table>
+                <div class="highlight-box" style="max-width: 1500px;">
+                    <strong>💡 核心洞察：</strong>训练关注"学得好"（收敛、泛化），推理关注"跑得快"（延迟、吞吐）。同一个模型在两个阶段的数据流、激活模块、优化目标完全不同。
+                </div>
+                <aside class="notes">
+                    这页是最重要的总结对比。让听众一目了然地看到训练和推理的本质区别。
+                    强调：不是简单的"去掉反向传播"，而是整个 pipeline 的设计目标和关注点都变了。
+                </aside>
+            </section>
+
+            <!-- ===== 总结 ===== -->
+            <section>
+                <h2>📋 总结</h2>
+                <div class="highlight-box">
+                    <strong>Key Takeaway:</strong> 核心贡献一句话总结
+                </div>
+                <aside class="notes">
+                    回顾核心贡献，展望未来方向。
+                </aside>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- ===== Reveal.js 初始化 ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/notes/notes.js"></script>
+    <script>
+        // Mermaid 手动渲染（解决隐藏 slide 不渲染问题）
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            flowchart: { useMaxWidth: true, htmlLabels: true }
+        });
+
+        async function renderAllMermaid() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            for (let i = 0; i < mermaidDivs.length; i++) {
+                const el = mermaidDivs[i];
+                if (el.getAttribute('data-processed')) continue;
+                const graphDef = el.textContent.trim();
+                if (!graphDef) continue;
+                try {
+                    const { svg } = await mermaid.render('mermaid-svg-' + i, graphDef);
+                    el.innerHTML = svg;
+                    el.setAttribute('data-processed', 'true');
+                } catch(e) {
+                    console.warn('Mermaid渲染失败:', e);
+                }
+            }
+        }
+
+        // Reveal.js 初始化（2:1 宽高比）
+        Reveal.initialize({
+            width: 1920,
+            height: 960,
+            margin: 0.1,
+            minScale: 0.2,
+            maxScale: 1.5,
+            center: true,
+            hash: true,
+            transition: 'slide',
+            plugins: [RevealHighlight, RevealNotes]
+        });
+
+        Reveal.on('ready', () => { renderAllMermaid(); });
+        Reveal.on('slidechanged', () => { renderAllMermaid(); });
+    </script>
+</body>
+</html>

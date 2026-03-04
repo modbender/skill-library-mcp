@@ -1,0 +1,102 @@
+{
+  "agent": "sonnet",
+  "analyzed_at": "2026-02-17T17:11:16Z",
+  "collection_days": 7,
+  "sessions_analyzed": 30,
+  "error_count": 0,
+  "error_snippets": [],
+  "frustration_events": [],
+  "frustration_count": 0,
+  "frustration_by_severity": {
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "exec_safety": {
+    "score": 6.8,
+    "safe": 1197,
+    "unsafe": 20,
+    "total": 1217,
+    "ratio": 0.984,
+    "unsafe_examples": [
+      {
+        "cmd": "openclaw gateway restart --note \"Gateway 재시작 (device token mismatch 해결)\" 2>&1 | ",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "mv /tmp/openclaw-updated.json ~/.openclaw/openclaw.json\necho \"✅ Config updated\"\n",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "openclaw gateway stop && sleep 2 && openclaw gateway start 2>&1 | tail -10",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "openclaw gateway stop && sleep 3 && openclaw gateway start 2>&1 | grep -A 5 \"Gat",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "launchctl bootout gui/$(id -u)/ai.openclaw.gateway 2>&1 ; sleep 2 ; openclaw gat",
+        "reason": "launchctl 직접 호출"
+      }
+    ]
+  },
+  "rule_violations": [
+    {
+      "rule": "git_direct_cmd",
+      "description": "git 직접 명령 (git-sync.sh 미사용)",
+      "count": 5,
+      "examples": [
+        "git pull --rebase 2>&1 | tail -10"
+      ]
+    },
+    {
+      "rule": "gateway_launchctl",
+      "description": "launchctl 직접 사용",
+      "count": 4,
+      "examples": [
+        "launchctl bootout gui/$(id -u)/ai.openclaw.gateway 2>&1 ; sleep 2 ; openclaw gat",
+        "launchctl bootout gui/$(id -u)/ai.openclaw.config-watch 2>&1"
+      ]
+    },
+    {
+      "rule": "script_no_fallback",
+      "description": "스크립트 에러 핸들링 없음",
+      "count": 4,
+      "examples": [
+        "python3 ~/openclaw/scripts/tqqq-yahoo-monitor.py",
+        "node ~/openclaw/scripts/predictive-analyzer.js"
+      ]
+    },
+    {
+      "rule": "rm_destructive",
+      "description": "rm -rf 사용 (trash 권장)",
+      "count": 2,
+      "examples": [
+        "sleep 2 && rm -f ~/.openclaw/device.json && openclaw gateway start",
+        "rm -rf venv"
+      ]
+    }
+  ],
+  "quality_score": 8.1,
+  "compaction_total": 27,
+  "message_total": 6046,
+  "agents_md_stats": {
+    "exec_safety_rules": [],
+    "key_rules": [],
+    "raw_lines": 661,
+    "has_exec_safety_section": true,
+    "has_or_true": true,
+    "has_git_sync": true,
+    "has_wal_protocol": true,
+    "has_channel_routing": true,
+    "rule_density": 33
+  },
+  "sessions_analyzed_paths": [
+    "/Users/ramsbaby/.openclaw/agents/sonnet/sessions/fd08d43e-f2fc-47c3-aed6-b98dddebb4d9.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/sonnet/sessions/53f381b9-98bc-4526-af3b-63c183b77055.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/sonnet/sessions/a291c045-5e83-47fa-b9e0-c0f54873098a.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/sonnet/sessions/90ed5886-a541-4822-8807-b25224cd333d.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/sonnet/sessions/c0edfaaf-d197-4d2b-98d9-1fea2a2ba74e.jsonl"
+  ]
+}

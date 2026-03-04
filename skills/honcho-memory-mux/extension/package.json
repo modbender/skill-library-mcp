@@ -1,0 +1,42 @@
+{
+    "name": "@alloralabs/honcho-memory-mux",
+    "version": "0.1.0",
+    "private": false,
+    "description": "OpenClaw memory extension that multiplexes Honcho cloud memory with local file fallback.",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "openclaw": {
+        "plugin": "./openclaw.plugin.json",
+        "extensions": [
+            "./dist/index.js"
+        ]
+    },
+    "files": [
+        "dist",
+        "openclaw.plugin.json"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "prepublishOnly": "npm run build",
+        "clawhub-publish": "clawhub publish --slug honcho-memory-mux --name 'Honcho Memory Multiplexer'"
+    },
+    "dependencies": {
+        "@honcho-ai/sdk": "^1.0.0",
+        "@sinclair/typebox": "^0.32.0"
+    },
+    "peerDependencies": {
+        "openclaw": "*"
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.0",
+        "typescript": "^5.9.0"
+    }
+}

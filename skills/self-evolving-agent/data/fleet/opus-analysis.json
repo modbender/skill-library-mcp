@@ -1,0 +1,94 @@
+{
+  "agent": "opus",
+  "analyzed_at": "2026-02-17T17:11:16Z",
+  "collection_days": 7,
+  "sessions_analyzed": 30,
+  "error_count": 0,
+  "error_snippets": [],
+  "frustration_events": [],
+  "frustration_count": 0,
+  "frustration_by_severity": {
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "exec_safety": {
+    "score": 6.9,
+    "safe": 1477,
+    "unsafe": 21,
+    "total": 1498,
+    "ratio": 0.986,
+    "unsafe_examples": [
+      {
+        "cmd": "# 스킬 폴더만 추출해서 독립 레포로 push\nrm -rf /tmp/sea-publish 2>/dev/null\nmkdir -p /tmp/sea-",
+        "reason": "rm -rf (복구 불가)"
+      },
+      {
+        "cmd": "openclaw gateway restart 2>&1",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "openclaw gateway stop 2>&1 && sleep 2 && openclaw gateway start 2>&1",
+        "reason": "gateway 직접 재시작"
+      },
+      {
+        "cmd": "launchctl bootout gui/$(id -u)/ai.openclaw.gateway 2>&1; sleep 3; echo \"stopped\"",
+        "reason": "launchctl 직접 호출"
+      },
+      {
+        "cmd": "launchctl bootout gui/$(id -u)/ai.openclaw.gateway 2>&1; echo \"EXIT:$?\"",
+        "reason": "launchctl 직접 호출"
+      }
+    ]
+  },
+  "rule_violations": [
+    {
+      "rule": "rm_destructive",
+      "description": "rm -rf 사용 (trash 권장)",
+      "count": 13,
+      "examples": [
+        "rm -f /tmp/sea-v4/*.json /tmp/sea-v4/*.md 2>/dev/null; cd ~/openclaw/skills/self",
+        "cd ~/openclaw/skills/self-evolving-agent && rm -f /tmp/sea-v4/*.json /tmp/sea-v4",
+        "rm -f ~/openclaw/skills/self-evolving-agent/config.yaml",
+        "rm -f ~/.openclaw/browser/openclaw/user-data/SingletonLock 2>/dev/null"
+      ]
+    },
+    {
+      "rule": "gateway_launchctl",
+      "description": "launchctl 직접 사용",
+      "count": 8,
+      "examples": [
+        "launchctl bootout gui/$(id -u)/ai.openclaw.gateway 2>&1; sleep 3; echo \"stopped\""
+      ]
+    },
+    {
+      "rule": "git_direct_cmd",
+      "description": "git 직접 명령 (git-sync.sh 미사용)",
+      "count": 7,
+      "examples": [
+        "git merge cleanup/phase1-scope-purge --no-edit"
+      ]
+    }
+  ],
+  "quality_score": 8.2,
+  "compaction_total": 25,
+  "message_total": 7629,
+  "agents_md_stats": {
+    "exec_safety_rules": [],
+    "key_rules": [],
+    "raw_lines": 661,
+    "has_exec_safety_section": true,
+    "has_or_true": true,
+    "has_git_sync": true,
+    "has_wal_protocol": true,
+    "has_channel_routing": true,
+    "rule_density": 33
+  },
+  "sessions_analyzed_paths": [
+    "/Users/ramsbaby/.openclaw/agents/opus/sessions/72b64c75-5118-41a6-bbca-45d32f7257b0.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/opus/sessions/ca4dea82-4d1e-4861-93f7-7f8c7d0ece16.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/opus/sessions/5d1eee0e-f858-499e-8de7-6b0ad33d48ad.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/opus/sessions/30e1241a-f529-434e-bca7-27d954ade8d4.jsonl",
+    "/Users/ramsbaby/.openclaw/agents/opus/sessions/a37cead4-9814-4a3c-a699-6e8896e07d81.jsonl"
+  ]
+}

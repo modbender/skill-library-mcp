@@ -1,0 +1,113 @@
+# Observability Stack — LGTM (Loki + Grafana + Tempo + Prometheus) + Alloy
+# ─────────────────────────────────────────────────────────────────────────────
+# Port map (avoiding conflicts with existing services):
+#   Grafana       → localhost:3000
+#   Prometheus    → localhost:9091  (9090 is MinIO)
+#   Loki          → localhost:3300  (3100 is Langfuse)
+#   Tempo gRPC    → localhost:4317  (OTLP from native apps)
+#   Tempo HTTP    → localhost:4318  (OTLP HTTP from native apps)
+#   Alloy UI      → localhost:12345
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: observability
+
+networks:
+  obs:
+    driver: bridge
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  loki_data:
+  tempo_data:
+
+services:
+
+  # ── Grafana — unified dashboard ───────────────────────────────────────────
+  grafana:
+    image: grafana/grafana-oss:11.4.0
+    container_name: obs-grafana
+    restart: unless-stopped
+    networks: [obs]
+    ports:
+      - "3000:3000"
+    environment:
+      # No-auth for local dev
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor tempoSearch"
+      GF_SERVER_ROOT_URL: "http://localhost:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on: [loki, prometheus, tempo]
+
+  # ── Prometheus — metrics ──────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: obs-prometheus
+    restart: unless-stopped
+    networks: [obs]
+    ports:
+      - "9091:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle          # hot-reload: curl -X POST localhost:9091/-/reload
+      - --web.enable-remote-write-receiver
+    volumes:
+      - prometheus_data:/prometheus
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus/targets:/etc/prometheus/targets:ro  # file-based discovery
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # reach native Mac apps
+
+  # ── Loki — logs ──────────────────────────────────────────────────────────
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: obs-loki
+    restart: unless-stopped
+    networks: [obs]
+    ports:
+      - "3300:3100"
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - loki_data:/loki
+      - ./config/loki/loki.yml:/etc/loki/loki.yml:ro
+
+  # ── Tempo — distributed traces ────────────────────────────────────────────
+  tempo:
+    image: grafana/tempo:2.7.1
+    container_name: obs-tempo
+    restart: unless-stopped
+    networks: [obs]
+    ports:
+      - "4317:4317"   # OTLP gRPC (apps send traces here)
+      - "4318:4318"   # OTLP HTTP
+      - "3400:3200"   # Tempo HTTP query API
+    command: -config.file=/etc/tempo/tempo.yml
+    volumes:
+      - tempo_data:/var/tempo
+      - ./config/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
+
+  # ── Grafana Alloy — unified agent (log shipping + OTLP pipeline) ──────────
+  alloy:
+    image: grafana/alloy:v1.5.1
+    container_name: obs-alloy
+    restart: unless-stopped
+    networks: [obs]
+    ports:
+      - "12345:12345"   # Alloy UI
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+    volumes:
+      - ./config/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./logs:/var/log/openclaw:ro   # app log files (read-only)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

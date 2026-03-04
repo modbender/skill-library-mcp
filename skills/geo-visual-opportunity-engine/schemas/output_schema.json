@@ -1,0 +1,396 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GEO 视觉机会工厂 - 输出结构",
+  "description": "定义 GEO 视觉机会工厂 skill 的输出 JSON 结构",
+  "type": "object",
+  "required": [
+    "opportunities",
+    "image_prompts",
+    "content_drafts",
+    "posting_schedule",
+    "meta"
+  ],
+  "properties": {
+    "opportunities": {
+      "type": "array",
+      "title": "机会清单",
+      "description": "按优先级排序的 long-tail 机会列表",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "intent_type",
+          "platforms",
+          "priority_score",
+          "brand_gap_summary",
+          "source_gap_summary",
+          "recommended_action"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "机会 ID",
+            "pattern": "^op[0-9]+$"
+          },
+          "title": {
+            "type": "string",
+            "title": "机会标题",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "intent_type": {
+            "type": "string",
+            "title": "意图类型",
+            "enum": ["explain", "compare", "use_case"]
+          },
+          "search_volume_estimate": {
+            "type": ["integer", "null"],
+            "title": "搜索量估计",
+            "minimum": 0
+          },
+          "platforms": {
+            "type": "array",
+            "title": "目标平台",
+            "items": {
+              "type": "string",
+              "enum": ["ChatGPT", "Perplexity", "Grok", "Gemini", "Claude", "Copilot"]
+            },
+            "minItems": 1
+          },
+          "priority_score": {
+            "type": "integer",
+            "title": "优先级分数",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "brand_gap_summary": {
+            "type": "string",
+            "title": "品牌差距摘要"
+          },
+          "source_gap_summary": {
+            "type": "string",
+            "title": "来源差距摘要"
+          },
+          "recommended_action": {
+            "type": "string",
+            "title": "建议行动"
+          }
+        }
+      }
+    },
+    "image_prompts": {
+      "type": "array",
+      "title": "图像提示词",
+      "description": "每个机会对应的三套 Nano-ready 图像 prompt",
+      "items": {
+        "type": "object",
+        "required": [
+          "opportunity_id",
+          "white_info",
+          "lifestyle",
+          "hero"
+        ],
+        "properties": {
+          "opportunity_id": {
+            "type": "string",
+            "title": "关联机会 ID"
+          },
+          "white_info": {
+            "type": "object",
+            "title": "白底信息图",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "title": "图像生成提示词"
+              },
+              "suggested_overlay_text": {
+                "type": "object",
+                "title": "建议叠加文字",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "bullets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "size_recommendation": {
+                "type": "string",
+                "title": "尺寸建议",
+                "examples": ["1200x1800", "1080x1920", "800x800"]
+              }
+            }
+          },
+          "lifestyle": {
+            "type": "object",
+            "title": "场景图",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "title": "图像生成提示词"
+              },
+              "suggested_overlay_text": {
+                "type": "object",
+                "title": "建议叠加文字",
+                "properties": {
+                  "main": {
+                    "type": "string"
+                  },
+                  "sub": {
+                    "type": "string"
+                  }
+                }
+              },
+              "size_recommendation": {
+                "type": "string",
+                "title": "尺寸建议",
+                "examples": ["1200x628", "1080x1080", "1920x1080"]
+              }
+            }
+          },
+          "hero": {
+            "type": "object",
+            "title": "封面图",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "title": "图像生成提示词"
+              },
+              "suggested_overlay_text": {
+                "type": "object",
+                "title": "建议叠加文字",
+                "properties": {
+                  "headline": {
+                    "type": "string"
+                  },
+                  "cta": {
+                    "type": "string"
+                  }
+                }
+              },
+              "size_recommendation": {
+                "type": "string",
+                "title": "尺寸建议",
+                "examples": ["1600x900", "1920x1080", "1200x630"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "content_drafts": {
+      "type": "array",
+      "title": "内容草稿",
+      "description": "每个机会对应的内容草稿",
+      "items": {
+        "type": "object",
+        "required": [
+          "opportunity_id",
+          "title",
+          "short_description",
+          "body",
+          "seo_keywords",
+          "suggested_cta"
+        ],
+        "properties": {
+          "opportunity_id": {
+            "type": "string",
+            "title": "关联机会 ID"
+          },
+          "title": {
+            "type": "string",
+            "title": "内容标题"
+          },
+          "short_description": {
+            "type": "string",
+            "title": "短描述",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "body": {
+            "type": "string",
+            "title": "正文内容",
+            "minLength": 150,
+            "maxLength": 300
+          },
+          "seo_keywords": {
+            "type": "array",
+            "title": "SEO 关键词",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "suggested_cta": {
+            "type": "string",
+            "title": "建议行动号召"
+          }
+        }
+      }
+    },
+    "posting_schedule": {
+      "type": "object",
+      "title": "发布节奏",
+      "description": "4 周发布计划",
+      "required": [
+        "country",
+        "week_by_week",
+        "first_publish_guidelines"
+      ],
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "目标国家"
+        },
+        "week_by_week": {
+          "type": "array",
+          "title": "每周计划",
+          "items": {
+            "type": "object",
+            "required": [
+              "week",
+              "channels",
+              "focus",
+              "kpis"
+            ],
+            "properties": {
+              "week": {
+                "type": "integer",
+                "title": "周次",
+                "minimum": 1,
+                "maximum": 4
+              },
+              "channels": {
+                "type": "array",
+                "title": "发布渠道",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "posts"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "examples": ["X", "LinkedIn", "Instagram", "Facebook", "TikTok", "YouTube"]
+                    },
+                    "posts": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10
+                    }
+                  }
+                }
+              },
+              "focus": {
+                "type": "string",
+                "title": "本周重点"
+              },
+              "kpis": {
+                "type": "array",
+                "title": "关键绩效指标",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "first_publish_guidelines": {
+          "type": "string",
+          "title": "首次发布指南"
+        },
+        "recap_and_iterations": {
+          "type": "string",
+          "title": "复盘与迭代建议"
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "title": "元数据",
+      "required": [
+        "skill_version",
+        "generated_at",
+        "input_echo"
+      ],
+      "properties": {
+        "skill_version": {
+          "type": "string",
+          "title": "Skill 版本",
+          "pattern": "^geo_v[0-9]+\\.[0-9]+$"
+        },
+        "generated_at": {
+          "type": "string",
+          "title": "生成时间",
+          "format": "date-time"
+        },
+        "input_echo": {
+          "type": "object",
+          "title": "输入回显",
+          "properties": {
+            "brand": {
+              "type": "string"
+            },
+            "product": {
+              "type": "string"
+            },
+            "core_keyword": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "competitors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "title": "错误响应",
+      "description": "当发生错误时返回的错误对象",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "string",
+          "title": "错误类型",
+          "enum": [
+            "invalid_input",
+            "model_timeout",
+            "safety_reject",
+            "invalid_model_output"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "title": "错误原因"
+        },
+        "details": {
+          "type": "string",
+          "title": "详细说明"
+        },
+        "retry_after_seconds": {
+          "type": "integer",
+          "title": "重试等待秒数"
+        }
+      }
+    }
+  }
+}

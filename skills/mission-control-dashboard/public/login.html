@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍑 Mission Control - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: { 50: '#FEFDFB', 100: '#FBF8F3', 200: '#F5F0E8', 300: '#EDE5D8' },
+            peach: { 100: '#FEF3E7', 400: '#F5A962', 500: '#F09440', 600: '#E67E22' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .login-card { animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .shake { animation: shake 0.5s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+  </style>
+</head>
+<body class="bg-cream-100 min-h-screen flex items-center justify-center p-4">
+  <div class="login-card bg-white rounded-2xl shadow-lg p-8 w-full max-w-md border border-cream-300">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-peach-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <span class="text-3xl">🍑</span>
+      </div>
+      <h1 class="text-xl font-semibold text-gray-800">Mission Control</h1>
+      <p class="text-sm text-gray-500 mt-1">Sign in to continue</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
+      <span id="error-text"></span>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username"
+          class="w-full px-4 py-3 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach-400 focus:border-transparent transition-all"
+          placeholder="Enter username"
+          autocomplete="username"
+          required
+        >
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          class="w-full px-4 py-3 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach-400 focus:border-transparent transition-all"
+          placeholder="Enter password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button 
+        type="submit" 
+        id="submit-btn"
+        class="w-full bg-peach-500 hover:bg-peach-600 text-white font-medium py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+      >
+        <span id="btn-text">Sign In</span>
+        <svg id="spinner" class="hidden animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+    </form>
+
+    <!-- Rate Limit Warning -->
+    <div id="rate-limit" class="hidden mt-4 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
+      ⚠️ Too many attempts. Please wait <span id="countdown">60</span>s
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 text-center text-xs text-gray-400">
+      Protected by rate limiting · Powered by OpenClaw
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorDiv = document.getElementById('error');
+    const errorText = document.getElementById('error-text');
+    const rateLimitDiv = document.getElementById('rate-limit');
+    const countdownSpan = document.getElementById('countdown');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const spinner = document.getElementById('spinner');
+
+    let isLocked = false;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isLocked) return;
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Show loading
+      btnText.textContent = 'Signing in...';
+      spinner.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          window.location.href = '/';
+        } else if (res.status === 429) {
+          // Rate limited
+          showRateLimit(data.retryAfter || 60);
+        } else {
+          showError(data.error || 'Invalid credentials');
+          form.classList.add('shake');
+          setTimeout(() => form.classList.remove('shake'), 500);
+        }
+      } catch (err) {
+        showError('Connection error. Please try again.');
+      } finally {
+        btnText.textContent = 'Sign In';
+        spinner.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+    });
+
+    function showError(msg) {
+      errorText.textContent = msg;
+      errorDiv.classList.remove('hidden');
+      setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+    }
+
+    function showRateLimit(seconds) {
+      isLocked = true;
+      errorDiv.classList.add('hidden');
+      rateLimitDiv.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      let remaining = seconds;
+      countdownSpan.textContent = remaining;
+
+      const interval = setInterval(() => {
+        remaining--;
+        countdownSpan.textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          rateLimitDiv.classList.add('hidden');
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          isLocked = false;
+        }
+      }, 1000);
+    }
+
+    // Check if already logged in
+    fetch('/auth/check').then(r => r.json()).then(d => {
+      if (d.authenticated) window.location.href = '/';
+    }).catch(() => {});
+  </script>
+</body>
+</html>

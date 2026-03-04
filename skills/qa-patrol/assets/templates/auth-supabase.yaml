@@ -1,0 +1,217 @@
+# QA Patrol - Supabase Auth Template
+# Level 2: Auth flow testing for Supabase-powered apps
+# Usage: qa-patrol --plan auth-supabase.yaml --url https://your-app.com
+#
+# SECURITY: All credentials use ${env.VAR} interpolation
+# Set ADMIN_EMAIL, ADMIN_PASSWORD, FREE_EMAIL, FREE_PASSWORD in your environment
+# NEVER hardcode real credentials in test plans
+
+app:
+  url: ${APP_URL}
+  name: ${APP_NAME:-My App}
+  stack: auto
+
+auth:
+  provider: supabase
+  login_path: /auth           # Adjust to your auth page
+  dashboard_path: /home       # Where users land after login
+  accounts:
+    admin:
+      email: ${ADMIN_EMAIL}
+      password: ${ADMIN_PASSWORD}
+      role: admin
+    free:
+      email: ${FREE_EMAIL}
+      password: ${FREE_PASSWORD}
+      role: user
+    guest: true  # Test anonymous/guest access
+
+tests:
+  smoke:
+    - name: Homepage loads
+      navigate: /
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+
+    - name: Auth page loads
+      navigate: ${auth.login_path}
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+
+  auth:
+    # Guest/Anonymous Tests
+    - name: Guest can access public pages
+      mode: guest
+      steps:
+        - navigate: /
+        - snapshot: true
+      assert:
+        - element_exists: body
+        - no_403_errors: true
+
+    - name: Guest redirected from protected pages
+      mode: guest
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - wait: 2000
+      assert:
+        - url_contains: ${auth.login_path}
+      # OR for apps that show content:
+      # assert:
+      #   - element_exists: sign_in_prompt
+
+    # Sign In Tests
+    - name: Sign in form renders
+      navigate: ${auth.login_path}
+      assert:
+        - element_exists: email_input
+        - element_exists: password_input
+        - element_exists: sign_in_button
+
+    - name: Sign in with valid credentials
+      account: free
+      steps:
+        - navigate: ${auth.login_path}
+        - clear_auth: true  # Ensure signed out first
+        - type:
+            ref: email_input
+            text: ${auth.accounts.free.email}
+        - type:
+            ref: password_input
+            text: ${auth.accounts.free.password}
+        - click:
+            ref: sign_in_button
+        - wait:
+            url_contains: ${auth.dashboard_path}
+            timeout: 10000
+      assert:
+        - url_contains: ${auth.dashboard_path}
+        - element_exists: user_indicator  # Avatar, email, or logout button
+        - no_console_errors: true
+
+    - name: Sign in with invalid credentials
+      steps:
+        - navigate: ${auth.login_path}
+        - clear_auth: true
+        - type:
+            ref: email_input
+            text: invalid@test.com
+        - type:
+            ref: password_input
+            text: wrongpassword
+        - click:
+            ref: sign_in_button
+        - wait: 3000
+      assert:
+        - url_not_contains: ${auth.dashboard_path}
+        - element_exists: error_message
+      # OR check for text:
+      # assert:
+      #   - text_contains: "Invalid"
+
+    # Session Persistence
+    - name: Session persists after refresh
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - wait: 1000
+        - refresh: true
+        - wait: 2000
+      assert:
+        - url_contains: ${auth.dashboard_path}
+        - element_exists: user_indicator
+
+    - name: Session persists across tabs
+      requires: signed_in
+      account: free
+      steps:
+        - open_new_tab: true
+        - navigate: ${auth.dashboard_path}
+      assert:
+        - element_exists: user_indicator
+
+    # Sign Out
+    - name: Sign out works
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - click:
+            ref: user_menu
+        - wait: 500
+        - click:
+            ref: sign_out_button
+        - wait: 2000
+      assert:
+        - url_contains: ${auth.login_path}
+      # OR:
+      # assert:
+      #   - element_not_exists: user_indicator
+
+    - name: Cannot access protected routes after sign out
+      requires: signed_out
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - wait: 2000
+      assert:
+        - url_contains: ${auth.login_path}
+
+    # RLS Policy Tests (Supabase-specific)
+    - name: Authenticated user can read own data
+      account: free
+      requires: signed_in
+      steps:
+        - navigate: /profile
+        - wait: 2000
+      assert:
+        - element_exists: profile_data
+        - no_403_errors: true
+        - no_empty_state: true  # Data should load
+
+    - name: Admin has elevated access
+      account: admin
+      requires: signed_in
+      steps:
+        - navigate: /admin
+      assert:
+        - no_403_errors: true
+        - element_exists: admin_panel
+      skip_if: no_admin_route
+
+  # Optional: Sign Up Tests
+  # signup:
+  #   - name: Sign up form renders
+  #     navigate: /auth/signup
+  #     assert:
+  #       - element_exists: email_input
+  #       - element_exists: password_input
+  #       - element_exists: sign_up_button
+  #
+  #   - name: Sign up with new account
+  #     steps:
+  #       - navigate: /auth/signup
+  #       - type:
+  #           ref: email_input
+  #           text: newuser_${TIMESTAMP}@test.com
+  #       - type:
+  #           ref: password_input
+  #           text: TestPassword123!
+  #       - click:
+  #           ref: sign_up_button
+  #       - wait: 5000
+  #     assert:
+  #       - element_exists: verify_email_message
+  #     # OR for auto-confirm:
+  #     # assert:
+  #     #   - url_contains: ${auth.dashboard_path}
+
+settings:
+  screenshot_on_failure: true
+  screenshot_format: png
+  timeout_default: 10000
+  retry_failed: true
+  retry_count: 2
+  clear_storage_between_accounts: true

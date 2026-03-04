@@ -1,0 +1,200 @@
+MS-TODO-OAUTH QUICK REFERENCE
+============================
+
+QUICK START
+-----------
+1. Login:
+   uv run scripts/ms-todo-oauth login get
+   uv run scripts/ms-todo-oauth login verify <code>
+
+2. List your task lists:
+   uv run scripts/ms-todo-oauth lists
+
+3. Add a task:
+   uv run scripts/ms-todo-oauth add -l "任务" "My task"
+
+4. List tasks:
+   uv run scripts/ms-todo-oauth tasks "任务"
+
+
+COMMON COMMANDS
+===============
+
+Authentication:
+---------------
+Login:                  ms-todo-oauth login get
+Complete login:         ms-todo-oauth login verify <code>
+Logout:                 ms-todo-oauth logout
+
+List Management:
+----------------
+List all lists:         ms-todo-oauth lists
+Create list:            ms-todo-oauth create-list "List Name"
+Delete list:            ms-todo-oauth delete-list "List Name" -y
+
+Basic Tasks:
+------------
+Add task:               ms-todo-oauth add -l "List" "Task Title"
+List tasks:             ms-todo-oauth tasks "List"
+List all (+ completed): ms-todo-oauth tasks "List" -a
+Complete task:          ms-todo-oauth complete -l "List" "Task Title"
+Delete task:            ms-todo-oauth delete -l "List" "Task Title" -y
+View details:           ms-todo-oauth detail -l "List" "Task Title"
+
+Task Options:
+-------------
+Priority:               -p high|normal|low
+Due date (days):        -d 3                    (3 days from now)
+Due date (specific):    -d 2026-12-31
+Reminder (hours):       -r 3h
+Reminder (days):        -r 2d
+Reminder (specific):    -r "2026-12-31 14:30"
+Description:            -D "Task description"
+Tags:                   -t "tag1,tag2,tag3"
+Recurrence:             -R daily|weekly|weekdays|monthly
+Recurrence interval:    -R daily:2              (every 2 days)
+
+Task Views:
+-----------
+Today's tasks:          ms-todo-oauth today
+Overdue tasks:          ms-todo-oauth overdue
+All pending:            ms-todo-oauth pending
+Pending (grouped):      ms-todo-oauth pending -g
+Search:                 ms-todo-oauth search "keyword"
+Statistics:             ms-todo-oauth stats
+
+Data Management:
+----------------
+Export:                 ms-todo-oauth export -o filename.json
+
+Other Options:
+--------------
+Verbose output:         -v
+Debug mode:             --debug
+Skip confirmation:      -y
+
+
+EXAMPLES
+========
+
+1. Add high priority task due tomorrow with reminder:
+   ms-todo-oauth add -l "Work" "Finish report" -p high -d 1 -r 3h
+
+2. Add weekly meeting reminder:
+   ms-todo-oauth add -l "Work" "Team meeting" -R weekly -r "2026-02-17 09:00"
+
+3. Add task with all features:
+   ms-todo-oauth add -l "Work" "Project Review" \
+     -p high \
+     -d 7 \
+     -r "2026-02-20 14:00" \
+     -D "Review Q1 project deliverables and prepare presentation" \
+     -t "work,important,meeting"
+
+4. Create daily habit tracking:
+   ms-todo-oauth add -l "Habits" "Morning exercise" -R daily -r 8h
+
+5. Search across all lists:
+   ms-todo-oauth search "meeting"
+
+6. View all work tasks:
+   ms-todo-oauth tasks "Work" -a
+
+7. Export everything:
+   ms-todo-oauth export -o backup_$(date +%Y%m%d).json
+
+
+TIPS & TRICKS
+=============
+
+1. Default list:
+   If you omit -l, the command uses your default list (usually "任务")
+
+2. Partial matching:
+   Task titles support partial matching for detail/complete/delete commands
+
+3. Chinese characters:
+   Fully supported in titles, descriptions, and tags
+
+4. Confirmation prompts:
+   Use -y flag to skip confirmation for delete operations
+
+5. Verbose mode:
+   Add -v to any command to see more details (IDs, timestamps, etc.)
+
+6. Date formats:
+   - Relative: "3" or "3d" (days from now)
+   - Absolute: "2026-12-31"
+   - With time: "2026-12-31 14:30"
+
+7. Recurring patterns:
+   - Simple: daily, weekly, weekdays, monthly
+   - With interval: daily:2, weekly:3, monthly:2
+
+8. Tags for organization:
+   Use tags to categorize tasks: -t "work,urgent,client-a"
+
+
+COMMON WORKFLOWS
+================
+
+Daily Review:
+-------------
+1. ms-todo-oauth today            # Check today's tasks
+2. ms-todo-oauth overdue          # Check overdue tasks
+3. ms-todo-oauth pending -g       # Review all pending by list
+
+Weekly Planning:
+----------------
+1. ms-todo-oauth pending -g       # Review all pending
+2. ms-todo-oauth add ...          # Add new tasks for the week
+3. ms-todo-oauth stats            # Check overall progress
+
+Task Management:
+----------------
+1. ms-todo-oauth tasks "任务"     # See what's active
+2. ms-todo-oauth complete ...     # Complete finished tasks
+3. ms-todo-oauth add ...          # Add new tasks
+4. ms-todo-oauth export -o backup.json  # Weekly backup
+
+
+TESTING
+=======
+
+Run comprehensive tests:
+  python3 test_ms_todo_sync.py
+
+Manual testing:
+  See MANUAL_TEST_CHECKLIST.txt
+
+
+TROUBLESHOOTING
+===============
+
+"Not logged in":
+  uv run scripts/ms-todo-oauth login get
+  uv run scripts/ms-todo-oauth login verify <code>
+
+"List not found":
+  Check exact list name: ms-todo-oauth lists
+  Use quotes for names with spaces
+
+"Task not found":
+  Use exact or partial match
+  Check with: ms-todo-oauth tasks "List" -a
+
+"Unsupported HTTP method":
+  This bug should be fixed - verify you applied all fixes
+
+Connection errors:
+  Check internet connection
+  Verify Microsoft services are accessible
+
+
+FOR MORE HELP
+=============
+
+- Detailed command help: ms-todo-oauth <command> -h
+- Full documentation: See main README
+- Test suite: See TEST_README.txt
+- Manual checklist: See MANUAL_TEST_CHECKLIST.txt

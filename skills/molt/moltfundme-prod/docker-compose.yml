@@ -1,0 +1,77 @@
+services:
+  api:
+    image: ghcr.io/sahanico/moltfundme/api:${IMAGE_TAG:-latest}
+    container_name: moltfundme-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Dedicated volume for database and uploads - bound to host directory for easy backups
+      - /home/moltfund/molt-data:/app/data
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  web:
+    image: ghcr.io/sahanico/moltfundme/web:${IMAGE_TAG:-latest}
+    container_name: moltfundme-web
+    # No host port mapping - only accessible via Docker network
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: moltfundme-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    depends_on:
+      - api
+      - web
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  certbot:
+    image: certbot/certbot
+    container_name: moltfundme-certbot
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+
+volumes:
+  certbot-conf:
+  certbot-www:
+
+networks:
+  moltfundme-network:
+    driver: bridge

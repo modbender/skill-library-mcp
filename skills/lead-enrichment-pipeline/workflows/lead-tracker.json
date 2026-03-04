@@ -1,0 +1,242 @@
+{
+  "updatedAt": "2026-02-18T18:15:59.999Z",
+  "createdAt": "2026-02-18T18:15:59.999Z",
+  "id": "QChZkwH2H3fJY9Xp",
+  "name": "Lead Tracker — Enriched Pipeline",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "add-lead-enriched",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        256,
+        304
+      ],
+      "typeVersion": 2,
+      "webhookId": "add-lead-enriched-wh",
+      "id": "ffe26ede-eca3-4b79-89d0-b219b5c8fef9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date().toISOString();\nconst input = $input.first().json;\nreturn [{\n  json: {\n    Date: now.split('T')[0],\n    Email: input.email || '',\n    Name: input.name || '',\n    Company: input.company || '',\n    Source: input.source || 'openclaw',\n    Priority: String(input.priority || '5'),\n    Notes: input.notes || '',\n    Status: 'new'\n  }\n}];"
+      },
+      "name": "Format Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        480,
+        304
+      ],
+      "typeVersion": 2,
+      "id": "0e66f0e6-235b-4f08-8ac6-aa32e6937d16"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_LEADS_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        720,
+        304
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      },
+      "id": "6cbe5c6b-d120-44ec-8b5a-d033601820cd"
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "YOUR_NOTIFICATION_EMAIL",
+        "subject": "=New Lead Added: {{ $json.Name }} ({{ $json.Company }})",
+        "emailType": "html",
+        "html": "<h2>New Lead Added to Tracker</h2><table style=\"border-collapse:collapse;font-family:sans-serif;\"><tr><td style=\"padding:4px 12px;font-weight:bold;\">Name:</td><td style=\"padding:4px 12px;\">{{ $json.Name }}</td></tr><tr><td style=\"padding:4px 12px;font-weight:bold;\">Email:</td><td style=\"padding:4px 12px;\">{{ $json.Email }}</td></tr><tr><td style=\"padding:4px 12px;font-weight:bold;\">Company:</td><td style=\"padding:4px 12px;\">{{ $json.Company }}</td></tr><tr><td style=\"padding:4px 12px;font-weight:bold;\">Source:</td><td style=\"padding:4px 12px;\">{{ $json.Source }}</td></tr><tr><td style=\"padding:4px 12px;font-weight:bold;\">Priority:</td><td style=\"padding:4px 12px;\">{{ $json.Priority }}/10</td></tr><tr><td style=\"padding:4px 12px;font-weight:bold;\">Notes:</td><td style=\"padding:4px 12px;\">{{ $json.Notes }}</td></tr></table>",
+        "options": {}
+      },
+      "name": "Notify Owner",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        720,
+        520
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      },
+      "id": "a059547f-aded-4580-bdc2-28d8e429432c"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"success\": true, \"message\": \"Lead added successfully\", \"email\": \"{{ $json.Email }}\"}"
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        960,
+        304
+      ],
+      "typeVersion": 1.1,
+      "id": "87359b8f-2e7a-434c-ba68-0f96cd5b45d7"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": null,
+  "pinData": null,
+  "versionId": "7c4cec68-a808-4549-9654-72c28397bceb",
+  "activeVersionId": "7c4cec68-a808-4549-9654-72c28397bceb",
+  "versionCounter": 11,
+  "triggerCount": 1,
+  "tags": []
+}

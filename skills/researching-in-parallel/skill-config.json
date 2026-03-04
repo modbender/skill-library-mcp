@@ -1,0 +1,49 @@
+{
+  "_comment": "Configuration for the researching-in-parallel skill. The main agent must read this file at Step 3 before assembling sub-agent prompts or calling sessions_spawn. If a model string is invalid or not in your openclaw.json allowlist, OpenClaw silently falls back to agents.defaults.subagents.model (or caller's model if unset). Set any model value to null to use OpenClaw's default.",
+  "subagents": {
+    "_comment": "Assign a model to each role. Use provider/model format e.g. anthropic/claude-haiku-4-5-20251001. null = use OpenClaw default. See configuration.md for guidance on model selection.",
+    "_vintage_warning": "Model vintage matters — not just tier. An older model on a research pass produces thinner coverage that synthesis cannot compensate for. Use frontier or near-frontier models for serious runs. Check model knowledge cutoff dates against your run date.",
+    "_synthesis_warning": "Do not leave synthesis as null for important runs. If the main agent fails over under rate limit pressure, null synthesis inherits the degraded model. Set it explicitly.",
+    "_rate_limit_warning": "Do not assign all three research sub-agents to the same provider. Parallel execution competes for rate limit pools. Distribute across providers — see configuration.md.",
+    "maxConcurrent": 3,
+    "params": {
+      "cleanup": "keep",
+      "runTimeoutSeconds": 1200,
+      "thinking": "high",
+      "agentId": "main"
+    },
+    "breadth": {
+      "prompt_template": "references/prompts/breadth.md",
+      "model": "anthropic/claude-3-haiku-20240307"
+    },
+    "critical": {
+      "prompt_template": "references/prompts/critical.md",
+      "model": "google/gemini-3-flash-preview"
+    },
+    "evidence": {
+      "prompt_template": "references/prompts/evidence.md",
+      "model": "google/gemini-3-flash-preview"
+    },
+    "synthesis": {
+      "prompt_template": "references/prompts/synthesis.md",
+      "model": "anthropic/claude-sonnet-4-6"
+    },
+    "updater": {
+      "prompt_template": "references/prompts/updater.md",
+      "model": "anthropic/claude-sonnet-4-6"
+    }
+  },
+  "file_naming": {
+    "_comment": "Naming conventions for workspace artifacts. [TOPIC_SLUG] is a short lowercase-hyphenated identifier for the topic; [DATE] is YYYY-MM-DD. All files are written inside workspace_path.",
+    "sources_provided": "sources-provided-[TOPIC_SLUG]-[DATE].md",
+    "research_breadth": "research-breadth-[TOPIC_SLUG]-[DATE].md",
+    "research_critical": "research-critical-[TOPIC_SLUG]-[DATE].md",
+    "research_evidence": "research-evidence-[TOPIC_SLUG]-[DATE].md",
+    "bibliography": "bibliography-[TOPIC_SLUG]-[DATE].md",
+    "review-report": "review-report-[TOPIC_SLUG]-[DATE].md",
+    "updated-report": "review-report-updated-[TOPIC_SLUG]-[DATE].md",
+    "source_extracts": "sources/[TOPIC_SLUG]-[DATE]/[SOURCE_SLUG].md"
+  },
+  "save_source_extracts": true,
+  "_save_source_extracts_comment": "When true, sub-agents save a cleaned extract of each source they cite to the workspace. Extracts contain only the content actually used. Recommended for serious research runs: extracts form a verifiable evidence base and can be reused as provided sources on the next run without re-fetching. Adds workspace storage and modest token overhead. Default false for exploratory runs."
+}

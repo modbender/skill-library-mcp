@@ -1,0 +1,29 @@
+{
+  "id": "content-pipeline",
+  "name": "Content Publishing Pipeline",
+  "version": 1,
+  "description": "Research, draft, edit, and publish blog content",
+  "steps": [
+    {
+      "id": "research",
+      "name": "Research Topic",
+      "input": "Research the topic: {{task}}\n\nUse web_search and web_fetch to gather information from multiple sources. Create a comprehensive research summary with:\n- Key points and insights\n- Statistics and data\n- Expert quotes\n- Source URLs\n\nSave your research to a markdown file.\n\nDo NOT just describe what you would do — actually use the tools and gather real information.\n\nWhen done, end with:\nSTATUS: done\nRESEARCH_FILE: path/to/research.md",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "draft",
+      "name": "Draft Article",
+      "input": "Write a blog post based on this research:\n\nResearch file: {{research_file}}\nResearch summary:\n{{research_output}}\n\nOriginal topic: {{task}}\n\nCreate a well-structured article with:\n- Compelling intro hook\n- Clear body sections with headers\n- Concrete examples and data\n- Strong conclusion with takeaways\n\nSave to a markdown file. Use proper formatting.\n\nWhen done, end with:\nSTATUS: done\nDRAFT_FILE: path/to/draft.md",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "edit",
+      "name": "Edit and Polish",
+      "input": "Edit this draft for clarity, grammar, and flow:\n\nDraft file: {{draft_file}}\n\nUse the `edit` tool to make improvements:\n- Fix grammar and typos\n- Improve sentence flow\n- Tighten verbose sections\n- Strengthen weak transitions\n- Ensure consistent tone\n\nWhen done, end with:\nSTATUS: done\nFINAL_FILE: path/to/final.md",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    }
+  ]
+}

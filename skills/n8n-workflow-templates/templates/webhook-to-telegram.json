@@ -1,0 +1,136 @@
+{
+  "name": "Webhook to Telegram",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "When clicking 'Test Workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [450, 300],
+      "webhookId": "webhook-alert"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process incoming webhook data\nconst input = $input.first().json;\n\n// Extract fields with defaults\nconst message = input.message || 'No message provided';\nconst level = input.level || 'info';\nconst timestamp = input.timestamp || new Date().toISOString();\nconst source = input.source || 'unknown';\n\n// Format the message\nconst levelEmoji = {\n  info: '\u2139\ufe0f',\n  warning: '\u26a0\ufe0f',\n  error: '\ud83d\udea8',\n  success: '\u2705'\n};\n\nconst emoji = levelEmoji[level] || levelEmoji.info;\nconst formattedMessage = `${emoji} *${level.toUpperCase()}* from *${source}*\\n\\n${message}\\n\\n\ud83d\udd50 ${timestamp}`;\n\nreturn {\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: formattedMessage,\n    parse_mode: 'Markdown'\n  }\n};"
+      },
+      "id": "3",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "options": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "4",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test Workflow'": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Telegram": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "id": "1",
+      "name": "webhook",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "telegram",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    }
+  ]
+}

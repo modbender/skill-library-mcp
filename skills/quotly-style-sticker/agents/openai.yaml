@@ -1,0 +1,25 @@
+interface:
+  display_name: "QuotLy Style Sticker"
+  short_description: "Generate QuotLy-style stickers from forwarded or quoted messages."
+  default_prompt: |
+    Use $quotly-style-sticker to generate quote stickers from forwarded messages or quoted messages in groups.
+
+    Input format:
+    - selected_messages: array of message items
+    - Each item has:
+      - message: { message_id, text, forward_from: { type, id, first_name, last_name, avatar_url, status_url } }
+      - overwrite_message (optional): { text, forward_from: { avatar_url, status_url } }
+
+    Build input with selected_messages. Include context.event.update_id when available for duplicate suppression.
+    Supported dedupe keys: context.event.update_id (preferred), event_id, delivery_id, id.
+    Example wrapper:
+    {
+      "context": { "event": { "channel": "telegram", "update_id": 123456789 } },
+      "selected_messages": [...]
+    }
+    Run the script once, and deliver the tool-emitted MEDIA result.
+    If selected_messages has multiple items, pass all items in one request.
+    Final assistant text must be empty.
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,250 @@
+# Colony Process Definitions
+# Multi-stage workflows that orchestrate multiple agents
+
+processes:
+  product-launch:
+    description: "End-to-end product launch"
+    triggers: [launch, ship, release, go to market]
+    stages:
+      - id: research
+        agent: scout
+        task: "Analyze market, competitors, and positioning for: {context}"
+        outputs: [market-brief.md]
+      - id: spec
+        agent: forge
+        task: "Write PRD based on market research"
+        inputs: [market-brief.md]
+        outputs: [prd.md]
+      - id: build
+        agent: pincer
+        task: "Implement MVP per PRD"
+        inputs: [prd.md]
+        outputs: [code/]
+        parallel_group: "build-copy"  # Build and copy run in parallel
+      - id: copy
+        agent: quill
+        task: "Write landing page copy"
+        inputs: [prd.md]
+        outputs: [landing-copy.md]
+        parallel_group: "build-copy"  # Same group = parallel execution
+    checkpoints: [spec, copy]
+
+  content-pipeline:
+    description: "Research, write, publish, promote"
+    triggers: [blog post, article, write about, content]
+    stages:
+      - id: research
+        agent: scout
+        task: "Research topic: {context}"
+        outputs: [research.md]
+      - id: draft
+        agent: scribe
+        task: "Write full article from research"
+        inputs: [research.md]
+        outputs: [draft.md]
+      - id: review
+        checkpoint: true
+        description: "Human reviews draft"
+      - id: publish
+        agent: shell
+        task: "Deploy article"
+        inputs: [draft.md]
+      - id: promote
+        agent: echo
+        task: "Create social posts for article"
+        inputs: [draft.md]
+        outputs: [social-posts.md]
+
+  bug-triage:
+    description: "Reproduce, fix, deploy bug fixes"
+    triggers: [bug, fix, issue, broken]
+    stages:
+      - id: reproduce
+        agent: sentry
+        task: "Reproduce and document bug: {context}"
+        outputs: [bug-report.md]
+      - id: fix
+        agent: pincer
+        task: "Implement fix based on bug report"
+        inputs: [bug-report.md]
+        outputs: [fix-summary.md]
+      - id: test
+        agent: sentry
+        task: "Verify fix works"
+        inputs: [fix-summary.md]
+      - id: deploy
+        agent: shell
+        task: "Deploy the fix"
+
+  validate-idea:
+    description: "Validate a business idea"
+    triggers: [validate, idea, should I build, worth building]
+    stages:
+      - id: brainstorm
+        agent: muse
+        task: "Brainstorm angles and variations: {context}"
+        outputs: [ideas.md]
+      - id: research
+        agent: scout
+        task: "Market research - does this exist? competitors?"
+        inputs: [ideas.md]
+        outputs: [market-research.md]
+      - id: analyze
+        agent: forecast
+        task: "Size the opportunity, analyze trends"
+        inputs: [market-research.md]
+        outputs: [analysis.md]
+      - id: spec
+        agent: forge
+        task: "Define MVP scope"
+        inputs: [analysis.md]
+        outputs: [mvp-spec.md]
+        parallel_group: "final"  # Spec and estimate run in parallel
+      - id: estimate
+        agent: ledger
+        task: "Cost to build vs potential return"
+        inputs: [analysis.md]
+        outputs: [business-case.md]
+        parallel_group: "final"  # Same group = parallel execution
+    checkpoints: [analyze]
+
+  customer-research:
+    description: "Deep dive on a customer segment"
+    triggers: [customer research, who are, target audience, user research]
+    stages:
+      - id: identify
+        agent: scout
+        task: "Identify and profile the target customer: {context}"
+        outputs: [customer-profile.md]
+      - id: pain-points
+        agent: muse
+        task: "Brainstorm pain points and jobs-to-be-done"
+        inputs: [customer-profile.md]
+        outputs: [pain-points.md]
+      - id: validate
+        agent: scout
+        task: "Find evidence for pain points - forums, reviews, discussions"
+        inputs: [pain-points.md]
+        outputs: [validation.md]
+      - id: synthesize
+        agent: forecast
+        task: "Synthesize findings into actionable insights"
+        inputs: [validation.md]
+        outputs: [insights.md]
+
+  landing-page:
+    description: "Create a full landing page"
+    triggers: [landing page, website, homepage, sales page]
+    stages:
+      - id: strategy
+        agent: scout
+        task: "Research competitor landing pages and best practices for: {context}"
+        outputs: [strategy.md]
+      - id: copy
+        agent: quill
+        task: "Write landing page copy - headline, subhead, sections, CTA"
+        inputs: [strategy.md]
+        outputs: [copy.md]
+      - id: review
+        checkpoint: true
+        description: "Human reviews copy"
+      - id: build
+        agent: pincer
+        task: "Implement the landing page in HTML/CSS"
+        inputs: [copy.md]
+        outputs: [landing.html, landing.css]
+
+  # === Governance Processes ===
+
+  system-health:
+    description: "Full system health audit by Doctor"
+    triggers: [health check, system audit, diagnose system, full audit]
+    stages:
+      - id: coordinator-review
+        agent: doctor
+        task: |
+          Audit the coordinator (Clutch). Review:
+          1. Recent task delegations - are they appropriate?
+          2. Response quality and timing
+          3. Memory usage - is MEMORY.md current and useful?
+          4. Missed opportunities or blind spots
+          5. Services status (cron, calendar, ComfyUI, etc.)
+          Context: {context}
+        outputs: [coordinator-audit.md]
+      - id: colony-review
+        agent: doctor
+        task: |
+          Audit the colony agents. Review audit/agents/*.json stats:
+          1. Which agents are underutilized?
+          2. Which have high failure rates?
+          3. Are triggers routing correctly?
+          4. Task duration outliers?
+          5. Gaps in coverage?
+        inputs: [coordinator-audit.md]
+        outputs: [colony-audit.md]
+      - id: audit-review
+        agent: doctor
+        task: |
+          Audit the audit system itself. Review:
+          1. Is log.jsonl capturing what matters?
+          2. Are stats being updated correctly?
+          3. Is the learning system working?
+          4. Missing metrics or events?
+          5. Recommendations for observability improvements
+        inputs: [colony-audit.md]
+        outputs: [meta-audit.md]
+      - id: recommendations
+        agent: doctor
+        task: |
+          Synthesize all findings into actionable recommendations.
+          Prioritize by impact. Be specific and practical.
+          Grade the overall system health (A-F).
+        inputs: [coordinator-audit.md, colony-audit.md, meta-audit.md]
+        outputs: [health-report.md]
+
+  colony-review:
+    description: "Quick colony performance review"
+    triggers: [review colony, colony performance, agent stats, how are agents doing]
+    stages:
+      - id: review
+        agent: doctor
+        task: |
+          Quick review of colony performance. Check audit/agents/*.json and audit/global.json:
+          1. Overall success rates
+          2. Top performers
+          3. Struggling agents
+          4. Recent failures and causes
+          5. Quick wins for improvement
+          Context: {context}
+        outputs: [colony-review.md]
+
+  process-retrospective:
+    description: "Review a completed process run and extract learnings"
+    triggers: [retro, retrospective, review process, what did we learn]
+    stages:
+      - id: gather
+        agent: scuttle
+        task: "Gather all context files and results from the process run: {context}"
+        outputs: [process-data.md]
+      - id: analyze
+        agent: doctor
+        task: |
+          Analyze the process run:
+          1. What went well?
+          2. What took longer than expected?
+          3. Where did humans need to intervene?
+          4. Quality of handoffs between agents?
+          5. Suggestions for process improvement
+        inputs: [process-data.md]
+        outputs: [retro-analysis.md]
+      - id: learn
+        agent: doctor
+        task: |
+          Extract specific learnings to add to:
+          1. Individual agent memory files
+          2. Shared learnings.yaml
+          3. Process definition improvements
+          Format as actionable items.
+        inputs: [retro-analysis.md]
+        outputs: [learnings-to-add.md]
+    checkpoints: [learn]

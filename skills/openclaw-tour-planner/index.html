@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCLAW Tour Planner — AI Travel Planning Skill for Agents</title>
+    <meta name="description" content="Add complete travel planning to any AI agent in under 5 minutes. Itineraries, weather, attractions — your users ask in plain language, OpenCLAW handles the rest. Free & open source.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="OpenCLAW Tour Planner — AI Travel Planning Skill">
+    <meta property="og:description" content="Add complete travel planning to any AI agent in under 5 minutes. Free, open source, no API key required for core features.">
+    <meta property="og:url" content="https://openclaw.tours/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OpenCLAW Tour Planner">
+    <meta name="twitter:description" content="Add complete travel planning to any AI agent in under 5 minutes. Free & open source.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://openclaw.tours/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --border: #2a2a3a;
+            --success: #22c55e;
+            --code-bg: #0d0d12;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── Navigation ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-cta:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px; height: 900px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            position: relative; z-index: 1;
+        }
+
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative; z-index: 1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin-bottom: 2.5rem;
+            position: relative; z-index: 1;
+            line-height: 1.7;
+        }
+
+        .hero p strong {
+            color: var(--text-primary);
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative; z-index: 1;
+            margin-bottom: 1rem;
+        }
+
+        .hero-cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cta-microcopy {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0.8;
+        }
+
+        .btn {
+            padding: 0.9rem 1.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 30px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        /* ── Stars badge ── */
+        .stars-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            margin-left: 0.4rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ── Social proof strip ── */
+        .social-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+            position: relative; z-index: 1;
+        }
+
+        .social-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .social-stat strong {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .social-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+        }
+
+        /* ── Hero terminal ── */
+        .hero-terminal {
+            width: 100%;
+            max-width: 780px;
+            margin: 3rem auto 0;
+            position: relative; z-index: 1;
+        }
+
+        .terminal-window {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+        }
+
+        .terminal-header {
+            background: var(--bg-card);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .t-dot.red { background: #ef4444; }
+        .t-dot.yellow { background: #f59e0b; }
+        .t-dot.green { background: #22c55e; }
+
+        .terminal-title {
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.9;
+            text-align: left;
+        }
+
+        .t-install { color: var(--success); }
+        .t-prompt { color: var(--accent); }
+        .t-dim { color: var(--text-secondary); }
+        .t-white { color: var(--text-primary); }
+        .t-check { color: var(--success); }
+
+        .t-line {
+            display: block;
+            opacity: 0;
+            animation: fadeSlideIn 0.4s ease forwards;
+        }
+
+        .t-line:nth-child(1)  { animation-delay: 0.3s; }
+        .t-line:nth-child(2)  { animation-delay: 0.8s; }
+        .t-line:nth-child(3)  { animation-delay: 1.4s; }
+        .t-line:nth-child(4)  { animation-delay: 2.0s; }
+        .t-line:nth-child(5)  { animation-delay: 2.5s; }
+        .t-line:nth-child(6)  { animation-delay: 3.0s; }
+        .t-line:nth-child(7)  { animation-delay: 3.5s; }
+        .t-line:nth-child(8)  { animation-delay: 4.0s; }
+        .t-line:nth-child(9)  { animation-delay: 4.5s; }
+        .t-line:nth-child(10) { animation-delay: 5.0s; }
+        .t-line:nth-child(11) { animation-delay: 5.5s; }
+        .t-line:nth-child(12) { animation-delay: 6.0s; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Scroll indicator ── */
+        .scroll-hint {
+            position: relative; z-index: 1;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            opacity: 0.6;
+            animation: fadeSlideIn 0.5s ease 7s both;
+        }
+
+        .scroll-arrow {
+            width: 20px; height: 20px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            transform: rotate(45deg);
+            animation: bounce 1.6s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: rotate(45deg) translateY(0); }
+            50% { transform: rotate(45deg) translateY(4px); }
+        }
+
+        /* ── Compatible with ── */
+        .compat {
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compat-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .compat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .compat-logos {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .compat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .compat-chip:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* ── Demo ── */
+        .demo {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .demo-window {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .demo-header {
+            background: var(--bg-card);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .demo-dot.red { background: #ef4444; }
+        .demo-dot.yellow { background: #f59e0b; }
+        .demo-dot.green { background: #22c55e; }
+
+        .demo-title {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .demo-content {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.9;
+        }
+
+        .chat-line { margin-bottom: 0.75rem; }
+        .chat-user { color: var(--accent); }
+        .chat-agent { color: var(--text-secondary); }
+
+        .chat-response {
+            color: var(--text-primary);
+            margin-left: 1rem;
+            border-left: 2px solid var(--accent);
+            padding-left: 1rem;
+            white-space: pre-wrap;
+        }
+
+        /* ── Features ── */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ── Install ── */
+        .install {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .install-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .install h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .install > .install-content > p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .install-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .install-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            text-align: left;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .step-num {
+            width: 24px; height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-content { flex: 1; }
+        .step-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .code-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .code-line .cmd-prefix { color: var(--accent); margin-right: 0.4rem; }
+        .code-line .cmd-comment { color: var(--text-secondary); }
+
+        .install-note {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .install-note a { color: var(--accent); text-decoration: none; }
+        .install-note a:hover { text-decoration: underline; }
+
+        /* ── Footer ── */
+        footer {
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p { color: var(--text-secondary); font-size: 0.875rem; }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            nav { padding: 1rem; }
+            .nav-links { display: none; }
+            .hero { padding: 6rem 1.5rem 2rem; }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            .hero-terminal { margin-top: 2rem; }
+            .terminal-body { font-size: 0.78rem; padding: 1rem; }
+            .demo { padding: 3rem 1rem; }
+            .features { padding: 4rem 1rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .install { padding: 4rem 1.5rem; }
+            .compat-inner { gap: 1rem; }
+            .social-strip { gap: 1rem; }
+            .social-divider { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">
+            <div class="logo-icon">🧭</div>
+            <span>OpenCLAW</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#demo">Live Demo</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#install">Install</a></li>
+            <li><a href="https://github.com/Asif2BD/openclaw.tours" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+        <a href="#install" class="nav-cta">Get Started — Free</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Open Source — 100% Free — No API Key Required
+        </div>
+
+        <h1>Give Your Agent the<br>Power to Plan Any Trip</h1>
+
+        <p>Add complete travel planning to any AI agent <strong>in under 5 minutes.</strong><br>
+        Your users ask in plain language — OpenCLAW handles itineraries,<br>weather, attractions, and real budget estimates.</p>
+
+        <div class="hero-cta">
+            <div class="hero-cta-buttons">
+                <a href="#install" class="btn btn-primary">Get Started — Free</a>
+                <a href="https://github.com/Asif2BD/openclaw.tours" class="btn btn-secondary" target="_blank" rel="noopener">
+                    View on GitHub
+                    <span class="stars-badge">⭐ Star</span>
+                </a>
+            </div>
+            <div class="cta-microcopy">clawhub install Asif2BD/openclaw-tour-planner &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Setup in &lt;5 min</div>
+        </div>
+
+        <!-- Social proof strip -->
+        <div class="social-strip">
+            <div class="social-stat">
+                <span>🌍</span>
+                <div><strong>150+</strong> destinations</div>
+            </div>
+            <div class="social-divider"></div>
+            <div class="social-stat">
+                <span>⚡</span>
+                <div>Itinerary in <strong>&lt;10s</strong></div>
+            </div>
+            <div class="social-divider"></div>
+            <div class="social-stat">
+                <span>🔑</span>
+                <div><strong>Zero</strong> required API keys</div>
+            </div>
+            <div class="social-divider"></div>
+            <div class="social-stat">
+                <span>📦</span>
+                <div>Works with <strong>any</strong> agent framework</div>
+            </div>
+        </div>
+
+        <!-- Hero terminal -->
+        <div class="hero-terminal">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="t-dot red"></div>
+                    <div class="t-dot yellow"></div>
+                    <div class="t-dot green"></div>
+                    <span class="terminal-title">openclaw · openclaw-tour-planner</span>
+                </div>
+                <div class="terminal-body">
+                    <span class="t-line"><span class="t-prompt">$</span> <span class="t-install">clawhub install Asif2BD/openclaw-tour-planner</span></span>
+                    <span class="t-line"><span class="t-check">✓</span> <span class="t-dim">Installed openclaw-tour-planner v1.0.0 — no API key needed</span></span>
+                    <span class="t-line">&nbsp;</span>
+                    <span class="t-line"><span class="t-prompt">User:</span> <span class="t-white">Plan a 5-day trip to Tokyo in April for two people, mid-range budget</span></span>
+                    <span class="t-line"><span class="t-dim">Agent: Gathering live data for Tokyo...</span></span>
+                    <span class="t-line"><span class="t-check">  ✓</span> <span class="t-dim">Geocoded Tokyo, Japan (35.6762°N, 139.6503°E)</span></span>
+                    <span class="t-line"><span class="t-check">  ✓</span> <span class="t-dim">Weather: 18–23°C, mostly sunny, low rain chance</span></span>
+                    <span class="t-line"><span class="t-check">  ✓</span> <span class="t-dim">Loaded Wikivoyage guide · 42 curated attractions found</span></span>
+                    <span class="t-line"><span class="t-check">  ✓</span> <span class="t-dim">Built 5-day itinerary · Est. budget: $1,400–1,900 for 2</span></span>
+                    <span class="t-line">&nbsp;</span>
+                    <span class="t-line"><span class="t-prompt">Agent:</span> <span class="t-white">Here's your Tokyo itinerary — Day 1: Arrival &amp; Shibuya...</span></span>
+                    <span class="t-line"><span class="t-dim">         Day 2: Asakusa &amp; Ueno · Day 3: Shinjuku · Day 4: Harajuku &amp; Roppongi · Day 5: Day trip to Nikko</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll hint -->
+        <div class="scroll-hint">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Compatible With -->
+    <div class="compat">
+        <div class="compat-inner">
+            <span class="compat-label">Works with</span>
+            <div class="compat-logos">
+                <span class="compat-chip">🔗 LangChain</span>
+                <span class="compat-chip">🤖 AutoGPT</span>
+                <span class="compat-chip">🦾 CrewAI</span>
+                <span class="compat-chip">⚡ OpenAI Functions</span>
+                <span class="compat-chip">🧠 LlamaIndex</span>
+                <span class="compat-chip">🐚 OpenClaw</span>
+                <span class="compat-chip">🔧 Any custom agent</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Demo -->
+    <section class="demo" id="demo">
+        <div class="section-header">
+            <h2>See It in Action</h2>
+            <p>Your users talk naturally. OpenCLAW handles every detail.</p>
+        </div>
+        <div class="demo-window">
+            <div class="demo-header">
+                <div class="demo-dot red"></div>
+                <div class="demo-dot yellow"></div>
+                <div class="demo-dot green"></div>
+                <span class="demo-title">Live agent session</span>
+            </div>
+            <div class="demo-content">
+                <div class="chat-line">
+                    <span class="chat-user">User:</span> Plan a 5-day trip to Tokyo in April
+                </div>
+                <div class="chat-line">
+                    <span class="chat-agent">Agent:</span> On it — gathering live data for Tokyo...
+                </div>
+                <div class="chat-line">
+                    <span class="chat-response">✓ Geocoded Tokyo, Japan
+✓ Retrieved 5-day weather forecast (18–22°C, partly cloudy)
+✓ Loaded Wikivoyage travel guide
+✓ Generated day-by-day plan with budget</span>
+                </div>
+                <div class="chat-line">
+                    <span class="chat-agent">Agent:</span> Here's your 5-day Tokyo adventure:
+                </div>
+                <div class="chat-line">
+                    <span class="chat-response"># 5-Day Tokyo Adventure
+
+## Overview
+- Dates: April 15–19, 2025
+- Weather: 18–22°C, partly cloudy, low rain chance
+- Budget: $1,200–1,800 (excl. flights)
+
+## Day 1: Arrival &amp; Shibuya
+### Morning
+- 10:00 — Arrive at Narita / Haneda
+- 12:00 — Airport Express → Shibuya (¥300, 35 min)
+- 13:00 — Lunch: Ichiran Ramen, Dogenzaka
+
+### Afternoon
+- 15:00 — Shibuya Crossing &amp; Hachiko statue
+- 16:30 — Meiji Shrine (free entry)
+
+### Evening
+- 19:00 — Dinner in Nonbei Yokocho (alley bars, avg ¥3,000/person)
+...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Everything Built In</h2>
+            <p>Free APIs, open data, zero setup friction. Your agent is travel-ready from day one.</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🗺️</div>
+                <h3>Day-by-Day Itineraries</h3>
+                <p>Morning, afternoon, evening blocks with timing, transit directions, and cost estimates. Optimized by location to minimize travel time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌤️</div>
+                <h3>15-Day Weather Forecasts</h3>
+                <p>Live weather data helps your users pack right and plan indoor backup activities for rainy days — before they even leave home.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Local Insider Tips</h3>
+                <p>Powered by Wikivoyage — curated guides with hidden gems, cultural etiquette, and practical advice for 150+ destinations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Real Budget Breakdowns</h3>
+                <p>Itemized estimates for accommodation, food, transport, and activities. Budget, mid-range, and luxury tiers supported.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Privacy by Design</h3>
+                <p>No data stored. No tracking. No user accounts. Every itinerary is generated fresh — nothing persists between sessions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Zero Cost, Forever</h3>
+                <p>Built on free APIs with generous limits — Nominatim, Wikivoyage, Open-Meteo. No API keys required to get started.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install -->
+    <section class="install" id="install">
+        <div class="install-content">
+            <h2>Up and Running in 3 Steps</h2>
+            <p>No account needed. No API key for core features. Just install and ask.</p>
+
+            <div class="install-steps">
+                <div class="install-step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-label">Install the skill</div>
+                        <div class="code-line">
+                            <span class="cmd-prefix">$</span>clawhub install Asif2BD/openclaw-tour-planner
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-label">Ask your agent</div>
+                        <div class="code-line">
+                            <span class="cmd-prefix">→</span> "Plan a 5-day trip to Tokyo in April"
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-label">Get a full itinerary</div>
+                        <div class="code-line">
+                            <span class="cmd-prefix">✓</span> Day-by-day plan, weather, budget &amp; tips <span class="cmd-comment">— in under 10 seconds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="install-note">
+                Prefer to self-host? <a href="https://github.com/Asif2BD/openclaw.tours" target="_blank" rel="noopener">Clone from GitHub</a> and install manually.
+                &nbsp;·&nbsp; MIT License — free forever.
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            Built for the OpenClaw community &bull;
+            <a href="https://github.com/Asif2BD/openclaw.tours" target="_blank" rel="noopener">GitHub</a> &bull;
+            <a href="https://openclaw.ai" target="_blank" rel="noopener">OpenClaw</a> &bull;
+            <a href="https://openclaw.tours/docs">Docs</a>
+        </p>
+        <p style="margin-top: 0.5rem; opacity: 0.6;">MIT License — Free forever</p>
+    </footer>
+
+</body>
+</html>

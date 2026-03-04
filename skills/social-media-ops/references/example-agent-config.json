@@ -1,0 +1,28 @@
+{
+  "_comment": "Reference only — not read by any script. See patch-config.js for the authoritative agent builder.",
+  "_model_note": "No model key on agents — they inherit from agents.defaults.model, configured during openclaw onboard.",
+  "agents": {
+    "defaults": {
+      "compaction": { "mode": "safeguard" },
+      "maxConcurrent": 4,
+      "subagents": { "maxConcurrent": 8 }
+    },
+    "list": [
+      {
+        "id": "leader",
+        "default": true,
+        "name": "Leader",
+        "workspace": "~/.openclaw/workspace",
+        "identity": { "name": "BOT_NAME", "emoji": "BOT_EMOJI" },
+        "tools": { "deny": ["exec", "browser"] }
+      },
+      {
+        "id": "reviewer",
+        "name": "Reviewer",
+        "workspace": "~/.openclaw/workspace-reviewer",
+        "sandbox": { "mode": "non-main", "scope": "session" },
+        "tools": { "deny": ["exec", "edit", "apply_patch", "write", "browser"] }
+      }
+    ]
+  }
+}

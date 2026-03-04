@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tribe-protocol.org/schemas/did-document/v1.0.0",
+  "title": "Tribe Protocol DID Document",
+  "description": "Decentralized identifier document for Tribe Protocol participants (humans and bots)",
+  "type": "object",
+  "required": [
+    "tribe_did",
+    "format_version",
+    "entity_type",
+    "display_name",
+    "created",
+    "platforms"
+  ],
+  "properties": {
+    "tribe_did": {
+      "type": "string",
+      "pattern": "^tribe:(bot|human):[a-z0-9-]+:v[0-9]+$",
+      "description": "Unique identifier in format: tribe:{type}:{name}:v{version}",
+      "examples": [
+        "tribe:bot:alice:v1",
+        "tribe:human:bob:v1"
+      ]
+    },
+    "format_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version of DID document format",
+      "examples": ["1.0.0", "1.2.3"]
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": ["bot", "human"],
+      "description": "Type of entity this DID represents"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Human-readable name",
+      "examples": ["Alice's Clawdbot", "Bob Smith"]
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of DID creation"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "public_key": {
+      "type": "string",
+      "pattern": "^(ed25519|rsa|ecdsa):[A-Za-z0-9+/=]+$",
+      "description": "Public key for signature verification (algorithm:base64)",
+      "examples": ["ed25519:AbCdEf1234567890..."]
+    },
+    "platforms": {
+      "type": "object",
+      "description": "Platform-specific identities",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["verified"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "Platform-specific user ID"
+          },
+          "username": {
+            "type": "string",
+            "description": "Platform-specific username/handle"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether this platform identity has been verified"
+          },
+          "verification_method": {
+            "type": "string",
+            "enum": [
+              "oauth_token_hash",
+              "commit_signature",
+              "domain_verification",
+              "pgp_signature",
+              "phone_hash",
+              "out_of_band"
+            ],
+            "description": "Method used to verify this platform identity"
+          },
+          "verification_proof": {
+            "type": "string",
+            "description": "Proof of verification (hash, signature, URL, etc.)"
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When this platform identity was added"
+          }
+        }
+      },
+      "examples": [
+        {
+          "discord": {
+            "user_id": "1234567890",
+            "username": "alice-bot",
+            "verified": true,
+            "verification_method": "oauth_token_hash",
+            "verification_proof": "sha256:abcdef...",
+            "added": "2025-01-31T00:00:00Z"
+          }
+        }
+      ]
+    },
+    "human_operator": {
+      "type": "object",
+      "description": "Human operator of this bot (required for entity_type=bot)",
+      "required": ["tribe_did", "relationship"],
+      "properties": {
+        "tribe_did": {
+          "type": "string",
+          "pattern": "^tribe:human:[a-z0-9-]+:v[0-9]+$",
+          "description": "DID of human operator"
+        },
+        "relationship": {
+          "type": "string",
+          "enum": ["primary", "secondary", "team"],
+          "description": "Type of operator relationship"
+        },
+        "platforms": {
+          "type": "object",
+          "description": "Human's platform identities (for verification)",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "user_id": { "type": "string" },
+              "username": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "List of capabilities this entity supports",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z_]+\\.[a-z_]+$",
+        "examples": [
+          "collaboration.research",
+          "collaboration.code_review",
+          "skills.web_search",
+          "skills.git_operations",
+          "tribe_protocol.v1"
+        ]
+      }
+    },
+    "contact_preferences": {
+      "type": "object",
+      "description": "Preferred contact methods and settings",
+      "properties": {
+        "primary_channel": {
+          "type": "string",
+          "enum": ["discord", "email", "http", "slack", "other"],
+          "description": "Preferred platform for first contact"
+        },
+        "response_time_sla": {
+          "type": "string",
+          "pattern": "^[0-9]+(m|h|d)$",
+          "description": "Expected response time (e.g., '1h', '30m', '2d')",
+          "examples": ["1h", "30m", "2d"]
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone identifier",
+          "examples": ["America/Los_Angeles", "Europe/London", "UTC"]
+        },
+        "active_hours": {
+          "type": "object",
+          "description": "When this entity is typically active",
+          "properties": {
+            "start": {
+              "type": "string",
+              "pattern": "^([0-1][0-9]|2[0-3]):[0-5][0-9]$",
+              "description": "Start time in HH:MM format (local timezone)"
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^([0-1][0-9]|2[0-3]):[0-5][0-9]$",
+              "description": "End time in HH:MM format (local timezone)"
+            },
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+              },
+              "description": "Active days of the week"
+            }
+          }
+        },
+        "http_endpoint": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "description": "HTTPS endpoint for direct protocol messages"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional optional metadata",
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Short description of this entity"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Website or documentation URL"
+        },
+        "avatar_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to avatar/profile image"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Searchable tags",
+          "examples": [["researcher", "coder", "open-source"]]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "entity_type": { "const": "bot" } }
+      },
+      "then": {
+        "required": ["human_operator"]
+      }
+    }
+  ]
+}

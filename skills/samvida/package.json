@@ -1,0 +1,62 @@
+{
+  "name": "samvida",
+  "version": "0.3.3",
+  "description": "An OpenClaw skill to generate agentic contracts (llms.txt) for your business. Crawls your website, fills gaps conversationally, and produces a structured agent-optimized llms.txt ready to deploy.",
+  "keywords": [
+    "llms",
+    "llms.txt",
+    "agents",
+    "agentic",
+    "crawl",
+    "ai",
+    "samvida",
+    "contract"
+  ],
+  "author": "ngm9",
+  "license": "MIT",
+  "requirements": {
+    "runtime": {
+      "python": ">=3.9",
+      "virtualenv": "~/.virtualenvs/samvida",
+      "note": "Skill assumes a Python virtualenv at ~/.virtualenvs/samvida with httpx installed. Generation is handled by your configured OpenClaw LLM \u2014 no separate API key required. Create venv with: python3 -m venv ~/.virtualenvs/samvida && ~/.virtualenvs/samvida/bin/pip install httpx"
+    },
+    "credentials": {
+      "cloudflare": {
+        "required": false,
+        "scope": "deploy (Cloudflare Workers path only)",
+        "fields": [
+          {
+            "name": "CF_API_TOKEN",
+            "description": "Cloudflare API token with 'Edit Cloudflare Workers' permissions"
+          },
+          {
+            "name": "CF_ACCOUNT_ID",
+            "description": "Cloudflare Account ID (top-right of dashboard)"
+          },
+          {
+            "name": "CF_ZONE_ID",
+            "description": "Zone ID for your domain (domain page \u2192 right sidebar)"
+          }
+        ],
+        "note": "Prompted at deploy time, never stored by the skill"
+      },
+      "webflow": {
+        "required": false,
+        "scope": "deploy (Webflow path only)",
+        "fields": [
+          {
+            "name": "WEBFLOW_SITE_API_TOKEN",
+            "description": "Webflow Site API token with Assets, Sites, Redirects, and Publishing scopes"
+          }
+        ],
+        "note": "Prompted at deploy time, never stored by the skill"
+      }
+    },
+    "paths": {
+      "crawl_script": "~/.openclaw/workspace/skills/samvida/scripts/crawl.py",
+      "deploy_script": "~/.openclaw/workspace/skills/samvida/scripts/deploy.py",
+      "spec_file": "~/.openclaw/workspace/skills/samvida/references/llms_txt_spec.md",
+      "note": "Paths assume OpenClaw default workspace at ~/.openclaw/workspace. Adjust if your workspace path differs."
+    }
+  }
+}

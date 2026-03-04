@@ -1,0 +1,186 @@
+# ============================================================
+# SRE Agent Infrastructure Configuration Center
+# ============================================================
+#
+# This file configures all infrastructure dependencies.
+# - If a service is configured: use the provided configuration
+# - If a service is not configured: auto-create locally (if enabled)
+#
+# Configuration priority:
+# 1. Environment variables (highest priority)
+# 2. This configuration file
+# 3. Auto-create defaults
+#
+# Environment variable format:
+#   INFRA_PROMETHEUS__URL=http://your-prometheus:9090
+#   INFRA_KAFKA__BOOTSTRAP_SERVERS=kafka1:9092,kafka2:9092
+#   Or simplified:
+#   PROMETHEUS_URL=http://your-prometheus:9090
+# ============================================================
+
+# ------------------------------------------------------------
+# Prometheus / Mimir (Metrics Storage)
+# ------------------------------------------------------------
+prometheus:
+  enabled: true
+  # url: http://your-prometheus:9090
+  # Or use environment variable: PROMETHEUS_URL
+  timeout_seconds: 30
+  retry_attempts: 3
+
+  # Mimir (long-term storage for Prometheus)
+  use_mimir: false
+  # mimir_url: http://your-mimir:9009
+  # Or use environment variable: MIMIR_URL
+
+  # Authentication (optional)
+  # username: ""
+  # password: ""
+  # bearer_token: ""
+
+# ------------------------------------------------------------
+# Loki (Log Storage)
+# ------------------------------------------------------------
+loki:
+  enabled: true
+  # url: http://your-loki:3100
+  # Or use environment variable: LOKI_URL
+  timeout_seconds: 30
+  retry_attempts: 3
+
+  # Multi-tenant (optional)
+  # tenant_id: ""
+
+  # Authentication (optional)
+  # username: ""
+  # password: ""
+
+# ------------------------------------------------------------
+# Grafana (Visualization)
+# ------------------------------------------------------------
+grafana:
+  enabled: false
+  # url: http://your-grafana:3000
+  # Or use environment variable: GRAFANA_URL
+
+  # API Key for dashboard management
+  # api_key: ""
+  org_id: 1
+
+# ------------------------------------------------------------
+# SkyWalking (Distributed Tracing)
+# ------------------------------------------------------------
+skywalking:
+  enabled: false
+  # oap_url: http://your-skywalking-oap:12800
+  # Or use environment variable: SKYWALKING_URL
+
+  # UI URL (for links in notifications)
+  # ui_url: http://your-skywalking-ui:8080
+
+  # Authentication
+  # username: ""
+  # password: ""
+
+# ------------------------------------------------------------
+# Kafka (Message Queue)
+# ------------------------------------------------------------
+kafka:
+  enabled: false
+  # bootstrap_servers: kafka1:9092,kafka2:9092
+  # Or use environment variable: KAFKA_BOOTSTRAP_SERVERS
+
+  # Security
+  security_protocol: PLAINTEXT  # PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+  # sasl_mechanism: ""  # PLAIN, SCRAM-SHA-256, SCRAM-SHA-512
+  # sasl_username: ""
+  # sasl_password: ""
+
+  # Topics (will be auto-created if they don't exist)
+  anomaly_topic: sre-agent-anomalies
+  action_topic: sre-agent-actions
+  audit_topic: sre-agent-audit
+
+# ------------------------------------------------------------
+# MySQL (Metadata Storage)
+# ------------------------------------------------------------
+mysql:
+  enabled: false
+  # host: your-mysql-host
+  # Or use environment variable: MYSQL_HOST
+  port: 3306
+  database: sre_agent
+  # username: ""
+  # password: ""  # Or use MYSQL_PASSWORD env var
+  pool_size: 5
+
+  # Or use full connection string
+  # connection_string: mysql://user:password@host:3306/database
+
+# ------------------------------------------------------------
+# Redis (Cache & Distributed Lock)
+# ------------------------------------------------------------
+redis:
+  enabled: false
+  # url: redis://[:password@]host[:port][/db]
+  # Or use environment variable: REDIS_URL
+
+  # Or specify separately
+  # host: your-redis-host
+  port: 6379
+  # password: ""
+  db: 0
+
+  # Cluster mode
+  cluster_mode: false
+  # cluster_nodes:
+  #   - redis-node1:6379
+  #   - redis-node2:6379
+
+  # Sentinel mode (HA)
+  sentinel_mode: false
+  # sentinel_master: mymaster
+  # sentinel_nodes:
+  #   - sentinel1:26379
+  #   - sentinel2:26379
+
+# ------------------------------------------------------------
+# Vector Database (RAG Knowledge Base)
+# ------------------------------------------------------------
+vector_db:
+  enabled: true
+  provider: qdrant  # qdrant or milvus
+
+  # Qdrant configuration
+  # qdrant_url: http://your-qdrant:6333
+  # Or use environment variable: QDRANT_URL
+  # qdrant_api_key: ""
+
+  # Milvus configuration
+  # milvus_host: your-milvus-host
+  # Or use environment variable: MILVUS_HOST
+  milvus_port: 19530
+  # milvus_username: ""
+  # milvus_password: ""
+
+  # Collection name for storing incidents
+  collection_name: sre_incidents
+
+# ------------------------------------------------------------
+# Auto-Create Configuration (Local Development)
+# ------------------------------------------------------------
+# When enabled, missing services will be automatically created
+# using docker-compose for local development
+auto_create:
+  enabled: true
+  docker_compose_file: docker-compose.yaml
+  timeout_seconds: 60
+
+  # Services to auto-create if not configured
+  # Remove services you don't want auto-created
+  services_to_create:
+    - prometheus
+    - loki
+    - qdrant
+    # - grafana
+    # - redis

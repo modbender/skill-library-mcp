@@ -1,0 +1,72 @@
+{
+  "name": "poe-api-orchestrator",
+  "version": "1.0.0",
+  "description": "Use Poe API to call specialized AI models (Claude-Opus, Claude-Sonnet, Gemini, GPT-Codex). Automatically spawn subagents for coding, UI/UX design, data analysis, and complex reasoning tasks.",
+  "main": "SKILL.md",
+  "author": "UAT",
+  "license": "MIT",
+  "keywords": [
+    "poe",
+    "api",
+    "ai",
+    "models",
+    "subagents",
+    "orchestration",
+    "claude",
+    "gemini",
+    "gpt",
+    "coding",
+    "design",
+    "analysis"
+  ],
+  "engines": {
+    "python": ">=3.8"
+  },
+  "dependencies": {
+    "openai": ">=1.0.0"
+  },
+  "environment": {
+    "POE_API_KEY": "required"
+  },
+  "scripts": {
+    "test": "python3 scripts/poe_client.py",
+    "install": "pip install -r requirements.txt"
+  },
+  "openclaw": {
+    "emoji": "🤖",
+    "userInvocable": false,
+    "disableModelInvocation": true,
+    "requires": {
+      "bins": ["python3"],
+      "env": ["POE_API_KEY"]
+    },
+    "categories": ["ai", "api", "orchestration"],
+    "taskTypes": {
+      "coding": {
+        "model": "GPT-5.3-Codex",
+        "maxTokens": 8000,
+        "keywords": ["code", "implement", "debug", "script", "function"]
+      },
+      "design": {
+        "model": "Gemini-3.1-Pro",
+        "maxTokens": 4000,
+        "keywords": ["design", "UI", "mockup", "visual", "frontend"]
+      },
+      "analysis": {
+        "model": "Claude-Sonnet-4.6",
+        "maxTokens": 3000,
+        "keywords": ["analyze", "requirements", "breakdown", "plan"]
+      },
+      "reasoning": {
+        "model": "Claude-Opus-4.6",
+        "maxTokens": 5000,
+        "keywords": ["complex", "difficult", "architecture", "reasoning"]
+      }
+    },
+    "tokenControl": {
+      "maxCallsPerTask": 10,
+      "maxTotalTokens": 100000,
+      "trackUsage": true
+    }
+  }
+}

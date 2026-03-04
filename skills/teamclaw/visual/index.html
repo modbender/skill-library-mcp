@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Agent Orchestration Studio</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+    <h1>🎨 Agent Orchestration Studio</h1>
+    <div class="controls">
+        <button id="btn-auto-arrange" title="Auto-arrange nodes in circle">🔄 Auto Arrange</button>
+        <button id="btn-save" title="Save current layout">💾 Save</button>
+        <button id="btn-load" title="Load saved layout">📂 Load</button>
+        <button id="btn-generate-prompt" title="Generate LLM prompt for YAML generation">🤖 LLM Prompt</button>
+        <button id="btn-export" class="primary" title="Copy YAML to clipboard">📋 Export YAML</button>
+        <button id="btn-clear" class="danger" title="Clear canvas">🗑️ Clear</button>
+    </div>
+</div>
+
+<!-- ── Main Layout ── -->
+<div class="main-container">
+
+    <!-- Left Sidebar - Expert Pool -->
+    <div class="sidebar">
+        <h2>🧑‍💼 Expert Pool</h2>
+        <div class="expert-list" id="expert-list">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Manual injection card -->
+        <div class="manual-card" draggable="true" id="manual-injection-card">
+            <span class="emoji">📝</span>
+            <div class="info">
+                <div class="name">Manual Injection</div>
+                <div class="tag" style="font-size:11px;color:#9944cc;">Inject fixed content</div>
+            </div>
+        </div>
+
+        <!-- Help -->
+        <div style="padding:8px 12px;font-size:11px;color:#555;border-top:1px solid #2a2a4a;">
+            <div style="margin-bottom:4px;"><b>Quick Guide:</b></div>
+            <div>• Drag experts to canvas</div>
+            <div>• Connect ports for workflow</div>
+            <div>• Select + Ctrl+G to group</div>
+            <div>• Right-click for more options</div>
+            <div>• Double-click sidebar to add</div>
+        </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-wrapper">
+        <div id="canvas-area">
+            <svg id="edge-svg" style="width:100%;height:100%;position:absolute;top:0;left:0;z-index:5;pointer-events:none;">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#667eea" />
+                    </marker>
+                </defs>
+            </svg>
+            <!-- Placeholder hint -->
+            <div id="canvas-hint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#3a3a6a;pointer-events:none;z-index:1;">
+                <div style="font-size:48px;margin-bottom:12px;">🎯</div>
+                <div style="font-size:16px;font-weight:500;">Drag experts here to start</div>
+                <div style="font-size:13px;margin-top:8px;color:#2a2a5a;">
+                    Connect nodes with edges for workflow<br>
+                    Group nodes for parallel / brainstorm
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel - YAML Output & Settings -->
+    <div class="right-panel">
+        <h2>⚙️ Settings</h2>
+        <div class="settings-section">
+            <label>
+                <input type="checkbox" id="setting-repeat" checked>
+                Repeat plan each round
+            </label>
+            <label>
+                Max rounds:
+                <input type="number" id="setting-rounds" value="5" min="1" max="20">
+            </label>
+            <label>
+                <input type="checkbox" id="setting-bot-session">
+                Stateful bot sessions
+            </label>
+            <label>
+                Cluster threshold:
+                <input type="range" id="setting-threshold" min="50" max="400" value="150">
+                <span id="threshold-value">150px</span>
+            </label>
+        </div>
+
+        <h2>🔐 Agent Credentials</h2>
+        <div class="settings-section" style="margin-bottom:8px;">
+            <label style="font-size:11px;color:#a0a0d0;">
+                Username:
+                <input type="text" id="agent-username" placeholder="e.g. bryankztan" style="width:100%;padding:4px 8px;background:#1a1a3a;border:1px solid #3a3a5c;border-radius:4px;color:#e0e0ff;font-size:12px;margin-top:2px;">
+            </label>
+            <label style="font-size:11px;color:#a0a0d0;margin-top:4px;display:block;">
+                Password:
+                <input type="password" id="agent-password" placeholder="Password" style="width:100%;padding:4px 8px;background:#1a1a3a;border:1px solid #3a3a5c;border-radius:4px;color:#e0e0ff;font-size:12px;margin-top:2px;">
+            </label>
+            <div id="auth-status" style="font-size:10px;color:#606090;margin-top:4px;">🔒 Enter credentials to authenticate with Main Agent</div>
+        </div>
+
+        <h2>🤖 Agent YAML Generator</h2>
+        <div id="agent-status" class="agent-status idle">
+            💡 Click "🤖 LLM Prompt" to generate → send to Main Agent → get YAML
+        </div>
+
+        <h3 style="font-size:12px;color:#80a0e0;margin:6px 0 4px;">
+            📨 Prompt sent to Agent
+            <button onclick="copyLLMPrompt()" style="float:right;font-size:10px;padding:1px 6px;border:1px solid #3a3a5c;border-radius:4px;background:#1e1e3a;color:#c0c0e0;cursor:pointer;" title="Copy prompt">📋</button>
+        </h3>
+        <div class="yaml-output" id="llm-prompt-content" style="max-height:140px;min-height:40px;flex:none;color:#e0c080;margin-bottom:4px;font-size:10px;">
+# Click "🤖 LLM Prompt" to auto-generate a prompt,
+# send it to the Main Agent, and receive YAML back.
+        </div>
+
+        <h3 style="font-size:12px;color:#80e0a0;margin:6px 0 4px;">
+            🤖 Agent-Generated YAML
+            <button onclick="copyAgentYaml()" style="float:right;font-size:10px;padding:1px 6px;border:1px solid #3a3a5c;border-radius:4px;background:#1e1e3a;color:#c0c0e0;cursor:pointer;" title="Copy agent YAML">📋</button>
+        </h3>
+        <div class="yaml-output" id="agent-yaml-content" style="max-height:200px;min-height:60px;flex:none;color:#a0e0a0;font-size:11px;">
+# Agent-generated YAML will appear here
+# after clicking "🤖 LLM Prompt"
+        </div>
+
+        <h2>📄 Rule-Based YAML</h2>
+        <div class="yaml-output" id="yaml-content">
+# Drag agents to the canvas to start building your schedule...
+#
+# Spatial Semantics:
+#   → Connected nodes = Sequential workflow
+#   ○ Grouped nodes = Parallel / Brainstorm
+#   ★ All nodes = all_experts: true
+#   📝 Manual node = Inject fixed content
+        </div>
+
+        <!-- Status bar inside panel -->
+        <div class="status-bar" id="status-bar">
+            Nodes: 0 | Edges: 0 | Groups: 0 | Selected: 0
+        </div>
+    </div>
+</div>
+
+<script src="/static/app.js"></script>
+<script src="/static/events.js"></script>
+<script>
+    // Setup manual injection card drag
+    document.getElementById('manual-injection-card').addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('application/json', JSON.stringify({
+            type: 'manual',
+            name: 'Manual Injection',
+            tag: 'manual',
+            emoji: '📝',
+            author: '主持人',
+            content: 'Please continue the discussion.',
+        }));
+        e.dataTransfer.effectAllowed = 'copy';
+    });
+
+    // Hide canvas hint when nodes exist
+    const hintObserver = new MutationObserver(() => {
+        const hint = document.getElementById('canvas-hint');
+        if (hint) {
+            hint.style.display = state.nodes.length > 0 ? 'none' : 'block';
+        }
+    });
+    hintObserver.observe(document.getElementById('canvas-area'), { childList: true });
+</script>
+
+</body>
+</html>

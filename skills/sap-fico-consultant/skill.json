@@ -1,0 +1,95 @@
+{
+  "skill_id": "sap-fico-expert",
+  "name": "SAP FICO Expert Consultant",
+  "description": "Senior SAP Finance & Controlling consultant with cross-module expertise, S/4HANA and Cloud Public Edition. Answers configuration, troubleshooting, integration and migration questions with production-grade accuracy.",
+  "version": "1.0.0",
+  "author": "@chanfouricc",
+  "language": "fr",
+  "enabled": true,
+
+  "activation": {
+    "mode": "auto",
+    "keywords": [
+      "SAP", "FICO", "FI/CO", "FI-GL", "FI-AP", "FI-AR", "FI-AA", "FI-BL",
+      "CO-CCA", "CO-PA", "CO-PC", "CO-OPA", "EC-PCA",
+      "S/4HANA", "S4HANA", "ACDOCA", "Universal Journal",
+      "T-code", "tcode", "transaction SAP",
+      "BKPF", "BSEG", "BSIS", "COSS", "COSP",
+      "OB52", "OB58", "OBYC", "OKKP",
+      "FB01", "FB50", "FB60", "F110", "F-02", "F-28",
+      "KS01", "KSB1", "KP26", "KE30",
+      "MIGO", "MIRO", "GR/IR",
+      "account determination", "document splitting",
+      "assessment", "distribution", "settlement",
+      "depreciation", "amortissement", "immobilisation",
+      "centre de coûts", "cost center", "profit center",
+      "clôture", "closing", "period-end", "year-end",
+      "plan comptable", "chart of accounts",
+      "écart", "variance", "rapprochement",
+      "Fiori app", "Cloud Public Edition", "RISE with SAP",
+      "note OSS", "erreur F5", "erreur AA", "erreur K"
+    ],
+    "manual_trigger": "/sap",
+    "confidence_threshold": 0.7
+  },
+
+  "model": {
+    "primary": "deepseek-chat",
+    "fallback_code": "deepseek-coder",
+    "code_detection_keywords": ["ABAP", "SELECT", "LOOP", "BADI", "enhancement", "user exit", "BAPI", "RFC", "ALV"],
+    "parameters": {
+      "temperature": 0.25,
+      "max_tokens": 600,
+      "top_p": 0.9,
+      "presence_penalty": 0.1,
+      "frequency_penalty": 0.0
+    }
+  },
+
+  "system_prompt_file": "system_prompt.md",
+  "examples_file": "examples.json",
+
+  "response_schema": {
+    "required_sections": [
+      "tcode",
+      "tables",
+      "steps"
+    ],
+    "optional_sections": [
+      "config",
+      "oss_notes",
+      "integrations",
+      "s4hana",
+      "abap_code"
+    ],
+    "max_response_words": 350,
+    "format_language": "fr"
+  },
+
+  "guardrails": {
+    "scope": [
+      "SAP Finance (FI) — all sub-modules",
+      "SAP Controlling (CO) — all sub-modules",
+      "FI/CO integrations with MM, SD, PP, HR, PS",
+      "S/4HANA migration and specifics",
+      "SAP Cloud Public Edition",
+      "SAP Fiori apps FI/CO",
+      "ABAP snippets related to FI/CO"
+    ],
+    "out_of_scope_response": "This question mainly concerns the {module} module. I can help with the FI/CO integration aspect, but for {module} specifics, I recommend consulting a {module} specialist.",
+    "never_invent": [
+      "OSS note numbers",
+      "KBA note numbers",
+      "Exact Fiori app names (except those listed in the prompt)",
+      "Exact SPRO paths"
+    ],
+    "uncertainty_phrase": "Verify on OSS/SAP Help Portal to confirm"
+  },
+
+  "metadata": {
+    "created": "2026-02-08",
+    "last_updated": "2026-02-08",
+    "sap_versions_covered": ["ECC 6.0", "S/4HANA 2021+", "S/4HANA Cloud Public Edition"],
+    "certification_basis": ["C_TFIN52_67", "C_TFIN22_67"]
+  }
+}

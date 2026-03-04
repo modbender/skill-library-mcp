@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Genomics Dashboard</title>
+    <style>
+        /* ========================================
+           CSS Variables & Theme
+           ======================================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #818cf8;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+        }
+        
+        /* ========================================
+           Reset & Base
+           ======================================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* ========================================
+           Layout
+           ======================================== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo svg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 0;
+            position: sticky;
+            top: 96px;
+            z-index: 90;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            white-space: nowrap;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        main {
+            padding: 2rem 0;
+        }
+        
+        /* ========================================
+           Components
+           ======================================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .card-header:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .card-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card.collapsed .card-body {
+            display: none;
+        }
+        
+        .chevron {
+            transition: transform 0.2s;
+        }
+        
+        .card.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-danger { background: rgba(220,38,38,0.15); color: var(--danger); }
+        .badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .badge-success { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge-info { background: rgba(59,130,246,0.15); color: var(--info); }
+        .badge-neutral { background: var(--bg-secondary); color: var(--text-secondary); }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .input {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .input:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+        
+        /* ========================================
+           Alert Boxes
+           ======================================== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .alert-critical {
+            background: linear-gradient(135deg, rgba(220,38,38,0.1), rgba(220,38,38,0.05));
+            border: 2px solid var(--danger);
+        }
+        
+        .alert-high {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05));
+            border: 2px solid var(--warning);
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .alert-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .alert-recommendations {
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+        }
+        
+        .alert-recommendations li {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* ========================================
+           Tables
+           ======================================== */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .mono {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+        
+        /* ========================================
+           Stats Grid
+           ======================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        /* ========================================
+           PRS Visualizations
+           ======================================== */
+        .prs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .prs-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .prs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .prs-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .prs-percentile {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        .prs-bar-container {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .prs-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .prs-marker {
+            position: absolute;
+            top: -4px;
+            width: 3px;
+            height: 16px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transform: translateX(-50%);
+        }
+        
+        .prs-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.625rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        .prs-confidence {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        /* ========================================
+           Trait Cards
+           ======================================== */
+        .trait-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .trait-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .trait-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--accent-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.25rem;
+        }
+        
+        .trait-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .trait-content p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .trait-content .gene {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-primary);
+        }
+        
+        /* ========================================
+           Gauge Charts
+           ======================================== */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .gauge {
+            position: relative;
+            width: 200px;
+            height: 100px;
+        }
+        
+        .gauge svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .gauge-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .gauge-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .gauge-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* ========================================
+           Food Matrix
+           ======================================== */
+        .food-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .food-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+        
+        .food-icon {
+            font-size: 1.5rem;
+        }
+        
+        .food-info h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .food-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .food-status {
+            margin-left: auto;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .food-status.good { background: var(--success); }
+        .food-status.moderate { background: var(--warning); }
+        .food-status.poor { background: var(--danger); }
+        
+        /* ========================================
+           Ancestry Section
+           ======================================== */
+        .ancestry-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .haplogroup-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .haplogroup-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .haplogroup-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+        
+        .haplogroup-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        /* ========================================
+           Carrier Status
+           ======================================== */
+        .carrier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .carrier-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+        
+        .carrier-status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .carrier-status-icon.positive {
+            background: rgba(245,158,11,0.2);
+        }
+        
+        .carrier-status-icon.negative {
+            background: rgba(16,185,129,0.2);
+        }
+        
+        .carrier-info {
+            flex: 1;
+        }
+        
+        .carrier-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .carrier-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* ========================================
+           Sleep Profile
+           ======================================== */
+        .sleep-profile {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .chronotype-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+        }
+        
+        .clock-display {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chronotype-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .chronotype-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .sleep-recommendations {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+        
+        .sleep-recommendations h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .sleep-time-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .sleep-time-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sleep-time-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .sleep-time-value {
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+        
+        /* ========================================
+           UV/Skin Section
+           ======================================== */
+        .skin-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .skin-type-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+        }
+        
+        .skin-type-visual {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+        }
+        
+        .spf-recommendation {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+        
+        .spf-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--warning);
+            text-align: center;
+        }
+        
+        .spf-label {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* ========================================
+           Search & Filter
+           ======================================== */
+        .search-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-bar .input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-pill:hover, .filter-pill.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+        
+        /* ========================================
+           Disclaimer
+           ======================================== */
+        .disclaimer {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin-top: 2rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        
+        .disclaimer h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .disclaimer p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* ========================================
+           Loading & Error States
+           ======================================== */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .error-state h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-state p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(79,70,229,0.05);
+        }
+        
+        .drop-zone svg {
+            margin-bottom: 1rem;
+        }
+        
+        /* ========================================
+           Footer
+           ======================================== */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .footer-content a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        /* ========================================
+           Print Styles
+           ======================================== */
+        @media print {
+            header, nav, .btn, .search-bar, .theme-toggle {
+                display: none !important;
+            }
+            
+            .card.collapsed .card-body {
+                display: block !important;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+        
+        /* ========================================
+           Responsive
+           ======================================== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav {
+                top: auto;
+                position: relative;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .gauge-container {
+                padding: 0.5rem;
+            }
+            
+            .gauge {
+                width: 150px;
+                height: 75px;
+            }
+        }
+        
+        /* Hidden utility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2"/>
+                        <path d="M12 20C12 20 16 12 20 12C24 12 28 20 28 20C28 20 24 28 20 28C16 28 12 20 12 20Z" stroke="white" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="4" fill="white"/>
+                    </svg>
+                    <h1>Personal Genomics Dashboard</h1>
+                </div>
+                <div class="header-controls">
+                    <button class="btn btn-secondary" onclick="toggleTheme()" title="Toggle dark mode">
+                        <span id="theme-icon">🌙</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()" title="Export to PDF">
+                        📄 Export PDF
+                    </button>
+                    <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                        📂 Load Data
+                    </button>
+                    <input type="file" id="file-input" accept=".json" class="hidden" onchange="loadFile(event)">
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <nav id="main-nav" class="hidden">
+        <div class="container">
+            <div class="nav-links">
+                <a href="#overview" class="nav-link active">Overview</a>
+                <a href="#pharmacogenomics" class="nav-link">💊 Pharmacogenomics</a>
+                <a href="#health-risks" class="nav-link">📊 Health Risks</a>
+                <a href="#traits" class="nav-link">🧬 Traits</a>
+                <a href="#ancestry" class="nav-link">🌍 Ancestry</a>
+                <a href="#carrier" class="nav-link">🧪 Carrier Status</a>
+                <a href="#sleep" class="nav-link">😴 Sleep</a>
+                <a href="#athletic" class="nav-link">🏃 Athletic</a>
+                <a href="#uv" class="nav-link">☀️ UV/Skin</a>
+                <a href="#dietary" class="nav-link">🥗 Dietary</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- Initial Load State -->
+        <div id="initial-state">
+            <div class="card">
+                <div class="card-body">
+                    <div class="drop-zone" id="drop-zone">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17,8 12,3 7,8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <h2 style="margin-bottom: 0.5rem;">Load Your Genetic Data</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            Drag & drop <code>agent_summary.json</code> or <code>full_analysis.json</code> here
+                        </p>
+                        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                            Browse Files
+                        </button>
+                        <p style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            🔒 All analysis runs locally in your browser. No data is uploaded.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Content (hidden initially) -->
+        <div id="dashboard-content" class="hidden">
+            
+            <!-- Overview Section -->
+            <section id="overview">
+                <div class="stats-grid" id="stats-grid"></div>
+                
+                <!-- Critical Alerts -->
+                <div id="critical-alerts"></div>
+                
+                <!-- High Priority -->
+                <div id="high-priority"></div>
+            </section>
+            
+            <!-- Pharmacogenomics Section -->
+            <section id="pharmacogenomics">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>💊 Pharmacogenomics</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-bar">
+                            <input type="text" class="input" placeholder="Search drugs or genes..." id="pharma-search" oninput="filterTable('pharma-table', this.value)">
+                        </div>
+                        <div class="table-container">
+                            <table id="pharma-table">
+                                <thead>
+                                    <tr>
+                                        <th>Gene</th>
+                                        <th>rsID</th>
+                                        <th>Genotype</th>
+                                        <th>Variant</th>
+                                        <th>Impact</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pharma-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Health Risks Section -->
+            <section id="health-risks">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>📊 Polygenic Risk Scores</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="prs-grid" id="prs-grid"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Traits Section -->
+            <section id="traits">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>🧬 Traits</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-bar">
+                            <input type="text" class="input" placeholder="Search traits..." id="trait-search" oninput="filterTraits(this.value)">
+                        </div>
+                        <div class="trait-grid" id="trait-grid"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Ancestry Section -->
+            <section id="ancestry">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>🌍 Ancestry & Haplogroups</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="ancestry-info" id="ancestry-info"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Carrier Status Section -->
+            <section id="carrier">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>🧪 Carrier Status</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="carrier-list" id="carrier-list"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sleep Profile Section -->
+            <section id="sleep">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>😴 Sleep Profile</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="sleep-profile" id="sleep-profile"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Athletic Profile Section -->
+            <section id="athletic">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>🏃 Athletic Profile</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div id="athletic-profile"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- UV/Skin Section -->
+            <section id="uv">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>☀️ UV Sensitivity & Skin</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="skin-info" id="skin-info"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Dietary Section -->
+            <section id="dietary">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h2>🥗 Dietary Interactions</h2>
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <div class="food-matrix" id="food-matrix"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <h3>⚠️ Important Disclaimers</h3>
+                <p>
+                    This analysis is for <strong>informational purposes only</strong> and is NOT medical advice. 
+                    Genetic risk does not equal destiny — lifestyle, environment, and other factors play a major role.
+                    Consumer DNA arrays capture ~0.1% of your genome and may miss important variants.
+                    <strong>Always consult healthcare providers before making medical decisions.</strong>
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>Personal Genomics Dashboard v4.2.0 | Analysis runs locally, your data stays private</p>
+                <p style="margin-top: 0.5rem;">
+                    <a href="https://github.com/elata-bio/personal-genomics" target="_blank">GitHub</a> · 
+                    Generated by <a href="https://openclaw.ai">OpenClaw</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // ========================================
+        // Global State
+        // ========================================
+        let data = null;
+        let allTraits = [];
+        
+        // ========================================
+        // Theme Toggle
+        // ========================================
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+            document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+        
+        // Initialize theme
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('theme-icon').textContent = '☀️';
+        }
+        
+        // ========================================
+        // File Loading
+        // ========================================
+        const dropZone = document.getElementById('drop-zone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+        
+        function loadFile(event) {
+            const file = event.target.files[0];
+            if (file) processFile(file);
+        }
+        
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    data = JSON.parse(e.target.result);
+                    renderDashboard();
+                } catch (err) {
+                    alert('Error parsing JSON file: ' + err.message);
+                    console.error(err);
+                }
+            };
+            reader.onerror = () => alert('Error reading file');
+            reader.readAsText(file);
+        }
+        
+        // ========================================
+        // Dashboard Rendering
+        // ========================================
+        function renderDashboard() {
+            document.getElementById('initial-state').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            document.getElementById('main-nav').classList.remove('hidden');
+            
+            renderStats();
+            renderAlerts();
+            renderPharma();
+            renderPRS();
+            renderTraits();
+            renderAncestry();
+            renderCarrier();
+            renderSleep();
+            renderAthletic();
+            renderSkin();
+            renderDietary();
+        }
+        
+        // ========================================
+        // Stats Section
+        // ========================================
+        function renderStats() {
+            const grid = document.getElementById('stats-grid');
+            const snps = data.snps_analyzed || data.total_snps || 0;
+            const format = data.format_detected || data.format || 'Unknown';
+            const criticalCount = (data.critical_alerts || []).length;
+            const highCount = (data.high_priority || []).length;
+            
+            grid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${snps.toLocaleString()}</div>
+                    <div class="stat-label">SNPs Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${format}</div>
+                    <div class="stat-label">File Format</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: ${criticalCount > 0 ? 'var(--danger)' : 'var(--success)'}">${criticalCount}</div>
+                    <div class="stat-label">Critical Alerts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: ${highCount > 0 ? 'var(--warning)' : 'var(--success)'}">${highCount}</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // Alerts Section
+        // ========================================
+        function renderAlerts() {
+            const criticalContainer = document.getElementById('critical-alerts');
+            const highContainer = document.getElementById('high-priority');
+            
+            const criticals = data.critical_alerts || [];
+            const highs = data.high_priority || [];
+            
+            if (criticals.length > 0) {
+                criticalContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-header" onclick="toggleCard(this)">
+                            <h2>🚨 Critical Alerts</h2>
+                            <span class="badge badge-danger">${criticals.length}</span>
+                        </div>
+                        <div class="card-body">
+                            ${criticals.map(alert => `
+                                <div class="alert alert-critical">
+                                    <div class="alert-icon">⚠️</div>
+                                    <div class="alert-content">
+                                        <h3>${alert.gene || 'Unknown'} (${alert.rsid || 'N/A'})</h3>
+                                        <p>Genotype: <code class="mono">${alert.genotype || 'N/A'}</code></p>
+                                        ${alert.recommendations ? `
+                                            <ul class="alert-recommendations">
+                                                ${alert.recommendations.map(r => `<li>${r}</li>`).join('')}
+                                            </ul>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (highs.length > 0) {
+                highContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-header" onclick="toggleCard(this)">
+                            <h2>⚡ High Priority Findings</h2>
+                            <span class="badge badge-warning">${highs.length}</span>
+                        </div>
+                        <div class="card-body">
+                            ${highs.slice(0, 10).map(item => `
+                                <div class="alert alert-high">
+                                    <div class="alert-icon">📋</div>
+                                    <div class="alert-content">
+                                        <h3>${item.gene || 'Unknown'} (${item.rsid || 'N/A'})</h3>
+                                        <p>Genotype: <code class="mono">${item.genotype || 'N/A'}</code></p>
+                                        ${item.recommendations ? `
+                                            <ul class="alert-recommendations">
+                                                ${item.recommendations.slice(0, 3).map(r => `<li>${r}</li>`).join('')}
+                                            </ul>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${highs.length > 10 ? `<p style="color: var(--text-secondary); text-align: center;">+ ${highs.length - 10} more findings</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // ========================================
+        // Pharmacogenomics Section
+        // ========================================
+        function renderPharma() {
+            const tbody = document.getElementById('pharma-tbody');
+            
+            // Get pharma data from multiple possible sources
+            let pharmaData = [];
+            
+            if (data.pharmacogenomics_alerts) {
+                pharmaData = data.pharmacogenomics_alerts;
+            } else if (data.pharmacogenomics?.findings) {
+                pharmaData = data.pharmacogenomics.findings;
+            }
+            
+            if (pharmaData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No pharmacogenomics data available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = pharmaData.map(item => {
+                const isRisk = item.is_risk || item.risk_copies > 0 || item.priority === 'high' || item.priority === 'critical';
+                return `
+                    <tr data-searchable="${(item.gene || '').toLowerCase()} ${(item.rsid || '').toLowerCase()} ${(item.variant || '').toLowerCase()}">
+                        <td><strong>${item.gene || 'Unknown'}</strong></td>
+                        <td class="mono">${item.rsid || 'N/A'}</td>
+                        <td class="mono">${item.genotype || 'N/A'}</td>
+                        <td>${item.variant || '-'}</td>
+                        <td><span class="badge ${isRisk ? 'badge-warning' : 'badge-neutral'}">${isRisk ? 'Actionable' : 'Normal'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ========================================
+        // PRS Section
+        // ========================================
+        function renderPRS() {
+            const grid = document.getElementById('prs-grid');
+            const prs = data.polygenic_risk_scores || data.prs || {};
+            
+            if (Object.keys(prs).length === 0 || prs.error) {
+                grid.innerHTML = '<p style="color: var(--text-secondary);">No polygenic risk scores available</p>';
+                return;
+            }
+            
+            grid.innerHTML = Object.entries(prs).map(([condition, scores]) => {
+                const percentile = scores.percentile_estimate || 50;
+                const confidence = scores.confidence || 'low';
+                const coverage = Math.round((scores.coverage || 0) * 100);
+                
+                // Color based on percentile
+                let color = 'var(--success)';
+                if (percentile > 75) color = 'var(--danger)';
+                else if (percentile > 50) color = 'var(--warning)';
+                
+                return `
+                    <div class="prs-card">
+                        <div class="prs-header">
+                            <span class="prs-name">${formatConditionName(condition)}</span>
+                            <span class="prs-percentile" style="color: ${color}">${percentile}%</span>
+                        </div>
+                        <div class="prs-bar-container">
+                            <div class="prs-bar" style="width: ${percentile}%; background: ${color}"></div>
+                            <div class="prs-marker" style="left: ${percentile}%"></div>
+                        </div>
+                        <div class="prs-scale">
+                            <span>Low Risk</span>
+                            <span>Average</span>
+                            <span>High Risk</span>
+                        </div>
+                        <div class="prs-confidence">
+                            ${scores.snps_found || 0}/${scores.snps_total || 0} SNPs (${coverage}%) · Confidence: ${confidence}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========================================
+        // Traits Section
+        // ========================================
+        function renderTraits() {
+            const grid = document.getElementById('trait-grid');
+            
+            // Collect traits from multiple sources
+            allTraits = data.notable_traits || [];
+            
+            if (data.traits?.findings) {
+                allTraits = [...allTraits, ...data.traits.findings.map(f => ({
+                    trait: f.trait || f.name,
+                    gene: f.gene,
+                    genotype: f.genotype,
+                    interpretation: f.effect || f.interpretation
+                }))];
+            }
+            
+            // Remove duplicates
+            const seen = new Set();
+            allTraits = allTraits.filter(t => {
+                const key = `${t.trait}-${t.gene}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+            
+            renderTraitGrid(allTraits);
+        }
+        
+        function renderTraitGrid(traits) {
+            const grid = document.getElementById('trait-grid');
+            
+            if (traits.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-secondary);">No trait data available</p>';
+                return;
+            }
+            
+            const icons = {
+                'caffeine': '☕', 'coffee': '☕', 'sleep': '😴', 'alcohol': '🍷',
+                'lactose': '🥛', 'bitter': '🥬', 'sweet': '🍬', 'muscle': '💪',
+                'eye': '👁️', 'hair': '💇', 'skin': '🧴', 'earwax': '👂',
+                'cilantro': '🌿', 'asparagus': '🥦', 'smell': '👃'
+            };
+            
+            grid.innerHTML = traits.slice(0, 24).map(trait => {
+                const name = (trait.trait || 'Unknown').toLowerCase();
+                let icon = '🧬';
+                for (const [key, emoji] of Object.entries(icons)) {
+                    if (name.includes(key)) { icon = emoji; break; }
+                }
+                
+                let interpretation = trait.interpretation || '';
+                if (typeof interpretation === 'object') {
+                    interpretation = interpretation[trait.genotype] || JSON.stringify(interpretation);
+                }
+                
+                return `
+                    <div class="trait-card" data-trait="${name}">
+                        <div class="trait-icon">${icon}</div>
+                        <div class="trait-content">
+                            <h4>${trait.trait || 'Unknown Trait'}</h4>
+                            <p>${String(interpretation).substring(0, 80)}${interpretation.length > 80 ? '...' : ''}</p>
+                            <span class="gene">${trait.gene || ''} · ${trait.genotype || ''}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function filterTraits(query) {
+            const filtered = query 
+                ? allTraits.filter(t => 
+                    (t.trait || '').toLowerCase().includes(query.toLowerCase()) ||
+                    (t.gene || '').toLowerCase().includes(query.toLowerCase())
+                )
+                : allTraits;
+            renderTraitGrid(filtered);
+        }
+        
+        // ========================================
+        // Ancestry Section
+        // ========================================
+        function renderAncestry() {
+            const container = document.getElementById('ancestry-info');
+            const haplogroups = data.haplogroups || {};
+            const ancestry = data.ancestry || {};
+            
+            let html = '';
+            
+            // Haplogroups
+            if (haplogroups.mtDNA || haplogroups.Y_DNA) {
+                html += `
+                    <div class="haplogroup-card">
+                        <div class="haplogroup-type">Maternal Lineage (mtDNA)</div>
+                        <div class="haplogroup-value">${haplogroups.mtDNA?.haplogroup || 'Unknown'}</div>
+                        <div class="haplogroup-desc">${haplogroups.mtDNA?.description || ''}</div>
+                    </div>
+                `;
+                
+                if (haplogroups.Y_DNA) {
+                    html += `
+                        <div class="haplogroup-card">
+                            <div class="haplogroup-type">Paternal Lineage (Y-DNA)</div>
+                            <div class="haplogroup-value">${haplogroups.Y_DNA?.haplogroup || 'Unknown'}</div>
+                            <div class="haplogroup-desc">${haplogroups.Y_DNA?.description || ''}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Ancestry composition
+            if (ancestry.composition && Object.keys(ancestry.composition).length > 0) {
+                html += `
+                    <div class="haplogroup-card" style="grid-column: 1 / -1;">
+                        <div class="haplogroup-type">Ancestry Composition</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                            ${Object.entries(ancestry.composition).map(([pop, pct]) => `
+                                <span class="badge badge-info">${pop}: ${typeof pct === 'number' ? pct.toFixed(1) : pct}%</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!html) {
+                html = '<p style="color: var(--text-secondary);">No ancestry/haplogroup data available</p>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // ========================================
+        // Carrier Status Section
+        // ========================================
+        function renderCarrier() {
+            const container = document.getElementById('carrier-list');
+            const carriers = data.carrier_status || [];
+            
+            if (carriers.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">No carrier variants detected in tested markers</p>';
+                return;
+            }
+            
+            container.innerHTML = carriers.map(c => `
+                <div class="carrier-item">
+                    <div class="carrier-status-icon positive">🧬</div>
+                    <div class="carrier-info">
+                        <h4>${c.gene || 'Unknown'} (${c.rsid || 'N/A'})</h4>
+                        <p>Genotype: ${c.genotype || 'N/A'} · ${c.condition || c.action_type || 'Carrier status identified'}</p>
+                        ${c.recommendations ? `<p style="margin-top: 0.5rem;">${c.recommendations[0] || ''}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ========================================
+        // Sleep Profile Section
+        // ========================================
+        function renderSleep() {
+            const container = document.getElementById('sleep-profile');
+            const sleep = data.sleep_profile || data.lifestyle_recommendations || {};
+            
+            // Extract sleep-related data
+            let chronotype = 'Intermediate';
+            let caffeineMetabolism = 'Normal';
+            let idealWake = '7:00 AM';
+            let idealSleep = '11:00 PM';
+            let coffeeCutoff = '2:00 PM';
+            
+            // Try to find sleep-related traits
+            const sleepTraits = (data.notable_traits || []).filter(t => 
+                (t.trait || '').toLowerCase().includes('sleep') ||
+                (t.trait || '').toLowerCase().includes('caffeine') ||
+                (t.trait || '').toLowerCase().includes('chronotype')
+            );
+            
+            sleepTraits.forEach(t => {
+                const trait = (t.trait || '').toLowerCase();
+                if (trait.includes('chronotype') || trait.includes('morning') || trait.includes('evening')) {
+                    chronotype = t.interpretation || chronotype;
+                }
+                if (trait.includes('caffeine')) {
+                    caffeineMetabolism = t.interpretation || caffeineMetabolism;
+                }
+            });
+            
+            container.innerHTML = `
+                <div class="chronotype-visual">
+                    <div class="clock-display">🌅</div>
+                    <div class="chronotype-label">Your Chronotype</div>
+                    <div class="chronotype-value">${typeof chronotype === 'string' ? chronotype.substring(0, 40) : 'Intermediate'}</div>
+                </div>
+                <div class="chronotype-visual">
+                    <div class="clock-display">☕</div>
+                    <div class="chronotype-label">Caffeine Metabolism</div>
+                    <div class="chronotype-value">${typeof caffeineMetabolism === 'string' ? caffeineMetabolism.substring(0, 40) : 'Normal'}</div>
+                </div>
+                <div class="sleep-recommendations">
+                    <h4>Personalized Timing</h4>
+                    <div class="sleep-time-grid">
+                        <div class="sleep-time-row">
+                            <span class="sleep-time-label">Ideal Wake Time</span>
+                            <span class="sleep-time-value">${idealWake}</span>
+                        </div>
+                        <div class="sleep-time-row">
+                            <span class="sleep-time-label">Ideal Bedtime</span>
+                            <span class="sleep-time-value">${idealSleep}</span>
+                        </div>
+                        <div class="sleep-time-row">
+                            <span class="sleep-time-label">Caffeine Cutoff</span>
+                            <span class="sleep-time-value">${coffeeCutoff}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // Athletic Profile Section
+        // ========================================
+        function renderAthletic() {
+            const container = document.getElementById('athletic-profile');
+            
+            // Look for fitness data
+            let powerScore = 50;
+            let enduranceScore = 50;
+            let athleticType = 'Balanced';
+            
+            const fitnessFindings = data.fitness?.findings || [];
+            
+            fitnessFindings.forEach(f => {
+                if (f.gene === 'ACTN3') {
+                    if (f.genotype === 'CC') { powerScore = 80; enduranceScore = 40; athleticType = 'Power'; }
+                    else if (f.genotype === 'TT') { powerScore = 40; enduranceScore = 80; athleticType = 'Endurance'; }
+                }
+            });
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div class="gauge-container">
+                        <div class="gauge">
+                            <svg viewBox="0 0 200 100">
+                                <defs>
+                                    <linearGradient id="gauge-gradient">
+                                        <stop offset="0%" stop-color="#3b82f6"/>
+                                        <stop offset="100%" stop-color="#dc2626"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Background arc -->
+                                <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="var(--border-color)" stroke-width="12" stroke-linecap="round"/>
+                                <!-- Value arc -->
+                                <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="url(#gauge-gradient)" stroke-width="12" stroke-linecap="round"
+                                    stroke-dasharray="${Math.PI * 80}" stroke-dashoffset="${Math.PI * 80 * (1 - powerScore/100)}"/>
+                                <!-- Pointer -->
+                                <circle cx="${100 + 70 * Math.cos(Math.PI - (Math.PI * powerScore/100))}" 
+                                        cy="${90 - 70 * Math.sin(Math.PI * powerScore/100)}" 
+                                        r="8" fill="var(--text-primary)"/>
+                            </svg>
+                            <div class="gauge-label">
+                                <div class="gauge-value">${athleticType}</div>
+                                <div class="gauge-title">Athletic Profile</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                            <span>🚴 Endurance</span>
+                            <span>Power 🏋️</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: var(--radius); padding: 1.5rem;">
+                        <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem;">Training Recommendations</h4>
+                        <ul style="list-style: none; font-size: 0.875rem;">
+                            <li style="margin-bottom: 0.5rem;">✓ ${athleticType === 'Power' ? 'Focus on explosive, high-intensity training' : athleticType === 'Endurance' ? 'Prioritize aerobic base building' : 'Mix both power and endurance training'}</li>
+                            <li style="margin-bottom: 0.5rem;">✓ Recovery time: ${athleticType === 'Power' ? '48-72 hours between intense sessions' : '24-48 hours between sessions'}</li>
+                            <li>✓ ${athleticType === 'Endurance' ? 'Marathon, triathlon, cycling recommended' : athleticType === 'Power' ? 'Sprinting, weightlifting recommended' : 'Versatile - can excel in mixed sports'}</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // UV/Skin Section
+        // ========================================
+        function renderSkin() {
+            const container = document.getElementById('skin-info');
+            
+            // Extract skin-related data
+            let skinType = 'Type II-III';
+            let spfRec = '30+';
+            let melanomaRisk = 'Average';
+            
+            const dermaFindings = data.dermatology?.findings || [];
+            
+            dermaFindings.forEach(f => {
+                if (f.gene === 'MC1R' && f.risk_copies > 0) {
+                    skinType = 'Type I-II (Fair)';
+                    spfRec = '50+';
+                    melanomaRisk = 'Elevated';
+                }
+            });
+            
+            // Skin type colors
+            const skinColors = {
+                'Type I': '#fce4d6', 'Type I-II': '#fde9d9', 'Type II': '#fef3e2',
+                'Type II-III': '#fef9e7', 'Type III': '#fff8dc', 'Type IV': '#f5deb3',
+                'Type V': '#d2b48c', 'Type VI': '#8b7355'
+            };
+            
+            const skinColor = skinColors[skinType] || '#fef9e7';
+            
+            container.innerHTML = `
+                <div class="skin-type-card">
+                    <div class="skin-type-visual" style="background: ${skinColor}; border: 2px solid var(--border-color);"></div>
+                    <h4>Estimated Skin Type</h4>
+                    <p style="font-size: 1.25rem; font-weight: 600; margin: 0.5rem 0;">${skinType}</p>
+                    <span class="badge ${melanomaRisk === 'Elevated' ? 'badge-warning' : 'badge-success'}">Melanoma Risk: ${melanomaRisk}</span>
+                </div>
+                <div class="spf-recommendation">
+                    <div class="spf-value">SPF ${spfRec}</div>
+                    <div class="spf-label">Recommended Protection</div>
+                    <ul style="margin-top: 1rem; font-size: 0.875rem; text-align: left; padding-left: 1.25rem;">
+                        <li>Apply 15-30 min before sun exposure</li>
+                        <li>Reapply every 2 hours</li>
+                        <li>Seek shade during peak hours (10am-4pm)</li>
+                        ${melanomaRisk === 'Elevated' ? '<li><strong>Annual dermatology screening recommended</strong></li>' : ''}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // Dietary Section
+        // ========================================
+        function renderDietary() {
+            const container = document.getElementById('food-matrix');
+            
+            // Default dietary items
+            const dietaryItems = [
+                { name: 'Caffeine', icon: '☕', status: 'good', note: 'Normal metabolism' },
+                { name: 'Alcohol', icon: '🍷', status: 'moderate', note: 'Moderate tolerance' },
+                { name: 'Lactose', icon: '🥛', status: 'good', note: 'Likely tolerant' },
+                { name: 'Gluten', icon: '🍞', status: 'good', note: 'No celiac markers' },
+                { name: 'Saturated Fat', icon: '🧈', status: 'moderate', note: 'Limit intake' },
+                { name: 'Bitter Taste', icon: '🥬', status: 'good', note: 'Normal perception' }
+            ];
+            
+            // Update based on actual data
+            const nutritionFindings = data.nutrition?.findings || [];
+            const traits = data.notable_traits || [];
+            
+            nutritionFindings.forEach(f => {
+                const gene = f.gene || '';
+                if (gene === 'LCT' && f.risk_copies > 0) {
+                    const item = dietaryItems.find(d => d.name === 'Lactose');
+                    if (item) { item.status = 'poor'; item.note = 'Likely intolerant'; }
+                }
+                if (gene === 'CYP1A2' && f.risk_copies > 0) {
+                    const item = dietaryItems.find(d => d.name === 'Caffeine');
+                    if (item) { item.status = 'moderate'; item.note = 'Slow metabolizer'; }
+                }
+            });
+            
+            container.innerHTML = dietaryItems.map(item => `
+                <div class="food-item">
+                    <span class="food-icon">${item.icon}</span>
+                    <div class="food-info">
+                        <h5>${item.name}</h5>
+                        <p>${item.note}</p>
+                    </div>
+                    <div class="food-status ${item.status}"></div>
+                </div>
+            `).join('');
+        }
+        
+        // ========================================
+        // Utility Functions
+        // ========================================
+        function toggleCard(header) {
+            header.parentElement.classList.toggle('collapsed');
+        }
+        
+        function filterTable(tableId, query) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            const q = query.toLowerCase();
+            
+            rows.forEach(row => {
+                const searchable = row.getAttribute('data-searchable') || row.textContent.toLowerCase();
+                row.style.display = searchable.includes(q) ? '' : 'none';
+            });
+        }
+        
+        function formatConditionName(name) {
+            return name
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+        
+        // Nav link highlighting
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Intersection observer for nav highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { rootMargin: '-20% 0px -80% 0px' });
+        
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>

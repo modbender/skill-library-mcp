@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="row" style="justify-content: space-between; margin-bottom: 14px;">
+    <div>
+      <h1 style="margin:0; font-size: 20px;">Review queue</h1>
+      <div class="muted">Documents flagged by confidence thresholds or missing required fields.</div>
+    </div>
+    <a href="/"><button>Back to list</button></a>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Year</th>
+          <th>Filer</th>
+          <th>Status</th>
+          <th>Overall conf</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in docs %}
+          <tr>
+            <td><a href="/doc/{{ d.id }}">{{ d.id[:8] }}</a></td>
+            <td>{{ d.doc_type or 'unknown' }}</td>
+            <td>{{ d.tax_year or '' }}</td>
+            <td>{{ d.filer or '' }}</td>
+            <td><span class="pill warn">{{ d.status }}</span></td>
+            <td class="muted">{{ '%.2f'|format(d.overall_confidence or 0) }}</td>
+            <td class="muted">{{ d.notes or '' }}</td>
+          </tr>
+        {% endfor %}
+        {% if docs|length == 0 %}
+          <tr><td colspan="7" class="muted">Nothing needs review.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

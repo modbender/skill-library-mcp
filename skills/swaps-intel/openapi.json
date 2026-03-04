@@ -1,0 +1,233 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Swaps Intelligence Agent API",
+    "version": "1.1.0",
+    "description": "Cryptocurrency address risk assessment and intelligence data for AI agents.\n\n## Versioning & Changelog\n- **v1.1.0**: Added capability transparency, rich schemas, and standardized auth.\n\n## Rate Limits\n- Free: 10/min, 500/day\n- Pro: 60/min, 10,000/day\n- Enterprise: 300/min, 1,000,000/day\n\n## Uptime & SLA\nWe aim for 99.9% uptime on our API endpoints. Note: This is a best-effort SLA and not legally binding for free tiers."
+  },
+  "servers": [
+    {
+      "url": "https://system.swaps.app/functions/v1/agent-api"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "agentAction",
+        "summary": "Execute an Agent Action",
+        "description": "Executes intelligence actions: `agent.check` (address risk), `agent.trace` (transaction trace), `agent.tx` (transaction risk). Supports multiple EVM and UTXO chains.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": ["agent.check", "agent.trace", "agent.tx"],
+                    "description": "The action to perform."
+                  },
+                  "payload": {
+                    "type": "object",
+                    "description": "The payload for the action. For `agent.check`, include `address` (string)."
+                  }
+                },
+                "required": ["action", "payload"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "requestId": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "risk_score": { "type": "number", "description": "0-100 risk score" },
+                        "labels": { "type": "array", "items": { "type": "string" }, "description": "Known labels, e.g. OFAC, Scam" },
+                        "report_url": { "type": "string", "description": "URL to the full report" },
+                        "confidence_tier": { "type": "string", "description": "Confidence level (low, medium, high)" },
+                        "markdown_summary": { "type": "string", "description": "Pre-formatted Markdown response intended for direct use by the agent." }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "ok": false, "requestId": "req-123", "error": { "code": "missing_api_key", "message": "Missing x-api-key header" } }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key inactive, expired, or out of scope",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "ok": false, "requestId": "req-123", "error": { "code": "scope_denied", "message": "Action not allowed for this key" } }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests - Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "ok": false, "requestId": "req-123", "error": { "code": "rate_limit_exceeded", "message": "Rate limit reached" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "ok": false, "requestId": "req-123", "error": { "code": "internal_error", "message": "Internal error" } }
+              }
+            }
+          }
+        },
+        "security": [
+          { "ApiKeyAuth": [] },
+          { "BearerAuth": [] }
+        ]
+      }
+    },
+    "/check_address_risk": {
+      "post": {
+        "operationId": "checkAddressRisk",
+        "summary": "Check Cryptocurrency Address Risk (Compatibility Alias)",
+        "description": "Alias for executing `agent.check` action. Same capabilities as the main endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "The cryptocurrency address to assess (e.g., EVM or Bitcoin address)."
+                  }
+                },
+                "required": ["address"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "requestId": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "risk_score": { "type": "number" },
+                        "labels": { "type": "array", "items": { "type": "string" } },
+                        "report_url": { "type": "string" },
+                        "confidence_tier": { "type": "string" },
+                        "markdown_summary": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        },
+        "security": [
+          { "ApiKeyAuth": [] },
+          { "BearerAuth": [] }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Primary authentication method."
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Fallback authentication method. If x-api-key is present, it takes precedence."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean", "example": false },
+          "requestId": { "type": "string" },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,898 @@
+{
+  "updatedAt": "2026-03-02T18:04:42.657Z",
+  "createdAt": "2026-02-24T23:30:02.370Z",
+  "id": "Se7nDTwRV4MRE2Qz",
+  "name": "Aethon Blog Cross-Post Pipeline",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aethon-blog-crosspost",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "id": "n1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2608,
+        376
+      ],
+      "webhookId": "aethon-crosspost-v3"
+    },
+    {
+      "parameters": {
+        "url": "=http://YOUR_BLOG_ADMIN_HOST:3000/api/posts/{{ $json.body.slug }}?lang={{ $json.body.lang || 'en' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "YOUR_BLOG_ADMIN_API_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Fetch Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2384,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhook = $('Webhook').first().json;\nconst post = $input.first().json;\n\n// C4: Verify webhook authentication via body secret\nconst secret = webhook.body?._secret || webhook._secret || '';\nconst expectedSecret = 'YOUR_CROSSPOST_SECRET';\nif (expectedSecret && secret !== expectedSecret) {\n  throw new Error('Unauthorized: invalid crosspost secret');\n}\n\nif (!post || !post.slug) {\n  throw new Error('Post not found: ' + (webhook.body?.slug || 'unknown'));\n}\nif (post.frontmatter?.draft === true) {\n  throw new Error('Skipping draft post: ' + post.slug);\n}\n\nconst canonical = 'https://YOUR_BLOG_DOMAIN/posts/' + post.slug + '/';\nlet imageUrl = '';\nif (post.frontmatter?.image) {\n  imageUrl = post.frontmatter.image.startsWith('http')\n    ? post.frontmatter.image\n    : 'https://YOUR_BLOG_DOMAIN' + post.frontmatter.image;\n}\n\nconst tags = (post.frontmatter?.tags || []).slice(0, 8);\nconst categories = (post.frontmatter?.categories || []);\nconst fullBody = post.body || '';\nconst truncBody = fullBody.length > 5000 ? fullBody.substring(0, 5000) + '\\n\\n[...truncated for AI prompt...]' : fullBody;\n\nreturn [{\n  json: {\n    slug: post.slug,\n    lang: post.lang || 'en',\n    title: post.frontmatter?.title || post.slug,\n    description: post.frontmatter?.description || '',\n    date: post.frontmatter?.date || '',\n    categories: categories,\n    tags: tags,\n    body: fullBody,\n    body_truncated: truncBody,\n    canonical_url: canonical,\n    image_url: imageUrl,\n    source: 'aethon-insights'\n  }\n}];"
+      },
+      "id": "n3",
+      "name": "Validate Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_TRACKER_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Read Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1936,
+        376
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Validate Post').first().json;\nconst sheetRows = $('Read Tracker').all().map(i => i.json);\nconst existing = sheetRows.find(r => r.slug === post.slug && r.source === 'aethon-insights');\n\n// Platform API keys — fill in to enable auto-posting\nconst config = {\n  devto_api_key: '',\n  hashnode_token: '',\n  hashnode_publication_id: '',\n};\n\n// Track what's already been posted\nlet already = {};\nif (existing) {\n  ['linkedin','devto','hashnode','substack','twitter','facebook','reddit'].forEach(p => {\n    if (existing[p + '_status'] === 'published') already[p] = true;\n  });\n}\n\nreturn [{\n  json: {\n    ...post,\n    config,\n    already_posted: already,\n    is_retry: !!existing,\n    do_linkedin: !already.linkedin,\n    do_devto: !already.devto && !!config.devto_api_key,\n    do_hashnode: !already.hashnode && !!config.hashnode_token && !!config.hashnode_publication_id,\n  }\n}];"
+      },
+      "id": "n5",
+      "name": "Platform Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'accepted', slug: $json.slug, auto_post: { linkedin: $json.do_linkedin, devto: $json.do_devto, hashnode: $json.do_hashnode }, manual: ['twitter','facebook','reddit','substack'] }) }}",
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1488,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $input.first().json;\n\nconst systemPrompt = `You are a world-class B2B content marketing strategist for Aethon Automation, an AI and business automation company. Your goal: MAXIMIZE engagement, reach, and thought leadership on every platform.\n\nBRAND VOICE: Professional yet approachable. Data-driven. Forward-thinking. Authoritative on AI and automation.\n\nCRITICAL: Each platform's content must feel NATIVE — not a copy-paste. Adapt tone, length, structure, and style for each audience.\n\nReturn ONLY valid JSON (no markdown fences) with this exact structure:\n{\n  \"linkedin\": { \"text\": \"string (max 3000 chars)\" },\n  \"twitter_thread\": { \"tweets\": [\"string (max 270 chars each)\", ...] },\n  \"devto\": { \"title\": \"string\", \"tags\": [\"string (max 4, lowercase, no spaces)\"], \"body\": \"string (full markdown article)\" },\n  \"hashnode\": { \"title\": \"string\", \"subtitle\": \"string\", \"tags\": [{\"slug\":\"string\",\"name\":\"string\"}], \"body\": \"string (full markdown article)\" },\n  \"facebook\": { \"text\": \"string (max 500 chars)\" },\n  \"reddit\": { \"title\": \"string\", \"body\": \"string (value-first, non-promotional)\", \"subreddits\": [\"string\"] },\n  \"substack\": { \"title\": \"string\", \"subtitle\": \"string\", \"body\": \"string (newsletter-style markdown)\" }\n}`;\n\nconst userPrompt = `Generate high-impact social media content for this Aethon Automation blog post:\n\nTITLE: ${post.title}\nDESCRIPTION: ${post.description}\nURL: ${post.canonical_url}\nTAGS: ${(post.tags || []).join(', ')}\nCATEGORIES: ${(post.categories || []).join(', ')}\n\nARTICLE CONTENT:\n${post.body_truncated}\n\n=== PLATFORM REQUIREMENTS ===\n\n1. LINKEDIN (B2B powerhouse — max 3000 chars):\n   - Open with a BOLD pattern-interrupt hook\n   - Use line breaks for mobile readability\n   - 3-5 key takeaways as bullet points with emojis\n   - End with engagement question\n   - CTA: \"Read the full breakdown on Aethon Insights\"\n   - 6-8 hashtags including #AethonAutomation #AIAutomation\n   - DO NOT include the URL in the text\n\n2. TWITTER/X THREAD (5-7 tweets, max 270 chars each):\n   - Tweet 1: Hook + end with thread emoji\n   - Tweets 2-5: One insight per tweet\n   - Tweet 6: CTA + article link\n   - Tweet 7: Follow CTA with hashtags\n\n3. DEV.TO (developer community — technical focus):\n   - Developer-focused title\n   - 4 tags (lowercase, no spaces)\n   - Full markdown article\n   - Practical, code examples where relevant\n\n4. HASHNODE (developer blogging — thought leadership):\n   - Compelling title + subtitle\n   - 5 tags as {slug, name} objects\n   - Full markdown article\n\n5. FACEBOOK (max 500 chars):\n   - Relatable question or surprising fact\n   - Conversational tone, 2-3 emojis\n   - 3-5 hashtags\n\n6. REDDIT (community value — zero promotion):\n   - Informative title\n   - Lead with VALUE, 3-5 key insights\n   - Mention article link naturally at end\n   - Suggest 3 subreddits\n\n7. SUBSTACK (newsletter style):\n   - Newsletter-friendly title + subtitle\n   - Warm intro, full content, personal closing`;\n\nconst requestBody = {\n  model: 'gpt-4o-mini',\n  messages: [\n    { role: 'system', content: systemPrompt },\n    { role: 'user', content: userPrompt }\n  ],\n  response_format: { type: 'json_object' },\n  temperature: 0.75,\n  max_tokens: 14000\n};\n\nreturn [{\n  json: {\n    ...post,\n    openai_request: requestBody\n  }\n}];"
+      },
+      "id": "n7",
+      "name": "Build AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "n8",
+      "name": "Call OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1040,
+        376
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAi account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Build AI Prompt').first().json;\nconst config = $('Platform Config').first().json.config;\nconst openaiResp = $input.first().json;\n\nlet ai;\ntry {\n  const raw = openaiResp.choices[0].message.content;\n  ai = JSON.parse(raw);\n} catch(e) {\n  ai = {\n    linkedin: { text: prev.title + '\\n\\n' + prev.description + '\\n\\nRead more on Aethon Insights:\\n\\n#AethonAutomation #AIAutomation #BusinessAutomation' },\n    twitter_thread: { tweets: [prev.title + ' thread', prev.description, 'Full article: ' + prev.canonical_url, 'Follow @AethonAutomation for more'] },\n    devto: { title: prev.title, tags: prev.tags.slice(0,4).map(t=>t.toLowerCase().replace(/[^a-z0-9]/g,'')), body: prev.body },\n    hashnode: { title: prev.title, subtitle: prev.description, tags: prev.tags.map(t=>({slug:t.toLowerCase().replace(/\\s/g,'-'),name:t})), body: prev.body },\n    facebook: { text: prev.description + '\\n\\n' + prev.canonical_url + '\\n\\n#AethonAutomation' },\n    reddit: { title: prev.title, body: prev.description + '\\n\\nFull article: ' + prev.canonical_url, subreddits: ['artificial','automation','smallbusiness'] },\n    substack: { title: prev.title, subtitle: prev.description, body: prev.body }\n  };\n}\n\n// Build Dev.to request body\nconst devtoBody = JSON.stringify({\n  article: {\n    title: ai.devto?.title || prev.title,\n    body_markdown: (ai.devto?.body || prev.body) + '\\n\\n---\\n\\n*Originally published on [Aethon Insights](' + prev.canonical_url + ')*',\n    canonical_url: prev.canonical_url,\n    tags: (ai.devto?.tags || prev.tags).slice(0,4).map(t => String(t).toLowerCase().replace(/[^a-z0-9]/g,'')),\n    published: true\n  }\n});\n\n// Build Hashnode request body\nconst hnTags = (ai.hashnode?.tags || []).slice(0,5).map(t => {\n  if (typeof t === 'string') return { slug: t.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,''), name: t };\n  return t;\n});\nconst hashnodeBody = JSON.stringify({\n  query: `mutation PublishPost($input: PublishPostInput!) {\n    publishPost(input: $input) {\n      post { url slug title }\n    }\n  }`,\n  variables: {\n    input: {\n      title: ai.hashnode?.title || prev.title,\n      subtitle: ai.hashnode?.subtitle || prev.description,\n      contentMarkdown: (ai.hashnode?.body || prev.body),\n      tags: hnTags,\n      publicationId: config.hashnode_publication_id || 'NOT_CONFIGURED',\n      originalArticleURL: prev.canonical_url\n    }\n  }\n});\n\n// Build Twitter thread text for email\nconst tweets = ai.twitter_thread?.tweets || [];\nconst twitterThreadText = tweets.map((t, i) => `${i+1}/${tweets.length}) ${t}`).join('\\n\\n');\n\n// Build manual platform content for email\nconst manualPlatforms = [];\n\nif (tweets.length > 0) {\n  manualPlatforms.push({\n    name: 'Twitter/X Thread', icon: 'twitter',\n    content: twitterThreadText,\n    instructions: 'Post as a thread. Copy each numbered tweet as a separate reply.'\n  });\n}\n\nif (ai.facebook?.text) {\n  manualPlatforms.push({\n    name: 'Facebook', icon: 'facebook',\n    content: ai.facebook.text + '\\n\\n' + prev.canonical_url,\n    instructions: 'Post on Aethon Automation Facebook page. Add link in comment for better reach.'\n  });\n}\n\nif (ai.reddit?.title) {\n  manualPlatforms.push({\n    name: 'Reddit', icon: 'reddit',\n    content: '**Title:** ' + ai.reddit.title + '\\n\\n' + ai.reddit.body,\n    instructions: 'Suggested subreddits: ' + (ai.reddit.subreddits || []).map(s => 'r/' + s).join(', ')\n  });\n}\n\nif (ai.substack?.body) {\n  manualPlatforms.push({\n    name: 'Substack Newsletter', icon: 'substack',\n    content: '**Title:** ' + (ai.substack?.title || prev.title) + '\\n**Subtitle:** ' + (ai.substack?.subtitle || prev.description),\n    instructions: 'Paste into Substack editor. Set canonical URL to: ' + prev.canonical_url,\n    full_body: ai.substack.body\n  });\n}\n\nreturn [{\n  json: {\n    ...prev,\n    ai,\n    config,\n    linkedin_text: ai.linkedin?.text || (prev.title + '\\n\\n' + prev.description + '\\n\\n#AethonAutomation'),\n    devto_body: devtoBody,\n    hashnode_body: hashnodeBody,\n    devto_api_key: config.devto_api_key || '',\n    hashnode_token: config.hashnode_token || '',\n    manual_platforms: manualPlatforms,\n    twitter_thread: twitterThreadText,\n    do_linkedin: prev.do_linkedin,\n    do_devto: prev.do_devto,\n    do_hashnode: prev.do_hashnode,\n    already_posted: prev.already_posted || {}\n  }\n}];"
+      },
+      "id": "n9",
+      "name": "Prepare All Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond_li",
+              "leftValue": "={{ $json.do_linkedin }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n10",
+      "name": "IF LinkedIn",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "person": "YOUR_LINKEDIN_PERSON_ID",
+        "text": "={{ $json.linkedin_text }}\n\n{{ $json.canonical_url }}",
+        "additionalFields": {}
+      },
+      "id": "n11",
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        240
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKEDIN_CREDENTIAL_ID",
+          "name": "LinkedIn account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond_devto",
+              "leftValue": "={{ $json.do_devto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n12",
+      "name": "IF Dev.to",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev.to/api/articles",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "={{ $json.devto_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.devto_body }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "n13",
+      "name": "Post to Dev.to",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        240
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond_hn",
+              "leftValue": "={{ $json.do_hashnode }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n14",
+      "name": "IF Hashnode",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        304,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gql.hashnode.com",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.hashnode_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.hashnode_body }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "n15",
+      "name": "Post to Hashnode",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        240
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Prepare All Posts').first().json;\nconst already = post.already_posted || {};\n\nfunction getResult(nodeName, platform) {\n  if (already[platform]) return { status: 'already_posted', url: '' };\n  try {\n    const data = $(nodeName).first().json;\n    if (data?.error || data?.statusCode >= 400 || data?.serviceErrorCode || data?.errors) {\n      const msg = data.message || data.error || data.errors?.[0]?.message || 'API error';\n      return { status: 'failed', url: '', error: msg };\n    }\n    const url = data?.postUrl || data?.activity || data?.url ||\n                data?.data?.publishPost?.post?.url ||\n                (data?.id ? 'https://dev.to/api/articles/' + data.id : '') || '';\n    return { status: 'published', url };\n  } catch(e) {\n    return { status: 'not_attempted', url: '', error: String(e).substring(0, 100) };\n  }\n}\n\nconst linkedin = post.do_linkedin ? getResult('Post to LinkedIn', 'linkedin') : { status: 'skipped', url: '' };\nconst devto = post.do_devto ? getResult('Post to Dev.to', 'devto') : { status: post.config?.devto_api_key ? 'skipped' : 'not_configured', url: '' };\nconst hashnode = post.do_hashnode ? getResult('Post to Hashnode', 'hashnode') : { status: post.config?.hashnode_token ? 'skipped' : 'not_configured', url: '' };\n\nconst twitter = already.twitter ? { status: 'already_posted' } : { status: 'content_ready' };\nconst facebook = already.facebook ? { status: 'already_posted' } : { status: 'content_ready' };\nconst reddit = already.reddit ? { status: 'already_posted' } : { status: 'content_ready' };\nconst substack = already.substack ? { status: 'already_posted' } : { status: 'content_ready' };\n\nconst allResults = { linkedin, devto, hashnode, twitter, facebook, reddit, substack };\n\nconst published = Object.values(allResults).filter(r => r.status === 'published').length;\nconst failed = Object.values(allResults).filter(r => r.status === 'failed').length;\nconst ready = Object.values(allResults).filter(r => r.status === 'content_ready').length;\nconst notConfigured = Object.values(allResults).filter(r => r.status === 'not_configured').length;\n\nconst errors = Object.entries(allResults)\n  .filter(([_, r]) => r.status === 'failed' && r.error)\n  .map(([name, r]) => name + ': ' + r.error);\n\nreturn [{\n  json: {\n    slug: post.slug,\n    title: post.title,\n    date: post.date,\n    canonical_url: post.canonical_url,\n    image_url: post.image_url || '',\n    source: 'aethon-insights',\n    crossposted_at: new Date().toISOString().split('T')[0],\n    linkedin_status: linkedin.status,\n    linkedin_url: linkedin.url || '',\n    devto_status: devto.status,\n    devto_url: devto.url || '',\n    hashnode_status: hashnode.status,\n    hashnode_url: hashnode.url || '',\n    twitter_status: twitter.status,\n    facebook_status: facebook.status,\n    reddit_status: reddit.status,\n    substack_status: substack.status,\n    notes: errors.join('; '),\n    published_count: published,\n    failed_count: failed,\n    content_ready_count: ready,\n    not_configured_count: notConfigured,\n    total_platforms: 7,\n    has_failures: failed > 0,\n    manual_platforms: post.manual_platforms || [],\n    twitter_thread: post.twitter_thread || '',\n    body: post.body || '',\n    ai: post.ai || {}\n  }\n}];"
+      },
+      "id": "n16",
+      "name": "Collect Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        376
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_TRACKER_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "id": "slug",
+              "displayName": "slug",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "canonical_url",
+              "displayName": "canonical_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "crossposted_at",
+              "displayName": "crossposted_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_status",
+              "displayName": "linkedin_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "devto_status",
+              "displayName": "devto_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "devto_url",
+              "displayName": "devto_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashnode_status",
+              "displayName": "hashnode_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashnode_url",
+              "displayName": "hashnode_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "twitter_status",
+              "displayName": "twitter_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "facebook_status",
+              "displayName": "facebook_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reddit_status",
+              "displayName": "reddit_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "substack_status",
+              "displayName": "substack_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n17",
+      "name": "Update Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        376
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#general"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ JSON.stringify([\n  {\n    \"type\": \"header\",\n    \"text\": {\n      \"type\": \"plain_text\",\n      \"text\": ($json.has_failures ? \"Warning\" : \"Success\") + \" Blog Published: \" + $json.title,\n      \"emoji\": true\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*\" + $json.published_count + \"/7 platforms auto-posted* | *\" + $json.content_ready_count + \" ready for manual posting*\"\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      { \"type\": \"mrkdwn\", \"text\": \"*LinkedIn:* \" + ($json.linkedin_status === \"published\" ? \"Done\" : $json.linkedin_status === \"failed\" ? \"Failed\" : \"Skip\") },\n      { \"type\": \"mrkdwn\", \"text\": \"*Dev.to:* \" + ($json.devto_status === \"published\" ? \"Done\" : $json.devto_status === \"not_configured\" ? \"N/C\" : $json.devto_status === \"failed\" ? \"Failed\" : \"Skip\") },\n      { \"type\": \"mrkdwn\", \"text\": \"*Hashnode:* \" + ($json.hashnode_status === \"published\" ? \"Done\" : $json.hashnode_status === \"not_configured\" ? \"N/C\" : $json.hashnode_status === \"failed\" ? \"Failed\" : \"Skip\") },\n      { \"type\": \"mrkdwn\", \"text\": \"*Twitter:* Ready\" },\n      { \"type\": \"mrkdwn\", \"text\": \"*Facebook:* Ready\" },\n      { \"type\": \"mrkdwn\", \"text\": \"*Reddit:* Ready\" },\n      { \"type\": \"mrkdwn\", \"text\": \"*Substack:* Ready\" }\n    ]\n  },\n  {\n    \"type\": \"actions\",\n    \"elements\": [\n      {\n        \"type\": \"button\",\n        \"text\": { \"type\": \"plain_text\", \"text\": \"Read Article\", \"emoji\": true },\n        \"url\": $json.canonical_url,\n        \"style\": \"primary\"\n      }\n    ]\n  }\n]) }}",
+        "otherOptions": {}
+      },
+      "id": "n18",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        304
+      ],
+      "webhookId": "6c4af48a-dc2a-49ad-8e5b-6345e59f23df",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "YOUR_NOTIFICATION_EMAIL",
+        "subject": "=Cross-Post Content Ready: {{ $json.title }}",
+        "html": "=<div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 0 auto; color: #1a1a1a;\">\n<div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px 32px; border-radius: 12px 12px 0 0;\">\n  <h1 style=\"color: white; margin: 0; font-size: 22px;\">Cross-Post Content Ready</h1>\n  <p style=\"color: rgba(255,255,255,0.9); margin: 8px 0 0;\">{{ $json.title }}</p>\n</div>\n\n<div style=\"background: #f8f9fa; padding: 20px 32px; border: 1px solid #e9ecef;\">\n  <p style=\"margin: 0;\"><strong>Canonical URL:</strong> <a href=\"{{ $json.canonical_url }}\">{{ $json.canonical_url }}</a></p>\n  <p style=\"margin: 8px 0 0;\"><strong>Auto-posted:</strong> {{ $json.published_count }} platforms | <strong>Ready to post:</strong> {{ $json.content_ready_count }} platforms</p>\n</div>\n\n<div style=\"padding: 24px 32px; border: 1px solid #e9ecef; border-top: 0;\">\n\n<h2 style=\"color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 8px;\">Twitter/X Thread</h2>\n<div style=\"background: #f0f7ff; padding: 16px; border-radius: 8px; border-left: 4px solid #1DA1F2; margin-bottom: 8px;\">\n  <pre style=\"white-space: pre-wrap; font-family: -apple-system, sans-serif; font-size: 14px; margin: 0;\">{{ $json.twitter_thread }}</pre>\n</div>\n<p style=\"color: #666; font-size: 13px; margin: 4px 0 20px;\">Post as a thread. Each numbered item = separate tweet reply.</p>\n\n<h2 style=\"color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 8px;\">Facebook</h2>\n<div style=\"background: #f0f4ff; padding: 16px; border-radius: 8px; border-left: 4px solid #1877F2; margin-bottom: 8px;\">\n  <pre style=\"white-space: pre-wrap; font-family: -apple-system, sans-serif; font-size: 14px; margin: 0;\">{{ $json.ai?.facebook?.text || 'Content generation failed' }}\n\n{{ $json.canonical_url }}</pre>\n</div>\n<p style=\"color: #666; font-size: 13px; margin: 4px 0 20px;\">Post on Aethon Automation page. Add link in first comment for better reach.</p>\n\n<h2 style=\"color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 8px;\">Reddit</h2>\n<div style=\"background: #fff5f0; padding: 16px; border-radius: 8px; border-left: 4px solid #FF4500; margin-bottom: 8px;\">\n  <p style=\"margin: 0 0 8px;\"><strong>Title:</strong> {{ $json.ai?.reddit?.title || $json.title }}</p>\n  <pre style=\"white-space: pre-wrap; font-family: -apple-system, sans-serif; font-size: 14px; margin: 0;\">{{ $json.ai?.reddit?.body || $json.description + '\\n\\nFull article: ' + $json.canonical_url }}</pre>\n</div>\n<p style=\"color: #666; font-size: 13px; margin: 4px 0 20px;\">Suggested subreddits: {{ ($json.ai?.reddit?.subreddits || ['artificial','automation']).map(s => 'r/' + s).join(', ') }}</p>\n\n<h2 style=\"color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 8px;\">Substack Newsletter</h2>\n<div style=\"background: #fff8f0; padding: 16px; border-radius: 8px; border-left: 4px solid #FF6719; margin-bottom: 8px;\">\n  <p style=\"margin: 0;\"><strong>Title:</strong> {{ $json.ai?.substack?.title || $json.title }}</p>\n  <p style=\"margin: 4px 0;\"><strong>Subtitle:</strong> {{ $json.ai?.substack?.subtitle || $json.description }}</p>\n</div>\n<div style=\"background: #fafafa; padding: 16px; border: 1px dashed #ccc; border-radius: 8px; margin: 8px 0 20px; max-height: 400px; overflow-y: auto;\">\n  <div style=\"font-family: Georgia, serif; line-height: 1.8; font-size: 15px;\">{{ ($json.ai?.substack?.body || $json.body || '').replace(/\\n/g, '<br>') }}</div>\n</div>\n<p style=\"color: #666; font-size: 13px; margin: 4px 0 20px;\">Set canonical URL to: <code>{{ $json.canonical_url }}</code></p>\n\n</div>\n\n<div style=\"background: #f8f9fa; padding: 16px 32px; border-radius: 0 0 12px 12px; border: 1px solid #e9ecef; border-top: 0;\">\n  <p style=\"margin: 0; color: #666; font-size: 13px;\">Generated by Aethon Blog Cross-Post Pipeline v3 &bull; <a href=\"{{ $json.canonical_url }}\">View Article</a></p>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "n19",
+      "name": "Send Platform Content",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        352
+      ],
+      "webhookId": "aa024e86-09c9-41c7-b05f-6f67fa8b59b5",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "YOUR_NOTIFICATION_EMAIL",
+        "subject": "={{ $json.has_failures ? 'Warning' : 'Success' }} Cross-Post Report: {{ $json.title }} ({{ $json.published_count }}/7 platforms)",
+        "html": "=<div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;\">\n<div style=\"background: {{ $json.has_failures ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}; padding: 20px 28px; border-radius: 12px 12px 0 0;\">\n  <h2 style=\"color: white; margin: 0;\">{{ $json.has_failures ? 'Warning' : 'Success' }} Cross-Post Report</h2>\n  <p style=\"color: rgba(255,255,255,0.9); margin: 6px 0 0;\">{{ $json.title }}</p>\n</div>\n\n<div style=\"padding: 20px 28px; border: 1px solid #e9ecef;\">\n<p><strong>Blog:</strong> Aethon Insights</p>\n<p><strong>Article:</strong> <a href=\"{{ $json.canonical_url }}\">{{ $json.canonical_url }}</a></p>\n<p><strong>Score:</strong> {{ $json.published_count }} auto-posted / {{ $json.content_ready_count }} ready for manual / {{ $json.failed_count }} failed / {{ $json.not_configured_count }} not configured</p>\n\n<table style=\"border-collapse: collapse; width: 100%; margin: 16px 0;\">\n<tr style=\"background: #f0f0f0;\">\n  <th style=\"padding: 10px; text-align: left; border: 1px solid #ddd;\">Platform</th>\n  <th style=\"padding: 10px; text-align: left; border: 1px solid #ddd;\">Status</th>\n  <th style=\"padding: 10px; text-align: left; border: 1px solid #ddd;\">Link</th>\n</tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;\">LinkedIn</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ {'published':'Posted','failed':'Failed','skipped':'Skipped','not_configured':'Not configured','already_posted':'Already posted','not_attempted':'Skipped'}[$json.linkedin_status] || $json.linkedin_status }}</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.linkedin_url || '-' }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;\">Dev.to</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ {'published':'Posted','failed':'Failed','skipped':'Skipped','not_configured':'Not configured','already_posted':'Already posted','not_attempted':'Skipped'}[$json.devto_status] || $json.devto_status }}</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.devto_url || '-' }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;\">Hashnode</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ {'published':'Posted','failed':'Failed','skipped':'Skipped','not_configured':'Not configured','already_posted':'Already posted','not_attempted':'Skipped'}[$json.hashnode_status] || $json.hashnode_status }}</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.hashnode_url || '-' }}</td></tr>\n<tr style=\"background:#fafafa;\"><td style=\"padding:8px;border:1px solid #ddd;\">Twitter/X</td><td style=\"padding:8px;border:1px solid #ddd;\">Content emailed</td><td style=\"padding:8px;border:1px solid #ddd;\">-</td></tr>\n<tr style=\"background:#fafafa;\"><td style=\"padding:8px;border:1px solid #ddd;\">Facebook</td><td style=\"padding:8px;border:1px solid #ddd;\">Content emailed</td><td style=\"padding:8px;border:1px solid #ddd;\">-</td></tr>\n<tr style=\"background:#fafafa;\"><td style=\"padding:8px;border:1px solid #ddd;\">Reddit</td><td style=\"padding:8px;border:1px solid #ddd;\">Content emailed</td><td style=\"padding:8px;border:1px solid #ddd;\">-</td></tr>\n<tr style=\"background:#fafafa;\"><td style=\"padding:8px;border:1px solid #ddd;\">Substack</td><td style=\"padding:8px;border:1px solid #ddd;\">Content emailed</td><td style=\"padding:8px;border:1px solid #ddd;\">-</td></tr>\n</table>\n\n{{ $json.notes ? '<div style=\"padding:12px;background:#fff3cd;border-radius:6px;margin:12px 0;\"><strong>Errors:</strong> ' + $json.notes + '</div>' : '' }}\n\n<div style=\"padding:12px;background:#e8f5e9;border-radius:6px;margin:12px 0;\">\n  <strong>Action required:</strong> Check your inbox for platform-specific content ready to paste into Twitter, Facebook, Reddit, and Substack.\n</div>\n\n<div style=\"padding:12px;background:#f0f0f0;border-radius:6px;margin:12px 0;\">\n  <p style=\"margin:0;\"><strong>Retry:</strong> <code>./publish.sh crosspost {{ $json.slug }}</code></p>\n  <p style=\"margin:4px 0 0;\"><strong>Specific platforms:</strong> <code>./publish.sh crosspost {{ $json.slug }} linkedin,devto</code></p>\n</div>\n</div>\n\n<div style=\"background:#f8f9fa;padding:12px 28px;border-radius:0 0 12px 12px;border:1px solid #e9ecef;border-top:0;\">\n  <p style=\"margin:0;color:#999;font-size:12px;\">Aethon Blog Cross-Post Pipeline v3 &bull; {{ $json.crossposted_at }}</p>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "n20",
+      "name": "Send Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1648,
+        376
+      ],
+      "webhookId": "498615fe-5159-40d5-8d01-afc13b8395bf",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Post": {
+      "main": [
+        [
+          {
+            "node": "Validate Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Post": {
+      "main": [
+        [
+          {
+            "node": "Read Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Tracker": {
+      "main": [
+        [
+          {
+            "node": "Platform Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Config": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "Call OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Prepare All Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare All Posts": {
+      "main": [
+        [
+          {
+            "node": "IF LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Dev.to",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "IF Dev.to",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Dev.to": {
+      "main": [
+        [
+          {
+            "node": "Post to Dev.to",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Hashnode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Dev.to": {
+      "main": [
+        [
+          {
+            "node": "IF Hashnode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Hashnode": {
+      "main": [
+        [
+          {
+            "node": "Post to Hashnode",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Hashnode": {
+      "main": [
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Results": {
+      "main": [
+        [
+          {
+            "node": "Update Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Tracker": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Platform Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Platform Content": {
+      "main": [
+        [
+          {
+            "node": "Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "3a7d57e9-f6b9-4915-bfbf-c8f6720343ea",
+  "activeVersionId": "620bc8bb-7d7f-4434-bd2a-38fad4c0ef60",
+  "versionCounter": 12,
+  "triggerCount": 1,
+  "tags": []
+}

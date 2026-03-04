@@ -1,0 +1,83 @@
+{
+  "name": "sq-memory",
+  "version": "1.0.1",
+  "description": "Persistent 11D memory for OpenClaw agents via SQ Cloud",
+  "author": "Mirrorborn",
+  "repository": "https://github.com/wbic16/openclaw-sq-skill",
+  "license": "MIT",
+  "openclaw_version": ">=2026.2.0",
+  "tools": [
+    {
+      "name": "remember",
+      "description": "Store text at a coordinate for permanent memory",
+      "parameters": {
+        "coordinate": {
+          "type": "string",
+          "description": "Memory coordinate (e.g., 'user/preferences/theme')",
+          "required": true
+        },
+        "text": {
+          "type": "string",
+          "description": "Text to store",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "recall",
+      "description": "Retrieve text from a coordinate",
+      "parameters": {
+        "coordinate": {
+          "type": "string",
+          "description": "Memory coordinate to retrieve",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "forget",
+      "description": "Delete memory at a coordinate",
+      "parameters": {
+        "coordinate": {
+          "type": "string",
+          "description": "Memory coordinate to delete",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "list_memories",
+      "description": "List all memory coordinates matching a prefix",
+      "parameters": {
+        "prefix": {
+          "type": "string",
+          "description": "Coordinate prefix to search (e.g., 'user/')",
+          "required": true
+        }
+      }
+    }
+  ],
+  "config": {
+    "endpoint": {
+      "type": "string",
+      "description": "SQ endpoint URL",
+      "default": "http://localhost:1337",
+      "required": true
+    },
+    "api_key": {
+      "type": "string",
+      "description": "SQ Cloud API key (leave empty for self-hosted)",
+      "required": false,
+      "secret": true
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Agent namespace for memory isolation",
+      "default": "default-agent",
+      "required": true
+    }
+  },
+  "dependencies": {
+    "node": ">=18.0.0"
+  }
+}

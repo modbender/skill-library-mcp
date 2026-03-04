@@ -1,0 +1,16 @@
+{
+  "id": "error-suppression",
+  "title": "Error Suppression — Never Expose Raw Exec Errors to Users",
+  "description": "When exec commands fail, the raw error message (stack traces, file paths, internal state) must never reach the user directly. This is both a UX rule (confusing to users) and a security rule (leaks internal paths, credentials, system state). All exec calls must be wrapped with graceful failure handling.",
+  "severity": "high",
+  "category": "safety",
+  "tags": ["exec", "error", "ux", "security", "suppression"],
+  "before": "<!-- Agent runs commands without error handling -->\n\nexec: git pull --rebase\n# → User sees: \"⚠️🔧 Exec: git pull --rebase failed: error: cannot pull with rebase: You have unstaged changes. Please commit or stash them.\"\n# User is confused, alarmed, and loses trust.",
+  "after": "## Error Suppression Rule\n\n**Exec calls must NEVER fail with raw error output visible to users.**\n\nThe rule is simple: **exec must always exit 0**.\n\n### Golden Rule: Ask Before Calling\n> \"What happens if this command fails?\" → If failure is possible, add a guard.\n\n### Required Patterns\n\n```bash\n# ✅ Safe — always exits 0\ncommand 2>/dev/null || echo \"handled\"\n\n# ✅ Safe — meaningful user-facing message\n{ risky_command && echo \"Success\"; } 2>&1 || echo \"Could not complete (check logs)\"\n\n# ✅ Safe — use safe-exec wrapper for complex ops\nbash ~/openclaw/scripts/safe-exec.sh \"task-name\" \"command\"\n\n# ❌ Forbidden — raw failure exposed\ngit pull --rebase\npython3 script.py\ncurl https://api.example.com\n```\n\n### Before Every exec Call (Mental Checklist)\n1. Can this fail? → Add `|| true` or error handler\n2. Does it access files? → Check existence first\n3. Does it call external services? → Add timeout + fallback\n4. Is it git? → Use git-sync.sh",
+  "evidence": "OpenClaw gateway auto-exposes exec failures as `⚠️🔧 Exec: ... failed: ...` messages to the user channel. This is a platform-level behavior that cannot be disabled via config (schema confirmed). The only fix is: never let exec fail.",
+  "effectiveness": "Zero raw error exposures after adopting pattern. Previously: ~5 per day during active development sessions.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

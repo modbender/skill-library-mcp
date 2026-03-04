@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>세금계산서</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+      padding: 30px;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 3px double #000;
+      padding-bottom: 15px;
+    }
+    .header h1 {
+      font-size: 26pt;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .header .subtitle {
+      font-size: 10pt;
+      color: #666;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #333;
+      background-color: #f5f5f5;
+    }
+    .meta div {
+      display: flex;
+      align-items: center;
+    }
+    .meta strong {
+      margin-right: 10px;
+    }
+    .party-section {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .party {
+      flex: 1;
+      border: 2px solid #333;
+      padding: 15px;
+    }
+    .party h2 {
+      font-size: 14pt;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #333;
+    }
+    .party-row {
+      display: flex;
+      margin-bottom: 6px;
+      font-size: 10pt;
+    }
+    .party-label {
+      width: 120px;
+      font-weight: bold;
+    }
+    .party-value {
+      flex: 1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table th, table td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+      font-size: 10pt;
+    }
+    table th {
+      background-color: #e0e0e0;
+      font-weight: bold;
+    }
+    table td.left {
+      text-align: left;
+    }
+    table td.right {
+      text-align: right;
+    }
+    .summary {
+      margin-top: 20px;
+      border: 2px solid #333;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+    .summary table {
+      width: 100%;
+      border: none;
+      margin: 0;
+    }
+    .summary td {
+      border: none;
+      padding: 8px;
+      font-size: 13pt;
+    }
+    .summary .total {
+      font-weight: bold;
+      font-size: 16pt;
+      background-color: #333;
+      color: white;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 9pt;
+      color: #666;
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>세 금 계 산 서</h1>
+    <div class="subtitle">Tax Invoice</div>
+  </div>
+
+  <div class="meta">
+    <div>
+      <strong>승인번호:</strong> {{approvalNumber}}
+    </div>
+    <div>
+      <strong>구분:</strong> {{type}}
+    </div>
+    <div>
+      <strong>작성일자:</strong> {{issueDate}}
+    </div>
+  </div>
+
+  <div class="party-section">
+    <div class="party">
+      <h2>공급자</h2>
+      <div class="party-row">
+        <div class="party-label">사업자등록번호</div>
+        <div class="party-value">{{myBusinessNumber}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">상호 (법인명)</div>
+        <div class="party-value">{{myCompanyName}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">성명 (대표자)</div>
+        <div class="party-value">{{myCEO}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">사업장 주소</div>
+        <div class="party-value">{{myAddress}}</div>
+      </div>
+    </div>
+
+    <div class="party">
+      <h2>공급받는자</h2>
+      <div class="party-row">
+        <div class="party-label">사업자등록번호</div>
+        <div class="party-value">{{clientBusinessNumber}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">상호 (법인명)</div>
+        <div class="party-value">{{clientName}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">성명 (대표자)</div>
+        <div class="party-value">{{clientCEO}}</div>
+      </div>
+      <div class="party-row">
+        <div class="party-label">사업장 주소</div>
+        <div class="party-value">{{clientAddress}}</div>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 100px;">작성일자</th>
+        <th style="width: 200px;">품목</th>
+        <th style="width: 80px;">수량</th>
+        <th style="width: 120px;">단가</th>
+        <th style="width: 120px;">공급가액</th>
+        <th style="width: 150px;">비고</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{itemRows}}
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <table>
+      <tr>
+        <td style="width: 200px;">공급가액 (Supply Amount)</td>
+        <td class="right">{{subtotal}} 원</td>
+      </tr>
+      <tr>
+        <td>세액 (Tax Amount 10%)</td>
+        <td class="right">{{vat}} 원</td>
+      </tr>
+      <tr class="total">
+        <td>합계 (Total)</td>
+        <td class="right">{{total}} 원</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>이 세금계산서는 전자세금계산서가 아닌 일반 세금계산서입니다.</p>
+    <p>{{myCompanyName}} | 사업자등록번호: {{myBusinessNumber}}</p>
+  </div>
+</body>
+</html>

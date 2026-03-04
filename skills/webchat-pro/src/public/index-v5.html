@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🦞 OpenClaw Chat v15 - 贝贝 (生产版)</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #f5f7fb;
+      --bg-secondary: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --accent-primary: #667eea;
+      --accent-secondary: #764ba2;
+    }
+    
+    [data-theme="dark"] {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --border-color: #2a2a4e;
+      --accent-primary: #667eea;
+      --accent-secondary: #764ba2;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .chat-container {
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-header {
+      padding: 20px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: white;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-left h1 { font-size: 24px; margin-bottom: 5px; }
+    .header-left p { font-size: 14px; opacity: 0.9; }
+    
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .model-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .model-selector label { font-size: 14px; opacity: 0.9; }
+    
+    .model-selector select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .model-selector select option {
+      background: var(--accent-primary);
+      color: white;
+    }
+    
+    .icon-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    
+    .icon-btn:hover { background: rgba(255,255,255,0.3); }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: var(--bg-primary);
+    }
+    
+    .message {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user { justify-content: flex-end; }
+    .message.assistant { justify-content: flex-start; }
+    
+    .message-content {
+      max-width: 75%;
+      padding: 12px 18px;
+      border-radius: 18px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    
+    .message.user .message-content {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.assistant .message-content {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .message.streaming .message-content {
+      border-left: 3px solid var(--accent-primary);
+    }
+    
+    .message-meta {
+      max-width: 75%;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 5px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    .message.assistant .message-meta {
+      justify-content: flex-start;
+    }
+    
+    .model-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .model-badge.qwen3.5-plus { background: var(--accent-primary); color: white; }
+    .model-badge.glm-4-flash { background: #10b981; color: white; }
+    .model-badge.gpt-4 { background: #f59e0b; color: white; }
+    .model-badge.qwen-vl { background: #8b5cf6; color: white; }
+    
+    .cost-badge {
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .chat-input {
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      border-radius: 0 0 20px 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 12px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+    
+    .chat-input input:focus { border-color: var(--accent-primary); }
+    
+    .chat-input button {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .chat-input button:hover { transform: scale(1.05); }
+    .chat-input button:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 18px;
+      background: var(--accent-primary);
+      margin-left: 2px;
+      animation: blink 1s infinite;
+      vertical-align: middle;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    
+    /* Markdown 样式 */
+    .message-content pre {
+      background: rgba(0,0,0,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    
+    .message-content code {
+      font-family: 'Courier New', monospace;
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .message-content pre code {
+      background: transparent;
+      padding: 0;
+    }
+    
+    .message-content table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 10px 0;
+    }
+    
+    .message-content th, .message-content td {
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      text-align: left;
+    }
+    
+    .message-content th {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    /* 认证弹窗 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.active { display: flex; }
+    
+    .modal-content {
+      background: var(--bg-secondary);
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+    
+    .modal-content input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+    
+    .modal-content button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    /* 导出菜单 */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: var(--bg-secondary);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 100;
+    }
+    
+    .dropdown-content a {
+      color: var(--text-primary);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-radius: 8px;
+      margin: 4px;
+    }
+    
+    .dropdown-content a:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .dropdown:hover .dropdown-content { display: block; }
+    
+    /* 系统消息 */
+    .system-message {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 认证弹窗 -->
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <h2>🔐 访问密码</h2>
+      <input type="password" id="passwordInput" placeholder="输入密码（默认：admin123）" onkeypress="if(event.key==='Enter')checkAuth()">
+      <button onclick="checkAuth()">登录</button>
+      <p id="authError" style="color: red; margin-top: 10px; display: none;"></p>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="header-left">
+        <h1>🦞 OpenClaw Chat v15</h1>
+        <p>生产就绪版 | 流式输出 | 多模型</p>
+      </div>
+      <div class="header-right">
+        <div class="model-selector">
+          <label>模型:</label>
+          <select id="modelSelect" onchange="changeModel()">
+            <option value="qwen3.5-plus">Qwen3.5 Plus</option>
+            <option value="glm-4-flash">GLM-4 Flash</option>
+            <option value="gpt-4">GPT-4</option>
+            <option value="qwen-vl">Qwen-VL</option>
+          </select>
+        </div>
+        <button class="icon-btn" onclick="toggleTheme()" title="切换主题">🌓</button>
+        <div class="dropdown">
+          <button class="icon-btn" title="导出">💾</button>
+          <div class="dropdown-content">
+            <a onclick="exportChat('json')">导出 JSON</a>
+            <a onclick="exportChat('md')">导出 Markdown</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-messages" id="messages"></div>
+    
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
+      <button id="sendBtn" onclick="sendMessage()">发送</button>
+    </div>
+  </div>
+
+  <script>
+    // 持久化 SESSION_ID
+    let SESSION_ID = localStorage.getItem('webchat_session_id');
+    if (!SESSION_ID) {
+      SESSION_ID = 'web-chat-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('webchat_session_id', SESSION_ID);
+    }
+    
+    let socket = null;
+    let currentStreamingMessage = null;
+    let isStreaming = false;
+    let currentModel = 'qwen3.5-plus';
+    let currentTheme = localStorage.getItem('theme') || 'light';
+    let isAuthenticated = false;
+
+    // 设置主题
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      currentTheme = theme;
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      setTheme(currentTheme === 'light' ? 'dark' : 'light');
+    }
+
+    // 检查认证
+    async function checkAuth() {
+      const password = document.getElementById('passwordInput').value;
+      
+      try {
+        const res = await fetch('/api/auth/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        
+        const data = await res.json();
+        
+        if (data.authenticated) {
+          isAuthenticated = true;
+          document.getElementById('authModal').classList.remove('active');
+          connectWebSocket();
+        } else {
+          document.getElementById('authError').textContent = '密码错误';
+          document.getElementById('authError').style.display = 'block';
+        }
+      } catch (e) {
+        console.error('认证失败:', e);
+      }
+    }
+
+    // 连接 WebSocket
+    function connectWebSocket() {
+      socket = io();
+      
+      socket.on('connect', () => {
+        console.log('[WS] 已连接');
+        socket.emit('join', SESSION_ID);
+      });
+      
+      socket.on('history', (messages) => {
+        console.log('[WS] 历史:', messages.length, '条');
+        renderMessages(messages);
+      });
+      
+      socket.on('session_config', (config) => {
+        currentModel = config.model || 'qwen3.5-plus';
+        document.getElementById('modelSelect').value = currentModel;
+      });
+      
+      socket.on('message', (msg) => {
+        if (msg.role === 'user') {
+          appendMessage('user', msg.content, msg.timestamp);
+        }
+      });
+      
+      socket.on('stream_chunk', (data) => {
+        if (!currentStreamingMessage) {
+          currentStreamingMessage = appendMessage('assistant', '', Date.now(), true);
+        }
+        currentStreamingMessage.content += data.content;
+        currentStreamingMessage.element.querySelector('.message-content').innerHTML = 
+          marked.parse(currentStreamingMessage.content) + '<span class="cursor"></span>';
+        scrollToBottom();
+      });
+      
+      socket.on('stream_complete', (data) => {
+        if (currentStreamingMessage) {
+          currentStreamingMessage.element.classList.remove('streaming');
+          const meta = createMessageMeta(data.model, data.stats);
+          currentStreamingMessage.element.innerHTML = `
+            <div class="message-content">${marked.parse(currentStreamingMessage.content)}</div>
+            ${meta}
+            <div class="message-time">${new Date(data.timestamp).toLocaleTimeString()}</div>
+          `;
+          currentStreamingMessage = null;
+        }
+        isStreaming = false;
+        document.getElementById('messageInput').disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('messageInput').focus();
+      });
+      
+      socket.on('model_changed', (data) => {
+        currentModel = data.model;
+        appendSystemMessage(`已切换到 ${getModelName(data.model)}`);
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('[WS] 断开，重连中...');
+        setTimeout(connectWebSocket, 2000);
+      });
+    }
+
+    // 创建消息元数据
+    function createMessageMeta(model, stats) {
+      if (!stats) return '';
+      
+      const costIcons = '💰'.repeat(stats.cost_level || 1);
+      
+      return `
+        <div class="message-meta">
+          <span class="model-badge ${model}">${getModelName(model)}</span>
+          <span class="cost-badge">⚡ ${stats.totalTokens || 0} tokens</span>
+          <span class="cost-badge">⏱️ ${stats.duration || 0}s</span>
+          <span class="cost-badge">💵 ¥${stats.cost || '0.00'}</span>
+        </div>
+      `;
+    }
+
+    // 获取模型名称
+    function getModelName(modelId) {
+      const models = {
+        'qwen3.5-plus': 'Qwen3.5 Plus',
+        'glm-4-flash': 'GLM-4 Flash',
+        'gpt-4': 'GPT-4',
+        'qwen-vl': 'Qwen-VL'
+      };
+      return models[modelId] || modelId;
+    }
+
+    // 添加系统消息
+    function appendSystemMessage(content) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = 'system-message';
+      div.textContent = content;
+      container.appendChild(div);
+      scrollToBottom();
+    }
+
+    // 渲染消息
+    function renderMessages(messages) {
+      const container = document.getElementById('messages');
+      container.innerHTML = '';
+      
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `message ${msg.role}`;
+        
+        const meta = msg.role === 'assistant' && msg.stats ? createMessageMeta(msg.model, msg.stats) : '';
+        
+        div.innerHTML = `
+          <div class="message-content">${marked.parse(msg.content)}</div>
+          ${meta}
+          <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+        `;
+        
+        container.appendChild(div);
+      });
+      
+      scrollToBottom();
+    }
+
+    // 添加消息
+    function appendMessage(role, content, timestamp, streaming = false) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `message ${role}${streaming ? ' streaming' : ''}`;
+      
+      const timeStr = new Date(timestamp).toLocaleTimeString();
+      div.innerHTML = `
+        <div class="message-content">${streaming ? content : marked.parse(content)}${streaming ? '<span class="cursor"></span>' : ''}</div>
+        ${!streaming && role === 'assistant' && currentModel ? createMessageMeta(currentModel, {}) : ''}
+        ${!streaming ? `<div class="message-time">${timeStr}</div>` : ''}
+      `;
+      
+      container.appendChild(div);
+      scrollToBottom();
+      
+      return { element: div, content: content };
+    }
+
+    // 滚动到底部
+    function scrollToBottom() {
+      const container = document.getElementById('messages');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // 切换模型
+    async function changeModel() {
+      const select = document.getElementById('modelSelect');
+      const model = select.value;
+      
+      try {
+        const res = await fetch(`/api/session/${SESSION_ID}/model`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model })
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          currentModel = model;
+          socket.emit('change_model', { sessionId: SESSION_ID, model });
+        }
+      } catch (e) {
+        console.error('切换模型失败:', e);
+      }
+    }
+
+    // 导出对话
+    function exportChat(format) {
+      window.open(`/api/export/${SESSION_ID}?format=${format}`, '_blank');
+    }
+
+    // 发送消息
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message || isStreaming) return;
+      
+      input.value = '';
+      input.disabled = true;
+      document.getElementById('sendBtn').disabled = true;
+      isStreaming = true;
+      currentStreamingMessage = null;
+
+      appendMessage('user', message, Date.now(), false);
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            message, 
+            sessionId: SESSION_ID,
+            model: currentModel
+          })
+        });
+        const data = await res.json();
+        
+        if (!data.streaming) {
+          appendMessage('assistant', data.message, Date.now(), false);
+          input.disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+        }
+        
+      } catch (e) {
+        console.error('发送失败:', e);
+        appendMessage('assistant', '⚠️ 发送失败：' + e.message, Date.now(), false);
+        input.disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        isStreaming = false;
+      }
+    }
+
+    // 初始化
+    setTheme(currentTheme);
+    document.getElementById('authModal').classList.add('active');
+  </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="row" style="justify-content: space-between; margin-bottom: 14px;">
+    <h1 style="margin:0; font-size: 20px;">Settings</h1>
+    <div class="muted" style="font-size: 13px;">Config: <code style="color: var(--text);">{{ config_path }}</code></div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    {% if status_level == 'full_local' %}
+      <div style="font-size: 16px; font-weight: 700;">🟢 FULLY LOCAL — All processing on this machine. Nothing leaves.</div>
+    {% else %}
+      <div style="font-size: 16px; font-weight: 700;">🟡 PARTIALLY LOCAL — Data stored here, but sent to <b>{{ cloud_model }}</b> for extraction.</div>
+      {% if needs_privacy_ack %}
+        <div class="muted" style="margin-top: 8px;">Cloud mode is selected but not acknowledged. Upload/extraction will be blocked until you confirm below.</div>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  {% if error %}
+    <div class="card" style="border-color: rgba(239,68,68,0.35); margin-bottom: 14px;">
+      <div style="color: var(--bad); font-weight: 700;">{{ error }}</div>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <form method="post" action="/settings" id="settings-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      <div style="display:grid; grid-template-columns: 1fr; gap: 14px;">
+
+        <div>
+          <div style="font-weight:700; margin-bottom: 8px;">Model backend</div>
+          <label style="display:flex; gap:10px; align-items:center; margin-bottom: 6px;">
+            <input type="radio" name="model_backend" value="local" {% if cfg.model_backend == 'local' %}checked{% endif %} />
+            <span>Local (Ollama) — recommended</span>
+          </label>
+          <label style="display:flex; gap:10px; align-items:center;">
+            <input type="radio" name="model_backend" value="cloud" {% if cfg.model_backend == 'cloud' %}checked{% endif %} />
+            <span>Cloud — sends tax document content to an external AI provider</span>
+          </label>
+        </div>
+
+        <div id="local-section" style="padding-top: 6px;">
+          <div style="font-weight:700; margin-bottom: 8px;">Local model (Ollama)</div>
+          <select name="local_model" style="min-width: 320px;">
+            {% for m in local_models_info %}
+              {% set is_glmocr = 'glm-ocr' in m.name %}
+              <option value="{{ m.name }}" {% if cfg.local_model == m.name %}selected{% endif %}>
+                {{ "✅" if m.vision else "⚠️" }} {{ m.name }}{% if is_glmocr %} — vision ⭐ recommended{% elif m.vision %} — vision{% else %} — text only, cannot read images{% endif %}
+              </option>
+            {% endfor %}
+            {% if local_models_info|length == 0 %}
+              <option value="{{ cfg.local_model }}" selected>{{ cfg.local_model }}</option>
+            {% endif %}
+          </select>
+          {% if not selected_is_vision and cfg.model_backend == 'local' %}
+          <div style="margin-top:8px; padding:10px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.5); background:rgba(239,68,68,0.08); font-size:13px; color:#ef4444;">
+            ⚠️ <strong>{{ cfg.local_model }}</strong> is a text-only model — it cannot read document images and will return empty extractions. Switch to a vision model (e.g. <strong>glm-ocr</strong> — run <code>ollama pull glm-ocr</code>) or use Cloud mode.
+          </div>
+          {% endif %}
+          <div class="muted" style="margin-top: 8px; font-size: 13px;">Vision models (✅) can read document images. Text-only models (⚠️) will not extract any data.</div>
+        </div>
+
+        <div id="cloud-section" style="padding-top: 6px;">
+          <div style="font-weight:700; margin-bottom: 8px;">Cloud model</div>
+          <select name="cloud_model" id="cloud-model" style="min-width: 320px;">
+            {% for cm in cloud_models %}
+              <option value="{{ cm }}" {% if cfg.cloud_model == cm %}selected{% endif %}>{{ cm }}</option>
+            {% endfor %}
+          </select>
+
+          <div style="height: 10px;"></div>
+          <label style="display:flex; gap:10px; align-items:flex-start;">
+            <input type="checkbox" id="privacy-ack" name="privacy_acknowledged" value="1" {% if cfg.privacy_acknowledged %}checked{% endif %} />
+            <span>
+              <div style="font-weight:700;">I understand and accept the privacy risk</div>
+              <div class="muted" style="font-size: 13px; margin-top: 4px;">
+                ⚠️ Your tax documents will be sent to an external AI provider. This includes document content, which may contain SSNs, income, and account numbers.
+              </div>
+            </span>
+          </label>
+        </div>
+
+        <details style="
+          border: 1px solid rgba(148,163,184,0.22);
+          background: rgba(15,23,42,0.35);
+          border-radius: 14px;
+          padding: 12px 12px;
+        ">
+          <summary style="cursor:pointer; font-weight: 700; list-style: none;">
+            📊 How model choice affects extraction quality
+          </summary>
+          <div style="height: 10px;"></div>
+
+          <div style="display:grid; grid-template-columns: 1fr; gap: 12px; font-size: 13px;">
+            <div>
+              <div style="font-weight:700; margin-bottom: 6px;">Local (Ollama)</div>
+              <div class="muted">✅ Free · ✅ Fully private · your data never leaves this machine</div>
+              <div style="height: 8px;"></div>
+              <div class="muted" style="margin-bottom: 6px;">⚠️ Smaller models may struggle with:</div>
+              <ul class="muted" style="margin: 0 0 0 18px;">
+                <li>Complex multi-copy forms (consolidated 1099s, K-1s)</li>
+                <li>Low-quality scans or non-standard layouts</li>
+                <li>Handwritten or corrected fields</li>
+              </ul>
+              <div class="muted" style="margin-top: 8px;">Typical confidence: <code style="color: var(--text);">0.85–0.97</code> with <strong>glm-ocr</strong> on clean PDFs</div>
+            </div>
+
+            <div>
+              <div style="font-weight:700; margin-bottom: 6px;">Cloud (Claude / OpenAI)</div>
+              <ul class="muted" style="margin: 0 0 0 18px;">
+                <li>✅ Higher accuracy on complex forms</li>
+                <li>✅ Better handling of edge cases and poor scans</li>
+                <li>✅ Confidence typically <code style="color: var(--text);">0.85–0.97</code></li>
+              </ul>
+              <div style="height: 8px;"></div>
+              <div class="muted">⚠️ Your document content leaves this machine — see <a href="/privacy">Privacy Policy</a></div>
+              <div class="muted">⚠️ Requires API key or cloud subscription</div>
+            </div>
+
+            <div class="muted">
+              💡 Tip: <strong>glm-ocr</strong> (<code>ollama pull glm-ocr</code>) is the recommended local model — purpose-built for document OCR, outperforms llava significantly. Switch to cloud only for low-confidence results or complex multi-page K-1s.
+            </div>
+          </div>
+        </details>
+
+        <div class="row" style="justify-content: space-between;">
+          <button type="submit">Save</button>
+          <a class="muted" href="/">Back to documents</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('settings-form');
+      const cloudModel = document.getElementById('cloud-model');
+      const ack = document.getElementById('privacy-ack');
+      const cloudRadio = form.querySelector('input[name="model_backend"][value="cloud"]');
+      const localRadio = form.querySelector('input[name="model_backend"][value="local"]');
+      if (!form || !cloudModel || !ack || !cloudRadio) return;
+
+      // Inline warning banner — shown when cloud is selected and ack not yet checked
+      const banner = document.createElement('div');
+      banner.id = 'cloud-warn-banner';
+      banner.style.cssText = 'display:none; margin-top:10px; padding:12px 14px; border-radius:10px; border:1px solid rgba(245,158,11,0.5); background:rgba(245,158,11,0.08); font-size:13px; color:#f59e0b; line-height:1.5;';
+      banner.innerHTML = '⚠️ <strong>Cloud mode selected.</strong> Your tax documents — including SSNs, income figures, and account numbers — will be sent to an external AI provider. Check the box below to confirm you accept this.';
+      const cloudSection = document.getElementById('cloud-section');
+      if (cloudSection) cloudSection.prepend(banner);
+
+      // Inline submit error
+      const submitErr = document.createElement('div');
+      submitErr.id = 'cloud-submit-err';
+      submitErr.style.cssText = 'display:none; margin-top:8px; color:#ef4444; font-size:13px;';
+      submitErr.textContent = '⚠️ You must check the privacy acknowledgment before saving cloud mode.';
+      const saveRow = form.querySelector('.row');
+      if (saveRow) saveRow.before(submitErr);
+
+      function updateBanner() {
+        const isCloud = cloudRadio.checked;
+        banner.style.display = (isCloud && !ack.checked) ? 'block' : 'none';
+        submitErr.style.display = 'none';
+      }
+
+      form.querySelectorAll('input[name="model_backend"]').forEach((el) => {
+        el.addEventListener('change', updateBanner);
+      });
+      ack.addEventListener('change', updateBanner);
+
+      form.addEventListener('submit', (e) => {
+        if (cloudRadio.checked && !ack.checked) {
+          e.preventDefault();
+          submitErr.style.display = 'block';
+          banner.style.display = 'block';
+          ack.closest('label').style.outline = '2px solid #f59e0b';
+          ack.closest('label').style.borderRadius = '6px';
+          ack.closest('label').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      // Init on page load
+      updateBanner();
+    })();
+  </script>
+{% endblock %}

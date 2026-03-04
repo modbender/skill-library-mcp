@@ -1,0 +1,214 @@
+MANUAL TEST CHECKLIST FOR ms-todo-oauth
+======================================
+
+Use this checklist to manually verify all functionality works correctly.
+Check off each item as you test it.
+
+PREREQUISITES:
+--------------
+[ ] Authenticated (uv run scripts/ms-todo-oauth.py lists works)
+
+TEST CATEGORY 1: LIST MANAGEMENT
+---------------------------------
+[ ] List all task lists
+    Command: uv run scripts/ms-todo-oauth.py lists
+    Expected: Shows all your task lists
+
+[ ] List with verbose mode
+    Command: uv run scripts/ms-todo-oauth.py lists -v
+    Expected: Shows list IDs and creation dates
+
+[ ] Create a new list
+    Command: uv run scripts/ms-todo-oauth.py create-list "Test List"
+    Expected: ✓ List created: Test List
+
+[ ] Delete a list
+    Command: uv run scripts/ms-todo-oauth.py delete-list "Test List" -y
+    Expected: ✓ List deleted: Test List
+
+
+TEST CATEGORY 2: BASIC TASK OPERATIONS
+---------------------------------------
+[ ] Add simple task
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Simple task"
+    Expected: ✓ Task added: Simple task
+
+[ ] List tasks
+    Command: uv run scripts/ms-todo-oauth.py tasks "任务"
+    Expected: Shows all incomplete tasks in the list
+
+[ ] List all tasks (including completed)
+    Command: uv run scripts/ms-todo-oauth.py tasks "任务" -a
+    Expected: Shows both complete and incomplete tasks
+
+[ ] View task details
+    Command: uv run scripts/ms-todo-oauth.py detail -l "任务" "Simple task"
+    Expected: Shows detailed task information
+
+[ ] Complete a task
+    Command: uv run scripts/ms-todo-oauth.py complete -l "任务" "Simple task"
+    Expected: ✓ Task completed: Simple task
+
+[ ] Delete a task
+    Command: uv run scripts/ms-todo-oauth.py delete -l "任务" "Simple task" -y
+    Expected: ✓ Task deleted: Simple task
+
+
+TEST CATEGORY 3: TASK WITH OPTIONS
+-----------------------------------
+[ ] Add task with high priority
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Urgent task" -p high
+    Expected: ✓ Task added (shows ⭐ in task list)
+
+[ ] Add task with low priority
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Low priority" -p low
+    Expected: ✓ Task added
+
+[ ] Add task due in 3 days
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Due in 3 days" -d 3
+    Expected: ✓ Task added
+
+[ ] Add task with specific date
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Specific date" -d 2026-03-15
+    Expected: ✓ Task added
+
+[ ] Add task with reminder (3 hours)
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Reminder test" -r 3h
+    Expected: ✓ Task added
+
+[ ] Add task with reminder (specific datetime)
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Specific reminder" -r "2026-03-15 14:30"
+    Expected: ✓ Task added
+
+[ ] Add task with description
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "With notes" -D "Detailed description here"
+    Expected: ✓ Task added
+
+[ ] Add task with tags
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Tagged task" -t "work,important,urgent"
+    Expected: ✓ Task added
+
+
+TEST CATEGORY 4: RECURRING TASKS
+---------------------------------
+[ ] Add daily recurring task
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Daily task" -R daily
+    Expected: ✓ Task added, 🔄 Recurring task created
+
+[ ] Add weekly recurring task
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Weekly task" -R weekly
+    Expected: ✓ Task added, 🔄 Recurring task created
+
+[ ] Add weekdays recurring task
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Weekday task" -R weekdays
+    Expected: ✓ Task added, 🔄 Recurring task created
+
+[ ] Add monthly recurring task
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Monthly task" -R monthly
+    Expected: ✓ Task added, 🔄 Recurring task created
+
+[ ] Add recurring with interval (every 2 days)
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "Every 2 days" -R daily:2
+    Expected: ✓ Task added, 🔄 Recurring task created
+
+
+TEST CATEGORY 5: TASK VIEWS
+----------------------------
+[ ] View today's tasks
+    Command: uv run scripts/ms-todo-oauth.py today
+    Expected: Shows tasks due today
+
+[ ] View overdue tasks
+    Command: uv run scripts/ms-todo-oauth.py overdue
+    Expected: Shows overdue tasks
+
+[ ] View all pending tasks
+    Command: uv run scripts/ms-todo-oauth.py pending
+    Expected: Shows all incomplete tasks
+
+[ ] View pending tasks grouped by list
+    Command: uv run scripts/ms-todo-oauth.py pending -g
+    Expected: Shows incomplete tasks organized by list
+
+
+TEST CATEGORY 6: SEARCH AND STATS
+----------------------------------
+[ ] Search for tasks
+    Command: uv run scripts/ms-todo-oauth.py search "test"
+    Expected: Shows tasks matching "test"
+
+[ ] View statistics
+    Command: uv run scripts/ms-todo-oauth.py stats
+    Expected: Shows task statistics (total, completed, pending, etc.)
+
+
+TEST CATEGORY 7: DATA MANAGEMENT
+---------------------------------
+[ ] Export tasks to JSON
+    Command: uv run scripts/ms-todo-oauth.py export -o my_tasks.json
+    Expected: ✓ Tasks exported to: my_tasks.json
+
+[ ] Verify export file exists and is valid JSON
+    Command: cat my_tasks.json | python -m json.tool
+    Expected: Pretty-printed JSON without errors
+
+
+TEST CATEGORY 8: EDGE CASES
+----------------------------
+[ ] Add task to non-existent list (should create it)
+    Command: uv run scripts/ms-todo-oauth.py add -l "New List" "Task in new list" --create-list
+    Expected: Creates list and adds task
+
+[ ] Try to complete non-existent task
+    Command: uv run scripts/ms-todo-oauth.py complete -l "任务" "NonExistentTask"
+    Expected: ❌ Task not found: NonExistentTask
+
+[ ] Try to delete non-existent list
+    Command: uv run scripts/ms-todo-oauth.py delete-list "NonExistentList" -y
+    Expected: ❌ List not found: NonExistentList
+
+[ ] Task with Chinese/Unicode characters
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "中文任务测试"
+    Expected: ✓ Task added: 中文任务测试
+
+[ ] Task with emojis
+    Command: uv run scripts/ms-todo-oauth.py add -l "任务" "🎉 Emoji task 🚀"
+    Expected: ✓ Task added
+
+
+TEST CATEGORY 9: AUTHENTICATION
+--------------------------------
+[ ] View current authentication status
+    Command: uv run scripts/ms-todo-oauth.py lists
+    Expected: Shows lists (if authenticated) or error message (if not)
+
+[ ] Logout
+    Command: uv run scripts/ms-todo-oauth.py logout
+    Expected: ✓ Login information cleared
+
+[ ] Login - Get authorization URL
+    Command: uv run scripts/ms-todo-oauth.py login get
+    Expected: Shows OAuth2 URL to visit
+
+[ ] Login - Verify with code
+    Command: uv run scripts/ms-todo-oauth.py login verify <code>
+    Expected: ✓ Authentication successful!
+
+
+COMPLETION CHECKLIST
+---------------------
+Total categories: 9
+Categories completed: [ ] / 9
+
+Notes:
+- Any failed tests? List them here:
+
+
+- Any unexpected behavior? List here:
+
+
+- Overall assessment: [ ] PASS  [ ] FAIL
+
+
+Date tested: _______________
+Tested by: _______________

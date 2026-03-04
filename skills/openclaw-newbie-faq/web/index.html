@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 新手指南</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>OpenClaw 新手指南</h1>
+            </div>
+            <p class="subtitle">为刚接触 OpenClaw 的新手提供完整指南</p>
+        </header>
+
+        <!-- 功能标签 -->
+        <div class="priority-tabs">
+            <button class="tab-btn active" data-tab="basics">
+                <i class="fas fa-book"></i>
+                <span>大模型常识</span>
+            </button>
+            <button class="tab-btn" data-tab="openclaw">
+                <i class="fas fa-sitemap"></i>
+                <span>OpenClaw架构和目录介绍</span>
+            </button>
+            <button class="tab-btn" data-tab="faq">
+                <i class="fas fa-question-circle"></i>
+                <span>常见问题</span>
+            </button>
+            <button class="tab-btn" data-tab="commands">
+                <i class="fas fa-terminal"></i>
+                <span>命令大全</span>
+            </button>
+            <button class="tab-btn" data-tab="optimization">
+                <i class="fas fa-clipboard-check"></i>
+                <span>推荐规范与实践</span>
+            </button>
+        </div>
+
+        <!-- 内容区域 -->
+        <main class="content">
+            <!-- 功能2: 大模型常识 -->
+            <section id="basics" class="tab-content active">
+                <div class="card">
+            <!-- 基础术语速查 -->
+            <!-- 基础术语标签 -->
+        <div class="terms-header">
+            <div class="terms-container">
+                <h3><i class="fas fa-tags"></i> 基础术语速查</h3>
+                <div class="terms-tags">
+                    <button class="term-tag" onclick="showTermDetail('token')">
+                        <i class="fas fa-coins"></i>
+                        <span>Token</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('skill')">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Skill</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('agent')">
+                        <i class="fas fa-user-astronaut"></i>
+                        <span>Agent</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('llm')">
+                        <i class="fas fa-brain"></i>
+                        <span>大模型</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('neural')">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>神经网络</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('api')">
+                        <i class="fas fa-plug"></i>
+                        <span>API</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('api-key')">
+                        <i class="fas fa-key"></i>
+                        <span>API Key</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('gateway')">
+                        <i class="fas fa-door-open"></i>
+                        <span>Gateway</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('rag')">
+                        <i class="fas fa-search"></i>
+                        <span>RAG</span>
+                    </button>
+                    <button class="term-tag" onclick="showTermDetail('prompt')">
+                        <i class="fas fa-edit"></i>
+                        <span>Prompt</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+                    <h2><i class="fas fa-book"></i> 大模型常识</h2>
+                    <p class="basics-intro">从产业视角、工程视角和 OpenClaw 架构，体系化了解 AI 大模型行业</p>
+                    
+                    <!-- 视角切换 -->
+                    <div class="perspective-switcher">
+                        <button class="perspective-btn active" onclick="switchPerspective('industry')">
+                            <i class="fas fa-industry"></i>
+                            <span>产业视角</span>
+                        </button>
+                        <button class="perspective-btn" onclick="switchPerspective('engineering')">
+                            <i class="fas fa-cogs"></i>
+                            <span>工程视角</span>
+                        </button>
+                    </div>
+
+                    <!-- 产业视角 -->
+                    <div class="perspective-content active" id="industry-perspective">
+                        <div class="industry-chain">
+                            <!-- 上游 -->
+                            <div class="chain-section upstream">
+                                <div class="chain-label">
+                                    <span class="chain-icon"><i class="fas fa-arrow-up"></i></span>
+                                    <span class="chain-title">上游：基础提供方</span>
+                                </div>
+                                <div class="chain-modules">
+                                    <div class="chain-module" onclick="showIndustryDetail('chip-vendor')">
+                                        <div class="module-icon"><i class="fas fa-microchip"></i></div>
+                                        <div class="module-name">芯片厂商</div>
+                                        <div class="module-example">NVIDIA、AMD</div>
+                                    </div>
+                                    <div class="chain-module" onclick="showIndustryDetail('cloud-provider')">
+                                        <div class="module-icon"><i class="fas fa-cloud"></i></div>
+                                        <div class="module-name">云服务商</div>
+                                        <div class="module-example">AWS、阿里云</div>
+                                    </div>
+                                    <div class="chain-module" onclick="showIndustryDetail('model-company')">
+                                        <div class="module-icon"><i class="fas fa-brain"></i></div>
+                                        <div class="module-name">基础模型公司</div>
+                                        <div class="module-example">OpenAI、Anthropic</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 连接箭头 -->
+                            <div class="chain-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>技术支撑</span>
+                            </div>
+
+                            <!-- 中游 -->
+                            <div class="chain-section midstream">
+                                <div class="chain-label">
+                                    <span class="chain-icon"><i class="fas fa-equals"></i></span>
+                                    <span class="chain-title">中游：技术集成方</span>
+                                </div>
+                                <div class="chain-modules">
+                                    <div class="chain-module" onclick="showIndustryDetail('ai-framework')">
+                                        <div class="module-icon"><i class="fas fa-puzzle-piece"></i></div>
+                                        <div class="module-name">AI应用框架</div>
+                                        <div class="module-example">LangChain、OpenClaw</div>
+                                    </div>
+                                    <div class="chain-module" onclick="showIndustryDetail('vector-db')">
+                                        <div class="module-icon"><i class="fas fa-database"></i></div>
+                                        <div class="module-name">向量数据库</div>
+                                        <div class="module-example">Pinecone、Milvus</div>
+                                    </div>
+                                    <div class="chain-module" onclick="showIndustryDetail('ai-middleware')">
+                                        <div class="module-icon"><i class="fas fa-layer-group"></i></div>
+                                        <div class="module-name">AI中间件</div>
+                                        <div class="module-example">监控、安全、计费</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 连接箭头 -->
+                            <div class="chain-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>解决方案</span>
+                            </div>
+
+                            <!-- 下游 -->
+                            <div class="chain-section downstream">
+                                <div class="chain-label">
+                                    <span class="chain-icon"><i class="fas fa-arrow-down"></i></span>
+                                    <span class="chain-title">下游：应用落地</span>
+                                </div>
+                                <div class="chain-modules">
+                                    <div class="chain-module" onclick="showIndustryDetail('industry-app')">
+                                        <div class="module-icon"><i class="fas fa-building"></i></div>
+                                        <div class="module-name">行业应用</div>
+                                        <div class="module-example">医疗、金融、教育</div>
+                                    </div>
+                                    <div class="chain-module" onclick="showIndustryDetail('enterprise-digital')">
+                                        <div class="module-icon"><i class="fas fa-users"></i></div>
+                                        <div class="module-name">企业数字化</div>
+                                        <div class="module-example">智能客服、办公助手</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 工程视角 -->
+                    <div class="perspective-content" id="engineering-perspective">
+                        <div class="engineering-arch">
+                            <!-- 第7层：应用产品层 -->
+                            <div class="eng-layer layer-7">
+                                <div class="layer-header">
+                                    <span class="layer-num">7</span>
+                                    <span class="layer-name">应用产品层</span>
+                                    <span class="layer-goal">把能力变成产品</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module" onclick="showEngineeringDetail('app-layer')">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>AI应用</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('saas')">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>SaaS产品</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('vertical-solution')">
+                                        <i class="fas fa-industry"></i>
+                                        <span>行业方案</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第6层：Agent与工作流层 -->
+                            <div class="eng-layer layer-6">
+                                <div class="layer-header">
+                                    <span class="layer-num">6</span>
+                                    <span class="layer-name">Agent与工作流层</span>
+                                    <span class="layer-goal">让模型具备任务执行能力</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module highlight" onclick="showEngineeringDetail('agent-layer')">
+                                        <i class="fas fa-user-astronaut"></i>
+                                        <span>Agent协作</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('workflow')">
+                                        <i class="fas fa-project-diagram"></i>
+                                        <span>工作流</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('planning')">
+                                        <i class="fas fa-tasks"></i>
+                                        <span>任务规划</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第5层：能力增强层 -->
+                            <div class="eng-layer layer-5">
+                                <div class="layer-header">
+                                    <span class="layer-num">5</span>
+                                    <span class="layer-name">能力增强层</span>
+                                    <span class="layer-goal">突破模型原始能力边界</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module" onclick="showEngineeringDetail('rag')">
+                                        <i class="fas fa-search"></i>
+                                        <span>RAG</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('finetune')">
+                                        <i class="fas fa-sliders-h"></i>
+                                        <span>微调</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('tool-use')">
+                                        <i class="fas fa-tools"></i>
+                                        <span>Tool Use</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('prompt-eng')">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Prompt工程</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第4层：模型服务层 -->
+                            <div class="eng-layer layer-4">
+                                <div class="layer-header">
+                                    <span class="layer-num">4</span>
+                                    <span class="layer-name">模型服务层</span>
+                                    <span class="layer-goal">提供稳定可扩展的推理能力</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module main highlight" onclick="showEngineeringDetail('model-serving')">
+                                        <i class="fas fa-brain"></i>
+                                        <span>基础模型</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('inference')">
+                                        <i class="fas fa-server"></i>
+                                        <span>推理服务</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('model-router')">
+                                        <i class="fas fa-route"></i>
+                                        <span>模型路由</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第3层：数据与知识层 -->
+                            <div class="eng-layer layer-3">
+                                <div class="layer-header">
+                                    <span class="layer-num">3</span>
+                                    <span class="layer-name">数据与知识层</span>
+                                    <span class="layer-goal">构建企业级记忆系统</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module" onclick="showEngineeringDetail('vector-db-layer')">
+                                        <i class="fas fa-database"></i>
+                                        <span>向量数据库</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('knowledge-graph')">
+                                        <i class="fas fa-project-diagram"></i>
+                                        <span>知识图谱</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('memory')">
+                                        <i class="fas fa-memory"></i>
+                                        <span>记忆管理</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第2层：AI工程与中间件层 -->
+                            <div class="eng-layer layer-2">
+                                <div class="layer-header">
+                                    <span class="layer-num">2</span>
+                                    <span class="layer-name">AI工程与中间件层</span>
+                                    <span class="layer-goal">把AI从实验变成可运营系统</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module" onclick="showEngineeringDetail('monitoring')">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>监控日志</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('security')">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>安全审计</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('cost-control')">
+                                        <i class="fas fa-coins"></i>
+                                        <span>成本控制</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layer-connector"><i class="fas fa-chevron-down"></i></div>
+
+                            <!-- 第1层：算力基础设施层 -->
+                            <div class="eng-layer layer-1">
+                                <div class="layer-header">
+                                    <span class="layer-num">1</span>
+                                    <span class="layer-name">算力基础设施层</span>
+                                    <span class="layer-goal">物理与资源底座</span>
+                                </div>
+                                <div class="layer-modules">
+                                    <div class="eng-module" onclick="showEngineeringDetail('gpu')">
+                                        <i class="fas fa-microchip"></i>
+                                        <span>GPU/TPU</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('cloud-infra')">
+                                        <i class="fas fa-cloud"></i>
+                                        <span>云平台</span>
+                                    </div>
+                                    <div class="eng-module" onclick="showEngineeringDetail('container')">
+                                        <i class="fas fa-cubes"></i>
+                                        <span>容器化</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 弹窗 -->
+                    <div class="modal-overlay" id="module-modal" onclick="closeModal(event)">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <button class="modal-close" onclick="closeModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="modal-body" id="modal-body">
+                                <!-- 内容将通过 JS 动态填充 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OpenClaw 架构和目录介绍 -->
+            <section id="openclaw" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-sitemap"></i> OpenClaw 架构和目录介绍</h2>
+                    
+                    <div class="openclaw-arch">
+                        <h3><i class="fas fa-sitemap"></i> OpenClaw 层级架构</h3>
+                        <div class="arch-layers">
+                            <div class="arch-layer layer-app">
+                                <div class="layer-num">L7</div>
+                                <div class="layer-info">
+                                    <h4>应用层 (Application)</h4>
+                                    <p>Skill、Bot、Dashboard 等用户交互界面</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-agent">
+                                <div class="layer-num">L6</div>
+                                <div class="layer-info">
+                                    <h4>Agent 层</h4>
+                                    <p>任务规划、工具编排、多模型协作</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-model">
+                                <div class="layer-num">L5</div>
+                                <div class="layer-info">
+                                    <h4>模型层 (Model)</h4>
+                                    <p>多模型接入（Claude、GPT、Gemini 等）</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-memory">
+                                <div class="layer-num">L4</div>
+                                <div class="layer-info">
+                                    <h4>记忆层 (Memory)</h4>
+                                    <p>向量数据库、长期记忆、会话管理</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-gateway">
+                                <div class="layer-num">L3</div>
+                                <div class="layer-info">
+                                    <h4>Gateway 层</h4>
+                                    <p>请求路由、限流、认证、会话管理</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-channel">
+                                <div class="layer-num">L2</div>
+                                <div class="layer-info">
+                                    <h4>频道层 (Channel)</h4>
+                                    <p>Telegram、Discord、Slack、Web 等接入</p>
+                                </div>
+                            </div>
+                            <div class="arch-layer layer-core">
+                                <div class="layer-num">L1</div>
+                                <div class="layer-info">
+                                    <h4>核心层 (Core)</h4>
+                                    <p>配置管理、日志、监控、插件系统</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="openclaw-config">
+                        <h3><i class="fas fa-folder-tree"></i> 配置目录说明</h3>
+                        <div class="config-tree">
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-folder"></i> ~/.openclaw/</div>
+                                <div class="config-desc">OpenClaw 主目录，所有数据存储位置</div>
+                            </div>
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-file-code"></i> openclaw.json</div>
+                                <div class="config-desc">主配置文件，包含 API Key、模型选择、频道配置等</div>
+                            </div>
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-folder"></i> workspace/</div>
+                                <div class="config-desc">工作区目录，存放 Skill、项目文件和数据</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-file"></i> soul.md</div>
+                                <div class="config-desc">行为宪法：定义 AI 身份、能力、风格、底线</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-file"></i> USER.md</div>
+                                <div class="config-desc">用户画像：用户背景、偏好、沟通风格</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-file"></i> IDENTITY.md</div>
+                                <div class="config-desc">身份定义：AI 角色设定、行为准则</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-file"></i> memory.md</div>
+                                <div class="config-desc">长期记忆：工作方法论、用户偏好、项目背景</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-file"></i> agents.md</div>
+                                <div class="config-desc">工作流规范：工具使用、协作机制、错误处理</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-folder"></i> skills/</div>
+                                <div class="config-desc">已安装的 Skill 集合</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-folder"></i> &lt;skill-name&gt;/</div>
+                                <div class="config-desc">单个 Skill 目录</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> skill.json</div>
+                                <div class="config-desc">Skill 元信息配置</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> index.js</div>
+                                <div class="config-desc">Skill 入口文件，定义激活/停用逻辑</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> server.js</div>
+                                <div class="config-desc">Skill Web 服务入口（如有独立服务）</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-folder"></i> web/</div>
+                                <div class="config-desc">Web 静态资源（HTML/CSS/JS/图片）</div>
+                            </div>
+                            <div class="config-item sub">
+                                <div class="config-path"><i class="fas fa-folder"></i> memory/</div>
+                                <div class="config-desc">向量数据存储与日期记忆文件</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> YYYY-MM-DD.md</div>
+                                <div class="config-desc">按日期维度的记忆文件</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-database"></i> vector/</div>
+                                <div class="config-desc">向量数据库存储（Chroma 等）</div>
+                            </div>
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-folder"></i> logs/</div>
+                                <div class="config-desc">日志目录</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> openclaw.log</div>
+                                <div class="config-desc">主程序运行日志</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> gateway.log</div>
+                                <div class="config-desc">Gateway 运行日志</div>
+                            </div>
+                            <div class="config-item sub sub2">
+                                <div class="config-path"><i class="fas fa-file"></i> error.log</div>
+                                <div class="config-desc">错误日志</div>
+                            </div>
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-file"></i> gateway.pid</div>
+                                <div class="config-desc">Gateway 进程 ID 文件</div>
+                            </div>
+                            <div class="config-item">
+                                <div class="config-path"><i class="fas fa-file"></i> gateway.sock</div>
+                                <div class="config-desc">Gateway Unix Socket 文件，Gateway 与 CLI 之间的 IPC 通信</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ常见问题 -->
+            <section id="faq" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-life-ring"></i> 常见问题解答</h2>
+                    <div class="search-box">
+                        <input type="text" id="faq-search" placeholder="搜索问题..." onkeyup="searchFAQ()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="faq-categories">
+                        <button class="category-btn active" data-category="all">全部</button>
+                        <button class="category-btn" data-category="install">安装问题</button>
+                        <button class="category-btn" data-category="network">网络连接</button>
+                        <button class="category-btn" data-category="gateway">Gateway</button>
+                        <button class="category-btn" data-category="channel">频道连接</button>
+                        <button class="category-btn" data-category="performance">性能优化</button>
+                        <button class="category-btn" data-category="config">配置管理</button>
+                        <button class="category-btn" data-category="skill">Skill开发</button>
+                    </div>
+                    <div class="faq-list" id="faq-list">
+                        <!-- FAQ项目将通过JS动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 功能3: 命令大全 -->
+            <section id="commands" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-list"></i> 常用命令大全</h2>
+                    <div class="command-search">
+                        <input type="text" id="command-search" placeholder="搜索命令..." onkeyup="searchCommands()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="command-categories">
+                        <button class="cat-btn active" data-cat="all">全部命令</button>
+                        <button class="cat-btn" data-cat="basic">基础诊断</button>
+                        <button class="cat-btn" data-cat="gateway">Gateway管理</button>
+                        <button class="cat-btn" data-cat="config">配置管理</button>
+                        <button class="cat-btn" data-cat="channel">频道管理</button>
+                        <button class="cat-btn" data-cat="model">模型管理</button>
+                        <button class="cat-btn" data-cat="skill">Skill管理</button>
+                        <button class="cat-btn" data-cat="update">更新升级</button>
+                    </div>
+                    <div class="commands-grid" id="commands-grid">
+                        <!-- 命令卡片将通过JS动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 推荐规范与实践 -->
+            <section id="optimization" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-clipboard-check"></i> 推荐规范与实践</h2>
+                    <p class="practice-intro">OpenClaw 知识库组织规范与最佳实践</p>
+                    
+                    <div class="optimization-grid">
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-user"></i></div>
+                            <h3>soul.md 行为宪法</h3>
+                            <ul>
+                                <li><strong>你是谁</strong>：定义 AI 助手的身份定位和角色</li>
+                                <li><strong>你的能力</strong>：明确技能范围、技术栈、擅长领域</li>
+                                <li><strong>你的风格</strong>：设定交流语气、回复风格、沟通习惯</li>
+                                <li><strong>你的底线</strong>：划定红线、禁止行为、伦理边界</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-brain"></i></div>
+                            <h3>memory.md 记忆管理</h3>
+                            <ul>
+                                <li><strong>长期记忆</strong>：记录工作方法论、用户偏好、项目背景</li>
+                                <li><strong>日期记忆</strong>：memory/YYYY-MM-DD.md 按日期维度组织</li>
+                                <li><strong>会话记忆</strong>：按会话维度记录上下文</li>
+                                <li><strong>记忆更新</strong>：定期回顾和清理过时信息</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-robot"></i></div>
+                            <h3>agents.md 工作流规范</h3>
+                            <ul>
+                                <li><strong>工作流定义</strong>：记录自动化任务流程和执行顺序</li>
+                                <li><strong>工具规范</strong>：定义工具使用场景、参数、返回值格式</li>
+                                <li><strong>协作机制</strong>：多 Agent 协作模式与通信协议</li>
+                                <li><strong>错误处理</strong>：异常捕获、降级策略、重试逻辑</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-layer-group"></i></div>
+                            <h3>模型分组调用</h3>
+                            <ul>
+                                <li><strong>简单任务</strong>：使用轻量模型（如 claude-sonnet-4-20250514）</li>
+                                <li><strong>复杂推理</strong>：使用强力模型（如 claude-opus-4-5-20251114）</li>
+                                <li><strong>代码任务</strong>：使用代码优化模型</li>
+                                <li><strong>成本控制</strong>：根据任务难度自动选择模型</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-cogs"></i></div>
+                            <h3>Session 会话管理</h3>
+                            <ul>
+                                <li>配置 <code>session.reset</code> 设置会话重置策略（daily/idle）</li>
+                                <li>使用 <code>session.idleMinutes</code> 控制空闲超时</li>
+                                <li>通过 <code>session.sendPolicy</code> 控制消息发送策略</li>
+                                <li>利用 <code>compaction</code> 管理长会话压缩</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-network-wired"></i></div>
+                            <h3>网络与安全</h3>
+                            <ul>
+                                <li>配置代理解决国际网络访问问题</li>
+                                <li>启用 <code>retry</code> 自动重试失败请求</li>
+                                <li>设置 API Key 环境变量保障安全</li>
+                                <li>配置请求并发限制防止 API 限流</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-heartbeat"></i></div>
+                            <h3>Heartbeat 心跳配置</h3>
+                            <ul>
+                                <li>使用 <code>heartbeat.every</code> 设置检查间隔</li>
+                                <li>配置 <code>heartbeat.activeHours</code> 限定活跃时段</li>
+                                <li>通过 <code>heartbeat.prompt</code> 自定义检查任务</li>
+                                <li>利用 <code>heartbeat.target</code> 指定消息推送目标</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-tasks"></i></div>
+                            <h3>Cron 定时任务</h3>
+                            <ul>
+                                <li>使用 <code>cron.enabled</code> 启用定时任务</li>
+                                <li>配置 <code>cron.maxConcurrentRuns</code> 控制并发数</li>
+                                <li>通过 <code>cron.store</code> 管理任务持久化</li>
+                                <li>结合 webhook 实现外部触发</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-plug"></i></div>
+                            <h3>Plugins 插件扩展</h3>
+                            <ul>
+                                <li>使用 <code>plugins.enabled</code> 全局启用/禁用插件</li>
+                                <li>通过 <code>plugins.allow</code> 和 <code>plugins.deny</code> 控制插件白名单</li>
+                                <li>配置 <code>plugins.slots.memory</code> 选择记忆插件后端</li>
+                                <li>安装外部插件扩展功能</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-tools"></i></div>
+                            <h3>Tools 工具权限</h3>
+                            <ul>
+                                <li>使用 <code>tools.profile</code> 选择工具配置集（minimal/coding/messaging/full）</li>
+                                <li>通过 <code>tools.allow</code> 和 <code>tools.deny</code> 细粒度控制工具</li>
+                                <li>配置 <code>tools.exec</code> 控制shell命令执行（host/security/ask）</li>
+                                <li>使用 <code>tools.web.search</code> 启用网页搜索</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-database"></i></div>
+                            <h3>Memory Search 记忆搜索</h3>
+                            <ul>
+                                <li>启用 <code>memorySearch.enabled</code> 开启向量记忆搜索</li>
+                                <li>配置 <code>memorySearch.sources</code> 选择索引源（memory/sessions）</li>
+                                <li>使用 <code>memorySearch.sync</code> 控制自动同步策略</li>
+                                <li>配置 <code>memorySearch.query</code> 优化搜索结果</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-comments"></i></div>
+                            <h3>Context 上下文管理</h3>
+                            <ul>
+                                <li>使用 <code>contextTokens</code> 限制上下文token上限</li>
+                                <li>配置 <code>contextPruning</code> 控制上下文修剪策略</li>
+                                <li>使用 <code>compaction</code> 管理长会话压缩</li>
+                                <li>配置 <code>contextPruning.softTrim</code> 保留关键内容</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-users"></i></div>
+                            <h3>Subagents 子代理</h3>
+                            <ul>
+                                <li>使用 <code>subagents.maxConcurrent</code> 控制并发子代理数</li>
+                                <li>配置 <code>subagents.archiveAfterMinutes</code> 设置自动归档时间</li>
+                                <li>通过 <code>subagents.model</code> 为子代理指定专用模型</li>
+                                <li>使用 <code>subagents.thinking</code> 控制子代理思考模式</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-shield-alt"></i></div>
+                            <h3>Sandbox 沙箱安全</h3>
+                            <ul>
+                                <li>使用 <code>sandbox.mode</code> 选择沙箱模式（off/non-main/all）</li>
+                                <li>配置 <code>sandbox.workspaceAccess</code> 控制工作区访问权限</li>
+                                <li>通过 <code>sandbox.docker</code> 配置容器化隔离</li>
+                                <li>使用 <code>sandbox.browser</code> 控制浏览器隔离</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-envelope"></i></div>
+                            <h3>Messages 消息处理</h3>
+                            <ul>
+                                <li>使用 <code>messages.queue</code> 配置消息队列策略</li>
+                                <li>配置 <code>messages.tts</code> 控制语音合成</li>
+                                <li>通过 <code>messages.ackReaction</code> 设置消息确认反应</li>
+                                <li>使用 <code>messages.inbound.debounceMs</code> 处理高频消息</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-key"></i></div>
+                            <h3>Auth 认证管理</h3>
+                            <ul>
+                                <li>使用 <code>auth.profiles</code> 配置多个认证配置</li>
+                                <li>通过 <code>auth.order</code> 设置认证优先级</li>
+                                <li>配置 <code>auth.cooldowns</code> 控制失败后冷却时间</li>
+                                <li>使用账单限流避免意外超额</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fab fa-telegram"></i></div>
+                            <h3>Telegram 配置</h3>
+                            <ul>
+                                <li>使用 <code>channels.telegram.dmPolicy</code> 控制DM权限</li>
+                                <li>配置 <code>channels.telegram.streamMode</code> 选择流式响应模式</li>
+                                <li>通过 <code>channels.telegram.groups</code> 配置群组设置</li>
+                                <li>使用 <code>channels.telegram.retry</code> 配置重试策略</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fab fa-discord"></i></div>
+                            <h3>Discord 配置</h3>
+                            <ul>
+                                <li>使用 <code>channels.discord.dm.policy</code> 控制DM权限</li>
+                                <li>配置 <code>channels.discord.intents</code> 启用特权intent</li>
+                                <li>通过 <code>channels.discord.pluralkit</code> 集成 PluralKit</li>
+                                <li>使用 <code>channels.discord.maxLinesPerMessage</code> 控制消息长度</li>
+                            </ul>
+                        </div>
+
+                        <div class="optimization-card">
+                            <div class="opt-icon"><i class="fas fa-clock"></i></div>
+                            <h3>Timeout 超时控制</h3>
+                            <ul>
+                                <li>使用 <code>timeoutSeconds</code> 设置请求超时</li>
+                                <li>配置 <code>typingIntervalSeconds</code> 控制打字间隔</li>
+                                <li>通过 <code>humanDelay</code> 模拟人类输入延迟</li>
+                                <li>使用 <code>mediaMaxMb</code> 限制媒体文件大小</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部 -->
+        <footer class="footer">
+            <p>OpenClaw 智能助手 | 让 AI 助手触手可及</p>
+        </footer>
+    </div>
+
+    <footer class="footer">
+        <p>源码地址：<a href="https://github.com/kunyashaw/openclaw-newbie-faq.git" target="_blank">https://github.com/kunyashaw/openclaw-newbie-faq.git</a></p>
+    </footer>
+
+    <script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  api:
+    image: ghcr.io/sahanico/moltfundme/api:latest
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: moltfundme-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=${ENV:-production}
+      - SECRET_KEY=${SECRET_KEY}
+      - API_KEY_SALT=${API_KEY_SALT}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - DATABASE_URL_DEV=${DATABASE_URL_DEV:-sqlite+aiosqlite:///./data/dev.db}
+      - DATABASE_URL_PROD=${DATABASE_URL_PROD:-sqlite+aiosqlite:///./data/prod.db}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-noreply@moltfundme.com}
+      - BLOCKCYPHER_API_TOKEN=${BLOCKCYPHER_API_TOKEN:-}
+      - HELIUS_API_KEY=${HELIUS_API_KEY:-}
+      - ALCHEMY_API_KEY=${ALCHEMY_API_KEY:-}
+      - BASE_RPC_URL=${BASE_RPC_URL:-https://mainnet.base.org}
+      - BALANCE_POLL_INTERVAL_SECONDS=${BALANCE_POLL_INTERVAL_SECONDS:-120}
+      - UVICORN_WORKERS=${UVICORN_WORKERS:-2}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      # Dedicated volume for database and uploads - bound to host directory for easy backups
+      - /home/moltfund/molt-data:/app/data
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  web:
+    image: ghcr.io/sahanico/moltfundme/web:latest
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: moltfundme-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - moltfundme-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+networks:
+  moltfundme-network:
+    driver: bridge

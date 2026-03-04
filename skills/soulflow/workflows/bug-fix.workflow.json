@@ -1,0 +1,29 @@
+{
+  "id": "bug-fix",
+  "name": "Bug Fix",
+  "version": 3,
+  "description": "Triage, investigate, fix, and verify bugs",
+  "steps": [
+    {
+      "id": "triage",
+      "name": "Triage",
+      "input": "BUG REPORT: {{task}}\n\nInvestigate this bug. Do NOT guess — actually look at the code.\n\n1. Use `exec` to find relevant source files (grep for keywords, list directories)\n2. Use `read` to examine the files most likely involved\n3. Trace the code path that triggers the bug\n4. Identify the root cause with exact file path and line\n5. Propose a specific fix\n\nWhen done, end with:\nSTATUS: done\nROOT_CAUSE: one-line description\nFIX_FILE: path to the file that needs changing",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "fix",
+      "name": "Fixer",
+      "input": "Apply the bug fix based on this triage.\n\n--- TRIAGE ---\n{{triage_output}}\n--- END ---\n\nOriginal bug: {{task}}\n\n1. `read` the affected file(s)\n2. `edit` to apply the fix\n3. Check for edge cases or related issues\n4. Verify the edit was applied by reading the file again\n\nDo the actual fix. Don't just describe it.\n\nWhen done, end with:\nSTATUS: done\nFILES_MODIFIED: list of changed files",
+      "expects": "STATUS: done",
+      "maxRetries": 2
+    },
+    {
+      "id": "verify",
+      "name": "Verifier",
+      "input": "Verify the bug fix was applied correctly.\n\n--- ORIGINAL BUG ---\n{{task}}\n--- END ---\n\n--- FIX APPLIED ---\n{{fix_output}}\n--- END ---\n\n1. `read` each modified file\n2. Trace the code path again — does the original bug still trigger?\n3. Check for regressions or edge cases the fix might have missed\n4. If the fix is incomplete, explain exactly what's still wrong\n\nWhen done, end with:\nSTATUS: done\nVERDICT: fixed | partial | not-fixed",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    }
+  ]
+}

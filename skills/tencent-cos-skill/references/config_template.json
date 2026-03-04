@@ -1,0 +1,61 @@
+{
+  "_description": "cos-mcp MCP 服务器配置模板，添加到客户端的 MCP 配置文件中",
+
+  "mcpServers": {
+    "cos-mcp": {
+      "_comment": "方式一：参数直接传入 args",
+      "command": "npx",
+      "args": [
+        "cos-mcp",
+        "--Region=<替换为存储桶区域，如 ap-guangzhou>",
+        "--Bucket=<替换为存储桶名称，格式 name-appid>",
+        "--SecretId=<替换为腾讯云 API 密钥 ID>",
+        "--SecretKey=<替换为腾讯云 API 密钥 Key>",
+        "--DatasetName=<替换为数据万象数据集名称，无则删除此行>",
+        "--connectType=stdio"
+      ]
+    },
+
+    "cos-mcp-env": {
+      "_comment": "方式二：通过 env 传递敏感参数（推荐）",
+      "command": "npx",
+      "args": [
+        "cos-mcp",
+        "--connectType=stdio"
+      ],
+      "env": {
+        "TENCENT_COS_SECRET_ID": "<替换为腾讯云 API 密钥 ID>",
+        "TENCENT_COS_SECRET_KEY": "<替换为腾讯云 API 密钥 Key>",
+        "TENCENT_COS_REGION": "<替换为存储桶区域，如 ap-guangzhou>",
+        "TENCENT_COS_BUCKET": "<替换为存储桶名称，格式 name-appid>",
+        "TENCENT_COS_DATASET_NAME": "<替换为数据万象数据集名称，无则删除此行>"
+      }
+    },
+
+    "cos-mcp-sse": {
+      "_comment": "方式三：SSE 模式（适合高频调用场景）",
+      "command": "npx",
+      "args": [
+        "cos-mcp",
+        "--connectType=sse",
+        "--port=3001"
+      ],
+      "env": {
+        "TENCENT_COS_SECRET_ID": "<替换为腾讯云 API 密钥 ID>",
+        "TENCENT_COS_SECRET_KEY": "<替换为腾讯云 API 密钥 Key>",
+        "TENCENT_COS_REGION": "<替换为存储桶区域，如 ap-guangzhou>",
+        "TENCENT_COS_BUCKET": "<替换为存储桶名称，格式 name-appid>"
+      }
+    }
+  },
+
+  "_参数说明": {
+    "Region": "存储桶区域，如 ap-guangzhou、ap-shanghai、ap-beijing 等",
+    "Bucket": "存储桶名称，格式为 name-appid，如 mybucket-1250000000",
+    "SecretId": "腾讯云 API 密钥 ID，在 访问管理 > API密钥管理 中创建",
+    "SecretKey": "腾讯云 API 密钥 Key，与 SecretId 配对使用",
+    "DatasetName": "数据万象数据集名称（仅图片搜索等智能功能需要，无则不填）",
+    "connectType": "连接模式：stdio（默认，推荐）或 sse",
+    "port": "SSE 模式下的监听端口（默认 3001）"
+  }
+}

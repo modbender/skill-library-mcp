@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Soul Package Manifest v0.1",
+  "type": "object",
+  "required": ["name", "version", "createdAt", "files"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "description": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "sourceWorkspace": { "type": "string" },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "allOf": [
+        { "contains": { "const": "SOUL.md" } },
+        { "contains": { "const": "preview.md" } },
+        { "contains": { "const": "manifest.json" } }
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,323 @@
+{
+  "category": "data_exfiltration",
+  "version": "1.0.0",
+  "updated": "2026-02-21",
+  "signatures": [
+    {
+      "id": "EXF-001",
+      "severity": "critical",
+      "score": 95,
+      "description": "AWS Access Key",
+      "pattern": "AKIA[0-9A-Z]{16}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-002",
+      "severity": "critical",
+      "score": 95,
+      "description": "AWS Secret Key",
+      "pattern": "(?i)aws_secret_access_key\\s*[=:]\\s*[A-Za-z0-9/+=]{40}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-003",
+      "severity": "critical",
+      "score": 95,
+      "description": "OpenAI API Key",
+      "pattern": "sk-[A-Za-z0-9]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-004",
+      "severity": "critical",
+      "score": 95,
+      "description": "Anthropic API Key",
+      "pattern": "sk-ant-[A-Za-z0-9-]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-005",
+      "severity": "critical",
+      "score": 93,
+      "description": "GCP API Key",
+      "pattern": "AIza[0-9A-Za-z_-]{35}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-006",
+      "severity": "critical",
+      "score": 93,
+      "description": "GitHub Token",
+      "pattern": "gh[pousr]_[A-Za-z0-9_]{36,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-007",
+      "severity": "critical",
+      "score": 90,
+      "description": "Generic Bearer Token",
+      "pattern": "(?i)bearer\\s+[A-Za-z0-9._-]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-008",
+      "severity": "critical",
+      "score": 95,
+      "description": "Australian TFN (Tax File Number)",
+      "pattern": "(?i)(?:tfn|tax\\s*file\\s*number)[\\s:()]*?(?:is|number)?[\\s:()]*\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}",
+      "flags": "",
+      "name": "Australian TFN (with context)"
+    },
+    {
+      "id": "EXF-009",
+      "severity": "critical",
+      "score": 92,
+      "description": "Australian Medicare Number",
+      "pattern": "(?i)(?:bsb)\\s*:?\\s*\\d{3}[\\s-]?\\d{3}(?:\\s+\\w+){0,2}?\\s+\\d{6,10}",
+      "flags": "",
+      "name": "BSB + Account (with context)"
+    },
+    {
+      "id": "EXF-010",
+      "severity": "high",
+      "score": 85,
+      "description": "Australian ABN",
+      "pattern": "\\bABN\\s*:?\\s*\\d{2}\\s?\\d{3}\\s?\\d{3}\\s?\\d{3}\\b",
+      "flags": "i"
+    },
+    {
+      "id": "EXF-011",
+      "severity": "high",
+      "score": 85,
+      "description": "Australian BSB + Account (with context)",
+      "pattern": "(?i)(?:bsb|account|banking|transfer|payment|balance)[\\s:]*(?:number|is|to)?[\\s:]*(?:\\d{3}[\\s-]?\\d{3})(?:\\s+\\w+){0,2}?\\s+\\d{6,10}",
+      "flags": "",
+      "name": "BSB + Account (requires financial context)"
+    },
+    {
+      "id": "EXF-012",
+      "severity": "critical",
+      "score": 95,
+      "description": "Credit Card (Visa)",
+      "pattern": "(?i)(?:card|visa|credit|payment)\\s*:?\\s*4\\d{3}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}",
+      "flags": "",
+      "name": "Visa Card Number (with context)"
+    },
+    {
+      "id": "EXF-013",
+      "severity": "critical",
+      "score": 95,
+      "description": "Credit Card (Mastercard)",
+      "pattern": "(?i)(?:card|master|credit|payment)\\s*:?\\s*5[1-5]\\d{2}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}",
+      "flags": "",
+      "name": "Mastercard Number (with context)"
+    },
+    {
+      "id": "EXF-014",
+      "severity": "critical",
+      "score": 95,
+      "description": "Credit Card (Amex)",
+      "pattern": "\\b3[47]\\d{2}[\\s-]?\\d{6}[\\s-]?\\d{5}\\b",
+      "flags": ""
+    },
+    {
+      "id": "EXF-015",
+      "severity": "high",
+      "score": 85,
+      "description": "Password in plaintext",
+      "pattern": "(?i)(password|passwd|pwd)\\s*[=:]\\s*\\S{4,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-016",
+      "severity": "high",
+      "score": 82,
+      "description": "Credential mention",
+      "pattern": "(?i)(my\\s+password\\s+is|credentials\\s+are|login\\s+details)\\s*:?\\s*\\S+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-017",
+      "severity": "high",
+      "score": 80,
+      "description": "Private key header",
+      "pattern": "-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----",
+      "flags": ""
+    },
+    {
+      "id": "EXF-018",
+      "severity": "high",
+      "score": 80,
+      "description": "SSH private key",
+      "pattern": "-----BEGIN\\s+OPENSSH\\s+PRIVATE\\s+KEY-----",
+      "flags": ""
+    },
+    {
+      "id": "EXF-019",
+      "severity": "high",
+      "score": 78,
+      "description": "Webhook URL with token",
+      "pattern": "https?://[^\\s]*webhook[^\\s]*token[=][^\\s]+",
+      "flags": "i"
+    },
+    {
+      "id": "EXF-020",
+      "severity": "high",
+      "score": 82,
+      "description": "Discord webhook URL",
+      "pattern": "https://discord\\.com/api/webhooks/\\d+/[A-Za-z0-9_-]+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-021",
+      "severity": "high",
+      "score": 80,
+      "description": "Slack webhook URL",
+      "pattern": "https://hooks\\.slack\\.com/services/T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-022",
+      "severity": "medium",
+      "score": 70,
+      "description": "External URL data send",
+      "pattern": "(?i)(send|post|upload|exfiltrate|transmit)\\s+(to|data\\s+to|this\\s+to)\\s+https?://",
+      "flags": ""
+    },
+    {
+      "id": "EXF-023",
+      "severity": "high",
+      "score": 82,
+      "description": "Database connection string",
+      "pattern": "(?i)(mongodb|postgres|mysql|redis)://[^\\s]+:[^\\s]+@",
+      "flags": ""
+    },
+    {
+      "id": "EXF-024",
+      "severity": "high",
+      "score": 78,
+      "description": "JWT token",
+      "pattern": "eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-025",
+      "severity": "medium",
+      "score": 68,
+      "description": "Email + password combo",
+      "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\s*[:/]\\s*\\S{6,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-026",
+      "severity": "high",
+      "score": 80,
+      "description": "Stripe API Key",
+      "pattern": "sk_live_[A-Za-z0-9]{24,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-027",
+      "severity": "high",
+      "score": 80,
+      "description": "Twilio credentials",
+      "pattern": "(?i)twilio.*(?:token|sid)\\s*[=:]\\s*[A-Za-z0-9]{32}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-028",
+      "severity": "high",
+      "score": 78,
+      "description": "SendGrid API Key",
+      "pattern": "SG\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-029",
+      "severity": "medium",
+      "score": 65,
+      "description": "Australian Drivers License",
+      "pattern": "(?i)(driver'?s?\\s+licen[cs]e|DL)\\s*:?\\s*\\d{6,10}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-030",
+      "severity": "high",
+      "score": 80,
+      "description": "Google OAuth token",
+      "pattern": "ya29\\.[A-Za-z0-9_-]{50,}",
+      "flags": ""
+    },
+    {
+      "id": "EXF-031",
+      "severity": "medium",
+      "score": 70,
+      "description": "Encode and send pattern",
+      "pattern": "(?i)(base64|encode).*send\\s+(to|via)\\s+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-032",
+      "severity": "high",
+      "score": 82,
+      "description": "Azure connection string",
+      "pattern": "(?i)DefaultEndpointsProtocol=https?;AccountName=[^;]+;AccountKey=[^;]+",
+      "flags": ""
+    },
+    {
+      "id": "EXF-033",
+      "severity": "high",
+      "score": 85,
+      "description": "Infostealer targeting OpenClaw config files (Vidar variant)",
+      "pattern": "(?i)(openclaw\\.json|device\\.json|gateway[_\\s]?token|soul\\.md)",
+      "flags": "",
+      "name": "OpenClaw config file exfiltration",
+      "source": "Hudson Rock / The Hacker News 2026-02-20",
+      "category": "exfiltration"
+    },
+    {
+      "id": "EXF-034",
+      "severity": "critical",
+      "score": 95,
+      "description": "Telethon session string (long base64 exported session)",
+      "pattern": "\\b1BQA[A-Za-z0-9+/=_-]{50,}",
+      "flags": "",
+      "name": "Telethon session string",
+      "source": "BL-027 Telegram OAuth investigation 2026-02-21",
+      "tags": ["telegram", "session-hijack"]
+    },
+    {
+      "id": "EXF-035",
+      "severity": "critical",
+      "score": 93,
+      "description": "Pyrogram session string (long base64 exported session)",
+      "pattern": "\\bBQA[A-Za-z0-9+/=_-]{60,}",
+      "flags": "",
+      "name": "Pyrogram session string",
+      "source": "BL-027 Telegram OAuth investigation 2026-02-21",
+      "tags": ["telegram", "session-hijack"]
+    },
+    {
+      "id": "EXF-036",
+      "severity": "critical",
+      "score": 95,
+      "description": "Telegram bot token (numeric ID colon hash)",
+      "pattern": "\\b\\d{8,12}:[A-Za-z0-9_-]{35,}\\b",
+      "flags": "",
+      "name": "Telegram bot token",
+      "source": "BL-027 Telegram OAuth investigation 2026-02-21",
+      "tags": ["telegram", "bot-token"]
+    },
+    {
+      "id": "EXF-037",
+      "severity": "high",
+      "score": 88,
+      "description": "Telegram API hash credential (api_hash = 32-hex string)",
+      "pattern": "(?i)api[_\\s]?hash\\s*[=:]\\s*[a-fA-F0-9]{32}",
+      "flags": "",
+      "name": "Telegram api_hash credential",
+      "source": "BL-027 Telegram OAuth investigation 2026-02-21",
+      "tags": ["telegram", "api-credentials"]
+    }
+  ]
+}

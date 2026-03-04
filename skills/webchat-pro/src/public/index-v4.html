@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🦞 OpenClaw Chat - 贝贝 (多模型)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      height: 90vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left h1 { font-size: 24px; margin-bottom: 5px; }
+    .header-left p { font-size: 14px; opacity: 0.9; }
+    .model-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .model-selector label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .model-selector select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    .model-selector select option {
+      background: #667eea;
+      color: white;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f5f7fb;
+    }
+    .message {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: flex-start;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message.user { justify-content: flex-end; }
+    .message.assistant { justify-content: flex-start; }
+    .message-content {
+      max-width: 70%;
+      padding: 12px 18px;
+      border-radius: 18px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .message.user .message-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message.assistant .message-content {
+      background: white;
+      color: #333;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .message.streaming .message-content {
+      border-left: 3px solid #667eea;
+    }
+    .message-model {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+      text-align: right;
+    }
+    .message-time {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+      text-align: right;
+    }
+    .chat-input {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      border-radius: 0 0 20px 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 12px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .chat-input input:focus { border-color: #667eea; }
+    .chat-input button {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .chat-input button:hover { transform: scale(1.05); }
+    .chat-input button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 18px;
+      background: #667eea;
+      margin-left: 2px;
+      animation: blink 1s infinite;
+      vertical-align: middle;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    /* 模型标签 */
+    .model-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 5px;
+    }
+    .model-badge.qwen3.5-plus { background: #667eea; color: white; }
+    .model-badge.glm-4-flash { background: #10b981; color: white; }
+    .model-badge.gpt-4 { background: #f59e0b; color: white; }
+    .model-badge.qwen-vl { background: #8b5cf6; color: white; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="header-left">
+        <h1>🦞 OpenClaw Chat</h1>
+        <p>与贝贝实时聊天（多模型支持）</p>
+      </div>
+      <div class="model-selector">
+        <label for="modelSelect">模型:</label>
+        <select id="modelSelect" onchange="changeModel()">
+          <option value="qwen3.5-plus">Qwen3.5 Plus</option>
+          <option value="glm-4-flash">GLM-4 Flash</option>
+          <option value="gpt-4">GPT-4</option>
+          <option value="qwen-vl">Qwen-VL</option>
+        </select>
+      </div>
+    </div>
+    <div class="chat-messages" id="messages"></div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
+      <button id="sendBtn" onclick="sendMessage()">发送</button>
+    </div>
+  </div>
+
+  <script>
+    // 持久化 SESSION_ID
+    let SESSION_ID = localStorage.getItem('webchat_session_id');
+    if (!SESSION_ID) {
+      SESSION_ID = 'web-chat-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('webchat_session_id', SESSION_ID);
+    }
+    
+    let socket = null;
+    let currentStreamingMessage = null;
+    let isStreaming = false;
+    let currentModel = 'qwen3.5-plus';
+
+    // 连接 WebSocket
+    function connectWebSocket() {
+      socket = io();
+      
+      socket.on('connect', () => {
+        console.log('[WS] 已连接');
+        socket.emit('join', SESSION_ID);
+      });
+      
+      socket.on('history', (messages) => {
+        console.log('[WS] 历史:', messages.length, '条');
+        renderMessages(messages);
+      });
+      
+      socket.on('session_config', (config) => {
+        console.log('[WS] 会话配置:', config);
+        currentModel = config.model || 'qwen3.5-plus';
+        document.getElementById('modelSelect').value = currentModel;
+      });
+      
+      socket.on('message', (msg) => {
+        if (msg.role === 'user') {
+          appendMessage('user', msg.content, msg.timestamp);
+        }
+      });
+      
+      socket.on('stream_chunk', (data) => {
+        if (!currentStreamingMessage) {
+          currentStreamingMessage = appendMessage('assistant', '', Date.now(), true);
+        }
+        currentStreamingMessage.content += data.content;
+        currentStreamingMessage.element.innerHTML = `
+          <div class="message-content">${escapeHtml(currentStreamingMessage.content)}<span class="cursor"></span></div>
+          <div class="message-model">模型：<span class="model-badge ${currentModel}">${getModelName(currentModel)}</span></div>
+        `;
+        scrollToBottom();
+      });
+      
+      socket.on('stream_complete', (data) => {
+        if (currentStreamingMessage) {
+          currentStreamingMessage.element.classList.remove('streaming');
+          currentStreamingMessage.element.innerHTML = `
+            <div class="message-content">${escapeHtml(currentStreamingMessage.content)}</div>
+            <div class="message-model">模型：<span class="model-badge ${data.model || currentModel}">${getModelName(data.model || currentModel)}</span></div>
+            <div class="message-time">${new Date(data.timestamp).toLocaleTimeString()}</div>
+          `;
+          currentStreamingMessage = null;
+        }
+        isStreaming = false;
+        document.getElementById('messageInput').disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('messageInput').focus();
+      });
+      
+      socket.on('model_changed', (data) => {
+        console.log('[WS] 模型已切换:', data.model);
+        currentModel = data.model;
+        appendSystemMessage(`已切换到 ${getModelName(data.model)}`);
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('[WS] 断开，重连中...');
+        setTimeout(connectWebSocket, 2000);
+      });
+    }
+
+    // 获取模型名称
+    function getModelName(modelId) {
+      const models = {
+        'qwen3.5-plus': 'Qwen3.5 Plus',
+        'glm-4-flash': 'GLM-4 Flash',
+        'gpt-4': 'GPT-4',
+        'qwen-vl': 'Qwen-VL'
+      };
+      return models[modelId] || modelId;
+    }
+
+    // 转义 HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML.replace(/\n/g, '<br>');
+    }
+
+    // 添加系统消息
+    function appendSystemMessage(content) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.style.cssText = 'text-align: center; color: #999; font-size: 12px; margin: 10px 0;';
+      div.textContent = content;
+      container.appendChild(div);
+      scrollToBottom();
+    }
+
+    // 加载历史消息
+    async function loadHistory() {
+      try {
+        const res = await fetch(`/api/history/${SESSION_ID}`);
+        const messages = await res.json();
+        renderMessages(messages);
+      } catch (e) {
+        console.error('加载历史失败:', e);
+      }
+    }
+
+    // 渲染消息
+    function renderMessages(messages) {
+      const container = document.getElementById('messages');
+      container.innerHTML = '';
+      
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `message ${msg.role}`;
+        const model = msg.model || 'qwen3.5-plus';
+        div.innerHTML = `
+          <div class="message-content">${escapeHtml(msg.content)}</div>
+          ${msg.role === 'assistant' ? `
+            <div class="message-model">模型：<span class="model-badge ${model}">${getModelName(model)}</span></div>
+          ` : ''}
+          <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+        `;
+        container.appendChild(div);
+      });
+      
+      scrollToBottom();
+    }
+
+    // 添加消息
+    function appendMessage(role, content, timestamp, streaming = false) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `message ${role}${streaming ? ' streaming' : ''}`;
+      
+      const timeStr = new Date(timestamp).toLocaleTimeString();
+      div.innerHTML = `
+        <div class="message-content">${escapeHtml(content)}${streaming ? '<span class="cursor"></span>' : ''}</div>
+        ${!streaming && role === 'assistant' ? `
+          <div class="message-model">模型：<span class="model-badge ${currentModel}">${getModelName(currentModel)}</span></div>
+        ` : ''}
+        ${!streaming ? `<div class="message-time">${timeStr}</div>` : ''}
+      `;
+      
+      container.appendChild(div);
+      scrollToBottom();
+      
+      return { element: div, content: content };
+    }
+
+    // 滚动到底部
+    function scrollToBottom() {
+      const container = document.getElementById('messages');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // 切换模型
+    async function changeModel() {
+      const select = document.getElementById('modelSelect');
+      const model = select.value;
+      
+      console.log('[MODEL] 切换:', model);
+      
+      try {
+        const res = await fetch(`/api/session/${SESSION_ID}/model`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model })
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          currentModel = model;
+          socket.emit('change_model', { sessionId: SESSION_ID, model });
+        }
+      } catch (e) {
+        console.error('切换模型失败:', e);
+        appendSystemMessage('⚠️ 切换模型失败');
+      }
+    }
+
+    // 发送消息
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message || isStreaming) return;
+      
+      input.value = '';
+      input.disabled = true;
+      document.getElementById('sendBtn').disabled = true;
+      isStreaming = true;
+      currentStreamingMessage = null;
+
+      appendMessage('user', message, Date.now(), false);
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            message, 
+            sessionId: SESSION_ID,
+            model: currentModel
+          })
+        });
+        const data = await res.json();
+        
+        if (!data.streaming) {
+          appendMessage('assistant', data.message, Date.now(), false);
+          input.disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+        }
+        
+      } catch (e) {
+        console.error('发送失败:', e);
+        appendMessage('assistant', '⚠️ 发送失败：' + e.message, Date.now(), false);
+        input.disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        isStreaming = false;
+      }
+    }
+
+    // 初始化
+    connectWebSocket();
+  </script>
+</body>
+</html>

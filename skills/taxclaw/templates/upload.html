@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1 style="margin:0 0 14px 0; font-size: 20px;">Upload</h1>
+
+  <style>
+    #progress-bar-track {
+      width: 100%; height: 10px;
+      background: rgba(148,163,184,0.12);
+      border-radius: 99px; overflow: hidden;
+      margin: 10px 0 6px;
+    }
+    #progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), #38bdf8);
+      border-radius: 99px;
+      transition: width 0.25s ease;
+    }
+  </style>
+
+  <div class="card" id="upload-card">
+    <form id="upload-form" method="post" action="/upload" enctype="multipart/form-data" style="max-width: 560px; margin: 0 auto;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      <div class="muted" style="margin-bottom: 14px; text-align:center;">
+        For best results, upload the original PDF.
+      </div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap: 10px; padding: 10px 6px;">
+        <button id="choose-btn" type="button" style="
+          background: rgba(15,23,42,0.9);
+          border: 1px solid rgba(148,163,184,0.25);
+          color: rgba(226,232,240,0.95);
+          padding: 16px 18px;
+          border-radius: 14px;
+          font-weight: 700;
+          font-size: 16px;
+          cursor: pointer;
+          min-width: min(420px, 100%);
+        ">📎 Choose a tax document</button>
+
+        <input id="file-input" type="file" name="file" required accept=".pdf,.png,.jpg,.jpeg,.tiff,.webp" style="display:none;" />
+
+        <div id="file-name" class="muted" style="font-size: 13px; min-height: 18px; text-align:center;"></div>
+
+        <div style="height: 2px;"></div>
+
+        <div class="muted" style="font-size: 12px; text-align:center; max-width: 520px; line-height: 1.35;">
+          💡 Getting low confidence results? Switch to a cloud model in <a href="/settings">Settings</a> for better accuracy on complex forms.
+        </div>
+
+        <button id="upload-btn" type="submit" disabled style="
+          opacity: 0.55;
+          cursor: not-allowed;
+        ">Upload + Extract</button>
+
+        <div class="muted" style="font-size: 11px; text-align:center; margin-top: 2px;">
+          {% if model_backend == 'cloud' %}
+          ☁️ Cloud mode — document content will be sent to <strong>{{ cloud_model }}</strong>. <a href="/settings">Change in Settings →</a>
+          {% else %}
+          🔒 Local mode — your documents stay on this machine. <a href="/settings">Change in Settings →</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    <!-- Progress UI (shown during upload + extraction) -->
+    <div id="progress-ui" style="display:none; max-width:520px; margin:0 auto; padding:24px 8px; text-align:center;">
+      <div id="progress-stage-icon" style="font-size:36px; margin-bottom:10px;">📤</div>
+      <div id="progress-stage-label" style="font-weight:700; font-size:15px; margin-bottom:4px;">Uploading…</div>
+      <div id="progress-bar-track">
+        <div id="progress-bar-fill"></div>
+      </div>
+      <div id="progress-pct" class="muted" style="font-size:13px;">0%</div>
+      <div class="muted" style="font-size:12px; margin-top:12px; line-height:1.5;">
+        {% if model_backend == 'cloud' %}
+        AI extraction can take up to a minute for multi-page documents.<br>
+        ☁️ Using <strong>{{ cloud_model }}</strong> — document content is being sent to the cloud model you selected in <a href="/settings">Settings</a>.
+        {% else %}
+        AI extraction can take up to a minute for multi-page documents.<br>
+        🔒 Running locally on <strong>{{ local_model }}</strong> — your data never leaves this machine.
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const card       = document.getElementById('upload-card');
+      const chooseBtn  = document.getElementById('choose-btn');
+      const input      = document.getElementById('file-input');
+      const fileName   = document.getElementById('file-name');
+      const uploadBtn  = document.getElementById('upload-btn');
+      const form       = document.getElementById('upload-form');
+      const progressUI = document.getElementById('progress-ui');
+      const barFill    = document.getElementById('progress-bar-fill');
+      const stageIcon  = document.getElementById('progress-stage-icon');
+      const stageLabel = document.getElementById('progress-stage-label');
+      const pctLabel   = document.getElementById('progress-pct');
+
+      if (!card || !chooseBtn || !input || !uploadBtn || !form) return;
+
+      // ── file picker ────────────────────────────────────────────
+      function setPicked(f) {
+        const has = !!f;
+        uploadBtn.disabled = !has;
+        uploadBtn.style.opacity = has ? '1' : '0.55';
+        uploadBtn.style.cursor  = has ? 'pointer' : 'not-allowed';
+        if (fileName) fileName.textContent = has ? `✅ ${f.name}` : '';
+      }
+      chooseBtn.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => setPicked(input.files && input.files[0]));
+
+      // drag/drop
+      function prevent(e) { e.preventDefault(); e.stopPropagation(); }
+      function setActive(on) {
+        card.style.borderColor = on ? 'rgba(96,165,250,0.45)' : '';
+        card.style.boxShadow   = on ? '0 0 0 3px rgba(96,165,250,0.10)' : '';
+      }
+      ['dragenter','dragover'].forEach(e => card.addEventListener(e, ev => { prevent(ev); setActive(true);  }));
+      ['dragleave','drop'    ].forEach(e => card.addEventListener(e, ev => { prevent(ev); setActive(false); }));
+      card.addEventListener('drop', e => {
+        const files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files.length) { input.files = files; setPicked(files[0]); }
+      });
+
+      // ── progress helpers ────────────────────────────────────────
+      let animFrame = null;
+      let currentPct = 0;
+      const STAGES = [
+        { from:  0, to: 30,  icon: '📤', label: 'Uploading…'                             },
+        { from: 30, to: 55,  icon: '🔍', label: 'Classifying document type…'             },
+        { from: 55, to: 88,  icon: '🤖', label: 'Extracting fields (AI working…)'        },
+        { from: 88, to: 99,  icon: '💾', label: 'Saving extracted data…'                 },
+        { from: 99, to: 100, icon: '✅', label: 'Done! Redirecting to your document…'    },
+      ];
+
+      function stageFor(pct) {
+        for (let i = STAGES.length - 1; i >= 0; i--)
+          if (pct >= STAGES[i].from) return STAGES[i];
+        return STAGES[0];
+      }
+
+      function setPct(pct) {
+        pct = Math.min(100, Math.max(0, pct));
+        currentPct = pct;
+        barFill.style.width  = pct + '%';
+        pctLabel.textContent = Math.round(pct) + '%';
+        const s = stageFor(pct);
+        stageIcon.textContent  = s.icon;
+        stageLabel.textContent = s.label;
+      }
+
+      // Slowly animate bar from current position toward target
+      function animateTo(target, durationMs, onDone) {
+        if (animFrame) cancelAnimationFrame(animFrame);
+        const start    = currentPct;
+        const startTs  = performance.now();
+        function tick(now) {
+          const t = Math.min(1, (now - startTs) / durationMs);
+          setPct(start + (target - start) * t);
+          if (t < 1) { animFrame = requestAnimationFrame(tick); }
+          else        { animFrame = null; if (onDone) onDone(); }
+        }
+        animFrame = requestAnimationFrame(tick);
+      }
+
+      // ── form submit via XHR ─────────────────────────────────────
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Hide form, show progress
+        form.style.display = 'none';
+        progressUI.style.display = 'block';
+        setPct(0);
+
+        const fd  = new FormData(form);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload');
+
+        // Phase 1: actual upload bytes progress (0→30)
+        xhr.upload.addEventListener('progress', ev => {
+          if (ev.lengthComputable) {
+            const up = (ev.loaded / ev.total) * 30;
+            if (up > currentPct) setPct(up);
+          }
+        });
+
+        // Upload bytes sent → start animating classify + extract (30→88)
+        xhr.upload.addEventListener('load', () => {
+          animateTo(88, 45000); // allow up to ~45s for llava extraction
+        });
+
+        // Full response received → done
+        xhr.addEventListener('load', () => {
+          if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+          if (xhr.status >= 200 && xhr.status < 400) {
+            setPct(100);
+            // Follow the redirect URL (XHR follows redirects; responseURL = final URL)
+            const dest = xhr.responseURL || '/documents';
+            setTimeout(() => { window.location.href = dest; }, 600);
+          } else {
+            stageIcon.textContent  = '❌';
+            stageLabel.textContent = 'Upload failed — please try again.';
+            pctLabel.textContent   = '';
+            barFill.style.background = 'var(--bad)';
+            setTimeout(() => { form.style.display = ''; progressUI.style.display = 'none'; setPct(0); }, 2500);
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          stageIcon.textContent  = '❌';
+          stageLabel.textContent = 'Network error — please try again.';
+        });
+
+        xhr.send(fd);
+      });
+
+      setPicked(null);
+    })();
+  </script>
+{% endblock %}

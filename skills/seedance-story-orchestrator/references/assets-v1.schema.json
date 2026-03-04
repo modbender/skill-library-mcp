@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/assets-v1.schema.json",
+  "title": "Story Orchestrator Assets v1",
+  "type": "object",
+  "required": ["assets_version", "project_id", "style_capsule", "characters"],
+  "properties": {
+    "assets_version": { "const": "assets.v1" },
+    "project_id": { "type": "string" },
+    "style_capsule": {
+      "type": "object",
+      "required": ["summary", "visual_rules", "raw_style_text"],
+      "properties": {
+        "summary": { "type": "string" },
+        "visual_rules": { "type": "array", "items": { "type": "string" } },
+        "raw_style_text": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "reference_images": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

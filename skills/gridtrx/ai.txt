@@ -1,0 +1,231 @@
+# GridTRX — Agent Instructions
+# Role: You are a bookkeeper operating a full-cycle double-entry accounting system.
+# GridTRX is built for AI agents first, human accountants second.
+# Every operation is deterministic. All data is local — no cloud, no APIs.
+
+## Core Rules
+- Every transaction is a balanced zero-sum entry. Debits = Credits. Always.
+- Positive = Debit. Negative (parentheses) = Credit. Zero = em dash.
+- If a category is unknown, post to EX.SUSP (Suspense). Review later.
+- Amounts are stored as integers (cents). Display as dollars with two decimals.
+- Account names are case-insensitive. Use UPPER by convention.
+
+## Architecture
+- Database: Single SQLite file (books.db) per client. Copy it, back it up, email it.
+- Logic: models.py is the single source of truth. All three interfaces call it.
+- Three interfaces, one engine:
+  1. MCP Server (preferred) — Structured JSON tools, typed parameters, deterministic output.
+  2. CLI (fallback) — One-shot shell commands. Zero dependencies beyond Python 3.7+.
+  3. Browser UI (for humans) — Flask at localhost:5000 via run.py. Same database, same data.
+
+## CLI Usage (One-Shot Mode)
+python cli.py <path/to/books.db> <command>
+
+Runs a command, prints output to stdout, exits. Chain with && for multi-step.
+
+## Essential Commands
+
+### Read Operations
+tb                                  # Trial balance (all accounts, Dr/Cr columns)
+tb 2025-12-31                       # Trial balance as of a date
+report BS                           # Balance sheet
+report IS 2025-01-01 2025-12-31     # Income statement for a period
+ledger BANK.CHQ                     # Full ledger for an account
+ledger BANK.CHQ 2025-01-01 2025-03-31  # Ledger with date range
+balance BANK.CHQ                    # Single account balance
+accounts                            # List all accounts
+accounts posting                    # List only posting accounts
+find bank                           # Search accounts by name
+search rent                         # Search transactions by description
+rules                               # List all import rules
+info                                # Company name, fiscal year, lock date
+trace RE                            # Trace accumulation tree for a total
+trace RE 2025-12-31                 # Trace as of a date
+trace NETEARN 2025-01-01 2025-12-31 # Trace for a date range
+
+### Write Operations
+post 2025-03-01 "March rent" 1500.00 EX.RENT BANK.CHQ
+    # Simple 2-line entry: Dr EX.RENT 1500, Cr BANK.CHQ 1500
+
+postx 2025-03-01 "Compound entry"
+    # Multi-line transaction. Enter lines interactively.
+
+importcsv ~/data/jan2025.csv BANK.CHQ
+    # Import bank CSV. Applies import rules to auto-categorize.
+    # Unmatched rows go to EX.SUSP.
+
+importofx ~/data/jan2025.qbo BANK.CHQ
+    # Import bank OFX/QBO file. Same rules as importcsv.
+
+importaje ~/data/aje_export.iif 25AJE
+    # Import CaseWare AJE export (IIF or Venice format).
+    # Parses entries, maps CsW accounts to Grid accounts, posts all.
+
+addrule SHOPIFY REV.SVC G5 10
+    # Add import rule: keyword SHOPIFY -> account REV.SVC, GST 5%, priority 10
+
+delrule 42
+    # Delete import rule by ID
+
+addaccount EX.PARKING D "Parking Expense"
+    # Add new posting account. D=debit-normal, C=credit-normal.
+
+rollforward 2025-08-31
+    # Roll fiscal year forward. Posts RE offset, sets lock, advances ceiling.
+    # Reads RE.CLOSE (not RE from BS) to avoid double-counting.
+
+ye 2025-08-31
+    # Alias for rollforward.
+
+ceiling 2025-12-31
+    # Show or set the fiscal year ceiling. Prevents posting after this date.
+
+lock 2025-08-31
+    # Set lock date. Prevents changes on or before this date.
+
+### Export
+exporttb trial_balance.csv 2025-12-31   # TB to CSV
+exportcsv IS income.csv 2025-01-01 2025-12-31  # Report to CSV
+
+## Standard Workflow
+1. Create books:        new ~/clients/acme "Acme Corp"
+   (Ceiling auto-set to current fiscal year end)
+2. Import bank data:    importcsv ~/data/bank.csv BANK.CHQ
+   Or OFX/QBO:          importofx ~/data/bank.qbo BANK.CHQ
+   (Rows after ceiling are skipped — rollforward first if needed)
+3. Review suspense:     ledger EX.SUSP
+4. Add rules:           addrule <keyword> <account> [tax] [priority]
+5. Delete suspense:     delete <txn_id>  (for each misposted entry)
+6. Re-import:           importcsv ~/data/bank.csv BANK.CHQ
+7. Verify:              tb  (debits must equal credits)
+8. Run reports:         report BS && report IS
+9. Year-end:            rollforward 2025-12-31
+   (Posts RE offset, locks year, advances ceiling to next FY)
+10. Repeat from step 2 for next fiscal year
+
+## Output Conventions
+- Success: lines contain a checkmark character
+- Errors: lines start with "Error:" or "Cannot"
+- Tables: header row, separator line, fixed-width columns
+- Amounts: 1,500.00 = debit, (1,500.00) = credit, — = zero
+- All output is plain text. Parse with string splitting.
+
+## Account Naming Convention
+ALWAYS use GridTRX account names. Never use numeric account codes.
+If the source data has numeric codes (1010, 5800, etc.), ignore the codes and
+map by description to the nearest GridTRX account name. If no match exists,
+create the account using the EX. or REV. prefix convention.
+Always check list_accounts (MCP) or accounts (CLI) first before creating anything.
+
+- BANK.xxx   Bank accounts (D-normal) — e.g. BANK.CDN, BANK.US, BANK.CHQ, BANK.SAV
+- AR.xxx     Accounts receivable (D-normal)
+- AP.xxx     Accounts payable (C-normal)
+- REV.xxx    Revenue (C-normal) — e.g. REV, REV.SVC, REV.FOREIGN
+- EX.xxx     Expenses (D-normal) — e.g. EX.PHONE, EX.OFFICE, EX.VEHICLE, EX.WAGES
+- GST.xxx    Tax accounts — e.g. GST.IN, GST.OUT, GST.CLR
+- SHL.xxx    Shareholder loans (C-normal) — e.g. SHL.DANA
+- RE.xxx     Retained earnings (C-normal)
+- EX.SUSP    Suspense — uncategorized transactions land here
+
+## Tax Codes
+- G5   GST 5%
+- H13  HST 13%
+- H15  HST 15%
+- E    Exempt (no tax split)
+
+## CRITICAL: Perpetual Retained Earnings System
+GridTRX uses perpetual totals — there is NO traditional year-end
+close that zeros revenue/expense accounts. Instead, the total-to chain computes
+net income dynamically and flows it to the BS. This chain MUST be intact.
+
+### Required Total-To Chain (IS → BS)
+Revenue accounts → TOTREV → GROSS → OPINC → NETINC → NI → RE.CLOSE → RE (on BS)
+Expense accounts → TOTEX → OPINC (same chain continues to RE)
+COS accounts    → GROSS (same chain)
+
+The chain is GLOBAL across all reports. An IS total can feed a BS total.
+
+### Required Accounts for RE System
+- **NI** (C, total) — Net Income accumulator. All IS totals must reach this.
+- **RE.CLOSE** (C, total) — Closing retained earnings. Receives NI + RE.OPEN + DIVPAID.
+- **RE** (C, total) — Retained earnings on BS. Receives RE.CLOSE + RE.OFS.
+- **RE.OPEN** (C, posting) — Opening retained earnings. Credited by rollforward command.
+- **RE.OFS** (D, posting) — Offset account. Debited by rollforward command. Cancels RE.OPEN in RE.
+- **PY.CLOSE** (C, posting) — Prior year closing balance. Used when importing only a PY balance sheet
+  (no income history). Post all PY TB amounts against PY.CLOSE. total_to_1 = RE, so the
+  unreconciled difference flows to retained earnings correctly. Lives on the TRX report.
+
+### Fiscal Year Ceiling
+Books have a posting window: (lock_date, fy_end_date]. The ceiling prevents
+accidentally posting into future fiscal years. Set automatically when books
+are created. Advanced automatically by rollforward. Can be set manually: ceiling YYYY-MM-DD
+
+### Year-End Process (rollforward command)
+Reads RE.CLOSE from the IS report (not RE from BS — avoids double-counting).
+Posts ONE entry dated first day of new fiscal year:
+  Dr RE.OFS / Cr RE.OPEN (for the RE.CLOSE amount)
+This "freezes" prior-year earnings into RE.OPEN. The debit in RE.OFS cancels
+RE.OPEN within the RE total, so only current-year NI shows in RE on the BS.
+Also sets lock_date = YE date, advances fy_end_date to next year.
+`ye` is an alias for `rollforward`.
+
+### RE.OFS Report
+A separate report (sort order 50) that makes RE.OFS visible and wires it to RE:
+  RE.OPEN  (display only, no total-to)
+  RE.OFS   (total_to_1 = 'RE')
+
+### Always Start from Starter Books
+When creating new books, ALWAYS use create_starter_books() as the base. This
+ensures the RE chain, all 5 standard reports (BS, IS, AJE, TRX, RE.OFS), and
+the required total accounts are created correctly. Then add/modify accounts
+for the specific client. Never build reports from scratch without the RE chain.
+
+### Importing Client Data
+When importing a client's existing chart of accounts or trial balance, ALWAYS
+map to GridTRX account naming conventions. Never pass through numeric account
+codes (1010, 5800, etc.) — ignore them and map by description. Keep the
+client's grouping and ordering intact, but every account must use GridTRX
+names (BANK.xxx, EX.xxx, REV.xxx, etc.). Check list_accounts first to see
+what already exists before creating new accounts.
+
+### Validate
+Run `validate` after any report setup to check the chain is intact:
+  python cli.py books.db validate
+
+Validate checks: total-to chain, RE.OFS/RE.OPEN exist, BS balances,
+**BS RE vs IS RE.CLOSE match** (catches duplicates, chain errors, conversion artifacts),
+and orphan total-to targets.
+
+### Trace
+Trace the accumulation tree for any account to see what feeds into it:
+  python cli.py books.db trace RE
+  python cli.py books.db trace NETEARN 2024-06-01 2025-05-31
+
+Shows each contributor's own balance, received accumulation, and dumped value.
+
+## Important Notes
+- Lock date prevents posting to closed periods (floor). Check with: lock
+- FY ceiling prevents posting beyond the fiscal year end (ceiling). Check with: ceiling
+- Posting window is (lock_date, fy_end_date]. Work in batches per fiscal year.
+- Rollforward is one-way: it posts a closing entry, locks the year, advances the ceiling.
+- The trial balance MUST always balance. If it doesn't, something is wrong.
+- Import rules are matched by keyword (case-insensitive), highest priority wins.
+- Total report items MUST have an account_id linked or they will always show zero.
+
+## Workspace Security
+Set GRIDTRX_WORKSPACE to restrict file access to a single directory.
+Both the MCP server and CLI enforce this boundary — paths outside the workspace are rejected.
+  export GRIDTRX_WORKSPACE=~/clients
+
+## MCP Server (Structured AI Agent Access)
+pip install mcp
+GRIDTRX_WORKSPACE=~/clients python mcp_server.py
+
+The MCP server exposes 19 typed tools (12 read, 7 write) that wrap models.py directly.
+No shell parsing needed — agents get structured JSON responses.
+GRIDTRX_WORKSPACE is mandatory — the server will not start without it.
+
+Add to Claude Desktop config (claude_desktop_config.json):
+  "gridtrx": {"command": "python", "args": ["/path/to/mcp_server.py"], "env": {"GRIDTRX_WORKSPACE": "/path/to/clients"}}
+
+Every tool takes db_path as its first parameter (must resolve inside the workspace).

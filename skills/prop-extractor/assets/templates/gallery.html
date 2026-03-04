@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PROJECT_NAME}} · 道具资产</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent: #c9a961;
+            --accent-dim: #8a7444;
+            --border: #2a2a2a;
+            --tag-weapon: #e74c3c;
+            --tag-token: #9b59b6;
+            --tag-magic: #3498db;
+            --tag-daily: #27ae60;
+            --tag-clue: #f39c12;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .header {
+            padding: 80px 40px 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        .header-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 24px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+        .header-meta {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+        }
+        .header-stat {
+            text-align: center;
+        }
+        .header-stat-value {
+            font-size: 2rem;
+            font-weight: 200;
+            color: var(--accent);
+        }
+        .header-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+        .section:last-child { margin-bottom: 0; }
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+        }
+        .section-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        }
+        .card-image {
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card:hover .card-image img {
+            transform: scale(1.08);
+        }
+        .card-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 4px 10px;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: #fff;
+        }
+        .card-tag.weapon { background: var(--tag-weapon); }
+        .card-tag.token { background: var(--tag-token); }
+        .card-tag.magic { background: var(--tag-magic); }
+        .card-tag.daily { background: var(--tag-daily); }
+        .card-tag.clue { background: var(--tag-clue); }
+        
+        .card-info {
+            padding: 16px;
+        }
+        .card-name {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+        }
+        .card-id {
+            font-size: 0.65rem;
+            color: var(--accent-dim);
+            font-family: 'SF Mono', 'Monaco', monospace;
+            margin-bottom: 6px;
+        }
+        .card-owner {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        .lightbox-image {
+            max-height: 70vh;
+            max-width: 40vw;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lightbox-info {
+            width: 360px;
+            flex-shrink: 0;
+        }
+        .lightbox-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 1001;
+        }
+        .lightbox-close:hover { color: var(--text-primary); }
+        .lightbox-name {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+        }
+        .lightbox-id {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-family: 'SF Mono', 'Monaco', monospace;
+            margin-bottom: 24px;
+        }
+        .lightbox-section {
+            margin-bottom: 20px;
+        }
+        .lightbox-section-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            margin-bottom: 8px;
+        }
+        .lightbox-section-content {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        .lightbox-attr {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .lightbox-attr-item {
+            background: var(--bg-card);
+            padding: 6px 12px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .lightbox-attr-label {
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        .footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 1024px) {
+            .lightbox-content { flex-direction: column; align-items: center; }
+            .lightbox-info { width: 100%; max-width: 500px; margin-top: 20px; }
+        }
+        @media (max-width: 768px) {
+            .header { padding: 60px 20px 40px; }
+            .header-title { font-size: 1.75rem; }
+            .main { padding: 40px 20px; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-badge">PROP ASSETS</div>
+        <h1 class="header-title">{{PROJECT_NAME}}</h1>
+        <p class="header-subtitle">道具资产展示</p>
+        <div class="header-meta">
+            <div class="header-stat">
+                <div class="header-stat-value">{{TOTAL_COUNT}}</div>
+                <div class="header-stat-label">道具总数</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        {{GALLERY_SECTIONS}}
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">{{PROJECT_NAME}} · 道具资产 · {{GENERATED_TIME}}</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">关闭</span>
+        <div class="lightbox-content">
+            <img class="lightbox-image" id="lightbox-img" src="" alt="">
+            <div class="lightbox-info" id="lightbox-info"></div>
+        </div>
+    </div>
+
+    <script>
+        const propData = {{PROP_DATA_JSON}};
+        
+        function openLightbox(id) {
+            const prop = propData[id];
+            if (!prop) return;
+            
+            document.getElementById('lightbox-img').src = prop.image;
+            document.getElementById('lightbox-info').innerHTML = `
+                <h2 class="lightbox-name">${prop.name}</h2>
+                <p class="lightbox-id">${prop.id}</p>
+                <div class="lightbox-attr">
+                    <span class="lightbox-attr-item"><span class="lightbox-attr-label">类型:</span>${prop.type}</span>
+                    <span class="lightbox-attr-item"><span class="lightbox-attr-label">归属:</span>${prop.owner}</span>
+                </div>
+                <div class="lightbox-section">
+                    <h3 class="lightbox-section-title">外观描述</h3>
+                    <p class="lightbox-section-content">${prop.appearance}</p>
+                </div>
+                <div class="lightbox-section">
+                    <h3 class="lightbox-section-title">剧情意义</h3>
+                    <p class="lightbox-section-content">${prop.meaning}</p>
+                </div>
+                <div class="lightbox-section">
+                    <h3 class="lightbox-section-title">出现场景</h3>
+                    <p class="lightbox-section-content">${prop.scenes}</p>
+                </div>
+            `;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+    </script>
+</body>
+</html>

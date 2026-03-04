@@ -1,0 +1,173 @@
+{
+  "id": "openclaw-logfire",
+  "kind": "observability",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "token": {
+        "type": "string",
+        "description": "Logfire write token. Falls back to LOGFIRE_TOKEN env var."
+      },
+      "projectUrl": {
+        "type": "string",
+        "description": "Logfire project URL for clickable trace links."
+      },
+      "region": {
+        "type": "string",
+        "enum": ["us", "eu"],
+        "default": "us",
+        "description": "Logfire region (US or EU endpoint)."
+      },
+      "environment": {
+        "type": "string",
+        "default": "development",
+        "description": "Deployment environment label."
+      },
+      "serviceName": {
+        "type": "string",
+        "default": "openclaw-agent",
+        "description": "OTEL service name for resource identification."
+      },
+      "providerName": {
+        "type": "string",
+        "description": "GenAI provider name (e.g. 'anthropic', 'openai')."
+      },
+      "captureToolInput": {
+        "type": "boolean",
+        "default": true,
+        "description": "Record tool call arguments as span attributes."
+      },
+      "captureToolOutput": {
+        "type": "boolean",
+        "default": false,
+        "description": "Record tool results as span attributes (verbose)."
+      },
+      "toolInputMaxLength": {
+        "type": "integer",
+        "default": 2048,
+        "description": "Max character length for captured tool input."
+      },
+      "toolOutputMaxLength": {
+        "type": "integer",
+        "default": 512,
+        "description": "Max character length for captured tool output."
+      },
+      "captureStackTraces": {
+        "type": "boolean",
+        "default": true,
+        "description": "Include stack traces in error spans."
+      },
+      "captureMessageContent": {
+        "type": "boolean",
+        "default": false,
+        "description": "Record message text (privacy-sensitive)."
+      },
+      "captureToolDefinitions": {
+        "type": "boolean",
+        "default": false,
+        "description": "Record tool schemas in inference events."
+      },
+      "captureInferenceEvents": {
+        "type": "boolean",
+        "default": false,
+        "description": "Emit gen_ai.client.inference.operation.details events."
+      },
+      "redactSecrets": {
+        "type": "boolean",
+        "default": true,
+        "description": "Strip API keys, tokens, and JWTs from recorded data."
+      },
+      "distributedTracing": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable W3C traceparent injection/extraction."
+          },
+          "injectIntoCommands": {
+            "type": "boolean",
+            "default": true,
+            "description": "Inject traceparent into curl/wget/httpie commands."
+          },
+          "extractFromWebhooks": {
+            "type": "boolean",
+            "default": true,
+            "description": "Extract traceparent from inbound webhook headers."
+          },
+          "urlPatterns": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["*"],
+            "description": "Glob patterns for URLs to inject traceparent into."
+          }
+        }
+      },
+      "enableMetrics": {
+        "type": "boolean",
+        "default": true,
+        "description": "Emit token usage and operation duration histograms."
+      },
+      "metricsIntervalMs": {
+        "type": "integer",
+        "default": 60000,
+        "description": "Metrics export interval in milliseconds."
+      },
+      "enableTraceLinks": {
+        "type": "boolean",
+        "default": true,
+        "description": "Log clickable Logfire trace URLs."
+      },
+      "logLevel": {
+        "type": "string",
+        "enum": ["debug", "info", "warn", "error"],
+        "default": "info",
+        "description": "Plugin log verbosity."
+      },
+      "resourceAttributes": {
+        "type": "object",
+        "additionalProperties": { "type": "string" },
+        "description": "Additional OTEL resource attributes."
+      },
+      "spanProcessorType": {
+        "type": "string",
+        "enum": ["batch", "simple"],
+        "default": "batch",
+        "description": "Span processor type. Use 'simple' for debugging."
+      },
+      "batchConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maxQueueSize": { "type": "integer", "default": 2048 },
+          "maxExportBatchSize": { "type": "integer", "default": 512 },
+          "scheduledDelayMs": { "type": "integer", "default": 5000 }
+        }
+      }
+    }
+  },
+  "uiHints": {
+    "token": {
+      "label": "Write Token",
+      "placeholder": "Set via LOGFIRE_TOKEN env var",
+      "sensitive": true
+    },
+    "projectUrl": {
+      "label": "Project URL",
+      "placeholder": "https://logfire.pydantic.dev/org/project"
+    },
+    "region": {
+      "label": "Region"
+    },
+    "environment": {
+      "label": "Environment",
+      "placeholder": "production"
+    },
+    "serviceName": {
+      "label": "Service Name",
+      "placeholder": "openclaw-agent"
+    }
+  }
+}

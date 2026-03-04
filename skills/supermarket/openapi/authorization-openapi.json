@@ -1,0 +1,545 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Authorization Endpoints",
+    "description": "The authorization endpoints provide a token that will allow your service or application to call Kroger APIs.\n<br><br>\nLearn more about how The Kroger Co uses Oauth2:\n<a href=\"https://developer.kroger.com/documentation/public/security/guides-oauth\">Understanding OAuth2</a>\n",
+    "termsOfService": "https://developer.kroger.com/terms",
+    "contact": {
+      "name": "API Support",
+      "email": "APISupport@kroger.com",
+      "url": "https://developer.kroger.com"
+    },
+    "version": "1.0.13"
+  },
+  "servers": [
+    {
+      "url": "https://api.kroger.com",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://api-ce.kroger.com",
+      "description": "Certification Environment"
+    }
+  ],
+  "paths": {
+    "/v1/connect/oauth2/authorize": {
+      "get": {
+        "tags": [
+          "OAuth2"
+        ],
+        "summary": "Authorization Code",
+        "description": "This endpoint is used when the end user must approve access to a protected resource (such as a cart) before a service can act on the user's behalf. Here's how it works:\n\n* Your service or application calls this endpoint and includes the redirect URL (what the end user should see after this service executes) and scopes (defines the actions your application or service can take on behalf of the user).\n* This endpoint displays a login screen, where the end user enters their email address and password.\n* The end user is then asked to give the application permission to access the resource on their behalf.\n* When the user agrees, this service returns the redirect URL with an authorization `code` as a parameter.\n\nAfter this endpoint returns, your service or application must call the `/token` endpoint with the `authorization_code` grant type and `code` value to get an access token. The access token is then sent to the endpoint being called to prove that your service or application is authorized to act on a user's behalf.\n",
+        "operationId": "authorizationCode",
+        "parameters": [
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "The level of access your application is requesting.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "Your application's client ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "description": "Your registered redirect URL. The redirect URL tells this endpoint which URL to display after the user approves access to the protected resource.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_type",
+            "in": "query",
+            "description": "Is always `code`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "A random string to verify that the response belongs to the initiated request. The server should always return the same state value as the one specified in the request to protect against forgery attacks.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "banner",
+            "in": "query",
+            "description": "Sets the chain specific branding displayed on the authorization consent screen presented to the end user for shopper logins. When this parameter is not supplied the default chain branding (Kroger) will be used. Only one option may be used at a time and the available options are the following:\n\n\"bakers\" - Bakers' Plus  \n\"citymarket\" - City Market  \n\"dillons\" - Dillons  \n\"fredmeyer\" - Fred Meyer  \n\"frys\" - Fry's Food  \n\"gerbes\" - Gerbes  \n\"kingsoopers\" - King Soopers  \n\"kroger\" - Kroger (default if no banner provided)  \n\"metromarket\" - Metro Market  \n\"picknsave\" - Pick 'n Save  \n\"qfc\" - QFC  \n\"ralphs\" - Ralphs  \n\"smiths\" - Smiths Food and Drug  \n\"food4less\" - Food 4 Less\"  \n\"foodsco\" - Foods Co.  \n\"harristeeter\" - Harris Teeter  \n\"vons\" - Vons  \n\"fredmeyerjewelers\" - Fred Meyer  \n\"jaycfoods\" - Jay C  \n\"marianos\" - Marianos  \n\"payless\" - Pay Less  \n\"ppsrx\" - Postal Prescription Services (PPSRX)  \n\"rulerfoods\" - Ruler Foods  \n\"copps\" - Copps  \n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "301": {
+            "description": "Moved Permanently",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oauth2_code_response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/invalid_scope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_grant_type"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_redirect_uri"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_access"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_credentials"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth_server_error"
+                }
+              }
+            }
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "html",
+            "source": "https://api.kroger.com/v1/connect/oauth2/authorize?scope={{SCOPES}}&response_type=code&client_id={{CLIENT_ID}}&redirect_uri={{REDIRECT_URI}}"
+          }
+        ]
+      }
+    },
+    "/v1/connect/oauth2/token": {
+      "post": {
+        "tags": [
+          "OAuth2"
+        ],
+        "summary": "Access Token",
+        "description": "All Oauth2 applications are issued \"client credentials\" in the form of a unique client_id and client_secret after registration. The credentials are used to authorize the application.\n<br/><br/>\nThere are 3 grant type flows that the token endpoint offers:\n1. `authorization_code` - Uses the `code` returned from the `/authorize` endpoint to get a token, allowing your service or application to make API requests on an end user's behalf, including accessing personal data. The service is only able to perform the actions specified in the approved scopes.\n2. `client_credentials` - Uses the client credentials to provide a token that allows your service or application to call endpoints that do not require user approval.\n3. `refresh_token`\t- Allows the application to \"refresh\" an access token that has expired. Refresh tokens are only granted when using the Authorization Code grant type. Using the refresh token eliminates the need to re-authenticate the customer when the access token expires.\n\nThe `access_token` received from this step is sent to the endpoint being called to prove that your service or application is authorized to call the API. The `token_type` field indicates what type of token it is so that you can correctly pass it to the API.\n",
+        "operationId": "accessToken",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Your `client_id:client_secret` base64 encoded.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/authorization_code"
+                  },
+                  {
+                    "$ref": "#/components/schemas/client_credentials"
+                  },
+                  {
+                    "$ref": "#/components/schemas/refresh_token"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "grant_type"
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/authorization_code_response"
+                    },
+                    {
+                      "$ref": "#/components/schemas/client_credentials_response"
+                    },
+                    {
+                      "$ref": "#/components/schemas/refresh_token_response"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/invalid_code"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_scope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_grant_type"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_refresh_token"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalid_credentials"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth_server_error"
+                }
+              }
+            }
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X POST \\\n  'https://api.kroger.com/v1/connect/oauth2/token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Basic {{base64(“CLIENT_ID:CLIENT_SECRET”)}}' \\\n  -d 'grant_type=client_credentials&scope={{SCOPE}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"strings\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/connect/oauth2/token\"\n\n  payload := strings.NewReader(\"grant_type=client_credentials&scope={{SCOPE}}\")\n\n  req, _ := http.NewRequest(\"POST\", url, payload)\n\n  req.Header.Add(\"Content-Type\", \"application/x-www-form-urlencoded\")\n  req.Header.Add(\"Authorization\", \"Basic {{base64(“CLIENT_ID:CLIENT_SECRET”)}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/connect/oauth2/token\",\n  \"method\": \"POST\",\n  \"headers\": {\n    \"Content-Type\": \"application/x-www-form-urlencoded\",\n    \"Authorization\": \"Basic {{base64(“CLIENT_ID:CLIENT_SECRET”)}}\"\n  },\n  \"data\": {\n    \"grant_type\": \"client_credentials\",\n    \"scope\": \"{{scope}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nMediaType mediaType = MediaType.parse(\"application/x-www-form-urlencoded\");\nRequestBody body = RequestBody.create(mediaType, \"grant_type=client_credentials&scope={{SCOPE}}\");\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/connect/oauth2/token\")\n  .post(body)\n  .addHeader(\"Content-Type\", \"application/x-www-form-urlencoded\")\n  .addHeader(\"Authorization\", \"Basic {{base64(“CLIENT_ID:CLIENT_SECRET”)}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "auth_server_error": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "description": "Description of the reason for the error",
+                "example": "Internal server error"
+              },
+              "code": {
+                "type": "string",
+                "description": "Unique identifier for the error used for troubleshooting purposes",
+                "example": "Auth-4xxx-xxx"
+              },
+              "timestamp": {
+                "type": "number",
+                "description": "Timestamp of the resposne",
+                "example": 1564159296910
+              }
+            }
+          }
+        }
+      },
+      "authorization_code": {
+        "required": [
+          "code",
+          "grant_type",
+          "redirect_uri"
+        ],
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "description": "Must be `authorization_code`.",
+            "example": "code"
+          },
+          "code": {
+            "type": "string",
+            "description": "The value of the `code` parameter returned from the `/authorization` endpoint on the redirect URL.",
+            "example": "zWrT1GkdshSadIowJW0Rm4w2kKhOzv1W"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "Your registered redirect URL. Must be the same redirect URL that was used for the authorizations code request.",
+            "example": "https://example.com/callback"
+          }
+        }
+      },
+      "authorization_code_response": {
+        "type": "object",
+        "properties": {
+          "expires_in": {
+            "type": "number",
+            "description": "How long the access token is valid for in seconds.",
+            "example": 1800
+          },
+          "access_token": {
+            "type": "string",
+            "description": "The access token string",
+            "example": "eyJh5GciOiJSUzI1NiGsImtpZCI6Ilo0RnQzbXNrSUj4OGlydDdMQjVjNmc2PSIsInR5cCI6IkpXVmJ9.eqJzY29wZSI6InByb2T1Y3QuY29tcGFjdCBjb3Vwb24uYmFzaWMiLCJhdXRoQXQiOjE1NjUwOTk0OTUzMzIzOTIxMTIsImF1ZCI6InBlcmsvcm1hbmNlLWFnZW50LXB1YmxpYyIsImV4cCI6MTU2NTEwMTI5NSwiaWF0IjoxNTY1MDk5BDkwLCJpc3MiOiJhcGkua3JvZ2VyLmNvbSIsInN1YiI6IjBmZjdkMGIwLWVkOGItNDJmOS1hNTExLWEzMGQyYTAyZDljNSJ9.ej0mov6SGV4n4HiAvduTdYCceMlSo3T06M4Nfh3MfpIjSKzKaLWgd5S0W1EKDXrWz8IE7NTg8EIrL-WKhwdZPt-TWaS7LLjRXLJ0w5rKc44DStgBdvDiCcnKeMsnimjhBlHOiiKUV5y3GbVqJzaDVZwg0j8lP9qtwZP9EIIQ7k409nkskY1pz7l1lZrGotYRJKmnteN5vVQeZ3R8jywIwOOSEbKSgQALVA3Oj02964P7lI6h1GsZ66V5FLA9KU8QXm4ejrFHf1beAIA2zi_fQI3dmW7yj57pWoCECZIjq7Sfo3nGR5rkjEwfyXEK7aTn8oj4_14YHgKRTY-28L96cw"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token.",
+            "example": "bearer"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "A token that can be used to request a new token on behalf of the end user. Refresh tokens have a longer expiration, typically 24 hours.",
+            "example": "FN20LbaF2EWC6MPMWdemBwwnP4ZmX8"
+          }
+        }
+      },
+      "client_credentials": {
+        "required": [
+          "grant_type"
+        ],
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "description": "Must be `client_credentials`.",
+            "example": "client_credentials"
+          },
+          "scope": {
+            "type": "string",
+            "description": "The level of access your application is requesting. Available options can be found on your app page.",
+            "example": "product.compact"
+          }
+        }
+      },
+      "client_credentials_response": {
+        "type": "object",
+        "properties": {
+          "expires_in": {
+            "type": "number",
+            "description": "How long the access token is valid for in seconds.",
+            "example": 1800
+          },
+          "access_token": {
+            "type": "string",
+            "description": "The access token string.",
+            "example": "eyJh5GciOiJSUzI1NiGsImtpZCI6Ilo0RnQzbXNrSUj4OGlydDdMQjVjNmc2PSIsInR5cCI6IkpXVmJ9.eqJzY29wZSI6InByb2T1Y3QuY29tcGFjdCBjb3Vwb24uYmFzaWMiLCJhdXRoQXQiOjE1NjUwOTk0OTUzMzIzOTIxMTIsImF1ZCI6InBlcmsvcm1hbmNlLWFnZW50LXB1YmxpYyIsImV4cCI6MTU2NTEwMTI5NSwiaWF0IjoxNTY1MDk5BDkwLCJpc3MiOiJhcGkua3JvZ2VyLmNvbSIsInN1YiI6IjBmZjdkMGIwLWVkOGItNDJmOS1hNTExLWEzMGQyYTAyZDljNSJ9.ej0mov6SGV4n4HiAvduTdYCceMlSo3T06M4Nfh3MfpIjSKzKaLWgd5S0W1EKDXrWz8IE7NTg8EIrL-WKhwdZPt-TWaS7LLjRXLJ0w5rKc44DStgBdvDiCcnKeMsnimjhBlHOiiKUV5y3GbVqJzaDVZwg0j8lP9qtwZP9EIIQ7k409nkskY1pz7l1lZrGotYRJKmnteN5vVQeZ3R8jywIwOOSEbKSgQALVA3Oj02964P7lI6h1GsZ66V5FLA9KU8QXm4ejrFHf1beAIA2zi_fQI3dmW7yj57pWoCECZIjq7Sfo3nGR5rkjEwfyXEK7aTn8oj4_14YHgKRTY-28L96cw"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token.",
+            "example": "bearer"
+          }
+        }
+      },
+      "invalid_access": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "invalid_request"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "The resource owner denied the request"
+          }
+        }
+      },
+      "invalid_code": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "invalid_request"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "invalid code"
+          }
+        }
+      },
+      "invalid_credentials": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "unauthorized"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "invalid credentials"
+          }
+        }
+      },
+      "invalid_grant_type": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "unsupported_grant_type"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "invalid grant_type"
+          }
+        }
+      },
+      "invalid_redirect_uri": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "invalid_request"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "The redirect_uri did not match the registered redirect_uri for this application"
+          }
+        }
+      },
+      "invalid_refresh_token": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "invalid_request"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "invalid refresh_token"
+          }
+        }
+      },
+      "invalid_scope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message",
+            "example": "invalid_scope"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Detailed error description",
+            "example": "invalid scope"
+          }
+        }
+      },
+      "oauth2_code_response": {
+        "type": "string",
+        "description": "Your registered redirect with the authorization code appended to the URL.",
+        "example": "https://YourRedirectUri.com/callback?code=zWrT1GkdshSadIowJW0Rm4w2kKhOzv1W"
+      },
+      "refresh_token": {
+        "required": [
+          "refresh_token",
+          "grant_type"
+        ],
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "description": "Must be `refresh_token`.",
+            "example": "refresh_token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "The refresh token returned from a call to this endpoint with the `authorization_code` or `refresh_token` grant type.",
+            "example": "FN20LbaF2EWC6MPMWdemBwwnP4ZmX8"
+          }
+        }
+      },
+      "refresh_token_response": {
+        "type": "object",
+        "properties": {
+          "expires_in": {
+            "type": "number",
+            "description": "How long the access token is valid for in seconds.",
+            "example": 1800
+          },
+          "access_token": {
+            "type": "string",
+            "description": "The access token string.",
+            "example": "eyJh5GciOiJSUzI1NiGsImtpZCI6Ilo0RnQzbXNrSUj4OGlydDdMQjVjNmc2PSIsInR5cCI6IkpXVmJ9.eqJzY29wZSI6InByb2T1Y3QuY29tcGFjdCBjb3Vwb24uYmFzaWMiLCJhdXRoQXQiOjE1NjUwOTk0OTUzMzIzOTIxMTIsImF1ZCI6InBlcmsvcm1hbmNlLWFnZW50LXB1YmxpYyIsImV4cCI6MTU2NTEwMTI5NSwiaWF0IjoxNTY1MDk5BDkwLCJpc3MiOiJhcGkua3JvZ2VyLmNvbSIsInN1YiI6IjBmZjdkMGIwLWVkOGItNDJmOS1hNTExLWEzMGQyYTAyZDljNSJ9.ej0mov6SGV4n4HiAvduTdYCceMlSo3T06M4Nfh3MfpIjSKzKaLWgd5S0W1EKDXrWz8IE7NTg8EIrL-WKhwdZPt-TWaS7LLjRXLJ0w5rKc44DStgBdvDiCcnKeMsnimjhBlHOiiKUV5y3GbVqJzaDVZwg0j8lP9qtwZP9EIIQ7k409nkskY1pz7l1lZrGotYRJKmnteN5vVQeZ3R8jywIwOOSEbKSgQALVA3Oj02964P7lI6h1GsZ66V5FLA9KU8QXm4ejrFHf1beAIA2zi_fQI3dmW7yj57pWoCECZIjq7Sfo3nGR5rkjEwfyXEK7aTn8oj4_14YHgKRTY-28L96cw"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token.",
+            "example": "bearer"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "A token that can be used to request a new token on behalf of the end user. Refresh tokens have a longer expiration, typically 24 hours.",
+            "example": "FN20LbaF2EWC6MPMWdemBwwnP4ZmX8"
+          }
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Authorization Endpoints",
+      "tags": [
+        "OAuth2"
+      ]
+    }
+  ]
+}

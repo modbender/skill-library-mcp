@@ -1,0 +1,59 @@
+providers:
+  huggingface:
+    enabled: true
+    allow_public_quota: true
+    # tokens can be a CSV string or list; supports env placeholders like ${T2I_PEINTURE_HF_TOKENS}
+    tokens: "${T2I_PEINTURE_HF_TOKENS}"
+
+  gitee:
+    enabled: true
+    tokens: "${T2I_PEINTURE_GITEE_TOKENS}"
+
+  modelscope:
+    enabled: true
+    tokens: "${T2I_PEINTURE_MODELSCOPE_TOKENS}"
+
+  a4f:
+    enabled: true
+    tokens: "${T2I_PEINTURE_A4F_TOKENS}"
+
+  openai_compatible:
+    enabled: false
+    # SiliconFlow example: https://api.siliconflow.cn/v1
+    api_url: "${T2I_PEINTURE_OPENAI_COMPATIBLE_URL}"
+    # Optional override, default /images/generations
+    images_endpoint: "/images/generations"
+    # Optional: set true only if your endpoint accepts `seed`
+    send_seed: false
+    tokens: "${T2I_PEINTURE_OPENAI_COMPATIBLE_TOKENS}"
+
+routing:
+  provider_order:
+    - huggingface
+    - gitee
+    - modelscope
+    - a4f
+    - openai_compatible
+
+prompt_optimization:
+  enabled: true
+  default_model_by_provider:
+    huggingface: openai-fast
+    gitee: deepseek-3_2
+    modelscope: deepseek-3_2
+    a4f: gemini-2.5-flash-lite
+  system_prompt: |
+    I am a master AI image prompt engineering advisor, specializing in crafting prompts that yield cinematic,
+    hyper-realistic visual narratives for advanced generative models. Rewrite and expand user prompts into
+    concise, high-quality image prompts with no markdown and no extra commentary.
+
+translation:
+  enabled: false
+  target_models:
+    - flux-1-schnell
+    - flux-1-krea
+    - flux-1
+    - flux-2
+
+state:
+  token_status_file: ~/.codex/skills/.state/free-quota-image-skill/token_status.json

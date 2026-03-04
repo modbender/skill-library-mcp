@@ -1,0 +1,132 @@
+{
+  "id": "memento",
+  "name": "Memento",
+  "description": "Memento — Local persistent memory with temporal intelligence for OpenClaw agents.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "pauseTimeoutMs": {
+        "type": "number",
+        "minimum": 1000,
+        "description": "Idle time (ms) before flushing a conversation segment"
+      },
+      "maxBufferTurns": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 500,
+        "description": "Maximum message turns before auto-flush"
+      },
+      "autoCapture": {
+        "type": "boolean",
+        "description": "Automatically capture all conversation messages"
+      },
+      "dataDir": {
+        "type": "string",
+        "description": "Directory for storing conversation data (relative to workspace)"
+      },
+      "extractionModel": {
+        "type": "string",
+        "description": "LLM model for fact extraction (Phase 2)"
+      },
+      "embeddingModel": {
+        "type": "string",
+        "description": "Local embedding model for semantic search"
+      },
+      "extraction": {
+        "type": "object",
+        "properties": {
+          "autoExtract": {
+            "type": "boolean",
+            "description": "Automatically extract facts after each segment"
+          },
+          "minTurnsForExtraction": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Minimum turns before extraction"
+          },
+          "maxExtractionsPerMinute": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Rate limit for extractions"
+          },
+          "includeExistingFactsCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "(Deprecated) No longer used — dedup is now handled by Phase 2 embedding similarity"
+          }
+        }
+      },
+      "recall": {
+        "type": "object",
+        "properties": {
+          "autoRecall": {
+            "type": "boolean",
+            "description": "Automatically inject recalled facts before each AI turn"
+          },
+          "maxFacts": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum facts to inject per turn"
+          },
+          "maxContextChars": {
+            "type": "number",
+            "minimum": 500,
+            "maximum": 20000,
+            "description": "Maximum characters for injected context"
+          },
+          "minQueryLength": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Minimum message length to trigger recall"
+          },
+          "crossAgentRecall": {
+            "type": "boolean",
+            "description": "Include shared facts from other agents (master KB)"
+          }
+        }
+      }
+    }
+  },
+  "uiHints": {
+    "pauseTimeoutMs": {
+      "label": "Pause Timeout (ms)",
+      "help": "Idle time before flushing a conversation segment (default: 300000 = 5 min)",
+      "advanced": true,
+      "placeholder": "300000"
+    },
+    "maxBufferTurns": {
+      "label": "Max Buffer Turns",
+      "help": "Maximum message turns before auto-flush (default: 50)",
+      "advanced": true,
+      "placeholder": "50"
+    },
+    "autoCapture": {
+      "label": "Auto-Capture",
+      "help": "Automatically capture all conversation messages (default: true)"
+    },
+    "dataDir": {
+      "label": "Data Directory",
+      "help": "Directory for storing conversation data, relative to workspace (default: .engram)",
+      "advanced": true,
+      "placeholder": ".engram"
+    },
+    "extractionModel": {
+      "label": "Extraction Model (Phase 2)",
+      "help": "LLM model for fact extraction — not used in Phase 1",
+      "advanced": true,
+      "placeholder": "anthropic/claude-sonnet-4-6"
+    },
+    "embeddingModel": {
+      "label": "Embedding Model",
+      "help": "Local embedding model for semantic search (future: BGE-M3)",
+      "advanced": true,
+      "placeholder": "hf:BAAI/bge-m3-gguf"
+    },
+    "recall": {
+      "label": "Recall Settings",
+      "help": "Configure auto-recall behavior (Phase 3)"
+    }
+  }
+}

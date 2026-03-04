@@ -1,0 +1,15 @@
+{
+  "name": "github-monitor",
+  "description": "GitHub 仓库监控：PR 审查、Issues 跟踪",
+  "prompts": ["github", "PR", "pull request", "代码审查", "code review"],
+  "tags": ["development", "github", "monitoring"],
+  "files": {
+    "AGENTS.md": "# AGENTS.md - GitHub Monitor Agent\n\n_Your development workflow assistant_\n\n## Core Identity\n\n- **Role:** GitHub repository monitor\n- **Personality:** Detail-oriented, efficient, technical\n- **Communication Style:** Clear and technical\n\n## Responsibilities\n\n- Monitor PRs and issues\n- Track code review requests\n- Notify on important events\n- Provide repository insights\n\n## Preferences\n\n- Focus on actionable items\n- Highlight blocking PRs\n- Summarize complex discussions\n",
+    "skills/README.md": "# Required Skills\n\n## Core Skills\n- `github` - GitHub CLI integration\n\n## Optional Skills\n- `github-repo-mirror` - Repository mirroring\n\n## Installation\n\n```bash\nnpx clawhub@latest install github\n```\n\n## Configuration\n\nConfigure GitHub CLI:\n```bash\ngh auth login\n```\n",
+    "workflows/pr-daily.yaml": "# PR Daily Digest Workflow\n\ntrigger:\n  type: time\n  value: \"9:00 AM\"\n\nactions:\n  - List open PRs\n  - Identify PRs awaiting review\n  - Highlight blocking PRs\n  - Provide digest summary\n\ncontext:\n  category: github\n  priority: high\n",
+    "workflows/pr-notify.yaml": "# PR Review Request Workflow\n\ntrigger:\n  type: webhook\n  value: \"pull_request_review_requested\"\n\nactions:\n  - Fetch PR details\n  - Assess priority\n  - Send notification\n  - Add to review queue\n\ncontext:\n  category: github\n  priority: critical\n",
+    "workflows/issue-track.yaml": "# Issue Tracking Workflow\n\ntrigger:\n  type: time\n  value: \"6:00 PM\"\n\nactions:\n  - List open issues\n  - Highlight high-priority issues\n  - Track issue age\n  - Provide summary\n\ncontext:\n  category: github\n  priority: medium\n",
+    "MEMORY.md": "# GitHub Monitor Memory\n\n## Tracked Repositories\n\n- Owner/Repo: [Add repos]\n- Owner/Repo: [Add repos]\n\n## Review Priority\n\n- **P0:** Blocking PRs\n- **P1:** Code review requested\n- **P2:** Non-blocking PRs\n\n## Notification Preferences\n\n- **Channels:** Telegram / Slack\n- **Digest Time:** 9:00 AM daily\n- **Urgent:** Immediate notification\n",
+    "README.md": "# GitHub Monitor Template\n\n## Overview\n\nA GitHub assistant that helps you:\n- Track open PRs and issues\n- Get daily digest\n- Never miss a review request\n\n## Quick Start\n\n1. Install required skills:\n   ```bash\n   npx clawhub@latest install github\n   ```\n\n2. Configure tracked repos in MEMORY.md\n\n3. Set up notification channels\n\n## Features\n\n- 📋 Daily PR digest (9:00 AM)\n- 🔔 Review request notifications\n- 📊 Issue tracking\n- 🚨 Blocking PR alerts\n\n## Supported Actions\n\n- `gh pr list` - List pull requests\n- `gh issue list` - List issues\n- `gh pr review` - Submit review\n"
+  }
+}

@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Video Chat</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-dark: #0a0a12;
+  --idle-color: #7c3aed;
+  --idle-glow: rgba(124, 58, 237, 0.4);
+  --speaking-color: #22c55e;
+  --speaking-glow: rgba(34, 197, 94, 0.5);
+  --thinking-color: #f59e0b;
+  --thinking-glow: rgba(245, 158, 11, 0.4);
+  --working-color: #06b6d4;
+  --working-glow: rgba(6, 182, 212, 0.4);
+  --danger: #ef4444;
+}
+
+body {
+  background: var(--bg-dark);
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+.call-timer {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+.call-timer .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--speaking-color);
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* === Left: User Video === */
+.video-panel {
+  flex: 1;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+}
+.video-panel video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.video-panel .video-label {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.8);
+}
+.video-panel .no-camera-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #555;
+  gap: 12px;
+}
+.no-camera-overlay .cam-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+/* === Right: Avatar Panel === */
+.avatar-panel {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1629 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(2px 2px at 20% 30%, rgba(124,58,237,0.3), transparent),
+    radial-gradient(2px 2px at 80% 20%, rgba(59,130,246,0.2), transparent),
+    radial-gradient(2px 2px at 50% 80%, rgba(124,58,237,0.2), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1px 1px at 90% 90%, rgba(59,130,246,0.15), transparent);
+  animation: ambientDrift 20s ease-in-out infinite alternate;
+}
+@keyframes ambientDrift {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+.avatar-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar-ring {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.avatar-ring .glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--idle-color), #3b82f6, var(--idle-color), #6366f1, var(--idle-color));
+  opacity: 0.5;
+  filter: blur(16px);
+  animation: idleBreathe 4s ease-in-out infinite;
+  transition: opacity 0.5s, filter 0.3s;
+}
+
+.avatar-ring.speaking .glow {
+  background: conic-gradient(from 0deg, var(--speaking-color), #34d399, var(--speaking-color), #10b981, var(--speaking-color));
+  opacity: 0.8;
+  filter: blur(20px);
+  animation: speakPulse 0.8s ease-in-out infinite;
+}
+
+.avatar-ring.thinking .glow {
+  background: conic-gradient(from 0deg, var(--thinking-color), #fb923c, var(--thinking-color), #f97316, var(--thinking-color));
+  opacity: 0.7;
+  filter: blur(18px);
+  animation: thinkSpin 2s linear infinite;
+}
+
+.avatar-ring.working .glow {
+  background: conic-gradient(from 0deg, var(--working-color), #22d3ee, transparent, var(--working-color), #0891b2, transparent, var(--working-color));
+  opacity: 0.7;
+  filter: blur(18px);
+  animation: workingSpin 3s linear infinite;
+}
+
+@keyframes idleBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 0.6; }
+}
+@keyframes speakPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 0.9; }
+}
+@keyframes thinkSpin {
+  0% { transform: rotate(0deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1.05); }
+}
+@keyframes workingSpin {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.5; }
+  50% { transform: rotate(180deg) scale(1.12); opacity: 0.8; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.5; }
+}
+
+.avatar-ring .ring-border {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid rgba(124, 58, 237, 0.3);
+  transition: border-color 0.5s;
+}
+.avatar-ring.speaking .ring-border { border-color: rgba(34, 197, 94, 0.5); }
+.avatar-ring.thinking .ring-border { border-color: rgba(245, 158, 11, 0.4); }
+.avatar-ring.working .ring-border { border-color: rgba(6, 182, 212, 0.4); }
+
+.avatar-face {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e1b4b, #1e293b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.robot-face { width: 100px; height: 100px; }
+.robot-eye { fill: var(--idle-color); transition: fill 0.5s; }
+.avatar-ring.speaking .robot-eye { fill: var(--speaking-color); }
+.avatar-ring.thinking .robot-eye { fill: var(--thinking-color); }
+.avatar-ring.working .robot-eye { fill: var(--working-color); }
+.robot-mouth {
+  fill: none;
+  stroke: var(--idle-color);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.5s, d 0.3s;
+}
+.avatar-ring.speaking .robot-mouth { stroke: var(--speaking-color); }
+.avatar-ring.thinking .robot-mouth { stroke: var(--thinking-color); }
+.avatar-ring.working .robot-mouth { stroke: var(--working-color); }
+.robot-eye { animation: eyeBlink 4s ease-in-out infinite; }
+@keyframes eyeBlink {
+  0%, 45%, 55%, 100% { ry: 6; }
+  50% { ry: 1; }
+}
+
+.avatar-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 2px;
+}
+
+.avatar-badge {
+  font-size: 0.65rem;
+  color: rgba(124, 58, 237, 0.7);
+  letter-spacing: 1px;
+  margin-top: -12px;
+}
+
+.subtitle-area {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 480px;
+  text-align: center;
+  z-index: 5;
+}
+.subtitle-text {
+  display: inline-block;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.9);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
+  max-height: 140px;
+  max-width: 100%;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+.subtitle-text.visible { opacity: 1; transform: translateY(0); }
+.subtitle-text::-webkit-scrollbar { width: 3px; }
+.subtitle-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+/* ===== Bottom Control Bar ===== */
+.control-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 28px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.4), transparent);
+  gap: 10px;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  height: 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.recording-indicator.active { opacity: 1; color: var(--danger); }
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  animation: recBlink 1s step-end infinite;
+}
+@keyframes recBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.waveform { display: flex; align-items: center; gap: 2px; height: 16px; }
+.waveform .bar {
+  width: 3px;
+  background: var(--danger);
+  border-radius: 2px;
+  animation: waveBar 0.6s ease-in-out infinite alternate;
+}
+.waveform .bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.waveform .bar:nth-child(2) { height: 8px; animation-delay: 0.1s; }
+.waveform .bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+.waveform .bar:nth-child(4) { height: 6px; animation-delay: 0.3s; }
+.waveform .bar:nth-child(5) { height: 10px; animation-delay: 0.15s; }
+@keyframes waveBar {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1.5); }
+}
+
+.rec-cancel-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  color: var(--danger);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  transition: background 0.2s, transform 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+.rec-cancel-btn:hover {
+  background: rgba(239, 68, 68, 0.4);
+  transform: scale(1.15);
+}
+
+.btn-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  padding: 14px 24px 12px;
+}
+
+.ctrl-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ctrl-label {
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.ctrl-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(255,255,255,0.8);
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), background 0.25s, box-shadow 0.25s, border-color 0.25s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ctrl-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 18px rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+}
+.ctrl-btn:active {
+  transform: scale(0.9);
+  background: rgba(255,255,255,0.06);
+  box-shadow: none;
+  transition-duration: 0.05s;
+}
+
+.btn-mic {
+  width: 62px;
+  height: 62px;
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+  font-size: 1.5rem;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.btn-mic:hover {
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 0 24px rgba(255,255,255,0.12);
+}
+.btn-mic.recording {
+  background: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.5);
+  animation: micPulse 1.5s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+}
+.btn-voice-name {
+  font-size: 0.55rem !important;
+  line-height: 1.1;
+  text-align: center;
+  padding: 2px;
+}
+
+.btn-end {
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border: 1px solid rgba(239, 68, 68, 0.6);
+}
+.btn-end:hover {
+  background: #dc2626;
+  box-shadow: 0 0 22px rgba(239,68,68,0.45);
+  transform: scale(1.1);
+  border-color: #ef4444;
+}
+.btn-end:active {
+  background: #b91c1c;
+  transform: scale(0.9);
+}
+
+#btnDownload:hover {
+  background: rgba(255,255,255,0.12) !important;
+  color: rgba(255,255,255,0.85) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+#btnDownload:active { transform: translateY(0); }
+
+.ctrl-btn svg { flex-shrink: 0; }
+
+canvas { display: none; }
+audio { display: none; }
+
+/* ===== Settings Button ===== */
+.top-buttons {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  z-index: 15;
+  display: flex;
+  gap: 8px;
+}
+.settings-btn {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 15;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.7);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.settings-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* ===== Settings Panel ===== */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.settings-overlay.open { display: flex; }
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+.settings-panel {
+  position: relative;
+  z-index: 1;
+  width: 360px;
+  max-width: 90vw;
+  background: rgba(20, 20, 35, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px;
+  color: rgba(255,255,255,0.85);
+}
+.settings-panel h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.settings-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.settings-close:hover { color: #fff; }
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.settings-item-label { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+.settings-item-sub { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+/* Toggle Switch */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--idle-color); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* Hotkey Button */
+.hotkey-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.7);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.hotkey-btn:hover { background: rgba(255,255,255,0.15); }
+.hotkey-btn.listening {
+  background: rgba(124, 58, 237, 0.3);
+  border-color: var(--idle-color);
+  animation: hotkeyPulse 1.5s ease-in-out infinite;
+}
+@keyframes hotkeyPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
+}
+
+/* ===== Light Theme ===== */
+body.light-theme {
+  background: #f0f0f5;
+  color: #1a1a2e;
+}
+body.light-theme .top-bar {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.7), transparent);
+}
+body.light-theme .call-timer { color: rgba(0,0,0,0.5); }
+body.light-theme .video-panel .video-label {
+  background: rgba(255,255,255,0.7);
+  color: rgba(0,0,0,0.7);
+}
+body.light-theme .avatar-panel {
+  background: linear-gradient(135deg, #e8e8f0 0%, #dde0ea 50%, #d0d4e0 100%);
+}
+body.light-theme .avatar-name { color: rgba(0,0,0,0.75); }
+body.light-theme .avatar-badge { color: var(--idle-color); }
+body.light-theme .subtitle-text {
+  background: rgba(255,255,255,0.75);
+  color: rgba(0,0,0,0.85);
+}
+body.light-theme .control-bar {
+  background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.5), transparent);
+}
+body.light-theme .btn-row {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.08);
+}
+body.light-theme .ctrl-btn {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.7);
+}
+body.light-theme .ctrl-btn:hover {
+  background: rgba(0,0,0,0.12);
+  border-color: rgba(0,0,0,0.2);
+}
+body.light-theme .btn-mic {
+  background: rgba(0,0,0,0.1);
+  color: #1a1a2e;
+  border-color: rgba(0,0,0,0.15);
+}
+body.light-theme .btn-mic:hover { background: rgba(0,0,0,0.18); }
+body.light-theme .ctrl-label { color: rgba(0,0,0,0.35); }
+body.light-theme .recording-indicator { color: rgba(0,0,0,0.5); }
+body.light-theme .chat-toggle, body.light-theme .settings-btn {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.6);
+}
+body.light-theme .chat-toggle:hover, body.light-theme .settings-btn:hover {
+  background: rgba(0,0,0,0.12);
+  color: rgba(0,0,0,0.85);
+}
+body.light-theme .chat-panel {
+  background: rgba(245, 245, 250, 0.95);
+  border-left-color: rgba(0,0,0,0.06);
+}
+body.light-theme .chat-header {
+  color: rgba(0,0,0,0.5);
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+body.light-theme .chat-msg.user {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.15);
+  color: rgba(0,0,0,0.85);
+}
+body.light-theme .chat-msg.ai {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.8);
+}
+body.light-theme .chat-msg .msg-sender { color: rgba(0,0,0,0.4); }
+body.light-theme .chat-msg .msg-time { color: rgba(0,0,0,0.25); }
+body.light-theme .chat-empty { color: rgba(0,0,0,0.2); }
+body.light-theme .connecting-overlay { background: #f0f0f5; }
+body.light-theme .connecting-text { color: rgba(0,0,0,0.5); }
+
+/* ===== System Status Panel ===== */
+.status-dot {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 20;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(34,197,94,0.5);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.status-dot.error {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+}
+.status-dot.warning {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245,158,11,0.5);
+}
+.status-panel {
+  position: absolute;
+  bottom: 30px;
+  right: 12px;
+  z-index: 20;
+  background: rgba(15, 15, 25, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 180px;
+  display: none;
+  animation: statusFadeIn 0.2s ease;
+}
+@keyframes statusFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.status-panel.open { display: block; }
+.status-panel-title {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+}
+.status-row .status-light {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-light.green { background: #22c55e; box-shadow: 0 0 4px rgba(34,197,94,0.5); }
+.status-light.red { background: #ef4444; box-shadow: 0 0 4px rgba(239,68,68,0.5); }
+.status-light.yellow { background: #f59e0b; box-shadow: 0 0 4px rgba(245,158,11,0.4); }
+body.light-theme .status-panel {
+  background: rgba(245, 245, 250, 0.85);
+  border-color: rgba(0,0,0,0.1);
+}
+body.light-theme .status-panel-title { color: rgba(0,0,0,0.35); }
+body.light-theme .status-row { color: rgba(0,0,0,0.6); }
+body.light-theme .no-camera-overlay {
+  background: linear-gradient(135deg, #e0e0ea, #d5d8e5);
+  color: #999;
+}
+body.light-theme .settings-panel {
+  background: rgba(245, 245, 250, 0.9);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.85);
+}
+body.light-theme .settings-close { color: rgba(0,0,0,0.4); }
+body.light-theme .settings-close:hover { color: rgba(0,0,0,0.8); }
+body.light-theme .settings-item { border-top-color: rgba(0,0,0,0.06); }
+body.light-theme .settings-item-label { color: rgba(0,0,0,0.6); }
+body.light-theme .settings-item-sub { color: rgba(0,0,0,0.35); }
+body.light-theme .hotkey-btn {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.6);
+}
+body.light-theme .toggle { background: rgba(0,0,0,0.12); }
+body.light-theme #btnDownload {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  color: rgba(0,0,0,0.45) !important;
+}
+body.light-theme .speed-text { color: #1a1a2e !important; }
+body.light-theme .avatar-face { background: linear-gradient(135deg, #e8e5f5, #dde0ef); }
+
+/* Light-theme fixes: recording mic, end button, avatar visibility */
+body.light-theme .btn-mic.recording {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+body.light-theme .btn-end {
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border-color: rgba(239, 68, 68, 0.6);
+}
+body.light-theme .btn-end:hover {
+  background: #dc2626;
+  border-color: #ef4444;
+}
+body.light-theme .robot-eye { fill: #6c5ce7; }
+body.light-theme .robot-mouth { stroke: #6c5ce7; }
+body.light-theme .robot-face line { stroke: #6c5ce7; }
+body.light-theme .robot-face rect { stroke: #6c5ce7; opacity: 0.4; }
+body.light-theme .robot-face circle[fill="rgba(255,255,255,0.6)"] { fill: rgba(255,255,255,0.9); }
+body.light-theme .avatar-ring.speaking .robot-eye { fill: #15803d; }
+body.light-theme .avatar-ring.speaking .robot-mouth { stroke: #15803d; }
+body.light-theme .avatar-ring.thinking .robot-eye { fill: #b45309; }
+body.light-theme .avatar-ring.thinking .robot-mouth { stroke: #b45309; }
+body.light-theme .avatar-ring.working .robot-eye { fill: #0e7490; }
+body.light-theme .avatar-ring.working .robot-mouth { stroke: #0e7490; }
+body.light-theme .avatar-face {
+  background: linear-gradient(135deg, #b8b3d8, #aeb5ca);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.15), 0 2px 12px rgba(58,45,124,0.2);
+}
+body.light-theme .avatar-ring .glow {
+  opacity: 0.8;
+  filter: blur(12px);
+  background: conic-gradient(from 0deg, #3a2d7c, #2d4a8f, #3a2d7c, #4a3d8f, #3a2d7c);
+}
+body.light-theme .avatar-ring.speaking .glow {
+  background: conic-gradient(from 0deg, #15803d, #166534, #15803d, #14532d, #15803d);
+  opacity: 0.8;
+}
+body.light-theme .avatar-ring.thinking .glow {
+  background: conic-gradient(from 0deg, #b45309, #92400e, #b45309, #78350f, #b45309);
+  opacity: 0.8;
+}
+body.light-theme .avatar-ring.working .glow {
+  background: conic-gradient(from 0deg, #0e7490, #155e75, #0e7490, #164e63, #0e7490);
+  opacity: 0.8;
+}
+body.light-theme .avatar-ring .ring-border { border-color: rgba(58,45,124,0.4); }
+body.light-theme .avatar-ring.speaking .ring-border { border-color: rgba(21,128,61,0.5); }
+body.light-theme .avatar-ring.thinking .ring-border { border-color: rgba(180,83,9,0.5); }
+body.light-theme .avatar-ring.working .ring-border { border-color: rgba(14,116,144,0.5); }
+
+/* ===== Chat Log Panel ===== */
+.chat-toggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 15;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.7);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chat-toggle:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.chat-toggle .unread-dot {
+  width: 6px; height: 6px;
+  background: var(--speaking-color);
+  border-radius: 50%;
+  display: none;
+}
+.chat-toggle .unread-dot.show { display: inline-block; }
+
+.chat-panel {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(10, 10, 18, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-left: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease, min-width 0.3s ease;
+}
+.chat-panel.open {
+  width: 320px;
+  min-width: 320px;
+}
+
+.chat-header {
+  padding: 14px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.chat-close-btn {
+  display: none;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  color: rgba(255,255,255,0.8);
+  font-size: 1.4rem;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  line-height: 1;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+.chat-close-btn:hover { color: #fff; background: rgba(255,255,255,0.2); }
+.chat-close-float {
+  display: none;
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 55;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+}
+.chat-close-float:active { transform: scale(0.95); }
+@media (max-width: 768px) {
+  .chat-close-btn { display: flex; }
+  .chat-panel.open .chat-close-float { display: block; }
+  .chat-panel {
+    padding-top: env(safe-area-inset-top, 0px);
+    left: 0;
+  }
+  .chat-header {
+    padding: 16px 16px;
+    min-height: 56px;
+  }
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.chat-msg {
+  max-width: 90%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: break-word;
+  animation: msgFadeIn 0.3s ease;
+}
+@keyframes msgFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: rgba(255,255,255,0.9);
+}
+.chat-msg.ai {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85);
+}
+.chat-msg .msg-time {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+}
+.chat-msg .msg-sender {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 2px;
+}
+
+.chat-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.15);
+  font-size: 0.8rem;
+}
+
+/* ===== Tablet (max-width: 768px) ===== */
+@media (max-width: 768px) {
+  .main-content { flex-direction: column; }
+  .video-panel { flex: 0 0 28vh; min-height: 140px; }
+  .avatar-panel { flex: 1; min-height: 0; }
+  .avatar-ring { width: 110px; height: 110px; }
+  .avatar-face { width: 110px; height: 110px; }
+  .robot-face { width: 66px; height: 66px; }
+  .avatar-name { font-size: 0.9rem; }
+  .avatar-container { gap: 12px; }
+
+  /* Avatar panel: adjust flex for mobile flow */
+  .avatar-panel { justify-content: center; padding-bottom: 8px; }
+
+  /* Subtitle: static flow inside avatar panel, not absolute overlay */
+  .subtitle-area {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    width: 92%;
+    max-width: 100%;
+    margin-top: 8px;
+    z-index: 5;
+  }
+  .subtitle-text { font-size: 0.8rem; padding: 10px 16px; max-height: 80px; }
+
+  /* Control bar */
+  .ctrl-btn { width: 42px; height: 42px; font-size: 1rem; }
+  .btn-mic { width: 52px; height: 52px; font-size: 1.2rem; }
+  .btn-row { gap: 6px; padding: 10px 14px 8px; border-radius: 22px; }
+  .ctrl-label { font-size: 0.5rem; }
+  .control-bar { padding: 6px 10px 14px; gap: 6px; }
+
+  /* Top buttons */
+  .top-buttons { top: 8px; right: 10px; }
+  .chat-toggle { padding: 5px 10px; font-size: 0.72rem; }
+  .settings-btn { padding: 5px 10px; }
+
+  /* Chat panel: full-screen overlay on tablet/mobile */
+  .chat-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 0 !important;
+    min-width: 0 !important;
+    z-index: 40;
+    transition: width 0.3s ease, min-width 0.3s ease;
+  }
+  .chat-panel.open {
+    width: 100vw !important;
+    min-width: 100vw !important;
+  }
+}
+
+/* ===== Phone (max-width: 480px) ===== */
+@media (max-width: 480px) {
+  .video-panel { flex: 0 0 24vh; min-height: 120px; }
+  .avatar-panel { flex: 1; }
+  .avatar-ring { width: 90px; height: 90px; }
+  .avatar-face { width: 90px; height: 90px; }
+  .robot-face { width: 56px; height: 56px; }
+  .avatar-name { font-size: 0.82rem; letter-spacing: 1px; }
+  .avatar-badge { font-size: 0.58rem; }
+  .avatar-container { gap: 8px; }
+
+  .subtitle-text { font-size: 0.75rem; padding: 8px 12px; max-height: 70px; }
+
+  /* Compact controls */
+  .ctrl-btn { width: 38px; height: 38px; font-size: 0.9rem; }
+  .btn-mic { width: 48px; height: 48px; font-size: 1.1rem; }
+  .btn-row { gap: 4px; padding: 8px 10px 6px; border-radius: 20px; }
+  .ctrl-label { font-size: 0.45rem; letter-spacing: 1px; }
+  .ctrl-wrap { gap: 4px; }
+  .control-bar { padding: 4px 8px 12px; gap: 4px; }
+
+  /* Smaller top bar */
+  .top-bar { padding: 8px 12px; }
+  .call-timer { font-size: 0.75rem; }
+  .top-buttons { top: 6px; right: 8px; gap: 6px; }
+  .chat-toggle { padding: 4px 8px; font-size: 0.68rem; gap: 4px; }
+  .settings-btn { padding: 4px 8px; font-size: 0.7rem; }
+
+  /* Video label */
+  .video-panel .video-label { bottom: 8px; left: 8px; padding: 4px 10px; font-size: 0.68rem; }
+
+  /* Status dot */
+  .status-dot { bottom: 8px; right: 8px; width: 10px; height: 10px; }
+  .status-panel { bottom: 24px; right: 8px; min-width: 160px; padding: 10px 12px; }
+
+  /* Recording indicator */
+  .recording-indicator { font-size: 0.68rem; }
+  .waveform .bar { width: 2px; }
+
+  /* Speed button text */
+  .btn-voice-name { font-size: 0.5rem !important; }
+}
+
+.connecting-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  gap: 20px;
+  transition: opacity 0.6s;
+}
+.connecting-overlay.hidden { opacity: 0; pointer-events: none; }
+.connecting-text {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.6);
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.connecting-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(124,58,237,0.2);
+  border-top-color: var(--idle-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="connecting-overlay" id="connectingOverlay">
+  <div class="connecting-spinner"></div>
+  <div class="connecting-text">Connecting...</div>
+</div>
+
+<div class="top-bar">
+  <div class="call-timer">
+    <span class="dot"></span>
+    <span id="callTimer">00:00</span>
+  </div>
+</div>
+<div class="top-buttons">
+  <button class="settings-btn" id="settingsBtn" title="设置">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+  <button class="chat-toggle" id="chatToggle">
+    💬 <span>记录</span>
+    <span class="unread-dot" id="unreadDot"></span>
+  </button>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-backdrop" id="settingsBackdrop"></div>
+  <div class="settings-panel">
+    <h2><span id="settingsTitle">设置</span><button class="settings-close" id="settingsClose">&times;</button></h2>
+    <div class="settings-item">
+      <div>
+        <div class="settings-item-label" id="themeLabel">主题</div>
+        <div class="settings-item-sub" id="themeSub">深色</div>
+      </div>
+      <div class="toggle" id="themeToggle"></div>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-item-label" id="hotkeyLabel">录音快捷键</div>
+        <div class="settings-item-sub" id="hotkeySub">当前快捷键: 空格 / Space</div>
+      </div>
+      <button class="hotkey-btn" id="hotkeyBtn">点击修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="video-panel">
+    <video id="videoEl" autoplay playsinline muted></video>
+    <div class="no-camera-overlay" id="noCameraOverlay" style="display:none;cursor:pointer" onclick="document.getElementById('btnCam').click()">
+      <div class="cam-icon">📷</div>
+      <div id="cameraOverlayText">摄像头已关闭</div>
+      <div style="font-size:0.75rem;opacity:0.5;margin-top:4px" id="cameraOverlayHint">点击开启</div>
+    </div>
+    <div class="video-label" id="userLabel">D</div>
+    <div class="status-dot" id="statusDot" title="System Status"></div>
+    <div class="status-panel" id="statusPanel">
+      <div class="status-panel-title" id="statusPanelTitle">系统状态</div>
+      <div class="status-row"><span class="status-light yellow" id="sl-backend"></span><span id="sn-backend">Backend</span></div>
+      <div class="status-row"><span class="status-light yellow" id="sl-stt"></span><span id="sn-stt">STT</span></div>
+      <div class="status-row"><span class="status-light yellow" id="sl-tts"></span><span id="sn-tts">TTS</span></div>
+      <div class="status-row"><span class="status-light yellow" id="sl-camera"></span><span id="sn-camera">Camera</span></div>
+      <div class="status-row"><span class="status-light yellow" id="sl-ai"></span><span id="sn-ai">AI</span></div>
+    </div>
+  </div>
+
+  <div class="avatar-panel">
+    <div class="avatar-container">
+      <div class="avatar-ring" id="avatarRing">
+        <div class="glow"></div>
+        <div class="ring-border"></div>
+        <div class="avatar-face">
+          <svg class="robot-face" viewBox="0 0 100 100">
+            <line x1="50" y1="8" x2="50" y2="18" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+            <circle cx="50" cy="6" r="3" fill="var(--idle-color)" class="robot-eye" opacity="0.6"/>
+            <rect x="22" y="24" width="56" height="52" rx="18" ry="18"
+                  fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.15"/>
+            <ellipse cx="38" cy="44" rx="5" ry="6" class="robot-eye"/>
+            <ellipse cx="62" cy="44" rx="5" ry="6" class="robot-eye"/>
+            <circle cx="36" cy="42" r="1.5" fill="rgba(255,255,255,0.6)"/>
+            <circle cx="60" cy="42" r="1.5" fill="rgba(255,255,255,0.6)"/>
+            <path d="M 38 60 Q 50 70 62 60" class="robot-mouth"/>
+            <circle cx="28" cy="54" r="4" fill="var(--idle-color)" opacity="0.15" class="robot-eye"/>
+            <circle cx="72" cy="54" r="4" fill="var(--idle-color)" opacity="0.15" class="robot-eye"/>
+          </svg>
+        </div>
+      </div>
+      <div class="avatar-name" id="avatarName">AI Assistant</div>
+      <div class="avatar-badge" id="avatarBadge" style="display:none"></div>
+    </div>
+
+    <div class="subtitle-area">
+      <div class="subtitle-text" id="subtitleText"></div>
+    </div>
+  </div>
+
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header"><span>💬 对话记录</span><button class="chat-close-btn" id="chatCloseBtn">✕</button></div>
+    <button class="chat-close-float" id="chatCloseFloat">✕ 关闭</button>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty" id="chatEmpty">开始通话后，对话会显示在这里</div>
+    </div>
+    <div style="padding:8px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);">
+      <button id="btnDownload" title="下载对话记录" style="background:rgba(255,255,255,0.06);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;cursor:pointer;font-size:0.8rem;color:rgba(255,255,255,0.55);padding:8px 20px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all 0.25s;letter-spacing:0.5px;width:auto;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>下载</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="control-bar">
+  <div class="recording-indicator" id="recIndicator">
+    <div class="rec-dot"></div>
+    <span id="recTimer">00:00</span>
+    <div class="waveform">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <button class="rec-cancel-btn" id="recCancelBtn" title="取消录音">✕</button>
+  </div>
+  <div class="btn-row">
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-secondary" id="btnSpeed" title="语速"><span class="speed-text" style="font-size:16px;font-weight:700;color:#fff;display:inline-block;transition:transform 0.2s ease,color 0.2s ease;">1x</span></button>
+      <span class="ctrl-label">语速</span>
+    </div>
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-secondary" id="btnCam" title="摄像头"><svg id="camIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></button>
+      <span class="ctrl-label">摄像头</span>
+    </div>
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-mic" id="btnMic" title="录音"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+      <span class="ctrl-label">录音</span>
+    </div>
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-secondary" id="btnLang" title="语言"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></button>
+      <span class="ctrl-label" id="langLabel">CN</span>
+    </div>
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-secondary" id="btnVoice" title="声音"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+      <span class="ctrl-label" id="voiceLabel">晓晓</span>
+    </div>
+    <div class="ctrl-wrap">
+      <button class="ctrl-btn btn-end" id="btnEnd" title="结束通话"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 11.94 11.94 0 0 0 3.75.6 2 2 0 0 1 2 2v3.4a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-5.95-5.95A19.79 19.79 0 0 1 3.39 4.18 2 2 0 0 1 5.38 2H8.8a2 2 0 0 1 2 1.72 12.05 12.05 0 0 0 .6 3.75 2 2 0 0 1-.45 2.11z"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+      <span class="ctrl-label">挂断</span>
+    </div>
+  </div>
+</div>
+
+<canvas id="captureCanvas"></canvas>
+<audio id="replyAudio"></audio>
+
+<script>
+(function() {
+  // ===== i18n =====
+  const i18n = {
+    zh: {
+      connecting: 'Connecting...',
+      chatToggle: '记录',
+      chatHeader: '💬 对话记录',
+      chatEmpty: '开始通话后，对话会显示在这里',
+      download: '下载',
+      speed: '语速',
+      camera: '摄像头',
+      record: '录音',
+      language: '语言',
+      voice: '声音',
+      end: '挂断',
+      thinking: '让我想想...',
+      callEnded: '通话结束了，下次再聊 ✨',
+      callAgain: '再拨一次',
+      duration: '通话时长',
+      working: '工作中...',
+      thinkingState: '思考中...',
+      speaking: '说话中',
+      micError: '麦克风访问失败: ',
+      sendError: '发送失败: ',
+      cameraUnavailable: '摄像头已关闭',
+      cameraHint: '点击开启',
+      titleSuffix: ' · 视频通话',
+      settings: '设置',
+      theme: '主题',
+      themeDark: '深色',
+      themeLight: '浅色',
+      recordHotkey: '录音快捷键',
+      currentHotkey: '当前快捷键',
+      clickToChange: '点击修改',
+      pressAnyKey: '按任意键...',
+      systemStatus: '系统状态',
+      statusBackend: '后端',
+      statusSTT: '语音识别',
+      statusTTS: '语音合成',
+      statusCamera: '摄像头',
+      statusAI: 'AI',
+      statusOK: '正常',
+      statusError: '异常',
+      statusOff: '已关闭',
+      statusUnknown: '未知',
+      cancelled: '已取消',
+      cancelRecording: '取消',
+    },
+    en: {
+      connecting: 'Connecting to Small...',
+      chatToggle: 'Log',
+      chatHeader: '💬 Chat Log',
+      chatEmpty: 'Chat will appear here after the call starts',
+      download: 'Download',
+      speed: 'Speed',
+      camera: 'Camera',
+      record: 'Record',
+      language: 'Lang',
+      voice: 'Voice',
+      end: 'End',
+      thinking: 'Let me think...',
+      callEnded: 'Call ended, chat again soon ✨',
+      callAgain: 'Call again',
+      duration: 'Duration',
+      working: 'Working...',
+      thinkingState: 'Thinking...',
+      speaking: 'Speaking',
+      micError: 'Microphone access failed: ',
+      sendError: 'Send failed: ',
+      cameraUnavailable: 'Camera off',
+      cameraHint: 'Click to enable',
+      titleSuffix: ' · Video Call',
+      settings: 'Settings',
+      theme: 'Theme',
+      themeDark: 'Dark',
+      themeLight: 'Light',
+      recordHotkey: 'Record Hotkey',
+      currentHotkey: 'Current hotkey',
+      clickToChange: 'Click to change',
+      pressAnyKey: 'Press any key...',
+      systemStatus: 'System Status',
+      statusBackend: 'Backend',
+      statusSTT: 'STT',
+      statusTTS: 'TTS',
+      statusCamera: 'Camera',
+      statusAI: 'AI',
+      statusOK: 'OK',
+      statusError: 'Error',
+      statusOff: 'Off',
+      statusUnknown: 'Unknown',
+      cancelled: 'Cancelled',
+      cancelRecording: 'Cancel',
+    }
+  };
+
+  function t(key) { return i18n[currentLang][key] || i18n['zh'][key] || key; }
+
+  function updateUILanguage() {
+    document.querySelector('.connecting-text').textContent = t('connecting');
+    document.querySelector('#chatToggle span').textContent = t('chatToggle');
+    document.querySelector('.chat-header').textContent = t('chatHeader');
+    const empty = document.getElementById('chatEmpty');
+    if (empty) empty.textContent = t('chatEmpty');
+    const dlSpan = document.querySelector('#btnDownload span');
+    if (dlSpan) dlSpan.textContent = t('download');
+    // Control labels
+    const labels = document.querySelectorAll('.ctrl-wrap .ctrl-label');
+    const labelKeys = ['speed', 'camera', 'record', 'language', 'voice', 'end'];
+    labels.forEach((el, i) => {
+      if (i < labelKeys.length) {
+        // Skip langLabel and voiceLabel - keep their dynamic values
+        if (el.id === 'langLabel' || el.id === 'voiceLabel') return;
+        el.textContent = t(labelKeys[i]);
+      }
+    });
+    // No camera overlay
+    const noCamText = document.getElementById('cameraOverlayText');
+    if (noCamText) noCamText.textContent = t('cameraUnavailable');
+    const noCamHint = document.getElementById('cameraOverlayHint');
+    if (noCamHint) noCamHint.textContent = t('cameraHint');
+    // Update settings panel if open
+    if (typeof updateSettingsUI === 'function') updateSettingsUI();
+    // Update status panel labels
+    if (typeof updateStatusLabels === 'function') updateStatusLabels();
+    // Update badge if visible
+    const badge = document.getElementById('avatarBadge');
+    if (badge && badge.style.display !== 'none') {
+      const ring = document.getElementById('avatarRing');
+      if (ring.classList.contains('working')) badge.textContent = t('working');
+      else if (ring.classList.contains('thinking')) badge.textContent = t('thinkingState');
+      else if (ring.classList.contains('speaking')) badge.textContent = t('speaking');
+    }
+  }
+
+  const videoEl = document.getElementById('videoEl');
+  const noCameraOverlay = document.getElementById('noCameraOverlay');
+  const connectingOverlay = document.getElementById('connectingOverlay');
+  const captureCanvas = document.getElementById('captureCanvas');
+  const btnMic = document.getElementById('btnMic');
+  const btnSpeed = document.getElementById('btnSpeed');
+  const btnCam = document.getElementById('btnCam');
+  const btnLang = document.getElementById('btnLang');
+  const btnVoice = document.getElementById('btnVoice');
+  const btnEnd = document.getElementById('btnEnd');
+  const btnDownload = document.getElementById('btnDownload');
+  const callTimerEl = document.getElementById('callTimer');
+  const recIndicator = document.getElementById('recIndicator');
+  const recTimerEl = document.getElementById('recTimer');
+  const avatarRing = document.getElementById('avatarRing');
+  const subtitleText = document.getElementById('subtitleText');
+  const replyAudio = document.getElementById('replyAudio');
+  const avatarNameEl = document.getElementById('avatarName');
+  const userLabelEl = document.getElementById('userLabel');
+
+  const chatToggle = document.getElementById('chatToggle');
+  const chatPanel = document.getElementById('chatPanel');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatEmpty = document.getElementById('chatEmpty');
+  const unreadDot = document.getElementById('unreadDot');
+  let chatOpen = false;
+
+  chatToggle.addEventListener('click', () => {
+    chatOpen = !chatOpen;
+    chatPanel.classList.toggle('open', chatOpen);
+    if (chatOpen) unreadDot.classList.remove('show');
+  });
+
+  document.getElementById('chatCloseBtn').addEventListener('click', () => {
+    chatOpen = false;
+    chatPanel.classList.remove('open');
+  });
+
+  document.getElementById('chatCloseFloat').addEventListener('click', () => {
+    chatOpen = false;
+    chatPanel.classList.remove('open');
+  });
+
+  function addChatMessage(sender, text, type) {
+    if (chatEmpty) chatEmpty.remove();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg ' + type;
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    msg.innerHTML = '<div class="msg-sender">' + sender + '</div>' +
+      '<div>' + text.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
+      '<span class="msg-time">' + time + '</span>';
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (!chatOpen) unreadDot.classList.add('show');
+    chatLog.push({time: now.toLocaleString(), sender: sender, text: text});
+  }
+
+  // Speed / Language / Voice state
+  const speedDisplay = {
+    normal: { text: '1x', color: '#fff' },
+    fast:   { text: '1.5x', color: '#4ade80' },
+    slow:   { text: '0.7x', color: '#fb923c' }
+  };
+  const speedOptions = [{label:'normal',value:'normal'},{label:'fast',value:'fast'},{label:'slow',value:'slow'}];
+  let speedIdx = 0;
+  let currentLang = 'zh'; // zh or en
+  const zhVoices = [{name:'晓晓',value:'zh-CN-XiaoxiaoNeural'},{name:'云希',value:'zh-CN-YunxiNeural'},{name:'晓伊',value:'zh-CN-XiaoyiNeural'}];
+  const enVoices = [{name:'Jenny',value:'en-US-JennyNeural'},{name:'Guy',value:'en-US-GuyNeural'},{name:'Aria',value:'en-US-AriaNeural'}];
+  let voiceIdx = 0;
+  function getVoices() { return currentLang === 'zh' ? zhVoices : enVoices; }
+  function getCurrentVoice() { return getVoices()[voiceIdx % getVoices().length].value; }
+
+  // Chat log for download
+  const chatLog = [];
+
+  let cameraStream = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false;
+  let isSending = false;
+  let callStartTime = null;
+  let callTimerInterval = null;
+  let recStartTime = null;
+  let recTimerInterval = null;
+
+  // Load config from server
+  fetch('/api/config').then(r => r.json()).then(cfg => {
+    if (cfg.agent_name) {
+      avatarNameEl.textContent = cfg.agent_name;
+      document.title = cfg.agent_name + t('titleSuffix');
+    }
+    if (cfg.user_name) userLabelEl.textContent = cfg.user_name;
+  }).catch(() => {});
+
+  function startCallTimer() {
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+      const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      callTimerEl.textContent = m + ':' + s;
+    }, 1000);
+  }
+
+  function startRecTimer() {
+    recStartTime = Date.now();
+    recIndicator.classList.add('active');
+    recTimerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+      const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      recTimerEl.textContent = m + ':' + s;
+    }, 100);
+  }
+
+  function stopRecTimer() {
+    clearInterval(recTimerInterval);
+    recIndicator.classList.remove('active');
+    recTimerEl.textContent = '00:00';
+  }
+
+  let hasCameraDevice = false;
+
+  async function initCamera() {
+    try {
+      // Check if actual camera device exists
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === 'videoinput');
+      hasCameraDevice = videoDevices.length > 0;
+
+      if (!hasCameraDevice) {
+        connectingOverlay.classList.add('hidden');
+        noCameraOverlay.style.display = 'flex';
+        if (typeof updateStatusLight === 'function') updateStatusLight('camera', 'red');
+        startCallTimer();
+        return;
+      }
+
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      videoEl.srcObject = cameraStream;
+      // Default camera off
+      cameraStream.getVideoTracks().forEach(t => { t.enabled = false; });
+      noCameraOverlay.style.display = 'flex';
+      btnCam.style.opacity = '0.5';
+      if (typeof updateStatusLight === 'function') updateStatusLight('camera', cameraOff ? 'yellow' : 'green');
+      videoEl.addEventListener('playing', () => {
+        connectingOverlay.classList.add('hidden');
+        startCallTimer();
+      }, { once: true });
+    } catch (err) {
+      connectingOverlay.classList.add('hidden');
+      noCameraOverlay.style.display = 'flex';
+      hasCameraDevice = false;
+      if (typeof updateStatusLight === 'function') updateStatusLight('camera', 'red');
+      startCallTimer();
+    }
+  }
+
+  function captureFrame() {
+    if (cameraOff) return Promise.resolve(null);
+    const vw = videoEl.videoWidth || 640;
+    const vh = videoEl.videoHeight || 480;
+    captureCanvas.width = vw;
+    captureCanvas.height = vh;
+    const ctx = captureCanvas.getContext('2d');
+    ctx.save();
+    ctx.translate(vw, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(videoEl, 0, 0, vw, vh);
+    ctx.restore();
+    return new Promise(resolve => {
+      captureCanvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.8);
+    });
+  }
+
+  function getSupportedMimeType() {
+    const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+    for (const t of types) {
+      if (MediaRecorder.isTypeSupported(t)) return t;
+    }
+    return '';
+  }
+
+  async function startRecording() {
+    if (isRecording || isSending) return;
+    try {
+      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(audioStream, { mimeType: getSupportedMimeType() });
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        audioStream.getTracks().forEach(t => t.stop());
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        handleSend(audioBlob);
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      btnMic.classList.add('recording');
+      startRecTimer();
+    } catch (err) {
+      showSubtitle(t('micError') + err.message);
+    }
+  }
+
+  function stopRecording() {
+    if (!isRecording || !mediaRecorder) return;
+    isRecording = false;
+    mediaRecorder.stop();
+    btnMic.classList.remove('recording');
+    stopRecTimer();
+  }
+
+  function cancelRecording() {
+    if (!isRecording || !mediaRecorder) return;
+    isRecording = false;
+    // Replace onstop to prevent sending
+    mediaRecorder.onstop = () => {
+      mediaRecorder.stream.getTracks().forEach(t => t.stop());
+      audioChunks = [];
+    };
+    mediaRecorder.stop();
+    btnMic.classList.remove('recording');
+    stopRecTimer();
+    // Show cancelled feedback in subtitle
+    showSubtitle(t('cancelled'));
+    setTimeout(hideSubtitle, 1000);
+  }
+
+  // Unlock audio on any user tap (iOS Safari requires this)
+  let audioUnlocked = false;
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true; // Set immediately to prevent re-entry
+    const silentAudio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRBqpAAAAAAD/+1DEAAAHAAGf9AAAIiWJs/80YAAAABBBP/k/JCCBnn5QEDBh+sCDv/KAgb/5OD4Pg+D7wfB8HwfB////8uD4Pg+D4nB8HwfB8Hw==');
+    silentAudio.play().then(() => {
+      console.log('Audio unlocked');
+    }).catch(() => {});
+    // Also unlock replyAudio with a silent play
+    const savedSrc = replyAudio.src;
+    replyAudio.muted = true;
+    replyAudio.play().then(() => { replyAudio.pause(); replyAudio.muted = false; replyAudio.currentTime = 0; }).catch(() => { replyAudio.muted = false; });
+  }
+  document.addEventListener('click', unlockAudio, { once: false });
+  document.addEventListener('touchstart', unlockAudio, { once: false });
+
+  btnMic.addEventListener('click', () => {
+    unlockAudio();
+    if (isSending) return;
+    if (isRecording) stopRecording();
+    else startRecording();
+  });
+
+  // Cancel recording button
+  document.getElementById('recCancelBtn').addEventListener('click', () => {
+    cancelRecording();
+  });
+
+  // ===== Settings Panel =====
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsClose = document.getElementById('settingsClose');
+  const settingsBackdrop = document.getElementById('settingsBackdrop');
+  const themeToggle = document.getElementById('themeToggle');
+  const hotkeyBtn = document.getElementById('hotkeyBtn');
+
+  // Theme
+  let lightTheme = localStorage.getItem('vc-theme') === 'light';
+  if (lightTheme) { document.body.classList.add('light-theme'); themeToggle.classList.add('on'); }
+
+  function updateSettingsUI() {
+    document.getElementById('settingsTitle').textContent = t('settings');
+    document.getElementById('themeLabel').textContent = t('theme');
+    document.getElementById('themeSub').textContent = lightTheme ? t('themeLight') : t('themeDark');
+    document.getElementById('hotkeyLabel').textContent = t('recordHotkey');
+    document.getElementById('hotkeySub').textContent = t('currentHotkey') + ': ' + recordHotkeyName;
+    if (!listeningForHotkey) hotkeyBtn.textContent = t('clickToChange');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    lightTheme = !lightTheme;
+    document.body.classList.toggle('light-theme', lightTheme);
+    themeToggle.classList.toggle('on', lightTheme);
+    localStorage.setItem('vc-theme', lightTheme ? 'light' : 'dark');
+    updateSettingsUI();
+  });
+
+  settingsBtn.addEventListener('click', () => { settingsOverlay.classList.add('open'); updateSettingsUI(); });
+  settingsClose.addEventListener('click', () => settingsOverlay.classList.remove('open'));
+  settingsBackdrop.addEventListener('click', () => settingsOverlay.classList.remove('open'));
+
+  // Hotkey
+  let recordHotkeyCode = localStorage.getItem('vc-hotkey-code') || 'Space';
+  let recordHotkeyName = localStorage.getItem('vc-hotkey-name') || (currentLang === 'zh' ? '空格 / Space' : 'Space');
+  let listeningForHotkey = false;
+
+  hotkeyBtn.addEventListener('click', () => {
+    listeningForHotkey = true;
+    hotkeyBtn.textContent = t('pressAnyKey');
+    hotkeyBtn.classList.add('listening');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (listeningForHotkey) {
+      e.preventDefault();
+      recordHotkeyCode = e.code;
+      recordHotkeyName = e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      localStorage.setItem('vc-hotkey-code', recordHotkeyCode);
+      localStorage.setItem('vc-hotkey-name', recordHotkeyName);
+      listeningForHotkey = false;
+      hotkeyBtn.classList.remove('listening');
+      updateSettingsUI();
+      return;
+    }
+    // Settings panel open - ignore hotkey
+    if (settingsOverlay.classList.contains('open')) return;
+    // Escape cancels recording
+    if (e.code === 'Escape' && isRecording) {
+      e.preventDefault();
+      cancelRecording();
+      return;
+    }
+    if (e.code === recordHotkeyCode && !e.repeat && !isSending && !isRecording) {
+      e.preventDefault();
+      startRecording();
+    }
+  });
+  document.addEventListener('keyup', (e) => {
+    if (settingsOverlay.classList.contains('open')) return;
+    if (e.code === recordHotkeyCode && isRecording) {
+      e.preventDefault();
+      stopRecording();
+    }
+  });
+
+  // Speed button
+  btnSpeed.addEventListener('click', () => {
+    speedIdx = (speedIdx + 1) % speedOptions.length;
+    const sd = speedDisplay[speedOptions[speedIdx].value];
+    const st = btnSpeed.querySelector('.speed-text');
+    st.style.transform = 'scale(1.3)';
+    st.style.color = sd.color;
+    st.textContent = sd.text;
+    setTimeout(() => { st.style.transform = 'scale(1)'; }, 180);
+  });
+
+  // Language button
+  const langLabel = document.getElementById('langLabel');
+  const voiceLabel = document.getElementById('voiceLabel');
+  btnLang.addEventListener('click', () => {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    langLabel.textContent = currentLang === 'zh' ? 'CN' : 'EN';
+    voiceIdx = 0;
+    voiceLabel.textContent = getVoices()[0].name;
+    updateUILanguage();
+  });
+
+  // Voice button
+  btnVoice.addEventListener('click', () => {
+    voiceIdx = (voiceIdx + 1) % getVoices().length;
+    voiceLabel.textContent = getVoices()[voiceIdx].name;
+  });
+
+  // Download chat log
+  btnDownload.addEventListener('click', () => {
+    if (chatLog.length === 0) return;
+    const lines = chatLog.map(m => `[${m.time}] ${m.sender}: ${m.text}`);
+    const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '对话记录_' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+  });
+
+  let cameraOff = true;
+  btnCam.addEventListener('click', () => {
+    cameraOff = !cameraOff;
+    updateStatusLight('camera', !hasCameraDevice ? 'red' : cameraOff ? 'yellow' : 'green');
+    if (cameraStream) {
+      cameraStream.getVideoTracks().forEach(t => { t.enabled = !cameraOff; });
+    }
+    btnCam.innerHTML = cameraOff
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16V5a2 2 0 0 0-2-2H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11"/><path d="M23 7l-7 5 7 5V7z"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>';
+    btnCam.style.opacity = cameraOff ? '0.5' : '1';
+    noCameraOverlay.style.display = cameraOff ? 'flex' : 'none';
+  });
+
+  btnEnd.addEventListener('click', () => {
+    if (isRecording) stopRecording();
+    clearInterval(callTimerInterval);
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      videoEl.srcObject = null;
+    }
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+        height:100vh;background:#0a0a12;color:rgba(255,255,255,0.6);gap:16px;font-family:sans-serif;">
+        <div style="font-size:3rem">👋</div>
+        <div style="font-size:1.2rem">${t('callEnded')}</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.3)">${t('duration')} ${callTimerEl.textContent}</div>
+        <button onclick="location.reload()" style="margin-top:20px;padding:10px 28px;
+          border-radius:24px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);
+          color:#fff;cursor:pointer;font-size:0.9rem;">${t('callAgain')}</button>
+      </div>`;
+  });
+
+  function setAvatarState(state) {
+    avatarRing.classList.remove('speaking', 'thinking', 'working');
+    if (state === 'speaking' || state === 'thinking' || state === 'working') {
+      avatarRing.classList.add(state);
+    }
+    // Update avatar badge text for working state
+    const badge = document.getElementById('avatarBadge');
+    if (badge) {
+      if (state === 'working') {
+        badge.textContent = t('working');
+        badge.style.color = 'var(--working-color)';
+        badge.style.display = '';
+      } else if (state === 'thinking') {
+        badge.textContent = t('thinkingState');
+        badge.style.color = 'var(--thinking-color)';
+        badge.style.display = '';
+      } else if (state === 'speaking') {
+        badge.textContent = t('speaking');
+        badge.style.color = 'var(--speaking-color)';
+        badge.style.display = '';
+      } else {
+        badge.textContent = '';
+        badge.style.display = 'none';
+      }
+    }
+  }
+
+  function showSubtitle(text) {
+    subtitleText.textContent = text;
+    subtitleText.classList.add('visible');
+  }
+
+  function hideSubtitle() { subtitleText.classList.remove('visible'); }
+
+  function typeSubtitle(text, speed) {
+    speed = speed || 50;
+    let i = 0;
+    subtitleText.textContent = '';
+    subtitleText.classList.add('visible');
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        subtitleText.textContent = text.slice(0, i + 1);
+        i++;
+        if (i >= text.length) { clearInterval(interval); resolve(); }
+      }, speed);
+    });
+  }
+
+  async function handleSend(audioBlob) {
+    if (isSending) return;
+    isSending = true;
+    setAvatarState('thinking');
+    showSubtitle(t('thinking'));
+    const imageBlob = await captureFrame();
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+    if (imageBlob) formData.append('image', imageBlob, 'frame.jpg');
+    formData.append('speed', speedOptions[speedIdx].value);
+    formData.append('language', currentLang);
+    formData.append('voice', getCurrentVoice());
+    try {
+      const resp = await fetch('/api/chat', { method: 'POST', body: formData });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      // Update status: STT success if transcription exists, AI success
+      updateStatusLight('stt', data.transcription && !data.transcription.startsWith('[STT error') ? 'green' : 'red');
+      updateStatusLight('ai', 'green');
+      if (data.transcription) addChatMessage(userLabelEl.textContent, data.transcription, 'user');
+      addChatMessage(avatarNameEl.textContent, data.text, 'ai');
+      setAvatarState('speaking');
+      const typewriterPromise = typeSubtitle(data.text, 45);
+      if (data.audio_url) {
+        // Clean up previous handlers to prevent repeated playback
+        replyAudio.onended = null;
+        replyAudio.onerror = null;
+        replyAudio.oncanplaythrough = null;
+        replyAudio.src = data.audio_url;
+        replyAudio.load();
+        const audioPromise = new Promise(resolve => {
+          let resolved = false;
+          const safeResolve = () => { if (!resolved) { resolved = true; resolve(); } };
+          replyAudio.onended = () => { replyAudio.oncanplaythrough = null; updateStatusLight('tts', 'green'); safeResolve(); };
+          replyAudio.onerror = (e) => { replyAudio.oncanplaythrough = null; console.error('Audio error:', e); updateStatusLight('tts', 'red'); safeResolve(); };
+          replyAudio.oncanplaythrough = () => {
+            replyAudio.oncanplaythrough = null; // Remove after first fire to prevent re-triggers
+            replyAudio.play().catch((e) => { console.error('Play failed:', e); updateStatusLight('tts', 'red'); safeResolve(); });
+          };
+        });
+        await Promise.all([audioPromise, typewriterPromise]);
+      } else {
+        await typewriterPromise;
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      setAvatarState('idle');
+      setTimeout(hideSubtitle, 2000);
+    } catch (err) {
+      updateStatusLight('ai', 'red');
+      setAvatarState('idle');
+      showSubtitle(t('sendError') + err.message);
+      setTimeout(hideSubtitle, 3000);
+    } finally {
+      isSending = false;
+    }
+  }
+
+  // ===== System Status Panel =====
+  const statusDot = document.getElementById('statusDot');
+  const statusPanel = document.getElementById('statusPanel');
+  const statusState = {
+    backend: 'unknown', // green, red, unknown
+    stt: 'unknown',
+    tts: 'unknown',
+    camera: 'unknown',
+    ai: 'unknown',
+  };
+
+  function updateStatusLight(module, state) {
+    statusState[module] = state;
+    const light = document.getElementById('sl-' + module);
+    if (light) {
+      light.className = 'status-light ' + (state === 'green' ? 'green' : state === 'red' ? 'red' : 'yellow');
+    }
+    // Update overall dot
+    const vals = Object.values(statusState);
+    if (vals.some(v => v === 'red')) {
+      statusDot.className = 'status-dot error';
+    } else if (vals.some(v => v === 'unknown' || v === 'yellow')) {
+      statusDot.className = 'status-dot warning';
+    } else {
+      statusDot.className = 'status-dot';
+    }
+  }
+
+  function updateStatusLabels() {
+    document.getElementById('statusPanelTitle').textContent = t('systemStatus');
+    document.getElementById('sn-backend').textContent = t('statusBackend');
+    document.getElementById('sn-stt').textContent = t('statusSTT');
+    document.getElementById('sn-tts').textContent = t('statusTTS');
+    document.getElementById('sn-camera').textContent = t('statusCamera');
+    document.getElementById('sn-ai').textContent = t('statusAI');
+  }
+
+  statusDot.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = statusPanel.classList.contains('open');
+    if (isOpen) {
+      statusPanel.classList.remove('open');
+      statusDot.style.display = '';
+    } else {
+      updateStatusLabels();
+      statusPanel.classList.add('open');
+      statusDot.style.display = 'none';
+    }
+  });
+
+  statusPanel.addEventListener('click', (e) => {
+    e.stopPropagation();
+    statusPanel.classList.remove('open');
+    statusDot.style.display = '';
+  });
+
+  document.addEventListener('click', () => {
+    if (statusPanel.classList.contains('open')) {
+      statusPanel.classList.remove('open');
+      statusDot.style.display = '';
+    }
+  });
+
+  // Backend health check every 15s
+  function pingBackend() {
+    fetch('/api/config').then(r => {
+      updateStatusLight('backend', r.ok ? 'green' : 'red');
+    }).catch(() => {
+      updateStatusLight('backend', 'red');
+    });
+  }
+  pingBackend();
+  setInterval(pingBackend, 15000);
+
+  updateUILanguage();
+  initCamera();
+})();
+</script>
+</body>
+</html>

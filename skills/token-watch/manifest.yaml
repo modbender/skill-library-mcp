@@ -1,0 +1,170 @@
+name: "TokenWatch"
+id: "tokenwatch"
+version: "1.2.3"
+description: "Track, analyze, and optimize AI API token costs across 10 providers (Anthropic, OpenAI, Google, Mistral, xAI, Kimi, Qwen, DeepSeek, Meta, MiniMax) — 44 models. Set budgets, get alerts, compare costs, and get optimization suggestions. Zero dependencies, local-only, MIT licensed."
+
+homepage: "https://unisai.vercel.app"
+repository: "https://github.com/vedantsingh60/tokenwatch"
+source: "included"
+required_env_vars: []
+primary_credential: "None — works locally with no API keys required"
+
+runtime: "local"
+execution: "python"
+
+intellectual_property:
+  license: "MIT"
+  license_file: "LICENSE.md"
+  copyright: "© 2026 UnisAI Community"
+  distribution: "clawhub-and-forks-allowed"
+  source_code_access: "included"
+  modification: "allowed"
+  reverse_engineering: "allowed"
+
+author:
+  company: "UnisAI Community"
+  contact: "support@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+
+category: "developer-tools"
+tags:
+  - "token-usage"
+  - "cost-tracking"
+  - "budget"
+  - "openai"
+  - "anthropic"
+  - "gemini"
+  - "optimization"
+  - "monitoring"
+  - "open-source"
+
+pricing:
+  model: "free"
+
+dependencies:
+  python: ">=3.9"
+  packages: []
+  note: "Zero external dependencies. Pure Python standard library only."
+
+security:
+  data_retention: "local-only"
+  data_flow: "no-external-calls"
+  privacy_policy: "All data stays on your machine in .tokenwatch/ directory"
+  terms_of_service: "MIT License"
+
+capabilities:
+  functions:
+    - name: "recordUsage"
+      description: "Record token usage from an API call with automatic cost calculation"
+      parameters:
+        model:
+          type: "string"
+          description: "Model name (e.g. claude-haiku-4-5-20251001, gpt-4o-mini, gemini-2.5-flash)"
+          required: true
+        input_tokens:
+          type: "integer"
+          description: "Number of input/prompt tokens used"
+          required: true
+        output_tokens:
+          type: "integer"
+          description: "Number of output/completion tokens used"
+          required: true
+        task_label:
+          type: "string"
+          description: "Optional label describing the task"
+          required: false
+
+    - name: "setBudget"
+      description: "Set daily, weekly, or monthly spending budget thresholds"
+      parameters:
+        daily_usd:
+          type: "number"
+          description: "Max daily spend in USD"
+          required: false
+        weekly_usd:
+          type: "number"
+          description: "Max weekly spend in USD"
+          required: false
+        monthly_usd:
+          type: "number"
+          description: "Max monthly spend in USD"
+          required: false
+        per_call_usd:
+          type: "number"
+          description: "Max cost per single API call"
+          required: false
+
+    - name: "getSpend"
+      description: "Get total spending for a time period"
+      parameters:
+        period:
+          type: "string"
+          description: "today, week, month, all, or YYYY-MM-DD"
+          required: false
+
+    - name: "getDashboard"
+      description: "Display a formatted spending dashboard with budget status and optimization tips"
+
+    - name: "compareModels"
+      description: "Compare costs across all known models for a given token count"
+      parameters:
+        input_tokens:
+          type: "integer"
+          required: true
+        output_tokens:
+          type: "integer"
+          required: true
+
+    - name: "getOptimizationSuggestions"
+      description: "Analyze usage patterns and return actionable cost reduction suggestions"
+
+    - name: "estimateCost"
+      description: "Estimate cost before making an API call"
+      parameters:
+        model:
+          type: "string"
+          required: true
+        input_tokens:
+          type: "integer"
+          required: true
+        output_tokens:
+          type: "integer"
+          required: true
+
+    - name: "exportReport"
+      description: "Export full usage report to JSON file"
+
+environment_variables: []
+
+support:
+  support_email: "support@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+  github: "https://github.com/vedantsingh60/tokenwatch"
+  documentation: "See SKILL.md in this package"
+  response_time: "Community supported"
+
+restrictions:
+  - "None — MIT Licensed"
+
+changelog:
+  "1.2.3":
+    - "✨ Initial release — TokenWatch"
+    - "✨ Pricing table for 11 models across 5 providers (Feb 2026)"
+    - "✨ Budget alerts: daily, weekly, monthly, per-call"
+    - "✨ Model comparison and cost estimation"
+    - "✨ Optimization suggestions with estimated savings"
+    - "✨ Auto-hooks for Anthropic and OpenAI response objects"
+    - "✨ Local-only storage, zero dependencies, MIT licensed"
+
+metadata:
+  status: "active"
+  created_at: "2026-02-16T00:00:00Z"
+  updated_at: "2026-02-16T00:00:00Z"
+  maturity: "production"
+  maintenance: "community-maintained"
+  required_credentials: "None"
+  compatibility:
+    - "Claude Code"
+    - "OpenClaw v1.0+"
+    - "ClawhHub v2.0+"
+  security_audit: "Source code included and MIT licensed — review and modify freely"

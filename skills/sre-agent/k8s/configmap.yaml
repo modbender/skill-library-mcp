@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sre-agent-config
+  namespace: sre-agent
+  labels:
+    app.kubernetes.io/name: sre-agent
+data:
+  config.yaml: |
+    app:
+      name: sre-agent
+      version: "0.1.0"
+      environment: production
+      log_level: INFO
+
+    prometheus:
+      url: http://prometheus-server.monitoring:9090
+      timeout_seconds: 30
+      retry_attempts: 3
+
+    loki:
+      url: http://loki.monitoring:3100
+      timeout_seconds: 30
+      retry_attempts: 3
+
+    baseline:
+      min_history_days: 7
+      optimal_history_days: 30
+      learning_interval_hours: 24
+
+    anomaly_detection:
+      check_interval_seconds: 60
+      zscore_threshold: 3.0
+      mad_threshold: 3.5
+      algorithms:
+        - zscore
+        - mad
+
+    auto_remediation:
+      enabled: true
+      dry_run: true  # Set to false when ready for production
+      max_concurrent_actions: 3
+      cooldown_minutes: 5
+      blacklist:
+        namespaces:
+          - kube-system
+          - production-critical
+
+    api:
+      host: 0.0.0.0
+      port: 8000
+      workers: 4
+
+    kubernetes:
+      in_cluster: true
+      namespace: default

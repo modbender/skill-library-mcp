@@ -1,0 +1,342 @@
+{
+  "schemaVersion": "1.0",
+  "projectProfile": {
+    "applicationType": "web_api_and_web",
+    "riskLevel": "medium",
+    "releaseCadence": "weekly",
+    "expectedLoad": {
+      "apiRps": 50,
+      "concurrency": 100
+    }
+  },
+  "scoring": {
+    "passScore": 85,
+    "warnScore": 70,
+    "overallAggregation": "weighted_average",
+    "blockIfAnyBlockingGateFails": true,
+    "unknownMetricDefaultScore": 70,
+    "unknownMetricSecurityDefaultScore": 0
+  },
+  "reporting": {
+    "markdownReportPath": "docs/quality/quality-gate-report.md",
+    "jsonReportPath": "docs/quality/quality-gate-report.json",
+    "evidenceDir": "docs/quality/evidence",
+    "tempDir": ".tmp/quality-gates"
+  },
+  "gates": [
+    {
+      "id": "build_dependency_health",
+      "name": "Build & Dependency Health",
+      "description": "Build reliability, dependency hygiene, and (optional) SBOM/license policy readiness.",
+      "weight": 0.15,
+      "blockingOnFail": true,
+      "checks": [
+        {
+          "id": "ci_green",
+          "name": "CI pipeline is green",
+          "description": "Default branch and/or PR pipeline succeeds with no failed mandatory jobs.",
+          "weight": 0.45,
+          "metricType": "boolean",
+          "scoringMethod": "boolean",
+          "thresholds": {},
+          "evidenceHints": ["CI job summary", "pipeline status badge", "build logs"]
+        },
+        {
+          "id": "dependency_staleness_ratio",
+          "name": "Dependency staleness is controlled",
+          "description": "Outdated dependencies ratio is below target; warn when above warn threshold.",
+          "weight": 0.35,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "lower_is_better",
+            "target": 10,
+            "warn": 20,
+            "max": 35
+          },
+          "evidenceHints": ["dependency report", "package lockfiles", "renovate/dependabot dashboards"]
+        },
+        {
+          "id": "sbom_present_if_required",
+          "name": "SBOM present (if required)",
+          "description": "If the project ships externally, an SBOM artifact should exist; otherwise may be optional.",
+          "weight": 0.2,
+          "metricType": "rubric",
+          "scoringMethod": "rubric",
+          "thresholds": {
+            "rubric": {
+              "missing": 0,
+              "partial": 50,
+              "complete": 100
+            }
+          },
+          "evidenceHints": ["sbom file paths", "CI artifact list", "release artifacts"]
+        }
+      ]
+    },
+    {
+      "id": "automated_testing_coverage",
+      "name": "Automated Testing & Coverage",
+      "description": "Unit/integration/e2e tests and coverage targets for regression prevention.",
+      "weight": 0.2,
+      "blockingOnFail": true,
+      "checks": [
+        {
+          "id": "tests_pass",
+          "name": "Mandatory test suites pass",
+          "description": "Unit + integration (and smoke/e2e if applicable) pass without retries masking failures.",
+          "weight": 0.45,
+          "metricType": "boolean",
+          "scoringMethod": "boolean",
+          "thresholds": {},
+          "evidenceHints": ["test reports (JUnit/TRX/etc.)", "CI test summary", "failed test list"]
+        },
+        {
+          "id": "coverage_overall",
+          "name": "Overall coverage meets baseline",
+          "description": "Overall line/statement coverage meets target (typical baseline for web+api).",
+          "weight": 0.35,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "higher_is_better",
+            "target": 80,
+            "warn": 70,
+            "max": 100
+          },
+          "evidenceHints": ["coverage summary file", "coverage HTML report", "CI coverage step output"]
+        },
+        {
+          "id": "critical_path_coverage",
+          "name": "Critical path coverage is adequate",
+          "description": "Key flows (auth, payments, core CRUD, critical UI routes) have adequate automated coverage.",
+          "weight": 0.2,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "higher_is_better",
+            "target": 70,
+            "warn": 60,
+            "max": 100
+          },
+          "evidenceHints": ["test plan mapping", "tagged tests", "route/service criticality list"]
+        }
+      ]
+    },
+    {
+      "id": "security_supply_chain",
+      "name": "Security & Supply-Chain",
+      "description": "Vulnerability, secret, and secure configuration posture for shipping safely.",
+      "weight": 0.25,
+      "blockingOnFail": true,
+      "checks": [
+        {
+          "id": "dependency_vulns_critical_high",
+          "name": "No Critical/High dependency vulnerabilities",
+          "description": "Critical=0 required. High should be 0 for most projects; allow small exception budgets only if explicitly set.",
+          "weight": 0.5,
+          "metricType": "count",
+          "scoringMethod": "penalty_by_count",
+          "thresholds": {
+            "allowed": 0,
+            "warnAbove": 0,
+            "failAbove": 0,
+            "penaltyPerUnit": 50
+          },
+          "evidenceHints": ["dependency vulnerability report", "SCA tool output", "lockfile audit output"]
+        },
+        {
+          "id": "secrets_scan",
+          "name": "No leaked secrets in repo/CI artifacts",
+          "description": "Any confirmed secret finding is a blocking failure.",
+          "weight": 0.35,
+          "metricType": "boolean",
+          "scoringMethod": "boolean",
+          "thresholds": {},
+          "evidenceHints": ["secret scan report", "git history scan summary", "CI secret scanning step output"]
+        },
+        {
+          "id": "sast_high_findings",
+          "name": "No High severity SAST findings",
+          "description": "High severity static security issues should be zero for release.",
+          "weight": 0.15,
+          "metricType": "count",
+          "scoringMethod": "penalty_by_count",
+          "thresholds": {
+            "allowed": 0,
+            "warnAbove": 0,
+            "failAbove": 0,
+            "penaltyPerUnit": 40
+          },
+          "evidenceHints": ["SAST summary report", "security pipeline logs"]
+        }
+      ]
+    },
+    {
+      "id": "performance_efficiency",
+      "name": "Performance & Efficiency (API + Web)",
+      "description": "Baseline latency, error rates, and core web vitals.",
+      "weight": 0.15,
+      "blockingOnFail": false,
+      "checks": [
+        {
+          "id": "api_p95_latency_ms",
+          "name": "API p95 latency meets target",
+          "description": "p95 latency under representative load meets target.",
+          "weight": 0.45,
+          "metricType": "duration_ms",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "lower_is_better",
+            "target": 300,
+            "warn": 500,
+            "max": 800
+          },
+          "evidenceHints": ["load test output", "APM snapshot", "benchmark report"]
+        },
+        {
+          "id": "api_error_rate_percent",
+          "name": "API error rate is controlled",
+          "description": "5xx + functional error rate stays under target.",
+          "weight": 0.25,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "lower_is_better",
+            "target": 1,
+            "warn": 2,
+            "max": 5
+          },
+          "evidenceHints": ["load test summary", "APM metrics export"]
+        },
+        {
+          "id": "web_core_web_vitals",
+          "name": "Web Core Web Vitals baseline",
+          "description": "LCP, CLS, INP meet baseline for typical user experience.",
+          "weight": 0.3,
+          "metricType": "rubric",
+          "scoringMethod": "rubric",
+          "thresholds": {
+            "rubric": {
+              "missing": 0,
+              "partial": 50,
+              "complete": 100
+            }
+          },
+          "evidenceHints": ["lighthouse report", "web vitals export", "bundle analyzer output"]
+        }
+      ]
+    },
+    {
+      "id": "maintainability_code_health",
+      "name": "Maintainability & Code Health",
+      "description": "Static quality, complexity, duplication, hotspots, and API documentation hygiene.",
+      "weight": 0.15,
+      "blockingOnFail": false,
+      "checks": [
+        {
+          "id": "static_issues_density",
+          "name": "Static analysis issue density",
+          "description": "Rule violations are below threshold (issues per KLOC or per changed files).",
+          "weight": 0.4,
+          "metricType": "count",
+          "scoringMethod": "penalty_by_count",
+          "thresholds": {
+            "allowed": 0,
+            "warnAbove": 10,
+            "failAbove": 25,
+            "penaltyPerUnit": 2
+          },
+          "evidenceHints": ["lint report", "static analysis summary", "CI annotations"]
+        },
+        {
+          "id": "complexity_exceed_ratio",
+          "name": "Complexity exceed ratio is controlled",
+          "description": "Percentage of functions/classes exceeding complexity threshold stays under target.",
+          "weight": 0.35,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "lower_is_better",
+            "target": 5,
+            "warn": 10,
+            "max": 20
+          },
+          "evidenceHints": ["complexity report", "hotspot list", "static analysis metrics"]
+        },
+        {
+          "id": "duplication_percent",
+          "name": "Duplication is controlled",
+          "description": "Duplicated lines percentage below baseline thresholds.",
+          "weight": 0.25,
+          "metricType": "percentage",
+          "scoringMethod": "threshold_range",
+          "thresholds": {
+            "direction": "lower_is_better",
+            "target": 5,
+            "warn": 10,
+            "max": 15
+          },
+          "evidenceHints": ["duplication report", "code quality dashboard export"]
+        }
+      ]
+    },
+    {
+      "id": "release_readiness_operability",
+      "name": "Release Readiness & Operability",
+      "description": "Minimum operational maturity: health checks, logs/metrics/tracing, runbooks, and release notes.",
+      "weight": 0.1,
+      "blockingOnFail": true,
+      "checks": [
+        {
+          "id": "health_endpoints",
+          "name": "Health endpoints exist and are meaningful",
+          "description": "Service exposes meaningful health readiness/liveness and dependencies checks where relevant.",
+          "weight": 0.3,
+          "metricType": "rubric",
+          "scoringMethod": "rubric",
+          "thresholds": {
+            "rubric": {
+              "missing": 0,
+              "partial": 50,
+              "complete": 100
+            }
+          },
+          "evidenceHints": ["health endpoint docs", "routing config", "ops documentation"]
+        },
+        {
+          "id": "observability_basics",
+          "name": "Logs + metrics (and tracing if applicable) are in place",
+          "description": "Structured logs, correlation IDs, and key metrics exist with at least basic dashboards/alerts.",
+          "weight": 0.45,
+          "metricType": "rubric",
+          "scoringMethod": "rubric",
+          "thresholds": {
+            "rubric": {
+              "missing": 0,
+              "partial": 50,
+              "complete": 100
+            }
+          },
+          "evidenceHints": ["logging policy", "dashboard definitions", "alert rules", "telemetry docs"]
+        },
+        {
+          "id": "runbooks_and_release_notes",
+          "name": "Runbooks and release notes exist",
+          "description": "Operational runbooks and minimal release documentation exist for shipping safely.",
+          "weight": 0.25,
+          "metricType": "rubric",
+          "scoringMethod": "rubric",
+          "thresholds": {
+            "rubric": {
+              "missing": 0,
+              "partial": 50,
+              "complete": 100
+            }
+          },
+          "evidenceHints": ["runbook docs", "incident guide", "CHANGELOG/release notes"]
+        }
+      ]
+    }
+  ]
+}

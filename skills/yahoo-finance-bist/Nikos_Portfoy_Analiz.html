@@ -1,0 +1,104 @@
+
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Nikos Portföy ve İşlem Analizi</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+            .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            h1 { text-align: center; color: #2c3e50; }
+            .summary { display: flex; justify-content: space-between; margin-bottom: 30px; }
+            .card { background: #ecf0f1; padding: 20px; border-radius: 8px; text-align: center; width: 30%; }
+            .card h3 { margin: 0 0 10px 0; color: #7f8c8d; }
+            .card p { margin: 0; font-size: 24px; font-weight: bold; color: #27ae60; }
+            .negative { color: #c0392b !important; }
+            table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background-color: #34495e; color: white; }
+            tr:hover { background-color: #f1f1f1; }
+            .chart-container { position: relative; height: 400px; width: 100%; margin-top: 30px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📊 Nikos Yatırım İşlem Geçmişi ve Performans Analizi</h1>
+            
+            <div class="summary">
+                <div class="card">
+                    <h3>Toplam İşlem Sayısı</h3>
+                    <p>3 Adet</p>
+                </div>
+                <div class="card">
+                    <h3>Toplam Net Kar / Zarar</h3>
+                    <p class="">5700.00 TL/$</p>
+                </div>
+                <div class="card">
+                    <h3>Kazanma Oranı (Win Rate)</h3>
+                    <p>66.7%</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="profitChart"></canvas>
+            </div>
+            
+            <div class="chart-container" style="margin-top:50px;">
+                <canvas id="cumulativeChart"></canvas>
+            </div>
+
+            <h2 style="margin-top: 50px;">📑 Detaylı İşlem Excel Tablosu</h2>
+            <table>
+                <tr>
+                    <th>Sembol</th>
+                    <th>Alış Tarihi</th>
+                    <th>Satış Tarihi</th>
+                    <th>Alış Fiyatı</th>
+                    <th>Satış Fiyatı</th>
+                    <th>Kar / Zarar</th>
+                    <th>Getiri (ROI)</th>
+                </tr>
+                <tr><td>GC=F (Altın)</td><td>2025-11-15 22:43:26</td><td>2026-02-28 22:43:26</td><td>2000.0</td><td>2150.0</td><td style='color: green'><b>750.00</b></td><td style='color: green'><b>%7.50</b></td></tr><tr><td>AAPL (Apple)</td><td>2025-11-15 22:43:26</td><td>2026-02-28 22:43:26</td><td>170.0</td><td>165.0</td><td style='color: red'><b>-50.00</b></td><td style='color: red'><b>%-2.94</b></td></tr><tr><td>THYAO.IS (Türk Hava Yolları)</td><td>2025-11-15 22:43:26</td><td>2026-02-28 22:43:26</td><td>250.0</td><td>300.0</td><td style='color: green'><b>5000.00</b></td><td style='color: green'><b>%20.00</b></td></tr>
+            </table>
+        </div>
+
+        <script>
+            // İşlem Bazlı Kar/Zarar Çubuk Grafiği
+            const ctx1 = document.getElementById('profitChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['THYAO.IS', 'AAPL', 'GC=F'],
+                    datasets: [{
+                        label: 'İşlem Başına Kar/Zarar',
+                        data: [5000.0, -50.0, 750.0],
+                        backgroundColor: [5000.0, -50.0, 750.0].map(p => p >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
+                        borderColor: [5000.0, -50.0, 750.0].map(p => p >= 0 ? 'rgba(39, 174, 96, 1)' : 'rgba(192, 57, 43, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Kümülatif Büyüme Çizgi Grafiği
+            const ctx2 = document.getElementById('cumulativeChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['2026-02-28', '2026-02-28', '2026-02-28'],
+                    datasets: [{
+                        label: 'Kümülatif Portföy Büyümesi (Toplam Kar)',
+                        data: [5000.0, 4950.0, 5700.0],
+                        fill: true,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        </script>
+    </body>
+    </html>
+    

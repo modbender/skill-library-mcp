@@ -1,0 +1,112 @@
+{
+  "project": "<PROJECT_NAME>",
+  "version": 1,
+  "runNumber": 1,
+  "currentPhase": "constitute",
+  "phases": {
+    "constitute": {
+      "status": "pending",
+      "artifact": "pipeline/CONSTITUTION.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "research": {
+      "status": "pending",
+      "artifact": "pipeline/RESEARCH.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "specify": {
+      "status": "pending",
+      "artifact": "pipeline/SPECIFICATION.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "plan": {
+      "status": "pending",
+      "artifact": "pipeline/PLAN.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "implement": {
+      "status": "pending",
+      "artifact": "pipeline/IMPL_STATUS.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "test": {
+      "status": "pending",
+      "artifact": "pipeline/TEST_REPORT.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "review": {
+      "status": "pending",
+      "artifact": "pipeline/REVIEW_REPORT.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    },
+    "gap_analysis": {
+      "status": "pending",
+      "artifact": "pipeline/GAP_ANALYSIS.md",
+      "retryCount": 0,
+      "escalationIndex": 0,
+      "peerConsultDone": false
+    }
+  },
+  "blockers": [],
+  "resolvedBlockers": [],
+  "lastOrchestratorRun": null,
+  "config": {
+    "maxRetries": 1,
+    "autoAdvance": true,
+    "notifyTopic": "<your-notification-channel>",
+    "roles": {
+      "constitute": { "agentId": "<your-architect-agent>", "model": "opus" },
+      "research":   { "agentId": "<your-researcher-agent>", "model": "gpro" },
+      "specify":    { "agentId": "<your-designer-agent>",  "model": "opus" },
+      "plan":       { "agentId": "<your-architect-agent>", "model": "opus" },
+      "implement":  { "agentId": "<your-coder-agent>",     "model": "codex" },
+      "test":       { "agentId": "<your-coder-agent>",     "model": "codex" },
+      "review":     { "agentId": "<your-reviewer-agent>",  "model": "opus" },
+      "gap_analysis": { "agentId": "<your-researcher-agent>", "model": "gpro" }
+    },
+    "escalation": {
+      "enabled": true,
+      "chain": [
+        "mini",
+        "gpro",
+        "codex"
+      ],
+      "escalateAfterFails": 1,
+      "humanThreshold": "codex"
+    },
+    "peerConsult": {
+      "enabled": true,
+      "triggerAfterEscalationFails": 2,
+      "consultModels": [
+        "gpro",
+        "sonnet"
+      ],
+      "consultTimeout": 300,
+      "synthesizerModel": "opus",
+      "maxConsultRounds": 1
+    },
+    "autoTriage": {
+      "enabled": true,
+      "triageModel": "opus",
+      "minConfidence": 0.6,
+      "allowRelax": true,
+      "allowDefer": true,
+      "maxRelaxPerRun": 3,
+      "maxDeferPerRun": 5
+    }
+  }
+}

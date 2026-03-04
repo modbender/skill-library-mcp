@@ -1,0 +1,355 @@
+{
+  "version": "1.0",
+  "description": "Detection knowledge base - risk descriptions and remediation guidance for TrustMyAgent checks",
+  "detections": {
+    "PHY-001": {
+      "risk": "Without disk encryption, data at rest is exposed if the host machine is physically compromised or the disk is cloned.",
+      "remediation": "Enable full-disk encryption (FileVault on macOS, LUKS on Linux).",
+      "can_auto_remediate": false
+    },
+    "PHY-002": {
+      "risk": "Without secure boot, the boot chain can be tampered with to load malicious firmware or kernel modules.",
+      "remediation": "Enable Secure Boot in BIOS/UEFI settings.",
+      "can_auto_remediate": false
+    },
+    "PHY-003": {
+      "risk": "Without container isolation, a compromised agent has direct access to the host filesystem, network, and processes.",
+      "remediation": "Run the agent inside a Docker container or equivalent sandbox: docker run --rm -it <agent-image>",
+      "can_auto_remediate": false
+    },
+    "PHY-004": {
+      "risk": "Running as root (UID 0) means a compromised process can modify any file, install backdoors, and fully own the host.",
+      "remediation": "If running in a container: add USER directive to Dockerfile ('RUN adduser -D openclaw && USER openclaw'). If running on a host: create a service account and switch ('useradd -r openclaw && runuser -u openclaw -- <command>'). In Cloudflare containers this is expected and mitigated by container isolation.",
+      "can_auto_remediate": false
+    },
+    "PHY-005": {
+      "risk": "Without memory limits, a runaway or malicious process can consume all host memory, causing denial of service.",
+      "remediation": "Set memory limits via cgroup, Docker --memory flag, or ulimit.",
+      "can_auto_remediate": false
+    },
+    "NET-001": {
+      "risk": "Commonly exploited ports (FTP/21, Telnet/23, SMB/445, RDP/3389) are listening, exposing known attack surfaces.",
+      "remediation": "Close unnecessary listening services or bind them to localhost only. Stop the offending service or firewall the port.",
+      "can_auto_remediate": false
+    },
+    "NET-002": {
+      "risk": "Without TLS 1.2+ support, connections may use weak or broken encryption, enabling eavesdropping and MITM attacks.",
+      "remediation": "Install or update OpenSSL/LibreSSL to a version supporting TLS 1.2+.",
+      "can_auto_remediate": false
+    },
+    "NET-003": {
+      "risk": "DNS resolution failure prevents the agent from reaching external services and may indicate network misconfiguration or DNS hijacking.",
+      "remediation": "1. Check DNS config: 'cat /etc/resolv.conf'. 2. Test resolution: 'python3 -c \"import socket; print(socket.gethostbyname(\\\"cloudflare.com\\\"))\"'. 3. If failing, add a DNS server: 'echo \"nameserver 1.1.1.1\" >> /etc/resolv.conf'. In containers, DNS may be restricted by network policy - check your container platform's DNS settings.",
+      "can_auto_remediate": false
+    },
+    "NET-004": {
+      "risk": "Missing or invalid CA certificates prevent TLS verification, making all HTTPS connections vulnerable to MITM attacks.",
+      "remediation": "Install CA certificates: apt install ca-certificates (Linux) or ensure /etc/ssl/cert.pem exists (macOS).",
+      "can_auto_remediate": false
+    },
+    "NET-005": {
+      "risk": "Suspicious proxy variables (no_proxy=* or all_proxy) can redirect or bypass traffic, enabling data exfiltration.",
+      "remediation": "Review and remove suspicious proxy environment variables: unset no_proxy all_proxy ALL_PROXY",
+      "can_auto_remediate": false
+    },
+    "SEC-001": {
+      "risk": "Secrets (passwords, API keys) in environment variables are visible to any process and easily leaked via logs or child processes.",
+      "remediation": "In containers: use your platform's secrets manager (Cloudflare Secrets, AWS SSM, Vault) instead of plain env vars. Verify no secrets are logged: check that logging config excludes environment dumps. If env vars are the only option (common in containers), ensure the container has no shell access for other users.",
+      "can_auto_remediate": false
+    },
+    "SEC-002": {
+      "risk": "Exposed AWS credentials allow unauthorized access to cloud resources, risking data breaches and financial abuse.",
+      "remediation": "Use IAM roles or instance profiles instead of environment variables. Rotate compromised credentials immediately.",
+      "can_auto_remediate": false
+    },
+    "SEC-003": {
+      "risk": "Private SSH keys with overly permissive file permissions are readable by other users on the system.",
+      "remediation": "Restrict permissions on private key files to owner-only.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 600 ~/.ssh/id_* ~/.ssh/*.pem 2>/dev/null"
+    },
+    "SEC-004": {
+      "risk": ".env files in common locations may contain secrets that are accidentally committed to git or read by other processes.",
+      "remediation": "Move .env files outside the project root, add .env to .gitignore, and use a secrets manager.",
+      "can_auto_remediate": false
+    },
+    "SEC-005": {
+      "risk": "Tokens or credentials in shell history can be recovered by anyone with access to the history file.",
+      "remediation": "Clear history entries containing secrets: history -d <line>. Set HISTIGNORE to exclude sensitive commands.",
+      "can_auto_remediate": false
+    },
+    "COD-001": {
+      "risk": "Git credential helper set to 'store' saves passwords in plaintext on disk, risking credential theft.",
+      "remediation": "Use a secure credential helper: git config --global credential.helper osxkeychain (macOS) or cache (Linux).",
+      "can_auto_remediate": false
+    },
+    "COD-002": {
+      "risk": "Secret patterns (AWS keys, GitHub tokens, private keys) found in recent git commit diffs, meaning credentials may be exposed in repository history.",
+      "remediation": "1. Identify the leaked secret: run 'git log -10 --all -p | grep -E \"AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9_]{36}|sk-[A-Za-z0-9]{32,}|BEGIN.*PRIVATE KEY\" | grep -v grep | grep -v regex'. 2. Rotate the credential immediately with the provider (AWS IAM, GitHub Settings, etc). 3. Remove from history: run 'git filter-branch --force --index-filter \"git rm --cached --ignore-unmatch <file>\" HEAD' or use BFG Repo Cleaner. 4. Add a pre-commit hook: install git-secrets ('git secrets --install && git secrets --register-aws').",
+      "can_auto_remediate": false
+    },
+    "COD-003": {
+      "risk": "Without a package manager lockfile, dependencies are untracked and vulnerable to supply chain attacks.",
+      "remediation": "Initialize a package manager: npm init, pip freeze > requirements.txt, or equivalent.",
+      "can_auto_remediate": false
+    },
+    "COD-004": {
+      "risk": "A .git directory in the web root exposes source code, credentials, and commit history to the public internet.",
+      "remediation": "Move the .git directory outside the web root or deny access via web server config.",
+      "can_auto_remediate": false
+    },
+    "LOG-001": {
+      "risk": "Without system logging, security events go unrecorded, making incident investigation impossible.",
+      "remediation": "Start the system logger: systemctl start rsyslog (Linux) or verify syslogd is running (macOS).",
+      "can_auto_remediate": false
+    },
+    "LOG-002": {
+      "risk": "Missing /var/log directory means logs cannot be written, leaving no audit trail.",
+      "remediation": "Create the log directory: sudo mkdir -p /var/log && sudo chmod 755 /var/log",
+      "can_auto_remediate": false
+    },
+    "LOG-003": {
+      "risk": "World-readable log files may expose sensitive information to unprivileged users.",
+      "remediation": "Restrict log file permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "sudo chmod o-r /var/log/*.log 2>/dev/null"
+    },
+    "LOG-004": {
+      "risk": "Without audit logging capability, detailed security event tracking is unavailable.",
+      "remediation": "Install auditd: apt install auditd (Linux). macOS uses unified logging by default.",
+      "can_auto_remediate": false
+    },
+    "SKL-001": {
+      "risk": "Missing skills directory may indicate the agent is not properly configured for skill management.",
+      "remediation": "Create the skills directory: mkdir -p ~/.openclaw/skills",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "mkdir -p ~/.openclaw/skills 2>/dev/null"
+    },
+    "SKL-002": {
+      "risk": "Skills without SKILL.md manifests lack transparency about their capabilities and permissions.",
+      "remediation": "Add a SKILL.md manifest to each skill directory describing its purpose and required permissions.",
+      "can_auto_remediate": false
+    },
+    "SKL-003": {
+      "risk": "Skills containing sudo or root commands can escalate privileges, potentially compromising the entire host.",
+      "remediation": "Audit and remove privilege escalation commands from skill definitions. Skills should never require root.",
+      "can_auto_remediate": false
+    },
+    "SKL-004": {
+      "risk": "MCP server configurations from untrusted paths could execute malicious code on the agent's behalf.",
+      "remediation": "Review MCP server configs in ~/.config/openclaw. Remove untrusted or unknown server entries.",
+      "can_auto_remediate": false
+    },
+    "SKL-005": {
+      "risk": "Skills without resource isolation can access the full host filesystem and network without restriction.",
+      "remediation": "Configure sandbox or container settings for skill execution in OpenClaw settings.",
+      "can_auto_remediate": false
+    },
+    "INT-001": {
+      "risk": "Unexpected network listeners on non-loopback interfaces expose services to the network, increasing attack surface.",
+      "remediation": "Identify and stop unauthorized listeners. Bind services to 127.0.0.1 unless external access is required.",
+      "can_auto_remediate": false
+    },
+    "INT-002": {
+      "risk": "Cron jobs with dangerous patterns (curl/wget piping to shell, reverse shells, destructive rm) may indicate persistence mechanisms planted by an attacker.",
+      "remediation": "1. List cron jobs: 'crontab -l'. 2. Identify suspicious entries: look for curl|bash, wget|sh, nc, ncat, reverse, rm -rf patterns. 3. Remove dangerous entries: 'crontab -e' and delete the line. TrustMyAgent's own cron entry is excluded from this check automatically.",
+      "can_auto_remediate": false
+    },
+    "INT-003": {
+      "risk": "Active backdoor processes (nc, ncat, socat with exec) provide remote shell access to attackers.",
+      "remediation": "Kill backdoor processes immediately: kill <PID>. Investigate how they were launched and check for persistence.",
+      "can_auto_remediate": false
+    },
+    "INT-004": {
+      "risk": "Browser automation targeting login pages or credentials indicates potential credential harvesting.",
+      "remediation": "Kill the suspicious browser automation process. Audit what credentials may have been accessed.",
+      "can_auto_remediate": false
+    },
+    "INT-005": {
+      "risk": "The agent can read sensitive system files (/etc/shadow, /etc/sudoers) or write to critical paths (/etc/passwd, /usr/local/bin), expanding attack surface.",
+      "remediation": "In containers running as root: this is expected since root can read everything. Mitigate by adding a non-root USER to the Dockerfile. On hosts: run 'chmod 640 /etc/shadow && chown root:shadow /etc/shadow'. Verify scope: run 'test -r /etc/shadow && echo EXPOSED || echo OK'.",
+      "can_auto_remediate": false
+    },
+    "SOC-001": {
+      "risk": "Without action logging, the agent's behavior is unauditable, preventing oversight and incident review.",
+      "remediation": "1. Create the logs directory: 'mkdir -p ~/.config/openclaw/logs'. 2. Verify logging is active: check that recent .jsonl or .log files exist in ~/.openclaw, ~/.config/openclaw, or ~/.claude with 'find ~/.openclaw ~/.config/openclaw ~/.claude -name \"*.jsonl\" -o -name \"*.log\" -mmin -60 2>/dev/null'. 3. If no files found, ensure your agent framework has logging enabled in its configuration.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "mkdir -p ~/.config/openclaw/logs 2>/dev/null"
+    },
+    "SOC-002": {
+      "risk": "Missing chat history prevents humans from reviewing the agent's conversations for safety or compliance.",
+      "remediation": "Enable conversation logging in OpenClaw settings.",
+      "can_auto_remediate": false
+    },
+    "SOC-003": {
+      "risk": "Outbound connections to messaging platforms (Telegram, Discord, Slack) may indicate covert data exfiltration.",
+      "remediation": "Investigate the outbound connections. Block unauthorized messaging endpoints via firewall rules.",
+      "can_auto_remediate": false
+    },
+    "SOC-004": {
+      "risk": "Missing transparency reports make it harder for users to understand the agent's capabilities and scope.",
+      "remediation": "Add SKILL.md or README.md to the agent's workspace describing its purpose and permissions.",
+      "can_auto_remediate": false
+    },
+    "SOC-005": {
+      "risk": "Agent Moltbook posts contain moral or integrity violations (deception, unauthorized access, data exfiltration, manipulation, or backdoor activity), indicating the agent may be acting against its owner's or community's interests.",
+      "remediation": "1. Review the flagged Moltbook posts at https://www.moltbook.com. 2. Investigate the agent's recent session transcripts for the behavior described. 3. If confirmed, revoke the agent's Moltbook API key and audit its actions. 4. Consider reporting the agent on Moltbook.",
+      "can_auto_remediate": false
+    },
+    "SOC-006": {
+      "risk": "The agent's human owner has low or no verifiable social reputation, making it harder to establish trust and accountability. Agents with unverifiable owners pose higher risk to the community.",
+      "remediation": "1. Claim the agent on Moltbook by linking a verified X/Twitter account at https://www.moltbook.com/humans/dashboard. 2. Build reputation by engaging with the community. 3. Agents with unclaimed profiles or owners with <10 followers are flagged as higher risk.",
+      "can_auto_remediate": false
+    },
+    "INC-001": {
+      "risk": "SSH authentication failures may indicate brute-force login attempts against the host.",
+      "remediation": "Install fail2ban to auto-block brute-force IPs. Review /var/log/auth.log for attack patterns.",
+      "can_auto_remediate": false
+    },
+    "INC-002": {
+      "risk": "Failed sudo attempts may indicate privilege escalation attacks or unauthorized access attempts.",
+      "remediation": "Review sudo failures in /var/log/auth.log. Lock compromised accounts. Consider restricting sudoers.",
+      "can_auto_remediate": false
+    },
+    "INC-003": {
+      "risk": "Suspicious processes (nc, ncat, socat) parented by init indicate orphaned backdoors or reverse shells.",
+      "remediation": "Kill the suspicious processes and investigate their origin. Check for persistence in cron, systemd, or rc.local.",
+      "can_auto_remediate": false
+    },
+    "INC-004": {
+      "risk": "Port scanning activity originating from the host indicates reconnaissance, possibly by a compromised process.",
+      "remediation": "Identify and stop the scanning process. Check for malware. Review outbound firewall rules.",
+      "can_auto_remediate": false
+    },
+    "INC-005": {
+      "risk": "Abnormally high system load may indicate cryptomining, denial-of-service, or runaway processes.",
+      "remediation": "Identify high-CPU processes with top or htop. Kill suspicious processes and investigate their origin.",
+      "can_auto_remediate": false
+    },
+    "MSG-001": {
+      "risk": "MCP servers using remote URLs or unusual npx packages could execute untrusted code with agent privileges.",
+      "remediation": "Review MCP server configs. Remove servers with remote URLs or unverified npx packages.",
+      "can_auto_remediate": false
+    },
+    "MSG-002": {
+      "risk": "Suspicious tool calls (accessing /etc/passwd, .ssh keys, or piping to shell) suggest compromise or injection.",
+      "remediation": "Review the agent's recent session transcript. Revoke the agent's access if compromise is confirmed.",
+      "can_auto_remediate": false
+    },
+    "MSG-003": {
+      "risk": "Skills with dangerous permissions (sudo, chmod 777) in their manifests can escalate privileges.",
+      "remediation": "Audit the flagged skill manifests. Remove or replace skills with dangerous permission requirements.",
+      "can_auto_remediate": false
+    },
+    "MSG-004": {
+      "risk": "Session files with weak permissions or corrupted data compromise audit integrity and may leak conversation history.",
+      "remediation": "Fix session file permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 600 ~/.openclaw/agents/*/sessions/*.jsonl ~/.claude/projects/*/*.jsonl 2>/dev/null"
+    },
+    "MSG-005": {
+      "risk": "Secrets (API keys, tokens, private keys) appearing in conversation context risk leaking via logs or model providers.",
+      "remediation": "Rotate the exposed credentials immediately. Avoid passing secrets in conversation — use environment variables or secret refs.",
+      "can_auto_remediate": false
+    },
+    "MSG-006": {
+      "risk": "URLs to data exfiltration services (pastebin, ngrok, transfer.sh) suggest data is being sent to external endpoints.",
+      "remediation": "Block the flagged domains via firewall or proxy. Review what data was sent and consider it compromised.",
+      "can_auto_remediate": false
+    },
+    "NODE-001": {
+      "risk": "Remote execution without approval allows paired nodes to run arbitrary commands on this machine.",
+      "remediation": "Set exec.security to 'ask' or 'deny' in ~/.openclaw/openclaw.json",
+      "can_auto_remediate": false
+    },
+    "NODE-002": {
+      "risk": "Unreviewed node pairings may include untrusted machines with access to this agent.",
+      "remediation": "Review paired nodes in Settings > Nodes and remove untrusted connections.",
+      "can_auto_remediate": false
+    },
+    "NODE-003": {
+      "risk": "Node pairing tokens with loose permissions can be read by other users, allowing unauthorized pairing.",
+      "remediation": "Restrict token file permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 600 ~/.openclaw/nodes/*.token 2>/dev/null"
+    },
+    "NODE-004": {
+      "risk": "macOS remote nodes without execution approval can be used to run commands without human oversight.",
+      "remediation": "Configure Settings > Exec approvals to require approval for remote execution.",
+      "can_auto_remediate": false
+    },
+    "NODE-005": {
+      "risk": "Without an execution allowlist, any command can be run remotely on this node.",
+      "remediation": "Configure exec allowlist in Settings > Exec approvals to restrict allowed commands.",
+      "can_auto_remediate": false
+    },
+    "MEDIA-001": {
+      "risk": "Outdated OpenClaw versions may have local file inclusion vulnerabilities in media handling.",
+      "remediation": "Update OpenClaw to the latest version with LFI protection patch.",
+      "can_auto_remediate": false
+    },
+    "MEDIA-002": {
+      "risk": "Media temp directory with open permissions allows other users to inject or read processed media files.",
+      "remediation": "Restrict temp directory permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 700 /tmp/openclaw-media 2>/dev/null"
+    },
+    "MEDIA-003": {
+      "risk": "Without media file type validation, malicious files disguised as media could be processed.",
+      "remediation": "Enable media type validation in OpenClaw settings.",
+      "can_auto_remediate": false
+    },
+    "LOC-001": {
+      "risk": "Unconfigured location services may expose or leak the agent's physical location.",
+      "remediation": "Review location settings in OpenClaw configuration.",
+      "can_auto_remediate": false
+    },
+    "LOC-002": {
+      "risk": "Unencrypted location data can be read by anyone with filesystem access.",
+      "remediation": "Enable location data encryption in settings.",
+      "can_auto_remediate": false
+    },
+    "GATEWAY-001": {
+      "risk": "Gateway bound to 0.0.0.0 is accessible from the network, exposing the agent's API to unauthorized access.",
+      "remediation": "Bind OpenClaw gateway to 127.0.0.1 only in the configuration.",
+      "can_auto_remediate": false
+    },
+    "GATEWAY-002": {
+      "risk": "Gateway without authentication allows anyone on the network to control the agent.",
+      "remediation": "Enable gateway authentication in OpenClaw settings.",
+      "can_auto_remediate": false
+    },
+    "SESSION-001": {
+      "risk": "Session transcripts with open permissions expose conversation history to other users.",
+      "remediation": "Restrict transcript file permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 600 ~/.openclaw/agents/*/sessions/*.jsonl 2>/dev/null"
+    },
+    "SESSION-002": {
+      "risk": "Session directories with open permissions allow other users to browse agent sessions.",
+      "remediation": "Restrict session directory permissions.",
+      "can_auto_remediate": true,
+      "auto_remediate_command": "chmod 700 ~/.openclaw/agents 2>/dev/null"
+    },
+    "IDENTITY-001": {
+      "risk": "Without a DM allowlist, any agent or user can send direct messages, enabling social engineering attacks.",
+      "remediation": "Configure DM allowlist to restrict who can message the agent.",
+      "can_auto_remediate": false
+    },
+    "IDENTITY-002": {
+      "risk": "Without a group allowlist, the agent can be added to unvetted group conversations.",
+      "remediation": "Configure group allowlist to restrict which groups the agent can join.",
+      "can_auto_remediate": false
+    },
+    "SUBAGENT-001": {
+      "risk": "Without concurrency limits, subagents can exhaust system resources via fork-bomb patterns.",
+      "remediation": "Configure maxConcurrent limit for subagents in OpenClaw settings.",
+      "can_auto_remediate": false
+    },
+    "SUBAGENT-002": {
+      "risk": "Without an agent allowlist, subagents can target any agent, enabling lateral movement.",
+      "remediation": "Configure allowAgents list to restrict subagent targets.",
+      "can_auto_remediate": false
+    }
+  }
+}

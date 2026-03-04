@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mulch Self Improver — Benchmark elevator pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..72,400;9..72,600;9..72,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --surface-elevated: #fffefb;
+    --border: rgba(0, 0, 0, 0.06);
+    --text: #1c1917;
+    --text-dim: #57534e;
+    --accent: #0d9488;
+    --accent-dim: rgba(13, 148, 136, 0.12);
+    --green: #059669;
+    --green-dim: rgba(5, 150, 105, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f0e;
+      --surface: #1a1918;
+      --surface-elevated: #242321;
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #fafaf9;
+      --text-dim: #a8a29e;
+      --accent: #2dd4bf;
+      --accent-dim: rgba(45, 212, 191, 0.15);
+      --green: #34d399;
+      --green-dim: rgba(52, 211, 153, 0.15);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-dim) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, var(--green-dim) 0%, transparent 45%);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate {
+    animation: fadeUp 0.5s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.08s);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 56px;
+    max-width: 640px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  }
+  .tagline {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .product {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+  .hero-value {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--green);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .hero-label {
+    font-size: 15px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .pitch {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.45;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+  .bullets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-bottom: 32px;
+  }
+  .bullet {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .bullet__value {
+    font-weight: 600;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+  }
+  .bullet__label { color: var(--text); }
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+  .cta-link {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-elevated);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .cta-link:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .cta-link--secondary {
+    color: var(--text-dim);
+  }
+  .footer-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .footer-note a { color: var(--accent); text-decoration: none; }
+  @media (max-width: 600px) {
+    body { padding: 24px 16px; }
+    .card { padding: 32px 24px; }
+    .tagline { font-size: 22px; }
+    .hero-value { font-size: 42px; }
+    .pitch { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <p class="product animate" style="--i:0">Mulch Self Improver</p>
+  <h1 class="tagline animate" style="--i:1">Let your agents grow 🌱</h1>
+  <div class="hero-value animate" style="--i:2">~27.5%</div>
+  <p class="hero-label animate" style="--i:3">fewer characters (token proxy) vs baseline — same session + troubleshooting + style &amp; memory. <strong>1441 chars (~352 tokens) saved</strong> per full mix.</p>
+  <p class="pitch animate" style="--i:4">Same tasks, less context. Proven side-by-side against <strong>Self Improving Agent — Rank #2 on ClawHub</strong>.</p>
+  <div class="bullets animate" style="--i:5">
+    <span class="bullet"><span class="bullet__value">~14%</span> <span class="bullet__label">session</span></span>
+    <span class="bullet"><span class="bullet__value">~54%</span> <span class="bullet__label">troubleshooting</span></span>
+    <span class="bullet"><span class="bullet__value">~33%</span> <span class="bullet__label">style &amp; memory</span></span>
+  </div>
+  <div class="cta-row animate" style="--i:6">
+    <a href="benchmark-comparison.html" class="cta-link">Full benchmark comparison</a>
+    <a href="../BENCHMARK.md" class="cta-link cta-link--secondary">BENCHMARK.md</a>
+  </div>
+  <p class="footer-note animate" style="--i:7">Baseline: <a href="https://clawhub.ai/pskoett/self-improving-agent" target="_blank" rel="noopener">Self Improving Agent — Rank #2 on ClawHub</a>. Built with the <a href="https://github.com/nicobailon/visual-explainer" target="_blank" rel="noopener">visual-explainer</a> skill.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvoYield Cloud — Conversational Yield Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-card-hover: #1f2b3d;
+            --accent-green: #10b981;
+            --accent-green-dim: #065f46;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-dim: #64748b;
+            --border: #1e293b;
+            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── Top Bar ──────────────────────────────────────────────── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .topbar-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-green);
+            font-size: 12px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: var(--glow-green); }
+            50% { opacity: 0.5; box-shadow: none; }
+        }
+
+        .topbar-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .time-select {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .api-key-display {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-dim);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        /* ── Main Grid ────────────────────────────────────────────── */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto auto auto;
+            gap: 16px;
+            padding: 24px 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ── KPI Cards ────────────────────────────────────────────── */
+        .kpi-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .kpi-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-green);
+            box-shadow: var(--glow-green);
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-value.green { color: var(--accent-green); }
+        .kpi-value.blue { color: var(--accent-blue); }
+        .kpi-value.yellow { color: var(--accent-yellow); }
+        .kpi-value.red { color: var(--accent-red); }
+        .kpi-value.purple { color: var(--accent-purple); }
+        .kpi-value.cyan { color: var(--accent-cyan); }
+
+        .kpi-subtext {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .kpi-delta {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .kpi-delta.up { color: var(--accent-green); background: var(--accent-green-dim); }
+        .kpi-delta.down { color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
+
+        /* ── Chart Cards ──────────────────────────────────────────── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .card-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Yield Chart ──────────────────────────────────────────── */
+        .yield-chart {
+            grid-column: 1 / 4;
+            min-height: 280px;
+        }
+
+        .chart-area {
+            width: 100%;
+            height: 220px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 30px;
+        }
+
+        .chart-bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 40px;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover { opacity: 0.8; }
+
+        .chart-bar.estimated {
+            background: linear-gradient(180deg, var(--accent-blue), rgba(59, 130, 246, 0.3));
+        }
+
+        .chart-bar.captured {
+            background: linear-gradient(180deg, var(--accent-green), rgba(16, 185, 129, 0.3));
+        }
+
+        .chart-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            position: absolute;
+            bottom: -24px;
+        }
+
+        /* ── Live Feed ────────────────────────────────────────────── */
+        .live-feed {
+            grid-column: 4 / 5;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .feed-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .feed-icon.arbitrage { background: rgba(245, 158, 11, 0.15); }
+        .feed-icon.conversion { background: rgba(16, 185, 129, 0.15); }
+        .feed-icon.play { background: rgba(139, 92, 246, 0.15); }
+        .feed-icon.alert { background: rgba(239, 68, 68, 0.15); }
+
+        .feed-text { color: var(--text-secondary); flex: 1; }
+        .feed-value { font-weight: 700; color: var(--accent-green); }
+        .feed-time { color: var(--text-dim); font-size: 10px; }
+
+        /* ── Play Performance ─────────────────────────────────────── */
+        .plays-table {
+            grid-column: 1 / 3;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .play-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .play-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .bar-cell {
+            width: 100px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* ── Arbitrage Map ────────────────────────────────────────── */
+        .arbitrage-map {
+            grid-column: 3 / 5;
+        }
+
+        .arb-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .arb-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .arb-type {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .arb-stats {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .arb-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        /* ── Conversion Funnel ────────────────────────────────────── */
+        .conversion-card {
+            grid-column: 1 / 3;
+        }
+
+        .funnel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .funnel-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .funnel-label {
+            width: 160px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .funnel-bar-container {
+            flex: 1;
+            height: 28px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .funnel-bar {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.5s ease;
+        }
+
+        .funnel-count {
+            width: 60px;
+            font-size: 12px;
+            color: var(--text-dim);
+            text-align: right;
+        }
+
+        /* ── Session Leaderboard ──────────────────────────────────── */
+        .leaderboard-card {
+            grid-column: 3 / 5;
+        }
+
+        .leader-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leader-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+
+        .leader-rank.gold { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
+        .leader-rank.silver { background: rgba(148, 163, 184, 0.2); color: var(--text-secondary); }
+        .leader-rank.bronze { background: rgba(180, 83, 9, 0.2); color: #d97706; }
+
+        .leader-info { flex: 1; }
+
+        .leader-session {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-family: monospace;
+        }
+
+        .leader-details {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .leader-yield {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* ── Setup Modal ──────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.hidden { display: none; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            width: 480px;
+            max-width: 90vw;
+        }
+
+        .modal h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: var(--glow-green);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ── Tier Badge ───────────────────────────────────────────── */
+        .tier-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .tier-free { background: rgba(100, 116, 139, 0.2); color: var(--text-dim); }
+        .tier-pro { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .tier-enterprise { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+
+        /* ── Scrollbar ────────────────────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* ── Responsive ───────────────────────────────────────────── */
+        @media (max-width: 1200px) {
+            .kpi-row { grid-template-columns: repeat(3, 1fr); }
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .yield-chart { grid-column: 1 / -1; }
+            .live-feed { grid-column: 1 / -1; }
+            .plays-table { grid-column: 1 / -1; }
+            .arbitrage-map { grid-column: 1 / -1; }
+            .conversion-card { grid-column: 1 / -1; }
+            .leaderboard-card { grid-column: 1 / -1; }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .topbar { flex-direction: column; gap: 12px; }
+            .dashboard { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Top Bar ────────────────────────────────────────────────── -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <h1>ConvoYield Cloud</h1>
+            <span class="topbar-status"><span class="pulse"></span> LIVE</span>
+            <span class="tier-badge tier-pro" id="tier-badge">PRO</span>
+        </div>
+        <div class="topbar-controls">
+            <select class="time-select" id="time-range" onchange="refreshDashboard()">
+                <option value="1">Last 1 Hour</option>
+                <option value="6">Last 6 Hours</option>
+                <option value="24" selected>Last 24 Hours</option>
+                <option value="168">Last 7 Days</option>
+                <option value="720">Last 30 Days</option>
+            </select>
+            <div class="api-key-display" id="api-key-display" onclick="showSetup()" title="Click to configure">
+                Click to set API key
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Dashboard Grid ─────────────────────────────────────────── -->
+    <div class="dashboard">
+
+        <!-- ── KPI Row ────────────────────────────────────────────── -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Estimated Yield</div>
+                <div class="kpi-value green" id="kpi-estimated">$0.00</div>
+                <div class="kpi-subtext">
+                    <span class="kpi-delta up" id="kpi-estimated-delta">--</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Captured Yield</div>
+                <div class="kpi-value cyan" id="kpi-captured">$0.00</div>
+                <div class="kpi-subtext">
+                    <span class="kpi-delta up" id="kpi-captured-delta">--</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Left on Table</div>
+                <div class="kpi-value yellow" id="kpi-left">$0.00</div>
+                <div class="kpi-subtext">Potential revenue missed</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Capture Rate</div>
+                <div class="kpi-value blue" id="kpi-efficiency">0%</div>
+                <div class="kpi-subtext">of available yield</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Active Sessions</div>
+                <div class="kpi-value purple" id="kpi-sessions">0</div>
+                <div class="kpi-subtext" id="kpi-turns">0 total turns</div>
+            </div>
+        </div>
+
+        <!-- ── Yield Timeline Chart ───────────────────────────────── -->
+        <div class="card yield-chart">
+            <div class="card-header">
+                <span class="card-title">Yield Timeline</span>
+                <span class="card-badge">Live</span>
+            </div>
+            <div class="chart-area" id="yield-timeline">
+                <!-- Bars generated by JS -->
+            </div>
+        </div>
+
+        <!-- ── Live Event Feed ────────────────────────────────────── -->
+        <div class="card live-feed">
+            <div class="card-header">
+                <span class="card-title">Live Feed</span>
+                <span class="card-badge">Real-time</span>
+            </div>
+            <div id="live-feed-items">
+                <div class="feed-item">
+                    <div class="feed-icon arbitrage">$</div>
+                    <div>
+                        <div class="feed-text">Waiting for events...</div>
+                        <div class="feed-time">Connect your bot to start</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Play Performance Table ─────────────────────────────── -->
+        <div class="card plays-table">
+            <div class="card-header">
+                <span class="card-title">Play Performance</span>
+                <span class="card-badge">Strategy</span>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Play</th>
+                        <th>Uses</th>
+                        <th>Avg Yield</th>
+                        <th>Effectiveness</th>
+                    </tr>
+                </thead>
+                <tbody id="plays-tbody">
+                    <tr><td colspan="4" style="color: var(--text-dim); font-size: 12px;">No play data yet</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Arbitrage Opportunity Map ───────────────────────────── -->
+        <div class="card arbitrage-map">
+            <div class="card-header">
+                <span class="card-title">Arbitrage Opportunities</span>
+                <span class="card-badge">Revenue</span>
+            </div>
+            <div id="arbitrage-list">
+                <div class="arb-item">
+                    <div class="arb-info">
+                        <div class="arb-type" style="color: var(--text-dim)">No arbitrage detected yet</div>
+                        <div class="arb-stats">Connect your bot to detect opportunities</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Micro-Conversion Funnel ────────────────────────────── -->
+        <div class="card conversion-card">
+            <div class="card-header">
+                <span class="card-title">Micro-Conversion Funnel</span>
+                <span class="card-badge">Capture</span>
+            </div>
+            <div class="funnel" id="conversion-funnel">
+                <div class="funnel-row">
+                    <div class="funnel-label" style="color: var(--text-dim)">No conversions yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Billing & Subscription ──────────────────────────────── -->
+        <div class="card billing-card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <span class="card-title">Billing & Subscription</span>
+                <span class="card-badge" id="billing-plan-badge">Free</span>
+            </div>
+            <div style="display: flex; gap: 32px; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <div class="kpi-label">Current Plan</div>
+                    <div class="kpi-value green" id="billing-plan" style="font-size: 22px;">Free</div>
+                </div>
+                <div>
+                    <div class="kpi-label">Active Playbooks</div>
+                    <div class="kpi-value cyan" id="billing-playbooks" style="font-size: 22px;">0</div>
+                </div>
+                <div>
+                    <div class="kpi-label">Subscriptions</div>
+                    <div class="kpi-value blue" id="billing-subs-count" style="font-size: 22px;">0</div>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 12px;">
+                    <button class="btn btn-primary" onclick="upgradePlan()">Upgrade Plan</button>
+                    <button class="btn btn-ghost" onclick="manageBilling()">Manage Billing</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Session Leaderboard ────────────────────────────────── -->
+        <div class="card leaderboard-card">
+            <div class="card-header">
+                <span class="card-title">Yield Leaderboard</span>
+                <span class="card-badge">Top Sessions</span>
+            </div>
+            <div id="leaderboard">
+                <div class="leader-item">
+                    <div class="leader-info">
+                        <div class="leader-session" style="color: var(--text-dim)">No sessions yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Setup Modal ────────────────────────────────────────────── -->
+    <div class="modal-overlay" id="setup-modal">
+        <div class="modal">
+            <h2>Connect to ConvoYield Cloud</h2>
+            <p>Enter your API key to connect the dashboard to your analytics data. Don't have one? Register below.</p>
+            <input type="text" id="api-key-input" placeholder="cy_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            <div style="margin-top: 4px; margin-bottom: 16px;">
+                <input type="text" id="server-url-input" placeholder="http://localhost:8000" value="http://localhost:8000" />
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="connectApiKey()">Connect</button>
+                <button class="btn btn-ghost" onclick="registerNew()">Register New Key</button>
+                <button class="btn btn-ghost" onclick="loadDemo()">Demo Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── State ────────────────────────────────────────────────────
+        let API_KEY = localStorage.getItem('cy_api_key') || '';
+        let SERVER = localStorage.getItem('cy_server') || 'http://localhost:8000';
+        let DEMO_MODE = false;
+        let refreshInterval = null;
+
+        // ── Init ─────────────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            if (API_KEY) {
+                document.getElementById('setup-modal').classList.add('hidden');
+                document.getElementById('api-key-display').textContent = API_KEY.substring(0, 12) + '...';
+                startDashboard();
+            }
+        });
+
+        function showSetup() {
+            document.getElementById('setup-modal').classList.remove('hidden');
+        }
+
+        function connectApiKey() {
+            API_KEY = document.getElementById('api-key-input').value.trim();
+            SERVER = document.getElementById('server-url-input').value.trim();
+            if (!API_KEY) return;
+            localStorage.setItem('cy_api_key', API_KEY);
+            localStorage.setItem('cy_server', SERVER);
+            document.getElementById('setup-modal').classList.add('hidden');
+            document.getElementById('api-key-display').textContent = API_KEY.substring(0, 12) + '...';
+            DEMO_MODE = false;
+            startDashboard();
+        }
+
+        async function registerNew() {
+            SERVER = document.getElementById('server-url-input').value.trim();
+            const email = prompt('Enter your email:');
+            if (!email) return;
+            try {
+                const res = await fetch(`${SERVER}/api/v1/keys`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, tier: 'pro' })
+                });
+                const data = await res.json();
+                API_KEY = data.api_key;
+                localStorage.setItem('cy_api_key', API_KEY);
+                localStorage.setItem('cy_server', SERVER);
+                document.getElementById('api-key-input').value = API_KEY;
+                alert(`API Key created: ${API_KEY}\n\nSave this key — you'll need it for your bot integration.`);
+                connectApiKey();
+            } catch (e) {
+                alert('Could not connect to server. Make sure it is running.');
+            }
+        }
+
+        function loadDemo() {
+            DEMO_MODE = true;
+            document.getElementById('setup-modal').classList.add('hidden');
+            document.getElementById('api-key-display').textContent = 'DEMO MODE';
+            document.getElementById('tier-badge').textContent = 'DEMO';
+            document.getElementById('tier-badge').className = 'tier-badge tier-enterprise';
+            startDashboard();
+        }
+
+        // ── Dashboard Loop ───────────────────────────────────────────
+        function startDashboard() {
+            refreshDashboard();
+            loadBillingInfo();
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(refreshDashboard, 5000); // Refresh every 5s
+        }
+
+        async function refreshDashboard() {
+            if (DEMO_MODE) {
+                renderDemoData();
+                return;
+            }
+
+            const hours = document.getElementById('time-range').value;
+            try {
+                const [overview, plays, arbitrage, conversions, timeline, leaderboard] = await Promise.all([
+                    apiGet(`/api/v1/analytics/overview?hours=${hours}`),
+                    apiGet(`/api/v1/analytics/plays?hours=${hours}`),
+                    apiGet(`/api/v1/analytics/arbitrage?hours=${hours}`),
+                    apiGet(`/api/v1/analytics/conversions?hours=${hours}`),
+                    apiGet(`/api/v1/analytics/timeline?hours=${hours}`),
+                    apiGet(`/api/v1/analytics/leaderboard?hours=${hours}`),
+                ]);
+
+                renderKPIs(overview);
+                renderPlays(plays.plays);
+                renderArbitrage(arbitrage.arbitrage);
+                renderConversions(conversions.conversions);
+                renderTimeline(timeline.timeline);
+                renderLeaderboard(leaderboard.leaderboard);
+            } catch (e) {
+                console.error('Dashboard refresh error:', e);
+            }
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(`${SERVER}${path}`, {
+                headers: { 'X-API-Key': API_KEY }
+            });
+            return res.json();
+        }
+
+        // ── Renderers ────────────────────────────────────────────────
+        function renderKPIs(data) {
+            document.getElementById('kpi-estimated').textContent = `$${(data.total_estimated_yield || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-captured').textContent = `$${(data.total_captured_yield || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-left').textContent = `$${(data.value_left_on_table || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-efficiency').textContent = `${data.capture_efficiency || 0}%`;
+            document.getElementById('kpi-sessions').textContent = data.total_sessions || 0;
+            document.getElementById('kpi-turns').textContent = `${data.total_turns || 0} total turns`;
+        }
+
+        function renderPlays(plays) {
+            const tbody = document.getElementById('plays-tbody');
+            if (!plays || plays.length === 0) return;
+
+            const maxCount = Math.max(...plays.map(p => p.count));
+            const colors = [
+                'var(--accent-green)', 'var(--accent-blue)', 'var(--accent-purple)',
+                'var(--accent-yellow)', 'var(--accent-cyan)', 'var(--accent-red)'
+            ];
+
+            tbody.innerHTML = plays.slice(0, 8).map((p, i) => `
+                <tr>
+                    <td>
+                        <div class="play-name">
+                            <div class="play-dot" style="background: ${colors[i % colors.length]}"></div>
+                            ${p.play}
+                        </div>
+                    </td>
+                    <td>${p.count}</td>
+                    <td style="color: var(--accent-green)">$${(p.avg_yield || 0).toFixed(2)}</td>
+                    <td class="bar-cell">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(p.count / maxCount * 100)}%; background: ${colors[i % colors.length]}"></div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderArbitrage(arbs) {
+            const container = document.getElementById('arbitrage-list');
+            if (!arbs || arbs.length === 0) return;
+
+            container.innerHTML = arbs.map(a => `
+                <div class="arb-item">
+                    <div class="arb-info">
+                        <div class="arb-type">${a.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+                        <div class="arb-stats">${a.count} opportunities detected</div>
+                    </div>
+                    <div class="arb-value">$${(a.total_yield || 0).toFixed(0)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderConversions(convs) {
+            const container = document.getElementById('conversion-funnel');
+            if (!convs || convs.length === 0) return;
+
+            const maxVal = Math.max(...convs.map(c => c.total_value));
+            const colors = [
+                'var(--accent-green)', 'var(--accent-blue)', 'var(--accent-purple)',
+                'var(--accent-yellow)', 'var(--accent-cyan)'
+            ];
+
+            container.innerHTML = convs.map((c, i) => `
+                <div class="funnel-row">
+                    <div class="funnel-label">${c.conversion_type.replace(/_/g, ' ')}</div>
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar" style="width: ${(c.total_value / maxVal * 100)}%; background: ${colors[i % colors.length]}">
+                            $${c.total_value.toFixed(2)}
+                        </div>
+                    </div>
+                    <div class="funnel-count">${c.count}x</div>
+                </div>
+            `).join('');
+        }
+
+        function renderTimeline(timeline) {
+            const container = document.getElementById('yield-timeline');
+            if (!timeline || timeline.length === 0) return;
+
+            const maxVal = Math.max(...timeline.map(t => Math.max(t.estimated || 0, t.captured || 0)));
+            if (maxVal === 0) return;
+
+            container.innerHTML = timeline.map(t => {
+                const estH = Math.max(4, (t.estimated || 0) / maxVal * 180);
+                const capH = Math.max(4, (t.captured || 0) / maxVal * 180);
+                const label = t.period ? t.period.split(' ').pop() || '' : '';
+
+                return `
+                    <div class="chart-bar-group" title="Est: $${(t.estimated||0).toFixed(2)} | Cap: $${(t.captured||0).toFixed(2)} | Sessions: ${t.sessions||0}">
+                        <div style="display: flex; gap: 2px; align-items: flex-end; width: 100%; justify-content: center;">
+                            <div class="chart-bar estimated" style="height: ${estH}px; width: 45%;"></div>
+                            <div class="chart-bar captured" style="height: ${capH}px; width: 45%;"></div>
+                        </div>
+                        <span class="chart-label">${label}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLeaderboard(leaders) {
+            const container = document.getElementById('leaderboard');
+            if (!leaders || leaders.length === 0) return;
+
+            const rankClasses = ['gold', 'silver', 'bronze'];
+
+            container.innerHTML = leaders.slice(0, 8).map((l, i) => `
+                <div class="leader-item">
+                    <div class="leader-rank ${rankClasses[i] || ''}">${i + 1}</div>
+                    <div class="leader-info">
+                        <div class="leader-session">${l.session_id.substring(0, 16)}...</div>
+                        <div class="leader-details">${l.turns} turns | ${l.last_phase}</div>
+                    </div>
+                    <div class="leader-yield" style="color: var(--accent-green)">$${(l.peak_yield || 0).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+
+        // ── Billing ──────────────────────────────────────────────────
+        async function loadBillingInfo() {
+            if (DEMO_MODE) {
+                document.getElementById('billing-plan').textContent = 'Pro';
+                document.getElementById('billing-plan-badge').textContent = 'PRO';
+                document.getElementById('billing-playbooks').textContent = '2';
+                document.getElementById('billing-subs-count').textContent = '3';
+                return;
+            }
+            try {
+                const data = await apiGet('/api/v1/billing/info');
+                const tier = (data.tier || 'free').charAt(0).toUpperCase() + (data.tier || 'free').slice(1);
+                document.getElementById('billing-plan').textContent = tier;
+                document.getElementById('billing-plan-badge').textContent = tier.toUpperCase();
+                document.getElementById('billing-playbooks').textContent = data.subscriptions
+                    ? data.subscriptions.filter(s => s.product_type === 'playbook').length : 0;
+                document.getElementById('billing-subs-count').textContent = data.active_subscriptions || 0;
+
+                // Update tier badge in topbar
+                const badge = document.getElementById('tier-badge');
+                badge.textContent = tier.toUpperCase();
+                badge.className = 'tier-badge tier-' + (data.tier || 'free');
+            } catch (e) {
+                console.error('Billing info error:', e);
+            }
+        }
+
+        async function upgradePlan() {
+            if (DEMO_MODE) { alert('Upgrade not available in demo mode.'); return; }
+            const plan = prompt('Enter plan to upgrade to (pro / enterprise):');
+            if (!plan || !['pro', 'enterprise'].includes(plan)) return;
+            try {
+                const res = await fetch(`${SERVER}/api/v1/billing/checkout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+                    body: JSON.stringify({ product_id: plan }),
+                });
+                const data = await res.json();
+                if (data.checkout_url) window.location.href = data.checkout_url;
+                else alert(data.detail || 'Could not create checkout session.');
+            } catch (e) {
+                alert('Could not connect to billing.');
+            }
+        }
+
+        async function manageBilling() {
+            if (DEMO_MODE) { alert('Billing portal not available in demo mode.'); return; }
+            try {
+                const res = await fetch(`${SERVER}/api/v1/billing/portal`, {
+                    method: 'POST',
+                    headers: { 'X-API-Key': API_KEY },
+                });
+                const data = await res.json();
+                if (data.portal_url) window.location.href = data.portal_url;
+                else alert(data.detail || 'No billing account found. Subscribe first.');
+            } catch (e) {
+                alert('Could not open billing portal.');
+            }
+        }
+
+        // ── Demo Data ────────────────────────────────────────────────
+        function renderDemoData() {
+            // Generate realistic demo data
+            const now = Date.now();
+
+            renderKPIs({
+                total_estimated_yield: 4827.50 + Math.random() * 100,
+                total_captured_yield: 1893.25 + Math.random() * 50,
+                value_left_on_table: 2934.25 + Math.random() * 50,
+                capture_efficiency: 39.2 + Math.random() * 2,
+                total_sessions: 147 + Math.floor(Math.random() * 5),
+                total_turns: 1842 + Math.floor(Math.random() * 20),
+            });
+
+            renderPlays([
+                { play: 'empathy_bridge', count: 89, avg_yield: 42.30 },
+                { play: 'value_stack', count: 67, avg_yield: 55.80 },
+                { play: 'competitor_displacement', count: 45, avg_yield: 68.20 },
+                { play: 'urgency_close', count: 38, avg_yield: 72.50 },
+                { play: 'assumptive_close', count: 31, avg_yield: 85.00 },
+                { play: 'budget_reframe', count: 28, avg_yield: 48.90 },
+                { play: 'social_proof_deploy', count: 22, avg_yield: 35.60 },
+                { play: 'dopamine_ride', count: 19, avg_yield: 61.40 },
+            ]);
+
+            renderArbitrage([
+                { type: 'frustration_capture', count: 67, total_yield: 1847 },
+                { type: 'competitor_displacement', count: 45, total_yield: 1523 },
+                { type: 'budget_value_stack', count: 38, total_yield: 982 },
+                { type: 'urgency_premium', count: 29, total_yield: 1245 },
+                { type: 'excitement_amplification', count: 24, total_yield: 678 },
+            ]);
+
+            renderConversions([
+                { conversion_type: 'budget_reveal', count: 42, total_value: 315.00 },
+                { conversion_type: 'email_capture', count: 38, total_value: 152.00 },
+                { conversion_type: 'need_statement', count: 67, total_value: 134.00 },
+                { conversion_type: 'competitor_mention', count: 31, total_value: 124.00 },
+                { conversion_type: 'timeline_reveal', count: 28, total_value: 84.00 },
+            ]);
+
+            // Generate timeline
+            const timeline = [];
+            for (let i = 23; i >= 0; i--) {
+                const hour = new Date(now - i * 3600000);
+                const hourStr = hour.getHours().toString().padStart(2, '0') + ':00';
+                const base = 100 + Math.sin(i / 4) * 80;
+                timeline.push({
+                    period: hourStr,
+                    sessions: Math.floor(3 + Math.random() * 8),
+                    estimated: base + Math.random() * 60,
+                    captured: (base + Math.random() * 60) * (0.3 + Math.random() * 0.2),
+                    avg_sentiment: -0.2 + Math.random() * 0.8,
+                    avg_momentum: -0.1 + Math.random() * 0.6,
+                });
+            }
+            renderTimeline(timeline);
+
+            // Leaderboard
+            renderLeaderboard([
+                { session_id: 'sess_8f3a2e4b1c9d7f6a', turns: 12, last_phase: 'closing', peak_yield: 342.50 },
+                { session_id: 'sess_2d5c8e1a3f7b9d4c', turns: 9, last_phase: 'negotiation', peak_yield: 287.30 },
+                { session_id: 'sess_6a1e3d7c5f2b8a9e', turns: 15, last_phase: 'post_close', peak_yield: 234.80 },
+                { session_id: 'sess_4c9b2f8e1d3a7c5f', turns: 7, last_phase: 'negotiation', peak_yield: 198.50 },
+                { session_id: 'sess_1f7d3a9c5e2b8d4a', turns: 11, last_phase: 'closing', peak_yield: 176.20 },
+            ]);
+
+            // Live feed
+            const feedItems = [
+                { icon: 'arbitrage', iconText: '$', text: 'Frustration capture detected in sess_8f3a...', value: '+$45.00', time: '12s ago' },
+                { icon: 'conversion', iconText: '>', text: 'Budget reveal captured: $5,000/mo range', value: '+$8.50', time: '28s ago' },
+                { icon: 'play', iconText: '#', text: 'empathy_bridge play executing', value: '', time: '45s ago' },
+                { icon: 'alert', iconText: '!', text: 'High risk alert: sess_2d5c... (risk: 0.78)', value: '', time: '1m ago' },
+                { icon: 'conversion', iconText: '>', text: 'Email capture opportunity in sess_6a1e...', value: '+$3.50', time: '2m ago' },
+                { icon: 'arbitrage', iconText: '$', text: 'Competitor displacement: switching from Slack', value: '+$52.00', time: '3m ago' },
+                { icon: 'play', iconText: '#', text: 'value_stack recommended (sentiment +0.6)', value: '', time: '4m ago' },
+            ];
+
+            document.getElementById('live-feed-items').innerHTML = feedItems.map(f => `
+                <div class="feed-item">
+                    <div class="feed-icon ${f.icon}">${f.iconText}</div>
+                    <div style="flex: 1">
+                        <div class="feed-text">${f.text}</div>
+                        <div class="feed-time">${f.time}</div>
+                    </div>
+                    ${f.value ? `<div class="feed-value">${f.value}</div>` : ''}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

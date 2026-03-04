@@ -1,0 +1,82 @@
+## Immanent Metaphysics Ontology Schema
+## For extracting structured knowledge from Forrest Landry's work
+
+types:
+  Concept:
+    required: [name, definition]
+    properties: [modality, domain, examples, source_section, location]
+    # modality: immanent | omniscient | transcendent | meta
+    # location: URL to whitebook source (https://mflb.com/...)
+    
+  Axiom:
+    required: [number, name, statement]
+    properties: [domain, implications, source_section, location]
+    # domain: primacy | circularity | trinity
+    # location: URL to whitebook source
+    
+  Theorem:
+    required: [name, statement]
+    properties: [proof_sketch, implications, source_section, location]
+    # location: URL to whitebook source
+    
+  Term:
+    required: [word, definition]
+    properties: [context, examples, source_section, location]
+    # location: URL to whitebook source
+    
+  Aphorism:
+    required: [number, text]
+    properties: [themes, source, location]
+    # For effective-choice.txt later
+    # location: URL to whitebook source (e.g., upmp_ch6.htm#2.12-13)
+    
+  Implication:
+    required: [name, description]
+    properties: [domain, source_theorem, source_section, location]
+    # domain: physics | logic | ethics | consciousness
+    # location: URL to whitebook source
+
+relations:
+  # Conceptual relations
+  implies:
+    from_types: [Axiom, Theorem, Concept]
+    to_types: [Concept, Implication, Theorem]
+    
+  paired_with:
+    from_types: [Concept]
+    to_types: [Concept]
+    # For ICT pairings: continuity+asymmetry, symmetry+discontinuity
+    
+  contrasts_with:
+    from_types: [Concept]
+    to_types: [Concept]
+    
+  depends_on:
+    from_types: [Concept, Theorem]
+    to_types: [Concept, Axiom]
+    
+  has_modality:
+    from_types: [Concept, Term]
+    to_types: [Concept]
+    # Links to Immanent, Omniscient, or Transcendent
+    
+  # Aphorism relations
+  illuminates:
+    from_types: [Aphorism]
+    to_types: [Concept, Axiom, Theorem]
+    # Links aphorisms to the IM concepts they illuminate
+    
+  # Source relations
+  defined_in:
+    from_types: [Concept, Term, Axiom, Theorem]
+    to_types: [Term]
+    # For tracking where things are defined
+
+constraints:
+  - type: Concept
+    rule: "paired_with relations should be symmetric"
+  - type: Axiom
+    rule: "axiom numbers must be 1, 2, or 3"
+
+  # Added: location field for whitebook source URLs
+  # All types can have: location: URL pointing to mflb.com/8192 source

@@ -1,0 +1,160 @@
+# SRE Agent Configuration
+# AI-powered Operations Agent for Cryptocurrency Trading Systems
+
+app:
+  name: sre-agent
+  version: "0.1.0"
+  environment: development  # development, staging, production
+  log_level: INFO
+
+# Data Sources Configuration
+prometheus:
+  url: ${PROMETHEUS_URL:-http://localhost:9090}
+  timeout_seconds: 30
+  retry_attempts: 3
+  retry_delay_seconds: 1
+
+loki:
+  url: ${LOKI_URL:-http://localhost:3100}
+  timeout_seconds: 30
+  retry_attempts: 3
+
+# LLM Configuration
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-20250514
+  api_key: ${ANTHROPIC_API_KEY}
+  max_tokens: 4096
+  temperature: 0.1
+
+# Vector Database (RAG)
+qdrant:
+  url: ${QDRANT_URL:-http://localhost:6333}
+  collection_name: sre_incidents
+  embedding_model: text-embedding-3-small
+  embedding_dimensions: 1536
+
+# Baseline Learning Configuration
+baseline:
+  min_history_days: 7
+  optimal_history_days: 30
+  learning_interval_hours: 24
+  stl_period: 1440  # minutes (24 hours)
+  quantile_lower: 0.05
+  quantile_upper: 0.95
+
+# Anomaly Detection Configuration
+anomaly_detection:
+  check_interval_seconds: 60
+  zscore_threshold: 3.0
+  mad_threshold: 3.5
+  min_anomaly_duration_minutes: 2
+  ensemble_min_votes: 2
+  algorithms:
+    - zscore
+    - mad
+    # - isolation_forest  # Enable in Phase 2
+
+# Trend Prediction Configuration
+prediction:
+  enabled: true
+  horizons_hours:
+    - 1
+    - 3
+    - 6
+  algorithms:
+    - holt_winters
+    # - prophet  # Enable in Phase 2
+
+# Root Cause Analysis Configuration
+rca:
+  enabled: true
+  lookback_minutes: 30
+  correlation_threshold: 0.7
+  granger_max_lag: 5
+  use_llm: true
+
+# Risk Assessment Configuration
+risk_assessment:
+  weights:
+    severity: 0.35
+    urgency: 0.25
+    impact: 0.25
+    complexity: 0.15
+  thresholds:
+    auto: 0.4
+    semi_auto: 0.6
+    manual: 0.8
+    # >= 0.8 is CRITICAL (diagnosis only)
+
+# Auto-Remediation Configuration
+auto_remediation:
+  enabled: true
+  dry_run: false  # Set to true for testing
+  max_concurrent_actions: 3
+  cooldown_minutes: 5
+  blacklist:
+    namespaces:
+      - kube-system
+      - production-critical
+    labels:
+      - "do-not-remediate=true"
+      - "critical=true"
+
+# Notification Configuration
+notification:
+  webhook:
+    url: ${WEBHOOK_URL}
+    timeout_seconds: 10
+    retry_attempts: 3
+  templates:
+    anomaly: |
+      🚨 *Anomaly Detected*
+      Service: {service}
+      Metric: {metric}
+      Current: {current_value}
+      Baseline: {baseline_value}
+      Deviation: {deviation}
+      Time: {timestamp}
+    prediction: |
+      ⚠️ *Trend Alert*
+      Service: {service}
+      Metric: {metric}
+      Predicted: {predicted_value}
+      Threshold: {threshold}
+      ETA: {eta}
+    remediation: |
+      🔧 *Remediation Executed*
+      Action: {action}
+      Target: {target}
+      Status: {status}
+      Duration: {duration}
+
+# Approval Configuration
+approval:
+  timeout_minutes: 30
+  required_approvers:
+    semi_auto: 1
+    manual: 2
+  notification_channels:
+    - webhook
+
+# Audit Configuration
+audit:
+  enabled: true
+  retention_days: 90
+  log_file: /var/log/sre-agent/audit.log
+
+# API Server Configuration
+api:
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  cors_origins:
+    - "*"
+
+# Kubernetes Configuration
+kubernetes:
+  in_cluster: ${K8S_IN_CLUSTER:-false}
+  kubeconfig: ${KUBECONFIG:-~/.kube/config}
+  namespace: default

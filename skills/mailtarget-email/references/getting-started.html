@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started with Mailtarget + OpenClaw</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.7; color: #1a1a1a; max-width: 740px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 2em; margin-bottom: 8px; }
+    h1 + p { font-size: 1.15em; color: #555; margin-bottom: 32px; }
+    h2 { font-size: 1.35em; margin: 36px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #e5e5e5; }
+    h3 { font-size: 1.1em; margin: 20px 0 8px; }
+    p { margin: 12px 0; }
+    ul, ol { margin: 12px 0 12px 24px; }
+    li { margin: 6px 0; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'SF Mono', Menlo, monospace; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 16px 0; }
+    pre code { background: none; padding: 0; color: inherit; }
+    blockquote { border-left: 3px solid #0066cc; padding: 12px 16px; margin: 16px 0; background: #f0f7ff; border-radius: 0 6px 6px 0; }
+    blockquote p { margin: 0; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { text-align: left; padding: 10px 14px; border: 1px solid #e0e0e0; }
+    th { background: #f8f8f8; font-weight: 600; }
+    .diagram { background: #f8f8f8; padding: 20px; border-radius: 8px; text-align: center; font-family: 'SF Mono', Menlo, monospace; font-size: 1.05em; margin: 16px 0; color: #333; }
+    .highlight-box { background: #f0f7ff; border: 1px solid #cce0ff; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .highlight-box h3 { margin-top: 0; color: #0050aa; }
+    strong { font-weight: 600; }
+    hr { border: none; border-top: 1px solid #e5e5e5; margin: 36px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>Getting Started with Mailtarget + OpenClaw</h1>
+  <p>Send your first email in under 5 minutes.</p>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><a href="https://openclaw.ai">OpenClaw</a> installed and running</li>
+    <li>A <a href="https://mailtarget.co">Mailtarget</a> account with API access</li>
+    <li>A verified sending domain in Mailtarget (or let the agent set one up — see <a href="#domain-setup">Domain Setup</a> below)</li>
+  </ul>
+
+  <h2>Step 1: Install the Skill</h2>
+  <pre><code>clawhub install mailtarget-email</code></pre>
+
+  <h2>Step 2: Get Your API Key</h2>
+  <ol>
+    <li>Log in to <a href="https://app.mailtarget.co">app.mailtarget.co</a></li>
+    <li>Go to <strong>Settings → API Keys</strong></li>
+    <li>Click <strong>Create API Key</strong></li>
+    <li>Copy the key</li>
+  </ol>
+
+  <h2>Step 3: Configure OpenClaw</h2>
+  <p>Add your API key to the OpenClaw gateway environment:</p>
+  <pre><code>openclaw env set MAILTARGET_API_KEY=your_api_key_here</code></pre>
+  <p>Or export it in your shell:</p>
+  <pre><code>export MAILTARGET_API_KEY=your_api_key_here</code></pre>
+
+  <h2>Step 4: Send Your First Email</h2>
+  <p>Just tell your agent:</p>
+  <blockquote>
+    <p>"Send a test email to hello@example.com from noreply@mydomain.com with the subject 'Hello from OpenClaw' and a simple welcome message."</p>
+  </blockquote>
+  <p>The agent handles the rest — writing the HTML, calling the API, confirming delivery.</p>
+
+  <h2>Step 5: Try More</h2>
+  <p>Here are things you can ask your agent to do:</p>
+  <ul>
+    <li><strong>"Send a campaign to these 50 contacts with personalized greetings"</strong> — uses substitution data</li>
+    <li><strong>"Create an HTML email template for our weekly newsletter"</strong> — stores it via the Template API</li>
+    <li><strong>"List our sending domains and check which ones are verified"</strong> — domain management</li>
+    <li><strong>"Send a transactional receipt email with a PDF attachment"</strong> — attachments + transactional flag</li>
+  </ul>
+
+  <hr>
+
+  <h2 id="domain-setup">Autonomous Domain Setup (SPF / DKIM / DMARC)</h2>
+
+  <div class="highlight-box">
+    <h3>🚀 Zero Manual DNS Editing</h3>
+    <p>If your domain is on Cloudflare, the agent can set up email authentication entirely by itself. No DNS dashboard required.</p>
+  </div>
+
+  <h3>What You Need</h3>
+  <ul>
+    <li>Mailtarget API key (from Step 2 above)</li>
+    <li>Cloudflare API token with <strong>DNS Write</strong> permission (<a href="https://dash.cloudflare.com/profile/api-tokens">create one here</a>)</li>
+    <li>Your Cloudflare Zone ID (found on the domain overview page)</li>
+  </ul>
+
+  <p>Configure the Cloudflare credentials:</p>
+  <pre><code>openclaw env set CLOUDFLARE_API_TOKEN=your_token_here
+openclaw env set CLOUDFLARE_ZONE_ID=your_zone_id_here</code></pre>
+
+  <h3>Just Tell Your Agent</h3>
+  <blockquote>
+    <p>"Set up example.com as a sending domain in Mailtarget with full email authentication."</p>
+  </blockquote>
+
+  <h3>What the Agent Does</h3>
+  <ol>
+    <li><strong>Creates the sending domain</strong> in Mailtarget</li>
+    <li><strong>Reads the required DNS records</strong> — SPF value, DKIM selector &amp; key, CNAME for tracking</li>
+    <li><strong>Adds SPF TXT record</strong> in Cloudflare (or merges into existing SPF)</li>
+    <li><strong>Adds DKIM TXT record</strong> in Cloudflare</li>
+    <li><strong>Adds CNAME record</strong> for click/open tracking</li>
+    <li><strong>Verifies the domain</strong> in Mailtarget</li>
+    <li><strong>Confirms</strong> all records pass verification</li>
+  </ol>
+
+  <p>The entire process takes about 30 seconds. Fully autonomous.</p>
+
+  <h3>For Non-Cloudflare Domains</h3>
+  <p>The agent will still create the domain and read the required DNS values. It will then provide you with the exact records to add manually:</p>
+  <ul>
+    <li>SPF TXT record — hostname and value</li>
+    <li>DKIM TXT record — selector hostname and public key</li>
+    <li>CNAME record — tracking domain</li>
+  </ul>
+  <p>After you add them, tell the agent to verify.</p>
+
+  <hr>
+
+  <h2>What's Happening Under the Hood</h2>
+  <div class="diagram">You (vision) → OpenClaw Agent (execution) → Mailtarget API (delivery)</div>
+  <ul>
+    <li><strong>You</strong> decide what to send and who to send it to</li>
+    <li><strong>OpenClaw</strong> writes the content, builds the HTML, sets up domains, calls the API</li>
+    <li><strong>Mailtarget</strong> handles delivery, authentication (SPF/DKIM/DMARC), tracking, and reliability</li>
+  </ul>
+
+  <h2>Tracking &amp; Events</h2>
+  <p>Enable open and click tracking by telling your agent:</p>
+  <blockquote>
+    <p>"Send the email with open tracking and click tracking enabled."</p>
+  </blockquote>
+  <p>The agent sets <code>openTracking: true</code> and <code>clickTracking: true</code> in the API call. Mailtarget fires webhook events for opens, clicks, bounces, and deliveries.</p>
+
+  <h2>Troubleshooting</h2>
+  <table>
+    <thead>
+      <tr><th>Problem</th><th>Fix</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>401 Unauthorized</code></td><td>Check your API key is correct and active</td></tr>
+      <tr><td><code>400 Bad Request</code></td><td>Verify the <code>from</code> email uses a verified sending domain</td></tr>
+      <tr><td>Email not arriving</td><td>Check spam folder; verify SPF/DKIM records for your domain</td></tr>
+      <tr><td><code>MAILTARGET_API_KEY</code> not found</td><td>Ensure the env var is set in the gateway environment</td></tr>
+      <tr><td>Domain verification fails</td><td>DNS propagation can take up to 5 minutes — tell the agent to retry</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Resources</h2>
+  <ul>
+    <li><a href="https://developer.mailtarget.co">Mailtarget API Docs</a></li>
+    <li><a href="https://app.mailtarget.co">Mailtarget Dashboard</a></li>
+    <li><a href="https://docs.openclaw.ai">OpenClaw Docs</a></li>
+    <li><a href="https://clawhub.ai">ClawHub Marketplace</a></li>
+  </ul>
+
+</body>
+</html>

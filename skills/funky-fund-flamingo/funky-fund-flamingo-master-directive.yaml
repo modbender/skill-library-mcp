@@ -1,0 +1,89 @@
+id: funky-fund-flamingo-master-directive
+version: "1.1"
+status: active
+authority: high
+precedence:
+  - ADL
+  - Safety
+  - VFM
+  - PCEC
+  - ForcedMutation
+scope:
+  - code
+  - skills
+  - memory
+  - tooling
+  - workflow
+
+# To reduce mutation pressure (e.g. prefer --review/--dry-run), set must_evolve_each_cycle
+# and/or no_op_forbidden to false in a local override.
+mandate:
+  stability_only_scans_banned: true
+  must_evolve_each_cycle: true
+  no_op_forbidden: true
+  goal: "Code Singularity — every cycle adds measurable value"
+
+allowed_directives:
+  - id: optimize
+    description: "Cut bloated branches, reduce latency, and compress logic without losing reliability"
+  - id: harden
+    description: "Fortify fragile paths with validation and guards; contain failures fast"
+  - id: automate
+    description: "Eliminate repeated manual work with scripts, commands, and deterministic flows"
+  - id: analyze
+    description: "Interrogate logs/transcripts for recurring waste and convert findings into shipped fixes"
+
+execution_loop:
+  steps:
+    - id: introspect
+      required: true
+      checks:
+        - "Read REAL SESSION TRANSCRIPT"
+        - "Identify errors, repetition, user complaints"
+        - "If logs missing -> fix logger"
+        - "If script failed -> patch immediately"
+        - "Assess evolve.js and feishu-card for improvement"
+    - id: mutate
+      required: true
+      choose_exactly_one_primary_mode: true
+      modes:
+        - repair
+        - optimize
+        - expand
+        - innovation
+        - personalization
+      personalization:
+        required_if_present:
+          - USER.md
+          - MEMORY.md
+    - id: report
+      required: true
+      tool: message
+      title_template: "🧬 Evolution Cycle #{{cycle_id}}"
+      status_enum: [SUCCESS, BLOCKED, REVERTED]
+      must_include:
+        - what_changed
+        - why_it_matters
+        - success_failure_detection
+      review_pause:
+        enabled_when_flag_present: --review
+        rule: "Ask before applying significant edits"
+    - id: persist
+      required: true
+      local_save_required: true
+      clawhub_publish_forbidden: true
+      remote_git_push_forbidden: true
+      forbidden_artifacts:
+        - safe_publish.js
+    - id: self_driving_loop
+      enabled_when_flags_present: [--loop, --funky-fund-flamingo]
+      cron_forbidden: true
+      relay_mode: local_only
+      required_action: "Plan local rerun only; no external tool calls"
+
+compliance:
+  must_produce_measurable_value: true
+  must_not_violate_adl: true
+  blocked_cycle_requirements:
+    must_explain_blocker: true
+    must_propose_next_action: true

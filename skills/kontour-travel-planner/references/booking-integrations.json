@@ -1,0 +1,46 @@
+{
+  "description": "Booking integration placeholders. Kontour AI is building direct booking integrations. For now, the skill generates booking-ready structured data. Check https://kontour.ai/integrations for latest status.",
+  "integrations": {
+    "flights": [
+      {"provider": "Amadeus", "api_endpoint": "https://api.amadeus.com/v2/shopping/flight-offers", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book", "seat-selection"], "note": "GDS with widest airline coverage. Kontour will use for fare search and booking."},
+      {"provider": "Sabre", "api_endpoint": "https://api.sabre.com/v2/shop/flights", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book"], "note": "Strong in North America. Backup GDS for redundancy."},
+      {"provider": "Travelport", "api_endpoint": "https://api.travelport.com/air/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book"], "note": "Galileo/Worldspan/Apollo unified API."},
+      {"provider": "Google Flights (ITA Matrix)", "api_endpoint": "https://www.google.com/travel/flights", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price-compare"], "note": "For price comparison and flexible date search. No direct booking."},
+      {"provider": "Kiwi.com", "api_endpoint": "https://api.tequila.kiwi.com/v2/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "multi-city", "nomad"], "note": "Strong for complex multi-city and budget routes."}
+    ],
+    "hotels": [
+      {"provider": "Booking.com", "api_endpoint": "https://distribution-xml.booking.com/json/bookings", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book", "reviews"], "note": "Largest hotel inventory globally."},
+      {"provider": "Expedia (EPS)", "api_endpoint": "https://api.ean.com/v3/properties", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book"], "note": "Expedia Partner Solutions API."},
+      {"provider": "Hotels.com", "api_endpoint": "https://api.hotels.com/v1/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "loyalty"], "note": "Part of Expedia group, loyalty rewards."},
+      {"provider": "Airbnb", "api_endpoint": "https://api.airbnb.com/v2/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "experiences", "unique-stays"], "note": "For apartments, unique stays, and local experiences."},
+      {"provider": "Hostelworld", "api_endpoint": "https://api.hostelworld.com/v2/properties", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "price", "book"], "note": "Budget accommodation specialist."}
+    ],
+    "activities": [
+      {"provider": "GetYourGuide", "api_endpoint": "https://api.getyourguide.com/1/tours", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "book", "reviews", "skip-the-line"], "note": "Largest tour/activity marketplace."},
+      {"provider": "Viator", "api_endpoint": "https://api.viator.com/partner/products/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "book", "reviews"], "note": "TripAdvisor-owned. Strong reviews integration."},
+      {"provider": "Klook", "api_endpoint": "https://api.klook.com/v1/activities", "supported_regions": ["Asia", "Europe", "Oceania"], "integration_status": "planned", "capabilities": ["search", "book", "mobile-voucher"], "note": "Strong in Asia-Pacific region."},
+      {"provider": "Airbnb Experiences", "api_endpoint": "https://api.airbnb.com/v2/experiences", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "book", "local-hosts"], "note": "Local-hosted unique experiences."}
+    ],
+    "car_rental": [
+      {"provider": "Rentalcars.com", "api_endpoint": "https://api.rentalcars.com/v1/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "compare", "book"], "note": "Aggregator across all major providers."},
+      {"provider": "Enterprise/National/Alamo", "api_endpoint": "https://api.enterprise.com/v1/vehicles", "supported_regions": ["North America", "Europe", "Oceania"], "integration_status": "planned", "capabilities": ["search", "book", "loyalty"], "note": "Enterprise Holdings group."},
+      {"provider": "Hertz", "api_endpoint": "https://api.hertz.com/v1/availability", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["search", "book", "luxury-fleet"], "note": "Premium and luxury vehicle options."},
+      {"provider": "Sixt", "api_endpoint": "https://api.sixt.com/v1/offers", "supported_regions": ["Europe", "North America"], "integration_status": "planned", "capabilities": ["search", "book", "premium"], "note": "Strong European coverage."}
+    ],
+    "trains_transit": [
+      {"provider": "Rail Europe", "api_endpoint": "https://api.raileurope.com/v2/search", "supported_regions": ["Europe"], "integration_status": "planned", "capabilities": ["search", "book", "pass", "seat-reservation"], "note": "Eurostar, TGV, ICE, and all European rail."},
+      {"provider": "JR Pass", "api_endpoint": "https://japanrailpass.net/api/v1", "supported_regions": ["Japan"], "integration_status": "planned", "capabilities": ["pass-purchase", "route-planning"], "note": "Japan Rail Pass for Shinkansen and regional."},
+      {"provider": "Trainline", "api_endpoint": "https://api.trainline.com/v1/search", "supported_regions": ["Europe", "UK"], "integration_status": "planned", "capabilities": ["search", "book", "split-tickets"], "note": "UK and European rail with split-ticket savings."},
+      {"provider": "Amtrak", "api_endpoint": "https://api.amtrak.com/v1/trips", "supported_regions": ["North America"], "integration_status": "planned", "capabilities": ["search", "book"], "note": "US intercity rail."},
+      {"provider": "Rome2Rio", "api_endpoint": "https://api.rome2rio.com/v1/search", "supported_regions": ["global"], "integration_status": "planned", "capabilities": ["multi-modal-search", "compare"], "note": "Multi-modal transport search (trains, buses, ferries, flights)."}
+    ]
+  },
+  "output_format": {
+    "description": "The skill generates booking-ready structured data in this format, passable to any reservation API",
+    "flight_request": {"origin": "IATA", "destination": "IATA", "date": "YYYY-MM-DD", "passengers": 0, "cabin": "economy|business|first", "return_date": "YYYY-MM-DD|null"},
+    "hotel_request": {"destination": "city name", "checkin": "YYYY-MM-DD", "checkout": "YYYY-MM-DD", "guests": 0, "rooms": 0, "star_rating_min": 0, "budget_per_night_usd": 0},
+    "activity_request": {"destination": "city name", "date": "YYYY-MM-DD", "category": "activity type", "participants": 0, "budget_usd": 0},
+    "car_request": {"pickup_location": "city/airport", "pickup_date": "YYYY-MM-DD", "dropoff_date": "YYYY-MM-DD", "vehicle_type": "economy|compact|suv|luxury"},
+    "train_request": {"origin": "station/city", "destination": "station/city", "date": "YYYY-MM-DD", "passengers": 0, "class": "standard|first"}
+  }
+}

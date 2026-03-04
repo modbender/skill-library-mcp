@@ -1,0 +1,44 @@
+{
+  "name": "@elvatis_com/openclaw-memory-core",
+  "version": "0.1.1",
+  "description": "Core utilities for OpenClaw memory plugins (redaction, local store, embeddings)",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "scan-secrets": "bash scripts/scan-secrets.sh",
+    "ci": "npm run typecheck && npm run build && npm run test && npm run scan-secrets",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elvatis/openclaw-memory-core.git"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.0.18"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  }
+}

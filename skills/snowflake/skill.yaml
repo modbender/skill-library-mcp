@@ -1,0 +1,38 @@
+name: snowflake_data_engineering
+display_name: Snowflake Data Engineering Skill
+version: 1.0.0
+description: >
+  Governed Snowflake read-only execution layer with enforced SELECT-only queries.
+
+author: Tiago Hübner
+category: data_engineering
+
+entrypoint:
+  type: http
+  url: http://localhost:8000/execute
+  method: POST
+  timeout_seconds: 60
+
+authentication:
+  type: none
+
+inputs:
+  type: object
+  properties:
+    sql:
+      type: string
+      description: "SELECT query to execute in Snowflake (read-only enforced)."
+  required:
+    - sql
+
+outputs:
+  type: object
+  properties:
+    query_id:
+      type: string
+    row_count:
+      type: integer
+    results:
+      type: array
+      items:
+        type: object

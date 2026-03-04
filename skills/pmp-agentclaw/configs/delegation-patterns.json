@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "orchestrationMode": "hub-and-spoke",
+  "raciMapping": {
+    "Responsible": {
+      "role": "Executor agent",
+      "behavior": "Performs the assigned work package",
+      "monitoring": "Report progress at defined intervals"
+    },
+    "Accountable": {
+      "role": "PMP-Agent (orchestrator)",
+      "behavior": "Owns deliverable quality, validates outputs, synthesizes results",
+      "monitoring": "Reviews every deliverable against acceptance criteria"
+    },
+    "Consulted": {
+      "role": "Specialist agent",
+      "behavior": "Provides domain expertise when queried",
+      "monitoring": "Available on-demand, responds within context"
+    },
+    "Informed": {
+      "role": "Reporting/notification agent",
+      "behavior": "Receives status updates, generates reports",
+      "monitoring": "Passive recipient of delegation log updates"
+    }
+  },
+  "delegationProtocol": {
+    "taskAssignment": {
+      "required": ["taskId", "wbsElement", "description", "acceptanceCriteria", "deadline", "assignedAgent"],
+      "optional": ["dependencies", "estimatedEffort", "priority", "riskLevel"]
+    },
+    "statusUpdate": {
+      "required": ["taskId", "status", "percentComplete", "blockers"],
+      "statuses": ["NOT_STARTED", "IN_PROGRESS", "BLOCKED", "IN_REVIEW", "COMPLETE"]
+    },
+    "qualityGate": {
+      "checks": ["deliverableExists", "acceptanceCriteriaMet", "noOpenBlockers", "peerReviewed"],
+      "escalation": "If quality gate fails twice, escalate to human stakeholder"
+    }
+  },
+  "preConfiguredTeam": {
+    "description": "When agents are pre-registered in AGENTS.md, use direct agent-send delegation",
+    "discovery": "Read AGENTS.md to identify available agents and capabilities",
+    "fallback": "If required specialist unavailable, PMP-Agent handles the task directly"
+  },
+  "dynamicSpawning": {
+    "description": "When no pre-configured team exists, recommend sub-agent creation",
+    "pattern": "Decompose WBS → identify required specializations → suggest agent creation per knowledge area",
+    "maxConcurrent": 5,
+    "lifecycle": "Spawn for task scope → deliver → terminate"
+  }
+}

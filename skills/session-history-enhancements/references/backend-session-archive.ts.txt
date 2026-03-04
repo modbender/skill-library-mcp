@@ -1,0 +1,285 @@
+import fs from "node:fs";
+import path from "node:path";
+import {
+  indexSession,
+  updateSessionStatus,
+  type SessionHistoryRow,
+} from "../config/sessions/history-db.js";
+import { initHistoryDbWithMigration } from "../config/sessions/history-migration.js";
+import type { SessionEntry } from "../config/sessions/types.js";
+import {
+  readFirstUserMessageFromTranscript,
+  readSessionMessages,
+  resolveSessionTranscriptCandidates,
+} from "./session-utils.fs.js";
+
+export type ArchiveSessionParams = {
+  sessionEntry: SessionEntry;
+  sessionsDir: string;
+  agentId: string;
+  reason?: string;
+};
+
+export type RestoreSessionParams = {
+  sessionId: string;
+  sessionsDir: string;
+  agentId: string;
+};
+
+export type ExtractedTranscriptMetadata = {
+  messageCount: number;
+  firstMessage?: string;
+  totalTokens?: number;
+  createdAt?: number;
+  updatedAt?: number;
+};
+
+/**
+ * Ensure the archive directory exists
+ */
+export function ensureArchiveDir(sessionsDir: string): void {
+  const archiveDir = path.join(sessionsDir, "archive");
+  if (!fs.existsSync(archiveDir)) {
+    fs.mkdirSync(archiveDir, { recursive: true });
+  }
+}
+
+/**
+ * Extract metadata from a transcript file
+ */
+export function extractTranscriptMetadata(
+  sessionId: string,
+  storePath: string | undefined,
+  sessionFile?: string,
+  agentId?: string,
+): ExtractedTranscriptMetadata {
+  // Count messages by reading all messages
+  const messages = readSessionMessages(sessionId, storePath, sessionFile);
+  const messageCount = messages.length;
+
+  // Extract first user message
+  const firstMessage = readFirstUserMessageFromTranscript(
+    sessionId,
+    storePath,
+    sessionFile,
+    agentId,
+    { includeInterSession: false },
+  );
+
+  // Try to extract timestamps from session header (first line of transcript)
+  let createdAt: number | undefined;
+  let updatedAt: number | undefined;
+
+  const candidates = resolveSessionTranscriptCandidates(sessionId, storePath, sessionFile, agentId);
+  const filePath = candidates.find((p) => fs.existsSync(p));
+
+  if (filePath) {
+    try {
+      const firstLine = fs.readFileSync(filePath, "utf-8").split(/\r?\n/)[0];
+      if (firstLine?.trim()) {
+        const parsed = JSON.parse(firstLine);
+        if (parsed?.type === "session") {
+          const timestamp = parsed.timestamp;
+          if (typeof timestamp === "string") {
+            createdAt = Date.parse(timestamp);
+            if (Number.isNaN(createdAt)) {
+              createdAt = undefined;
+            }
+          }
+        }
+      }
+
+      // Use file mtime as fallback for updatedAt
+      const stat = fs.statSync(filePath);
+      updatedAt = stat.mtimeMs;
+    } catch {
+      // Ignore errors, use fallbacks
+    }
+  }
+
+  // Use current time as fallbacks
+  const now = Date.now();
+  createdAt = createdAt || now;
+  updatedAt = updatedAt || now;
+
+  return {
+    messageCount,
+    firstMessage: firstMessage || undefined,
+    totalTokens: undefined, // TODO: Extract from transcript if available
+    createdAt,
+    updatedAt,
+  };
+}
+
+/**
+ * Archive a session: move transcript to archive/ folder and index in SQLite
+ */
+export function archiveSessionToHistory(params: ArchiveSessionParams): void {
+  const { sessionEntry, sessionsDir, agentId } = params;
+
+  // Ensure archive directory exists
+  ensureArchiveDir(sessionsDir);
+
+  // Initialize/get the history database
+  const historyDb = initHistoryDbWithMigration(sessionsDir, agentId);
+
+  // Find the current transcript file
+  const storePath = path.join(sessionsDir, "sessions.json");
+  const candidates = resolveSessionTranscriptCandidates(
+    sessionEntry.sessionId,
+    storePath,
+    sessionEntry.sessionFile,
+    agentId,
+  );
+
+  const currentTranscriptPath = candidates.find((p) => fs.existsSync(p));
+  if (!currentTranscriptPath) {
+    // No transcript file found, but still create a database record
+    const historyEntry: SessionHistoryRow = {
+      sessionId: sessionEntry.sessionId,
+      agentId,
+      sessionKey: "", // Will need to derive this from context
+      displayName: sessionEntry.displayName,
+      createdAt: Date.now(),
+      updatedAt: sessionEntry.updatedAt || Date.now(),
+      archivedAt: Date.now(),
+      messageCount: 0,
+      filePath: "", // No file
+      firstMessage: undefined,
+      channel: sessionEntry.lastChannel,
+      chatType: sessionEntry.chatType || "direct",
+      totalTokens: undefined,
+      status: "archived",
+    };
+
+    indexSession(historyDb, historyEntry);
+    return;
+  }
+
+  // Extract metadata from transcript
+  const metadata = extractTranscriptMetadata(
+    sessionEntry.sessionId,
+    storePath,
+    sessionEntry.sessionFile,
+    agentId,
+  );
+
+  // Determine new archive path
+  const transcriptFileName = path.basename(currentTranscriptPath);
+  const archiveTranscriptPath = path.join(sessionsDir, "archive", transcriptFileName);
+
+  try {
+    // Move transcript file to archive directory
+    if (currentTranscriptPath !== archiveTranscriptPath) {
+      fs.renameSync(currentTranscriptPath, archiveTranscriptPath);
+    }
+
+    // Create history database entry
+    const historyEntry: SessionHistoryRow = {
+      sessionId: sessionEntry.sessionId,
+      agentId,
+      sessionKey: "", // Will need to derive this from the session context
+      displayName: sessionEntry.displayName,
+      createdAt: metadata.createdAt || Date.now(),
+      updatedAt: metadata.updatedAt || sessionEntry.updatedAt || Date.now(),
+      archivedAt: Date.now(),
+      messageCount: metadata.messageCount,
+      filePath: archiveTranscriptPath,
+      firstMessage: metadata.firstMessage,
+      channel: sessionEntry.lastChannel,
+      chatType: sessionEntry.chatType || "direct",
+      totalTokens: metadata.totalTokens,
+      status: "archived",
+    };
+
+    indexSession(historyDb, historyEntry);
+  } catch (error) {
+    // If move fails, log but don't throw - we don't want to break session creation
+    console.error(`Failed to archive session ${sessionEntry.sessionId}:`, error);
+  }
+}
+
+/**
+ * Restore a session from archive: move transcript back and update database
+ */
+export function restoreSessionFromArchive(params: RestoreSessionParams): SessionHistoryRow | null {
+  const { sessionId, sessionsDir, agentId } = params;
+
+  // Get the history database
+  const historyDb = initHistoryDbWithMigration(sessionsDir, agentId);
+
+  // Find the session in history
+  const stmt = historyDb.prepare(`SELECT * FROM session_history WHERE sessionId = ?`);
+  const historyEntry = stmt.get(sessionId) as SessionHistoryRow | undefined;
+
+  if (!historyEntry) {
+    return null;
+  }
+
+  // Check if the archived file exists
+  if (!historyEntry.filePath || !fs.existsSync(historyEntry.filePath)) {
+    return null;
+  }
+
+  try {
+    // Determine the active session file name (restore to original location)
+    const archiveFileName = path.basename(historyEntry.filePath);
+    const activeTranscriptPath = path.join(sessionsDir, archiveFileName);
+
+    // Move file back from archive to active sessions directory
+    if (historyEntry.filePath !== activeTranscriptPath) {
+      fs.renameSync(historyEntry.filePath, activeTranscriptPath);
+    }
+
+    // Update the database record
+    const updatedEntry: SessionHistoryRow = {
+      ...historyEntry,
+      filePath: activeTranscriptPath,
+      status: "active",
+      updatedAt: Date.now(),
+      archivedAt: undefined,
+    };
+
+    updateSessionStatus(historyDb, sessionId, "active");
+
+    return updatedEntry;
+  } catch (error) {
+    console.error(`Failed to restore session ${sessionId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Index an existing session as active (for new sessions)
+ */
+export function indexActiveSession(params: {
+  sessionEntry: SessionEntry;
+  sessionKey: string;
+  sessionsDir: string;
+  agentId: string;
+}): void {
+  const { sessionEntry, sessionKey, sessionsDir, agentId } = params;
+
+  // Initialize/get the history database
+  const historyDb = initHistoryDbWithMigration(sessionsDir, agentId);
+
+  // Create active session record
+  const historyEntry: SessionHistoryRow = {
+    sessionId: sessionEntry.sessionId,
+    agentId,
+    sessionKey,
+    displayName: sessionEntry.displayName,
+    createdAt: Date.now(),
+    updatedAt: sessionEntry.updatedAt || Date.now(),
+    archivedAt: undefined,
+    messageCount: 0, // New session starts with 0 messages
+    filePath: "", // Will be set when transcript file is created
+    firstMessage: undefined,
+    channel: sessionEntry.lastChannel,
+    chatType: sessionEntry.chatType || "direct",
+    totalTokens: undefined,
+    status: "active",
+  };
+
+  indexSession(historyDb, historyEntry);
+}

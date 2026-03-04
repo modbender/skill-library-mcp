@@ -1,0 +1,72 @@
+name: pc-assistant
+version: "1.2.4"
+description: PC healthcheck and diagnostics for Linux, Windows, and macOS. Read-only system diagnostics - CPU, memory, disk, network, processes, services, packages, SSH config, and security logs. Includes scheduler for automated runs via cron. Reports contain sensitive system info - keep reports private.
+author: Muhammad Hakim
+license: MIT
+
+# Platform support
+platforms:
+  - linux
+  - darwin
+  - windows
+
+# Files to install (relative to skill root)
+files:
+  - scripts/healthcheck.sh      # Linux/WSL
+  - scripts/healthcheck.command # macOS
+  - scripts/healthcheck.ps1     # Windows PowerShell
+  - scripts/run.sh              # Convenience wrapper (auto-detects OS)
+  - scripts/run.ps1             # Windows runner
+  - scripts/schedule.sh         # Scheduler for cron jobs
+
+# Required tools (optional - script handles missing tools gracefully)
+dependencies:
+  - bash
+  - coreutils
+
+# Optional tools (checked at runtime)
+optional_dependencies:
+  - systemctl
+  - docker
+  - nvidia-smi
+  - smartctl
+
+# Permissions required (documented for user awareness)
+permissions:
+  - read: system-info       # CPU, memory, disk, network
+  - read: user-info         # logged-in users, groups
+  - read: security-logs     # auth.log (failed logins)
+  - read: ssh-config        # authorized_keys, known_hosts
+  - read: package-lists     # apt, npm, pip, etc.
+
+# Security notes:
+# - Reports contain system info, SSH key filenames, package lists
+# - Do not share reports publicly or leave in world-readable locations
+# - When scheduling, use a private output directory
+# - Run as regular user, not root
+
+# Install location
+install_path: ~/.npm-global/lib/node_modules/openclaw/skills/pc-assistant
+
+# Commands provided
+commands:
+  - name: healthcheck
+    script: scripts/run.sh
+    description: Run PC healthcheck (auto-detects OS)
+    usage: |
+      # Run full healthcheck
+      ~/.npm-global/lib/node_modules/openclaw/skills/pc-assistant/scripts/run.sh
+
+      # Run Linux-specific
+      ~/.npm-global/lib/node_modules/openclaw/skills/pc-assistant/scripts/healthcheck.sh
+
+  - name: schedule
+    script: scripts/schedule.sh
+    description: Run scheduled healthcheck with configurable output
+    usage: |
+      # Run with defaults
+      ~/.npm-global/lib/node_modules/openclaw/skills/pc-assistant/scripts/schedule.sh
+
+      # Custom output directory
+      PC_ASSISTANT_OUTPUT_DIR="$HOME/Downloads/reports" \
+        ~/.npm-global/lib/node_modules/openclaw/skills/pc-assistant/scripts/schedule.sh

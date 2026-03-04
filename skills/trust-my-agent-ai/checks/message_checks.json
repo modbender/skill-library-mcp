@@ -1,0 +1,86 @@
+{
+  "version": "2.0",
+  "description": "Python-backed security sensors: secrets detection, behavioral analysis, and agent monitoring",
+  "checks": [
+    {
+      "check_id": "SEC-001",
+      "name": "No secrets in environment",
+      "description": "Detect secrets in environment variables using pattern matching and Shannon entropy analysis",
+      "category": "secrets",
+      "severity": "critical",
+      "type": "python"
+    },
+    {
+      "check_id": "SEC-002",
+      "name": "No exposed cloud credentials",
+      "description": "Check for AWS, GCP, and Azure credentials in environment and credential files",
+      "category": "secrets",
+      "severity": "critical",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-001",
+      "name": "MCP servers from trusted sources",
+      "description": "Verify MCP server configurations use trusted packages and don't use suspicious paths or env overrides",
+      "category": "skills",
+      "severity": "high",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-002",
+      "name": "No suspicious tool call patterns",
+      "description": "Analyze recent tool calls for dangerous patterns and behavioral anomalies (bash ratio, directory enumeration)",
+      "category": "integrity",
+      "severity": "critical",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-003",
+      "name": "Skills have valid manifests",
+      "description": "Verify installed skills have SKILL.md manifests, no dangerous permissions, and no obfuscated code",
+      "category": "skills",
+      "severity": "high",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-004",
+      "name": "Session transcripts accessible and valid",
+      "description": "Check session files have proper permissions, valid JSONL, and reasonable sizes",
+      "category": "social_guards",
+      "severity": "high",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-005",
+      "name": "No secrets in conversation context",
+      "description": "Scan agent conversation history for leaked credentials, API keys, or tokens",
+      "category": "secrets",
+      "severity": "critical",
+      "type": "python"
+    },
+    {
+      "check_id": "MSG-006",
+      "name": "No suspicious URLs in session",
+      "description": "Check URLs for data exfiltration services, tunneling, raw IPs, and unusual ports",
+      "category": "integrity",
+      "severity": "high",
+      "type": "python"
+    },
+    {
+      "check_id": "SOC-005",
+      "name": "Moltbook posts pass integrity review",
+      "description": "If Moltbook skill is installed, find the agent's username and scan recent posts (last 15 min) for moral or integrity violations such as hiding information from humans, discussing credential access, or deceptive behavior",
+      "category": "social_guards",
+      "severity": "critical",
+      "type": "python"
+    },
+    {
+      "check_id": "SOC-006",
+      "name": "Human owner has verifiable social reputation",
+      "description": "If Moltbook skill is installed, retrieve the human owner's X/Twitter profile and assess reputation based on follower count: <10 followers = no reputation (high risk), 10-1000 = some reputation (medium risk), >1000 = socially verified (low risk)",
+      "category": "social_guards",
+      "severity": "medium",
+      "type": "python"
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+// Add these handlers to: src/gateway/server-methods/sessions.ts
+// inside the sessionsHandlers object.
+//
+// Required imports to add at the top of the file:
+//
+//   import {
+//     listArchivedSessions,
+//     updateSessionName,
+//     deleteSessionRecord,
+//   } from "../../config/sessions/history-db.js";
+//   import { initHistoryDbWithMigration } from "../../config/sessions/history-migration.js";
+//   import { resolveSessionTranscriptsDirForAgent } from "../../config/sessions/paths.js";
+//   import { archiveSessionToHistory, restoreSessionFromArchive } from "../session-archive.js";
+//
+// And import the validators from protocol/index.ts:
+//   validateSessionsArchivedParams,
+//   validateSessionsResumeParams,
+//   validateSessionsRenameParams,
+//   validateSessionsDeleteArchivedParams,
+
+  // ── Archive active session (deactivate + move to history) ──────
+
+  "sessions.archive": async ({ params, respond }) => {
+    // Reuses validateSessionsDeleteParams (needs { key } param)
+    if (!assertValidParams(params, validateSessionsDeleteParams, "sessions.archive", respond)) {
+      return;
+    }
+    const p = params;
+    const key = requireSessionKey(p.key, respond);
+    if (!key) {
+      return;
+    }
+
+    const { cfg, target, storePath } = resolveGatewaySessionTargetFromKey(key);
+    const mainKey = resolveMainSessionKey(cfg);
+    if (target.canonicalKey === mainKey) {
+      respond(
+        false,
+        undefined,
+        errorShape(ErrorCodes.INVALID_REQUEST, `Cannot archive the main session (${mainKey}).`),
+      );
+      return;
+    }
+
+    const { entry } = loadSessionEntry(key);
+    if (!entry) {
+      respond(false, undefined, errorShape(ErrorCodes.NotFound, `Session not found: ${key}`));
+      return;
+    }
+
+    const sessionId = entry.sessionId;
+    const cleanupError = await ensureSessionRuntimeCleanup({ cfg, key, target, sessionId });
+    if (cleanupError) {
+      respond(false, undefined, cleanupError);
+      return;
+    }
+
+    // Archive transcript to history.db + move to archive/ folder
+    try {
+      const sessionsDir = resolveSessionTranscriptsDirForAgent(target.agentId);
+      archiveSessionToHistory({
+        sessionEntry: entry,
+        sessionsDir,
+        agentId: target.agentId,
+        reason: "archived",
+      });
+    } catch (err) {
+      // Log but don't fail — the session store removal is more important
+      console.error(`Failed to index archived session ${sessionId}:`, err);
+    }
+
+    // Remove from active session store
+    await updateSessionStore(storePath, (store) => {
+      const { primaryKey } = migrateAndPruneSessionStoreKey({ cfg, key, store });
+      if (store[primaryKey]) {
+        delete store[primaryKey];
+      }
+    });
+
+    respond(true, { ok: true, key: target.canonicalKey, archived: true }, undefined);
+  },
+
+  // ── List archived sessions (with pagination + search) ─────────
+
+  "sessions.archived": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateSessionsArchivedParams, "sessions.archived", respond)) {
+      return;
+    }
+
+    const { agentId, limit = 50, offset = 0, search, status = "archived" } = params;
+    const config = loadConfig();
+    const resolvedAgentId = agentId ?? resolveDefaultAgentId(config);
+
+    try {
+      const sessionsDir = resolveSessionTranscriptsDirForAgent(resolvedAgentId);
+      const historyDb = initHistoryDbWithMigration(sessionsDir, resolvedAgentId);
+
+      const result = listArchivedSessions(historyDb, {
+        agentId: resolvedAgentId,
+        limit,
+        offset,
+        search,
+        status,
+      });
+
+      respond(true, result, undefined);
+    } catch (error) {
+      respond(false, undefined, errorShape(ErrorCodes.InternalError, String(error), true));
+    }
+  },
+
+  // ── Resume archived session ───────────────────────────────────
+
+  "sessions.resume": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateSessionsResumeParams, "sessions.resume", respond)) {
+      return;
+    }
+
+    const { sessionId, agentId } = params;
+    const config = loadConfig();
+    const resolvedAgentId = agentId ?? resolveDefaultAgentId(config);
+
+    try {
+      const sessionsDir = resolveSessionTranscriptsDirForAgent(resolvedAgentId);
+      const restored = restoreSessionFromArchive({
+        sessionId,
+        sessionsDir,
+        agentId: resolvedAgentId,
+      });
+
+      if (!restored) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.NotFound, "Session not found in archive", false),
+        );
+        return;
+      }
+
+      respond(
+        true,
+        {
+          sessionId: restored.sessionId,
+          sessionKey: restored.sessionKey,
+          displayName: restored.displayName,
+          status: restored.status,
+        },
+        undefined,
+      );
+    } catch (error) {
+      respond(false, undefined, errorShape(ErrorCodes.InternalError, String(error), true));
+    }
+  },
+
+  // ── Rename archived session ───────────────────────────────────
+
+  "sessions.rename": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateSessionsRenameParams, "sessions.rename", respond)) {
+      return;
+    }
+
+    const { sessionId, displayName, agentId } = params;
+    const config = loadConfig();
+    const resolvedAgentId = agentId ?? resolveDefaultAgentId(config);
+
+    try {
+      const sessionsDir = resolveSessionTranscriptsDirForAgent(resolvedAgentId);
+      const historyDb = initHistoryDbWithMigration(sessionsDir, resolvedAgentId);
+
+      updateSessionName(historyDb, sessionId, displayName);
+      respond(true, { sessionId, displayName }, undefined);
+    } catch (error) {
+      respond(false, undefined, errorShape(ErrorCodes.InternalError, String(error), true));
+    }
+  },
+
+  // ── Delete archived session ───────────────────────────────────
+
+  "sessions.deleteArchived": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateSessionsDeleteArchivedParams, "sessions.deleteArchived", respond)) {
+      return;
+    }
+
+    const { sessionId, agentId, deleteTranscript = false } = params;
+    const config = loadConfig();
+    const resolvedAgentId = agentId ?? resolveDefaultAgentId(config);
+
+    try {
+      const sessionsDir = resolveSessionTranscriptsDirForAgent(resolvedAgentId);
+      const historyDb = initHistoryDbWithMigration(sessionsDir, resolvedAgentId);
+
+      const sessionRecord = historyDb
+        .prepare(`SELECT * FROM session_history WHERE sessionId = ?`)
+        .get(sessionId) as unknown;
+
+      if (!sessionRecord) {
+        respond(false, undefined, errorShape(ErrorCodes.NotFound, "Session not found", false));
+        return;
+      }
+
+      const filePath = (sessionRecord as { filePath?: string }).filePath;
+      if (deleteTranscript && filePath && fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      deleteSessionRecord(historyDb, sessionId);
+
+      respond(
+        true,
+        {
+          sessionId,
+          transcriptDeleted: Boolean(deleteTranscript && filePath),
+        },
+        undefined,
+      );
+    } catch (error) {
+      respond(false, undefined, errorShape(ErrorCodes.InternalError, String(error), true));
+    }
+  },

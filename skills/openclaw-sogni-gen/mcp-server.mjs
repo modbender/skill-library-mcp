@@ -1,0 +1,846 @@
+#!/usr/bin/env node
+/**
+ * sogni-gen MCP Server
+ *
+ * Exposes Sogni AI image/video generation as MCP tools for Claude Code
+ * and Claude Desktop.  Wraps the sogni-gen CLI using its --json mode.
+ *
+ * Install (Claude Code):
+ *   claude mcp add sogni -- npx -y -p sogni-gen sogni-gen-mcp
+ *
+ * Install (Claude Desktop – add to claude_desktop_config.json):
+ *   { "mcpServers": { "sogni": { "command": "npx", "args": ["-y", "-p", "sogni-gen", "sogni-gen-mcp"] } } }
+ */
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { homedir } from 'os';
+
+// ---------------------------------------------------------------------------
+// Paths
+// ---------------------------------------------------------------------------
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const SOGNI_GEN = join(__dirname, 'sogni-gen.mjs');
+const DEFAULT_CREDENTIALS_PATH = join(homedir(), '.config', 'sogni', 'credentials');
+const DEFAULT_DOWNLOADS_DIR = join(homedir(), 'Downloads', 'sogni');
+const CREDENTIALS_PATH = process.env.SOGNI_CREDENTIALS_PATH?.trim() || DEFAULT_CREDENTIALS_PATH;
+const DOWNLOADS_DIR = process.env.SOGNI_DOWNLOADS_DIR?.trim() || DEFAULT_DOWNLOADS_DIR;
+const MCP_SAVE_DOWNLOADS = process.env.SOGNI_MCP_SAVE_DOWNLOADS !== '0';
+const SERVER_VERSION = (() => {
+  try {
+    const pkg = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf8'));
+    return pkg.version || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+})();
+
+// ---------------------------------------------------------------------------
+// Input sanitization — validate MCP tool inputs before passing to CLI
+// ---------------------------------------------------------------------------
+
+/**
+ * Reject null bytes and control characters in a string value.
+ * Throws on invalid input; returns the string unchanged when valid.
+ */
+function sanitizeString(value, label) {
+  if (typeof value !== 'string') {
+    throw new Error(`${label || 'Value'} must be a string.`);
+  }
+  if (value.includes('\0')) {
+    throw new Error(`${label || 'Value'} contains a null byte.`);
+  }
+  if (/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(value)) {
+    throw new Error(`${label || 'Value'} contains invalid control characters.`);
+  }
+  return value;
+}
+
+/**
+ * Validate a string is one of the allowed values (case-sensitive).
+ */
+function validateEnum(value, allowed, label) {
+  sanitizeString(value, label);
+  if (!allowed.includes(value)) {
+    throw new Error(`${label || 'Value'} must be one of: ${allowed.join(', ')}`);
+  }
+  return value;
+}
+
+// ---------------------------------------------------------------------------
+// CLI spawning helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Spawn `node sogni-gen.mjs --json ...args`, collect stdout, parse JSON.
+ * Returns the parsed object on success or throws on failure.
+ */
+function runSogniGen(args, { timeoutMs = 30_000 } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [SOGNI_GEN, '--json', '--quiet', ...args], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: timeoutMs,
+    });
+
+    const stdoutChunks = [];
+    const stderrChunks = [];
+
+    child.stdout.on('data', (chunk) => stdoutChunks.push(chunk));
+    child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
+
+    child.on('error', (err) => {
+      reject(new Error(`Failed to spawn sogni-gen: ${err.message}`));
+    });
+
+    child.on('close', (code) => {
+      const stdout = Buffer.concat(stdoutChunks).toString('utf8').trim();
+      const stderr = Buffer.concat(stderrChunks).toString('utf8').trim();
+
+      if (!stdout) {
+        reject(new Error(stderr || `sogni-gen exited with code ${code} and no output`));
+        return;
+      }
+
+      try {
+        const result = JSON.parse(stdout);
+        resolve(result);
+      } catch {
+        reject(new Error(`Failed to parse sogni-gen output: ${stdout.slice(0, 500)}`));
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Credential check helper
+// ---------------------------------------------------------------------------
+
+function checkCredentials() {
+  if (existsSync(CREDENTIALS_PATH)) return null;
+  if (process.env.SOGNI_USERNAME && process.env.SOGNI_PASSWORD) return null;
+  return {
+    content: [
+      {
+        type: 'text',
+        text: [
+          'Sogni credentials not found. Please set up credentials:',
+          '',
+          '1. Create a Sogni account at https://sogni.ai',
+          '2. Create the credentials file:',
+          '',
+          '   mkdir -p ~/.config/sogni',
+          '   cat > ~/.config/sogni/credentials << \'EOF\'',
+          '   SOGNI_USERNAME=your_username',
+          '   SOGNI_PASSWORD=your_password',
+          '   EOF',
+          '   chmod 600 ~/.config/sogni/credentials',
+          '',
+          'Or set SOGNI_USERNAME and SOGNI_PASSWORD environment variables.',
+          'Optional: set SOGNI_CREDENTIALS_PATH to use a different credentials file path.',
+        ].join('\n'),
+      },
+    ],
+    isError: true,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Result formatting
+// ---------------------------------------------------------------------------
+
+async function formatSuccess(result) {
+  const parts = [];
+
+  if (result.type === 'balance') {
+    parts.push(`SPARK: ${result.spark ?? 'N/A'}`);
+    parts.push(`SOGNI: ${result.sogni ?? 'N/A'}`);
+    return { content: [{ type: 'text', text: parts.join('\n') }] };
+  }
+
+  // Image / video result
+  if (result.prompt) parts.push(`Prompt: ${result.prompt}`);
+  parts.push(`Model: ${result.model}`);
+  parts.push(`Size: ${result.width}x${result.height}`);
+  if (result.seed != null) parts.push(`Seed: ${result.seed}`);
+
+  if (result.type === 'video') {
+    if (result.workflow) parts.push(`Workflow: ${result.workflow}`);
+    if (result.duration) parts.push(`Duration: ${result.duration}s`);
+    if (result.fps) parts.push(`FPS: ${result.fps}`);
+  }
+
+  if (result.localPath) parts.push(`Saved to: ${result.localPath}`);
+
+  // URLs
+  const urls = result.urls || [];
+  if (urls.length > 0) {
+    parts.push('');
+    urls.forEach((url, i) => {
+      parts.push(urls.length === 1 ? `URL: ${url}` : `URL #${i + 1}: ${url}`);
+    });
+  }
+
+  const content = [{ type: 'text', text: parts.join('\n') }];
+
+  // Download images/videos and save locally + embed as base64 for MCP clients
+  // that support inline image rendering (e.g. Claude Desktop).
+  // For Claude Code (terminal), the saved file path is the primary way to view results.
+  const savedPaths = [];
+  for (const url of urls) {
+    const isImage = /\.(png|jpg|jpeg|webp|gif)(\?|$)/i.test(url);
+    const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url);
+
+    if (!isImage && !isVideo) continue;
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) continue;
+      const buf = Buffer.from(await resp.arrayBuffer());
+
+      // Determine extension and build a temp file path
+      const ext = isImage
+        ? (url.match(/\.(png|jpg|jpeg|webp|gif)/i)?.[1]?.toLowerCase() || 'png')
+        : (url.match(/\.(mp4|webm|mov)/i)?.[1]?.toLowerCase() || 'mp4');
+
+      // Save to local disk (default: ~/Downloads/sogni) so terminal users can open files.
+      if (MCP_SAVE_DOWNLOADS) {
+        const { mkdirSync, writeFileSync } = await import('fs');
+        mkdirSync(DOWNLOADS_DIR, { recursive: true });
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const filename = `sogni-${timestamp}-${savedPaths.length}.${ext}`;
+        const filePath = join(DOWNLOADS_DIR, filename);
+        writeFileSync(filePath, buf);
+        savedPaths.push(filePath);
+      }
+
+      // For images, also embed as base64 (Claude Desktop can render these)
+      if (isImage) {
+        const mimeType = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
+          : ext === 'webp' ? 'image/webp'
+          : ext === 'gif' ? 'image/gif'
+          : 'image/png';
+        content.push({ type: 'image', data: buf.toString('base64'), mimeType });
+      }
+    } catch {
+      // If download fails, skip — the URL is still in the text above
+    }
+  }
+
+  // Append saved file paths to the text output so Claude Code users can see/open them
+  if (savedPaths.length > 0) {
+    const textBlock = content[0];
+    textBlock.text += '\n\n' + savedPaths.map((p, i) =>
+      savedPaths.length === 1 ? `📁 Saved: ${p}` : `📁 Saved #${i + 1}: ${p}`
+    ).join('\n');
+    textBlock.text += '\n\nTip: In Claude Code, ask Claude to run `open <path>` to view the file.';
+  }
+
+  return { content };
+}
+
+function formatError(result) {
+  const parts = [`Error: ${result.error}`];
+  if (result.errorCode) parts.push(`Code: ${result.errorCode}`);
+  if (result.hint) parts.push(`Hint: ${result.hint}`);
+  return { content: [{ type: 'text', text: parts.join('\n') }], isError: true };
+}
+
+async function formatResult(result) {
+  if (result.success === false) return formatError(result);
+  return formatSuccess(result);
+}
+
+async function runAndFormat(args, { timeoutMs = 30_000, requireCredentials = true } = {}) {
+  if (requireCredentials) {
+    const credErr = checkCredentials();
+    if (credErr) return credErr;
+  }
+  const result = await runSogniGen(args, { timeoutMs });
+  return formatResult(result);
+}
+
+// ---------------------------------------------------------------------------
+// Tool definitions
+// ---------------------------------------------------------------------------
+
+const IMAGE_MODEL_TABLE = `Image Models:
+  z_image_turbo_bf16         — Fast (~5-10s), general purpose (default)
+  flux1-schnell-fp8          — Very fast (~3-5s), quick iterations
+  flux2_dev_fp8              — Slow (~2min), high quality
+  chroma-v.46-flash_fp8      — Medium (~30s), balanced
+  qwen_image_edit_2511_fp8   — Medium (~30s), image editing with context
+  qwen_image_edit_2511_fp8_lightning — Fast (~8s), quick image editing`;
+
+const VIDEO_MODEL_TABLE = `WAN 2.2 Video Models (auto-selected per workflow):
+  wan_v2.2-14b-fp8_t2v_lightx2v             — Text-to-video (~5min)
+  wan_v2.2-14b-fp8_i2v_lightx2v             — Image-to-video (~3-5min)
+  wan_v2.2-14b-fp8_s2v_lightx2v             — Sound-to-video (~5min)
+  wan_v2.2-14b-fp8_animate-move_lightx2v    — Animate-move (~5min)
+  wan_v2.2-14b-fp8_animate-replace_lightx2v — Animate-replace (~5min)
+
+LTX-2 Video Models:
+  ltx2-19b-fp8_t2v_distilled              — Text-to-video, fast 8-step (~2-3min)
+  ltx2-19b-fp8_t2v                        — Text-to-video, quality 20-step (~5min)
+  ltx2-19b-fp8_v2v_distilled              — Video-to-video with ControlNet (~3min)
+  ltx2-19b-fp8_v2v                        — Video-to-video with ControlNet, quality (~5min)`;
+
+const TOOLS = [
+  {
+    name: 'generate_image',
+    description: `Generate an image using Sogni AI's decentralized GPU network.
+
+${IMAGE_MODEL_TABLE}
+
+Cost: Uses Spark tokens. 512x512 is most cost-efficient. Claim 50 free daily Spark at https://app.sogni.ai/`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: {
+          type: 'string',
+          description: 'Image description / generation prompt',
+        },
+        model: {
+          type: 'string',
+          description: 'Model ID (default: z_image_turbo_bf16)',
+        },
+        width: {
+          type: 'number',
+          description: 'Image width in pixels (default: 512)',
+        },
+        height: {
+          type: 'number',
+          description: 'Image height in pixels (default: 512)',
+        },
+        count: {
+          type: 'number',
+          description: 'Number of images to generate (default: 1)',
+        },
+        seed: {
+          type: 'number',
+          description: 'Specific seed for reproducibility',
+        },
+        output: {
+          type: 'string',
+          description: 'Save image to this file path',
+        },
+        output_format: {
+          type: 'string',
+          enum: ['png', 'jpg'],
+          description: 'Output format (default: png)',
+        },
+        loras: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'LoRA model IDs',
+        },
+        lora_strengths: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'LoRA strengths (parallel to loras array)',
+        },
+      },
+      required: ['prompt'],
+    },
+  },
+  {
+    name: 'generate_video',
+    description: `Generate a video using Sogni AI's decentralized GPU network.
+
+Workflows:
+  t2v             — Text-to-video (default). Just provide a prompt.
+  i2v             — Image-to-video. Provide ref (reference image). Supports looping.
+  s2v             — Sound-to-video. Provide ref (face image) + ref_audio.
+  v2v             — Video-to-video (LTX-2). Provide ref_video + controlnet_name.
+  animate-move    — Transfer motion from ref_video to ref image.
+  animate-replace — Replace subject in ref_video with ref image.
+
+${VIDEO_MODEL_TABLE}
+
+WAN video dimensions: divisible by 16, min 480px, max 1536px. LTX-2: divisible by 64, 768-1920px.
+Generation takes 3-5 minutes. Cost: Uses Spark tokens. Claim 50 free daily Spark at https://app.sogni.ai/`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: {
+          type: 'string',
+          description: 'Video description / generation prompt',
+        },
+        workflow: {
+          type: 'string',
+          enum: ['t2v', 'i2v', 's2v', 'v2v', 'animate-move', 'animate-replace'],
+          description: 'Video workflow (default: t2v, auto-inferred from provided refs)',
+        },
+        model: {
+          type: 'string',
+          description: 'Model ID (auto-selected per workflow by default)',
+        },
+        width: {
+          type: 'number',
+          description: 'Video width in pixels (default: 512, must be divisible by 16)',
+        },
+        height: {
+          type: 'number',
+          description: 'Video height in pixels (default: 512, must be divisible by 16)',
+        },
+        fps: {
+          type: 'number',
+          description: 'Frames per second (default: 16)',
+        },
+        duration: {
+          type: 'number',
+          description: 'Duration in seconds (default: 5)',
+        },
+        frames: {
+          type: 'number',
+          description: 'Override total frame count (alternative to duration)',
+        },
+        ref: {
+          type: 'string',
+          description: 'Reference image path or URL (for i2v, s2v, animate workflows)',
+        },
+        ref_end: {
+          type: 'string',
+          description: 'End frame image path or URL (for i2v interpolation)',
+        },
+        ref_audio: {
+          type: 'string',
+          description: 'Reference audio file path (for s2v workflow)',
+        },
+        ref_video: {
+          type: 'string',
+          description: 'Reference video file path (for animate and v2v workflows)',
+        },
+        controlnet_name: {
+          type: 'string',
+          enum: ['canny', 'pose', 'depth', 'detailer'],
+          description: 'ControlNet type for v2v workflow',
+        },
+        controlnet_strength: {
+          type: 'number',
+          description: 'ControlNet strength for v2v (0.0-1.0, default: 0.8)',
+        },
+        sam2_coordinates: {
+          type: 'string',
+          description: 'SAM2 click coordinates for animate-replace (x,y or x1,y1;x2,y2)',
+        },
+        trim_end_frame: {
+          type: 'boolean',
+          description: 'Trim last frame for seamless video stitching',
+        },
+        first_frame_strength: {
+          type: 'number',
+          description: 'Keyframe strength for start frame (0.0-1.0)',
+        },
+        last_frame_strength: {
+          type: 'number',
+          description: 'Keyframe strength for end frame (0.0-1.0)',
+        },
+        seed: {
+          type: 'number',
+          description: 'Specific seed for reproducibility',
+        },
+        output: {
+          type: 'string',
+          description: 'Save video to this file path',
+        },
+        looping: {
+          type: 'boolean',
+          description: 'Generate seamless loop (i2v only)',
+        },
+      },
+      required: ['prompt'],
+    },
+  },
+  {
+    name: 'edit_image',
+    description: `Edit or transform an existing image using Sogni AI (Qwen image editing models).
+
+Provide 1-3 context images and a prompt describing the desired edit. Examples:
+  - "make the background a beach"
+  - "apply pop art style"
+  - "remove the person on the left"
+  - "add a rainbow in the sky"
+
+Models:
+  qwen_image_edit_2511_fp8_lightning — Fast (~8s), default
+  qwen_image_edit_2511_fp8          — Medium (~30s), higher quality`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: {
+          type: 'string',
+          description: 'Editing instruction describing the desired change',
+        },
+        context_images: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Image file paths or URLs to edit (1-3 images)',
+          minItems: 1,
+          maxItems: 3,
+        },
+        model: {
+          type: 'string',
+          description: 'Model ID (default: qwen_image_edit_2511_fp8_lightning)',
+        },
+        width: {
+          type: 'number',
+          description: 'Output width in pixels',
+        },
+        height: {
+          type: 'number',
+          description: 'Output height in pixels',
+        },
+        output: {
+          type: 'string',
+          description: 'Save edited image to this file path',
+        },
+      },
+      required: ['prompt', 'context_images'],
+    },
+  },
+  {
+    name: 'photobooth',
+    description: `Generate stylized portraits from a face photo using InstantID face transfer.
+
+Provide a face reference image and a style prompt. Examples:
+  - "80s fashion portrait"
+  - "LinkedIn professional headshot"
+  - "oil painting Renaissance style"
+  - "anime character"
+
+Uses SDXL Turbo (coreml-sogniXLturbo_alpha1_ad) at 1024x1024 by default.
+The face likeness is preserved while applying the style from the prompt.`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: {
+          type: 'string',
+          description: 'Style/scene description for the portrait',
+        },
+        reference_face: {
+          type: 'string',
+          description: 'Face image file path or URL',
+        },
+        model: {
+          type: 'string',
+          description: 'Model ID (default: coreml-sogniXLturbo_alpha1_ad)',
+        },
+        cn_strength: {
+          type: 'number',
+          description: 'ControlNet strength — higher = more face likeness (default: 0.8)',
+        },
+        cn_guidance_end: {
+          type: 'number',
+          description: 'ControlNet guidance end point (default: 0.3)',
+        },
+        width: {
+          type: 'number',
+          description: 'Output width in pixels (default: 1024)',
+        },
+        height: {
+          type: 'number',
+          description: 'Output height in pixels (default: 1024)',
+        },
+        count: {
+          type: 'number',
+          description: 'Number of images to generate (default: 1)',
+        },
+        output: {
+          type: 'string',
+          description: 'Save image to this file path',
+        },
+      },
+      required: ['prompt', 'reference_face'],
+    },
+  },
+  {
+    name: 'check_balance',
+    description:
+      'Check your current Sogni token balances (SPARK and SOGNI). Free daily Spark tokens can be claimed at https://app.sogni.ai/',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'list_models',
+    description:
+      'List all available Sogni AI models for image generation, image editing, photobooth, and video generation with speed estimates.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'get_version',
+    description: 'Show the running sogni-gen version for this MCP server instance.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'extract_last_frame',
+    description: 'Extract the last frame from a video file as an image. Safe ffmpeg wrapper with input sanitization.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        video_path: {
+          type: 'string',
+          description: 'Path to the source video file',
+        },
+        output_path: {
+          type: 'string',
+          description: 'Path to save the extracted frame image (e.g. /tmp/lastframe.png)',
+        },
+      },
+      required: ['video_path', 'output_path'],
+    },
+  },
+  {
+    name: 'concat_videos',
+    description: 'Concatenate multiple video clips into a single video file. Safe ffmpeg wrapper with input sanitization. Requires at least 2 clips.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        output_path: {
+          type: 'string',
+          description: 'Path for the concatenated output video',
+        },
+        clips: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of video clip file paths to concatenate (minimum 2)',
+          minItems: 2,
+        },
+      },
+      required: ['output_path', 'clips'],
+    },
+  },
+  {
+    name: 'list_media',
+    description: 'List recent inbound media files (images, audio, or all) from the user media directory (~/.clawdbot/media/inbound/). Returns the 5 most recent files sorted by modification time.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['images', 'audio', 'all'],
+          description: 'Type of media to list (default: images)',
+        },
+      },
+    },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Tool handlers
+// ---------------------------------------------------------------------------
+
+async function handleGenerateImage(params) {
+  sanitizeString(params.prompt, 'prompt');
+  const args = [];
+  if (params.model) args.push('-m', sanitizeString(params.model, 'model'));
+  if (params.width) args.push('-w', String(params.width));
+  if (params.height) args.push('-h', String(params.height));
+  if (params.count) args.push('-n', String(params.count));
+  if (params.seed != null) args.push('-s', String(params.seed));
+  if (params.output) args.push('-o', sanitizeString(params.output, 'output'));
+  if (params.output_format) args.push('--output-format', validateEnum(params.output_format, ['png', 'jpg'], 'output_format'));
+  if (params.loras?.length) {
+    params.loras.forEach((l, i) => sanitizeString(l, `loras[${i}]`));
+    args.push('--loras', params.loras.join(','));
+  }
+  if (params.lora_strengths?.length) args.push('--lora-strengths', params.lora_strengths.join(','));
+  args.push('--', params.prompt);
+
+  return runAndFormat(args, { timeoutMs: 60_000 });
+}
+
+async function handleGenerateVideo(params) {
+  sanitizeString(params.prompt, 'prompt');
+  const args = ['--video'];
+  if (params.workflow) args.push('--workflow', validateEnum(params.workflow, ['t2v', 'i2v', 's2v', 'v2v', 'animate-move', 'animate-replace'], 'workflow'));
+  if (params.model) args.push('-m', sanitizeString(params.model, 'model'));
+  if (params.width) args.push('-w', String(params.width));
+  if (params.height) args.push('-h', String(params.height));
+  if (params.fps) args.push('--fps', String(params.fps));
+  if (params.duration) args.push('--duration', String(params.duration));
+  if (params.frames) args.push('--frames', String(params.frames));
+  if (params.ref) args.push('--ref', sanitizeString(params.ref, 'ref'));
+  if (params.ref_end) args.push('--ref-end', sanitizeString(params.ref_end, 'ref_end'));
+  if (params.ref_audio) args.push('--ref-audio', sanitizeString(params.ref_audio, 'ref_audio'));
+  if (params.ref_video) args.push('--ref-video', sanitizeString(params.ref_video, 'ref_video'));
+  if (params.controlnet_name) args.push('--controlnet-name', validateEnum(params.controlnet_name, ['canny', 'pose', 'depth', 'detailer'], 'controlnet_name'));
+  if (params.controlnet_strength != null) args.push('--controlnet-strength', String(params.controlnet_strength));
+  if (params.sam2_coordinates) args.push('--sam2-coordinates', sanitizeString(params.sam2_coordinates, 'sam2_coordinates'));
+  if (params.trim_end_frame) args.push('--trim-end-frame');
+  if (params.first_frame_strength != null) args.push('--first-frame-strength', String(params.first_frame_strength));
+  if (params.last_frame_strength != null) args.push('--last-frame-strength', String(params.last_frame_strength));
+  if (params.seed != null) args.push('-s', String(params.seed));
+  if (params.output) args.push('-o', sanitizeString(params.output, 'output'));
+  if (params.looping) args.push('--looping');
+  args.push('--', params.prompt);
+
+  return runAndFormat(args, { timeoutMs: 600_000 });
+}
+
+async function handleEditImage(params) {
+  sanitizeString(params.prompt, 'prompt');
+  const args = [];
+  for (const img of params.context_images) {
+    args.push('-c', sanitizeString(img, 'context_images'));
+  }
+  if (params.model) args.push('-m', sanitizeString(params.model, 'model'));
+  if (params.width) args.push('-w', String(params.width));
+  if (params.height) args.push('-h', String(params.height));
+  if (params.output) args.push('-o', sanitizeString(params.output, 'output'));
+  args.push('--', params.prompt);
+
+  return runAndFormat(args, { timeoutMs: 60_000 });
+}
+
+async function handlePhotobooth(params) {
+  sanitizeString(params.prompt, 'prompt');
+  sanitizeString(params.reference_face, 'reference_face');
+  const args = ['--photobooth', '--ref', params.reference_face];
+  if (params.model) args.push('-m', sanitizeString(params.model, 'model'));
+  if (params.cn_strength != null) args.push('--cn-strength', String(params.cn_strength));
+  if (params.cn_guidance_end != null) args.push('--cn-guidance-end', String(params.cn_guidance_end));
+  if (params.width) args.push('-w', String(params.width));
+  if (params.height) args.push('-h', String(params.height));
+  if (params.count) args.push('-n', String(params.count));
+  if (params.output) args.push('-o', sanitizeString(params.output, 'output'));
+  args.push('--', params.prompt);
+
+  return runAndFormat(args, { timeoutMs: 60_000 });
+}
+
+async function handleCheckBalance() {
+  return runAndFormat(['--balance'], { timeoutMs: 30_000 });
+}
+
+async function handleGetVersion() {
+  const result = await runSogniGen(['--version'], { timeoutMs: 5_000 });
+  if (result.success === false) return formatError(result);
+  return {
+    content: [{
+      type: 'text',
+      text: `mcp-server version: ${SERVER_VERSION}\nsogni-gen version: ${result.version || 'unknown'}`,
+    }],
+  };
+}
+
+function handleListModels() {
+  const text = `${IMAGE_MODEL_TABLE}
+
+Photobooth Model:
+  coreml-sogniXLturbo_alpha1_ad — Fast, face transfer (SDXL Turbo, default for --photobooth)
+
+${VIDEO_MODEL_TABLE}
+
+Defaults:
+  Image generation: z_image_turbo_bf16
+  Image editing:    qwen_image_edit_2511_fp8_lightning
+  Photobooth:       coreml-sogniXLturbo_alpha1_ad
+  Video:            auto-selected per workflow (t2v/i2v/s2v/v2v/animate-move/animate-replace)`;
+
+  return { content: [{ type: 'text', text }] };
+}
+
+async function handleExtractLastFrame(params) {
+  const videoPath = sanitizeString(params.video_path, 'video_path');
+  const outputPath = sanitizeString(params.output_path, 'output_path');
+  const result = await runSogniGen(['--extract-last-frame', videoPath, outputPath], { timeoutMs: 30_000 });
+  if (result.success === false) return formatError(result);
+  return { content: [{ type: 'text', text: `Extracted last frame to: ${result.outputPath || outputPath}` }] };
+}
+
+async function handleConcatVideos(params) {
+  const outputPath = sanitizeString(params.output_path, 'output_path');
+  if (!params.clips || params.clips.length < 2) {
+    return { content: [{ type: 'text', text: 'Error: At least 2 clips are required.' }], isError: true };
+  }
+  const clips = params.clips.map((c, i) => sanitizeString(c, `clips[${i}]`));
+  const result = await runSogniGen(['--concat-videos', outputPath, ...clips], { timeoutMs: 60_000 });
+  if (result.success === false) return formatError(result);
+  return { content: [{ type: 'text', text: `Concatenated ${result.clipCount || clips.length} clips to: ${result.outputPath || outputPath}` }] };
+}
+
+async function handleListMedia(params) {
+  const args = ['--list-media'];
+  if (params.type) {
+    args.push(validateEnum(params.type, ['images', 'audio', 'all'], 'type'));
+  }
+  const result = await runSogniGen(args, { timeoutMs: 10_000 });
+  if (result.success === false) return formatError(result);
+  const files = result.files || [];
+  if (files.length === 0) {
+    return { content: [{ type: 'text', text: `No ${result.mediaType || 'media'} files found.` }] };
+  }
+  const lines = files.map(f => `${f.name}  (${f.size} bytes, ${f.modified})\n  ${f.path}`);
+  return { content: [{ type: 'text', text: `Recent ${result.mediaType || 'media'} (${files.length}):\n${lines.join('\n')}` }] };
+}
+
+// ---------------------------------------------------------------------------
+// Server setup
+// ---------------------------------------------------------------------------
+
+const server = new Server(
+  { name: 'sogni', version: SERVER_VERSION },
+  { capabilities: { tools: {} } },
+);
+
+server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: params } = request.params;
+  try {
+    switch (name) {
+      case 'generate_image':
+        return await handleGenerateImage(params);
+      case 'generate_video':
+        return await handleGenerateVideo(params);
+      case 'edit_image':
+        return await handleEditImage(params);
+      case 'photobooth':
+        return await handlePhotobooth(params);
+      case 'check_balance':
+        return await handleCheckBalance();
+      case 'list_models':
+        return handleListModels();
+      case 'get_version':
+        return await handleGetVersion();
+      case 'extract_last_frame':
+        return await handleExtractLastFrame(params);
+      case 'concat_videos':
+        return await handleConcatVideos(params);
+      case 'list_media':
+        return await handleListMedia(params);
+      default:
+        return {
+          content: [{ type: 'text', text: `Unknown tool: ${name}` }],
+          isError: true,
+        };
+    }
+  } catch (err) {
+    return {
+      content: [{ type: 'text', text: `Error: ${err.message}` }],
+      isError: true,
+    };
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Start
+// ---------------------------------------------------------------------------
+
+const transport = new StdioServerTransport();
+await server.connect(transport);

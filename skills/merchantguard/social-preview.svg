@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1a3a38" stroke-width="0.5"/>
+    </pattern>
+
+    <!-- Noise texture -->
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feBlend in="SourceGraphic" in2="noise" mode="multiply" result="blend"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.08"/>
+      </feComponentTransfer>
+    </filter>
+
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle glow for text -->
+    <filter id="textGlow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Gradient for lobster -->
+    <linearGradient id="lobsterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2abcb4"/>
+      <stop offset="50%" style="stop-color:#1f9990"/>
+      <stop offset="100%" style="stop-color:#167872"/>
+    </linearGradient>
+
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1614"/>
+      <stop offset="100%" style="stop-color:#0d1f1c"/>
+    </linearGradient>
+
+    <!-- Accent line gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2abcb4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#2abcb4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#2abcb4;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bgGrad)"/>
+
+  <!-- Grid overlay -->
+  <rect width="1280" height="640" fill="url(#grid)" opacity="0.4"/>
+
+  <!-- Noise texture overlay -->
+  <rect width="1280" height="640" fill="#2abcb4" filter="url(#noise)" opacity="0.15"/>
+
+  <!-- Diagonal accent lines -->
+  <line x1="0" y1="200" x2="400" y2="0" stroke="#2abcb4" stroke-width="1" opacity="0.2"/>
+  <line x1="0" y1="400" x2="600" y2="0" stroke="#2abcb4" stroke-width="1" opacity="0.15"/>
+  <line x1="880" y1="640" x2="1280" y2="240" stroke="#2abcb4" stroke-width="1" opacity="0.2"/>
+  <line x1="1080" y1="640" x2="1280" y2="440" stroke="#2abcb4" stroke-width="1" opacity="0.15"/>
+
+  <!-- Circuit traces -->
+  <g stroke="#2abcb4" stroke-width="1.5" fill="none" opacity="0.3">
+    <path d="M 0 320 L 120 320 L 140 300 L 200 300"/>
+    <circle cx="200" cy="300" r="4" fill="#2abcb4"/>
+    <path d="M 1280 400 L 1160 400 L 1140 420 L 1080 420"/>
+    <circle cx="1080" cy="420" r="4" fill="#2abcb4"/>
+  </g>
+
+  <!-- Stylized Lobster Icon -->
+  <g transform="translate(180, 200)" filter="url(#glow)">
+    <!-- Main body shell -->
+    <ellipse cx="100" cy="120" rx="70" ry="90" fill="url(#lobsterGrad)" opacity="0.9"/>
+
+    <!-- Shell segments -->
+    <path d="M 40 80 Q 100 60 160 80" stroke="#0d1f1c" stroke-width="3" fill="none" opacity="0.5"/>
+    <path d="M 35 110 Q 100 90 165 110" stroke="#0d1f1c" stroke-width="3" fill="none" opacity="0.4"/>
+    <path d="M 35 140 Q 100 120 165 140" stroke="#0d1f1c" stroke-width="3" fill="none" opacity="0.3"/>
+
+    <!-- Left claw -->
+    <g transform="translate(-30, 40)">
+      <ellipse cx="30" cy="50" rx="35" ry="25" fill="url(#lobsterGrad)"/>
+      <ellipse cx="10" cy="45" rx="20" ry="15" fill="url(#lobsterGrad)"/>
+      <path d="M -5 35 L -15 25 M -5 55 L -15 65" stroke="#2abcb4" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Right claw -->
+    <g transform="translate(130, 40)">
+      <ellipse cx="30" cy="50" rx="35" ry="25" fill="url(#lobsterGrad)"/>
+      <ellipse cx="50" cy="45" rx="20" ry="15" fill="url(#lobsterGrad)"/>
+      <path d="M 65 35 L 75 25 M 65 55 L 75 65" stroke="#2abcb4" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Antennae -->
+    <path d="M 70 30 Q 50 -10 30 -30" stroke="#2abcb4" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M 130 30 Q 150 -10 170 -30" stroke="#2abcb4" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- Eyes -->
+    <circle cx="75" cy="55" r="10" fill="#0a1614"/>
+    <circle cx="125" cy="55" r="10" fill="#0a1614"/>
+    <circle cx="77" cy="53" r="4" fill="#2abcb4"/>
+    <circle cx="127" cy="53" r="4" fill="#2abcb4"/>
+
+    <!-- Tail segments -->
+    <ellipse cx="100" cy="220" rx="45" ry="20" fill="url(#lobsterGrad)" opacity="0.8"/>
+    <ellipse cx="100" cy="250" rx="35" ry="15" fill="url(#lobsterGrad)" opacity="0.7"/>
+    <ellipse cx="100" cy="275" rx="25" ry="12" fill="url(#lobsterGrad)" opacity="0.6"/>
+
+    <!-- Tail fan -->
+    <path d="M 75 285 L 60 310 L 100 295 L 140 310 L 125 285" fill="url(#lobsterGrad)" opacity="0.5"/>
+  </g>
+
+  <!-- Badge/Shield behind lobster -->
+  <g transform="translate(180, 165)" opacity="0.15">
+    <path d="M 100 0 L 180 30 L 180 120 Q 180 180 100 220 Q 20 180 20 120 L 20 30 Z"
+          fill="none" stroke="#2abcb4" stroke-width="2"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="520" y="250" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+        font-size="84" font-weight="700" fill="#ffffff" letter-spacing="-2" filter="url(#textGlow)">
+    GuardBot
+  </text>
+  <text x="520" y="340" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+        font-size="84" font-weight="300" fill="#2abcb4" letter-spacing="-2">
+    Skills
+  </text>
+
+  <!-- Accent line -->
+  <rect x="520" y="365" width="280" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Tagline -->
+  <text x="520" y="420" font-family="'SF Pro Text', 'Helvetica Neue', Arial, sans-serif"
+        font-size="28" font-weight="400" fill="#8fa8a5" letter-spacing="1">
+    Compliance passports for AI agents
+  </text>
+
+  <!-- OpenClaw badge -->
+  <g transform="translate(520, 460)">
+    <rect x="0" y="0" width="180" height="36" rx="18" fill="#2abcb4" opacity="0.15"/>
+    <rect x="0" y="0" width="180" height="36" rx="18" fill="none" stroke="#2abcb4" stroke-width="1.5" opacity="0.5"/>
+    <text x="90" y="24" font-family="'SF Mono', 'Monaco', monospace" font-size="14"
+          font-weight="500" fill="#2abcb4" text-anchor="middle" letter-spacing="1">
+      OPENCLAW SKILL
+    </text>
+  </g>
+
+  <!-- GitHub-style repo path -->
+  <text x="520" y="560" font-family="'SF Mono', 'Monaco', monospace" font-size="18" fill="#5a7370" letter-spacing="0.5">
+    MerchantGuard/guardbot-skills
+  </text>
+
+  <!-- Corner accents -->
+  <path d="M 0 0 L 80 0 L 80 4 L 4 4 L 4 80 L 0 80 Z" fill="#2abcb4" opacity="0.6"/>
+  <path d="M 1280 640 L 1200 640 L 1200 636 L 1276 636 L 1276 560 L 1280 560 Z" fill="#2abcb4" opacity="0.6"/>
+
+  <!-- Version indicator -->
+  <g transform="translate(1150, 50)">
+    <rect x="0" y="0" width="80" height="28" rx="4" fill="#2abcb4" opacity="0.2"/>
+    <text x="40" y="19" font-family="'SF Mono', monospace" font-size="12" fill="#2abcb4" text-anchor="middle">
+      v1.0.0
+    </text>
+  </g>
+</svg>

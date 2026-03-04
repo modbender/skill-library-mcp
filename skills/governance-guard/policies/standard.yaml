@@ -1,0 +1,80 @@
+version: "0.1"
+default_verdict: deny
+
+rules:
+  - name: allow-read-local
+    match:
+      action_type: read
+      target_pattern: "~/**"
+    verdict: approve
+    reason: "Local file reads are permitted"
+
+  - name: allow-read-workspace
+    match:
+      action_type: read
+      target_pattern: "./**"
+    verdict: approve
+    reason: "Workspace file reads are permitted"
+
+  - name: allow-write-workspace
+    match:
+      action_type: write
+      target_pattern: "./**"
+    verdict: approve
+    reason: "Writes within workspace are permitted"
+
+  - name: allow-create-workspace
+    match:
+      action_type: create
+      target_pattern: "./**"
+    verdict: approve
+    reason: "File creation within workspace is permitted"
+
+  - name: block-destructive-shell
+    match:
+      action_type: delete
+      tool_pattern: "shell.*"
+    verdict: deny
+    reason: "Destructive shell commands require manual approval"
+
+  - name: escalate-network
+    match:
+      action_type: network
+    verdict: escalate
+    reason: "External network requests require user confirmation"
+
+  - name: escalate-delete
+    match:
+      action_type: delete
+    verdict: escalate
+    reason: "Deletion requires user approval"
+
+  - name: block-profile-creation
+    match:
+      action_type: create
+      data_scope:
+        - personal
+        - identity
+    verdict: deny
+    reason: "Creating profiles on external services is not authorized"
+
+sensitive_data:
+  - category: credentials
+    patterns:
+      - "**/*.env"
+      - "**/.ssh/**"
+      - "**/credentials*"
+      - "**/*secret*"
+    action: deny
+
+  - category: financial
+    patterns:
+      - "**/*wallet*"
+      - "**/*payment*"
+    action: escalate
+
+  - category: personal
+    patterns:
+      - "**/*personal*"
+      - "**/*private*"
+    action: escalate

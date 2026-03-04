@@ -1,0 +1,54 @@
+{
+  "name": "ksef-accountant-pl",
+  "version": "1.0.0",
+  "description": "Asystent ksiegowy Krajowego Systemu e-Faktur (KSeF) — wiedza domenowa, wzorce architektoniczne i przyklady kodu. Nie zawiera kodu wykonywalnego.",
+  "license": "MIT",
+  "homepage": "https://github.com/alexwoo-awso/skills",
+  "source": "https://github.com/alexwoo-awso/skills/tree/main/ksef-accountant-pl",
+  "type": "instruction-only",
+  "has_executable_code": false,
+  "has_install_script": false,
+  "has_binaries": false,
+  "has_runtime_dependencies": false,
+  "security": {
+    "disable-model-invocation": true,
+    "disableModelInvocation": true,
+    "allow-model-invocation": false,
+    "allowModelInvocation": false,
+    "requires-user-action": true,
+    "instruction-only": true,
+    "credential-handling": "user-managed-only",
+    "credential-storage": "none",
+    "credential-transmission": "none"
+  },
+  "env": {
+    "KSEF_TOKEN": {
+      "description": "Token API KSeF do uwierzytelniania sesji. Dostarczany przez uzytkownika — skill nie generuje, nie przechowuje ani nie przesyla tokenow.",
+      "required": false,
+      "secret": true,
+      "scope": "session-auth"
+    },
+    "KSEF_ENCRYPTION_KEY": {
+      "description": "Klucz szyfrowania Fernet do bezpiecznego przechowywania tokenow. Uzycie opcjonalne — przyklad wzorca bezpieczenstwa.",
+      "required": false,
+      "secret": true,
+      "scope": "encryption"
+    },
+    "KSEF_BASE_URL": {
+      "description": "Bazowy URL API KSeF. Domyslnie https://ksef-demo.mf.gov.pl (DEMO). Produkcja wymaga jawnej zgody uzytkownika.",
+      "required": false,
+      "secret": false,
+      "default": "https://ksef-demo.mf.gov.pl",
+      "scope": "api-endpoint"
+    }
+  },
+  "constraints": {
+    "no-autonomous-execution": true,
+    "requires-explicit-user-consent": true,
+    "demo-first": true,
+    "production-requires-user-approval": true,
+    "never-store-credentials": true,
+    "never-transmit-credentials": true,
+    "never-generate-credentials": true
+  }
+}

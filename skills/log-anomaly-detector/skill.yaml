@@ -1,0 +1,46 @@
+# Skill: log_anomaly_detector
+
+analyze_logs(logs: string, sensitivity: string) => object
+
+## Trigger Patterns
+- 分析日志
+- 日志异常
+- 日志错误
+- log analysis
+- error detection
+
+## Implementation
+
+智能分析日志文件，检测异常模式、错误趋势、性能问题。
+
+```javascript
+function analyzeLogs(logs, sensitivity = 'medium') {
+  const patterns = {
+    error: /ERROR|FATAL|Exception/gi,
+    warning: /WARN|Warning/gi,
+    performance: /slow|timeout|latency/gi,
+    security: /unauthorized|forbidden|injection/gi
+  };
+  
+  const results = {
+    errors: [],
+    warnings: [],
+    anomalies: [],
+    recommendations: []
+  };
+  
+  // 检测错误模式
+  for (const line of logs.split('\n')) {
+    if (patterns.error.test(line)) {
+      results.errors.push({ line, timestamp: extractTimestamp(line) });
+    }
+  }
+  
+  // 生成建议
+  if (results.errors.length > 10) {
+    results.recommendations.push('错误数量过多，建议设置告警');
+  }
+  
+  return results;
+}
+```

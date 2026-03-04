@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust-cli:
+    name: Build Rust CLI
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+      
+      - name: Build
+        working-directory: speakturbo-cli
+        run: cargo build --release
+      
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: speakturbo-${{ matrix.os }}
+          path: speakturbo-cli/target/release/speakturbo
+
+  python-daemon:
+    name: Test Python Daemon
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install pocket-tts uvicorn fastapi pytest
+      
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check speakturbo/
+      
+      - name: Test imports
+        run: |
+          python -c "from speakturbo.daemon_streaming import app"
+          python -c "from speakturbo.cli import main"

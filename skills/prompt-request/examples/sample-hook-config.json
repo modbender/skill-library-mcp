@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "enabled": true,
+    "path": "/hooks",
+    "token": "<generate-a-secure-token>",
+    "mappings": [
+      {
+        "match": { "path": "github" },
+        "action": "agent",
+        "name": "GitHub",
+        "sessionKey": "hook:github:{{repository.name}}:{{headers.x-github-event}}:{{issue.number}}{{pull_request.number}}{{check_run.id}}",
+        "messageTemplate": "<paste contents of templates/messageTemplate.txt here, replacing WORKDIR with your actual path>",
+        "deliver": true,
+        "allowUnsafeExternalContent": true,
+        "channel": "telegram",
+        "to": "<your-chat-id>",
+        "model": "anthropic/claude-opus-4-6",
+        "thinking": "high",
+        "timeoutSeconds": 900
+      }
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id": "hopeids",
+  "name": "hopeIDS Security Scanner",
+  "version": "0.4.0",
+  "description": "Inference-based intrusion detection with quarantine and human-in-the-loop",
+  "homepage": "https://github.com/E-x-O-Entertainment-Studios-Inc/hopeIDS",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "autoScan": {
+        "type": "boolean",
+        "default": false,
+        "description": "Automatically scan messages before agent processing"
+      },
+      "strictMode": {
+        "type": "boolean",
+        "default": false,
+        "description": "Block (vs warn) when risk exceeds threshold"
+      },
+      "defaultRiskThreshold": {
+        "type": "number",
+        "default": 0.7,
+        "description": "Risk threshold for warnings/blocks (0-1)"
+      },
+      "telegramAlerts": {
+        "type": "boolean",
+        "default": true,
+        "description": "Send Telegram alerts for blocked messages. Requires Telegram channel configured in OpenClaw (channels.telegram.botToken)"
+      },
+      "telegramChatId": {
+        "type": "string",
+        "description": "Telegram chat ID for alerts. Defaults to ownerNumbers[0]. Only used if channels.telegram is configured."
+      },
+      "quarantineDir": {
+        "type": "string",
+        "description": "Directory for quarantine records"
+      },
+      "agents": {
+        "type": "object",
+        "description": "Per-agent configuration overrides",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "strictMode": { "type": "boolean" },
+            "riskThreshold": { "type": "number" }
+          }
+        }
+      },
+      "semanticEnabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable LLM-based semantic analysis"
+      },
+      "llmEndpoint": {
+        "type": "string",
+        "description": "LLM endpoint for semantic analysis"
+      },
+      "logLevel": {
+        "type": "string",
+        "enum": ["debug", "info", "warn", "error"],
+        "default": "info"
+      },
+      "trustOwners": {
+        "type": "boolean",
+        "default": true,
+        "description": "Auto-trust messages from owner numbers"
+      },
+      "classifierAgent": {
+        "type": "string",
+        "description": "Agent ID for semantic classification (fallback if llm-task unavailable)"
+      },
+      "useLlmTask": {
+        "type": "boolean",
+        "default": true,
+        "description": "Use llm-task plugin for classification (preferred over classifierAgent)"
+      },
+      "llmTaskModel": {
+        "type": "string",
+        "description": "Model for llm-task classification (e.g. claude-sonnet-4-5)"
+      },
+      "llmTaskProvider": {
+        "type": "string",
+        "description": "Provider for llm-task classification (e.g. anthropic, openai-codex)"
+      }
+    }
+  },
+  "uiHints": {
+    "enabled": { "label": "Enable Security Scanning" },
+    "autoScan": { "label": "Auto-Scan", "help": "Scan every message before processing" },
+    "strictMode": { "label": "Strict Mode", "help": "Block threats (vs warn)" },
+    "defaultRiskThreshold": { "label": "Risk Threshold", "help": "0.7 = 70% risk triggers action" },
+    "telegramAlerts": { "label": "Telegram Alerts", "help": "Notify on blocked messages" },
+    "agents": { "label": "Per-Agent Config", "advanced": true },
+    "semanticEnabled": { "label": "Semantic Analysis" },
+    "llmEndpoint": { "label": "LLM Endpoint", "placeholder": "http://localhost:1234/v1" },
+    "logLevel": { "label": "Log Level" },
+    "trustOwners": { "label": "Trust Owner Messages" },
+    "classifierAgent": { "label": "Classifier Agent", "help": "Fallback agent for LLM classification" },
+    "useLlmTask": { "label": "Use llm-task", "help": "Preferred: lightweight JSON-only classification via llm-task plugin" },
+    "llmTaskModel": { "label": "llm-task Model", "placeholder": "claude-sonnet-4-5" },
+    "llmTaskProvider": { "label": "llm-task Provider", "placeholder": "anthropic" }
+  }
+}

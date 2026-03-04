@@ -1,0 +1,259 @@
+name: "SEO Optimizer Pro"
+id: "seo-optimizer-pro"
+version: "1.0.7"
+description: "AI-powered SEO content optimization for Google ranking and AI search (AEO). Model-agnostic: pass any model from Claude, GPT, Gemini, DeepSeek, Grok, MiniMax, Qwen, Llama, Mistral — provider auto-detected from model name."
+
+# Top-level registry fields (for ClawhHub registry indexing)
+homepage: "https://unisai.vercel.app"
+repository: "https://github.com/vedantsingh60/seo-optimizer-pro"
+source: "included"  # Source code is included in this package
+required_env_vars:
+  - "ANTHROPIC_API_KEY"   # Required if using Claude models
+  - "OPENAI_API_KEY"      # Required if using GPT models
+  - "GOOGLE_API_KEY"      # Required if using Gemini models
+  - "MISTRAL_API_KEY"     # Required if using Mistral models
+  - "DEEPSEEK_API_KEY"    # Required if using DeepSeek models
+  - "XAI_API_KEY"         # Required if using Grok/xAI models
+  - "MINIMAX_API_KEY"     # Required if using MiniMax models
+  - "DASHSCOPE_API_KEY"   # Required if using Qwen/Alibaba models
+  - "OPENROUTER_API_KEY"  # Required if using Llama/OpenRouter models
+primary_credential: "At least ONE provider API key is required (see required_env_vars)"
+
+# Runtime
+runtime: "local"  # Runs locally as a Python module — no hosted backend
+execution: "python"
+
+# IP Protection & Source Availability
+intellectual_property:
+  license: "free-to-use"  # Free to use with source code provided for transparency
+  license_file: "LICENSE.md"
+  copyright: "© 2026 UnisAI. All rights reserved."
+  distribution: "via-clawhub-only"  # Distribute only through ClawhHub registry
+  source_code_access: "included"  # Source code included for transparency and trust
+  modification: "personal-use-only"  # Users may modify for personal use but not redistribute modifications
+  reverse_engineering: "allowed-for-security-audit"  # Allowed for security review
+
+author:
+  company: "UnisAI"
+  contact: "hello@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+
+category: "seo"
+tags:
+  - "seo"
+  - "content-optimization"
+  - "aeo"
+  - "ai-search"
+  - "copywriting"
+  - "readability"
+  - "keyword-analysis"
+  - "technical-seo"
+  - "marketing-tech"
+  - "ai-optimization"
+  - "seo-tools"
+  - "content-analysis"
+
+pricing:
+  model: "free"
+
+# Dependencies — must be installed before use
+dependencies:
+  python: ">=3.9"
+  packages:
+    - "anthropic>=0.40.0"          # Required ONLY for Claude models
+    - "openai>=1.60.0"             # Required ONLY for GPT and Llama (via OpenRouter) models
+    - "google-generativeai>=0.8.0" # Required ONLY for Gemini models
+    - "mistralai>=1.3.0"           # Required ONLY for Mistral models
+  install_all: "pip install anthropic openai google-generativeai mistralai"
+  install_selective: |
+    # Install ONLY the SDK for your chosen provider:
+    pip install anthropic          # Claude
+    pip install openai             # GPT, DeepSeek, xAI, MiniMax, Qwen, Llama (OpenAI-compat)
+    pip install google-generativeai  # Gemini
+    pip install mistralai          # Mistral
+  note: "RECOMMENDED: Install only the SDK for the provider you plan to use. DeepSeek, xAI, MiniMax, Qwen, and Llama all use the openai package with a custom base URL."
+  requirements_file: "requirements.txt"
+
+security:
+  data_retention: "0 days"  # No storage by this skill — all analysis runs in-memory locally
+  data_flow: "content-sent-to-chosen-ai-provider"  # Your content is sent to whichever AI provider you select
+  third_party_data_sharing: |
+    WARNING: This skill sends your content to third-party AI providers (Anthropic, OpenAI, Google, OpenRouter, or Mistral).
+    Each provider has their own data retention and privacy policies. Review the provider's terms before sending sensitive content:
+    - Anthropic: https://www.anthropic.com/legal/privacy
+    - OpenAI: https://openai.com/policies/privacy-policy
+    - Google: https://ai.google.dev/gemini-api/terms
+    - OpenRouter: https://openrouter.ai/privacy
+    - Mistral: https://mistral.ai/terms/
+  privacy_recommendation: "Test with non-sensitive sample content first. Do not send confidential data without reviewing the AI provider's data policies."
+  api_key_storage: "Environment variables only — never hardcoded or logged"
+  network_access: "Required to call chosen AI provider's API"
+
+capabilities:
+  functions:
+    - name: "analyzeContent"
+      description: "Analyze content for SEO optimization opportunities"
+      parameters:
+        content:
+          type: "string"
+          description: "HTML or plain text content to analyze"
+          required: true
+          max_length: 50000
+        url:
+          type: "string"
+          description: "Optional URL for reference"
+          required: false
+        target_keywords:
+          type: "array"
+          description: "Target keywords to analyze"
+          items:
+            type: "string"
+          max_items: 20
+          required: false
+
+    - name: "generateOptimization"
+      description: "Get AI-powered optimization suggestions"
+      parameters:
+        content:
+          type: "string"
+          description: "Content to optimize"
+          required: true
+        model:
+          type: "string"
+          description: "AI model to use (Claude, GPT-5.2, Gemini, Llama, Mistral)"
+          options:
+            - "claude-opus-4-5-20251101"
+            - "claude-sonnet-4-5-20250929"
+            - "claude-haiku-4-5-20251001"
+            - "gpt-5.2-pro"
+            - "gpt-5.2-thinking"
+            - "gpt-5.2-instant"
+            - "gemini-3-pro"
+            - "gemini-2.5-pro"
+            - "gemini-2.5-flash"
+            - "llama-3.3-70b"
+            - "llama-3.2-90b"
+            - "mistral-large-2501"
+          required: false
+        keywords:
+          type: "array"
+          items:
+            type: "string"
+          description: "Keywords to focus on"
+          required: false
+
+    - name: "getAEORecommendations"
+      description: "Get Answer Engine Optimization recommendations for AI search"
+      parameters:
+        content:
+          type: "string"
+          description: "Content to analyze for AI search"
+          required: true
+        model:
+          type: "string"
+          description: "AI model to use"
+          required: false
+        keywords:
+          type: "array"
+          items:
+            type: "string"
+          description: "Target keywords"
+          required: false
+
+# Credentials — at least ONE provider key is required depending on chosen model.
+# The skill will raise an error at initialization without the key for the selected provider.
+credentials:
+  required: true  # At least one provider API key MUST be set
+  note: "Exactly one provider API key is required for whichever model you choose."
+
+environment_variables:
+  ANTHROPIC_API_KEY:
+    description: "Anthropic API key — required for any claude-* model"
+    required_for_prefix: "claude-"
+  OPENAI_API_KEY:
+    description: "OpenAI API key — required for any gpt-*, o1*, o3* model"
+    required_for_prefix: "gpt-, o1, o3"
+  GOOGLE_API_KEY:
+    description: "Google AI API key — required for any gemini-* model"
+    required_for_prefix: "gemini-"
+  MISTRAL_API_KEY:
+    description: "Mistral API key — required for mistral-*, mixtral-*, devstral-*, ministral-* models"
+    required_for_prefix: "mistral-, mixtral-, devstral-, ministral-"
+  DEEPSEEK_API_KEY:
+    description: "DeepSeek API key — required for any deepseek-* model"
+    required_for_prefix: "deepseek-"
+  XAI_API_KEY:
+    description: "xAI API key — required for any grok-* model"
+    required_for_prefix: "grok-"
+  MINIMAX_API_KEY:
+    description: "MiniMax API key — required for minimax* or MiniMax* models"
+    required_for_prefix: "minimax, MiniMax"
+  DASHSCOPE_API_KEY:
+    description: "Alibaba DashScope API key — required for any qwen* model"
+    required_for_prefix: "qwen"
+  OPENROUTER_API_KEY:
+    description: "OpenRouter API key — required for meta-llama/* or llama-* models"
+    required_for_prefix: "meta-llama/, llama-"
+
+support:
+  support_email: "support@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+  github: "https://github.com/vedantsingh60/seo-optimizer-pro"
+  documentation: "See SKILL.md in this package"
+  response_time: "Best effort — community supported"
+
+restrictions:
+  - "No redistribution outside ClawhHub registry"
+  - "No resale or sublicensing"
+  - "No trademark usage without permission"
+  - "Modifications allowed for personal use only (no redistribution of modified versions)"
+
+changelog:
+  "1.0.7":
+    - "🏗️ Model-agnostic architecture — provider auto-detected from model name prefix, no hardcoded whitelist"
+    - "✨ Added DeepSeek (deepseek-chat, deepseek-reasoner), xAI (grok-4-1-fast), MiniMax (MiniMax-M2.1), Qwen (qwen3.5-plus)"
+    - "✨ Updated Claude to 4.6 series (claude-opus-4-6, claude-sonnet-4-6)"
+    - "✨ Any future model works automatically without code changes — just pass the model ID"
+    - "🔧 Simplified _call_ai — all OpenAI-compat providers share one code path"
+  "1.0.6":
+    - "🔒 Fixed license contradiction — source code IS included for transparency"
+    - "🔒 Changed license from 'proprietary' to 'free-to-use' with source included"
+    - "🔒 Clarified IP restrictions — modifications allowed for personal use only"
+    - "📝 Fixed metadata inconsistency — required_env_vars now accurately reflects code requirements"
+    - "⚠️ Added explicit third-party data sharing warnings for AI provider usage"
+    - "📦 Updated install instructions to RECOMMEND selective SDK installation (not all)"
+    - "📦 Clarified requirements.txt with version pins and usage notes"
+    - "🌐 Added GitHub repository and documentation links to support section"
+    - "🔧 Updated all version references to 1.0.6 across manifest, LICENSE, SKILL.md"
+  "1.0.2":
+    - "✨ Multi-model support: Claude, GPT-5.2, Gemini, Llama, Mistral"
+    - "✨ Choose your preferred AI model for analysis"
+    - "✨ 12 models across 5 providers"
+    - "✨ Real provider SDK integration (not mocked)"
+    - "✨ Updated to latest 2026 models"
+    - "✨ Added requirements.txt / install instructions"
+    - "🔧 Fixed credentials metadata consistency"
+    - "🔧 Removed non-existent integrations and API endpoints"
+  "1.0.0":
+    - "✨ Content readability analysis with Flesch-Kincaid scoring"
+    - "✨ Keyword density tracking for target keywords"
+    - "✨ Technical SEO audit (headings, structure, links)"
+    - "✨ AI-powered optimization suggestions"
+    - "✨ Answer Engine Optimization (AEO) recommendations"
+    - "✨ Real-time impact estimation"
+
+metadata:
+  status: "active"
+  created_at: "2026-02-02T00:00:00Z"
+  updated_at: "2026-02-14T18:30:00Z"
+  maturity: "production"
+  maintenance: "actively-maintained"
+  required_env_vars: "At least ONE of: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY, OPENROUTER_API_KEY, MISTRAL_API_KEY"
+  credentials_note: "Exactly one provider API key is REQUIRED for whichever model you choose. The skill will raise an error at initialization if the key for the selected model is missing. Keys must be set as environment variables."
+  data_sharing_notice: "This skill sends your content to third-party AI providers. Review provider privacy policies before sending sensitive content."
+  install_recommendation: "Install only the SDK(s) for your chosen provider to minimize dependencies."
+  compatibility:
+    - "OpenClaw v1.0+"
+    - "Claude Code"
+    - "ClawhHub v2.0+"
+  security_audit: "Source code included for security review and transparency"

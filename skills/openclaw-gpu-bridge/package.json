@@ -1,0 +1,64 @@
+{
+  "name": "@elvatis_com/openclaw-gpu-bridge",
+  "version": "0.2.0",
+  "description": "OpenClaw plugin - Remote GPU compute via FastAPI microservice (BERTScore, embeddings)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "!dist/**/*.test.*",
+    "gpu-service/",
+    "!gpu-service/__pycache__/",
+    "!gpu-service/**/__pycache__/",
+    "!gpu-service/tests/",
+    "!gpu-service/pytest.ini",
+    "!gpu-service/.pytest_cache/",
+    "!gpu-service/requirements-dev.txt",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:python": "cd gpu-service && python -m pytest tests/ -v",
+    "test:all": "npm test && npm run test:python",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "gpu",
+    "bert-score",
+    "embeddings",
+    "ml",
+    "remote-compute",
+    "sentence-transformers",
+    "roberta"
+  ],
+  "author": "Elvatis <hello@example.invalid>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elvatis/openclaw-gpu-bridge.git"
+  },
+  "homepage": "https://github.com/elvatis/openclaw-gpu-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/elvatis/openclaw-gpu-bridge/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  }
+}

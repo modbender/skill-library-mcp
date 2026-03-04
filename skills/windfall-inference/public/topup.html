@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Top up your Windfall API key with card or crypto. No subscription, credits never expire.">
+<meta property="og:title" content="Windfall — Top Up">
+<meta property="og:description" content="Add credit to your Windfall API key. Pay by card or send USDC/ETH on Base.">
+<meta property="og:image" content="https://windfall.ecofrontiers.xyz/assets/og-image.jpg">
+<meta property="og:url" content="https://windfall.ecofrontiers.xyz/topup">
+<meta name="twitter:card" content="summary_large_image">
+<title>Windfall — Top Up</title>
+<link rel="stylesheet" href="/assets/shared.css">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  .topo-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 80C60 60 100 100 140 80C180 60 200 80 200 80' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M0 120C40 100 80 140 120 120C160 100 200 120 200 120' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M20 160C60 140 100 180 140 160C180 140 200 160 200 160' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M0 40C40 20 80 60 120 40C160 20 200 40 200 40' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+</style>
+</head>
+<body class="bg-warm-50 text-warm-800 font-sans min-h-screen flex flex-col topo-bg" data-page="topup">
+
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-sage-600 focus:text-white focus:px-4 focus:py-2 focus:rounded focus:z-50">Skip to content</a>
+
+<main id="main-content" class="flex-1 flex items-center justify-center px-6 py-24">
+  <div class="max-w-md w-full">
+
+    <!-- Success state -->
+    <div id="success-state" class="hidden text-center">
+      <div class="w-12 h-12 rounded-full bg-sage-600 text-white flex items-center justify-center text-2xl mx-auto mb-4">&#10003;</div>
+      <h1 class="font-serif text-2xl font-bold text-warm-900 mb-2">Payment received</h1>
+      <p class="text-warm-600 mb-6">Your API key balance has been credited. It may take a few seconds to appear.</p>
+      <div id="success-balance" class="bg-white rounded-xl p-6 border border-warm-200 mb-6 hidden">
+        <div class="text-sm text-warm-500 mb-1">Current balance</div>
+        <div id="success-balance-amount" class="text-3xl font-bold text-sage-700">—</div>
+        <div class="text-sm text-warm-500 mt-2">Free requests remaining: <span id="success-free" class="font-semibold">—</span></div>
+      </div>
+      <a href="/dashboard" class="inline-block px-5 py-2.5 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 transition-colors text-sm">View your dashboard</a>
+      <div class="mt-3">
+        <a href="/" class="text-sage-600 hover:underline text-sm">Back to Windfall</a>
+      </div>
+    </div>
+
+    <!-- Top-up form -->
+    <div id="topup-form">
+      <h1 class="font-serif text-2xl font-bold text-warm-900 text-center mb-2">Top up your API key</h1>
+      <p class="text-center text-warm-500 mb-8">Used your free requests? Add credit to keep going.</p>
+
+      <!-- API Key Input -->
+      <div class="mb-6">
+        <label for="api-key-input" class="block text-sm font-medium text-warm-700 mb-2">Your API key</label>
+        <input type="text" id="api-key-input" placeholder="wf_..." class="w-full px-4 py-3 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500 font-mono bg-white" />
+        <div id="key-status" class="text-xs mt-1 text-warm-500"></div>
+        <p class="text-xs text-warm-500 italic mt-1">Your key is stored in this browser only and never sent to our servers.</p>
+      </div>
+
+      <!-- Key Info (shown after validation) -->
+      <div id="key-info" class="hidden bg-white rounded-xl p-4 border border-warm-200 mb-6">
+        <div class="grid grid-cols-3 gap-3 text-center text-sm">
+          <div>
+            <div class="text-warm-500">Balance</div>
+            <div id="info-balance" class="font-bold text-warm-900">—</div>
+          </div>
+          <div>
+            <div class="text-warm-500">Free left</div>
+            <div id="info-free" class="font-bold text-warm-900">—</div>
+          </div>
+          <div>
+            <div class="text-warm-500">Requests</div>
+            <div id="info-requests" class="font-bold text-warm-900">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment method tabs -->
+      <div class="flex mb-6 bg-warm-100 rounded-lg p-1">
+        <button id="tab-card" class="pay-tab flex-1 py-2 text-sm font-medium rounded-md bg-white text-warm-900 shadow-sm transition-all" onclick="switchTab('card')" aria-label="Pay with card">Card</button>
+        <button id="tab-crypto" class="pay-tab flex-1 py-2 text-sm font-medium rounded-md text-warm-500 transition-all" onclick="switchTab('crypto')" aria-label="Pay with crypto on Base">Crypto on Base</button>
+      </div>
+
+      <!-- Card payment -->
+      <div id="panel-card">
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-warm-700 mb-2">Amount</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <button data-amount="500" class="amount-btn px-4 py-3 border border-warm-200 rounded-lg text-sm font-semibold hover:border-sage-500 hover:bg-sage-600/5 transition-colors bg-white">$5</button>
+            <button data-amount="1000" class="amount-btn px-4 py-3 border-2 border-sage-500 rounded-lg text-sm font-semibold bg-sage-600/5 text-sage-700">$10</button>
+            <button data-amount="2500" class="amount-btn px-4 py-3 border border-warm-200 rounded-lg text-sm font-semibold hover:border-sage-500 hover:bg-sage-600/5 transition-colors bg-white">$25</button>
+            <button data-amount="5000" class="amount-btn px-4 py-3 border border-warm-200 rounded-lg text-sm font-semibold hover:border-sage-500 hover:bg-sage-600/5 transition-colors bg-white">$50</button>
+          </div>
+          <div class="text-xs text-warm-500 mt-2 text-center">
+            <span id="amount-requests">$10 = ~2,500 requests</span>
+          </div>
+        </div>
+
+        <div class="bg-warm-100/60 rounded-lg p-4 mb-6 text-xs text-warm-500 text-center">
+          No subscription. Credits never expire. Pay once, use whenever.
+        </div>
+
+        <div class="mb-4">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" id="eu-waiver-checkbox" class="mt-0.5 accent-sage-600 flex-shrink-0" />
+            <span class="text-xs text-warm-500 leading-snug">I agree that delivery begins immediately upon payment and I waive my 14-day right of withdrawal per Article 16(m) of Directive 2011/83/EU.</span>
+          </label>
+          <p id="eu-waiver-notice" class="text-xs text-warm-500 mt-1 hidden">Please accept the withdrawal waiver to proceed with payment.</p>
+        </div>
+
+        <button id="pay-btn" class="w-full py-3 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          Top up with card
+        </button>
+
+        <p class="text-center text-xs text-warm-500 mt-4">
+          Secure payment via Stripe. Your balance is credited instantly.
+        </p>
+      </div>
+
+      <!-- Crypto payment -->
+      <div id="panel-crypto" class="hidden">
+        <div class="bg-white rounded-xl p-5 border border-warm-200 mb-4">
+          <p class="text-xs text-warm-600 mb-4">Send USDC or ETH on Base mainnet to the address below. Your API key must be linked to the sending wallet address. Credits appear within 60 seconds.</p>
+
+          <label class="block text-xs font-medium text-warm-500 mb-1">Deposit address (same for USDC and ETH)</label>
+          <div class="flex items-center gap-2 mb-4">
+            <input id="deposit-address" type="text" readonly aria-label="Deposit address" class="flex-1 min-w-0 px-3 py-2.5 bg-warm-50 border border-warm-200 rounded-lg text-xs font-mono text-warm-800 select-all truncate" value="loading...">
+            <button onclick="copyAddress()" id="copy-btn" aria-label="Copy deposit address" class="px-3 py-2.5 bg-warm-100 border border-warm-200 rounded-lg text-xs text-warm-600 hover:bg-warm-200 transition-colors flex-shrink-0">Copy</button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs">
+              <div class="flex items-center gap-1.5 mb-1">
+                <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" fill="white" font-weight="bold">$</text></svg>
+                <span class="font-semibold text-warm-900">USDC</span>
+              </div>
+              <span class="text-warm-600">1 USDC = $1.00 credit</span>
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 text-xs">
+              <div class="flex items-center gap-1.5 mb-1">
+                <svg class="w-4 h-4 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l-8 13h5.5L8 22.5l12-14h-5.5L16 1.5z"/></svg>
+                <span class="font-semibold text-warm-900">ETH</span>
+              </div>
+              <span class="text-warm-600">Market rate at receipt</span>
+            </div>
+          </div>
+
+          <div class="bg-sage-600/5 border border-sage-500/15 rounded-lg p-3 text-xs">
+            <div class="font-semibold text-sage-700 mb-1">How it works</div>
+            <ol class="space-y-1 text-warm-600 list-decimal list-inside">
+              <li>Create your API key with your wallet address: <code class="bg-warm-200 px-1 rounded font-mono">POST /api/keys</code> with <code class="bg-warm-200 px-1 rounded font-mono">wallet_address</code></li>
+              <li>Send USDC or ETH to the address above from that wallet</li>
+              <li>Windfall detects the transfer and credits your key automatically</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-warm-100/60 rounded-lg p-4 mb-4 text-xs text-warm-500 text-center">
+          No minimum. No subscription. Gas fees on Base are fractions of a cent.
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-warm-500 justify-center">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Network: <strong class="text-warm-600">Base</strong> (Chain ID 8453). Do not send from other networks.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/assets/shared.js" defer></script>
+<script>
+const apiKeyInput = document.getElementById('api-key-input');
+const keyStatus = document.getElementById('key-status');
+const keyInfo = document.getElementById('key-info');
+const payBtn = document.getElementById('pay-btn');
+let selectedAmount = 1000;
+let validatedKey = null;
+
+// EU waiver checkbox
+const euWaiverCheckbox = document.getElementById('eu-waiver-checkbox');
+const euWaiverNotice = document.getElementById('eu-waiver-notice');
+
+function updatePayBtnState() {
+  const keyValid = !!validatedKey;
+  const waiverAccepted = euWaiverCheckbox.checked;
+  payBtn.disabled = !(keyValid && waiverAccepted);
+  euWaiverNotice.classList.toggle('hidden', waiverAccepted || !keyValid);
+}
+
+euWaiverCheckbox.addEventListener('change', updatePayBtnState);
+
+// Tab switching
+function switchTab(tab) {
+  document.getElementById('panel-card').classList.toggle('hidden', tab !== 'card');
+  document.getElementById('panel-crypto').classList.toggle('hidden', tab !== 'crypto');
+  document.getElementById('tab-card').className = 'pay-tab flex-1 py-2 text-sm font-medium rounded-md transition-all ' +
+    (tab === 'card' ? 'bg-white text-warm-900 shadow-sm' : 'text-warm-500');
+  document.getElementById('tab-crypto').className = 'pay-tab flex-1 py-2 text-sm font-medium rounded-md transition-all ' +
+    (tab === 'crypto' ? 'bg-white text-warm-900 shadow-sm' : 'text-warm-500');
+}
+
+// Fetch deposit address
+fetch('/api/deposit-address')
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('deposit-address').value = data.address;
+  })
+  .catch(() => {
+    document.getElementById('deposit-address').value = 'Error loading address';
+  });
+
+function copyAddress() {
+  const addr = document.getElementById('deposit-address');
+  addr.select();
+  navigator.clipboard.writeText(addr.value).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+// Check for success redirect
+if (window.location.pathname === '/topup/success') {
+  document.getElementById('topup-form').classList.add('hidden');
+  document.getElementById('success-state').classList.remove('hidden');
+
+  // Try to show balance if key is in localStorage
+  const savedKey = localStorage.getItem('windfall_key');
+  if (savedKey) {
+    fetch('/api/keys/me', { headers: { 'Authorization': 'Bearer ' + savedKey } })
+      .then(r => r.json())
+      .then(data => {
+        if (data.balanceUsd !== undefined) {
+          document.getElementById('success-balance').classList.remove('hidden');
+          document.getElementById('success-balance-amount').textContent = '$' + data.balanceUsd.toFixed(2);
+          document.getElementById('success-free').textContent = data.freeRequestsRemaining;
+        }
+      })
+      .catch(() => {});
+  }
+}
+
+// Amount selection
+document.querySelectorAll('.amount-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedAmount = parseInt(btn.dataset.amount);
+    document.querySelectorAll('.amount-btn').forEach(b => {
+      b.className = 'amount-btn px-4 py-3 border border-warm-200 rounded-lg text-sm font-semibold hover:border-sage-500 hover:bg-sage-600/5 transition-colors bg-white';
+    });
+    btn.className = 'amount-btn px-4 py-3 border-2 border-sage-500 rounded-lg text-sm font-semibold bg-sage-600/5 text-sage-700';
+
+    const dollars = selectedAmount / 100;
+    const requests = Math.round(dollars / 0.004);
+    document.getElementById('amount-requests').textContent = `$${dollars} = ~${requests.toLocaleString()} requests`;
+  });
+});
+
+// Key validation on input
+let debounceTimer;
+apiKeyInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  const key = apiKeyInput.value.trim();
+
+  if (!key.startsWith('wf_') || key.length < 10) {
+    keyStatus.textContent = '';
+    keyInfo.classList.add('hidden');
+    validatedKey = null;
+    updatePayBtnState();
+    return;
+  }
+
+  keyStatus.textContent = 'Checking...';
+  keyStatus.className = 'text-xs mt-1 text-warm-500';
+
+  debounceTimer = setTimeout(async () => {
+    try {
+      const res = await fetch('/api/keys/me', {
+        headers: { 'Authorization': 'Bearer ' + key },
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        validatedKey = key;
+        localStorage.setItem('windfall_key', key);
+        keyStatus.textContent = `Key: ${data.keyPrefix} (${data.label || 'no label'})`;
+        keyStatus.className = 'text-xs mt-1 text-sage-600';
+
+        document.getElementById('info-balance').textContent = '$' + data.balanceUsd.toFixed(2);
+        document.getElementById('info-free').textContent = data.freeRequestsRemaining;
+        document.getElementById('info-requests').textContent = data.totalRequests;
+        keyInfo.classList.remove('hidden');
+        updatePayBtnState();
+      } else {
+        keyStatus.textContent = 'Key not found';
+        keyStatus.className = 'text-xs mt-1 text-red-500';
+        keyInfo.classList.add('hidden');
+        validatedKey = null;
+        updatePayBtnState();
+      }
+    } catch {
+      keyStatus.textContent = 'Error checking key';
+      keyStatus.className = 'text-xs mt-1 text-red-500';
+    }
+  }, 500);
+});
+
+// Pre-fill from localStorage
+const savedKey = localStorage.getItem('windfall_key');
+if (savedKey) {
+  apiKeyInput.value = savedKey;
+  apiKeyInput.dispatchEvent(new Event('input'));
+}
+
+// Pay button
+payBtn.addEventListener('click', async () => {
+  if (!validatedKey) return;
+
+  payBtn.disabled = true;
+  payBtn.textContent = 'Redirecting to Stripe...';
+
+  try {
+    const res = await fetch('/api/topup', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + validatedKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: selectedAmount }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || 'Failed to create checkout session');
+      payBtn.textContent = 'Top up with card';
+      updatePayBtnState();
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+    payBtn.textContent = 'Top up with card';
+    updatePayBtnState();
+  }
+});
+</script>
+
+</body>
+</html>

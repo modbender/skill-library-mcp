@@ -1,0 +1,88 @@
+name: orderly-perps
+version: 1.0.0
+description: Trade perpetual futures on Orderly Network. Full workflow for registration, deposits, trading, and funding rate farming. 98 pairs including crypto, stocks, and memecoins.
+author: ori
+homepage: https://orderly.network
+repository: https://github.com/orimolty-lang/ori-agent/tree/main/skills/orderly-perps
+license: MIT
+
+triggers:
+  - perp
+  - perpetual
+  - funding rate
+  - orderly
+  - hyperclaw
+  - leverage trading
+  - funding farming
+  - perp trade
+  - open position
+  - close position
+
+requires:
+  bins:
+    - node
+    - curl
+    - jq
+    - cast
+  npm:
+    - ethers
+
+emoji: 📈
+
+scripts:
+  - name: orderly-register
+    path: scripts/orderly-register.mjs
+    description: Register new Orderly account with HyperClaw broker
+  - name: orderly-keygen
+    path: scripts/orderly-keygen.mjs
+    description: Generate ED25519 trading keypair for API access
+  - name: orderly-add-key
+    path: scripts/orderly-add-key.mjs
+    description: Add trading key to Orderly account (enables trading)
+  - name: orderly-deposit
+    path: scripts/orderly-deposit.mjs
+    description: Deposit USDC from wallet to Orderly
+    args: "<amount>"
+  - name: orderly-trade
+    path: scripts/orderly-trade.mjs
+    description: Execute market buy/sell orders
+    args: "<symbol> <side> <size>"
+  - name: orderly-balance
+    path: scripts/orderly-balance.mjs
+    description: Check account balance, positions, and collateral
+  - name: orderly-funding-history
+    path: scripts/orderly-funding-history.mjs
+    description: Track funding payments received/paid
+    args: "[--alert]"
+  - name: orderly-markets
+    path: scripts/orderly-markets.sh
+    description: Scan all perp markets with funding rates
+    args: "[--sort funding|volume|oi]"
+  - name: funding-tracker
+    path: scripts/funding-tracker.sh
+    description: Track position and funding with countdown to next payment
+  - name: funding-scanner
+    path: scripts/funding-scanner.sh
+    description: Find extreme funding rates for farming opportunities
+    args: "[--threshold 0.1]"
+  - name: funding-report
+    path: scripts/funding-report.sh
+    description: Generate funding farming performance reports
+
+config:
+  orderly_keys_file:
+    type: path
+    description: Path to Orderly keys JSON file
+    default: ~/.orderly-keys.json
+  eth_private_key_file:
+    type: path
+    description: Path to Ethereum private key file
+    default: ~/.eth-wallet.txt
+
+tags:
+  - trading
+  - defi
+  - perpetuals
+  - base
+  - funding-rate
+  - leverage

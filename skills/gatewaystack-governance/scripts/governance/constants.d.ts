@@ -1,0 +1,13 @@
+export declare const SKILL_DIR: string;
+export declare const DEFAULT_POLICY_PATH: string;
+export declare const DEFAULT_EXAMPLE_POLICY_PATH: string;
+export declare const DEFAULT_AUDIT_PATH: string;
+export declare const RATE_LIMIT_STATE_PATH: string;
+export declare const FIRST_USE_STATE_PATH: string;
+export declare const PENDING_REVIEWS_PATH: string;
+export declare const BEHAVIORAL_BASELINE_PATH: string;
+export declare const INJECTION_PATTERNS_HIGH: RegExp[];
+export declare const INJECTION_PATTERNS_MEDIUM: RegExp[];
+export declare const INJECTION_PATTERNS_LOW: RegExp[];
+export declare const INJECTION_PATTERNS_EXTRACTION: RegExp[];
+export declare const INJECTION_PATTERNS_MULTILANG: RegExp[];

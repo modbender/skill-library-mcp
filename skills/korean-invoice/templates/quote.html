@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>견적서</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+      padding: 40px;
+      font-size: 12pt;
+      line-height: 1.6;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 28pt;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .info-section {
+      margin-bottom: 20px;
+      border: 1px solid #333;
+      padding: 15px;
+    }
+    .info-section h2 {
+      font-size: 14pt;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #333;
+    }
+    .info-row {
+      display: flex;
+      margin-bottom: 5px;
+    }
+    .info-label {
+      width: 120px;
+      font-weight: bold;
+    }
+    .info-value {
+      flex: 1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table th, table td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+    table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    table td.left {
+      text-align: left;
+    }
+    table td.right {
+      text-align: right;
+    }
+    .summary {
+      margin-top: 20px;
+      text-align: right;
+    }
+    .summary table {
+      width: 400px;
+      margin-left: auto;
+    }
+    .summary td {
+      padding: 10px;
+      font-size: 14pt;
+    }
+    .summary .total {
+      font-weight: bold;
+      font-size: 16pt;
+      background-color: #f0f0f0;
+    }
+    .notes {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 10pt;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>견 적 서</h1>
+    <p>Quotation</p>
+  </div>
+
+  <div class="info-section">
+    <h2>공급자 (Supplier)</h2>
+    <div class="info-row">
+      <div class="info-label">상호 (Company):</div>
+      <div class="info-value">{{myCompanyName}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">사업자등록번호:</div>
+      <div class="info-value">{{myBusinessNumber}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">대표자 (CEO):</div>
+      <div class="info-value">{{myCEO}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">주소 (Address):</div>
+      <div class="info-value">{{myAddress}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">전화 (Phone):</div>
+      <div class="info-value">{{myPhone}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">이메일 (Email):</div>
+      <div class="info-value">{{myEmail}}</div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h2>공급받는자 (Recipient)</h2>
+    <div class="info-row">
+      <div class="info-label">상호 (Company):</div>
+      <div class="info-value">{{clientName}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">사업자등록번호:</div>
+      <div class="info-value">{{clientBusinessNumber}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">대표자 (CEO):</div>
+      <div class="info-value">{{clientCEO}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">주소 (Address):</div>
+      <div class="info-value">{{clientAddress}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">전화 (Phone):</div>
+      <div class="info-value">{{clientPhone}}</div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-row">
+      <div class="info-label">작성일자:</div>
+      <div class="info-value">{{issueDate}}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">유효기간:</div>
+      <div class="info-value">{{validUntil}}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50px;">No.</th>
+        <th style="width: 250px;">품명 (Description)</th>
+        <th style="width: 80px;">단위 (Unit)</th>
+        <th style="width: 80px;">수량 (Qty)</th>
+        <th style="width: 120px;">단가 (Unit Price)</th>
+        <th style="width: 120px;">공급가액 (Amount)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{itemRows}}
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <table>
+      <tr>
+        <td>공급가액 (Subtotal)</td>
+        <td class="right">{{subtotal}} 원</td>
+      </tr>
+      <tr>
+        <td>부가세 (VAT 10%)</td>
+        <td class="right">{{vat}} 원</td>
+      </tr>
+      <tr class="total">
+        <td>합계 (Total)</td>
+        <td class="right">{{total}} 원</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="notes">
+    <strong>비고 (Notes):</strong><br>
+    {{notes}}
+  </div>
+
+  <div class="footer">
+    <p>위 금액을 청구합니다.</p>
+    <p>{{myCompanyName}} | {{myPhone}} | {{myEmail}}</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ELBA Accounts Output",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "title": "Depot Account",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "name", "iban", "value", "profit_loss"],
+        "properties": {
+          "type": {"const": "Depot"},
+          "name": {"type": "string"},
+          "iban": {"type": "string"},
+          "value": {"$ref": "#/definitions/money"},
+          "value_eur": {"$ref": "#/definitions/money"},
+          "profit_loss": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "amount": {"type": "number"},
+              "currencyCode": {"type": "string"},
+              "percent": {"type": "number"}
+            }
+          }
+        }
+      },
+      {
+        "title": "Non-Depot Account",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "name", "iban", "balance", "available"],
+        "properties": {
+          "type": {"type": "string"},
+          "name": {"type": "string"},
+          "iban": {"type": "string"},
+          "balance": {"$ref": "#/definitions/money"},
+          "balance_eur": {"$ref": "#/definitions/money"},
+          "available": {"$ref": "#/definitions/money"},
+          "available_eur": {"$ref": "#/definitions/money"}
+        }
+      }
+    ]
+  },
+  "definitions": {
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currencyCode"],
+      "properties": {
+        "amount": {"type": "number"},
+        "currencyCode": {"type": "string"}
+      }
+    }
+  }
+}

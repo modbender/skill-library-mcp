@@ -1,0 +1,70 @@
+# QA Patrol - Basic Template
+# Level 1: Zero-config smoke test
+# Usage: qa-patrol --plan basic.yaml --url https://your-app.com
+
+app:
+  url: ${APP_URL}  # Override with --url flag or set APP_URL env var
+  name: ${APP_NAME:-My App}
+  stack: auto  # auto-detect: expo-web | nextjs | spa | static
+
+tests:
+  smoke:
+    - name: Homepage loads
+      navigate: /
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+      timeout: 10000
+
+    - name: No critical console errors
+      navigate: /
+      assert:
+        - no_console_errors: true
+        - no_network_errors: true
+
+    - name: Page has main content
+      navigate: /
+      assert:
+        - element_exists: main
+      fallback_assert:
+        - element_exists: "#root"
+        - element_exists: "#app"
+
+    - name: Basic navigation
+      navigate: /
+      steps:
+        - snapshot: true
+        - find_links: true
+      assert:
+        - link_count_gte: 1
+
+    - name: Page title exists
+      navigate: /
+      assert:
+        - title_not_empty: true
+
+    - name: No JavaScript errors
+      navigate: /
+      wait: 3000
+      assert:
+        - no_js_errors: true
+
+  # Optional: Enable if paths are known
+  # routes:
+  #   - name: About page
+  #     navigate: /about
+  #     assert:
+  #       - element_exists: main
+  #       - status_code: 200
+  #
+  #   - name: 404 handling
+  #     navigate: /this-page-does-not-exist-12345
+  #     assert:
+  #       - text_contains: "not found"
+
+settings:
+  screenshot_on_failure: true
+  screenshot_format: png
+  timeout_default: 10000
+  retry_failed: false
+  parallel: false  # Run tests sequentially for basic plan

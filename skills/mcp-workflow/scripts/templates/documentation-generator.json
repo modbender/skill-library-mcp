@@ -1,0 +1,74 @@
+{
+  "name": "documentation-generator",
+  "version": "1.0.0",
+  "description": "Generate documentation from codebase",
+  "author": "MCP Workflow",
+  "steps": [
+    {
+      "name": "scan-codebase",
+      "type": "analysis",
+      "action": "scan-files",
+      "description": "Scan codebase structure"
+    },
+    {
+      "name": "identify-components",
+      "type": "analysis",
+      "action": "find-components",
+      "description": "Identify components and modules"
+    },
+    {
+      "name": "extract-api-surface",
+      "type": "analysis",
+      "action": "extract-exports",
+      "description": "Extract public API surface"
+    },
+    {
+      "name": "generate-api-docs",
+      "type": "generate",
+      "action": "create-api-documentation",
+      "description": "Generate API documentation",
+      "condition": "{has_api}"
+    },
+    {
+      "name": "generate-component-docs",
+      "type": "generate",
+      "action": "create-component-docs",
+      "description": "Generate component documentation",
+      "condition": "{has_components}"
+    },
+    {
+      "name": "generate-readme",
+      "type": "generate",
+      "action": "create-readme",
+      "description": "Generate README with examples"
+    },
+    {
+      "name": "validate-links",
+      "type": "validation",
+      "action": "check-links",
+      "description": "Validate documentation links"
+    },
+    {
+      "name": "output-docs",
+      "type": "output",
+      "action": "write-documentation",
+      "format": "markdown",
+      "destination": "docs/",
+      "description": "Write documentation files"
+    }
+  ],
+  "resources": [
+    "file://{source}/**/*.{js,ts,jsx,tsx,py,go,rs}",
+    "file://{source}/README.md"
+  ],
+  "branches": {
+    "api": {
+      "condition": "{file_type} == 'api'",
+      "steps": ["extract-api-surface", "generate-api-docs"]
+    },
+    "component": {
+      "condition": "{file_type} == 'component'",
+      "steps": ["identify-components", "generate-component-docs"]
+    }
+  }
+}

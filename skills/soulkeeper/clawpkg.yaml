@@ -1,0 +1,68 @@
+name: soulkeeper
+version: 1.0.0
+description: >
+  Identity persistence for AI agents. Audit your SOUL.md/TOOLS.md/AGENTS.md
+  into structured rules, detect behavioral drift in conversation transcripts,
+  and inject context-aware reminders before you respond.
+  
+  The problem: agents forget who they are. SoulKeeper fixes that.
+
+author: Chartist
+license: MIT
+
+tags:
+  - identity
+  - memory
+  - soul
+  - audit
+  - drift-detection
+  - agent-health
+  - continuity
+  - openclaw
+
+requires:
+  python: ">=3.8"
+  packages: []  # stdlib only
+
+entrypoints:
+  audit:
+    script: audit.py
+    description: "Extract behavioral rules from soul files"
+    usage: "python audit.py --workspace /path/to/workspace --output soul_rules.json"
+  drift:
+    script: drift.py
+    description: "Detect soul drift in conversation transcripts"
+    usage: "python drift.py --transcript chat.txt --rules soul_rules.json --report"
+  remind:
+    script: remind.py
+    description: "Inject context-aware soul reminders"
+    usage: "python remind.py --context 'about to write code' --rules soul_rules.json"
+
+files:
+  - audit.py
+  - drift.py
+  - remind.py
+  - SKILL.md
+  - clawpkg.yaml
+
+generated_files:
+  - soul_rules.json  # Created by audit.py, specific to each agent
+
+install: |
+  # No install steps required - pure Python stdlib
+  # Optional: link to PATH
+  # chmod +x audit.py drift.py remind.py
+
+quickstart: |
+  cd /path/to/skills/soulkeeper
+  python audit.py --workspace /root/.openclaw/workspace --output soul_rules.json
+  python audit.py --summary
+  python drift.py --transcript your_session.txt --rules soul_rules.json --report
+  python remind.py --heartbeat
+
+changelog:
+  "1.0.0":
+    date: "2026-02-24"
+    notes: >
+      Initial release. Soul audit, drift detection, reminder injection.
+      Tested against OpenClaw agent soul files. Works with any SOUL.md.

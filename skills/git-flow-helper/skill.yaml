@@ -1,0 +1,25 @@
+# Skill: git_flow_helper
+
+git_operation(command: string, options: object) => object
+
+## Trigger Patterns
+- git操作
+- git命令
+- git flow
+
+## Implementation
+
+智能 Git 操作助手，帮助处理分支、合并、冲突等。
+
+```javascript
+async function gitOperation(command, options = {}) {
+  const operations = {
+    'create-branch': async (name) => exec(`git checkout -b ${name}`),
+    'merge': async (source, target) => exec(`git merge ${source} into ${target}`),
+    'rebase': async (branch) => exec(`git rebase ${branch}`),
+    'cherry-pick': async (commit) => exec(`git cherry-pick ${commit}`),
+    'clean-branches': async () => exec(`git branch --merged | grep -v '*' | xargs git branch -d`)
+  };
+  
+  return operations[command]?.(options.params) || { error: 'Unknown command' };
+}

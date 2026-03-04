@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 Self-Evolving Agent · Dashboard</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   RESET + VARIABLES
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0d1117;
+  --bg2:         #161b22;
+  --bg3:         #21262d;
+  --border:      #30363d;
+  --border-glow: #388bfd40;
+  --text:        #e6edf3;
+  --text2:       #8b949e;
+  --text3:       #484f58;
+  --accent:      #388bfd;
+  --accent2:     #58a6ff;
+  --green:       #3fb950;
+  --green-dim:   #1a3a1f;
+  --yellow:      #d29922;
+  --yellow-dim:  #2d2009;
+  --red:         #f85149;
+  --red-dim:     #3a1010;
+  --purple:      #bc8cff;
+  --purple-dim:  #1e1040;
+  --cyan:        #39d353;
+  --orange:      #f0883e;
+
+  --font: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,.5);
+  --transition: .15s ease;
+}
+
+html { font-size: 15px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════ */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -.3px;
+}
+
+.logo-brain {
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px #388bfd80);
+}
+
+.logo-badge {
+  font-size: .65rem;
+  font-family: var(--font);
+  background: var(--bg3);
+  color: var(--accent2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: .5px;
+}
+
+.header-sep { flex: 1; }
+
+.header-time {
+  font-family: var(--font);
+  font-size: .75rem;
+  color: var(--text2);
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--sans);
+}
+.refresh-btn:hover { border-color: var(--accent); color: var(--text); }
+.refresh-btn.loading .spin { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Main grid ───────────────────────────────────────────── */
+.main {
+  flex: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 24px 24px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 20px;
+}
+
+/* Full-width rows */
+.span-full  { grid-column: 1 / -1; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.card:hover { border-color: var(--border-glow); }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: .9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.card-meta {
+  font-size: .72rem;
+  color: var(--text2);
+  font-family: var(--font);
+}
+
+.card-body { padding: 16px 20px; }
+
+/* ═══════════════════════════════════════════════════════════
+   STAT PILLS (top summary row)
+═══════════════════════════════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+.stat-pill {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.stat-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+.stat-label {
+  font-size: .72rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font);
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-value.green  { color: var(--green); }
+.stat-value.red    { color: var(--red); }
+.stat-value.yellow { color: var(--yellow); }
+.stat-value.blue   { color: var(--accent2); }
+.stat-value.purple { color: var(--purple); }
+
+.stat-sub {
+  font-size: .7rem;
+  color: var(--text3);
+  font-family: var(--font);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SVG CHARTS
+═══════════════════════════════════════════════════════════ */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.chart-wrap svg {
+  width: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Line chart */
+.line-path {
+  fill: none;
+  stroke: var(--accent2);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.line-area {
+  fill: url(#areaGrad);
+  opacity: .35;
+}
+.line-dot {
+  fill: var(--bg2);
+  stroke: var(--accent2);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: r .15s;
+}
+.line-dot:hover { r: 6; }
+
+/* Bar chart */
+.bar-group { cursor: default; }
+.bar-seg { transition: opacity .15s; }
+.bar-seg:hover { opacity: .85; }
+
+/* Axis */
+.axis-line { stroke: var(--border); stroke-width: 1; }
+.axis-tick { stroke: var(--border); stroke-width: 1; }
+.axis-label { fill: var(--text2); font-size: 11px; font-family: var(--font); }
+.grid-line  { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; opacity: .5; }
+.chart-label { fill: var(--text2); font-size: 10px; font-family: var(--font); }
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: .76rem;
+  font-family: var(--font);
+  color: var(--text);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s;
+  z-index: 999;
+  max-width: 220px;
+  white-space: pre-line;
+  box-shadow: var(--shadow);
+}
+#tooltip.visible { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════
+   PROPOSAL TABLE
+═══════════════════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x: auto;
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+
+thead { position: sticky; top: 0; z-index: 2; }
+
+th {
+  background: var(--bg3);
+  color: var(--text2);
+  font-weight: 600;
+  text-align: left;
+  padding: 9px 12px;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text);
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td { background: var(--bg3); }
+
+.title-cell {
+  max-width: 280px;
+  font-size: .82rem;
+  line-height: 1.4;
+}
+
+.mono { font-family: var(--font); font-size: .75rem; }
+
+/* ── Badges ──────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: .7rem;
+  font-weight: 600;
+  font-family: var(--font);
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+
+.badge-high     { background: #3a1010; color: var(--red);    border: 1px solid #f8514940; }
+.badge-medium   { background: #2d2009; color: var(--yellow); border: 1px solid #d2992240; }
+.badge-low      { background: #1a3a1f; color: var(--green);  border: 1px solid #3fb95040; }
+.badge-critical { background: #4a0020; color: #ff79c6;       border: 1px solid #ff79c640; }
+
+.badge-applied  { background: #1a3a1f; color: var(--green);  border: 1px solid #3fb95040; }
+.badge-pending  { background: #2d2009; color: var(--yellow); border: 1px solid #d2992240; }
+.badge-rejected { background: #3a1010; color: var(--red);    border: 1px solid #f8514940; }
+
+.badge-effective  { background: #1a3a1f; color: var(--green);  border: 1px solid #3fb95040; }
+.badge-neutral    { background: #0f2040; color: var(--accent2); border: 1px solid #388bfd40; }
+.badge-regressed  { background: #3a1010; color: var(--red);    border: 1px solid #f8514940; }
+.badge-pending-m  { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+
+/* ═══════════════════════════════════════════════════════════
+   RULES EFFECTIVENESS
+═══════════════════════════════════════════════════════════ */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rule-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: start;
+  transition: border-color var(--transition);
+}
+
+.rule-item.effective { border-left: 3px solid var(--green); }
+.rule-item.neutral   { border-left: 3px solid var(--accent2); }
+.rule-item.regressed { border-left: 3px solid var(--red); }
+
+.rule-title {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.rule-detail {
+  font-size: .72rem;
+  color: var(--text2);
+  font-family: var(--font);
+  margin-top: 3px;
+}
+
+.rule-delta {
+  font-family: var(--font);
+  font-size: .85rem;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rule-delta.positive { color: var(--green); }
+.rule-delta.negative { color: var(--red); }
+.rule-delta.zero     { color: var(--text2); }
+
+/* ═══════════════════════════════════════════════════════════
+   AGENTS.MD HEALTH
+═══════════════════════════════════════════════════════════ */
+.health-score-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.score-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+
+.score-ring svg { transform: rotate(-90deg); }
+
+.score-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+.score-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--font);
+  line-height: 1;
+}
+
+.score-max { font-size: .65rem; color: var(--text2); }
+
+.health-meta { flex: 1; }
+.health-label { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.health-missing {
+  font-size: .75rem;
+  color: var(--yellow);
+  font-family: var(--font);
+  background: var(--yellow-dim);
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: inline-block;
+}
+
+.health-ok {
+  font-size: .75rem;
+  color: var(--green);
+  font-family: var(--font);
+}
+
+.health-history { margin-top: 12px; }
+.health-history-title {
+  font-size: .72rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EMPTY / LOADING STATES
+═══════════════════════════════════════════════════════════ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text2);
+}
+
+.empty-icon { font-size: 2.5rem; opacity: .5; }
+.empty-title { font-size: .95rem; font-weight: 600; color: var(--text); }
+.empty-sub { font-size: .8rem; font-family: var(--font); max-width: 320px; line-height: 1.5; }
+.empty-code {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-family: var(--font);
+  font-size: .78rem;
+  color: var(--cyan);
+  margin-top: 4px;
+}
+
+.loading-pulse {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════ */
+.footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 12px 24px;
+  text-align: center;
+  font-size: .72rem;
+  color: var(--text3);
+  font-family: var(--font);
+}
+
+.footer a { color: var(--text2); text-decoration: none; }
+.footer a:hover { color: var(--accent2); }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .main { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .header-time { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBARS
+═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════
+   PATTERN LEGEND
+═══════════════════════════════════════════════════════════ */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .72rem;
+  color: var(--text2);
+  font-family: var(--font);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+<div id="tooltip"></div>
+<div class="app">
+
+<!-- ── HEADER ───────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <span class="logo-brain">🧠</span>
+      <span>Self-Evolving Agent</span>
+      <span class="logo-badge">v4.1</span>
+    </a>
+    <div class="header-sep"></div>
+    <span class="header-time" id="clock">—</span>
+    <button class="refresh-btn" id="refreshBtn" onclick="reload()">
+      <span class="spin" id="spinIcon">↻</span>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<!-- ── MAIN ─────────────────────────────────────────────────── -->
+<main class="main" id="mainGrid">
+
+  <!-- Stats row placeholder -->
+  <div class="span-full stats-row" id="statsRow">
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+    <div class="stat-pill"><div class="stat-label">Loading…</div><div class="stat-value loading-pulse">—</div></div>
+  </div>
+
+  <!-- Quality trend -->
+  <div class="card" id="cardQuality">
+    <div class="card-header">
+      <div class="card-title">📈 Quality Trend</div>
+      <span class="card-meta" id="qualityMeta">loading…</span>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" id="qualityChart" style="height:200px">
+        <div class="empty-state loading-pulse" style="height:200px">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENTS.md Health -->
+  <div class="card" id="cardHealth">
+    <div class="card-header">
+      <div class="card-title">🏥 AGENTS.md Health</div>
+      <span class="card-meta" id="healthMeta">loading…</span>
+    </div>
+    <div class="card-body" id="healthBody">
+      <div class="empty-state loading-pulse" style="height:200px">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Pattern frequency -->
+  <div class="card span-full" id="cardPatterns">
+    <div class="card-header">
+      <div class="card-title">🔍 Pattern Frequency</div>
+      <span class="card-meta" id="patternMeta">loading…</span>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" id="patternChart" style="min-height:220px">
+        <div class="empty-state loading-pulse" style="height:220px">Loading…</div>
+      </div>
+      <div class="legend" id="patternLegend"></div>
+    </div>
+  </div>
+
+  <!-- Proposal History -->
+  <div class="card span-full" id="cardHistory">
+    <div class="card-header">
+      <div class="card-title">📋 Proposal History</div>
+      <span class="card-meta" id="historyMeta">loading…</span>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap" id="proposalTable">
+        <div class="empty-state loading-pulse" style="height:200px">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules Effectiveness -->
+  <div class="card span-full" id="cardRules">
+    <div class="card-header">
+      <div class="card-title">⚡ Active Rules Effectiveness</div>
+      <span class="card-meta" id="rulesMeta">loading…</span>
+    </div>
+    <div class="card-body" id="rulesBody">
+      <div class="empty-state loading-pulse" style="height:200px">Loading…</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer class="footer">
+  self-evolving-agent v4.1 · <a href="../SKILL.md">SKILL.md</a> · <a href="../README.md">README</a> · data refreshes on page reload
+</footer>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LOAD-DATA MODULE (inline — mirror of load-data.js)
+══════════════════════════════════════════════════════════════ -->
+<script>
+(function (global) {
+  'use strict';
+  function formatDate(isoStr) {
+    if (!isoStr) return '—';
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  }
+  function severityRank(s) {
+    return { critical: 4, high: 3, medium: 2, low: 1, info: 0 }[s] ?? 0;
+  }
+  async function loadAll() {
+    let index;
+    try {
+      const r = await fetch('./data-index.json');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      index = await r.json();
+    } catch (e) {
+      console.warn('[SEAData] data-index.json:', e.message);
+      return buildEmpty('Run build-index.sh, then refresh.');
+    }
+    if (!index.files || index.files.length === 0) {
+      return buildEmpty('No proposal files found in data/proposals/.');
+    }
+    const results = await Promise.allSettled(
+      index.files.map(path =>
+        fetch(path)
+          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+          .catch(e => { console.warn('[SEAData] Failed:', path, e.message); return null; })
+      )
+    );
+    const proposals = results
+      .map(r => r.status === 'fulfilled' ? r.value : null)
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.generated_at) - new Date(b.generated_at));
+    return buildDashboardData(proposals);
+  }
+  function buildEmpty(reason) {
+    return { empty: true, reason, qualityTrend: [], proposalHistory: [],
+             patternFrequency: {}, rulesEffectiveness: [], agentsMdHealth: null, stats: null };
+  }
+  function buildDashboardData(proposals) {
+    const qualityTrend = proposals
+      .filter(p => p.quality_score != null)
+      .map(p => ({
+        date: p.generated_at,
+        dateLabel: formatDate(p.week_end || p.generated_at),
+        score: p.quality_score,
+        sessions: p.sessions_analyzed,
+        status: p.status,
+      }));
+    const proposalHistory = [];
+    for (const p of proposals) {
+      const weekLabel = p.week_end
+        ? `${formatDate(p.week_start)} – ${formatDate(p.week_end)}`
+        : formatDate(p.generated_at);
+      for (const sub of p.proposals || []) {
+        proposalHistory.push({
+          parentId: p.id, id: sub.id, title: sub.title, severity: sub.severity,
+          status: p.status, date: p.generated_at, dateLabel: weekLabel,
+          effect: sub.effect, effectDelta: sub.effect_delta, evidence: sub.evidence,
+        });
+      }
+    }
+    proposalHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const patternKeys = new Set();
+    const patternByDate = proposals
+      .filter(p => p.pattern_frequencies)
+      .map(p => {
+        const pf = p.pattern_frequencies;
+        Object.keys(pf).forEach(k => patternKeys.add(k));
+        return { dateLabel: formatDate(p.week_end || p.generated_at), patterns: pf };
+      });
+    const patternFrequency = {
+      dates: patternByDate.map(p => p.dateLabel),
+      keys: Array.from(patternKeys),
+      series: patternByDate.map(p => p.patterns),
+    };
+    const rulesEffectiveness = [];
+    for (const p of proposals) {
+      for (const sub of p.proposals || []) {
+        if (sub.effect === null || sub.effect === undefined) continue;
+        rulesEffectiveness.push({
+          id: sub.id, title: sub.title, severity: sub.severity, effect: sub.effect,
+          delta: sub.effect_delta, before: sub.pattern_hits_before,
+          after: sub.pattern_hits_after, date: p.generated_at,
+          dateLabel: formatDate(p.week_end || p.generated_at),
+        });
+      }
+    }
+    rulesEffectiveness.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const withBench = proposals.filter(p => p.benchmarks?.agents_md_score != null);
+    const latestBench = withBench.length > 0 ? withBench[withBench.length - 1].benchmarks : null;
+    const agentsMdHealth = latestBench ? {
+      score: latestBench.agents_md_score,
+      label: latestBench.agents_md_label,
+      missingSections: latestBench.missing_sections || [],
+      githubStatus: latestBench.github_status,
+      clawHubStatus: latestBench.clawhub_status,
+      history: withBench.map(p => ({
+        dateLabel: formatDate(p.week_end || p.generated_at),
+        score: p.benchmarks.agents_md_score,
+      })),
+    } : null;
+    const stats = {
+      totalProposals: proposalHistory.length,
+      applied: proposalHistory.filter(p => p.status === 'applied').length,
+      rejected: proposalHistory.filter(p => p.status === 'rejected').length,
+      pending: proposalHistory.filter(p => p.status === 'pending').length,
+      effective: rulesEffectiveness.filter(r => r.effect === 'effective').length,
+      neutral: rulesEffectiveness.filter(r => r.effect === 'neutral').length,
+      regressed: rulesEffectiveness.filter(r => r.effect === 'regressed').length,
+      latestScore: qualityTrend.length > 0 ? qualityTrend[qualityTrend.length - 1].score : null,
+    };
+    return { empty: false, qualityTrend, proposalHistory, patternFrequency,
+             rulesEffectiveness, agentsMdHealth, stats, raw: proposals };
+  }
+  global.SEAData = { loadAll, formatDate, severityRank };
+})(window);
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHART ENGINE (pure SVG/Canvas, no deps)
+══════════════════════════════════════════════════════════════ -->
+<script>
+// ── Palette ──────────────────────────────────────────────────────
+const PALETTE = [
+  '#388bfd','#3fb950','#f85149','#d29922','#bc8cff',
+  '#f0883e','#39d353','#58a6ff','#ff79c6','#8b949e',
+];
+
+// ── Tooltip ──────────────────────────────────────────────────────
+const tip = document.getElementById('tooltip');
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.classList.add('visible');
+  positionTip(e);
+}
+function positionTip(e) {
+  const margin = 12;
+  let x = e.clientX + margin, y = e.clientY + margin;
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  if (x + tw > window.innerWidth)  x = e.clientX - tw - margin;
+  if (y + th > window.innerHeight) y = e.clientY - th - margin;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+function hideTip() { tip.classList.remove('visible'); }
+document.addEventListener('mousemove', e => { if (tip.classList.contains('visible')) positionTip(e); });
+
+// ── SVG helpers ──────────────────────────────────────────────────
+function svgEl(tag, attrs = {}) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function makeSVG(w, h) {
+  return svgEl('svg', { viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
+}
+
+// ── LINE CHART (quality trend) ────────────────────────────────────
+function renderLineChart(container, data) {
+  container.innerHTML = '';
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📉</div><div class="empty-sub">No quality score data yet</div></div>';
+    return;
+  }
+
+  const W = 560, H = 200;
+  const pad = { top: 16, right: 24, bottom: 36, left: 44 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  const scores = data.map(d => d.score);
+  const minS = Math.max(0, Math.min(...scores) - 0.5);
+  const maxS = Math.min(10, Math.max(...scores) + 0.5);
+
+  const sx = i => pad.left + (i / (data.length - 1)) * cw;
+  const sy = v => pad.top + ch - ((v - minS) / (maxS - minS)) * ch;
+
+  const svg = makeSVG(W, H);
+
+  // Defs: gradient
+  const defs = svgEl('defs');
+  const grad = svgEl('linearGradient', { id: 'areaGrad', x1: '0', y1: '0', x2: '0', y2: '1' });
+  const s1 = svgEl('stop', { offset: '0%',   'stop-color': '#388bfd', 'stop-opacity': '.5' });
+  const s2 = svgEl('stop', { offset: '100%', 'stop-color': '#388bfd', 'stop-opacity': '0' });
+  grad.append(s1, s2);
+  defs.append(grad);
+  svg.append(defs);
+
+  // Grid lines (Y)
+  const ticks = 5;
+  for (let i = 0; i <= ticks; i++) {
+    const v = minS + (i / ticks) * (maxS - minS);
+    const y = sy(v);
+    svg.append(svgEl('line', { class: 'grid-line', x1: pad.left, y1: y, x2: pad.left + cw, y2: y }));
+    svg.append(Object.assign(svgEl('text', { class: 'axis-label', x: pad.left - 8, y: y + 4, 'text-anchor': 'end' }),
+      { textContent: v.toFixed(1) }));
+  }
+
+  // X axis labels
+  data.forEach((d, i) => {
+    const x = sx(i);
+    svg.append(Object.assign(svgEl('text', { class: 'axis-label', x, y: H - pad.bottom + 16, 'text-anchor': 'middle' }),
+      { textContent: d.dateLabel }));
+    svg.append(svgEl('line', { class: 'axis-tick', x1: x, y1: pad.top + ch, x2: x, y2: pad.top + ch + 4 }));
+  });
+
+  // Area
+  let areaD = `M ${sx(0)} ${sy(data[0].score)}`;
+  for (let i = 1; i < data.length; i++) areaD += ` L ${sx(i)} ${sy(data[i].score)}`;
+  areaD += ` L ${sx(data.length - 1)} ${pad.top + ch} L ${sx(0)} ${pad.top + ch} Z`;
+  svg.append(svgEl('path', { class: 'line-area', d: areaD }));
+
+  // Line
+  let lineD = `M ${sx(0)} ${sy(data[0].score)}`;
+  for (let i = 1; i < data.length; i++) lineD += ` L ${sx(i)} ${sy(data[i].score)}`;
+  svg.append(svgEl('path', { class: 'line-path', d: lineD }));
+
+  // Dots
+  data.forEach((d, i) => {
+    const circle = svgEl('circle', { class: 'line-dot', cx: sx(i), cy: sy(d.score), r: 4 });
+    circle.addEventListener('mouseenter', e =>
+      showTip(`${d.dateLabel}\nScore: ${d.score}\nSessions: ${d.sessions ?? '—'}\nStatus: ${d.status}`, e));
+    circle.addEventListener('mouseleave', hideTip);
+    svg.append(circle);
+  });
+
+  // Axes
+  svg.append(svgEl('line', { class: 'axis-line', x1: pad.left, y1: pad.top, x2: pad.left, y2: pad.top + ch }));
+  svg.append(svgEl('line', { class: 'axis-line', x1: pad.left, y1: pad.top + ch, x2: pad.left + cw, y2: pad.top + ch }));
+
+  container.appendChild(svg);
+}
+
+// ── BAR CHART (pattern frequency) ────────────────────────────────
+function renderBarChart(container, data) {
+  container.innerHTML = '';
+  if (!data || !data.dates || data.dates.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">No pattern data yet</div></div>';
+    return;
+  }
+
+  const { dates, keys, series } = data;
+  if (keys.length === 0 || series.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">No pattern data yet</div></div>';
+    return;
+  }
+
+  const W = 900, H = 220;
+  const pad = { top: 16, right: 16, bottom: 40, left: 48 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  // Max stack height
+  const maxVal = Math.max(...series.map(s => Object.values(s).reduce((a, b) => a + b, 0)));
+  const sy = v => pad.top + ch - (v / (maxVal || 1)) * ch;
+
+  const groupW = cw / dates.length;
+  const barW = Math.max(12, groupW * 0.55);
+
+  const svg = makeSVG(W, H);
+
+  // Grid lines
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = Math.round((i / ticks) * maxVal);
+    const y = sy(v);
+    svg.append(svgEl('line', { class: 'grid-line', x1: pad.left, y1: y, x2: pad.left + cw, y2: y }));
+    svg.append(Object.assign(svgEl('text', { class: 'axis-label', x: pad.left - 8, y: y + 4, 'text-anchor': 'end' }),
+      { textContent: v }));
+  }
+
+  // Bars (stacked)
+  dates.forEach((date, gi) => {
+    const gx = pad.left + gi * groupW + (groupW - barW) / 2;
+    const s = series[gi] || {};
+    let yOff = pad.top + ch;
+
+    keys.forEach((key, ki) => {
+      const val = s[key] || 0;
+      if (val === 0) return;
+      const barH = (val / (maxVal || 1)) * ch;
+      yOff -= barH;
+      const rect = svgEl('rect', {
+        class: 'bar-seg',
+        x: gx, y: yOff, width: barW, height: barH,
+        fill: PALETTE[ki % PALETTE.length],
+        rx: 2,
+      });
+      const localY = yOff; const localGi = gi;
+      rect.addEventListener('mouseenter', e =>
+        showTip(`${date}\n${key}: ${val}`, e));
+      rect.addEventListener('mouseleave', hideTip);
+      svg.append(rect);
+    });
+
+    // X label
+    svg.append(Object.assign(svgEl('text', {
+      class: 'axis-label', x: gx + barW / 2, y: H - pad.bottom + 16, 'text-anchor': 'middle',
+    }), { textContent: date }));
+  });
+
+  // Axes
+  svg.append(svgEl('line', { class: 'axis-line', x1: pad.left, y1: pad.top, x2: pad.left, y2: pad.top + ch }));
+  svg.append(svgEl('line', { class: 'axis-line', x1: pad.left, y1: pad.top + ch, x2: pad.left + cw, y2: pad.top + ch }));
+
+  container.appendChild(svg);
+}
+
+// ── SPARKLINE (AGENTS.md history) ─────────────────────────────────
+function renderSparkline(container, history) {
+  container.innerHTML = '';
+  if (!history || history.length < 2) return;
+
+  const W = 280, H = 48;
+  const pad = { top: 4, right: 4, bottom: 16, left: 4 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  const scores = history.map(h => h.score);
+  const minS = Math.max(0, Math.min(...scores) - 5);
+  const maxS = Math.min(100, Math.max(...scores) + 5);
+  const sx = i => pad.left + (i / (history.length - 1)) * cw;
+  const sy = v => pad.top + ch - ((v - minS) / (maxS - minS)) * ch;
+
+  const svg = makeSVG(W, H);
+  const defs = svgEl('defs');
+  const g2 = svgEl('linearGradient', { id: 'spkGrad', x1: '0', y1: '0', x2: '0', y2: '1' });
+  g2.append(Object.assign(svgEl('stop'), { setAttribute: () => {} }));
+  const s1 = svgEl('stop', { offset: '0%', 'stop-color': '#3fb950', 'stop-opacity': '.4' });
+  const s2 = svgEl('stop', { offset: '100%', 'stop-color': '#3fb950', 'stop-opacity': '0' });
+  g2.append(s1, s2);
+  defs.append(g2);
+  svg.append(defs);
+
+  let areaD = `M ${sx(0)} ${sy(scores[0])}`;
+  let lineD  = `M ${sx(0)} ${sy(scores[0])}`;
+  for (let i = 1; i < history.length; i++) {
+    areaD += ` L ${sx(i)} ${sy(scores[i])}`;
+    lineD  += ` L ${sx(i)} ${sy(scores[i])}`;
+  }
+  areaD += ` L ${sx(history.length - 1)} ${pad.top + ch} L ${sx(0)} ${pad.top + ch} Z`;
+  svg.append(svgEl('path', { d: areaD, fill: 'url(#spkGrad)' }));
+  svg.append(svgEl('path', { d: lineD, fill: 'none', stroke: '#3fb950', 'stroke-width': '2', 'stroke-linejoin': 'round' }));
+
+  // X labels (first and last)
+  [0, history.length - 1].forEach(i => {
+    svg.append(Object.assign(svgEl('text', {
+      class: 'chart-label', x: sx(i), y: H, 'text-anchor': i === 0 ? 'start' : 'end',
+    }), { textContent: history[i].dateLabel }));
+  });
+
+  container.appendChild(svg);
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     APP LOGIC
+══════════════════════════════════════════════════════════════ -->
+<script>
+// ── Clock ────────────────────────────────────────────────────────
+(function tickClock() {
+  const el = document.getElementById('clock');
+  function update() {
+    el.textContent = new Date().toLocaleTimeString('ko-KR', {
+      timeZone: 'Asia/Seoul', hour12: false,
+      weekday: 'short', hour: '2-digit', minute: '2-digit',
+    });
+  }
+  update();
+  setInterval(update, 1000);
+})();
+
+// ── Severity badge ───────────────────────────────────────────────
+function severityBadge(s) {
+  const map = { high: '🔴', medium: '🟡', low: '🟢', critical: '🟣', info: 'ℹ️' };
+  return `<span class="badge badge-${s || 'low'}">${map[s] || '⚪'} ${(s || '?').toUpperCase()}</span>`;
+}
+
+function statusBadge(s) {
+  const map = { applied: '✅ Applied', pending: '⏳ Pending', rejected: '❌ Rejected' };
+  return `<span class="badge badge-${s || 'pending'}">${map[s] || s || '?'}</span>`;
+}
+
+function effectBadge(e, delta) {
+  if (e === null || e === undefined) return `<span class="badge badge-pending-m">⏳ Measuring</span>`;
+  const map = { effective: '✅ Effective', neutral: '➡️ Neutral', regressed: '📈 Regressed' };
+  const d = delta != null ? ` (${delta > 0 ? '+' : ''}${delta.toFixed(0)}%)` : '';
+  return `<span class="badge badge-${e || 'neutral'}">${map[e] || e}${d}</span>`;
+}
+
+// ── Score ring ───────────────────────────────────────────────────
+function renderScoreRing(score) {
+  const radius = 36, cx = 44, cy = 44;
+  const circ = 2 * Math.PI * radius;
+  const pct = score / 100;
+  const color = score >= 80 ? '#3fb950' : score >= 60 ? '#d29922' : '#f85149';
+  const textColor = color;
+  const label = score >= 80 ? 'Excellent' : score >= 70 ? 'Good' : score >= 60 ? 'Fair' : 'Needs Work';
+
+  return `
+<div class="health-score-wrap">
+  <div class="score-ring">
+    <svg viewBox="0 0 88 88" width="88" height="88">
+      <circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="#21262d" stroke-width="8"/>
+      <circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${color}" stroke-width="8"
+        stroke-dasharray="${(circ * pct).toFixed(2)} ${(circ * (1-pct)).toFixed(2)}"
+        stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:44px 44px;
+        transition:stroke-dasharray .5s ease"/>
+    </svg>
+    <div class="score-text">
+      <span class="score-num" style="color:${textColor}">${score}</span>
+      <span class="score-max">/100</span>
+    </div>
+  </div>
+  <div class="health-meta">
+    <div class="health-label" style="color:${textColor}">${label}</div>
+    <div id="healthMissing"></div>
+    <div style="margin-top:8px;font-size:.75rem;color:var(--text2)">
+      AGENTS.md structure score from benchmark analysis
+    </div>
+  </div>
+</div>`;
+}
+
+// ── Render all ───────────────────────────────────────────────────
+async function render() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+
+  let data;
+  try {
+    data = await SEAData.loadAll();
+  } catch(e) {
+    console.error(e);
+    data = { empty: true, reason: 'Unexpected error: ' + e.message };
+  }
+
+  btn.classList.remove('loading');
+
+  // ── Stats row ────────────────────────────────────────────────
+  const stats = data.stats || {};
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-pill">
+      <div class="stat-label">Latest Score</div>
+      <div class="stat-value ${stats.latestScore >= 8 ? 'green' : stats.latestScore >= 6 ? 'yellow' : 'red'}">
+        ${stats.latestScore?.toFixed(1) ?? '—'}
+      </div>
+      <div class="stat-sub">/ 10.0 quality</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Total Proposals</div>
+      <div class="stat-value blue">${stats.totalProposals ?? 0}</div>
+      <div class="stat-sub">across all cycles</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Applied</div>
+      <div class="stat-value green">${stats.applied ?? 0}</div>
+      <div class="stat-sub">merged to AGENTS.md</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value yellow">${stats.pending ?? 0}</div>
+      <div class="stat-sub">awaiting review</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Effective Rules</div>
+      <div class="stat-value green">${stats.effective ?? 0}</div>
+      <div class="stat-sub">patterns ↓ 30%+</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Regressed</div>
+      <div class="stat-value red">${stats.regressed ?? 0}</div>
+      <div class="stat-sub">needs re-review</div>
+    </div>
+  `;
+
+  // ── Quality trend ─────────────────────────────────────────────
+  const qContainer = document.getElementById('qualityChart');
+  qContainer.style.height = '220px';
+  renderLineChart(qContainer, data.qualityTrend || []);
+  document.getElementById('qualityMeta').textContent =
+    `${(data.qualityTrend || []).length} data points`;
+
+  // ── AGENTS.md Health ──────────────────────────────────────────
+  const health = data.agentsMdHealth;
+  const healthBody = document.getElementById('healthBody');
+  if (!health) {
+    healthBody.innerHTML = '<div class="empty-state"><div class="empty-icon">🏥</div><div class="empty-sub">No benchmark data yet</div></div>';
+    document.getElementById('healthMeta').textContent = '—';
+  } else {
+    healthBody.innerHTML = renderScoreRing(health.score);
+    const missingEl = document.getElementById('healthMissing');
+    if (health.missingSections && health.missingSections.length > 0) {
+      missingEl.innerHTML = `<div class="health-missing">⚠️ Missing: ${health.missingSections.join(', ')}</div>`;
+    } else {
+      missingEl.innerHTML = `<div class="health-ok">✅ All recommended sections present</div>`;
+    }
+    // Sparkline
+    const spk = document.createElement('div');
+    spk.className = 'health-history';
+    spk.innerHTML = '<div class="health-history-title">Score History</div>';
+    const spkChart = document.createElement('div');
+    spk.appendChild(spkChart);
+    healthBody.appendChild(spk);
+    renderSparkline(spkChart, health.history);
+    document.getElementById('healthMeta').textContent = `${health.label} · ${health.score}/100`;
+  }
+
+  // ── Pattern frequency ─────────────────────────────────────────
+  const pContainer = document.getElementById('patternChart');
+  pContainer.style.minHeight = '220px';
+  renderBarChart(pContainer, data.patternFrequency);
+  document.getElementById('patternMeta').textContent =
+    `${(data.patternFrequency?.keys || []).length} patterns tracked`;
+
+  // Legend
+  const legendEl = document.getElementById('patternLegend');
+  const keys = data.patternFrequency?.keys || [];
+  legendEl.innerHTML = keys.map((k, i) =>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:${PALETTE[i % PALETTE.length]}"></div>
+      <span>${k}</span>
+    </div>`
+  ).join('');
+
+  // ── Proposal History ──────────────────────────────────────────
+  const tableWrap = document.getElementById('proposalTable');
+  const history = data.proposalHistory || [];
+  document.getElementById('historyMeta').textContent = `${history.length} proposals`;
+
+  if (history.length === 0) {
+    tableWrap.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">${data.empty ? 'No data loaded' : 'No proposals yet'}</div>
+      <div class="empty-sub">${data.reason || 'Run the weekly pipeline to generate proposals.'}</div>
+      ${data.empty ? `<div class="empty-code">bash dashboard/build-index.sh</div>` : ''}
+    </div>`;
+  } else {
+    tableWrap.innerHTML = `<table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Proposal</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Effect</th>
+          <th>Period</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${history.map((p, i) => `
+          <tr>
+            <td class="mono" style="color:var(--text2);width:36px">${i + 1}</td>
+            <td class="title-cell">
+              <div style="font-weight:600">${escHtml(p.title)}</div>
+              <div style="font-size:.7rem;color:var(--text2);margin-top:2px;font-family:var(--font)">${escHtml(p.evidence || '')}</div>
+            </td>
+            <td>${severityBadge(p.severity)}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td>${effectBadge(p.effect, p.effectDelta)}</td>
+            <td class="mono" style="color:var(--text2);font-size:.72rem;white-space:nowrap">${escHtml(p.dateLabel)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  // ── Rules Effectiveness ───────────────────────────────────────
+  const rulesBody = document.getElementById('rulesBody');
+  const rules = data.rulesEffectiveness || [];
+  document.getElementById('rulesMeta').textContent =
+    `${rules.length} measured · ${data.stats?.effective ?? 0} effective · ${data.stats?.regressed ?? 0} regressed`;
+
+  if (rules.length === 0) {
+    rulesBody.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">⚡</div>
+      <div class="empty-sub">No measured rules yet. Apply proposals to start tracking effectiveness.</div>
+    </div>`;
+  } else {
+    rulesBody.innerHTML = `<div class="rules-list">
+      ${rules.map(r => {
+        const deltaStr = r.delta != null
+          ? `${r.delta > 0 ? '+' : ''}${r.delta.toFixed(1)}%`
+          : null;
+        const deltaClass = r.delta == null ? '' : r.delta < -10 ? 'positive' : r.delta > 10 ? 'negative' : 'zero';
+        return `<div class="rule-item ${r.effect}">
+          <div>
+            <div class="rule-title">${escHtml(r.title)}</div>
+            <div class="rule-detail">
+              ${severityBadge(r.severity)}
+              &nbsp;${r.before != null ? `before: ${r.before}` : ''}
+              ${r.after  != null ? `→ after: ${r.after}` : ''}
+              &nbsp;·&nbsp;${escHtml(r.dateLabel)}
+            </div>
+          </div>
+          <div>
+            ${effectBadge(r.effect, r.delta)}
+            ${deltaStr ? `<div class="rule-delta ${deltaClass}" style="margin-top:4px">${deltaStr}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function reload() { render(); }
+
+// Boot
+render();
+</script>
+</body>
+</html>

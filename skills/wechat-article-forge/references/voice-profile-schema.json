@@ -1,0 +1,381 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://openclaw.dev/schemas/wechat-article-writer/voice-profile.json",
+  "title": "WeChatArticleWriter Voice Profile",
+  "description": "Captures an author's writing style fingerprint for consistent AI-assisted 公众号 article generation.",
+  "type": "object",
+  "required": ["meta", "rhythm", "structure", "rhetoric", "vocabulary", "punctuation", "tone"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "meta": {
+      "type": "object",
+      "description": "Profile metadata",
+      "required": ["created_at", "updated_at", "article_count", "version"],
+      "properties": {
+        "created_at":     { "type": "string", "format": "date-time" },
+        "updated_at":     { "type": "string", "format": "date-time" },
+        "article_count":  { "type": "integer", "minimum": 1, "description": "Number of articles used to build this profile" },
+        "version":        { "type": "string", "description": "Schema version, e.g. '1.0'" },
+        "sample_titles":  {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 10,
+          "description": "Representative article titles used during training"
+        }
+      }
+    },
+
+    "rhythm": {
+      "type": "object",
+      "description": "Sentence and paragraph pacing",
+      "required": ["avg_sentence_chars", "avg_paragraph_sentences", "short_sentence_ratio"],
+      "properties": {
+        "avg_sentence_chars": {
+          "type": "number",
+          "description": "Average Chinese characters per sentence (punctuation excluded)",
+          "examples": [28.5]
+        },
+        "avg_paragraph_sentences": {
+          "type": "number",
+          "description": "Average sentences per paragraph",
+          "examples": [3.2]
+        },
+        "short_sentence_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of sentences under 15 characters (punchy style indicator)",
+          "examples": [0.22]
+        },
+        "long_sentence_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of sentences over 50 characters",
+          "examples": [0.08]
+        },
+        "variation_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Sentence length variation — higher means more dynamic rhythm",
+          "examples": [0.65]
+        }
+      }
+    },
+
+    "structure": {
+      "type": "object",
+      "description": "Article-level structural preferences",
+      "required": ["preferred_section_count", "uses_subheadings", "opening_style", "closing_style"],
+      "properties": {
+        "preferred_section_count": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 15,
+          "description": "Typical number of H2 sections per article",
+          "examples": [5]
+        },
+        "uses_subheadings": {
+          "type": "boolean",
+          "description": "Does the author use H3 subheadings within sections?"
+        },
+        "uses_numbered_lists": {
+          "type": "boolean",
+          "description": "Does the author use numbered lists?"
+        },
+        "uses_bullet_lists": {
+          "type": "boolean",
+          "description": "Does the author use bullet (unordered) lists?"
+        },
+        "uses_summary_box": {
+          "type": "boolean",
+          "description": "Does the author use a blockquote/callout summary box?"
+        },
+        "opening_style": {
+          "type": "string",
+          "enum": [
+            "question",
+            "story",
+            "data_shock",
+            "scene_setting",
+            "bold_claim",
+            "contrast",
+            "anecdote"
+          ],
+          "description": "Dominant opening hook pattern across analyzed articles"
+        },
+        "closing_style": {
+          "type": "string",
+          "enum": [
+            "call_to_action",
+            "open_question",
+            "summary",
+            "personal_reflection",
+            "forward_looking",
+            "quote"
+          ],
+          "description": "Dominant closing pattern"
+        },
+        "avg_word_count": {
+          "type": "integer",
+          "description": "Typical article length in Chinese characters",
+          "examples": [1800]
+        }
+      }
+    },
+
+    "rhetoric": {
+      "type": "object",
+      "description": "Rhetorical devices and writing techniques used",
+      "required": ["dominant_devices"],
+      "properties": {
+        "dominant_devices": {
+          "type": "array",
+          "description": "Top rhetorical devices, ordered by frequency",
+          "items": {
+            "type": "string",
+            "enum": [
+              "analogy",
+              "metaphor",
+              "data_cite",
+              "expert_quote",
+              "rhetorical_question",
+              "contrast",
+              "enumeration",
+              "storytelling",
+              "personal_anecdote",
+              "hypothetical"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "uses_technical_deep_dives": {
+          "type": "boolean",
+          "description": "Does the author regularly include technical details, code, or specs?"
+        },
+        "simplification_style": {
+          "type": "string",
+          "enum": ["analogy_heavy", "step_by_step", "compare_to_known", "visual_description", "minimal"],
+          "description": "How the author explains complex concepts to a general audience"
+        },
+        "self_reference_frequency": {
+          "type": "string",
+          "enum": ["never", "rare", "occasional", "frequent"],
+          "description": "How often the author writes in first person or shares personal experience"
+        }
+      }
+    },
+
+    "vocabulary": {
+      "type": "object",
+      "description": "Word and terminology preferences",
+      "required": ["formality_level", "english_loanword_style"],
+      "properties": {
+        "formality_level": {
+          "type": "string",
+          "enum": ["casual", "semi_formal", "formal", "academic"],
+          "description": "Overall register of the writing"
+        },
+        "english_loanword_style": {
+          "type": "string",
+          "enum": [
+            "avoid",
+            "parenthetical",
+            "mixed_freely",
+            "full_english_terms"
+          ],
+          "description": "How to handle English technical terms — e.g. 'AI' vs '人工智能' vs '人工智能(AI)'"
+        },
+        "signature_phrases": {
+          "type": "array",
+          "description": "Phrases the author uses characteristically — include these occasionally",
+          "items": { "type": "string" },
+          "maxItems": 20,
+          "examples": [["说到底", "换句话说", "值得注意的是", "这意味着"]]
+        },
+        "avoid_phrases": {
+          "type": "array",
+          "description": "Phrases to avoid (clichés the author never uses)",
+          "items": { "type": "string" },
+          "maxItems": 20,
+          "examples": [["总而言之", "综上所述", "毋庸置疑"]]
+        },
+        "domain_focus": {
+          "type": "array",
+          "description": "Primary subject domains (informs vocabulary choices)",
+          "items": {
+            "type": "string",
+            "enum": [
+              "technology",
+              "ai_ml",
+              "product",
+              "entrepreneurship",
+              "design",
+              "science",
+              "finance",
+              "culture",
+              "lifestyle",
+              "general"
+            ]
+          }
+        }
+      }
+    },
+
+    "punctuation": {
+      "type": "object",
+      "description": "Chinese punctuation and typographic preferences",
+      "required": ["prefers_chinese_comma", "uses_em_dash", "uses_ellipsis"],
+      "properties": {
+        "prefers_chinese_comma": {
+          "type": "boolean",
+          "description": "Prefers 顿号（、）over comma for list separation"
+        },
+        "uses_em_dash": {
+          "type": "boolean",
+          "description": "Uses 破折号（——）for parenthetical asides"
+        },
+        "uses_ellipsis": {
+          "type": "boolean",
+          "description": "Uses 省略号（……）for trailing effect"
+        },
+        "book_title_marks": {
+          "type": "boolean",
+          "description": "Uses 书名号（《》）for product/article names"
+        },
+        "emoji_usage": {
+          "type": "string",
+          "enum": ["none", "section_headers_only", "occasional", "frequent"],
+          "description": "How often emoji appear in the article body and headers"
+        },
+        "emoji_style": {
+          "type": "array",
+          "description": "Characteristic emoji used by this author",
+          "items": { "type": "string" },
+          "maxItems": 15,
+          "examples": [["🔥", "💡", "📌", "🚀", "✅"]]
+        }
+      }
+    },
+
+    "tone": {
+      "type": "object",
+      "description": "Overall voice and attitude of the writing",
+      "required": ["primary_tone", "reader_relationship"],
+      "properties": {
+        "primary_tone": {
+          "type": "string",
+          "enum": [
+            "authoritative",
+            "conversational",
+            "enthusiastic",
+            "analytical",
+            "skeptical",
+            "encouraging",
+            "neutral_informative"
+          ],
+          "description": "The dominant emotional register of the writing"
+        },
+        "secondary_tone": {
+          "type": "string",
+          "enum": [
+            "authoritative",
+            "conversational",
+            "enthusiastic",
+            "analytical",
+            "skeptical",
+            "encouraging",
+            "neutral_informative",
+            "none"
+          ]
+        },
+        "reader_relationship": {
+          "type": "string",
+          "enum": ["mentor_student", "peer_to_peer", "expert_to_layperson", "friend_to_friend"],
+          "description": "How the author positions themselves relative to the reader"
+        },
+        "humor_level": {
+          "type": "string",
+          "enum": ["none", "occasional_wit", "light_humor", "playful"],
+          "description": "How much humor appears in the writing"
+        },
+        "opinion_strength": {
+          "type": "string",
+          "enum": ["factual_only", "mild_opinion", "clear_stance", "provocative"],
+          "description": "How strongly the author asserts their own views"
+        }
+      }
+    },
+
+    "writing_prompt_injection": {
+      "type": "string",
+      "description": "Optional freeform instruction appended to the writing prompt verbatim. Use for nuances not captured by the schema. Max 500 characters.",
+      "maxLength": 500,
+      "examples": [
+        "作者喜欢用具体数字而不是模糊表述，总是在引出话题后先给读者一个「为什么这很重要」的背景，结尾常提出一个开放性问题让读者思考。"
+      ]
+    }
+  },
+
+  "examples": [
+    {
+      "meta": {
+        "created_at": "2024-02-17T12:00:00Z",
+        "updated_at": "2024-02-17T12:00:00Z",
+        "article_count": 12,
+        "version": "1.0",
+        "sample_titles": ["2024年AI工具全景图", "为什么程序员应该学习写作", "Rust让我重新思考内存管理"]
+      },
+      "rhythm": {
+        "avg_sentence_chars": 24.3,
+        "avg_paragraph_sentences": 3.1,
+        "short_sentence_ratio": 0.28,
+        "long_sentence_ratio": 0.06,
+        "variation_score": 0.71
+      },
+      "structure": {
+        "preferred_section_count": 5,
+        "uses_subheadings": false,
+        "uses_numbered_lists": true,
+        "uses_bullet_lists": false,
+        "uses_summary_box": true,
+        "opening_style": "bold_claim",
+        "closing_style": "open_question",
+        "avg_word_count": 2100
+      },
+      "rhetoric": {
+        "dominant_devices": ["analogy", "data_cite", "rhetorical_question"],
+        "uses_technical_deep_dives": true,
+        "simplification_style": "analogy_heavy",
+        "self_reference_frequency": "occasional"
+      },
+      "vocabulary": {
+        "formality_level": "semi_formal",
+        "english_loanword_style": "parenthetical",
+        "signature_phrases": ["换句话说", "值得注意的是", "说到底"],
+        "avoid_phrases": ["总而言之", "综上所述"],
+        "domain_focus": ["technology", "ai_ml"]
+      },
+      "punctuation": {
+        "prefers_chinese_comma": false,
+        "uses_em_dash": true,
+        "uses_ellipsis": false,
+        "book_title_marks": true,
+        "emoji_usage": "section_headers_only",
+        "emoji_style": ["💡", "🔥", "✅", "📌"]
+      },
+      "tone": {
+        "primary_tone": "analytical",
+        "secondary_tone": "conversational",
+        "reader_relationship": "peer_to_peer",
+        "humor_level": "occasional_wit",
+        "opinion_strength": "clear_stance"
+      },
+      "writing_prompt_injection": "作者喜欢在文章开头用一个反直觉的事实抓住读者，中段用类比降低阅读门槛，结尾留开放性问题。避免过于学术的表述。"
+    }
+  ]
+}

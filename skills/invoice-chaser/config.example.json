@@ -1,0 +1,143 @@
+{
+  "business": {
+    "name": "Your Business Name",
+    "contact_name": "Your Name",
+    "email": "billing@yourbusiness.com",
+    "phone": "+1-555-0100",
+    "website": "https://yourbusiness.com",
+    "default_payment_terms": "net-30",
+    "currency": "USD"
+  },
+  "payment_methods": {
+    "include_in_reminders": true,
+    "methods": [
+      {
+        "type": "bank_transfer",
+        "details": "Bank: Example Bank\nAccount: 123456789\nRouting: 987654321"
+      },
+      {
+        "type": "stripe",
+        "link": "https://pay.yourbusiness.com/invoice/{invoice_number}"
+      },
+      {
+        "type": "paypal",
+        "email": "payments@yourbusiness.com"
+      },
+      {
+        "type": "check",
+        "details": "Make checks payable to: Your Business Name\nMail to: 123 Main St, City, ST 12345"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "name": "pre-due-reminder",
+      "enabled": true,
+      "trigger_days": 3,
+      "trigger_from": "invoice_date",
+      "subject": "Friendly reminder: Invoice {invoice_number} due soon",
+      "body": "Hi {client_name},\n\nJust a friendly reminder that invoice #{invoice_number} for {amount} is due on {due_date}.\n\nIf you have any questions about the invoice or need any clarification, please don't hesitate to reach out.\n\n{payment_instructions}\n\nThanks for your business!\n\n{contact_name}\n{business_name}",
+      "tone": "friendly"
+    },
+    {
+      "name": "due-date-reminder",
+      "enabled": true,
+      "trigger_days": 0,
+      "trigger_from": "due_date",
+      "subject": "Payment due today: Invoice {invoice_number}",
+      "body": "Hi {client_name},\n\nThis is a reminder that payment for invoice #{invoice_number} ({amount}) is due today ({due_date}).\n\nIf you've already sent payment, thank you! Please disregard this message.\n\n{payment_instructions}\n\nPlease let me know if you have any questions.\n\nBest regards,\n{contact_name}\n{business_name}",
+      "tone": "professional"
+    },
+    {
+      "name": "first-overdue",
+      "enabled": true,
+      "trigger_days": 14,
+      "trigger_from": "due_date",
+      "subject": "Overdue invoice: {invoice_number} ({days_overdue} days past due)",
+      "body": "Hi {client_name},\n\nI wanted to follow up on invoice #{invoice_number} for {amount}, which was due on {due_date} and is now {days_overdue} days past due.\n\nIf you've already sent payment, please disregard this message and accept my thanks. Otherwise, I'd appreciate if you could let me know when I can expect payment, or if there are any issues preventing payment that I should be aware of.\n\n{payment_instructions}\n\nThank you for your attention to this matter.\n\nBest regards,\n{contact_name}\n{business_name}\n{phone}",
+      "tone": "professional"
+    },
+    {
+      "name": "firm-notice",
+      "enabled": true,
+      "trigger_days": 30,
+      "trigger_from": "due_date",
+      "subject": "URGENT: Invoice {invoice_number} is 30 days overdue",
+      "body": "Dear {client_name},\n\nYour account is now 30 days past due. Invoice #{invoice_number} for {amount} was due on {due_date}.\n\nImmediate payment is required. If payment is not received within 7 days, we may need to suspend services and assess late fees per our payment terms.\n\n{payment_instructions}\n\nIf there is a reason for the delay that I'm not aware of, please contact me immediately at {phone} or {email}.\n\nRegards,\n{contact_name}\n{business_name}",
+      "tone": "firm"
+    },
+    {
+      "name": "final-notice",
+      "enabled": true,
+      "trigger_days": 45,
+      "trigger_from": "due_date",
+      "subject": "FINAL NOTICE: Invoice {invoice_number} - Action Required",
+      "body": "Dear {client_name},\n\nFINAL NOTICE\n\nInvoice #{invoice_number} for {amount} is now {days_overdue} days overdue (due date: {due_date}).\n\nIf we do not receive payment within 7 days, we will be forced to escalate this matter to a collections agency, which will negatively impact your credit rating and may result in additional fees.\n\n{payment_instructions}\n\nPlease contact me immediately at {phone} or {email} if you need to arrange a payment plan or discuss this matter.\n\nThis is your final notice before escalation.\n\n{contact_name}\n{business_name}\n{phone}\n{email}",
+      "tone": "final"
+    }
+  ],
+  "timing": {
+    "check_frequency_hours": 24,
+    "max_emails_per_day": 5,
+    "min_hours_between_stages": 12,
+    "business_hours_only": true,
+    "business_hours": {
+      "start": "09:00",
+      "end": "17:00",
+      "timezone": "America/New_York"
+    },
+    "skip_weekends": true,
+    "skip_holidays": true,
+    "holidays": [
+      "2025-01-01",
+      "2025-07-04",
+      "2025-12-25"
+    ]
+  },
+  "escalation": {
+    "auto_escalate": true,
+    "human_intervention_days": 60,
+    "human_intervention_amount": 5000,
+    "collections_threshold_days": 90,
+    "late_fee": {
+      "enabled": false,
+      "percentage": 1.5,
+      "start_after_days": 30,
+      "max_percentage": 10
+    },
+    "manual_override_clients": []
+  },
+  "notifications": {
+    "channel": "telegram",
+    "notify_on": [
+      "payment_received",
+      "escalation_required",
+      "stage_progression",
+      "email_bounce"
+    ],
+    "daily_summary": true,
+    "weekly_ar_report": true,
+    "weekly_report_day": "monday"
+  },
+  "reporting": {
+    "aging_buckets": [
+      {"label": "Current", "days": 0, "max_days": 30, "emoji": "✅"},
+      {"label": "31-60 days", "days": 31, "max_days": 60, "emoji": "⚠️"},
+      {"label": "61-90 days", "days": 61, "max_days": 90, "emoji": "🚨"},
+      {"label": "90+ days", "days": 91, "max_days": 999, "emoji": "💀"}
+    ],
+    "include_notes": true,
+    "include_contact_history": true
+  },
+  "email": {
+    "from_name": "{contact_name} - {business_name}",
+    "reply_to": "{email}",
+    "cc": [],
+    "bcc": ["{email}"],
+    "signature": "\n\n--\n{contact_name}\n{business_name}\n{email}\n{phone}\n{website}"
+  },
+  "testing": {
+    "dry_run_default": false,
+    "test_email": "your-test-email@example.com"
+  }
+}

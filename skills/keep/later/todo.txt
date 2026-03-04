@@ -1,0 +1,254 @@
+* URIs: What's safe to normalize?
+  RFC 3986 §6.2.2 defines "syntax-based normalization" that's always safe:
+    - Scheme/host case — always case-insensitive (HTTPS://EXAMPLE.COM → https://example.com)
+    - Percent-encoding of unreserved chars — %41 → A (unreserved chars should not be encoded)
+    - Port normalization — :443 on https, :80 on http are default, can be dropped
+    - Path segment normalization — /./../a → /a (dot segments)
+    - Empty path — https://example.com → https://example.com/
+
+* Maybe the metadoc should say how many results to produce by default?
+    (e.g. closures: 10, learnings: 3)
+
+* VS Code hooks 
+    https://docs.github.com/en/copilot/reference/hooks-configuration
+    Session Start - output is ignored!
+    User Prompt Submitted
+
+* Codex hooks
+    https://developers.openai.com/codex/config-advanced/#notifications
+    Notification - can just log the user prompts for the turn (better than nothing)
+    "We are actively working on designing a hooks system" (https://github.com/openai/codex/pull/11067#issuecomment-3866360949)
+
+* need to make sure the tagging instructions are as clear as poss
+    - reference `keep get .tag/act` directly
+
+* can `keep config` return error status if there's no correct configuration yet?
+
+* `keep reflect --something` that helps trigger "hourly reflection"?
+    (different "reflect docs" would do that, but... do we want mmore than one?)
+
+* lectio
+    - encourage "deep reflection" on items that were important
+      e.g. URLs and files that were captured recently
+
+* check - what is your emotional response when encountering this project the first time?
+
+* let's explore some semantic relationships that are important
+    the thing we're talking about is related to (many of):
+    - a meeting or other event
+    - people
+    - places
+    - events in the world
+    do we want to go down the whole "entity extraction" thing? really?
+    but we absolutely do need to handle "hey, note about XYZ, ...." whare XYZ is a capital-E Entity;
+    or "I just talked to Z and T"
+    maybe the entity-extraction is done by the AGENT, huh?
+    - so the agent should tag "entities" in a consistent way, but it's just a convention, not rules
+        -t class=Person entity=Daniel
+
+* let's explore the macOS native entities (not just the filesystem things):
+    - contacts
+    - music (albums, artists, tracks, ...)
+    - notes
+    - health data
+    (etc)...
+    - want URLs for each of these so that we can represent them in our database with summaries and tags
+
+* Some tools (e.g. VS Code) don't really have a global config.
+  But if keep is running within a git project, in one of these tools,
+  and there's no keep "hook" within the project itself, should we prompt to install it?
+
+* USECASES.md "what is this great at"
+    lesson zero: the context window doesn't really matter if you have exponentially-good navigation
+        (tiny chunks loosely joined)
+
+    lesson one: embeddings plus tagging plus summaries is a whole new thing, actually
+        (especially for capturing knowledge about many document, links, references)
+
+    lesson two: metadocs go boom
+
+    so, the great use cases?
+        - personal agent:
+            - first, like a bookmark-manager with superpowers
+            - or a research-assistant with superpowers
+        - what else?
+
+    And, how do we suggest the agents to /create higher structures/ as they work?
+        - tags: locate your stuff by project, topic
+        - update with all relevant documents as you research
+        - update with all relevant URLs as you research
+        - more tags?  update with descriptions-of-tags?  auto-summarize to make descriptions-of-tags?
+
+* re-test the gemini path
+
+* dynamically detect available models using the provider's API?
+    - we could do this, but when?
+    - no capability for "model migration and re-embedding" yet
+
+* Measure some outcomes.  Describe behavior in openclaw, in claude code, etc.  Show where it works.
+
+* tag-by-model ("auto-tag")?
+    - is there a model-supported tagging? what would that need to be useful? (specific domains??)
+      - i.e. as well as summarization, there's a "system document" that the model reads, and uses that document to decide which tags should be applied
+      - it really needs to be one document per tag (because the model might choose multiple tags)
+      - these are "system documents"
+    - want this to be pluggable, guide the model-driven tagging from a sysdoc that defines how it works
+    - want "references" for this too... maybe later
+
+* Other auto-taggers:
+    - geolocation-tagger to extract location stuff from latlong
+
+* check for compatibility with linux (so far I've exclusively been running on macOS)
+    can deploy on rpi at home
+    also think about what would differ if we wanted to run this within docker, or in a k8s cluster
+
+* check for compatibility with windows
+    not sure we need to support powershell, only WSL? but paths etc. will vary
+    and I don't know if windows has local models available through system services yet (would be nice)
+    - this is all investigation work, not implementation  (I don't have a test environment)
+
+* add support for the kimi/moonshot models, etc - what are we missing? compare claude code, openclaw
+ 
+----
+
+Done: (finished items go at the end)
+
+. start a todo list for notes
+. move the test docs into docs/library (the soul docs)
+. move docs/README to docs/INDEX.md
+. be clear that the tags are overlay, not replace
+. lazy-load embedding/summarization providers for offline read-only operations
+. fix __del__ crash when embedding provider fails to initialize
+. karma (AN5.57): "I am the owner of my deeds and heir to my deeds".
+. `keep -v` please, for debug-level logging to stderr
+. CLI-first documentation ordering in REFERENCE.md and QUICKSTART.md
+. enable "local config" - tree-walk config discovery, KEEP_CONFIG envvar, store.path config option
+. tag docs: "one value per key" documented in REFERENCE.md
+. tag-update CLI and tag() API for updating existing documents
+. delete tags via empty string or --remove flag
+. `keep tag KEY` works with key only (any value)
+. `keep tag --list` and `keep tag KEY --list`
+. rename source_tags → tags (with deprecation warning)
+. KEEP_TAG_* environment variables for auto-tagging
+. [tags] config section for default tags
+. summaries: --summary flag, smart remember (short content verbatim), max_summary_length config
+. documentstore already correct (stores only summaries, not full content)
+x remember vs update: keep separate → unified into put() (v0.42.0)
+. model dimensions: lazy detection for unknown models (OpenAI, Gemini)
+. `keep init` works offline - providers lazy-loaded, no network at init
+. `process-pending` robust to offline - retries with max 5 attempts, graceful degradation
+. startup cost optimized - read-only commands don't load providers
+. error handling: log tracebacks to /tmp/keep-errors.log, show clean message to user
+. timestamps always UTC - verified all datetime.now uses timezone.utc
+. --since option for time-based filtering: accepts ISO duration (P3D, P1W, PT1H) or date (2026-01-15)
+. time-based filtering on find, similar, search, tag commands
+. system tags documented in docs/SYSTEM-TAGS.md (implemented vs reserved, protection mechanism)
+. `keep` with no args shows current working context (the "now")
+. `keep now` command to get/set current context
+. get_now() and set_now() API methods with auto-create on first access
+. default "now" content in docs/system/now.md (pre-loaded content pattern)
+. unified output format: ID [tag1=val1, tag2=val2, ...] with all tags shown
+. renamed 'builtin' to 'system' (docs/builtin → docs/system, _load_builtin → _load_system)
+. `keep tag xyz` lists VALUES for key (not documents)
+. `keep tag xyz=foo` lists DOCUMENTS with that tag
+. what is the "warning" for HF sentence trqansformers
+. preload system docs (conversations.md, domains.md) with special IDs (_system:*) and tags from frontmatter
+. fixed CLI help consistency: `keep now` examples now match option descriptions
+. document versioning: retain history on update, same id with version counter
+    - PRAGMA user_version for schema migrations, document_versions table
+    - address by id (newest) or id+offset (0=current, 1=previous)
+    - prev/next navigation in frontmatter output
+    - `keep get -V N` and `keep now -V N` for specific versions
+    - `keep get --history` and `keep now --history` to list versions
+    - text-mode updates use content-addressed IDs (_text:{hash}) for versioning
+    - ChromaDB stores versioned embeddings as {id}@v{N}
+. composable history: `keep list` IDs-first, `--ids --history` outputs @V{N} identifiers
+. typer version compat: uv/venv recommended in docs, removed ImportError guards for core deps
+. `keep now --history` and `keep get _now:default --history` produce identical output
+. condensed tags in frontmatter: YAML flow format `{key: value, ...}`
+. similar items in frontmatter: max 3, version-aware filtering, `--similar`/`--no-similar` flags, `-n` limit
+. disable Rich markup in CLI help (plain text, teletype-safe)
+. Ancrene Riwle attribution: James Morton, Camden Society 1853
+. AN5.57 URLs added to INDEX.md
+. consolidated three output formats: --ids (versioned ID), --full (YAML frontmatter), default (summary line)
+. self-healing install: Layer 0 in SKILL.md teaches agents to install Protocol Block in system rules
+x `context` text alongside summaries? (no, summary is good now)
+. review how system documents (e.g. "metaschema") are used today, if any
+. consolidated `keep tag` into `keep list`: --tag for filtering, --tags for listing, --since for time filtering
+. changed "context" to "intentions" in `keep now` docs and docstrings
+. `keep --version` flag to show version and exit
+. `_system:library` document with URI templates for library files
+. tag filtering for find, get, now: -t filters results/versions (context-dependent with set behavior)
+. document project/topic segregation: SKILL.md, README.md, REFERENCE.md, AGENT-GUIDE.md; KEEP_COLLECTION envvar
+. reviewed library content and docs for alignment with teachings (AN5.57, impermanence verse, forty-two chapters all support the practice)
+. restructured SKILL.md Layers 1 & 2: integrated Language-Action (ground) + MN61 (mirror) teachings without duplication
+. enhanced `keep config`: get any setting from CLI, added file/tool paths, test with `ls $(keep config tool)`
+. HTML content regularization: HttpDocumentProvider extracts text from HTML at fetch time (matching FileDocumentProvider), fixing web URL summarization
+. tag-based filtering: -t flag on list/find/get/similar filters by tag; --tags lists distinct tag values; --since for time filtering
+. contextual summarization: user tags provide context for LLM summaries; _gather_context finds similar items with matching tags (OR-union, score boosted per tag match); tag changes trigger re-summarization
+. remove `keep init`, streamline API and key selection, and add VoyageAI support for embeddings
+. check functionality using Claude Desktop
+. binary embedding cache: struct.pack float32 replaces json.dumps (~3.3x smaller), transparent migration, migrate() for bulk conversion
+. fix summarizer contamination: removed product-name example from system prompt, context passes topic keywords not raw summaries, boundary instruction in contextual prompt
+. terminal-width-aware summary lines: shutil.get_terminal_size with 120-col default for agents, real terminal width for humans
+. add `keep delete`
+. add `keep reflect` command with reflection instructions
+. better plugin-hooks for claude code
+. better readme: BLUF "what this is and why" replaces "what it does" tagline
+. auto-install integrations: keep/integrations.py with TOOL_CONFIGS pattern, Claude Code hooks auto-installed on first run
+. now.md onboarding: default nowdoc guides agents to read SKILL.md and foundational teachings (SYSTEM_DOCS_VERSION 4)
+. TTY-gated reflect prompt: "As an agent, you should reflect" only shown when stdout is not a TTY
+. shell-safe ID quoting: _shell_quote_id() wraps IDs with special chars in single quotes (text output only, not JSON)
+. last-accessed rank bump: accessed_at column, touch/touch_many, --sort accessed on list, schema v2 migration
+. codebase cleanup: removed dead modules (indexing.py, chunking.py, context.py), dead code (_timestamp, AVAILABLE_SETTINGS, enable_verbose_mode), fixed mock signatures, consolidated tag parsing, unified tag-update output
+. rename for compact usage: `keep update` → `keep put`, `keep delete` → `keep del` (old names kept as hidden aliases)
+. speech-act tagging: `act` tag (commitment, request, offer, assertion, assessment, declaration) and `status` tag (open, fulfilled, declined, withdrawn, renegotiated) with system docs (_tag:act, _tag:status, _tag:project, _tag:topic), woven into conversations.md, domains.md, SKILL.md, AGENT-GUIDE.md, REFERENCE.md, reflect.md
+. tag description system docs: _tag:* IDs with `context: tag-description` frontmatter, loaded via SYSTEM_DOC_IDS registry (SYSTEM_DOCS_VERSION 5)
+. reflect.md updated with act/status tag examples for commitment tracking
+. _accessed and _accessed_date system tags: exposed accessed_at from DocumentStore as queryable tags, added item.accessed property, documented in SYSTEM-TAGS.md
+. surface similar items on create/update: `keep put` and `keep now` show similar items in output as occasions for reflection
+. anthropic OAuth token support: CLAUDE_CODE_OAUTH_TOKEN as alternative to ANTHROPIC_API_KEY, documented distinction between API keys (sk-ant-api03-...) and OAuth tokens (sk-ant-oat01-...) from `claude setup-token`
+. document indexing practice: added guidance to SKILL.md, reflect.md, and Protocol Block instructing agents to index important documents (URLs, files) encountered during work with appropriate tags explaining what and why
+. timestamps: seconds-precision UTC, no timezone suffix in frontmatter (stored and displayed)
+. ID prefix rename: _text:hash → %hash, _system:foo → .foo, _tag:foo → .tag/foo, _now:default → now. Migration renames old IDs, SYSTEM_DOCS_VERSION 6, % added to shell-safe pattern.
+. aligned ID column in `keep list` output (capped at 20 chars)
+. QUICKSTART.md reordered: keep[local] shown before API key options
+. Ollama support: auto-detection via /api/tags (0.5s timeout), smart model selection (embed vs generative), OLLAMA_HOST env var, priority between API keys and MLX
+. `keep put --suggest-tags`: shows tag suggestions from similar items with frequency counts
+. `keep add` as hidden alias for `keep put` (alongside existing `update` alias)
+. openclaw AGENTS.md detection: install protocol block into AGENTS.md in cwd (openclaw sets cwd to workspace)
+. `keep get` accepts multiple IDs: `keep --ids list -n 5 | xargs keep get` works; items separated by `---`
+. `keep del` accepts multiple IDs
+. inline content safety: --summary rejected for inline/stdin, length limit enforced, default max_summary_length bumped 500→2000
+. meta-docs: .meta/* system docs with tag-based contextual resolution; todo/learnings/decisions surface in `now` and `get` frontmatter (SYSTEM_DOCS_VERSION 7)
+. aligned ID column in frontmatter sections (similar, meta, prev/next) — same strategy as `keep list`, capped at 20 chars
+. meta section namespace: `meta/todo:` prefix in frontmatter output prevents conflicts with built-in keys (prev, next, similar)
+. openclaw plugin rework
+. "remember X when Z" - covered by meta-docs
+. compact bundled_hash: truncated _content_hash to 10 hex chars, migration for existing data
+. `keep get --meta`: dedicated meta mode with -n limit, removed --no-similar
+. decision: no edges in the data model, at least for a while.  The meta tags are dynamic edges.
+. readme note Shinn et al. "Reflexion" (very cool, and a lot earlier)
+. add persistence instructions for Kiro
+. small extension to bootstrap instructions
+. `keep now -f` removed (not useful)
+. hooks rework (claude code, openclaw, add kiro)
+. skills/docs rework
+. Separate functional docs/KEEP-NOW.md, docs/KEEP-FIND.md, docs/KEEP-PUT.md etc
+. `keep save "name"`: extract now history into named item, with tag-filtered variant (-t)
+. gap-tolerant version numbering: get_version() uses OFFSET, revert() uses max_version(), list_recent_with_history() uses ROW_NUMBER()
+. repaired malformed SQLite database (iterdump + rebuild)
+. media: pptx, docx
+. media: images, audio (tag extraction, not multimodal models yet)
+. `keep save --from ITEM_ID` — extend save to extract from any versioned item, not just now
+. media description: MediaDescriber protocol, MLX (vision + whisper), Ollama (vision), LockedMediaDescriber, config detection, lazy sub-providers, graceful degradation, [media] optional extra
+. threads -> strings
+. constrained tags: sub-doc validation at .tag/KEY/VALUE, fail on invalid values, casefold on write
+. semantic part decomposition: `keep analyze`, @P{N} syntax, --analyze flag on put, linked parts with independent tags
+. multi-file/directory put: `keep put /path/to/dir` recurses and indexes
+. pypi Documentation URL → https://docs.keepnotes.ai/guides/
+. interface refactor: unified remember()+update() into put(content, uri, id, summary, tags)
+. interface refactor: unified find()+find_similar()+query_fulltext() into find(query, similar_to, fulltext, ...)
+. security: error log 0o600 permissions via os.open(), binary stdin handling in put/now, tag validation on all put() paths
+. REST API: unified POST /search endpoint, ValueError→400 handler, include_hidden passthrough fixes
+. protocol consistency: KeeperProtocol fully aligned with Keeper and RemoteKeeper (resolve_inline_meta, include_hidden, move default)

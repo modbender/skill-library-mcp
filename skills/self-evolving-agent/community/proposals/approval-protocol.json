@@ -1,0 +1,16 @@
+{
+  "id": "approval-protocol",
+  "title": "Approval Protocol — Record Proposals Before Presenting to User",
+  "description": "When an agent proposes a destructive or significant action (file deletion, config change, cron creation), it must first write the proposal to a durable file (pending-actions.json) BEFORE presenting it to the user. If context compacts between the proposal and the user's approval, the agent forgets it ever made a proposal — and may silently never execute the approved action, or worse, re-propose the same thing repeatedly.",
+  "severity": "high",
+  "category": "safety",
+  "tags": ["approval", "pending", "safety", "compaction", "destructive"],
+  "before": "<!-- No durable proposal record -->\nAgent: \"I'll delete the old logs. Shall I proceed?\"\nUser: \"Yes, go ahead.\"\n# [context compacts]\nAgent: \"Sure! What would you like me to do?\"\n# → Agent forgot it proposed deletion. User is baffled.\n\n# Worse variant:\nAgent proposes deletion.\nUser approves.\nAgent executes deletion.\n# [no record of what was deleted]\n# → User asks about files a week later. Agent has no record.",
+  "after": "## Approval Protocol\n\n**Write proposal to pending-actions.json BEFORE presenting to user.**\n\n### File Location\n`memory/pending-actions.json`\n\n### When to Use\n- File deletions or moves\n- Script modifications\n- System configuration changes\n- Cron creation or deletion\n- Any destructive operation\n- Anything that can't be easily undone\n\n### Protocol Steps\n1. **Write** the proposal to `pending-actions.json` with status `awaiting_confirmation`\n2. **Present** the proposal to the user\n3. User approves → **Execute** + update status to `completed`\n4. User rejects → Update status to `rejected`\n\n### Schema\n```json\n{\n  \"pending\": [{\n    \"id\": \"unique-id\",\n    \"requested_at\": \"ISO timestamp\",\n    \"channel\": \"discord:CHANNEL_ID\",\n    \"description\": \"Brief summary\",\n    \"status\": \"awaiting_confirmation|completed|rejected\",\n    \"details\": {\n      \"action\": \"delete\",\n      \"target\": \"/path/to/file\",\n      \"reversible\": false\n    }\n  }]\n}\n```\n\n### Why This Works\nThe pending-actions.json file survives context compaction. Even if the agent restarts mid-approval, it reads the file and knows what was pending. No proposal is silently dropped.",
+  "evidence": "Observed 7 instances of 'agent forgot its own proposal' over 2 months. In 3 cases, the user had already approved, and the agent simply never executed. In 2 cases, the agent re-proposed the same action after the user had rejected it. Pending-actions.json eliminated all recurrences.",
+  "effectiveness": "Zero 'forgot proposal' incidents after adoption. Durable proposal record also serves as an audit trail for what changes were made and when.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

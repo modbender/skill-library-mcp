@@ -1,0 +1,26 @@
+# Skill: json_formatter
+
+format_json(data: string, indent: number) => string
+
+## Trigger Patterns
+- 格式化JSON
+- json格式化
+- prettify json
+
+## Implementation
+
+格式化、验证和压缩 JSON 数据。
+
+```javascript
+function formatJson(data, indent = 2) {
+  try {
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return {
+      formatted: JSON.stringify(parsed, null, indent),
+      valid: true,
+      size: JSON.stringify(parsed).length
+    };
+  } catch (e) {
+    return { error: e.message, valid: false };
+  }
+}

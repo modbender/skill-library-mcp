@@ -1,0 +1,371 @@
+# Production-Ready Kubernetes StatefulSet Template
+# Replace all <placeholders> with actual values
+# Lines marked with # CUSTOMIZE require modification for your workload
+
+---
+# Headless Service (required for StatefulSet DNS)
+# Provides stable network identities: <pod-name>.<service-name>.<namespace>.svc.cluster.local
+apiVersion: v1
+kind: Service
+metadata:
+  name: <app-name>-headless  # CUSTOMIZE: headless service name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+    app.kubernetes.io/component: <component>  # CUSTOMIZE: database, cache, queue, etc.
+    app.kubernetes.io/part-of: <system-name>
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "Headless service for <app-name> StatefulSet"
+spec:
+  clusterIP: None  # Headless - no load balancing, direct pod DNS
+  selector:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+  ports:
+  - name: client  # CUSTOMIZE: primary port name
+    port: 9042  # CUSTOMIZE: primary service port
+    targetPort: 9042
+    protocol: TCP
+  - name: peer  # CUSTOMIZE: peer communication port name
+    port: 7000  # CUSTOMIZE: inter-node communication port
+    targetPort: 7000
+    protocol: TCP
+  publishNotReadyAddresses: true  # Include not-ready pods in DNS for peer discovery
+
+---
+# Client-Facing Service (optional - for external client connections)
+apiVersion: v1
+kind: Service
+metadata:
+  name: <app-name>  # CUSTOMIZE: client service name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+  ports:
+  - name: client
+    port: 9042  # CUSTOMIZE: client-facing port
+    targetPort: 9042
+    protocol: TCP
+  - name: metrics
+    port: 9090  # CUSTOMIZE: metrics port
+    targetPort: 9090
+    protocol: TCP
+
+---
+# StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: <app-name>  # CUSTOMIZE: statefulset name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+    app.kubernetes.io/version: "<version>"  # CUSTOMIZE: application version
+    app.kubernetes.io/component: <component>  # CUSTOMIZE: database, cache, queue
+    app.kubernetes.io/part-of: <system-name>  # CUSTOMIZE: parent system name
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "<application description>"  # CUSTOMIZE: workload description
+    contact: "<team-email>"  # CUSTOMIZE: responsible team contact
+spec:
+  serviceName: <app-name>-headless  # Must match headless Service name above
+  replicas: 3  # CUSTOMIZE: number of replicas (odd numbers recommended for quorum)
+
+  # podManagementPolicy controls pod creation/deletion order
+  # OrderedReady (default): pods are created sequentially (0, 1, 2...)
+  # Parallel: all pods are created/deleted simultaneously
+  podManagementPolicy: OrderedReady
+
+  # Update strategy
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  # Update one pod at a time (K8s 1.24+)
+
+  # Revision history for rollbacks
+  revisionHistoryLimit: 10
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: <app-name>
+      app.kubernetes.io/instance: <instance-name>
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: <app-name>
+        app.kubernetes.io/instance: <instance-name>
+        app.kubernetes.io/version: "<version>"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"  # CUSTOMIZE: metrics port
+        prometheus.io/path: "/metrics"  # CUSTOMIZE: metrics endpoint path
+
+    spec:
+      serviceAccountName: <app-name>  # CUSTOMIZE: service account
+
+      # Graceful shutdown - allow time for deregistration and drain
+      terminationGracePeriodSeconds: 60  # CUSTOMIZE: increase for slow-draining workloads
+
+      # Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000  # CUSTOMIZE: application user ID
+        runAsGroup: 1000  # CUSTOMIZE: application group ID
+        fsGroup: 1000  # CUSTOMIZE: volume filesystem group
+        seccompProfile:
+          type: RuntimeDefault
+
+      # Pod anti-affinity for high availability
+      # Ensures pods are distributed across nodes and zones
+      affinity:
+        podAntiAffinity:
+          # Hard rule: never schedule two pods on the same node
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: <app-name>
+                app.kubernetes.io/instance: <instance-name>
+            topologyKey: kubernetes.io/hostname
+          # Soft rule: prefer spreading across availability zones
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: <app-name>
+                  app.kubernetes.io/instance: <instance-name>
+              topologyKey: topology.kubernetes.io/zone
+
+      # Topology spread for even distribution across zones
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: <app-name>
+
+      # Init containers for bootstrapping
+      initContainers:
+      - name: init-config
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          # Extract ordinal index from pod name
+          ORDINAL=$(echo $POD_NAME | rev | cut -d'-' -f1 | rev)
+          echo "Initializing pod with ordinal: $ORDINAL"
+          # CUSTOMIZE: add initialization logic here
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+
+      containers:
+      - name: <container-name>  # CUSTOMIZE: container name
+        image: <registry>/<image>:<tag>  # CUSTOMIZE: container image (never use :latest)
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - name: client
+          containerPort: 9042  # CUSTOMIZE: primary service port
+          protocol: TCP
+        - name: peer
+          containerPort: 7000  # CUSTOMIZE: inter-node communication port
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090  # CUSTOMIZE: metrics port
+          protocol: TCP
+
+        # Environment variables
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        # Derive ordinal from pod name for cluster configuration
+        - name: POD_ORDINAL
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+
+        # Load from ConfigMap and Secret
+        envFrom:
+        - configMapRef:
+            name: <app-name>-config  # CUSTOMIZE: configmap name
+        - secretRef:
+            name: <app-name>-secret  # CUSTOMIZE: secret name
+
+        # Resource limits
+        resources:
+          requests:
+            memory: "1Gi"  # CUSTOMIZE: memory request (stateful workloads often need more)
+            cpu: "500m"  # CUSTOMIZE: CPU request
+          limits:
+            memory: "2Gi"  # CUSTOMIZE: memory limit
+            cpu: "1000m"  # CUSTOMIZE: CPU limit
+
+        # Startup probe (for slow-starting stateful apps like databases)
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "<startup-check-command>"  # CUSTOMIZE: e.g., "pg_isready" or "redis-cli ping"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30  # 5 minutes to start up
+
+        # Liveness probe - restart pod if unhealthy
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "<liveness-check-command>"  # CUSTOMIZE: health check command
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Readiness probe - remove from service if not ready
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "<readiness-check-command>"  # CUSTOMIZE: readiness check command
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+        # Volume mounts
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/<app-name>  # CUSTOMIZE: data directory path
+        - name: config
+          mountPath: /etc/<app-name>  # CUSTOMIZE: config directory path
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+
+        # Container security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+
+        # Lifecycle hooks
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - |
+                # CUSTOMIZE: graceful shutdown procedure
+                # Example: deregister from cluster, flush data, close connections
+                echo "Gracefully shutting down..."
+                sleep 15
+
+      # Non-persistent volumes
+      volumes:
+      - name: config
+        configMap:
+          name: <app-name>-config  # CUSTOMIZE: configmap with config files
+      - name: tmp
+        emptyDir: {}
+
+      # Image pull secrets (if using private registry)
+      # imagePullSecrets:
+      # - name: regcred  # CUSTOMIZE: registry credential secret name
+
+  # Persistent volume claim templates
+  # Each pod gets its own PVC that persists across restarts and rescheduling
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app.kubernetes.io/name: <app-name>
+        app.kubernetes.io/instance: <instance-name>
+      # annotations:
+      #   volume.beta.kubernetes.io/storage-class: "gp3"  # CUSTOMIZE: storage class
+    spec:
+      accessModes:
+      - ReadWriteOnce  # One pod per volume (standard for StatefulSets)
+      storageClassName: <storage-class>  # CUSTOMIZE: gp3, standard, fast-ssd, etc.
+      resources:
+        requests:
+          storage: 50Gi  # CUSTOMIZE: storage size per replica
+
+---
+# PodDisruptionBudget - ensures minimum availability during voluntary disruptions
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: <app-name>-pdb
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+spec:
+  # Use minAvailable for quorum-based systems (e.g., 2 of 3 for etcd)
+  # Use maxUnavailable for systems that can tolerate partial outages
+  minAvailable: 2  # CUSTOMIZE: minimum pods that must remain available
+  # maxUnavailable: 1  # Alternative: maximum pods that can be unavailable
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: <app-name>
+      app.kubernetes.io/instance: <instance-name>
+
+---
+# Usage Notes:
+#
+# 1. Pod DNS names follow the pattern:
+#    <pod-name>.<headless-service>.<namespace>.svc.cluster.local
+#    Example: mydb-0.mydb-headless.default.svc.cluster.local
+#
+# 2. Pods are created in order (0, 1, 2...) and deleted in reverse order
+#    unless podManagementPolicy is set to Parallel
+#
+# 3. PVCs are NOT deleted when the StatefulSet is scaled down
+#    Manual cleanup: kubectl delete pvc data-<app-name>-<ordinal>
+#
+# 4. To scale: kubectl scale statefulset <app-name> --replicas=5
+#
+# 5. To update image: kubectl set image statefulset/<app-name> <container>=<new-image>
+#    Pods are updated in reverse ordinal order (2, 1, 0)

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Macro Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; background: #1a1a1a; color: white; padding: 20px; box-sizing: border-box; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 1100px; }
+        .tab-btn { background: #333; border: none; color: #888; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .tab-btn.active { background: #36A2EB; color: white; }
+        .tab-content { display: none; width: 100%; max-width: 1100px; gap: 30px; align-items: flex-start; }
+        .tab-content.active { display: flex; }
+        .main-container { width: 100%; max-width: 1100px; gap: 30px; align-items: flex-start; }
+        .chart-section { flex: 1.2; text-align: center; background: #2a2a2a; border-radius: 12px; padding: 30px; }
+        .history-section { flex: 0.8; background: #2a2a2a; border-radius: 12px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+        .goals-section { padding: 18px; background: #1a1a1a; border-radius: 10px; font-size: 0.9rem; border: 1px solid #333; }
+        .goal-bar { height: 10px; background: #333; border-radius: 5px; margin: 8px 0 18px 0; overflow: hidden; border: 1px solid #444; }
+        .progress { height: 100%; background: #4caf50; transition: width 0.5s ease-out; }
+        .progress.over { background: #f44336; }
+        .progress.protein { background: #36A2EB; }
+        h2 { margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #eee; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        h3 { color: #888; margin: 10px 0 25px 0; font-weight: normal; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; color: #666; padding: 12px 8px; border-bottom: 1px solid #444; text-transform: uppercase; font-size: 0.75rem; }
+        td { padding: 10px 8px; border-bottom: 1px solid #333; color: #ccc; }
+        .val { font-weight: bold; color: #fff; }
+        canvas { max-width: 100%; height: auto !important; }
+        .metric-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .metric-label { font-weight: bold; color: #aaa; }
+        .metric-stats { font-size: 0.8rem; color: #666; }
+        .metric-current { color: #fff; font-weight: bold; font-size: 0.9rem; }
+        .insight-box { background: #1a1a2e; border: 1px solid #36A2EB; padding: 15px; border-radius: 10px; font-size: 0.85rem; color: #ccc; line-height: 1.4; }
+        .error-state { color: #f44336; padding: 20px; text-align: center; }
+        .log-entry { background: #2a2a2a; border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #36A2EB; }
+        .log-time { color: #888; font-size: 0.8rem; margin-bottom: 5px; }
+        .log-food { font-weight: bold; font-size: 1rem; }
+        .log-macros { color: #aaa; font-size: 0.85rem; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="tabs" id="tabs" style="display:none">
+        <button class="tab-btn active" onclick="showTab('dashboard-tab')">Overview</button>
+        <button class="tab-btn" onclick="showTab('log-tab')">Today's Log</button>
+    </div>
+
+    <div id="dashboard-tab" class="tab-content active">
+        <div class="history-section">
+            <div class="table-container">
+                <h2>Last 7 Days</h2>
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Kcal</th>
+                            <th>P / C / F</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="goals-section">
+                <h2>Daily Goals</h2>
+                <div id="goalBars" style="margin-top:15px"></div>
+            </div>
+
+            <div class="insight-box">
+                <h2 style="border-bottom: none; color: #36A2EB; margin-bottom: 10px; font-size: 0.9rem;">Insights & Tips</h2>
+                <div id="recommendations">Log your first meal to see AI insights!</div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 id="headerDate">Macro Distribution</h2>
+            <h3 id="totalCalories">Loading Data...</h3>
+            <div style="position: relative; margin: auto;">
+                <canvas id="macroChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="log-tab" class="tab-content">
+        <div class="history-section" style="flex: 1;">
+            <h2>What I've Eaten Today</h2>
+            <div id="dailyLogContent" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div id="loader" class="error-state">Loading your nutritional data...</div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        // --- EMBEDDED DATA START ---
+        const fallbackData = [
+  {
+    "date": "2026-01-01",
+    "calories": 0,
+    "protein": 0,
+    "carbs": 0,
+    "fats": 0,
+    "meals": []
+  }
+];
+        const fallbackGoals = {
+  "daily_goals": {
+    "calories": 2000,
+    "protein": 150,
+    "carbs": 200,
+    "fats": 70
+  },
+  "focus": [],
+  "notes": "Default goals. Update these to match your personal targets."
+};
+        const fallbackInsights = {
+  "date": "2026-01-01",
+  "insights": [
+    "Log your first meal to see AI insights!"
+  ],
+  "tips": [
+    "Consistency is key! Try to log your meals as you eat them."
+  ]
+};
+        // --- EMBEDDED DATA END ---
+
+        function renderUI(data, goalsJson, insights) {
+            if (!data || data.length === 0) return;
+            
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('tabs').style.display = 'flex';
+            document.getElementById('dashboard-tab').classList.add('active');
+
+            const goals = goalsJson.daily_goals;
+            const latest = data[data.length - 1];
+            document.getElementById('headerDate').innerText = `Macro Distribution - ${latest.date}`;
+            document.getElementById('totalCalories').innerText = `Current: ${Math.round(latest.calories)} / Target: ${goals.calories} kcal`;
+
+            // Today's Log
+            const logContent = document.getElementById('dailyLogContent');
+            logContent.innerHTML = '';
+            if (latest.meals && latest.meals.length > 0) {
+                const categories = {
+                    "Breakfast": [],
+                    "Lunch": [],
+                    "Dinner": [],
+                    "Snacks": []
+                };
+
+                latest.meals.forEach(meal => {
+                    const localTime = new Date(new Date(meal.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Yerevan' }));
+                    const hour = localTime.getHours();
+                    let category = "Snacks";
+                    if (hour >= 6 && hour < 12) category = "Breakfast";
+                    else if (hour >= 13 && hour < 15) category = "Lunch";
+                    else if (hour >= 19) category = "Dinner";
+                    
+                    categories[category].push(meal);
+                });
+
+                Object.keys(categories).forEach(cat => {
+                    if (categories[cat].length > 0) {
+                        logContent.innerHTML += `<h3 style="color: #36A2EB; margin: 20px 0 10px 0; font-size: 0.9rem; text-transform: uppercase;">${cat}</h3>`;
+                        categories[cat].forEach(meal => {
+                            const time = new Date(meal.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Yerevan' });
+                            logContent.innerHTML += `
+                                <div class="log-entry">
+                                    <div class="log-time">${time}</div>
+                                    <div class="log-food">${meal.food}</div>
+                                    <div class="log-macros">${Math.round(meal.calories)} kcal | P: ${meal.protein}g | C: ${meal.carbs}g | F: ${meal.fat}g</div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+            } else {
+                logContent.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No meals logged yet today.</div>';
+            }
+
+            // Table
+            const tableBody = document.querySelector('#historyTable tbody');
+            tableBody.innerHTML = '';
+            data.slice(-7).reverse().forEach(entry => {
+                const row = `<tr>
+                    <td>${entry.date.split('-').slice(1).join('/')}</td>
+                    <td class="val">${Math.round(entry.calories)}</td>
+                    <td>${Math.round(entry.protein)} / ${Math.round(entry.carbs)} / ${Math.round(entry.fats)}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+
+            // Insights
+            const recs = document.getElementById('recommendations');
+            recs.innerText = '';
+            if (insights && insights.tips && Array.isArray(insights.tips)) {
+                insights.tips.forEach(t => {
+                    const tipDiv = document.createElement('div');
+                    tipDiv.style.marginBottom = '8px';
+                    tipDiv.textContent = t;
+                    recs.appendChild(tipDiv);
+                });
+            } else {
+                recs.innerHTML = 'Log your first meal to see AI insights!';
+            }
+
+            // Goal Bars
+            const goalBars = document.getElementById('goalBars');
+            goalBars.innerHTML = '';
+            const metrics = [
+                { label: 'Calories', current: latest.calories, target: goals.calories, class: '' },
+                { label: 'Protein', current: latest.protein, target: goals.protein, class: 'protein' },
+                { label: 'Carbs', current: latest.carbs, target: goals.carbs, class: '' },
+                { label: 'Fats', current: latest.fats, target: goals.fats, class: '' }
+            ];
+
+            metrics.forEach(m => {
+                const pct = (m.current / m.target) * 100;
+                const isOver = m.current > m.target && m.label !== 'Protein' && m.label !== 'Calories';
+                goalBars.innerHTML += `
+                    <div class="metric-header">
+                        <span class="metric-label">${m.label}</span>
+                        <span class="metric-stats">
+                            <span class="metric-current">${Math.round(m.current)}</span> / ${m.target}${m.label === 'Calories' ? '' : 'g'}
+                        </span>
+                    </div>
+                    <div class="goal-bar">
+                        <div class="progress ${m.class} ${isOver ? 'over' : ''}" style="width: ${Math.min(pct, 100)}%"></div>
+                    </div>
+                `;
+            });
+
+            // Pie Chart
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [`Protein (${Math.round(latest.protein)}g)`, `Carbs (${Math.round(latest.carbs)}g)`, `Fats (${Math.round(latest.fats)}g)`],
+                    datasets: [{
+                        data: [latest.protein, latest.carbs, latest.fats],
+                        backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderColor: '#2a2a2a',
+                        borderWidth: 4,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#aaa', padding: 20, font: { size: 12 } } }
+                    }
+                }
+            });
+        }
+
+        async function init() {
+            try {
+                const [dRes, gRes, iRes] = await Promise.all([
+                    fetch('../nutrition/daily_macros.json?v=' + Date.now()),
+                    fetch('../nutrition/targets.json?v=' + Date.now()),
+                    fetch('../nutrition/insights.json?v=' + Date.now())
+                ]);
+                
+                if (dRes.ok && gRes.ok) {
+                    const data = await dRes.json();
+                    const goals = await gRes.json();
+                    const insights = iRes.ok ? await iRes.json() : null;
+                    renderUI(data, goals, insights);
+                } else {
+                    renderUI(fallbackData, fallbackGoals, fallbackInsights);
+                }
+            } catch (e) { 
+                renderUI(fallbackData, fallbackGoals, fallbackInsights);
+            }
+        }
+        init();
+    </script>
+</body>
+</html>

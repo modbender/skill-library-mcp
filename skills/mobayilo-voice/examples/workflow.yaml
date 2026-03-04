@@ -1,0 +1,24 @@
+# Example OpenClaw workflow snippet (skill-wired)
+steps:
+  - id: mobayilo_preflight
+    run: |
+      python integrations/mobayilo_voice/actions/check_status.py --pretty
+
+  - id: confirm_call
+    prompt: "Send call to {{destination}}?"
+
+  - id: launch_call
+    when: steps.confirm_call.approved
+    run: |
+      python integrations/mobayilo_voice/actions/start_call.py \
+        --destination "{{destination}}" \
+        --country "{{country}}" \
+        --approved
+
+  - id: launch_call_dry_run
+    when: not steps.confirm_call.approved
+    run: |
+      python integrations/mobayilo_voice/actions/start_call.py \
+        --destination "{{destination}}" \
+        --country "{{country}}" \
+        --dry-run

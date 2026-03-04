@@ -1,0 +1,74 @@
+name: slack-controller
+version: 1.2.0
+description: Control Slack to physically open chats, send messages, huddles, screen share, manage status, upload files, and search.
+permissions:
+  - network
+  - command_execution
+config:
+  slack_bot_token:
+    type: string
+    required: false
+    description: Optional Slack Bot Token (mostly using browser automation now).
+inputs:
+  action:
+    type: string
+    required: true
+    enum: 
+      - sendMessage
+      - reply
+      - sendHuddleInvite
+      - openChat
+      - startHuddleAndScreenShare
+      - leaveHuddle
+      - setStatus
+      - setPresence
+      - pauseNotifications
+      - uploadFile
+      - addReaction
+      - search
+    description: The action to perform.
+  target:
+    type: string
+    required: true
+    description: The channel name, username, search query, or target ID.
+  message:
+    type: string
+    required: false
+    description: Message content, caption, or search query.
+  threadTs:
+    type: string
+    required: false
+    description: The timestamp of the parent message if replying to a thread.
+  openApp:
+    type: boolean
+    default: true
+    description: If true, physically opens the Slack window.
+  statusEmoji:
+    type: string
+    required: false
+    description: Emoji for custom status (e.g. :spiral_calendar_pad:)
+  statusText:
+    type: string
+    required: false
+    description: Text for custom status
+  statusExpiration:
+    type: string
+    required: false
+    description: Status expiration (30min, 1h, 4h, today, week)
+  presence:
+    type: string
+    required: false
+    enum: [active, away]
+    description: Presence state to set
+  duration:
+    type: string
+    required: false
+    description: Duration for Pause Notifications (e.g., '30 mins', '1 hour')
+  filePath:
+    type: string
+    required: false
+    description: Absolute path to file to upload
+  reactionEmoji:
+    type: string
+    required: false
+    description: Emoji to react with (e.g. :thumbsup:)

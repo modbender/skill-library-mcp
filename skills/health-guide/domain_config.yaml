@@ -1,0 +1,138 @@
+domain:
+  name: "의료/건강"
+  emoji: "🏥"
+  disclaimer: |
+    ⚠️ 본 내용은 일반 건강 정보 제공 목적이며, 의학적 진단·처방이 아닙니다.
+    증상이 지속되거나 악화되면 반드시 의사 진료를 받으시기 바랍니다.
+    응급 상황 시 즉시 119에 연락하세요.
+  beginner_alias:
+    - "처음인데"
+    - "모르겠어"
+    - "쉽게"
+    - "기초"
+    - "초보"
+    - "어려워"
+
+# 응급 키워드 — 감지 시 모든 처리보다 우선하여 119 안내
+emergency_keywords:
+  - "흉통"
+  - "가슴이 눌려"
+  - "숨을 못 쉬어"
+  - "호흡 곤란"
+  - "의식을 잃"
+  - "쓰러졌"
+  - "마비"
+  - "갑자기 말이 안 나"
+  - "심한 출혈"
+  - "피를 많이 흘려"
+  - "경련"
+  - "발작"
+  - "39도 이상"
+  - "고열 경련"
+
+intents:
+  - id: symptom_check
+    label: "Symptom Check"
+    triggers: ["어디 아파", "증상이", "어디 가야 해?", "무슨 과 가야 해?", "진료과 추천"]
+    output: "증상 분석 → 진료과 추천 + hira-hospital 병원 연계"
+    min_data: ["증상 부위 또는 증상 설명"]
+    depth: flash
+
+  - id: find_hospital
+    label: "Find Hospital"
+    triggers: ["병원 찾아줘", "근처 병원", "어디 병원", "응급실 어디"]
+    output: "hira-hospital 스킬 호출 → 병원 목록"
+    min_data: ["지역 또는 진료과"]
+    depth: flash
+
+  - id: disease_info
+    label: "Disease Info"
+    triggers: ["이 병이 뭐야?", "질환 설명", "원인이 뭐야?", "치료법", "합병증"]
+    output: "질환 개요 + 원인 + 증상 + 치료 Flash"
+    min_data: ["질환명"]
+    depth: both
+
+  - id: drug_info
+    label: "Drug Info"
+    triggers: ["이 약 뭐야?", "용법 알려줘", "부작용", "약 먹어도 돼?", "같이 먹으면 안 되는 약"]
+    output: "의약품 용법·효능·부작용·주의사항"
+    min_data: ["약 이름"]
+    depth: both
+
+  - id: emergency_guide
+    label: "Emergency Guide"
+    triggers: ["응급인지", "119 불러야 해?", "응급실 가야 해?", "위험한 증상"]
+    output: "응급 여부 판단 기준 + 즉시 행동 지침"
+    min_data: ["증상 설명"]
+    depth: flash
+
+  - id: health_checkup
+    label: "Health Checkup"
+    triggers: ["건강검진", "검진 받아야 해?", "국가검진", "암검진", "검진 주기"]
+    output: "검진 종류·대상·주기·무료 검진 안내"
+    min_data: []
+    depth: both
+
+  - id: vaccination
+    label: "Vaccination"
+    triggers: ["예방접종", "독감 접종", "필수 백신", "접종 일정", "성인 예방접종"]
+    output: "접종 종류·대상·시기·방법 Flash"
+    min_data: ["연령 또는 접종 종류(선택)"]
+    depth: both
+
+  - id: healthy_living
+    label: "Healthy Living"
+    triggers: ["건강하게 사는 법", "혈압 낮추는 법", "식단", "운동 추천", "금연", "금주"]
+    output: "생활습관 개선 가이드 Flash"
+    min_data: ["관심 분야(선택)"]
+    depth: both
+
+  - id: mental_health
+    label: "Mental Health"
+    triggers: ["번아웃", "우울해", "불안해", "스트레스", "수면 장애", "정신건강"]
+    output: "정신건강 정보 + 자가 체크 + 전문 상담 연계"
+    min_data: []
+    depth: both
+
+  - id: beginner_guide
+    label: "Beginner Guide"
+    triggers: ["진료과 뭐가 있어?", "병원 처음인데", "의료보험", "실비보험 청구"]
+    output: "한국 의료 시스템 입문 Flash (초보자 모드 강제)"
+    min_data: []
+    depth: flash
+
+data_sources:
+  primary:
+    - "hira-hospital 스킬 — 병원 검색 (scripts/hospital_search.sh)"
+    - "국가건강정보포털 API (health.kdca.go.kr) — 질환·증상 정보 [키: ~/.config/kdca/api_key]"
+    - "식약처 의약품개요정보 API (data.go.kr/15075057) — 의약품 정보 [키: ~/.config/data-go-kr/api_key]"
+  secondary:
+    - "web_search: [질환명/약명] 국가건강정보포털"
+    - "web_search: 질병관리청 [증상/질환] 정보"
+
+flash:
+  max_lines: 40
+  always: true
+
+deep_dive:
+  trigger: request
+  trigger_intents:
+    - disease_info
+    - drug_info
+    - mental_health
+    - health_checkup
+    - vaccination
+
+beginner_mode:
+  max_table_rows: 5
+  conclusion_first: true
+  glossary:
+    내과: "몸 내부 장기(심장·폐·위·간 등)를 다루는 과. 특정 증상 없을 때 첫 방문 추천"
+    외과: "수술이 필요한 질환을 다루는 과"
+    이비인후과: "귀(이)·코(비)·목(인후)을 다루는 과"
+    정형외과: "뼈·근육·관절 등 근골격계 질환을 다루는 과"
+    신경과: "뇌·척수·말초신경 질환(두통·마비·어지럼증 등)"
+    신경외과: "뇌·척수 수술이 필요한 질환"
+    비급여: "건강보험이 적용되지 않아 전액 본인 부담인 항목"
+    본인부담금: "건강보험 적용 후 환자가 직접 내는 금액 (보통 의원급 30%)"
+    실손보험: "병원비 중 본인부담금을 보상해주는 민영 보험"

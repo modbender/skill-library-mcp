@@ -1,0 +1,126 @@
+{
+  "name": "odoo",
+  "version": "2.0.0",
+  "description": "Odoo RPC-based financial intelligence for accounting audits, VAT/cashflow analysis, inventory valuation, and compliant financial reporting. Read-only access to Odoo ERP.",
+  "author": "ashrf",
+  "license": "MIT",
+  "primaryCredential": {
+    "type": "environment",
+    "description": "Odoo connection credentials (URL, database, username, password/API key)",
+    "required": true,
+    "fields": [
+      "ODOO_URL",
+      "ODOO_DB", 
+      "ODOO_USER",
+      "ODOO_PASSWORD"
+    ]
+  },
+  "requiredEnvVars": [
+    {
+      "name": "ODOO_URL",
+      "description": "Odoo instance URL (e.g., https://your-odoo.com)",
+      "required": true,
+      "secret": false,
+      "example": "https://mycompany.odoo.com"
+    },
+    {
+      "name": "ODOO_DB",
+      "description": "Odoo database name",
+      "required": true,
+      "secret": false,
+      "example": "mycompany_prod"
+    },
+    {
+      "name": "ODOO_USER",
+      "description": "Odoo username/email",
+      "required": true,
+      "secret": false,
+      "example": "admin@mycompany.com"
+    },
+    {
+      "name": "ODOO_PASSWORD",
+      "description": "Odoo API key or password. For production, use an API key from Odoo Settings > Account Security.",
+      "required": true,
+      "secret": true,
+      "sensitive": true,
+      "example": "api_key_from_odoo_settings"
+    }
+  ],
+  "optionalEnvVars": [
+    {
+      "name": "ODOO_RPC_BACKEND",
+      "description": "RPC backend: xmlrpc (legacy, default) or json2 (Odoo 19+)",
+      "default": "xmlrpc",
+      "required": false
+    }
+  ],
+  "install": {
+    "type": "script",
+    "description": "Local Python installation with venv and pip packages",
+    "path": "assets/autonomous-cfo/install.sh",
+    "requires": ["python3", "pip", "venv"],
+    "packages": [
+      "requests>=2.31.0",
+      "matplotlib>=3.8.0",
+      "pillow>=10.0.0",
+      "fpdf2>=2.8.0",
+      "openpyxl>=3.1.0"
+    ],
+    "manualInstall": "cd assets/autonomous-cfo && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt"
+  },
+  "configFiles": [
+    {
+      "path": "assets/autonomous-cfo/.env",
+      "description": "Odoo connection credentials (create from .env.example)",
+      "required": true,
+      "template": "assets/autonomous-cfo/.env.example",
+      "sensitive": true
+    },
+    {
+      "path": "assets/autonomous-cfo/config/settings.json",
+      "description": "Report generation settings (anomalies, forecasting, notifications)",
+      "required": false
+    }
+  ],
+  "capabilities": {
+    "networkAccess": true,
+    "networkEndpoints": [
+      "User-specified Odoo instance only (ODOO_URL)"
+    ],
+    "filesystemAccess": true,
+    "filesystemPaths": [
+      "assets/autonomous-cfo/output/",
+      "assets/autonomous-cfo/config/",
+      "assets/autonomous-cfo/.env"
+    ],
+    "externalApiCalls": true,
+    "endpoints": [
+      "Odoo XML-RPC: /xmlrpc/2/common, /xmlrpc/2/object",
+      "Odoo JSON-RPC: /json/2/{model}/{method}"
+    ]
+  },
+  "security": {
+    "readOnly": true,
+    "readOnlyEnforcement": "client-side",
+    "serverSideEnforcementRecommended": true,
+    "recommendedPractice": "Create a read-only Odoo user with minimal permissions for production use",
+    "blockedMethods": ["create", "write", "unlink", "copy", "action_post", "action_confirm", "button_validate"],
+    "allowedMethods": ["search", "search_read", "read", "search_count", "fields_get", "name_search", "context_get", "default_get"],
+    "dataHandling": "Reads financial data from Odoo. Generates reports locally. No data exfiltration. No external endpoints beyond user-specified Odoo URL.",
+    "credentialStorage": "Environment variables loaded from .env file (assets/autonomous-cfo/.env). Password/API key never logged or displayed.",
+    "credentialTransmission": "API key transmitted as Bearer token for JSON-RPC (Odoo 19+ standard) or in request body for XML-RPC"
+  },
+  "modelInvocation": {
+    "disabled": true,
+    "reason": "This skill handles sensitive financial data and connects to external Odoo ERP systems. It MUST be explicitly invoked by the user and CANNOT be invoked autonomously by AI models.",
+    "requiresUserInvocation": true
+  },
+  "always": false,
+  "userInvocationRequired": true,
+  "tags": ["odoo", "accounting", "finance", "erp", "reporting", "ifrs", "audit", "read-only"],
+  "documentation": {
+    "readme": "README.md",
+    "skill": "SKILL.md",
+    "security": "SECURITY.md"
+  }
+}

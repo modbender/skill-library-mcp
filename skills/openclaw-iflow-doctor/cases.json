@@ -1,0 +1,272 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-02-27",
+  "cases": [
+    {
+      "id": "CASE-001",
+      "title": "Memory Search Function Broken",
+      "error_code": "MEMORY_SEARCH_ERROR",
+      "error_signature": "a1b2c3d4e5f67890",
+      "keywords": ["memory", "search", "broken", "failed", "identity"],
+      "description": "OpenClaw memory search function is not working properly, cannot retrieve historical memories, identity recognition is damaged",
+      "symptoms": [
+        "Memory search returns no results",
+        "OpenClaw cannot remember user identity",
+        "Conversation continuity is broken"
+      ],
+      "root_cause": "Memory index corruption or embedding model mismatch",
+      "solution": "Refer to openclaw_memory_fix.md for repair steps: 1) Backup existing memory 2) Check memory file integrity 3) Reinitialize memory system if needed",
+      "commands": [
+        "cp -r ~/.openclaw/memory ~/.openclaw/memory.backup.$(date +%Y%m%d)",
+        "cat ~/.openclaw/AGENTS.md",
+        "cat ~/.openclaw/MEMORY.md"
+      ],
+      "success_rate": 0.85,
+      "difficulty": "medium",
+      "estimated_time": "10-15 minutes",
+      "references": [
+        "~/.iflow/memory/long_term/openclaw_memory_fix.md"
+      ]
+    },
+    {
+      "id": "CASE-002",
+      "title": "Gateway Service Not Starting",
+      "error_code": "GATEWAY_START_FAILED",
+      "error_signature": "b2c3d4e5f6a78901",
+      "keywords": ["gateway", "start", "failed", "service", "crash"],
+      "description": "OpenClaw Gateway service fails to start or crashes immediately after starting",
+      "symptoms": [
+        "Gateway process not found",
+        "Port 18789 not responding",
+        "Crash loop after restart"
+      ],
+      "root_cause": "Configuration error, port conflict, or missing dependencies",
+      "solution": "1) Check configuration file syntax 2) Verify port availability 3) Check logs for specific errors 4) Restart with debug mode",
+      "commands": [
+        "openclaw config validate",
+        "lsof -i :18789",
+        "tail -50 ~/.openclaw/logs/gateway.log",
+        "pkill -f openclaw-gateway; nohup openclaw gateway > /var/log/openclaw-gateway.log 2>&1 &"
+      ],
+      "success_rate": 0.90,
+      "difficulty": "easy",
+      "estimated_time": "5-10 minutes",
+      "references": [
+        "https://docs.openclaw.ai/troubleshooting"
+      ]
+    },
+    {
+      "id": "CASE-003",
+      "title": "API Rate Limit Exceeded",
+      "error_code": "API_RATE_LIMIT_429",
+      "error_signature": "c3d4e5f6a7b89012",
+      "keywords": ["api", "rate", "limit", "429", "quota", "exceeded"],
+      "description": "API rate limit exceeded error (HTTP 429), cannot make requests to AI model",
+      "symptoms": [
+        "Error 429 in logs",
+        "Requests timing out",
+        "Model not responding"
+      ],
+      "root_cause": "Too many requests in short time, or API quota depleted",
+      "solution": "1) Wait for rate limit reset (usually 1 minute) 2) Check API quota status 3) Switch to backup API key if available 4) Contact provider to increase quota",
+      "commands": [
+        "curl -H \"Authorization: Bearer YOUR_API_KEY\" https://api.provider.com/quota",
+        "openclaw config set api.rate_limit_delay 2000"
+      ],
+      "success_rate": 0.95,
+      "difficulty": "easy",
+      "estimated_time": "2-5 minutes",
+      "references": [
+        "https://platform.openclaw.ai/billing"
+      ]
+    },
+    {
+      "id": "CASE-004",
+      "title": "Agent Spawn Failed",
+      "error_code": "AGENT_SPAWN_ERROR",
+      "error_signature": "d4e5f6a7b8c90123",
+      "keywords": ["agent", "spawn", "failed", "subagent", "tool"],
+      "description": "Failed to spawn sub-agent, agent tools not working properly",
+      "symptoms": [
+        "spawn command returns error",
+        "Sub-agent not responding",
+        "Agent ID not found"
+      ],
+      "root_cause": "Agent configuration missing or corrupted, agent not registered",
+      "solution": "1) Verify agent configuration exists 2) Re-register agents 3) Check agent file permissions 4) Reload agent configurations",
+      "commands": [
+        "openclaw agents list",
+        "openclaw agents reload",
+        "ls -la ~/.openclaw/agents/",
+        "openclaw spawn pm --task 'test' --debug"
+      ],
+      "success_rate": 0.80,
+      "difficulty": "medium",
+      "estimated_time": "10-15 minutes",
+      "references": [
+        "~/.openclaw/agents/"
+      ]
+    },
+    {
+      "id": "CASE-005",
+      "title": "Channel Configuration Error",
+      "error_code": "CHANNEL_CONFIG_ERROR",
+      "error_signature": "e5f6a7b8c9d01234",
+      "keywords": ["channel", "config", "dingtalk", "feishu", "webhook"],
+      "description": "Channel integration failed, cannot receive or send messages through external platforms",
+      "symptoms": [
+        "Messages not delivered to channel",
+        "Webhook returns 404/403",
+        "Bot not responding in group"
+      ],
+      "root_cause": "Webhook URL incorrect, authentication failed, or channel credentials expired",
+      "solution": "1) Verify webhook URL is correct 2) Check authentication tokens 3) Regenerate channel credentials 4) Test with curl command",
+      "commands": [
+        "openclaw channels list",
+        "openclaw channels test <channel-id>",
+        "curl -X POST <webhook-url> -H 'Content-Type: application/json' -d '{\"test\":true}'"
+      ],
+      "success_rate": 0.85,
+      "difficulty": "medium",
+      "estimated_time": "15-20 minutes",
+      "references": [
+        "https://docs.openclaw.ai/channels"
+      ]
+    },
+    {
+      "id": "CASE-006",
+      "title": "Model Provider Connection Failed",
+      "error_code": "PROVIDER_CONNECTION_ERROR",
+      "error_signature": "f6a7b8c9d0e12345",
+      "keywords": ["model", "provider", "connection", "timeout", "deepseek", "glm", "qwen"],
+      "description": "Cannot connect to AI model provider, requests timing out or returning errors",
+      "symptoms": [
+        "Connection timeout errors",
+        "Model not responding",
+        "Empty responses from model"
+      ],
+      "root_cause": "Network issue, provider service down, or incorrect API endpoint",
+      "solution": "1) Check network connectivity 2) Verify API endpoint URL 3) Test with different provider 4) Check provider status page 5) Update API key if expired",
+      "commands": [
+        "curl -I https://api.deepseek.com",
+        "openclaw models list",
+        "openclaw config get models.default",
+        "openclaw agent --message 'test' --agent main --debug"
+      ],
+      "success_rate": 0.75,
+      "difficulty": "medium",
+      "estimated_time": "10-20 minutes",
+      "references": [
+        "https://status.deepseek.com"
+      ]
+    },
+    {
+      "id": "CASE-007",
+      "title": "Configuration File Corrupted",
+      "error_code": "CONFIG_CORRUPTED",
+      "error_signature": "a7b8c9d0e1f23456",
+      "keywords": ["config", "corrupted", "json", "syntax", "parse"],
+      "description": "Configuration file is corrupted or has syntax errors, preventing OpenClaw from starting",
+      "symptoms": [
+        "JSON parse errors in logs",
+        "OpenClaw crashes on startup",
+        "Config validation failed"
+      ],
+      "root_cause": "Manual edit mistake, incomplete write, or encoding issue",
+      "solution": "1) Backup corrupted config 2) Validate JSON syntax 3) Restore from backup if available 4) Regenerate default config 5) Reconfigure settings",
+      "commands": [
+        "python -m json.tool ~/.openclaw/openclaw.json",
+        "cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.corrupted.$(date +%Y%m%d)",
+        "openclaw config reset",
+        "openclaw init"
+      ],
+      "success_rate": 0.90,
+      "difficulty": "medium",
+      "estimated_time": "15-30 minutes",
+      "references": [
+        "~/.openclaw/openclaw.json"
+      ]
+    },
+    {
+      "id": "CASE-008",
+      "title": "Multiple Agents Conflict",
+      "error_code": "AGENT_CONFLICT",
+      "error_signature": "b8c9d0e1f2a34567",
+      "keywords": ["agent", "conflict", "multiple", "fight", "response"],
+      "description": "Multiple agents responding to same message, causing confusion or duplicate responses",
+      "symptoms": [
+        "Multiple bots reply to one message",
+        "Agents stepping on each other",
+        "Inconsistent responses"
+      ],
+      "root_cause": "Routing rules overlap, agent triggers not specific enough, or channel binding conflict",
+      "solution": "1) Review agent routing rules 2) Make triggers more specific 3) Check channel-agent bindings 4) Configure agent priority levels",
+      "commands": [
+        "openclaw agents routes list",
+        "openclaw agents config <agent-id> get triggers",
+        "openclaw channels bindings <channel-id>"
+      ],
+      "success_rate": 0.80,
+      "difficulty": "hard",
+      "estimated_time": "20-30 minutes",
+      "references": [
+        "https://docs.openclaw.ai/multi-agent"
+      ]
+    },
+    {
+      "id": "CASE-009",
+      "title": "Permission Denied Errors",
+      "error_code": "PERMISSION_DENIED",
+      "error_signature": "c9d0e1f2a3b45678",
+      "keywords": ["permission", "denied", "access", "forbidden", "403"],
+      "description": "Permission denied when accessing files, directories, or APIs",
+      "symptoms": [
+        "EACCES errors in logs",
+        "Cannot read/write config files",
+        "API returns 403 Forbidden"
+      ],
+      "root_cause": "File permissions incorrect, running as wrong user, or API key lacks permissions",
+      "solution": "1) Check file ownership and permissions 2) Run with correct user 3) Verify API key permissions 4) Check SELinux/AppArmor if on Linux",
+      "commands": [
+        "ls -la ~/.openclaw/",
+        "chmod 600 ~/.openclaw/*.json",
+        "chown -R $(whoami):$(whoami) ~/.openclaw/",
+        "openclaw config validate --permissions"
+      ],
+      "success_rate": 0.85,
+      "difficulty": "easy",
+      "estimated_time": "5-10 minutes",
+      "references": [
+        "https://docs.openclaw.ai/permissions"
+      ]
+    },
+    {
+      "id": "CASE-010",
+      "title": "Log File Too Large",
+      "error_code": "LOG_FILE_TOO_LARGE",
+      "error_signature": "d0e1f2a3b4c56789",
+      "keywords": ["log", "large", "disk", "space", "cleanup"],
+      "description": "Log files growing too large, consuming disk space, slowing down system",
+      "symptoms": [
+        "Disk space warnings",
+        "Slow log queries",
+        "System sluggish"
+      ],
+      "root_cause": "No log rotation configured, verbose logging enabled, or long-running without cleanup",
+      "solution": "1) Enable log rotation 2) Clean old logs 3) Adjust log level 4) Set up automatic cleanup",
+      "commands": [
+        "du -sh ~/.openclaw/logs/",
+        "find ~/.openclaw/logs/ -name '*.log' -mtime +7 -delete",
+        "openclaw config set logging.level 'info'",
+        "openclaw config set logging.max_size '100mb'",
+        "openclaw config set logging.max_files 5"
+      ],
+      "success_rate": 0.95,
+      "difficulty": "easy",
+      "estimated_time": "5 minutes",
+      "references": [
+        "~/.openclaw/logs/"
+      ]
+    }
+  ]
+}

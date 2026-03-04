@@ -1,0 +1,102 @@
+{
+  "name": "hsk-learning",
+  "version": "1.1.0",
+  "description": "HSK Chinese learning system with spaced repetition mastery tracking - User-agnostic edition",
+  "author": "Claw",
+  "license": "MIT",
+  "main": "index.js",
+  "openclaw": {
+    "tools": [
+      {
+        "name": "hsk_update_vocab_tracker",
+        "description": "Update HSK vocabulary tracker by scanning memory files",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "force": {
+              "type": "boolean",
+              "description": "Force update even if recent scan exists"
+            }
+          }
+        }
+      },
+      {
+        "name": "hsk_update_mastery_from_quiz",
+        "description": "Update mastery database from quiz performance logs",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "Specific date to process (YYYY-MM-DD), or 'all' for all logs"
+            }
+          }
+        }
+      },
+      {
+        "name": "hsk_get_mastery_stats",
+        "description": "Get mastery statistics summary",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "format": {
+              "type": "string",
+              "description": "Output format: 'text', 'json', or 'markdown'",
+              "enum": ["text", "json", "markdown"]
+            }
+          }
+        }
+      },
+      {
+        "name": "hsk_get_due_words",
+        "description": "Get words due for review based on spaced repetition",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "number",
+              "description": "Maximum number of words to return"
+            },
+            "level": {
+              "type": "number",
+              "description": "Filter by HSK level (1-6), 0 for all"
+            }
+          }
+        }
+      },
+      {
+        "name": "hsk_generate_quiz",
+        "description": "Generate adaptive HSK quiz based on mastery level",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "difficulty": {
+              "type": "string",
+              "description": "Quiz difficulty: 'review', 'learning', 'new', or 'mixed'",
+              "enum": ["review", "learning", "new", "mixed"]
+            },
+            "format": {
+              "type": "string",
+              "description": "Quiz format: 'simple', 'listening', 'reading', 'writing', or 'full'",
+              "enum": ["simple", "listening", "reading", "writing", "full"]
+            }
+          }
+        }
+      },
+      {
+        "name": "hsk_parse_quiz_log",
+        "description": "Parse a quiz performance log file and extract vocabulary",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "filePath": {
+              "type": "string",
+              "description": "Path to quiz performance log file"
+            }
+          },
+          "required": ["filePath"]
+        }
+      }
+    ]
+  }
+}

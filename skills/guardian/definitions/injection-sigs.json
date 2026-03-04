@@ -1,0 +1,428 @@
+{
+  "category": "prompt_injection",
+  "version": "1.0.0",
+  "updated": "2026-02-21",
+  "signatures": [
+    {
+      "id": "INJ-001",
+      "severity": "critical",
+      "score": 95,
+      "description": "System prompt override with [SYSTEM]:",
+      "pattern": "(?i)(?<!\\[)(?:Human|Assistant)\\s*:\\s*(?:ignore|forget|disregard|override)",
+      "flags": "i",
+      "name": "Role impersonation with override"
+    },
+    {
+      "id": "INJ-002",
+      "severity": "critical",
+      "score": 95,
+      "description": "System prompt override with <<SYS>>",
+      "pattern": "<<SYS>>",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-003",
+      "severity": "critical",
+      "score": 90,
+      "description": "Triple-backtick system block",
+      "pattern": "```system\\b",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-004",
+      "severity": "critical",
+      "score": 92,
+      "description": "Ignore previous instructions",
+      "pattern": "ignore\\s+(all\\s+)?previous\\s+instructions",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-005",
+      "severity": "critical",
+      "score": 90,
+      "description": "Forget your rules",
+      "pattern": "forget\\s+(all\\s+)?(your|the)\\s+(rules|instructions|guidelines|constraints)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-006",
+      "severity": "critical",
+      "score": 92,
+      "description": "You are now a different AI",
+      "pattern": "you\\s+are\\s+now\\s+(a|an|the)\\s+",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-007",
+      "severity": "high",
+      "score": 85,
+      "description": "Disregard previous directives",
+      "pattern": "disregard\\s+(all\\s+)?(previous|prior|above|earlier)\\s+(directives|instructions|prompts|rules)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-008",
+      "severity": "critical",
+      "score": 95,
+      "description": "DAN mode jailbreak",
+      "pattern": "\\bDAN\\s+mode\\b",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-009",
+      "severity": "critical",
+      "score": 93,
+      "description": "Developer mode enable",
+      "pattern": "\\bdeveloper\\s+mode\\s*(enabled|on|activate)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-010",
+      "severity": "high",
+      "score": 88,
+      "description": "No restrictions directive",
+      "pattern": "\\b(without|no|remove|disable)\\s+(any\\s+)?(restrictions|limitations|filters|guardrails|safety)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-011",
+      "severity": "high",
+      "score": 85,
+      "description": "Override safety measures",
+      "pattern": "override\\s+(your\\s+)?(safety|security|content)\\s+(measures|filters|policies)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-012",
+      "severity": "high",
+      "score": 80,
+      "description": "Pretend you can do anything",
+      "pattern": "pretend\\s+(that\\s+)?(you|u)\\s+(can|are\\s+able\\s+to|have\\s+no)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-013",
+      "severity": "high",
+      "score": 82,
+      "description": "Act as if you have no rules",
+      "pattern": "act\\s+(as\\s+if|like)\\s+(you\\s+)?(have\\s+no|there\\s+are\\s+no)\\s+(rules|restrictions)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-014",
+      "severity": "critical",
+      "score": 90,
+      "description": "New system prompt injection",
+      "pattern": "new\\s+system\\s+prompt\\s*:",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-015",
+      "severity": "high",
+      "score": 85,
+      "description": "Reveal your system prompt",
+      "pattern": "(reveal|show|display|print|output|tell\\s+me)\\s+(your\\s+)?(system\\s+prompt|initial\\s+instructions|hidden\\s+instructions)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-016",
+      "severity": "high",
+      "score": 82,
+      "description": "What are your instructions",
+      "pattern": "what\\s+are\\s+your\\s+(instructions|rules|guidelines|system\\s+prompt)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-017",
+      "severity": "medium",
+      "score": 70,
+      "description": "Repeat everything above",
+      "pattern": "repeat\\s+(everything|all|the\\s+text)\\s+(above|before\\s+this)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-018",
+      "severity": "high",
+      "score": 85,
+      "description": "Base64 encoded instruction injection",
+      "pattern": "base64[:\\s]+(decode|eval|execute)\\b",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-019",
+      "severity": "high",
+      "score": 80,
+      "description": "Unicode/encoding obfuscation attempt",
+      "pattern": "\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}",
+      "flags": ""
+    },
+    {
+      "id": "INJ-020",
+      "severity": "critical",
+      "score": 90,
+      "description": "Jailbreak prompt keyword",
+      "pattern": "\\b(jailbreak|jail\\s*break)\\s*(prompt|mode|this)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-021",
+      "severity": "high",
+      "score": 83,
+      "description": "Roleplay as unrestricted AI",
+      "pattern": "roleplay\\s+(as|being)\\s+(an?\\s+)?(unrestricted|unfiltered|uncensored)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-022",
+      "severity": "high",
+      "score": 85,
+      "description": "Ignore content policy",
+      "pattern": "ignore\\s+(the\\s+)?(content\\s+policy|usage\\s+policy|terms\\s+of\\s+service|ethical\\s+guidelines)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-023",
+      "severity": "medium",
+      "score": 75,
+      "description": "Hidden text in markdown",
+      "pattern": "<!--\\s*(?:ignore|override|inject|bypass|jailbreak|system\\s*prompt)[^>]*-->",
+      "flags": "is"
+    },
+    {
+      "id": "INJ-024",
+      "severity": "high",
+      "score": 80,
+      "description": "Prompt leaking via completion",
+      "pattern": "complete\\s+the\\s+following\\s*:.*\\[INST\\]",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-025",
+      "severity": "critical",
+      "score": 92,
+      "description": "INST tag injection",
+      "pattern": "\\[/?INST\\]",
+      "flags": ""
+    },
+    {
+      "id": "INJ-026",
+      "severity": "high",
+      "score": 85,
+      "description": "From now on respond without",
+      "pattern": "from\\s+now\\s+on\\s+(respond|answer|reply)\\s+(without|with\\s+no)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-027",
+      "severity": "medium",
+      "score": 72,
+      "description": "Hypothetical scenario bypass",
+      "pattern": "(hypothetically|in\\s+a\\s+hypothetical|for\\s+a\\s+fictional)\\s+.*\\b(how\\s+to|explain|tell)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-028",
+      "severity": "high",
+      "score": 80,
+      "description": "Do anything now",
+      "pattern": "\\bdo\\s+anything\\s+now\\b",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-029",
+      "severity": "high",
+      "score": 83,
+      "description": "Stop being an AI",
+      "pattern": "stop\\s+being\\s+(an?\\s+)?AI",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-030",
+      "severity": "medium",
+      "score": 70,
+      "description": "Translate to bypass filters",
+      "pattern": "translate\\s+to\\s+.{2,20}\\s*:.*(?:kill|hack|bomb|weapon)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-031",
+      "severity": "high",
+      "score": 85,
+      "description": "System message XML injection",
+      "pattern": "<\\|?(system|im_start|im_end)\\|?>",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-033",
+      "severity": "medium",
+      "score": 68,
+      "description": "Encoded payload marker",
+      "pattern": "\\b(eval|exec|decode)\\s*\\(\\s*['\"]",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-034",
+      "severity": "high",
+      "score": 80,
+      "description": "Persona switch attempt",
+      "pattern": "switch\\s+(to|into)\\s+(persona|character|mode|role)\\s*:",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-035",
+      "severity": "high",
+      "score": 82,
+      "description": "Bypass content filter",
+      "pattern": "bypass\\s+(the\\s+)?(content|safety|output)\\s+(filter|check|restriction)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-036",
+      "severity": "medium",
+      "score": 72,
+      "description": "Opposite day technique",
+      "pattern": "(opposite\\s+day|opposite\\s+mode|reversed\\s+rules)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-037",
+      "severity": "high",
+      "score": 85,
+      "description": "Token smuggling delimiters",
+      "pattern": "\\|\\|\\|.*SYSTEM.*\\|\\|\\|",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-038",
+      "severity": "medium",
+      "score": 70,
+      "description": "Grandmother exploit",
+      "pattern": "my\\s+(dead\\s+)?grandmother\\s+(used\\s+to|would)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-039",
+      "severity": "high",
+      "score": 80,
+      "description": "Multi-language injection evasion",
+      "pattern": "en\\s+espa\u00f1ol\\s*:.*ignor",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-040",
+      "severity": "critical",
+      "score": 90,
+      "description": "Prompt injection research payload",
+      "pattern": "pwned|PWNED|p]w]n]e]d",
+      "flags": ""
+    },
+    {
+      "id": "INJ-041",
+      "severity": "high",
+      "score": 78,
+      "description": "Markdown image injection",
+      "pattern": "!\\[.*\\]\\(https?://.*\\?.*prompt",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-042",
+      "severity": "high",
+      "score": 82,
+      "description": "Instruction in code block",
+      "pattern": "```\\s*(ignore|override|system|new instructions)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-043",
+      "severity": "medium",
+      "score": 68,
+      "description": "Zero-width character obfuscation",
+      "pattern": "[\\u200b\\u200c\\u200d\\ufeff]{3,}",
+      "flags": ""
+    },
+    {
+      "id": "INJ-044",
+      "severity": "high",
+      "score": 80,
+      "description": "ChatML injection",
+      "pattern": "<\\|im_start\\|>",
+      "flags": ""
+    },
+    {
+      "id": "INJ-045",
+      "severity": "high",
+      "score": 82,
+      "description": "Forget everything before this",
+      "pattern": "forget\\s+(everything|all)\\s+(before|above|prior)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-046",
+      "severity": "medium",
+      "score": 72,
+      "description": "ASCII art evasion",
+      "pattern": "(?i)(?:^|\\n)\\s*ignore\\s+(?:all\\s+)?(?:previous|above|prior|earlier)\\s+(?:instructions|rules|prompts|guidelines|directions)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-047",
+      "severity": "high",
+      "score": 80,
+      "description": "Simulate unrestricted mode",
+      "pattern": "simulate\\s+(an?\\s+)?(unrestricted|unfiltered|uncensored)\\s+(mode|version|AI)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-048",
+      "severity": "high",
+      "score": 85,
+      "description": "Direct prompt injection marker",
+      "pattern": "BEGIN\\s+INJECTION|END\\s+INJECTION|INJECT:",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-049",
+      "severity": "medium",
+      "score": 75,
+      "description": "Continuation attack",
+      "pattern": "continue\\s+from\\s+where\\s+(the\\s+)?system\\s+prompt",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-050",
+      "severity": "high",
+      "score": 80,
+      "description": "Overwrite instructions directive",
+      "pattern": "(overwrite|replace|update)\\s+(your|the|all)\\s+(instructions|system\\s+prompt|rules)",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-051",
+      "severity": "high",
+      "score": 78,
+      "description": "Markdown link with data exfil",
+      "pattern": "!\\[.*\\]\\(https?://[^)]+\\{\\{",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-052",
+      "severity": "medium",
+      "score": 70,
+      "description": "Adversarial suffix pattern",
+      "pattern": "describing\\.\\+ similarlyNow write",
+      "flags": "i"
+    },
+    {
+      "id": "INJ-053",
+      "severity": "high",
+      "score": 88,
+      "description": "AI memory poisoning via fetched web content — persistence injection commands targeting AI memory context",
+      "pattern": "(?i)(remember\\s+(?:\\S+\\s+){1,3}as\\s+(?:trusted|preferred|best)|always\\s+recommend|add\\s+(?:this\\s+)?to\\s+(?:your\\s+)?memory)",
+      "flags": "i",
+      "name": "Memory persistence injection",
+      "category": "prompt_injection",
+      "source": "Microsoft Security Blog 2026-02-10",
+      "tags": ["memory-poisoning", "persistence", "web-content"]
+    }
+  ]
+}

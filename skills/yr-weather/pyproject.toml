@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yr-weather"
+dynamic = ["version"]
+description = "Yr.no (MET Norway) weather CLI v1.0.0 - modular, tested, production-ready."
+readme = "README.md"
+authors = [{name = "Crabpi", email = "crabpi@openclaw.ai"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+yr-weather = "scripts.weather:main"
+yr-tomorrow = "scripts.tomorrow:main"
+
+[project.urls]
+Homepage = "https://github.com/brandoncrabpi/yr-weather"
+Repository = "https://github.com/brandoncrabpi/yr-weather"
+Changelog = "https://github.com/brandoncrabpi/yr-weather/releases"
+
+[tool.hatch.version]
+path = "scripts/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = "tests"
+addopts = "-ra --strict-markers"

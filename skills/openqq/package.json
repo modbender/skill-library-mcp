@@ -1,0 +1,38 @@
+{
+  "name": "openqq",
+  "version": "0.0.4",
+  "description": "QQ bot integration for OpenClaw with session isolation and logging",
+  "main": "qq-bot.js",
+  "bin": {
+    "openqq": "./qq-bot.js"
+  },
+  "scripts": {
+    "start": "node qq-bot.js",
+    "dev": "node --watch qq-bot.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "setup": "cp open-qq-config.json.example ~/.openclaw/workspace/open-qq-config.json && echo '✅ Config created! Edit ~/.openclaw/workspace/open-qq-config.json'",
+    "install-deps": "npm install",
+    "clean": "rm -rf node_modules package-lock.json",
+    "logs": "tail -f ../../logs/qq-bot/qq-bot-$(date +%Y-%m-%d).log",
+    "status": "pgrep -f 'node qq-bot.js' > /dev/null && echo '✅ Running' || echo '❌ Not running'",
+    "health": "bash scripts/health-check.sh",
+    "version": "echo \"openqq v$(node -p \"require('./package.json').version\")\"",
+    "test-msg": "node -e \"const {spawn}=require('child_process'); const m=process.argv.slice(3).join(' ')||'你好'; const p=spawn('openclaw',['agent','--session-id','qq-test','--message',m]); p.stdout.on('data',d=>console.log(d.toString())); p.stderr.on('data',d=>console.error(d.toString()));\"",
+    "restart": "echo '❌ Use systemctl restart qq-bot (if installed as service)'",
+    "stop": "echo '❌ Use systemctl stop qq-bot (if installed as service)' || pkill -f 'node qq-bot.js'"
+  },
+  "keywords": ["qq", "bot", "openclaw", "websocket"],
+  "author": "番茄",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://clawhub.com/skills/openqq"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "ws": "^8.19.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ipeaky — Secure API Key Management for AI Agents</title>
+<meta name="description" content="Keys never touch chat history. Secure API key management for OpenClaw and AI agents.">
+<meta property="og:title" content="ipeaky — Secure API Key Management">
+<meta property="og:description" content="Keys never touch chat history, command arguments, or logs. Ever.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ipeaky — Secure API Key Management">
+<meta name="twitter:description" content="Keys never touch chat history. Pure bash. Zero dependencies.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: rgba(255,255,255,0.06);
+    --glow: #00ff88;
+    --glow-dim: rgba(0,255,136,0.15);
+    --glow-bright: rgba(0,255,136,0.4);
+    --text: #e0e0e8;
+    --text-dim: #666680;
+    --accent: #00ff88;
+    --danger: #ff4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+  }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 120px 0 80px;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    backdrop-filter: blur(8px);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .hero-badge span { color: var(--accent); }
+
+  h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--accent), #00cc6a, var(--accent));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .hero-sub {
+    font-size: 20px;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  /* Terminal */
+  .terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+    margin: 0 auto 80px;
+    max-width: 600px;
+    box-shadow: 0 0 60px rgba(0,255,136,0.05);
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .terminal-dot.r { background: #ff5f57; }
+  .terminal-dot.y { background: #febc2e; }
+  .terminal-dot.g { background: #28c840; }
+
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .prompt { color: var(--accent); }
+  .cmd { color: var(--text); }
+  .output { color: var(--text-dim); }
+  .success { color: var(--accent); }
+  .masked { color: #ffaa00; }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 80px;
+  }
+
+  @media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+
+  .feature {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .feature:hover {
+    border-color: var(--glow-dim);
+    box-shadow: 0 0 30px rgba(0,255,136,0.05);
+  }
+
+  .feature-icon { font-size: 24px; margin-bottom: 12px; }
+
+  .feature h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .feature p { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+
+  /* Flow diagram */
+  .flow {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .flow h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+
+  .flow-node {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .flow-node.secure {
+    border-color: var(--glow-dim);
+    color: var(--accent);
+  }
+
+  .flow-arrow { color: var(--text-dim); font-size: 18px; }
+
+  .flow-node.danger {
+    border-color: rgba(255,68,68,0.3);
+    color: var(--danger);
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* CTA */
+  .cta {
+    text-align: center;
+    padding: 60px 0 120px;
+  }
+
+  .cta-install {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    padding: 16px 32px;
+    border: 1px solid var(--glow-dim);
+    border-radius: 8px;
+    background: rgba(0,255,136,0.05);
+    color: var(--accent);
+    margin-bottom: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .cta-install:hover {
+    background: rgba(0,255,136,0.1);
+    box-shadow: 0 0 40px rgba(0,255,136,0.1);
+  }
+
+  .cta-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .cta-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .cta-links a:hover { color: var(--accent); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <section class="hero">
+    <div class="hero-badge">open source · <span>zero dependencies</span> · pure bash</div>
+    <h1>ipeaky</h1>
+    <p class="hero-sub">
+      <strong>Keys never touch chat history.</strong><br>
+      Secure API key management for AI agents.
+    </p>
+  </section>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot r"></div>
+      <div class="terminal-dot y"></div>
+      <div class="terminal-dot g"></div>
+      <div class="terminal-title">ipeaky</div>
+    </div>
+    <div class="terminal-body">
+      <div><span class="prompt">$</span> <span class="cmd">ipeaky store OPENAI_API_KEY</span></div>
+      <div><span class="output">Key: ••••••••••••••••</span></div>
+      <div><span class="success">✓ Stored securely (stdin → file, 600 perms)</span></div>
+      <div>&nbsp;</div>
+      <div><span class="prompt">$</span> <span class="cmd">ipeaky list</span></div>
+      <div><span class="masked">OPENAI_API_KEY = sk-7****</span></div>
+      <div>&nbsp;</div>
+      <div><span class="prompt">$</span> <span class="cmd">ipeaky test OPENAI_API_KEY</span></div>
+      <div><span class="success">✓ OpenAI key is valid.</span></div>
+    </div>
+  </div>
+
+  <section class="flow">
+    <h2>How keys flow</h2>
+    <div class="flow-diagram">
+      <div class="flow-node">You</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node secure">stdin</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node secure">~/.openclaw/credentials/</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node secure">chmod 600</div>
+    </div>
+    <div class="flow-diagram" style="margin-top: 16px; opacity: 0.5;">
+      <div class="flow-node danger">chat history</div>
+      <div class="flow-node danger">shell args</div>
+      <div class="flow-node danger">process list</div>
+      <div class="flow-node danger">logs</div>
+    </div>
+  </section>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>stdin-only</h3>
+      <p>Keys never appear in command arguments, ps output, or shell history. Invisible to everything except the target file.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🧪</div>
+      <h3>built-in tests</h3>
+      <p>Validate keys against OpenAI, ElevenLabs, Anthropic APIs with one command. Know it works before you ship.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👁️</div>
+      <h3>masked display</h3>
+      <p>List shows sk-7**** — enough to identify, never enough to compromise. Full values never leave the file.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>zero dependencies</h3>
+      <p>Pure bash. No npm install, no pip, no Docker. Runs on any Unix system with a shell. That's it.</p>
+    </div>
+  </div>
+
+  <section class="cta">
+    <div class="cta-install" onclick="navigator.clipboard.writeText('clawhub install ipeaky')">
+      $ clawhub install ipeaky
+      <span style="font-size:11px; opacity:0.5; margin-left:8px;">click to copy</span>
+    </div>
+    <div class="cta-links">
+      <a href="https://github.com/christiancattaneo/ipeaky">GitHub →</a>
+      <a href="https://openclaw.ai">OpenClaw →</a>
+      <a href="https://clawhub.com">ClawHub →</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Built by <a href="https://github.com/christiancattaneo">Christian Cattaneo</a> · MIT License · 2026
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PROJECT_NAME}} · 分镜展示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent: #c9a961;
+            --accent-dim: #8a7444;
+            --border: #2a2a2a;
+            --tag-p0: #e74c3c;
+            --tag-p1: #f39c12;
+            --tag-p2: #3498db;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .header {
+            padding: 80px 40px 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        .header-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 24px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+        .header-meta {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+        .header-stat {
+            text-align: center;
+        }
+        .header-stat-value {
+            font-size: 2rem;
+            font-weight: 200;
+            color: var(--accent);
+        }
+        .header-stat-value.p0 { color: var(--tag-p0); }
+        .header-stat-value.p1 { color: var(--tag-p1); }
+        .header-stat-value.p2 { color: var(--tag-p2); }
+        .header-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+        .nav-inner {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+        .nav-item {
+            padding: 16px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+
+        .main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+        .section:last-child { margin-bottom: 0; }
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+        }
+        .section-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        }
+        .card-image {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card:hover .card-image img {
+            transform: scale(1.03);
+        }
+        .card-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .card-badge {
+            padding: 4px 10px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 2px;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+        }
+        .card-badge.priority { color: #fff; }
+        .card-badge.priority.p0 { background: var(--tag-p0); }
+        .card-badge.priority.p1 { background: var(--tag-p1); }
+        .card-badge.priority.p2 { background: var(--tag-p2); }
+        .card-badge.purpose { color: var(--accent); }
+        
+        .card-info {
+            padding: 20px;
+        }
+        .card-shot {
+            font-size: 0.65rem;
+            color: var(--accent);
+            font-family: 'SF Mono', 'Monaco', monospace;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: 0.06em;
+        }
+        .card-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .card-meta {
+            margin-top: 12px;
+            display: flex;
+            gap: 16px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .card-meta-item span {
+            color: var(--text-secondary);
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-content {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .lightbox-image {
+            width: 100%;
+            max-height: 55vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lightbox-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .lightbox-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 1001;
+        }
+        .lightbox-close:hover { color: var(--text-primary); }
+        .lightbox-header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+        .lightbox-shot {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        .lightbox-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+        .lightbox-section {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 4px;
+        }
+        .lightbox-section.full {
+            grid-column: 1 / -1;
+        }
+        .lightbox-section-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+        }
+        .lightbox-section-content {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        .lightbox-prompt {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            word-break: break-all;
+            position: relative;
+        }
+        .lightbox-copy {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--bg-card);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lightbox-copy:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+        .lightbox-attrs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .lightbox-attr {
+            background: var(--bg-secondary);
+            padding: 6px 12px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+        }
+        .lightbox-attr-label {
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+        .lightbox-attr-value {
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 1024px) {
+            .lightbox-info { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header { padding: 60px 20px 40px; }
+            .header-title { font-size: 1.75rem; }
+            .nav-inner { padding: 0 20px; }
+            .main { padding: 40px 20px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-badge">STORYBOARD</div>
+        <h1 class="header-title">{{PROJECT_NAME}}</h1>
+        <p class="header-subtitle">{{EPISODE_TITLE}} · 分镜展示</p>
+        <div class="header-meta">
+            <div class="header-stat">
+                <div class="header-stat-value">{{TOTAL_COUNT}}</div>
+                <div class="header-stat-label">总镜头</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value p0">{{P0_COUNT}}</div>
+                <div class="header-stat-label">P0 核心</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value p1">{{P1_COUNT}}</div>
+                <div class="header-stat-label">P1 重要</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value p2">{{P2_COUNT}}</div>
+                <div class="header-stat-label">P2 氛围</div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            {{NAV_ITEMS}}
+        </div>
+    </nav>
+
+    <main class="main">
+        {{GALLERY_SECTIONS}}
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">{{PROJECT_NAME}} · {{EPISODE_TITLE}} · 分镜表 · {{GENERATED_TIME}}</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">关闭</span>
+        <div class="lightbox-content" id="lightbox-content"></div>
+    </div>
+
+    <script>
+        const shotData = {{SHOT_DATA_JSON}};
+        
+        function openLightbox(id) {
+            const shot = shotData[id];
+            if (!shot) return;
+            
+            document.getElementById('lightbox-content').innerHTML = `
+                <img class="lightbox-image" src="${shot.image}" alt="${shot.id}">
+                <div class="lightbox-info">
+                    <div class="lightbox-header">
+                        <span class="lightbox-shot">${shot.id}</span>
+                        <h2 class="lightbox-title">${shot.title}</h2>
+                    </div>
+                    <div class="lightbox-section">
+                        <h3 class="lightbox-section-title">镜头参数</h3>
+                        <div class="lightbox-attrs">
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">场次:</span><span class="lightbox-attr-value">${shot.scene}</span></span>
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">景别:</span><span class="lightbox-attr-value">${shot.shotSize}</span></span>
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">机位:</span><span class="lightbox-attr-value">${shot.angle}</span></span>
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">运镜:</span><span class="lightbox-attr-value">${shot.movement}</span></span>
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">目的:</span><span class="lightbox-attr-value">${shot.purpose}</span></span>
+                            <span class="lightbox-attr"><span class="lightbox-attr-label">优先级:</span><span class="lightbox-attr-value">${shot.priority}</span></span>
+                        </div>
+                    </div>
+                    <div class="lightbox-section">
+                        <h3 class="lightbox-section-title">唯一信息点</h3>
+                        <p class="lightbox-section-content">${shot.info}</p>
+                    </div>
+                    <div class="lightbox-section full">
+                        <h3 class="lightbox-section-title">定格瞬间</h3>
+                        <p class="lightbox-section-content">${shot.moment}</p>
+                    </div>
+                    <div class="lightbox-section full">
+                        <h3 class="lightbox-section-title">完整提示词</h3>
+                        <div class="lightbox-prompt">
+                            <button class="lightbox-copy" onclick="copyPrompt(this, '${shot.id}')">复制</button>
+                            ${shot.prompt}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        function copyPrompt(btn, id) {
+            const shot = shotData[id];
+            navigator.clipboard.writeText(shot.prompt).then(() => {
+                btn.textContent = '已复制';
+                setTimeout(() => btn.textContent = '复制', 2000);
+            });
+        }
+        
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+        
+        // Smooth scroll
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('.nav').offsetHeight;
+                    window.scrollTo({ top: target.offsetTop - navHeight, behavior: 'smooth' });
+                }
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+        
+        // Update active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-item');
+            const navHeight = document.querySelector('.nav')?.offsetHeight || 0;
+            let current = '';
+            sections.forEach(section => {
+                if (scrollY >= section.offsetTop - navHeight - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

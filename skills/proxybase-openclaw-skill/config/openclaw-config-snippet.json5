@@ -1,0 +1,72 @@
+// OpenClaw configuration snippet for ProxyBase skill
+// Add these sections to your openclaw.json or gateway config file.
+// See https://docs.openclaw.ai for full configuration reference.
+
+{
+  // ─── Skill registration ───────────────────────────────────────────
+  "skills": {
+    "entries": {
+      "proxybase": {
+        "enabled": true,
+        // Your ProxyBase API key (starts with pk_...)
+        // This maps to the skill's primaryEnv: PROXYBASE_API_KEY
+        "apiKey": "pk_YOUR_API_KEY_HERE"
+      }
+    }
+  },
+
+  // ─── Enable Lobster (optional, for pipeline workflows) ────────────
+  "tools": {
+    "alsoAllow": ["lobster"]
+  },
+
+  // ─── Global proxy environment (optional) ──────────────────────────
+  // Uncomment to route ALL exec/curl/wget traffic through your SOCKS5 proxy.
+  // Only set these AFTER you have an active proxy order.
+  //
+  // "env": {
+  //   "ALL_PROXY": "socks5://USER:PASS@api.proxybase.xyz:1080",
+  //   "HTTPS_PROXY": "socks5://USER:PASS@api.proxybase.xyz:1080",
+  //   "HTTP_PROXY": "socks5://USER:PASS@api.proxybase.xyz:1080"
+  // },
+
+  // ─── Sandbox proxy (optional, for Docker sandbox mode) ────────────
+  // If you run OpenClaw in sandbox mode, inject proxy env vars here.
+  //
+  // "sandbox": {
+  //   "docker": {
+  //     "env": {
+  //       "ALL_PROXY": "socks5://USER:PASS@api.proxybase.xyz:1080",
+  //       "HTTPS_PROXY": "socks5://USER:PASS@api.proxybase.xyz:1080"
+  //     },
+  //     "network": "bridge"
+  //   }
+  // },
+
+  // ─── Browser proxy (optional, remote CDP approach) ────────────────
+  // For routing browser tool traffic through SOCKS5:
+  // 1. Launch Chromium: chromium --proxy-server="socks5://USER:PASS@api.proxybase.xyz:1080" --remote-debugging-port=9222
+  // 2. Point a browser profile at it:
+  //
+  // "tools": {
+  //   "browser": {
+  //     "profiles": {
+  //       "proxybase": {
+  //         "cdpUrl": "http://127.0.0.1:9222"
+  //       }
+  //     }
+  //   }
+  // },
+
+  // ─── Cron job for automatic polling (optional) ────────────────────
+  // Poll active orders every 30 seconds automatically.
+  // The --once --quiet flags ensure it checks once and stays silent
+  // when status hasn't changed.
+  //
+  // "cron": [
+  //   {
+  //     "schedule": "*/1 * * * *",
+  //     "command": "bash {baseDir}/scripts/proxybase-poll.sh --once --quiet $(jq -r '.orders[-1].order_id' {baseDir}/state/orders.json)"
+  //   }
+  // ]
+}
