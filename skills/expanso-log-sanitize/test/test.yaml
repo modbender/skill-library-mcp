@@ -1,0 +1,19 @@
+# Test cases for log-sanitize skill
+
+tests:
+  - name: "Sanitize password"
+    input: "user=admin password=secret123"
+    expected:
+      has_field: sanitized
+      metadata_has: [skill, trace_id, timestamp]
+
+  - name: "Sanitize API key"
+    input: "api_key=sk-test123abc"
+    expected:
+      has_field: sanitized
+      has_field: redactions
+
+  - name: "Sanitize complex log"
+    input_file: fixtures/input.txt
+    expected:
+      has_field: sanitized

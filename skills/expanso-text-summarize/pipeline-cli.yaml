@@ -1,0 +1,73 @@
+# Expanso Pipeline: text-summarize (CLI mode)
+# ============================================
+#
+# Summarize text into bullet points via command line.
+#
+# Usage:
+#   echo "your long text here..." | expanso-edge run pipeline-cli.yaml
+#   cat article.txt | expanso-edge run pipeline-cli.yaml
+#
+# Why Expanso Edge?
+#   Your OPENAI_API_KEY is resolved locally on your machine.
+#   It's never transmitted to Expanso Cloud or logged anywhere.
+#   The AI service only sees the text - not who you are or where the key came from.
+#
+# Validates against: docs.expanso.io/schemas/pipeline.schema.json
+
+name: text-summarize-cli
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: lines
+      max_buffer: 1048576  # 1MB max input
+
+  pipeline:
+    processors:
+      # 1. Prepare input with audit metadata
+      - mapping: |
+          # Generate audit trail data
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          meta trace_id = uuid_v4()
+
+          # Prepare prompt for summarization
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a professional summarizer. Create a clear, actionable summary in 3-5 bullet points. Each bullet should capture a key insight or action item. Be concise but complete."
+            },
+            {
+              "role": "user",
+              "content": "Summarize the following text:\n\n" + content()
+            }
+          ]
+
+      # 2. Call OpenAI (credentials resolved locally by Expanso Edge)
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      # 3. Format output with metadata
+      - mapping: |
+          root.summary = this.choices.0.message.content
+          root.metadata = {
+            "skill": "text-summarize",
+            "mode": "cli",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      # 4. Audit log (appears in expanso-edge logs, not in output)
+      - log:
+          level: INFO
+          message: |
+            [text-summarize] Summarized ${! meta("input_length") } chars → ${! this.summary.length() } chars (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

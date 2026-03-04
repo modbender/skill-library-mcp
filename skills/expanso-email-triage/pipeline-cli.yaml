@@ -1,0 +1,261 @@
+# Expanso Pipeline: email-triage (CLI mode)
+# ==========================================
+#
+# Intelligent email triage with AI-powered categorization.
+#
+# Usage:
+#   # Process Gmail inbox
+#   echo '{"provider":"gmail","limit":50}' | \
+#     GMAIL_TOKEN=... OPENAI_API_KEY=... expanso-edge run pipeline-cli.yaml
+#
+#   # Process with calendar sync
+#   echo '{"provider":"outlook","create_calendar_events":true}' | \
+#     OUTLOOK_TOKEN=... expanso-edge run pipeline-cli.yaml
+#
+# Why Expanso Edge?
+#   Your email credentials and OAuth tokens stay on YOUR machine.
+#   The AI only sees email content - never your authentication.
+#   Full audit trail of what was processed and why.
+#
+# Validates against: docs.expanso.io/schemas/pipeline.schema.json
+
+name: email-triage-cli
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: lines
+
+  pipeline:
+    processors:
+      # ═══════════════════════════════════════════════════════════════════════
+      # STEP 1: Parse input and initialize
+      # ═══════════════════════════════════════════════════════════════════════
+      - mapping: |
+          meta trace_id = uuid_v4()
+          meta start_time = now()
+
+          let input = content().parse_json()
+          meta provider = $input.provider.or("gmail")
+          meta folder = $input.folder.or("INBOX")
+          meta limit = $input.limit.or(50)
+          meta since_hours = $input.since_hours.or(24)
+          meta create_calendar_events = $input.create_calendar_events.or(true)
+
+          # Calculate date filter
+          let since_date = now().ts_sub("${! meta(\"since_hours\") }h")
+          meta since_date = $since_date
+
+          root.status = "initializing"
+          root.provider = meta("provider")
+
+      - log:
+          level: INFO
+          message: |
+            [email-triage] Starting triage: provider=${! meta("provider") }, folder=${! meta("folder") }, limit=${! meta("limit") } (trace: ${! meta("trace_id").slice(0, 8) })
+
+      # ═══════════════════════════════════════════════════════════════════════
+      # STEP 2: Fetch emails (simulated - real impl uses provider-specific API)
+      # ═══════════════════════════════════════════════════════════════════════
+      - mapping: |
+          # Configure EMAIL_API_URL to connect to Gmail/Outlook API
+          # Sample emails shown below - replace with http call to EMAIL_API_URL
+
+          let sample_emails = [
+            {
+              "id": "msg-001",
+              "subject": "URGENT: Server down - need immediate help",
+              "from": "ops@company.com",
+              "to": "you@company.com",
+              "date": now().ts_sub("2h"),
+              "body": "Production server is unresponsive. Please check immediately.",
+              "has_attachment": false
+            },
+            {
+              "id": "msg-002",
+              "subject": "Meeting request: Q1 Planning - Thursday 2pm",
+              "from": "manager@company.com",
+              "to": "you@company.com",
+              "date": now().ts_sub("5h"),
+              "body": "Hi, can we schedule a meeting to discuss Q1 planning? I'm proposing Thursday at 2pm. Let me know if that works.",
+              "has_attachment": false
+            },
+            {
+              "id": "msg-003",
+              "subject": "Weekly Newsletter: Tech Updates",
+              "from": "newsletter@techdigest.com",
+              "to": "you@company.com",
+              "date": now().ts_sub("8h"),
+              "body": "This week in tech: AI developments, new frameworks, and more...",
+              "has_attachment": false
+            },
+            {
+              "id": "msg-004",
+              "subject": "RE: Contract review needed",
+              "from": "legal@company.com",
+              "to": "you@company.com",
+              "date": now().ts_sub("12h"),
+              "body": "Please review the attached contract and provide feedback by EOD Friday.",
+              "has_attachment": true
+            },
+            {
+              "id": "msg-005",
+              "subject": "FYI: New office policies",
+              "from": "hr@company.com",
+              "to": "all@company.com",
+              "date": now().ts_sub("18h"),
+              "body": "Please review the updated office policies in the attached document.",
+              "has_attachment": true
+            }
+          ]
+
+          root.emails = $sample_emails.slice(0, meta("limit"))
+          root.fetch_status = "success"
+          root.email_count = $sample_emails.length()
+
+      - log:
+          level: INFO
+          message: |
+            [email-triage] Fetched ${! this.email_count } emails
+
+      # ═══════════════════════════════════════════════════════════════════════
+      # STEP 3: AI Classification - categorize each email
+      # ═══════════════════════════════════════════════════════════════════════
+      - mapping: |
+          # Prepare batch for AI classification
+          let emails_text = this.emails.map_each(e ->
+            "EMAIL ID: " + e.id + "\n" +
+            "FROM: " + e.from + "\n" +
+            "SUBJECT: " + e.subject + "\n" +
+            "BODY: " + e.body.slice(0, 500) + "\n---"
+          ).join("\n\n")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are an expert email triage assistant. Analyze emails and classify each one. For each email, determine:
+1. category: urgent, action-required, meeting, fyi, newsletter, or spam
+2. priority: 1 (highest) to 5 (lowest)
+3. action: what the recipient should do (e.g., 'respond immediately', 'schedule meeting', 'review document', 'archive', 'unsubscribe')
+4. calendar_event: if it's a meeting request, extract {title, proposed_date, proposed_time, duration_minutes}
+
+Respond with a JSON array matching the email IDs provided."
+            },
+            {
+              "role": "user",
+              "content": "Classify these emails:\n\n" + $emails_text + "\n\nRespond with JSON array: [{\"id\": \"...\", \"category\": \"...\", \"priority\": N, \"action\": \"...\", \"calendar_event\": null or {...}}]"
+            }
+          ]
+          meta emails = this.emails
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      # ═══════════════════════════════════════════════════════════════════════
+      # STEP 4: Merge AI results with email data
+      # ═══════════════════════════════════════════════════════════════════════
+      - mapping: |
+          let ai_response = this.choices.0.message.content
+          let classifications = $ai_response.parse_json().catch([])
+
+          # Merge classifications with original emails
+          let emails = meta("emails")
+          let processed_emails = $emails.map_each(email -> email.merge($classifications.filter(c -> c.id == email.id).index(0).or({
+            "category": "fyi",
+            "priority": 3,
+            "action": "review",
+            "calendar_event": null
+          })))
+
+          # Extract calendar events
+          let calendar_events = $processed_emails.filter(e -> e.calendar_event != null).map_each(e ->
+            e.calendar_event.merge({
+              "email_id": e.id,
+              "from": e.from,
+              "subject": e.subject
+            })
+          )
+
+          # Count by category
+          let urgent_count = $processed_emails.filter(e -> e.category == "urgent").length()
+          let action_count = $processed_emails.filter(e -> e.category == "action-required").length()
+          let meeting_count = $processed_emails.filter(e -> e.category == "meeting").length()
+
+          root.summary = {
+            "processed": $processed_emails.length(),
+            "urgent_count": $urgent_count,
+            "action_required_count": $action_count,
+            "meetings_found": $meeting_count,
+            "by_category": {
+              "urgent": $urgent_count,
+              "action-required": $action_count,
+              "meeting": $meeting_count,
+              "fyi": $processed_emails.filter(e -> e.category == "fyi").length(),
+              "newsletter": $processed_emails.filter(e -> e.category == "newsletter").length(),
+              "spam": $processed_emails.filter(e -> e.category == "spam").length()
+            }
+          }
+
+          root.emails = $processed_emails.map_each(e -> {
+            "id": e.id,
+            "subject": e.subject,
+            "from": e.from,
+            "category": e.category,
+            "priority": e.priority,
+            "action": e.action,
+            "calendar_event": e.calendar_event
+          })
+
+          root.calendar_events = $calendar_events
+
+          root.metadata = {
+            "skill": "email-triage",
+            "mode": "cli",
+            "provider": meta("provider"),
+            "folder": meta("folder"),
+            "trace_id": meta("trace_id"),
+            "processing_time_ms": now().ts_sub(meta("start_time")).abs(),
+            "timestamp": now()
+          }
+
+      # ═══════════════════════════════════════════════════════════════════════
+      # STEP 5: Generate draft responses for action-required emails
+      # ═══════════════════════════════════════════════════════════════════════
+      - mapping: |
+          # For urgent and action-required, suggest quick responses
+          let action_emails = this.emails.filter(e ->
+            e.category == "urgent" || e.category == "action-required"
+          )
+
+          root = this
+          root.draft_responses = $action_emails.map_each(e -> {
+            "email_id": e.id,
+            "subject": "RE: " + e.subject,
+            "suggested_response": if e.category == "urgent" {
+              "I'm looking into this now. Will update you within the hour."
+            } else {
+              "Thank you for your email. I'll review and get back to you by [deadline]."
+            }
+          })
+
+      - log:
+          level: INFO
+          message: |
+            [email-triage] Complete: ${! this.summary.processed } emails, ${! this.summary.urgent_count } urgent, ${! this.summary.meetings_found } meetings (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object
+
+# Rate limit resources
+rate_limit_resources:
+  - label: email_api
+    local:
+      count: 10
+      interval: 1s
+  - label: openai_api
+    local:
+      count: 20
+      interval: 60s

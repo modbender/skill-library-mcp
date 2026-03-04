@@ -1,0 +1,101 @@
+# Expanso Pipeline: text-summarize (MCP mode)
+# =============================================
+#
+# HTTP endpoint for MCP/OpenClaw integration.
+#
+# Usage:
+#   # Start the server
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml
+#
+#   # Call from curl
+#   curl -X POST http://localhost:8080/summarize \
+#     -H "Content-Type: application/json" \
+#     -d '{"text": "Your long text here..."}'
+#
+# Why this matters for OpenClaw:
+#   When Claude (via MCP) calls this endpoint, it runs on YOUR machine.
+#   Your OPENAI_API_KEY stays local - the MCP server only receives results.
+#   This is the "12-factor app" pattern for AI agent security.
+#
+# Validates against: docs.expanso.io/schemas/pipeline.schema.json
+
+name: text-summarize-mcp
+type: pipeline
+
+config:
+  # HTTP server configuration
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /summarize
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      # 1. Parse JSON body and prepare with audit metadata
+      - mapping: |
+          # Extract text from JSON body {"text": "..."}
+          let input_text = this.text.or(content())
+
+          # Validate input
+          let text_length = $input_text.length()
+          root = if $text_length == 0 {
+            throw("text field is required and cannot be empty")
+          } else if $text_length > 1048576 {
+            throw("text exceeds maximum length of 1MB")
+          } else {
+            {
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a professional summarizer. Create a clear, actionable summary in 3-5 bullet points. Each bullet should capture a key insight or action item. Be concise but complete."
+                },
+                {
+                  "role": "user",
+                  "content": "Summarize the following text:\n\n" + $input_text
+                }
+              ]
+            }
+          }
+
+          # Audit metadata
+          meta input_hash = $input_text.hash("sha256").encode("hex")
+          meta input_length = $text_length
+          meta trace_id = uuid_v4()
+
+      # 2. Call OpenAI (credentials resolved locally by Expanso Edge)
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      # 3. Format response with metadata
+      - mapping: |
+          root.summary = this.choices.0.message.content
+          root.metadata = {
+            "skill": "text-summarize",
+            "mode": "mcp",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      # 4. Audit log
+      - log:
+          level: INFO
+          message: |
+            [text-summarize] MCP request: ${! meta("input_length") } chars (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    # Return response synchronously to HTTP caller
+    sync_response: {}
+
+# Optional: Node selection for Expanso Cloud deployment
+selector:
+  match_labels:
+    capability: llm

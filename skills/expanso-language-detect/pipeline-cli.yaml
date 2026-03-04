@@ -1,0 +1,32 @@
+name: "language-detect-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 102400
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          root.messages = [
+            {"role": "system", "content": "You are a language detection expert. Respond with ONLY a JSON object containing: language (full name), code (ISO 639-1), confidence (0-1). Example: {\"language\": \"English\", \"code\": \"en\", \"confidence\": 0.95}"},
+            {"role": "user", "content": "Detect the language of this text:\n\n" + content()}
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let response = this.choices.0.message.content.parse_json().catch({})
+          root.language = $response.language.or("Unknown")
+          root.code = $response.code.or("xx")
+          root.confidence = $response.confidence.or(0)
+          root.metadata = {"skill": "language-detect", "mode": "cli", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    stdout:
+      codec: json_object

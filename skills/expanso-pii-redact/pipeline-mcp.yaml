@@ -1,0 +1,77 @@
+# Expanso Pipeline: pii-redact (MCP mode)
+# ========================================
+#
+# Usage:
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml &
+#   curl -X POST http://localhost:8080/redact \
+#     -d '{"text": "Contact John at john@example.com", "placeholder": "[HIDDEN]"}'
+
+name: "pii-redact-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /redact
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let input_text = this.text.or(content())
+          meta input_hash = $input_text.hash("sha256").encode("hex")
+          meta input_length = $input_text.length()
+          meta trace_id = uuid_v4()
+          meta placeholder = this.placeholder.or("[REDACTED]")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a PII redaction specialist. Analyze the text and replace ALL personally identifiable information with the placeholder '" + meta("placeholder") + "'. PII includes: names, emails, phone numbers, SSNs, addresses, credit card numbers, IP addresses, dates of birth, and any other identifying information. Return a JSON object with: redacted_text (the text with PII replaced), redaction_count (integer), redacted_types (array of PII types found like 'email', 'phone', 'name', etc.)."
+            },
+            {
+              "role": "user",
+              "content": $input_text
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let response = this.choices.0.message.content.parse_json().catch({
+            "redacted_text": this.choices.0.message.content,
+            "redaction_count": 0,
+            "redacted_types": []
+          })
+          root.redacted_text = $response.redacted_text
+          root.redaction_count = $response.redaction_count
+          root.redacted_types = $response.redacted_types
+          root.metadata = {
+            "skill": "pii-redact",
+            "mode": "mcp",
+            "model": "gpt-4o-mini",
+            "placeholder": meta("placeholder"),
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [pii-redact] Redacted ${! root.redaction_count } items (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}
+
+selector:
+  match_labels:
+    capability: llm

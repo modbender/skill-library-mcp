@@ -1,0 +1,20 @@
+# Test cases for pii-redact skill
+
+tests:
+  - name: "Redact email and name"
+    input: "Contact John Smith at john.smith@example.com"
+    expected:
+      has_field: redacted_text
+      metadata_has: [skill, trace_id, timestamp]
+
+  - name: "Redact phone number"
+    input: "Call us at 555-123-4567"
+    expected:
+      has_field: redacted_text
+      has_field: redaction_count
+
+  - name: "Multiple PII types"
+    input_file: fixtures/input.txt
+    expected:
+      has_field: redacted_text
+      has_field: redacted_types

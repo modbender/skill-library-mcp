@@ -1,0 +1,37 @@
+name: "language-detect-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /detect
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let text = this.text.or(content()).string()
+          root.messages = [
+            {"role": "system", "content": "You are a language detection expert. Respond with ONLY a JSON object containing: language (full name), code (ISO 639-1), confidence (0-1). Example: {\"language\": \"English\", \"code\": \"en\", \"confidence\": 0.95}"},
+            {"role": "user", "content": "Detect the language of this text:\n\n" + $text}
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let response = this.choices.0.message.content.parse_json().catch({})
+          root.language = $response.language.or("Unknown")
+          root.code = $response.code.or("xx")
+          root.confidence = $response.confidence.or(0)
+          root.metadata = {"skill": "language-detect", "mode": "mcp", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    sync_response: {}

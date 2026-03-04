@@ -1,0 +1,281 @@
+{
+  "id": "discord-voice",
+  "name": "Discord Voice",
+  "description": "Real-time voice conversations in Discord voice channels",
+  "requirements": {
+    "config": {
+      "discord.token": {
+        "required": true,
+        "description": "Discord bot token (via channels.discord.token or discord.token in main config)"
+      }
+    },
+    "env": {
+      "OPENAI_API_KEY": {
+        "required": false,
+        "description": "OpenAI API key — needed for whisper STT and openai TTS providers (fallback if not set in plugin config)"
+      },
+      "ELEVENLABS_API_KEY": {
+        "required": false,
+        "description": "ElevenLabs API key — needed for elevenlabs TTS provider (fallback if not set in plugin config)"
+      },
+      "DEEPGRAM_API_KEY": {
+        "required": false,
+        "description": "Deepgram API key — needed for deepgram STT provider (fallback if not set in plugin config)"
+      }
+    },
+    "systemDependencies": ["ffmpeg"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "enabled": { "type": "boolean", "default": true },
+      "sttProvider": {
+        "type": "string",
+        "enum": [
+          "whisper",
+          "gpt4o-mini",
+          "gpt4o-transcribe",
+          "gpt4o-transcribe-diarize",
+          "deepgram",
+          "local-whisper",
+          "wyoming-whisper"
+        ],
+        "default": "whisper",
+        "description": "whisper, gpt4o-*, deepgram, local-whisper, or wyoming-whisper (remote Wyoming Faster Whisper)"
+      },
+      "sttFallbackProvider": {
+        "type": "string",
+        "enum": [
+          "whisper",
+          "gpt4o-mini",
+          "gpt4o-transcribe",
+          "gpt4o-transcribe-diarize",
+          "deepgram",
+          "local-whisper",
+          "wyoming-whisper"
+        ],
+        "description": "Single fallback STT (legacy). Prefer sttFallbackProviders for multiple fallbacks."
+      },
+      "sttFallbackProviders": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "whisper",
+            "gpt4o-mini",
+            "gpt4o-transcribe",
+            "gpt4o-transcribe-diarize",
+            "deepgram",
+            "local-whisper",
+            "wyoming-whisper"
+          ]
+        },
+        "description": "Fallback STT providers when primary fails (quota, rate limit, Wyoming unreachable)"
+      },
+      "streamingSTT": {
+        "type": "boolean",
+        "default": true,
+        "description": "Use streaming STT for lower latency (Deepgram only)"
+      },
+      "ttsProvider": {
+        "type": "string",
+        "enum": ["openai", "elevenlabs", "deepgram", "polly", "edge", "kokoro"],
+        "default": "openai",
+        "description": "openai, elevenlabs, deepgram, polly, edge (free), or kokoro (free local)"
+      },
+      "ttsVoice": { "type": "string", "default": "nova" },
+      "vadSensitivity": {
+        "type": "string",
+        "enum": ["low", "medium", "high"],
+        "default": "medium"
+      },
+      "bargeIn": {
+        "type": "boolean",
+        "default": true,
+        "description": "Stop speaking when user starts talking"
+      },
+      "model": {
+        "type": "string",
+        "description": "LLM model for voice responses (e.g. anthropic/claude-3-5-haiku-latest)"
+      },
+      "thinkLevel": {
+        "type": "string",
+        "enum": ["off", "low", "medium", "high"],
+        "default": "off",
+        "description": "Thinking level for voice responses (lower = faster)"
+      },
+      "noEmojiHint": {
+        "oneOf": [{ "type": "boolean" }, { "type": "string" }],
+        "default": true,
+        "description": "Inject TTS hint: true = default 'no emojis' text, false = off, string = custom text"
+      },
+      "ttsFallbackProvider": {
+        "type": "string",
+        "enum": ["openai", "elevenlabs", "deepgram", "polly", "edge", "kokoro"],
+        "description": "Single fallback TTS (legacy). Prefer ttsFallbackProviders for multiple fallbacks."
+      },
+      "ttsFallbackProviders": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["openai", "elevenlabs", "deepgram", "polly", "edge", "kokoro"] },
+        "description": "Fallback TTS providers tried in order when primary fails (quota/rate limit)"
+      },
+      "allowedUsers": { "type": "array", "items": { "type": "string" }, "default": [] },
+      "silenceThresholdMs": { "type": "number", "default": 1500 },
+      "minAudioMs": { "type": "number", "default": 500 },
+      "maxRecordingMs": { "type": "number", "default": 30000 },
+      "heartbeatIntervalMs": {
+        "type": "number",
+        "default": 30000,
+        "description": "Connection health check interval in ms"
+      },
+      "autoJoinChannel": { "type": "string", "description": "Voice channel ID to auto-join on startup" },
+      "openclawRoot": {
+        "type": "string",
+        "description": "OpenClaw package root if auto-detection fails (path containing dist/extensionAPI.js)"
+      },
+      "thinkingSound": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": true, "description": "Play sound while processing" },
+          "path": {
+            "type": "string",
+            "default": "assets/thinking.mp3",
+            "description": "Path to MP3 (relative to plugin root or absolute)"
+          },
+          "volume": { "type": "number", "default": 0.7, "minimum": 0, "maximum": 1, "description": "Volume 0-1" },
+          "stopDelayMs": { "type": "number", "default": 50 }
+        }
+      },
+      "openai": {
+        "type": "object",
+        "properties": {
+          "apiKey": { "type": "string" },
+          "whisperModel": { "type": "string", "default": "whisper-1" },
+          "ttsModel": { "type": "string", "default": "tts-1" },
+          "voice": {
+            "type": "string",
+            "default": "nova",
+            "description": "nova, shimmer, echo, onyx, fable, alloy, ash, sage, coral"
+          }
+        }
+      },
+      "polly": {
+        "type": "object",
+        "properties": {
+          "region": { "type": "string", "default": "us-east-1" },
+          "voiceId": { "type": "string", "default": "Joanna" },
+          "engine": { "type": "string", "enum": ["standard", "neural", "long-form", "generative"] },
+          "accessKeyId": { "type": "string" },
+          "secretAccessKey": { "type": "string" }
+        }
+      },
+      "edge": {
+        "type": "object",
+        "properties": {
+          "voice": {
+            "type": "string",
+            "default": "de-DE-KatjaNeural",
+            "description": "Edge neural voice (e.g. de-DE-KatjaNeural, en-US-MichelleNeural)"
+          },
+          "lang": { "type": "string", "default": "de-DE", "description": "Language code (e.g. de-DE, en-US)" },
+          "outputFormat": {
+            "type": "string",
+            "default": "webm-24khz-16bit-mono-opus",
+            "description": "Output format for Discord"
+          },
+          "rate": { "type": "string", "description": "Speech rate (e.g. +10%, -5%)" },
+          "pitch": { "type": "string", "description": "Pitch (e.g. +10%, -5%)" },
+          "volume": { "type": "string", "description": "Volume (e.g. +10%, -5%)" },
+          "proxy": { "type": "string", "description": "Proxy URL for requests" },
+          "timeoutMs": { "type": "number", "description": "Request timeout in ms" }
+        }
+      },
+      "kokoro": {
+        "type": "object",
+        "properties": {
+          "voice": { "type": "string", "default": "af_heart", "description": "af_heart, af_bella, af_nicole, etc." },
+          "modelId": { "type": "string" },
+          "dtype": { "type": "string", "enum": ["fp32", "fp16", "q8", "q4", "q4f16"], "default": "fp32" }
+        }
+      },
+      "elevenlabs": {
+        "type": "object",
+        "properties": {
+          "apiKey": { "type": "string" },
+          "voiceId": { "type": "string" },
+          "modelId": {
+            "type": "string",
+            "default": "eleven_turbo_v2_5",
+            "description": "turbo, flash, v2, v3, or full model ID (eleven_turbo_v2_5, eleven_flash_v2_5, eleven_multilingual_v2, eleven_multilingual_v3)"
+          }
+        }
+      },
+      "deepgram": {
+        "type": "object",
+        "properties": {
+          "apiKey": { "type": "string" },
+          "model": { "type": "string", "default": "nova-2" },
+          "ttsModel": {
+            "type": "string",
+            "default": "aura-asteria-en",
+            "description": "TTS model: aura-asteria-en, aura-2-thalia-en, etc."
+          }
+        }
+      },
+      "wyomingWhisper": {
+        "type": "object",
+        "properties": {
+          "host": { "type": "string", "default": "127.0.0.1", "description": "Wyoming server host" },
+          "port": { "type": "number", "default": 10300, "description": "Wyoming server port" },
+          "uri": { "type": "string", "description": "Alternative: host:port or tcp://host:port" },
+          "language": { "type": "string", "description": "Language hint (e.g. de, en)" },
+          "connectTimeoutMs": { "type": "number", "default": 10000, "description": "Timeout incl. processing" }
+        },
+        "description": "Wyoming Faster Whisper (remote STT over TCP)"
+      },
+      "localWhisper": {
+        "type": "object",
+        "properties": { "model": { "type": "string" }, "quantized": { "type": "boolean" } },
+        "description": "Local Whisper STT (Xenova)"
+      }
+    }
+  },
+  "uiHints": {
+    "enabled": {
+      "label": "Enable Discord Voice",
+      "help": "Enable real-time voice conversations in Discord voice channels"
+    },
+    "sttProvider": {
+      "label": "Speech-to-Text Provider",
+      "help": "whisper, gpt4o-mini, deepgram, local-whisper, or wyoming-whisper (remote)"
+    },
+    "ttsProvider": {
+      "label": "Text-to-Speech Provider",
+      "help": "openai, elevenlabs, deepgram, polly, edge, or kokoro"
+    },
+    "ttsVoice": {
+      "label": "TTS Voice (deprecated)",
+      "help": "Use openai.voice, elevenlabs.voiceId, edge.voice, kokoro.voice instead"
+    },
+    "ttsFallbackProviders": {
+      "label": "TTS Fallback Providers",
+      "help": "Fallbacks tried in order when primary fails (quota/rate limit). E.g. [\"edge\", \"polly\", \"kokoro\"]"
+    },
+    "openai.voice": {
+      "label": "OpenAI TTS Voice",
+      "help": "nova, shimmer, echo, onyx, fable, alloy, ash, sage, coral"
+    },
+    "edge.voice": { "label": "Edge TTS Voice", "help": "de-DE-KatjaNeural, en-US-MichelleNeural, etc." },
+    "kokoro.voice": { "label": "Kokoro TTS Voice", "help": "af_heart, af_bella, af_nicole, etc." },
+    "vadSensitivity": { "label": "VAD Sensitivity", "help": "Voice activity detection sensitivity (low/medium/high)" },
+    "allowedUsers": { "label": "Allowed Users", "help": "Discord user IDs allowed to use voice (empty = all allowed)" },
+    "openai.apiKey": { "label": "OpenAI API Key", "sensitive": true },
+    "elevenlabs.apiKey": { "label": "ElevenLabs API Key", "sensitive": true },
+    "elevenlabs.modelId": { "label": "ElevenLabs Model", "help": "turbo, flash, v2, v3 (or full model ID)" },
+    "deepgram.apiKey": { "label": "Deepgram API Key", "sensitive": true },
+    "thinkingSound.enabled": { "label": "Thinking Sound", "help": "Play sound while processing (default: on)" },
+    "thinkingSound.path": { "label": "Thinking Sound File", "help": "Path to MP3 (default: assets/thinking.mp3)" },
+    "thinkingSound.volume": { "label": "Thinking Sound Volume", "help": "Volume 0-1 (default: 0.7)" }
+  }
+}

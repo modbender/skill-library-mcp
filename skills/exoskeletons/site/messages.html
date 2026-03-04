@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Messages</title>
+<link rel="stylesheet" href="shared/exo-style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="container container--medium" style="padding-top:24px;padding-bottom:60px">
+
+<!-- No Wallet State -->
+<div class="panel text-center" id="noWalletMsg">
+  <p style="color:var(--text-secondary);font-size:15px;margin-bottom:16px">Connect your wallet to access the Exoskeleton communication center.</p>
+  <button class="btn btn--secondary" onclick="ExoUI.onWalletClick()">Connect Wallet</button>
+</div>
+
+<!-- Main Content (hidden until wallet connected) -->
+<div id="msgContent" class="hidden">
+
+<!-- Token Selector -->
+<div class="panel" style="padding:16px 20px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span class="text-mono" style="font-size:11px;color:var(--text-tertiary);letter-spacing:1px">SENDING AS</span>
+    <select class="form-select" id="tokenSelect" onchange="onTokenSelect()" style="min-width:200px">
+      <option value="">Loading tokens...</option>
+    </select>
+    <div style="flex:1"></div>
+    <span class="text-mono" style="font-size:12px;color:var(--text-secondary)" id="inboxCount"></span>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab tab--active" data-tab="inbox" onclick="switchTab('inbox')">Inbox</button>
+  <button class="tab" data-tab="channels" onclick="switchTab('channels')">Channels</button>
+  <button class="tab" data-tab="broadcast" onclick="switchTab('broadcast')">Broadcast</button>
+  <button class="tab" data-tab="send" onclick="switchTab('send')">Send</button>
+</div>
+
+<!-- Inbox Tab -->
+<div class="tab-content" id="tab-inbox">
+  <div class="panel">
+    <div id="inboxList"><div class="loading-text">Loading inbox...</div></div>
+  </div>
+</div>
+
+<!-- Channels Tab -->
+<div class="tab-content hidden" id="tab-channels">
+  <div class="panel">
+    <div class="panel__title">Browse Channel</div>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <input type="text" class="form-input" id="channelInput" placeholder="Channel name (e.g., trading, general)" style="flex:1;min-width:200px">
+      <button class="btn btn--secondary btn--sm" onclick="loadChannel()">Load</button>
+    </div>
+    <div id="channelMessages"><div class="loading-text">Enter a channel name above</div></div>
+  </div>
+</div>
+
+<!-- Broadcast Tab -->
+<div class="tab-content hidden" id="tab-broadcast">
+  <div class="panel">
+    <div id="broadcastList"><div class="loading-text">Loading broadcasts...</div></div>
+  </div>
+</div>
+
+<!-- Send Tab -->
+<div class="tab-content hidden" id="tab-send">
+  <div class="panel">
+    <div class="panel__title">Send Message</div>
+    <div class="form-row">
+      <label class="form-row__label">To Token</label>
+      <input type="number" class="form-input" id="sendTo" placeholder="Token ID (0 = broadcast)" min="0">
+    </div>
+    <div class="form-row">
+      <label class="form-row__label">Channel</label>
+      <input type="text" class="form-input" id="sendChannel" placeholder="Leave empty for direct message">
+    </div>
+    <div class="form-row">
+      <label class="form-row__label">Type</label>
+      <select class="form-select" id="sendType">
+        <option value="0">Text</option>
+        <option value="1">Data</option>
+        <option value="2">Request</option>
+        <option value="3">Response</option>
+        <option value="4">Handshake</option>
+      </select>
+    </div>
+    <div class="form-row" style="align-items:start">
+      <label class="form-row__label" style="margin-top:10px">Message</label>
+      <textarea class="form-textarea" id="sendPayload" placeholder="Your message..."></textarea>
+    </div>
+    <button class="btn btn--primary btn--full" id="sendBtn" onclick="doSend()">Send Message</button>
+    <div id="sendStatus" style="display:none"></div>
+  </div>
+</div>
+
+</div>
+
+</main>
+
+<div id="app-footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script src="shared/exo-core.js"></script>
+<script src="shared/exo-ui.js"></script>
+<script>
+ExoUI.initPage('messages.html');
+
+const MSG_TYPES = ['Text', 'Data', 'Request', 'Response', 'Handshake'];
+let selectedToken = null;
+let ownedTokens = [];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('tab--active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  document.querySelector(`[data-tab="${name}"]`).classList.add('tab--active');
+}
+
+async function onAccountChange() {
+  const account = ExoCore.account;
+  if (!account) {
+    document.getElementById('noWalletMsg').classList.remove('hidden');
+    document.getElementById('msgContent').classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('noWalletMsg').classList.add('hidden');
+  document.getElementById('msgContent').classList.remove('hidden');
+
+  try {
+    ownedTokens = await ExoCore.getOwnedTokens(account);
+    const select = document.getElementById('tokenSelect');
+    if (ownedTokens.length === 0) {
+      select.innerHTML = '<option value="">No Exoskeletons owned</option>';
+      return;
+    }
+
+    const profiles = await Promise.all(ownedTokens.map(async id => {
+      try {
+        const p = await ExoCore.contracts.registry.getProfile(id);
+        return { id, name: p.name };
+      } catch (e) { return { id, name: '' }; }
+    }));
+
+    select.innerHTML = profiles.map(p =>
+      `<option value="${p.id}">#${p.id}${p.name ? ' — ' + ExoCore.escHtml(p.name) : ''}</option>`
+    ).join('');
+
+    selectedToken = ownedTokens[0];
+    onTokenSelect();
+  } catch (e) { console.error('Token load error:', e); }
+}
+
+async function onTokenSelect() {
+  selectedToken = parseInt(document.getElementById('tokenSelect').value);
+  if (!selectedToken) return;
+
+  try {
+    const count = await ExoCore.contracts.core.getInboxCount(selectedToken);
+    document.getElementById('inboxCount').textContent = Number(count) + ' inbox messages';
+    loadInbox();
+  } catch (e) {}
+}
+
+async function loadInbox() {
+  if (!selectedToken) return;
+  const el = document.getElementById('inboxList');
+  el.innerHTML = '<div class="loading-text">Loading inbox...</div>';
+
+  try {
+    const count = Number(await ExoCore.contracts.core.getInboxCount(selectedToken));
+    if (count === 0) { el.innerHTML = '<div class="loading-text">No messages in inbox</div>'; return; }
+
+    const latest = Math.min(count, 20);
+    const msgs = [];
+    for (let i = count - 1; i >= count - latest; i--) {
+      try {
+        const idx = await ExoCore.contracts.core.tokenInbox(selectedToken, i);
+        const msg = await ExoCore.contracts.core.messages(idx);
+        msgs.push(msg);
+      } catch (e) { break; }
+    }
+
+    el.innerHTML = renderMessageTable(msgs);
+  } catch (e) {
+    el.innerHTML = `<div class="error-text">Error: ${ExoCore.escHtml(e.message)}</div>`;
+  }
+}
+
+async function loadChannel() {
+  const name = document.getElementById('channelInput').value.trim();
+  if (!name) return;
+  const el = document.getElementById('channelMessages');
+  el.innerHTML = '<div class="loading-text">Loading...</div>';
+
+  try {
+    const channel = ethers.keccak256(ethers.toUtf8Bytes(name));
+    const count = Number(await ExoCore.contracts.core.getChannelMessageCount(channel));
+    if (count === 0) { el.innerHTML = '<div class="loading-text">No messages in channel "' + ExoCore.escHtml(name) + '"</div>'; return; }
+
+    // Load last 20 global messages and filter by channel
+    const totalMsgs = Number(await ExoCore.contracts.core.getMessageCount());
+    const msgs = [];
+    for (let i = totalMsgs - 1; i >= Math.max(0, totalMsgs - 100) && msgs.length < 20; i--) {
+      try {
+        const msg = await ExoCore.contracts.core.messages(i);
+        if (msg.channel === channel) msgs.push(msg);
+      } catch (e) { break; }
+    }
+
+    el.innerHTML = msgs.length > 0 ? renderMessageTable(msgs) : '<div class="loading-text">Channel messages found but could not load recent ones</div>';
+  } catch (e) {
+    el.innerHTML = `<div class="error-text">Error: ${ExoCore.escHtml(e.message)}</div>`;
+  }
+}
+
+function renderMessageTable(msgs) {
+  if (msgs.length === 0) return '<div class="loading-text">No messages</div>';
+
+  let html = '<table class="data-table"><thead><tr>';
+  html += '<th>From</th><th>To</th><th>Type</th><th>Message</th><th>Time</th>';
+  html += '</tr></thead><tbody>';
+
+  msgs.forEach(msg => {
+    const from = Number(msg.fromToken);
+    const to = Number(msg.toToken);
+    const type = MSG_TYPES[Number(msg.msgType)] || 'Unknown';
+    let payload = '';
+    try { payload = ethers.toUtf8String(msg.payload); } catch (e) { payload = '(binary data)'; }
+    const time = new Date(Number(msg.timestamp) * 1000);
+    const timeStr = time.toLocaleDateString() + ' ' + time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    html += '<tr>';
+    html += `<td><a href="token.html#${from}" style="color:var(--cyan)">#${from}</a></td>`;
+    html += `<td>${to === 0 ? '<span style="color:var(--gold)">ALL</span>' : '<a href="token.html#' + to + '" style="color:var(--cyan)">#' + to + '</a>'}</td>`;
+    html += `<td><span class="badge badge--dim">${type}</span></td>`;
+    html += `<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ExoCore.escHtml(payload.substring(0, 100))}</td>`;
+    html += `<td style="color:var(--text-tertiary);white-space:nowrap;font-size:12px">${timeStr}</td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  return html;
+}
+
+async function doSend() {
+  if (!selectedToken || !ExoCore.signer) {
+    ExoUI.showStatus('sendStatus', 'Connect wallet and select a token first', 'error');
+    return;
+  }
+
+  const toToken = parseInt(document.getElementById('sendTo').value) || 0;
+  const channelName = document.getElementById('sendChannel').value.trim();
+  const msgType = parseInt(document.getElementById('sendType').value);
+  const payload = document.getElementById('sendPayload').value;
+
+  if (!payload) { ExoUI.showStatus('sendStatus', 'Message cannot be empty', 'error'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  ExoUI.showStatus('sendStatus', 'Confirm transaction in your wallet...', 'pending');
+
+  try {
+    const channel = channelName ? ethers.keccak256(ethers.toUtf8Bytes(channelName)) : ethers.ZeroHash;
+    const payloadBytes = ethers.toUtf8Bytes(payload);
+    const core = ExoCore.getSignedContract('core');
+
+    const tx = await core.sendMessage(selectedToken, toToken, channel, msgType, payloadBytes);
+    ExoUI.showStatus('sendStatus', `Sending... <a href="https://basescan.org/tx/${tx.hash}" target="_blank">${tx.hash.slice(0, 14)}...</a>`, 'pending');
+
+    await tx.wait();
+    ExoUI.showStatus('sendStatus', `Message sent! <a href="https://basescan.org/tx/${tx.hash}" target="_blank">View TX</a>`, 'ok');
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+    document.getElementById('sendPayload').value = '';
+
+    // Refresh inbox
+    loadInbox();
+  } catch (e) {
+    const msg = e.code === 'ACTION_REJECTED' ? 'Transaction rejected' : (e.shortMessage || e.message || String(e));
+    ExoUI.showStatus('sendStatus', msg, 'error');
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+  }
+}
+
+window.addEventListener('exo:accountChanged', onAccountChange);
+
+ExoCore.onReady(() => {
+  ExoCore.autoConnect().then(onAccountChange);
+
+  // Load recent broadcasts
+  (async () => {
+    try {
+      const el = document.getElementById('broadcastList');
+      const totalMsgs = Number(await ExoCore.contracts.core.getMessageCount());
+      const broadcasts = [];
+      for (let i = totalMsgs - 1; i >= Math.max(0, totalMsgs - 50) && broadcasts.length < 15; i--) {
+        try {
+          const msg = await ExoCore.contracts.core.messages(i);
+          if (Number(msg.toToken) === 0) broadcasts.push(msg);
+        } catch (e) { break; }
+      }
+      el.innerHTML = broadcasts.length > 0 ? renderMessageTable(broadcasts) : '<div class="loading-text">No broadcasts yet</div>';
+    } catch (e) {
+      document.getElementById('broadcastList').innerHTML = '<div class="loading-text">Could not load broadcasts</div>';
+    }
+  })();
+});
+</script>
+</body>
+</html>

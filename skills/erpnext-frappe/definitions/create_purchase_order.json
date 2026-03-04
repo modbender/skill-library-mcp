@@ -1,0 +1,109 @@
+{
+  "name": "create_purchase_order",
+  "version": "1.0.0",
+  "description": "Create a purchase order for purchasing items from a supplier",
+  "author": "Business Claw Team",
+  "category": "procurement",
+  
+  "triggers": [
+    "create purchase order",
+    "new purchase order",
+    "order from supplier",
+    "request purchase"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_document",
+      "description": "Fetch supplier details",
+      "required": true
+    },
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Purchase Order DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the purchase order",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit the purchase order",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "supplier": {
+        "type": "string",
+        "description": "Supplier name"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_code": {"type": "string"},
+            "qty": {"type": "number"},
+            "rate": {"type": "number"},
+            "warehouse": {"type": "string"}
+          }
+        },
+        "description": "List of items to purchase"
+      },
+      "schedule_date": {
+        "type": "string",
+        "description": "Expected delivery date"
+      },
+      "transaction_date": {
+        "type": "string",
+        "description": "Order date"
+      }
+    },
+    "required": ["supplier", "items"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "fetch_supplier",
+        "tool": "get_document",
+        "arguments": {
+          "doctype": "Supplier",
+          "name": "${supplier}"
+        }
+      },
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Purchase Order"
+        }
+      },
+      {
+        "step": "create_order",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Purchase Order",
+          "data": {
+            "supplier": "${supplier}",
+            "schedule_date": "${schedule_date}",
+            "transaction_date": "${transaction_date}",
+            "items": "${items}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "max_amount": 500000,
+    "require_supplier_approval": true
+  },
+  
+  "output_template": "Created Purchase Order {{name}}\nSupplier: {{supplier}}\nTotal: {{grand_total}}\nExpected: {{schedule_date}}"
+}

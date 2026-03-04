@@ -1,0 +1,41 @@
+name: "sentiment-score-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /score
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let text = this.text.or(content())
+          meta trace_id = uuid_v4()
+          root.messages = [
+            {"role": "system", "content": "Score the sentiment of text. Return JSON: 'score' (-1 to 1), 'label' (positive/negative/neutral), 'confidence' (0-1)."},
+            {"role": "user", "content": $text}
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let r = this.choices.0.message.content.parse_json().catch({"score": 0, "label": "neutral"})
+          root.score = $r.score
+          root.label = $r.label
+          root.confidence = $r.confidence.or(0.5)
+          root.metadata = {"skill": "sentiment-score", "mode": "mcp", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    sync_response: {}
+
+selector:
+  match_labels:
+    capability: llm

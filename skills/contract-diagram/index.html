@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Contract Diagram Viewer</title>
+    <link rel="stylesheet" href="github-markdown.css">
+    <style>
+        /* INLINE CSS - Layout básico (overrides GitHub theme) */
+        body {
+            background: white;
+            margin: 0;
+            padding: 30px;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        main.container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #d0d7de;
+            border-radius: 5px;
+        }
+        /* Frontmatter table (GitHub-style) */
+        .frontmatter-table {
+            width: 100%;
+            margin-bottom: 16px;
+            border: 1px solid #d0d7de;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .frontmatter-table th,
+        .frontmatter-table td {
+            padding: 6px 13px;
+            border: 1px solid #d0d7de;
+        }
+        .frontmatter-table th {
+            background: #f6f8fa;
+            font-weight: 600;
+            text-align: left;
+            width: 25%;
+        }
+    </style>
+    <script src="marked.min.js"></script>
+    <script src="mermaid.min.js"></script>
+</head>
+<body>
+    <main class="container markdown-body">
+        <!-- Markdown content renders here -->
+    </main>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#4A90E2',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#2E5C8A',
+                lineColor: '#666',
+                secondaryColor: '#50E3C2',
+                tertiaryColor: '#FFD700'
+            }
+        });
+
+        // Get MD file path from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const mdPath = urlParams.get('md');
+        const hotReload = urlParams.get('hot') !== 'false'; // Default: enabled
+        const pollInterval = parseInt(urlParams.get('interval') || '2000'); // Default: 2 seconds
+
+        let lastContent = '';
+        let cachedTheme = null;
+
+        // Fetch theme from styles.css (source of truth)
+        async function getThemeFromCSS() {
+            if (cachedTheme) return cachedTheme;
+            
+            const response = await fetch('styles.css');
+            const css = await response.text();
+            
+            // Extract theme variables from :root
+            const themeVars = {};
+            const rootMatch = css.match(/:root\s*\{([^}]+)\}/);
+            if (rootMatch) {
+                const varsText = rootMatch[1];
+                // Map CSS vars to mermaid theme
+                const map = {
+                    'primaryColor': '#4A90E2',
+                    'primaryTextColor': '#fff',
+                    'primaryBorderColor': '#2E5C8A',
+                    'lineColor': '#666',
+                    'secondaryColor': '#50E3C2',
+                    'tertiaryColor': '#FFD700',
+                    'edgeLabelBackground': '#666'
+                };
+                Object.assign(themeVars, map);
+            }
+            
+            const flowchartConfig = {
+                'nodeSpacing': 50,
+                'rankSpacing': 50,
+                'padding': 15,
+                'curve': 'basis'
+            };
+            
+            cachedTheme = `%%{init: {'theme':'base','themeVariables':${JSON.stringify(themeVars)},'flowchart':${JSON.stringify(flowchartConfig)}}}%%`;
+            return cachedTheme;
+        }
+
+        if (!mdPath) {
+            document.querySelector('.container').innerHTML = `
+                <div class="error">
+                    <h2>No tape loaded</h2>
+                    <p>Usage: <code>?md=/path/to/file.md</code></p>
+                    <p>Hot reload: <code>&hot=true&interval=2000</code> (default: enabled, 2s)</p>
+                    <p>Example: <code>?md=../../../librarian/backstage/epic-notes/v0.15.0-skill-protocol.md</code></p>
+                </div>
+            `;
+        } else {
+            loadTape(mdPath);
+            
+            // Hot reload polling
+            if (hotReload) {
+                setInterval(() => loadTape(mdPath, true), pollInterval);
+                console.log(`🔥 Hot reload enabled (${pollInterval}ms interval)`);
+            }
+        }
+
+        async function loadTape(path, silent = false) {
+            try {
+                const response = await fetch(path + '?t=' + Date.now()); // Cache bust
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const markdown = await response.text();
+                
+                // Skip re-render if content hasn't changed
+                if (hotReload && markdown === lastContent) {
+                    return;
+                }
+                lastContent = markdown;
+                
+                renderMarkdownWithMermaid(markdown);
+                
+                if (!silent && hotReload) {
+                    console.log('🔄 Tape reloaded');
+                }
+                
+            } catch (error) {
+                if (!silent) {
+                    document.querySelector('.container').innerHTML = `
+                        <div class="error">
+                            <h2>Failed to load tape</h2>
+                            <p>${error.message}</p>
+                            <p>Path: <code>${path}</code></p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Check file write permissions and show SIGNOFF banner
+        async function checkAndShowSignoffBanner(mdPath) {
+            try {
+                // Test write access with empty write (no actual change)
+                const testResponse = await fetch('/write', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: mdPath, content: '' })
+                });
+                
+                const canWrite = testResponse.ok;
+                
+                // Remove existing banner if present
+                const existingBanner = document.querySelector('.signoff-banner');
+                if (existingBanner) existingBanner.remove();
+                
+                // Create banner
+                const banner = document.createElement('div');
+                banner.className = 'signoff-banner';
+                banner.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 9999;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    ${canWrite 
+                        ? 'background: #D5F5D5; border: 2px solid #388E3C; color: #1B5E20;'
+                        : 'background: #FFCDD2; border: 2px solid #D32F2F; color: #B71C1C;'
+                    }
+                `;
+                banner.textContent = canWrite 
+                    ? '✅ Ready to develop? All nodes approved.'
+                    : '❌ No write access. Grant permissions first.';
+                
+                document.body.appendChild(banner);
+                
+                // Auto-hide after 10s
+                setTimeout(() => banner.remove(), 10000);
+            } catch (err) {
+                console.error('Failed to check write permissions:', err);
+            }
+        }
+
+        // Detect phase from node class counts
+        function detectPhase(mermaidCode) {
+            const lines = mermaidCode.split('\n');
+            const counts = { default: 0, approved: 0, developed: 0, blocker: 0, notes: 0, outside: 0, total: 0 };
+
+            lines.forEach(line => {
+                if (!line.includes('class ')) return;
+                
+                // Match: "class NODE1,NODE2,NODE3 className"
+                const match = line.match(/class\s+([\w,]+)\s+([\w-]+)/);
+                if (!match) return;
+                
+                const nodeList = match[1].split(',');
+                const className = match[2];
+                const nodeCount = nodeList.length;
+                
+                
+                // Map class names to counts
+                if (className === 'default') counts.default += nodeCount;
+                else if (className === 'approved') counts.approved += nodeCount;
+                else if (className === 'developed') counts.developed += nodeCount;
+                else if (className === 'blocker') counts.blocker += nodeCount;
+                else if (className === 'notes') counts.notes += nodeCount;
+                else if (className === 'outside') {
+                    counts.outside += nodeCount;
+                }
+                
+                counts.total += nodeCount;
+            });
+
+
+            // Apply rules (Nicholas's logic 2026-02-22, updated 2026-02-22 21:43)
+            // Count wrapper nodes (discount outside - user actions)
+            const wrapperTotal = counts.total - counts.outside;
+            
+            // Design phase: has default OR blocker
+            if (counts.default > 0 || counts.blocker > 0) return "Design phase";
+            
+            // Ready to approve: ALL wrapper nodes approved
+            if (counts.approved === wrapperTotal) return "Ready to approve";
+            
+            // Ready to check: ALL wrapper nodes developed
+            if (counts.developed + counts.notes === wrapperTotal) return "Ready to check";
+            
+            // Developing...: mix (work in progress)
+            return "Developing...";
+        }
+
+        // Ensure ALL nodes have a class (default: class-1-gray)
+        function ensureNodeClasses(mermaidCode) {
+            const lines = mermaidCode.split('\n');
+            const result = [];
+            const nodesSeen = new Set();
+            
+            for (let line of lines) {
+                // Skip empty, comments, init blocks
+                if (!line.trim() || line.trim().startsWith('%%')) {
+                    result.push(line);
+                    continue;
+                }
+                
+                // Match node definitions: NODE_ID["label"] or NODE_ID("label") or NODE_ID{label}
+                const nodeDefMatch = line.match(/^\s*(\w+)([\[\(\{])/);
+                if (nodeDefMatch) {
+                    const nodeId = nodeDefMatch[1];
+                    nodesSeen.add(nodeId);
+                    
+                    // Check if line already has :::class
+                    if (!line.includes(':::class-')) {
+                        // Add default class
+                        line = line.trimEnd() + ':::class-1-gray';
+                    }
+                }
+                
+                result.push(line);
+            }
+            
+            return result.join('\n');
+        }
+
+        async function renderMarkdownWithMermaid(markdown) {
+            const container = document.querySelector('.container');
+            
+            // Parse frontmatter (YAML between first --- blocks)
+            let frontmatter = null;
+            let bodyMarkdown = markdown;
+            
+            // Match: --- frontmatter --- body (everything after frontmatter)
+            const frontmatterMatch = markdown.match(/^---\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
+            
+            if (frontmatterMatch) {
+                const yamlText = frontmatterMatch[1];
+                bodyMarkdown = frontmatterMatch[2]; // Everything after frontmatter (includes legend)
+                
+                // Simple YAML parser (key: value pairs)
+                frontmatter = {};
+                yamlText.split('\n').forEach(line => {
+                    const match = line.match(/^(\w+):\s*(.+)$/);
+                    if (match) {
+                        const key = match[1];
+                        let value = match[2].trim();
+                        // Remove quotes
+                        if ((value.startsWith('"') && value.endsWith('"')) || 
+                            (value.startsWith("'") && value.endsWith("'"))) {
+                            value = value.slice(1, -1);
+                        }
+                        frontmatter[key] = value;
+                    }
+                });
+            }
+            
+            // Replace mermaid code blocks with placeholder divs BEFORE marked.parse
+            let mermaidCounter = 0;
+            const mermaidBlocks = [];
+            
+            const processedMarkdown = bodyMarkdown.replace(/```mermaid\n([\s\S]*?)```/g, (match, code) => {
+                const id = `mermaid-${mermaidCounter++}`;
+                mermaidBlocks.push({ id, code: code.trim() });
+                return `<div class="mermaid-placeholder" data-id="${id}"></div>`;
+            });
+            
+            // Render frontmatter table (if exists)
+            let frontmatterHTML = '';
+            if (frontmatter) {
+                frontmatterHTML = '<table class="frontmatter-table"><tbody>';
+                for (const [key, value] of Object.entries(frontmatter)) {
+                    frontmatterHTML += `<tr><th>${key}</th><td>${value}</td></tr>`;
+                }
+                frontmatterHTML += '</tbody></table>';
+            }
+            
+            // Parse markdown to HTML
+            const html = marked.parse(processedMarkdown);
+            
+            
+            container.innerHTML = frontmatterHTML + html;
+            
+            // Render mermaid diagrams
+            for (const block of mermaidBlocks) {
+                const placeholder = container.querySelector(`[data-id="${block.id}"]`);
+                if (placeholder) {
+                    const pre = document.createElement('pre');
+                    pre.className = 'mermaid';
+                    // INJECT linkStyle based on node classes (arrow inherits border color)
+                    pre.textContent = injectLinkStyles(block.code);
+                    placeholder.replaceWith(pre);
+                }
+            }
+            
+            // Render all mermaid diagrams
+            await mermaid.run({
+                querySelector: '.mermaid'
+            });
+            
+            // INJECT CONTRACT TITLE (if missing) + CLAIM (write to MD)
+            const firstMermaid = container.querySelector('.mermaid');
+            if (firstMermaid) {
+                // Check if title already exists in markdown (any format)
+                const hasTitleInMD = /##\s*.*?\s*contract diagram/.test(markdown);
+                
+                // If missing in MD → CLAIM (write to file)
+                if (!hasTitleInMD) {
+                    // Extract mermaid block
+                    const mermaidMatch = markdown.match(/(```mermaid\n)([\s\S]*?)(```)/);
+                    if (mermaidMatch) {
+                        let mermaidCode = mermaidMatch[2];
+                        
+                        // Remove existing %%{init:...}%% declarations
+                        mermaidCode = mermaidCode.replace(/%%\{init:[\s\S]*?\}%%\n?/g, '');
+                        
+                        // Inject OUR CSS from styles.css (source of truth)
+                        const ourInit = await getThemeFromCSS();
+                        
+                        // Ensure all nodes have classes
+                        // Detect phase from node classes (use raw code, class statements already exist)
+                        const phase = detectPhase(mermaidCode);
+                        const badgeLabel = phase.replace(/ /g, '%20'); // URL encode spaces
+                        
+                        // Fetch real filename (resolve symlinks)
+                        fetch(`/realpath?path=${encodeURIComponent(mdPath)}`)
+                          .then(r => r.json())
+                          .then(data => {
+                            const filename = data.basename.replace('.md', '');
+                            
+                            // Rebuild mermaid block with our CSS
+                            const claimedMermaid = `${mermaidMatch[1]}${ourInit}\n${mermaidCode.trim()}\n${mermaidMatch[3]}`;
+                            
+                            // Add title BEFORE first mermaid (wherever it is)
+                            const titleText = `## ${filename} contract diagram ![${badgeLabel}](https://img.shields.io/badge/${badgeLabel}-lightgray) [ℹ️](https://github.com/nonlinear/skills/tree/main/contract-diagram/SKILL.md)\n\n`;
+                            
+                            // Replace first mermaid block with title + claimed mermaid
+                            const modifiedMarkdown = markdown.replace(/(```mermaid\n[\s\S]*?```)/, titleText + claimedMermaid);
+                            
+                            // POST to /write endpoint
+                            return fetch('/write', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ path: mdPath, content: modifiedMarkdown })
+                            });
+                          })
+                          .then(res => res.json())
+                          .then(data => {
+                              if (data.success) {
+                                  console.log('✅ Claimed diagram (title + CSS added to MD)');
+                                  lastContent = modifiedMarkdown; // Update cache to prevent re-render
+                                  
+                                  // Check if Ready to approve phase
+                                  if (phase === "Ready to approve") {
+                                      checkAndShowSignoffBanner(mdPath);
+                                  }
+                              }
+                          })
+                          .catch(err => console.error('❌ Failed to claim:', err));
+                    }
+                }
+                
+                // AUTO-SCROLL to title (always exists after claiming)
+                const title = container.querySelector('h2');
+                title.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update page title to match h2 (extract text without badge/emoji)
+                if (title) {
+                    const titleText = title.textContent.replace(/[📊ℹ️]/g, '').trim();
+                    document.title = titleText;
+                }
+            }
+        }
+        
+        function injectLinkStyles(mermaidCode) {
+            // Parse mermaid code to find nodes with classes
+            // Format: NODE_ID["label"]:::className
+            const nodeClassMap = {};
+            const classColorMap = {
+                'default': '#666',           // --node-border
+                'approved': '#F9A825',       // --approved-border
+                'blocker': '#D32F2F',        // --blocker-border
+                'developed': '#388E3C',      // --developed-border
+                'notes': '#1976D2', // --notes-border
+                'partial': '#7B1FA2'         // --partial-border
+            };
+            
+            // Extract node definitions with classes
+            const nodeRegex = /(\w+)\[.*?\]:::(\w+)/g;
+            let match;
+            while ((match = nodeRegex.exec(mermaidCode)) !== null) {
+                const [, nodeId, className] = match;
+                nodeClassMap[nodeId] = className;
+            }
+            
+            // Extract arrows and build linkStyle
+            const arrowRegex = /(\w+)\s*(?:-->|==>|-\.->|---)\s*(?:\|.*?\|)?\s*(\w+)/g;
+            const linkStyles = [];
+            let arrowIndex = 0;
+            
+            while ((match = arrowRegex.exec(mermaidCode)) !== null) {
+                const [, fromNode] = match;
+                const className = nodeClassMap[fromNode];
+                if (className && classColorMap[className]) {
+                    linkStyles.push(`    linkStyle ${arrowIndex} stroke:${classColorMap[className]}`);
+                }
+                arrowIndex++;
+            }
+            
+            // Inject linkStyle at end (if any arrows found)
+            if (linkStyles.length > 0) {
+                return mermaidCode + '\n\n' + linkStyles.join('\n');
+            }
+            
+            return mermaidCode;
+        }
+        
+        // Periodic phase check + badge update
+        setInterval(async () => {
+            const mdPath = new URLSearchParams(window.location.search).get('md');
+            if (!mdPath) return;
+            
+            try {
+                const res = await fetch(mdPath + '?t=' + Date.now()); // Direct fetch with cache bust
+                if (!res.ok) return;
+                const markdown = await res.text();
+                
+                // Extract mermaid code
+                const mermaidMatch = markdown.match(/(```mermaid\n)([\s\S]*?)(```)/);
+                if (!mermaidMatch) return;
+                
+                const mermaidCode = mermaidMatch[2];
+                const currentPhase = detectPhase(mermaidCode);
+                
+                // Check if badge needs update
+                const titleMatch = markdown.match(/##\s*(.*?)\s*contract diagram.*?!\[(.*?)\]\(https:\/\/img\.shields\.io/);
+                if (!titleMatch) return; // No badge yet (unclaimed)
+                
+                const filename = titleMatch[1];
+                const badgePhase = titleMatch[2].replace(/%20/g, ' ');
+                
+                if (badgePhase !== currentPhase) {
+                    console.log(`🔄 Phase changed: "${badgePhase}" → "${currentPhase}"`);
+                    
+                    // Update badge in title (preserve filename)
+                    const badgeLabel = currentPhase.replace(/ /g, '%20');
+                    const newTitle = `## ${filename} contract diagram ![${badgeLabel}](https://img.shields.io/badge/${badgeLabel}-lightgray) [ℹ️](https://github.com/nonlinear/skills/tree/main/contract-diagram/SKILL.md)`;
+                    const updatedMarkdown = markdown.replace(/##\s*.*?\s*contract diagram.*/, newTitle);
+                    
+                    // POST update
+                    await fetch('/write', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ path: mdPath, content: updatedMarkdown })
+                    });
+                    
+                    console.log(`✅ Badge updated to: ${currentPhase}`);
+                    lastContent = updatedMarkdown; // Prevent reload loop
+                    
+                    // Force visual refresh (re-render with new badge)
+                    setTimeout(() => loadTape(mdPath, true), 100);
+                }
+            } catch (err) {
+                console.error('Phase check failed:', err);
+            }
+        }, 5000); // Check every 5 seconds
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+# Skill: csv-to-json
+# Version: 1.0.0
+#
+# Convert CSV data to JSON.
+# Runs locally without API calls.
+
+name: "csv-to-json"
+version: "1.0.0"
+description: "Convert CSV data to JSON array of objects"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials: []
+
+inputs:
+  - name: csv
+    type: string
+    required: true
+    description: CSV data with header row
+  - name: delimiter
+    type: string
+    default: ","
+    description: Field delimiter
+
+outputs:
+  - name: data
+    type: array
+    description: Array of JSON objects
+  - name: row_count
+    type: integer
+    description: Number of data rows
+  - name: columns
+    type: array
+    description: Column names from header
+
+backends:
+  - name: local
+    type: local
+    requires: []
+    description: Pure local conversion
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+  outputs:
+    - stdout
+    - sync_response

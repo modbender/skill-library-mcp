@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Modules</title>
+<link rel="stylesheet" href="shared/exo-style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="container container--medium" style="padding-top:24px;padding-bottom:60px">
+
+<!-- Module Stats -->
+<div class="panel">
+  <div class="panel__title">Module Registry</div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-box"><div class="stat-box__value" id="sModCount">--</div><div class="stat-box__label">Tracked Modules</div></div>
+    <div class="stat-box"><div class="stat-box__value">8</div><div class="stat-box__label">Genesis Slots</div></div>
+    <div class="stat-box"><div class="stat-box__value">5</div><div class="stat-box__label">Standard Slots</div></div>
+  </div>
+</div>
+
+<!-- Available Modules -->
+<div class="panel">
+  <div class="panel__title">Available Modules</div>
+  <div id="modGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="loading-text" style="grid-column:1/-1">Loading modules...</div>
+  </div>
+</div>
+
+<!-- My Modules (wallet connected) -->
+<div class="panel hidden" id="myModulesPanel">
+  <div class="panel__title">My Modules</div>
+  <div id="myModList"></div>
+</div>
+
+<!-- Build a Module -->
+<div class="panel">
+  <div class="panel__title">Build a Module</div>
+  <div style="color:var(--text-secondary);line-height:1.8;font-size:14px">
+    <p>Modules extend Exoskeleton capabilities. Any smart contract can be registered as a module by the contract owner. Once registered, token holders can activate modules in their available slots.</p>
+
+    <details style="margin-top:16px">
+      <summary>How Modules Work</summary>
+      <h4 style="color:var(--gold);margin:16px 0 8px">Module Types</h4>
+      <p><strong style="color:var(--text-primary)">Free modules</strong> can be activated at no cost. <strong style="color:var(--text-primary)">Premium modules</strong> require an ETH payment. Genesis Exoskeletons get <span class="badge badge--gold">8 slots</span>, standard get <span class="badge badge--dim">5 slots</span>.</p>
+
+      <h4 style="color:var(--gold);margin:16px 0 8px">Registration</h4>
+      <ol style="padding-left:24px;margin:8px 0">
+        <li>Deploy your module contract to Base</li>
+        <li>Contact the team to register it: <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--green)">registerModule(name, contract, premium, cost)</code></li>
+        <li>Once registered, any Exoskeleton holder can activate it</li>
+      </ol>
+
+      <h4 style="color:var(--gold);margin:16px 0 8px">Activation Flow</h4>
+      <ol style="padding-left:24px;margin:8px 0">
+        <li>Token owner calls <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--green)">activateModule(tokenId, moduleName)</code> (+ ETH for premium)</li>
+        <li>Module is tracked in the token's active modules list</li>
+        <li>Module count contributes to reputation (+10 per active module)</li>
+        <li>Deactivate: <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--green)">deactivateModule(tokenId, moduleName)</code></li>
+      </ol>
+
+      <h4 style="color:var(--gold);margin:16px 0 8px">Module Ideas</h4>
+      <ul style="padding-left:24px;margin:8px 0">
+        <li><strong style="color:var(--text-primary)">Communication bridges</strong> — relay messages to/from other protocols</li>
+        <li><strong style="color:var(--text-primary)">Reputation scorers</strong> — external scoring (game ELO, social metrics)</li>
+        <li><strong style="color:var(--text-primary)">Storage extensions</strong> — structured data schemas</li>
+        <li><strong style="color:var(--text-primary)">Identity verification</strong> — prove ownership of external accounts</li>
+        <li><strong style="color:var(--text-primary)">Agent tools</strong> — onchain capabilities for AI agents</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>Smart Contract Interface</summary>
+      <div class="code-block" style="margin-top:8px">
+<span class="comment">// Core: ${ExoCore ? ExoCore.CONTRACTS.core : '0x8241BDD5009ed3F6C99737D2415994B58296Da0d'}</span>
+<span class="comment">// Registry: 0x46fd56417dcd08cA8de1E12dd6e7f7E1b791B3E9</span>
+
+<span class="comment">// Register (owner only)</span>
+<span class="keyword">registerModule</span>(bytes32 name, address contract, bool premium, uint256 cost)
+
+<span class="comment">// Activate (token owner)</span>
+<span class="keyword">activateModule</span>(uint256 tokenId, bytes32 moduleName) <span class="keyword">payable</span>
+
+<span class="comment">// Deactivate</span>
+<span class="keyword">deactivateModule</span>(uint256 tokenId, bytes32 moduleName)
+
+<span class="comment">// Query</span>
+<span class="keyword">isModuleActive</span>(uint256 tokenId, bytes32 moduleName) <span class="keyword">returns</span> (bool)
+<span class="keyword">getActiveModulesForToken</span>(uint256 tokenId) <span class="keyword">returns</span> (bytes32[])
+
+<span class="comment">// External scoring (granted modules)</span>
+<span class="keyword">grantScorer</span>(uint256 tokenId, address scorer)
+<span class="keyword">setExternalScore</span>(uint256 tokenId, bytes32 key, int256 value)</div>
+    </details>
+
+    <p style="margin-top:16px">Full documentation: <a href="docs.html">Docs</a> · <a href="https://github.com/Potdealer/exoskeletons" target="_blank">GitHub</a></p>
+  </div>
+</div>
+
+</main>
+
+<div id="app-footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script src="shared/exo-core.js"></script>
+<script src="shared/exo-ui.js"></script>
+<script>
+ExoUI.initPage('modules.html');
+
+async function loadModules() {
+  try {
+    const modIds = await ExoCore.withFallback(() => ExoCore.contracts.registry.getTrackedModules());
+    const count = modIds.length;
+    document.getElementById('sModCount').textContent = count;
+
+    if (count === 0) {
+      document.getElementById('modGrid').innerHTML = '<div class="loading-text" style="grid-column:1/-1">No modules registered yet. Be the first to build one!</div>';
+      return;
+    }
+
+    const modules = await Promise.all(modIds.map(async modId => {
+      try {
+        const [label, reg] = await Promise.all([
+          ExoCore.contracts.registry.moduleLabels(modId),
+          ExoCore.contracts.core.moduleRegistry(modId),
+        ]);
+        return {
+          id: modId,
+          label: label || modId.substring(0, 16) + '...',
+          address: reg.contractAddress,
+          premium: reg.premium,
+          cost: reg.premiumCost,
+        };
+      } catch (e) { return { id: modId, label: modId.substring(0, 16) + '...', address: ethers.ZeroAddress, premium: false, cost: 0n }; }
+    }));
+
+    const grid = document.getElementById('modGrid');
+    grid.innerHTML = modules.map(mod => `
+      <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">${ExoCore.escHtml(mod.label)}</div>
+        <div class="text-mono" style="font-size:10px;color:var(--text-tertiary);word-break:break-all;margin-bottom:8px">${mod.id}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${mod.premium
+            ? `<span class="badge badge--gold">Premium · ${ExoCore.formatEth(mod.cost)} ETH</span>`
+            : '<span class="badge badge--green">Free</span>'}
+        </div>
+        <div style="font-size:11px;color:var(--text-tertiary)">Contract: <a href="https://basescan.org/address/${mod.address}" target="_blank">${ExoCore.truncAddr(mod.address)}</a></div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Module load error:', e);
+    document.getElementById('modGrid').innerHTML = `<div class="error-text" style="grid-column:1/-1">Failed to load modules: ${ExoCore.escHtml(e.message)}</div>`;
+  }
+}
+
+// My modules (when wallet connected)
+async function loadMyModules() {
+  const account = ExoCore.account;
+  if (!account) { document.getElementById('myModulesPanel').classList.add('hidden'); return; }
+
+  try {
+    const tokenIds = await ExoCore.getOwnedTokens(account);
+    if (tokenIds.length === 0) { document.getElementById('myModulesPanel').classList.add('hidden'); return; }
+
+    document.getElementById('myModulesPanel').classList.remove('hidden');
+    let html = '';
+
+    for (const tokenId of tokenIds) {
+      const [profile, activeMods] = await Promise.all([
+        ExoCore.contracts.registry.getProfile(tokenId),
+        ExoCore.contracts.registry.getActiveModulesForToken(tokenId),
+      ]);
+
+      const maxSlots = profile.genesis ? 8 : 5;
+      html += `<div style="margin-bottom:16px;padding:16px;background:var(--bg-primary);border-radius:var(--radius-md)">`;
+      html += `<div style="display:flex;justify-content:space-between;margin-bottom:8px">`;
+      html += `<span style="font-weight:600">#${tokenId}${profile.name ? ' — ' + ExoCore.escHtml(profile.name) : ''}</span>`;
+      html += `<span class="text-mono" style="font-size:12px;color:var(--text-secondary)">${activeMods.length}/${maxSlots} slots</span>`;
+      html += '</div>';
+
+      if (activeMods.length === 0) {
+        html += '<div style="color:var(--text-tertiary);font-size:13px">No modules active</div>';
+      } else {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        for (const mod of activeMods) {
+          const label = await ExoCore.contracts.registry.moduleLabels(mod).catch(() => mod.substring(0, 10) + '...');
+          html += `<span class="mod-tag">${ExoCore.escHtml(label || mod.substring(0, 10) + '...')}</span>`;
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    document.getElementById('myModList').innerHTML = html;
+  } catch (e) { console.error('My modules error:', e); }
+}
+
+window.addEventListener('exo:accountChanged', loadMyModules);
+
+ExoCore.onReady(() => {
+  loadModules();
+  loadMyModules();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+# Skill: keyword-extract
+# Version: 1.0.0
+#
+# Extract keywords and key phrases from text.
+
+name: "keyword-extract"
+version: "1.0.0"
+description: "Extract keywords and key phrases from text for SEO, tagging, and indexing"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key
+
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text to analyze
+  - name: max_keywords
+    type: integer
+    default: 10
+    description: Maximum keywords to extract
+
+outputs:
+  - name: keywords
+    type: array
+    description: Extracted keywords with scores
+  - name: phrases
+    type: array
+    description: Key phrases (2-3 words)
+  - name: topics
+    type: array
+    description: Main topics/themes
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: OpenAI GPT
+  - name: ollama
+    type: local
+    models: [llama3.2, mistral]
+    description: Local Ollama
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+    - openai_chat_completion
+  outputs:
+    - stdout
+    - sync_response

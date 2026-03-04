@@ -1,0 +1,59 @@
+# Skill: secrets-scan
+# Version: 1.0.0
+#
+# Detect hardcoded secrets in text or code.
+
+name: secrets-scan
+version: 1.0.0
+description: Detect hardcoded secrets (API keys, tokens, passwords) in text or code
+
+author:
+  name: Expanso Team
+  url: https://expanso.io
+  avatar: EX
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key (optional - enhances detection)
+
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text or code to scan for secrets
+  - name: types
+    type: array
+    required: false
+    description: Secret types to detect (api_key, token, password, etc.)
+
+outputs:
+  - name: findings
+    type: array
+    description: Detected secrets with type and location
+  - name: has_secrets
+    type: boolean
+    description: Whether any secrets were found
+  - name: metadata
+    type: object
+    description: Audit metadata
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: LLM-enhanced secret detection
+  - name: regex
+    type: local
+    description: Pattern-based detection (no API key)
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+    - openai_chat_completion
+  outputs:
+    - stdout
+    - sync_response

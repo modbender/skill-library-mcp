@@ -1,0 +1,25 @@
+{
+  "profile": "balanced",
+  "workspaceRoots": [
+    "/home/ubuntu/.openclaw/workspace"
+  ],
+  "allowlistedDomains": [
+    "api.openai.com",
+    "api.anthropic.com",
+    "api.github.com",
+    "github.com"
+  ],
+  "highRiskPatterns": {
+    "destructive": ["rm -rf", "rm -r", "shred", "mkfs", "dd if="],
+    "privilege": ["sudo", "su ", "chmod -R 777", "chown -R"],
+    "remoteExec": ["curl | sh", "wget | bash", "bash <(curl", "powershell -enc"],
+    "systemMutation": ["systemctl", "service ", "apt ", "yum ", "dnf ", "apk add"],
+    "secretAccess": ["~/.ssh", "/home/*/.ssh", "printenv", "cat .env", "cat ~/.aws/credentials"],
+    "sensitivePaths": ["/etc/", "/var/lib/", "/root/", "~/.ssh/"]
+  },
+  "actions": {
+    "default": "allow",
+    "highRisk": "require_approval",
+    "critical": "block"
+  }
+}

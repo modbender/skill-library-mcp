@@ -1,0 +1,1133 @@
+openapi: 3.1.1
+info:
+  title: FastFold Jobs API
+  version: 1.0.0
+  contact:
+    name: FastFold API Support
+    email: hello@fastfold.ai
+  license:
+    name: Proprietary
+    url: https://fastfold.ai
+
+servers:
+  - url: https://api.fastfold.ai
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Jobs
+    description: Create and manage jobs
+
+paths:
+  '/v1/jobs':
+    post:
+      tags:
+        - Jobs
+      summary: Create Job
+      description: |
+        Create a new job to fold protein sequences using AI models. The job will be processed
+        asynchronously and you can track its status using the returned job ID.
+
+      operationId: createJob
+      parameters:
+        - name: from
+          in: query
+          description: Optional library item ID to associate with this job
+          required: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Job creation request with sequences and parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobInput'
+            examples:
+              boltz2Affinity:
+                summary: Boltz-2 affinity with ligand CCD
+                value:
+                  name: "My Boltz-2 Affinity Job"
+                  isPublic: false
+                  sequences:
+                    - proteinChain:
+                        sequence: "MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKE"
+                    - ligandSequence:
+                        sequence: "U4U"
+                        is_ccd: true
+                        property_type: "affinity"
+                  params:
+                    modelName: "boltz-2"
+
+              complexWithConstraints:
+                summary: Protein complex with constraints
+                value:
+                  name: "Protein Complex with Pocket"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL"
+                        chain_id: "A"
+                        count: 1
+                    - proteinChain:
+                        sequence: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL"
+                        chain_id: "B"
+                        count: 1
+                  params:
+                    modelName: "multimer"
+                    relaxPrediction: true
+                  constraints:
+                    pocket:
+                      - binder:
+                          chain_id: "A"
+                        contacts:
+                          - chain_id: "B"
+                            res_idx: 10
+                          - chain_id: "B"
+                            res_idx: 11
+              boltz2WithModifications:
+                summary: Boltz-2 model with modifications
+                value:
+                  name: "Modified Protein"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL"
+                        chain_id: "A"
+                        modifications:
+                          - res_idx: 5
+                            ccd: "PTM"
+                        cyclic: true
+                  params:
+                    modelName: "boltz-2"
+                    recyclingSteps: 3
+                    samplingSteps: 10
+                    diffusionSample: 1
+                    stepScale: 0.1
+                    affinityMwCorrection: true
+                    samplingStepsAffinity: 5
+                    diffusionSamplesAffinity: 1
+              streptococcalProteinGPocket:
+                summary: Streptococcal protein G with ATP pocket constraint
+                value:
+                  name: "Streptococcal protein G with Pocket"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MTYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"
+                        chain_id: "A"
+                    - ligandSequence:
+                        sequence: "ATP"
+                        is_ccd: true
+                        chain_id: "B"
+                  params:
+                    modelName: "boltz-2"
+                  constraints:
+                    pocket:
+                      - binder:
+                          chain_id: "B"
+                        contacts:
+                          - chain_id: "A"
+                            res_idx: 12
+                          - chain_id: "A"
+                            res_idx: 15
+                          - chain_id: "A"
+                            res_idx: 18
+              humanKRASG12CWithCovalentLigand:
+                summary: Human KRAS G12C protein with covalent ligand bond
+                value:
+                  name: "Human KRAS G12C protein with covalent ligand"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKE"
+                        chain_id: "A"
+                    - ligandSequence:
+                        sequence: "U4U"
+                        is_ccd: true
+                        chain_id: "B"
+                  params:
+                    modelName: "boltz-2"
+                  constraints:
+                    bond:
+                      - atom1:
+                          chain_id: "A"
+                          res_idx: 12
+                          atom_name: "SG"
+                        atom2:
+                          chain_id: "B"
+                          res_idx: 1
+                          atom_name: "C22"
+              esm1bOpenFold:
+                summary: ESM1b OpenFold style folding
+                value:
+                  name: "ESM1b OpenFold"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLERFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKKGHHEAEIKPLAQSHATKHKIPVKYLEFISECIIQVLQSKHPGDFGADAQRAMNKALELFRKDMASNYKELGFQG"
+                        chain_id: "A"
+                  params:
+                    modelName: "esm1b"
+              monomerAlphaFold2:
+                summary: Monomer AlphaFold2
+                value:
+                  name: "Monomer AlphaFold2"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLERFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKKGHHEAEIKPLAQSHATKHKIPVKYLEFISECIIQVLQSKHPGDFGADAQRAMNKALELFRKDMASNYKELGFQG"
+                        chain_id: "A"
+                  params:
+                    modelName: "monomer"
+              multimerAlphaFold2:
+                summary: Multimer AlphaFold2
+                value:
+                  name: "Multimer AlphaFold2"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MCNTNMSVSTEGAASTSQIPASEQETLVRPKPLLLKLLKSVGAQNDTYTMKEIIFYIGQYIMTKRLYDEKQQHIVYCSNDLLGDVFGVPSFSVKEHRKIYAMIYRNLVAV"
+                        chain_id: "A"
+                    - proteinChain:
+                        sequence: "SQETFSGLWKLLPPE"
+                        chain_id: "B"
+                  params:
+                    modelName: "multimer"
+              complexDnaBoltz:
+                summary: Protein-DNA complex using Boltz
+                value:
+                  name: "Complex DNA Boltz"
+                  sequences:
+                    - proteinChain:
+                        sequence: "MASSRRESINPWILTGFADAEGSFGLSILNRNRGTARYHTRLSFTIMLHNKDKSILENIQSTWKVGSILNNGDHYVSLVVYRFEDLKVIIDHFEKYPLITQKLGDYKLFKQAFSVMENKEHLKENGIKELVRIKAKMNWGLNDELKKAFPENISKERPLINKNIPNFKWLAGFTSGDGSFFVRLRKSNVNARVRVQLVFEISQHIRDKNLMNSLITYLGCGHIYEGNKSERSWLQFRVEKFSDINDKIIPVFQENTLIGVKLEDFEDWCKVAKLIEEKKHLTESGLDEIKKIKLNMNKGR"
+                        chain_id: "A"
+                    - dnaSequence:
+                        sequence: "GGGGGCATGCAGATCCCACAGGCGCG"
+                        chain_id: "B"
+                    - dnaSequence:
+                        sequence: "CCGCGCCTGTGGGATCTGCATGCCCC"
+                        chain_id: "C"
+                  params:
+                    modelName: "boltz"
+              boltz2AffinityLigandSmiles:
+                summary: Boltz-2 affinity with ligand SMILES
+                value:
+                  name: "Boltz-2 Affinity Ligand Smiles"
+                  sequences:
+                    - proteinChain:
+                        sequence: "PQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF"
+                        chain_id: "A"
+                    - ligandSequence:
+                        sequence: "CC1CN(CC(C1)NC(=O)C2=CC=CC=C2N)C(=O)NC(C)(C)C"
+                        chain_id: "B"
+                  params:
+                    modelName: "boltz-2"
+              simpleFold100M:
+                summary: SimpleFold 100M
+                value:
+                  name: "SimpleFold 100M"
+                  sequences:
+                    - proteinChain:
+                        sequence: "GASKLRAVLEKLKLSRDDISTAAGMVKGVVDHLLLRLKCDSAFRGVGLLNTGSYYEHVKISAPNEFDVMFKLEVPRIQLEEYSNTRAYYFVKFKRNPKENPLSQFLEGEILSASKMLSKFRKIIKEEINDDTDVIMKRKRGGSPAVTLLISEKISVDITLALESKSSWPASTQEGLRIQNWLSAKVRKQLRLKPFYLVPKHAEETWRLSFSHIEKEILNNHGKSKTCCENKEEKCCRKDCLKLMKYLLEQLKERFKDKKHLDKFSSYHVKTAFFHVCTQNPQDSQWDRKDLGLCFDNCVTYFLQCLRTEKLENYFIPEFNLFSSNLIDKRSKEFLTKQIEYERNNEFPVFD"
+                        chain_id: "A"
+                  params:
+                    modelName: "simplefold_100M"
+      responses:
+        '200':
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+              example:
+                jobId: "550e8400-e29b-41d4-a716-446655440000"
+                jobRunId: "660e8400-e29b-41d4-a716-446655440001"
+                jobName: "My Protein Fold"
+                jobStatus: "INITIALIZED"
+                sequencesIds:
+                  - "770e8400-e29b-41d4-a716-446655440002"
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Invalid sequence format"
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Unauthorized"
+        '429':
+          description: Too Many Requests - Daily quota exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Daily quota exceeded. Limit: 30 calls per day. Current: 30 calls."
+
+  '/v1/jobs/{jobId}/results':
+    get:
+      tags:
+        - Jobs
+      summary: Get Job Results
+      description: |
+        Fetch job + latest job run + sequences for a job ID.
+
+        - If the job is **public** (`isPublic: true`), authentication is **not required**.
+        - If the job is **not public** (`isPublic: false` or `null`), authentication is required and the caller must own the job.
+      operationId: getJobResults
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Job ID
+      responses:
+        '200':
+          description: Job results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResultsOutput'
+              examples:
+                complexJob:
+                  summary: Complex job (top-level predictionPayload)
+                  value:
+                    job:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      status: "COMPLETED"
+                      name: "Job_2026-01-06_18:46"
+                      date: "2026-01-06T23:46:14.413714"
+                      updatedAt: "2026-01-06T23:48:17.564509"
+                      isComplex: true
+                      isPublic: true
+                    parameters:
+                      count: 2
+                      createdAt: "2026-01-06T23:46:14.423605"
+                      modelName: "boltz-2"
+                      weightSet: "Boltz-2"
+                      method: "Boltz-2"
+                      relaxPrediction: true
+                    sequences:
+                      - id: "f989c0c1-37ac-4f6e-aacf-579ebe79c22e"
+                        createdAt: "2026-01-06T23:46:14.417233"
+                        updatedAt: "2026-01-06T23:48:20.503840"
+                        name: null
+                        sequence: "MTYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"
+                        type: "protein"
+                      - id: "42aea8ca-4cec-450a-890f-fd13d6625809"
+                        createdAt: "2026-01-06T23:46:14.417247"
+                        updatedAt: "2026-01-06T23:48:20.503840"
+                        name: null
+                        sequence: "ATP"
+                        type: "ligand"
+                    predictionPayload:
+                      predictionStatus: "COMPLETED"
+                      jobRunStatus: "COMPLETED"
+                      msaStatus: "PENDING"
+                      prediction: true
+                      error: null
+                      meanPLLDT: 76.26388669013977
+                      executionTimeInMinutes: 1.99
+                      pdb_url: ""
+                      cif_url: "https://artifacts.fastfold.ai/.../output_model_0.cif"
+                      msa_coverage_plot_url: null
+                      pae_plot_url: "https://artifacts.fastfold.ai/.../PAE_heatmap.svg"
+                      plddt_plot_url: "https://artifacts.fastfold.ai/.../pLDDT_plot.svg"
+                      metrics_json_url: "https://artifacts.fastfold.ai/.../plddt_pae_metrics.json"
+                      config_json_url: null
+                      citations_bibtex_url: null
+                      plots_url: ""
+                      ptm_score: 0.8331819772720337
+                      iptm_score: 0.6137562990188599
+                      max_pae_score: null
+                      seed: "1496388795"
+                      execution_time_in_minutes: 1.99
+                      affinity_result_raw_json:
+                        affinity_pred_value: 0.9314461946487427
+                        affinity_probability_binary: 0.38347506523132324
+                nonComplexJob:
+                  summary: Non-complex job (per-sequence predictionPayload)
+                  value:
+                    job:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      status: "COMPLETED"
+                      name: "Job_2026-01-07_12:58"
+                      date: "2026-01-07T17:58:40.989292"
+                      updatedAt: "2026-01-07T18:00:07.805305"
+                      isComplex: false
+                      isPublic: false
+                    parameters:
+                      count: 2
+                      createdAt: "2026-01-07T17:58:41.531574"
+                      modelName: "monomer"
+                      weightSet: "AlphaFold"
+                      method: "ColabFold"
+                      relaxPrediction: true
+                    sequences:
+                      - id: "a1fb8db4-001c-4a74-90e3-4f7bb075f40f"
+                        createdAt: "2026-01-07T17:58:41.256587"
+                        updatedAt: "2026-01-07T17:59:53.647548"
+                        name: null
+                        sequence: "MCNTNMSVSTEGAASTSQIPASEQETLVRPKPLLLKLLKSVGAQNDTYTMKEIIFYIGQYIMTKRLYDEKQQHIVYCSNDLLGDVFGVPSFSVKEHRKIYAMIYRNLVAV"
+                        type: "protein"
+                        predictionPayload:
+                          predictionStatus: "COMPLETED"
+                          jobRunStatus: "COMPLETED"
+                          msaStatus: "PENDING"
+                          prediction: true
+                          error: "File not found: output_a1fb8db4-001c-4a74-90e3-4f7bb075f40f.cif"
+                          meanPLLDT: 85.86245454545454
+                          executionTimeInMinutes: 1.2
+                          pdb_url: "https://artifacts.fastfold.ai/.../rank_001.pdb"
+                          cif_url: "https://artifacts.fastfold.ai/.../output.cif"
+                      - id: "75cdd52a-eddc-46cb-81f2-0d7af3fe7f9d"
+                        createdAt: "2026-01-07T17:58:41.256616"
+                        updatedAt: "2026-01-07T18:00:06.175863"
+                        name: null
+                        sequence: "SQETFSGLWKLLPPE"
+                        type: "protein"
+                        predictionPayload:
+                          predictionStatus: "COMPLETED"
+                          jobRunStatus: "COMPLETED"
+                          msaStatus: "PENDING"
+                          prediction: true
+                          error: "File not found: output_75cdd52a-eddc-46cb-81f2-0d7af3fe7f9d.cif"
+                          meanPLLDT: 76.30466666666668
+                          executionTimeInMinutes: 1.4
+                          pdb_url: "https://artifacts.fastfold.ai/.../rank_001.pdb"
+                          cif_url: "https://artifacts.fastfold.ai/.../output.cif"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Unauthorized"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Job not found"
+
+  '/v1/jobs/{jobId}/public':
+    patch:
+      tags:
+        - Jobs
+      summary: Update Job Public Visibility
+      description: |
+        Update a job's `isPublic` flag.
+        Authentication is required and **only the job owner** can change this field.
+      operationId: updateJobPublic
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Job ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPublicUpdate'
+            examples:
+              makePublic:
+                summary: Make job public
+                value:
+                  isPublic: true
+              makePrivate:
+                summary: Make job private
+                value:
+                  isPublic: false
+      responses:
+        '200':
+          description: Updated job visibility
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPublicUpdateResponse'
+              example:
+                jobId: "550e8400-e29b-41d4-a716-446655440000"
+                isPublic: true
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Unauthorized"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Job not found"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token authentication. Use your API key with the format:
+        `Authorization: Bearer sk-...your-api-key`
+
+  schemas:
+    JobInput:
+      type: object
+      required:
+        - name
+        - sequences
+        - params
+      properties:
+        name:
+          type: string
+          description: Name of the job
+          example: "My Protein Fold"
+        isPublic:
+          type: boolean
+          description: Whether the job results should be publicly accessible
+          default: false
+        sequences:
+          type: array
+          description: List of sequences to fold
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SequenceInput'
+        params:
+          $ref: '#/components/schemas/ParamsInput'
+        constraints:
+          $ref: '#/components/schemas/ConstraintsInput'
+        chatId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional chat ID to associate with this job
+          example: "880e8400-e29b-41d4-a716-446655440000"
+
+    SequenceInput:
+      type: object
+      description: |
+        Sequence input. Exactly one of proteinChain, rnaSequence, dnaSequence, or ligandSequence must be provided.
+      properties:
+        sourceSequenceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of source sequence if cloning from library
+        proteinChain:
+          $ref: '#/components/schemas/ProteinChainInput'
+        rnaSequence:
+          $ref: '#/components/schemas/RnaSequenceInput'
+        dnaSequence:
+          $ref: '#/components/schemas/DnaSequenceInput'
+        ligandSequence:
+          $ref: '#/components/schemas/LigandSequenceInput'
+
+    ProteinChainInput:
+      type: object
+      required:
+        - sequence
+      properties:
+        sequence:
+          type: string
+          description: Amino acid sequence (single letter code)
+          example: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL"
+        chain_id:
+          type: string
+          nullable: true
+          description: Chain identifier
+          example: "A"
+        label:
+          type: string
+          nullable: true
+          description: Human-readable label for the chain
+          example: "Chain A"
+        count:
+          type: integer
+          default: 1
+          description: Number of copies of this chain
+          minimum: 1
+          example: 1
+        property_type:
+          type: string
+          nullable: true
+          description: Property type classification
+        cyclic:
+          type: boolean
+          nullable: true
+          description: Whether the protein is cyclic
+          default: false
+        modifications:
+          type: array
+          nullable: true
+          description: List of modifications to apply
+          items:
+            $ref: '#/components/schemas/ModificationInput'
+
+    RnaSequenceInput:
+      type: object
+      required:
+        - sequence
+      properties:
+        sequence:
+          type: string
+          description: RNA sequence (A, U, G, C)
+          example: "AUGCAUGCAUGCAUGC"
+        chain_id:
+          type: string
+          nullable: true
+          example: "A"
+        label:
+          type: string
+          nullable: true
+          example: "RNA Chain A"
+        count:
+          type: integer
+          default: 1
+          minimum: 1
+        property_type:
+          type: string
+          nullable: true
+        cyclic:
+          type: boolean
+          nullable: true
+          default: false
+        modifications:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ModificationInput'
+
+    DnaSequenceInput:
+      type: object
+      required:
+        - sequence
+      properties:
+        sequence:
+          type: string
+          description: DNA sequence (A, T, G, C)
+          example: "ATGCATGCATGCATGC"
+        chain_id:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        count:
+          type: integer
+          default: 1
+          minimum: 1
+        property_type:
+          type: string
+          nullable: true
+        cyclic:
+          type: boolean
+          nullable: true
+          default: false
+        modifications:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ModificationInput'
+
+    LigandSequenceInput:
+      type: object
+      required:
+        - sequence
+      properties:
+        sequence:
+          type: string
+          description: Ligand sequence or CCD code
+          example: "HEM"
+        chain_id:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        count:
+          type: integer
+          default: 1
+          minimum: 1
+        property_type:
+          type: string
+          nullable: true
+        is_ccd:
+          type: boolean
+          nullable: true
+          description: Whether the sequence is a CCD code
+          default: false
+
+    ModificationInput:
+      type: object
+      required:
+        - res_idx
+        - ccd
+      properties:
+        res_idx:
+          type: integer
+          description: Residue index (1-based)
+          minimum: 1
+          example: 5
+        ccd:
+          type: string
+          description: Chemical Component Dictionary code for the modification
+          example: "PTM"
+
+    ParamsInput:
+      type: object
+      required:
+        - modelName
+      properties:
+        modelName:
+          $ref: '#/components/schemas/ModelName'
+        msaAlgorithm:
+          type: string
+          nullable: true
+          description: MSA algorithm to use
+          default: "jackhmmer"
+          example: "jackhmmer"
+        relaxPrediction:
+          type: boolean
+          default: false
+          description: Whether to relax the prediction structure
+        seed:
+          type: string
+          nullable: true
+          description: Random seed for reproducibility
+          example: "12345"
+        recyclingSteps:
+          type: integer
+          nullable: true
+          description: Number of recycling steps (for Boltz models)
+          minimum: 1
+          example: 3
+        samplingSteps:
+          type: integer
+          nullable: true
+          description: Number of sampling steps (for Boltz models)
+          minimum: 1
+          example: 10
+        diffusionSample:
+          type: integer
+          nullable: true
+          description: Number of diffusion samples (for Boltz models)
+          minimum: 1
+          example: 1
+        stepScale:
+          type: number
+          format: float
+          nullable: true
+          description: Step scale factor (for Boltz models)
+          minimum: 0
+          example: 0.1
+        affinityMwCorrection:
+          type: boolean
+          nullable: true
+          description: Apply molecular weight correction for affinity (for Boltz models)
+          default: false
+        samplingStepsAffinity:
+          type: integer
+          nullable: true
+          description: Number of sampling steps for affinity (for Boltz models)
+          minimum: 1
+          example: 5
+        diffusionSamplesAffinity:
+          type: integer
+          nullable: true
+          description: Number of diffusion samples for affinity (for Boltz models)
+          minimum: 1
+          example: 1
+
+    ModelName:
+      type: string
+      enum:
+        - monomer
+        - multimer
+        - esm1b
+        - boltz
+        - boltz-2
+        - simplefold_100M
+        - simplefold_360M
+        - simplefold_700M
+        - simplefold_1.1B
+        - simplefold_1.6B
+        - simplefold_3B
+      description: |
+        Folding model to use:
+        - `monomer`: AlphaFold2 for single chain proteins
+        - `multimer`: AlphaFold2 for protein complexes
+        - `esm1b`: ESM-1b language model
+        - `boltz`: Boltz model for protein folding
+        - `boltz-2`: Enhanced Boltz-2 model
+        - `simplefold_*`: SimpleFold models of varying sizes (100M to 3B parameters)
+      example: "monomer"
+
+    ConstraintsInput:
+      type: object
+      description: Optional constraints to apply during folding
+      properties:
+        pocket:
+          type: array
+          nullable: true
+          description: Pocket constraints defining binding sites
+          items:
+            $ref: '#/components/schemas/PocketItemInput'
+        bond:
+          type: array
+          nullable: true
+          description: Bond constraints between atoms
+          items:
+            $ref: '#/components/schemas/BondItemInput'
+
+    PocketItemInput:
+      type: object
+      required:
+        - binder
+        - contacts
+      properties:
+        binder:
+          $ref: '#/components/schemas/BinderInput'
+        contacts:
+          type: array
+          description: List of contact residues
+          items:
+            $ref: '#/components/schemas/ContactInput'
+
+    BinderInput:
+      type: object
+      required:
+        - chain_id
+      properties:
+        chain_id:
+          type: string
+          description: Chain ID of the binder
+          example: "A"
+
+    ContactInput:
+      type: object
+      required:
+        - chain_id
+        - res_idx
+      properties:
+        chain_id:
+          type: string
+          description: Chain ID of the contact residue
+          example: "B"
+        res_idx:
+          type: integer
+          description: Residue index (1-based)
+          minimum: 1
+          example: 10
+
+    BondItemInput:
+      type: object
+      required:
+        - atom1
+        - atom2
+      properties:
+        atom1:
+          $ref: '#/components/schemas/AtomReferenceInput'
+        atom2:
+          $ref: '#/components/schemas/AtomReferenceInput'
+
+    AtomReferenceInput:
+      type: object
+      required:
+        - chain_id
+        - res_idx
+        - atom_name
+      properties:
+        chain_id:
+          type: string
+          description: Chain ID
+          example: "A"
+        res_idx:
+          type: integer
+          description: Residue index (1-based)
+          minimum: 1
+          example: 5
+        atom_name:
+          type: string
+          description: Atom name (e.g., CA, N, C, O)
+          example: "CA"
+
+    JobResponse:
+      type: object
+      description: Response after successfully creating a job
+      properties:
+        jobId:
+          type: string
+          format: uuid
+          description: Unique identifier for the job
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        jobRunId:
+          type: string
+          format: uuid
+          description: Unique identifier for the job run
+          example: "660e8400-e29b-41d4-a716-446655440001"
+        jobName:
+          type: string
+          description: Name of the job
+          example: "My Protein Fold"
+        jobStatus:
+          $ref: '#/components/schemas/JobStatus'
+        sequencesIds:
+          type: array
+          nullable: true
+          description: List of sequence IDs created for this job
+          items:
+            type: string
+            format: uuid
+          example:
+            - "770e8400-e29b-41d4-a716-446655440002"
+
+    JobStatus:
+      type: string
+      enum:
+        - PENDING
+        - INITIALIZED
+        - RUNNING
+        - COMPLETED
+        - FAILED
+        - STOPPED
+      description: |
+        Current status of the job:
+        - `PENDING`: Job is queued but not yet initialized
+        - `INITIALIZED`: Job has been created and is ready to run
+        - `RUNNING`: Job is currently being processed
+        - `COMPLETED`: Job finished successfully
+        - `FAILED`: Job encountered an error
+        - `STOPPED`: Job was stopped before completion
+      example: "INITIALIZED"
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong
+          example: "Invalid sequence format"
+
+    JobRunResultsSummary:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          description: Number of sequences for the latest job run
+          example: 2
+        createdAt:
+          type: string
+          nullable: true
+          description: Job run creation timestamp (ISO 8601)
+        modelName:
+          type: string
+          nullable: true
+          description: Model name for the job run
+        weightSet:
+          type: string
+          nullable: true
+        method:
+          type: string
+          nullable: true
+        relaxPrediction:
+          type: boolean
+          nullable: true
+
+    PredictionPayload:
+      type: object
+      required:
+        - predictionStatus
+        - jobRunStatus
+        - msaStatus
+      properties:
+        predictionStatus:
+          $ref: '#/components/schemas/JobStatus'
+        jobRunStatus:
+          $ref: '#/components/schemas/JobStatus'
+        msaStatus:
+          $ref: '#/components/schemas/JobStatus'
+        prediction:
+          type: boolean
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        meanPLLDT:
+          type: number
+          nullable: true
+        executionTimeInMinutes:
+          type: number
+          nullable: true
+        pdb_url:
+          type: string
+          nullable: true
+        cif_url:
+          type: string
+          nullable: true
+        msa_coverage_plot_url:
+          type: string
+          nullable: true
+        pae_plot_url:
+          type: string
+          nullable: true
+        plddt_plot_url:
+          type: string
+          nullable: true
+        metrics_json_url:
+          type: string
+          nullable: true
+        config_json_url:
+          type: string
+          nullable: true
+        citations_bibtex_url:
+          type: string
+          nullable: true
+        plots_url:
+          type: string
+          nullable: true
+        ptm_score:
+          type: number
+          nullable: true
+        iptm_score:
+          type: number
+          nullable: true
+        max_pae_score:
+          type: number
+          nullable: true
+        seed:
+          type: string
+          nullable: true
+        execution_time_in_minutes:
+          type: number
+          nullable: true
+        affinity_result_raw_json:
+          type: object
+          nullable: true
+          additionalProperties: true
+
+    JobSequenceOutput:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - sequence
+        - type
+      properties:
+        id:
+          type: string
+          description: Sequence ID
+        createdAt:
+          type: string
+          description: Sequence creation timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          description: Sequence update timestamp (ISO 8601)
+        name:
+          type: string
+          nullable: true
+          description: Sequence label (if provided)
+        sequence:
+          type: string
+        type:
+          type: string
+        predictionPayload:
+          $ref: '#/components/schemas/PredictionPayload'
+          nullable: true
+
+    JobResultsOutput:
+      type: object
+      required:
+        - job
+        - parameters
+        - sequences
+      properties:
+        job:
+          $ref: '#/components/schemas/JobInfoOutput'
+        parameters:
+          $ref: '#/components/schemas/JobRunResultsSummary'
+        sequences:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobSequenceOutput'
+        predictionPayload:
+          $ref: '#/components/schemas/PredictionPayload'
+          nullable: true
+
+    JobInfoOutput:
+      type: object
+      required:
+        - id
+        - status
+        - name
+        - date
+        - updatedAt
+        - isComplex
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        name:
+          type: string
+        date:
+          type: string
+        updatedAt:
+          type: string
+        isComplex:
+          type: boolean
+          description: Whether the latest job run is treated as a complex run
+        isPublic:
+          type: boolean
+          nullable: true
+
+    JobPublicUpdate:
+      type: object
+      required:
+        - isPublic
+      properties:
+        isPublic:
+          type: boolean
+
+    JobPublicUpdateResponse:
+      type: object
+      required:
+        - jobId
+        - isPublic
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        isPublic:
+          type: boolean
+          nullable: true

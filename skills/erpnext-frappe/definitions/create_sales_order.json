@@ -1,0 +1,114 @@
+{
+  "name": "create_sales_order",
+  "version": "1.0.0",
+  "description": "Create a sales order from a quotation or directly with items for a customer",
+  "author": "Business Claw Team",
+  "category": "sales",
+  
+  "triggers": [
+    "create sales order",
+    "new sales order",
+    "convert quotation to order",
+    "process customer order"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_document",
+      "description": "Fetch customer details",
+      "required": true
+    },
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Sales Order DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the sales order",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit the sales order",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_id": {
+        "type": "string",
+        "description": "Customer ID or name"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_code": {"type": "string"},
+            "qty": {"type": "number"},
+            "rate": {"type": "number"},
+            "warehouse": {"type": "string"}
+          }
+        },
+        "description": "List of items to order"
+      },
+      "delivery_date": {
+        "type": "string",
+        "description": "Expected delivery date"
+      },
+      "quotation": {
+        "type": "string",
+        "description": "Quotation ID if converting (optional)"
+      },
+      "transaction_date": {
+        "type": "string",
+        "description": "Order date (optional)"
+      }
+    },
+    "required": ["customer_id", "items"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "fetch_customer",
+        "tool": "get_document",
+        "arguments": {
+          "doctype": "Customer",
+          "name": "${customer_id}"
+        }
+      },
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Sales Order"
+        }
+      },
+      {
+        "step": "create_order",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Sales Order",
+          "data": {
+            "customer": "${customer_id}",
+            "delivery_date": "${delivery_date}",
+            "items": "${items}",
+            "transaction_date": "${transaction_date}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "max_amount": 500000,
+    "require_credit_check": true,
+    "validate_stock": true
+  },
+  
+  "output_template": "Created Sales Order {{name}}\nCustomer: {{customer}}\nTotal: {{grand_total}}\nDelivery by: {{delivery_date}}"
+}

@@ -1,0 +1,55 @@
+# Expanso Pipeline: json-validate (CLI mode)
+# ===========================================
+#
+# Usage:
+#   echo '{"key": "value"}' | expanso-edge run pipeline-cli.yaml
+#   cat data.json | expanso-edge run pipeline-cli.yaml
+#
+# No API key needed - runs entirely locally.
+
+name: "json-validate-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 10485760
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          meta trace_id = uuid_v4()
+
+          # Try to parse JSON
+          let parsed = content().parse_json().catch(null)
+          let error = if $parsed == null { "Invalid JSON syntax" } else { null }
+
+          root.valid = $parsed != null
+          root.error = $error
+          root.parsed = $parsed
+          root.stats = if $parsed != null {
+            {
+              "type": $parsed.type(),
+              "length": content().length()
+            }
+          } else { null }
+          root.metadata = {
+            "skill": "json-validate",
+            "mode": "cli",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [json-validate] Valid: ${! root.valid } (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

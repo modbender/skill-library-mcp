@@ -1,0 +1,104 @@
+{
+  "name": "stock_entry",
+  "version": "1.0.0",
+  "description": "Create a stock entry for material transfer, receipt, or issue",
+  "author": "Business Claw Team",
+  "category": "inventory",
+  
+  "triggers": [
+    "stock entry",
+    "material transfer",
+    "stock transfer",
+    "stock receipt",
+    "stock issue"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Stock Entry DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the stock entry",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit the stock entry",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "purpose": {
+        "type": "string",
+        "enum": ["Material Receipt", "Material Issue", "Material Transfer", "Material Transfer for Manufacture"],
+        "description": "Purpose of stock entry"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_code": {"type": "string"},
+            "qty": {"type": "number"},
+            "t_warehouse": {"type": "string"},
+            "s_warehouse": {"type": "string"},
+            "basic_rate": {"type": "number"}
+          }
+        },
+        "description": "List of items"
+      },
+      "transaction_date": {
+        "type": "string",
+        "description": "Transaction date"
+      },
+      "from_warehouse": {
+        "type": "string",
+        "description": "Source warehouse (for transfer/issue)"
+      },
+      "to_warehouse": {
+        "type": "string",
+        "description": "Target warehouse (for transfer/receipt)"
+      }
+    },
+    "required": ["purpose", "items"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Stock Entry"
+        }
+      },
+      {
+        "step": "create_entry",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Stock Entry",
+          "data": {
+            "purpose": "${purpose}",
+            "transaction_date": "${transaction_date}",
+            "from_warehouse": "${from_warehouse}",
+            "to_warehouse": "${to_warehouse}",
+            "items": "${items}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "validate_warehouse": true,
+    "validate_stock": true
+  },
+  
+  "output_template": "Created Stock Entry {{name}}\nPurpose: {{purpose}}\nItems: {{total_items}}"
+}

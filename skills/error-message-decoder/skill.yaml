@@ -1,0 +1,32 @@
+# Skill: error_message_decoder
+
+decode_error(error: string, language: string) => object
+
+## Trigger Patterns
+- 错误解析
+- 错误解码
+- error decode
+- 错误原因
+
+## Implementation
+
+解析错误信息，提供可能的原因和解决方案。
+
+```javascript
+function decodeError(error, language = 'en') {
+  const knownErrors = {
+    'ENOENT': { zh: '文件不存在', en: 'No such file', fix: '检查文件路径是否正确' },
+    'ECONNREFUSED': { zh: '连接被拒绝', en: 'Connection refused', fix: '检查服务是否启动' },
+    'EADDRINUSE': { zh: '端口已被占用', en: 'Address already in use', fix: '杀死占用进程或更换端口' },
+    'undefined is not a function': { zh: '调用了未定义的函数', en: 'Calling undefined function', fix: '检查函数名拼写和导入' },
+    'null reference': { zh: '空指针错误', en: 'Null reference', fix: '添加空值检查' }
+  };
+  
+  for (const [pattern, info] of Object.entries(knownErrors)) {
+    if (error.includes(pattern)) {
+      return { error, ...info[language] || info.en, pattern };
+    }
+  }
+  
+  return { error, suggestion: '未知错误，请搜索具体错误信息' };
+}

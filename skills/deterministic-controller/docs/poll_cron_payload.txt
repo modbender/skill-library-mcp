@@ -1,0 +1,11 @@
+# Poll cron payload (systemEvent)
+
+Use this as the cron job payload text for a 3-minute poll loop.
+
+Replace:
+- <WORKSPACE> with your OpenClaw workspace path.
+
+---
+
+TRIGGER=POLL_TICK
+Read <WORKSPACE>/HEARTBEAT.md and <WORKSPACE>/ACTIVITIES.md only. Execute exactly one POLL_TICK control cycle. If ACTIVITIES.md is unreadable or unparseable, emit "HB_RUNTIME_ERROR reason=activities_unreadable action=abort_tick", then emit "HB_COMPLETE trigger=POLL_TICK state=BLOCKED doing=0 todo=0 blocked=0", then stop. Otherwise reconcile worker events, enforce same-cycle dispatch (if READY exists and capacity exists, dispatch at least one READY step now and emit PROJECT_TASK_STARTED), enforce completion transitions (DOING with completion condition met and non-empty evidence must transition to DONE and emit PROJECT_TASK_COMPLETE), enforce non-exhausted failure transitions (DOING failed/timed out with retries remaining must stay DOING and emit PROJECT_TASK_FAILED), enforce retry exhaustion transitions (DOING failed/timed out with exhausted retries must transition to BLOCKED with concrete unblock condition and emit PROJECT_TASK_BLOCKED), persist updates to ACTIVITIES.md, and emit exactly one HB_COMPLETE line for this POLL_TICK.

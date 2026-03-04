@@ -1,0 +1,20 @@
+# DepGuard — lefthook configuration
+# Installed by: depguard hooks install
+# Documentation: https://depguard.pages.dev/docs/hooks
+
+pre-commit:
+  parallel: true
+  commands:
+    depguard-lockfile-scan:
+      glob: "{package-lock.json,yarn.lock,pnpm-lock.yaml,Cargo.lock,go.sum,composer.lock,Gemfile.lock,requirements.txt,Pipfile.lock}"
+      run: |
+        DEPGUARD_SKILL_DIR="${DEPGUARD_SKILL_DIR:-$HOME/.openclaw/skills/depguard}"
+        if [[ -f "$DEPGUARD_SKILL_DIR/scripts/scanner.sh" ]]; then
+          source "$DEPGUARD_SKILL_DIR/scripts/scanner.sh"
+          do_scan .
+        else
+          echo "[DepGuard] Skill not found at $DEPGUARD_SKILL_DIR — skipping scan"
+        fi
+      fail_text: |
+        Dependency vulnerabilities detected!
+        Run 'depguard fix' to auto-fix or 'git commit --no-verify' to skip.

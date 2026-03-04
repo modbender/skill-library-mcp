@@ -1,0 +1,44 @@
+# =============================================================================
+# Recommended Cron Jobs for Crypto Trader Skill
+# =============================================================================
+# These are example cron jobs that can be added to OpenClaw's cron/jobs.json
+# via the chat interface. They are NOT automatically activated.
+#
+# To activate, ask OpenClaw to add these cron jobs.
+
+recommended_jobs:
+  - name: "Daily Portfolio Summary"
+    description: "Send daily portfolio overview at 8 PM"
+    schedule: "0 20 * * *"
+    example_cron_entry:
+      sessionTarget: "main"
+      payload:
+        kind: "systemEvent"
+        message: "Run the crypto-trader skill in status mode and send a summary of the portfolio to Telegram. Include balances, active strategies, daily P&L, and any risk warnings."
+
+  - name: "Hourly Risk Check"
+    description: "Check risk limits and alert on warnings"
+    schedule: "0 * * * *"
+    example_cron_entry:
+      sessionTarget: "isolated"
+      payload:
+        kind: "agentTurn"
+        message: "AUTONOMOUS: Run crypto-trader --mode status. If daily loss exceeds 80% of limit or drawdown exceeds 80% of max, send a Telegram alert."
+
+  - name: "Morning Market Briefing"
+    description: "Sentiment analysis at 8 AM"
+    schedule: "0 8 * * *"
+    example_cron_entry:
+      sessionTarget: "main"
+      payload:
+        kind: "systemEvent"
+        message: "Run crypto-trader sentiment analysis for BTC and ETH. Summarize the market mood and any significant news."
+
+  - name: "Weekly Performance Report"
+    description: "Comprehensive weekly review on Sunday evening"
+    schedule: "0 18 * * 0"
+    example_cron_entry:
+      sessionTarget: "main"
+      payload:
+        kind: "systemEvent"
+        message: "Run crypto-trader --mode history --days 7 and generate a weekly performance report. Compare strategy performance, highlight best/worst trades, and suggest adjustments."

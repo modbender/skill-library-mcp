@@ -1,0 +1,66 @@
+# Expanso Pipeline: secrets-scan (MCP mode)
+# ==========================================
+
+name: secrets-scan-mcp
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /scan
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let text = this.text.or("")
+
+          root = if $text.length() == 0 {
+            throw("text field is required")
+          }
+
+          meta input_hash = $text.hash("sha256").encode("hex")
+          meta input_length = $text.length()
+          meta trace_id = uuid_v4()
+
+          let secret_types = this.types.or(["api_key", "token", "password", "private_key"]).join(",")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a security scanner specialized in detecting hardcoded secrets. Be thorough but avoid false positives. Do NOT flag placeholder values."
+            },
+            {
+              "role": "user",
+              "content": "Scan for: " + $secret_types + "\n\nReturn JSON:\n{\n  \"findings\": [{\"type\": \"...\", \"value\": \"partial\", \"line\": 1, \"severity\": \"high|medium|low\"}],\n  \"summary\": \"...\"\n}\n\nText:\n```\n" + $text + "\n```"
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let raw = this.choices.0.message.content
+          let parsed = $raw.parse_json().catch({"findings": []})
+
+          root.findings = $parsed.findings.or([])
+          root.has_secrets = $parsed.findings.or([]).length() > 0
+          root.summary = $parsed.summary.or("")
+          root.metadata = {
+            "skill": "secrets-scan",
+            "mode": "mcp",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "trace_id": meta("trace_id"),
+            "findings_count": $parsed.findings.or([]).length(),
+            "timestamp": now()
+          }
+
+  output:
+    sync_response: {}

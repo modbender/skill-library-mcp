@@ -1,0 +1,118 @@
+{
+  "models": {
+    "fal-ai/nano-banana-pro": {
+      "name": "Gemini 3 Pro Image (text-to-image)",
+      "description": "Text-to-image generation using Google's Gemini 3 Pro",
+      "type": "text-to-image",
+      "input": {
+        "prompt": { "type": "string", "required": true },
+        "num_images": { "type": "integer", "default": 1 },
+        "aspect_ratio": { "type": "enum", "default": "1:1", "options": ["auto", "21:9", "16:9", "3:2", "4:3", "5:4", "1:1", "4:5", "3:4", "2:3", "9:16"] },
+        "resolution": { "type": "enum", "default": "1K", "options": ["1K", "2K", "4K"] },
+        "output_format": { "type": "enum", "default": "png", "options": ["jpeg", "png", "webp"] },
+        "seed": { "type": "integer" },
+        "safety_tolerance": { "type": "enum", "default": "4", "options": ["1", "2", "3", "4", "5", "6"] }
+      }
+    },
+    "fal-ai/nano-banana-pro/edit": {
+      "name": "Gemini 3 Pro Image (edit/img2img)",
+      "description": "Edit images with text prompts using Google's Gemini 3 Pro. Supports multiple input images.",
+      "type": "image-to-image",
+      "input": {
+        "prompt": { "type": "string", "required": true, "description": "The editing instruction" },
+        "image_urls": { "type": "array", "required": true, "description": "Array of image URLs or base64 data URIs" },
+        "num_images": { "type": "integer", "default": 1 },
+        "aspect_ratio": { "type": "enum", "default": "auto", "options": ["auto", "21:9", "16:9", "3:2", "4:3", "5:4", "1:1", "4:5", "3:4", "2:3", "9:16"] },
+        "resolution": { "type": "enum", "default": "1K", "options": ["1K", "2K", "4K"] },
+        "output_format": { "type": "enum", "default": "png", "options": ["jpeg", "png", "webp"] },
+        "seed": { "type": "integer" },
+        "safety_tolerance": { "type": "enum", "default": "4", "options": ["1", "2", "3", "4", "5", "6"] }
+      }
+    },
+    "fal-ai/flux/dev/image-to-image": {
+      "name": "FLUX.1 [dev] Image-to-Image",
+      "description": "Transform images with FLUX.1 dev model",
+      "type": "image-to-image",
+      "input": {
+        "image_url": { "type": "string", "required": true },
+        "prompt": { "type": "string", "required": true },
+        "strength": { "type": "float", "default": 0.95 },
+        "num_inference_steps": { "type": "integer", "default": 40 },
+        "guidance_scale": { "type": "float", "default": 3.5 },
+        "seed": { "type": "integer" },
+        "num_images": { "type": "integer", "default": 1 },
+        "output_format": { "type": "enum", "default": "jpeg", "options": ["jpeg", "png"] }
+      }
+    },
+    "fal-ai/kling-video/o3/pro/video-to-video/edit": {
+      "name": "Kling O3 Video-to-Video Edit [Pro]",
+      "description": "Transform videos with AI effects using Kling O3 Pro.",
+      "type": "video-to-video",
+      "limits": {
+        "formats": [".mp4", ".mov"],
+        "duration_seconds": "3-10",
+        "resolution": "720-2160px",
+        "max_file_size_mb": 200,
+        "max_elements_total": 4
+      },
+      "input": {
+        "prompt": { 
+          "type": "string", 
+          "required": true, 
+          "description": "Text prompt for video generation. Reference video as @Video1." 
+        },
+        "video_url": { 
+          "type": "string", 
+          "required": true, 
+          "description": "Reference video URL. Only .mp4/.mov, 3-10s duration, 720-2160px, max 200MB." 
+        },
+        "image_urls": { 
+          "type": "array[string]", 
+          "required": false, 
+          "description": "Reference images for style/appearance. Use as @Image1, @Image2, etc. Max 4 total with elements." 
+        },
+        "keep_audio": { 
+          "type": "boolean", 
+          "required": false,
+          "default": true,
+          "description": "Whether to keep original audio from reference video." 
+        },
+        "elements": { 
+          "type": "array[KlingV3ImageElementInput]", 
+          "required": false, 
+          "description": "Elements (characters/objects) to include. Reference as @Element1, @Element2.",
+          "items": {
+            "reference_image_urls": "array[string] - reference images for the element",
+            "frontal_image_url": "string - frontal view image for better face/body capture"
+          }
+        },
+        "shot_type": {
+          "type": "enum",
+          "required": false,
+          "default": "customize",
+          "options": ["customize"],
+          "description": "The type of multi-shot video generation."
+        }
+      },
+      "output": {
+        "video": {
+          "url": "string",
+          "content_type": "string"
+        }
+      },
+      "example": {
+        "prompt": "Change environment to be fully snow as @Image1. Replace animal with @Element1",
+        "video_url": "https://example.com/video.mp4",
+        "image_urls": ["https://example.com/snow_reference.jpg"],
+        "keep_audio": true,
+        "elements": [
+          {
+            "reference_image_urls": ["https://example.com/element_ref.png"],
+            "frontal_image_url": "https://example.com/element_front.png"
+          }
+        ],
+        "shot_type": "customize"
+      }
+    }
+  }
+}

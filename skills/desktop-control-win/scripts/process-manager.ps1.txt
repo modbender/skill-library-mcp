@@ -1,0 +1,108 @@
+# process-manager.ps1 - Process Management for OpenClaw
+param(
+    [Parameter(Mandatory=$true)]
+    [ValidateSet("list","info","start","kill","monitor","wait","help")]
+    [string]$Action,
+    [string]$Name = "",
+    [int]$ProcId = 0,
+    [string]$Path = "",
+    [string]$Arguments = "",
+    [ValidateSet("memory","cpu","name","pid","")][string]$SortBy = "",
+    [int]$Top = 0,
+    [int]$Duration = 5,
+    [switch]$Force
+)
+try {
+    switch ($Action) {
+        "help" {
+            Write-Output "process-manager.ps1 - list, info, start, kill, monitor, wait"
+            Write-Output "  list  [-Name [filter]] [-SortBy memory|cpu|name|pid] [-Top [n]]"
+            Write-Output "  info  -ProcId [pid]"
+            Write-Output "  start -Path [exe] [-Arguments [args]]"
+            Write-Output "  kill  -ProcId [pid] | -Name [name] [-Force]"
+            Write-Output "  monitor -ProcId [pid] [-Duration [seconds]]"
+            Write-Output "  wait  -ProcId [pid]"
+        }
+        "list" {
+            $procs = Get-Process -ErrorAction SilentlyContinue
+            if ($Name) { $procs = $procs | Where-Object { $_.ProcessName -like "*$Name*" } }
+            $data = $procs | Where-Object { $_.Id -ne 0 } | ForEach-Object {
+                [PSCustomObject]@{
+                    PID=$_.Id; Name=$_.ProcessName
+                    MemMB=[math]::Round($_.WorkingSet64/1MB,1)
+                    CPU=if($_.CPU){[math]::Round($_.CPU,1)}else{0.0}
+                    Title=if($_.MainWindowTitle){$_.MainWindowTitle}else{"-"}
+                }
+            }
+            switch ($SortBy) {
+                "memory" { $data = $data | Sort-Object MemMB -Descending }
+                "cpu"    { $data = $data | Sort-Object CPU -Descending }
+                "name"   { $data = $data | Sort-Object Name }
+                "pid"    { $data = $data | Sort-Object PID }
+                default  { $data = $data | Sort-Object MemMB -Descending }
+            }
+            if ($Top -gt 0) { $data = $data | Select-Object -First $Top }
+            $data | ForEach-Object {
+                $t = if($_.Title -ne "-"){ '  Title="' + $_.Title + '"' } else { "" }
+                Write-Output ("PID={0,-6} Mem={1,8}MB  CPU={2,8}s  Name={3}{4}" -f $_.PID,$_.MemMB,$_.CPU,$_.Name,$t)
+            }
+            Write-Output "`nTotal: $($data.Count) processes$(if($Name){" matching '$Name'"})"
+        }
+        "info" {
+            if ($ProcId -le 0) { Write-Error "Missing -ProcId"; exit 1 }
+            $proc = Get-Process -Id $ProcId -EA SilentlyContinue
+            if (-not $proc) { Write-Error "Not found: PID=$ProcId"; exit 1 }
+            $st = try{$proc.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}catch{"N/A"}
+            $ep = try{$proc.Path}catch{"N/A"}
+            Write-Output "PID=$ProcId  Name=$($proc.ProcessName)"
+            Write-Output "Path: $ep"
+            Write-Output "Started: $st"
+            Write-Output "Memory: $([math]::Round($proc.WorkingSet64/1MB,1))MB (peak $([math]::Round($proc.PeakWorkingSet64/1MB,1))MB)"
+            Write-Output "CPU: $([math]::Round($proc.CPU,2))s  Threads: $($proc.Threads.Count)  Handles: $($proc.HandleCount)"
+            Write-Output "Window: $(if($proc.MainWindowTitle){$proc.MainWindowTitle}else{'(none)'})"
+            Write-Output "Responding: $($proc.Responding)  Priority: $($proc.PriorityClass)"
+        }
+        "start" {
+            if (-not $Path) { Write-Error "Missing -Path"; exit 1 }
+            $p = if($Arguments){Start-Process $Path -ArgumentList $Arguments -PassThru}else{Start-Process $Path -PassThru}
+            Start-Sleep -Milliseconds 500
+            Write-Output "Started: $Path (PID=$($p.Id))"
+        }
+        "kill" {
+            if ($ProcId -gt 0) {
+                $p = Get-Process -Id $ProcId -EA SilentlyContinue
+                if (-not $p) { Write-Error "Not found: PID=$ProcId"; exit 1 }
+                if ($Force) { Stop-Process -Id $ProcId -Force } else { Stop-Process -Id $ProcId }
+                Write-Output "Killed: $($p.ProcessName) (PID=$ProcId)"
+            } elseif ($Name) {
+                $ps = Get-Process -Name "*$Name*" -EA SilentlyContinue
+                if (-not $ps) { Write-Error "No match: '$Name'"; exit 1 }
+                $ps | ForEach-Object { if($Force){Stop-Process -Id $_.Id -Force}else{Stop-Process -Id $_.Id} }
+                Write-Output "Killed: $($ps.Count) process(es) matching '$Name'"
+            } else { Write-Error "Missing -ProcId or -Name"; exit 1 }
+        }
+        "monitor" {
+            if ($ProcId -le 0) { Write-Error "Missing -ProcId"; exit 1 }
+            $proc = Get-Process -Id $ProcId -EA SilentlyContinue
+            if (-not $proc) { Write-Error "Not found: PID=$ProcId"; exit 1 }
+            Write-Output "Monitoring PID=$ProcId ($($proc.ProcessName)) for ${Duration}s..."
+            $prev = $proc.CPU
+            for ($i=0; $i -lt $Duration; $i++) {
+                Start-Sleep 1
+                $proc = Get-Process -Id $ProcId -EA SilentlyContinue
+                if (-not $proc) { Write-Output "Process exited."; break }
+                $d = [math]::Round($proc.CPU - $prev, 2); $prev = $proc.CPU
+                Write-Output "[$((Get-Date).ToString('HH:mm:ss'))] Mem=$([math]::Round($proc.WorkingSet64/1MB,1))MB CPU-delta=${d}s Threads=$($proc.Threads.Count)"
+            }
+        }
+        "wait" {
+            if ($ProcId -le 0) { Write-Error "Missing -ProcId"; exit 1 }
+            $proc = Get-Process -Id $ProcId -EA SilentlyContinue
+            if (-not $proc) { Write-Output "PID=$ProcId already exited."; exit 0 }
+            Write-Output "Waiting for PID=$ProcId ($($proc.ProcessName))..."
+            $proc.WaitForExit()
+            Write-Output "PID=$ProcId exited (code: $($proc.ExitCode))"
+        }
+    }
+    exit 0
+} catch { Write-Error "ERROR: $_"; exit 1 }

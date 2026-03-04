@@ -1,0 +1,54 @@
+# Test cases for secrets-scan
+name: secrets-scan-tests
+description: Test cases for the secrets-scan skill
+
+tests:
+  - name: api_key_detection
+    description: Detect API keys
+    input: |
+      const API_KEY = "sk-abc123def456789012345678901234567890";
+    expected:
+      has_secrets: true
+      has_field: findings
+
+  - name: aws_credentials
+    description: Detect AWS credentials
+    input: |
+      aws_access_key_id = YOUR_REAL_AWS_KEY_HERE
+      aws_secret_access_key = YOUR_REAL_SECRET_HERE
+    expected:
+      has_secrets: true
+
+  - name: password_detection
+    description: Detect hardcoded passwords
+    input: |
+      database:
+        password: "mysuperpassword123"
+    expected:
+      has_secrets: true
+
+  - name: no_secrets
+    description: Clean code with no secrets
+    input: |
+      const config = {
+        apiKey: process.env.API_KEY,
+        database: {
+          password: "${DB_PASSWORD}"
+        }
+      };
+    expected:
+      has_secrets: false
+
+  - name: placeholder_ignored
+    description: Ignore placeholder values
+    input: |
+      API_KEY=your-api-key-here
+      TOKEN=xxx
+    expected:
+      has_secrets: false
+
+  - name: empty_input
+    description: Handle empty input
+    input: ""
+    expected:
+      error_or_empty: true

@@ -1,0 +1,52 @@
+# Skill: json-validate
+# Version: 1.0.0
+#
+# Validate JSON syntax and optionally check against a schema.
+# Runs locally without API calls.
+
+name: "json-validate"
+version: "1.0.0"
+description: "Validate JSON syntax and structure"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials: []  # No API key needed
+
+inputs:
+  - name: json
+    type: string
+    required: true
+    description: JSON content to validate
+
+outputs:
+  - name: valid
+    type: boolean
+    description: Whether the JSON is valid
+  - name: error
+    type: string
+    description: Error message if invalid
+  - name: parsed
+    type: object
+    description: Parsed JSON object (if valid)
+  - name: stats
+    type: object
+    description: Statistics about the JSON (keys, depth, etc.)
+
+backends:
+  - name: local
+    type: local
+    requires: []
+    description: Pure local validation
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+  outputs:
+    - stdout
+    - sync_response

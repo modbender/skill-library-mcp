@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonant Crystal</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; overflow: hidden; }
+  #rc-container {
+    position: relative; width: 100%; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #rc-canvas { display: block; width: 100%; height: 100%; }
+  #rc-regime-label {
+    position: absolute; bottom: 12%; left: 50%;
+    transform: translateX(-50%);
+    font-family: "Courier New", monospace; font-size: 14px;
+    letter-spacing: 6px; text-transform: uppercase;
+    color: #888; text-shadow: 0 0 10px currentColor;
+    pointer-events: none; transition: color 0.8s, text-shadow 0.8s;
+  }
+  #rc-energy-label {
+    position: absolute; top: 12%; left: 50%;
+    transform: translateX(-50%);
+    font-family: "Courier New", monospace; font-size: 11px;
+    letter-spacing: 3px; color: #666;
+    text-shadow: 0 0 8px currentColor;
+    pointer-events: none; transition: color 0.8s;
+  }
+</style>
+</head>
+<body>
+<div id="rc-container">
+  <canvas id="rc-canvas"></canvas>
+  <div id="rc-regime-label">DARK</div>
+  <div id="rc-energy-label">E: 0.000</div>
+</div>
+<script>
+(function() {
+  "use strict";
+
+  var REGIME_COLORS = {
+    DARK:         { primary: "#444455", glow: "#333344", particle: "#555566" },
+    SPONTANEOUS:  { primary: "#a855f7", glow: "#7c3aed", particle: "#c084fc" },
+    STIMULATED:   { primary: "#00f0ff", glow: "#0088aa", particle: "#67e8f9" },
+    SUPERRADIANT: { primary: "#f59e0b", glow: "#d97706", particle: "#fbbf24" }
+  };
+
+  var state = {
+    rc_energy: 0, rc_cap: 1, rc_regime: "DARK",
+    rc_amp: 0, rc_coh: 0, rc_inv: 0, rc_nex: 0,
+    rc_q: 0, rc_forb: 0, rc_fb: 0, rc_boost: 1,
+    rc_info: 0, rc_rich: 0, rc_fid: 0, rc_pow: 0, rc_res: 0,
+    dims: [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
+  };
+
+  var time = 0;
+  var particles = [];
+  var infoParticles = [];
+  var resonanceWaves = [];
+  var targetColors = { primary: "#444455", glow: "#333344", particle: "#555566" };
+  var currentColors = { primary: "#444455", glow: "#333344", particle: "#555566" };
+
+  var canvas = document.getElementById("rc-canvas");
+  var ctx = canvas.getContext("2d");
+  var regimeLabel = document.getElementById("rc-regime-label");
+  var energyLabel = document.getElementById("rc-energy-label");
+
+  function resize() {
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function parseColor(hex) {
+    if (hex.indexOf("rgb") === 0) {
+      var m = hex.match(/(\d+)/g);
+      return { r: +m[0], g: +m[1], b: +m[2] };
+    }
+    var c = hex.replace("#", "");
+    return { r: parseInt(c.substr(0,2),16), g: parseInt(c.substr(2,2),16), b: parseInt(c.substr(4,2),16) };
+  }
+
+  function lerpColor(a, b, t) {
+    var pa = parseColor(a), pb = parseColor(b);
+    var r = Math.round(lerp(pa.r, pb.r, t));
+    var g = Math.round(lerp(pa.g, pb.g, t));
+    var bl = Math.round(lerp(pa.b, pb.b, t));
+    return "rgb(" + r + "," + g + "," + bl + ")";
+  }
+
+  function hexToRgba(hex, a) {
+    var c = parseColor(hex);
+    return "rgba(" + c.r + "," + c.g + "," + c.b + "," + a + ")";
+  }
+
+  function getHexPoints(cx, cy, radius, rotation) {
+    var pts = [];
+    for (var i = 0; i < 6; i++) {
+      var angle = (Math.PI / 3) * i + rotation;
+      pts.push({ x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) });
+    }
+    return pts;
+  }
+
+  function getIntensity() {
+    var r = state.rc_regime;
+    return r === "SUPERRADIANT" ? 1.0 : r === "STIMULATED" ? 0.7 : r === "SPONTANEOUS" ? 0.4 : 0.12;
+  }
+
+  function getCrystalGeometry(cx, cy, baseRadius, t) {
+    var breathe = 1 + 0.015 * Math.sin(t * 0.8) * (state.rc_regime === "DARK" ? 0.2 : 1);
+    var pulseAmp = state.rc_regime === "SUPERRADIANT" ? 0.04 :
+                   state.rc_regime === "STIMULATED" ? 0.025 :
+                   state.rc_regime === "SPONTANEOUS" ? 0.012 : 0.003;
+    var pulse = 1 + pulseAmp * Math.sin(t * 2.5);
+    var r = baseRadius * breathe * pulse;
+    var rot = t * 0.1;
+    var outerHex = getHexPoints(cx, cy, r, rot);
+    var innerHex = getHexPoints(cx, cy, r * 0.45, rot + Math.PI / 6);
+    return { outerHex: outerHex, innerHex: innerHex, radius: r, cx: cx, cy: cy, rot: rot };
+  }
+
+  // === DRAW Q-FACTOR SHIELD ===
+  function drawShield(cx, cy, radius, col) {
+    var qNorm = clamp(state.rc_q / 50, 0, 1);
+    if (qNorm < 0.05) return;
+    var shieldThick = 3 + qNorm * 18;
+    var shieldAlpha = 0.08 + qNorm * 0.25;
+    for (var s = 0; s < 3; s++) {
+      var sr = radius + 20 + s * shieldThick;
+      ctx.beginPath();
+      ctx.arc(cx, cy, sr, 0, Math.PI * 2);
+      ctx.strokeStyle = hexToRgba(col, shieldAlpha * (1 - s * 0.3));
+      ctx.lineWidth = shieldThick * (1 - s * 0.25);
+      ctx.setLineDash([4 + s * 8, 3 + s * 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // === DRAW OUTER GLOW ===
+  function drawOuterGlow(cx, cy, radius, col, glowCol, intensity) {
+    var glowR = radius * (1.3 + intensity * 0.5);
+    var glowGrad = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, glowR);
+    glowGrad.addColorStop(0, hexToRgba(col, 0.15 * intensity));
+    glowGrad.addColorStop(0.5, hexToRgba(glowCol, 0.06 * intensity));
+    glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(cx - glowR, cy - glowR, glowR * 2, glowR * 2);
+  }
+
+  // === DRAW FACETS (12 dimensions) ===
+  function drawFacets(outerHex, innerHex, cx, cy, col, intensity) {
+    for (var i = 0; i < 6; i++) {
+      var p1 = outerHex[i];
+      var p2 = outerHex[(i + 1) % 6];
+      var stab1 = state.dims[i];
+      var stab2 = state.dims[i + 6];
+
+      // Outer facet triangle
+      ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+      ctx.closePath();
+      ctx.fillStyle = hexToRgba(col, 0.05 + stab1 * 0.2 * intensity);
+      ctx.fill();
+      ctx.strokeStyle = hexToRgba(col, 0.2 + stab1 * 0.4 * intensity);
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Inner line
+      var ip = innerHex[i % 6];
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ip.x, ip.y);
+      ctx.strokeStyle = hexToRgba(col, 0.1 + stab2 * 0.3 * intensity);
+      ctx.lineWidth = 0.5; ctx.stroke();
+
+      // Stability dot at vertex
+      var dotR = 2 + stab1 * 4 * intensity;
+      ctx.beginPath(); ctx.arc(p1.x, p1.y, dotR, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba(col, 0.4 + stab1 * 0.6);
+      ctx.fill();
+    }
+  }
+
+  // === DRAW CRYSTAL BODY ===
+  function drawCrystalBody(outerHex, cx, cy, radius, col, intensity) {
+    ctx.beginPath();
+    ctx.moveTo(outerHex[0].x, outerHex[0].y);
+    for (var i = 1; i < 6; i++) ctx.lineTo(outerHex[i].x, outerHex[i].y);
+    ctx.closePath();
+    var bodyGrad = ctx.createLinearGradient(cx, cy - radius, cx, cy + radius);
+    bodyGrad.addColorStop(0, hexToRgba(col, 0.03 + intensity * 0.08));
+    bodyGrad.addColorStop(0.5, hexToRgba(col, 0.06 + intensity * 0.12));
+    bodyGrad.addColorStop(1, hexToRgba(col, 0.02 + intensity * 0.06));
+    ctx.fillStyle = bodyGrad;
+    ctx.fill();
+    ctx.strokeStyle = hexToRgba(col, 0.4 + intensity * 0.5);
+    ctx.lineWidth = 1.5 + intensity;
+    ctx.stroke();
+  }
+
+  // === DRAW ENERGY FILL (liquid inside) ===
+  function drawEnergyFill(outerHex, cx, cy, radius, col, glowCol, intensity) {
+    var energyRatio = state.rc_cap > 0 ? clamp(state.rc_energy / state.rc_cap, 0, 1) : 0;
+    if (energyRatio < 0.01) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(outerHex[0].x, outerHex[0].y);
+    for (var i = 1; i < 6; i++) ctx.lineTo(outerHex[i].x, outerHex[i].y);
+    ctx.closePath(); ctx.clip();
+    var fillTop = cy + radius - (energyRatio * radius * 2);
+    var fillGrad = ctx.createLinearGradient(cx, fillTop, cx, cy + radius);
+    fillGrad.addColorStop(0, hexToRgba(col, 0.15 + intensity * 0.2));
+    fillGrad.addColorStop(0.3, hexToRgba(col, 0.25 + intensity * 0.3));
+    fillGrad.addColorStop(1, hexToRgba(glowCol, 0.35 + intensity * 0.25));
+    ctx.fillStyle = fillGrad;
+    ctx.fillRect(cx - radius, fillTop, radius * 2, (cy + radius) - fillTop);
+    // Liquid surface wave
+    ctx.beginPath();
+    ctx.moveTo(cx - radius, fillTop);
+    for (var x = cx - radius; x <= cx + radius; x += 2) {
+      var waveY = fillTop + Math.sin((x - cx) * 0.06 + time * 3) * (2 + intensity * 4)
+                          + Math.sin((x - cx) * 0.1 + time * 1.7) * (1 + intensity * 2);
+      ctx.lineTo(x, waveY);
+    }
+    ctx.lineTo(cx + radius, cy + radius);
+    ctx.lineTo(cx - radius, cy + radius);
+    ctx.closePath();
+    ctx.fillStyle = hexToRgba(col, 0.12 + intensity * 0.15);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // === DRAW SPECTRUM ONDULATIONS ===
+  function drawSpectrum(outerHex, cx, cy, radius, col) {
+    if (state.rc_amp < 0.01) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(outerHex[0].x, outerHex[0].y);
+    for (var i = 1; i < 6; i++) ctx.lineTo(outerHex[i].x, outerHex[i].y);
+    ctx.closePath(); ctx.clip();
+    var specAmp = state.rc_amp * 15;
+    var numWaves = 5 + Math.floor(state.rc_amp * 8);
+    for (var w = 0; w < numWaves; w++) {
+      var wPhase = (w / numWaves) * Math.PI * 2;
+      var wY = cy - radius + (w / numWaves) * radius * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - radius, wY);
+      for (var x = cx - radius; x <= cx + radius; x += 3) {
+        var dx = (x - cx) / radius;
+        var dy = Math.sin(dx * 4 + time * 2 + wPhase) * specAmp * (1 - Math.abs(dx));
+        ctx.lineTo(x, wY + dy);
+      }
+      ctx.strokeStyle = hexToRgba(col, 0.08 + state.rc_amp * 0.12);
+      ctx.lineWidth = 0.6; ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // === INNER HEX + 3D CONNECTIONS ===
+  function drawInnerStructure(outerHex, innerHex, cx, cy, col, intensity) {
+    ctx.beginPath();
+    ctx.moveTo(innerHex[0].x, innerHex[0].y);
+    for (var i = 1; i < 6; i++) ctx.lineTo(innerHex[i].x, innerHex[i].y);
+    ctx.closePath();
+    ctx.strokeStyle = hexToRgba(col, 0.15 + intensity * 0.25);
+    ctx.lineWidth = 0.8; ctx.stroke();
+    for (var i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(outerHex[i].x, outerHex[i].y);
+      ctx.lineTo(innerHex[i].x, innerHex[i].y);
+      ctx.strokeStyle = hexToRgba(col, 0.08 + intensity * 0.15);
+      ctx.lineWidth = 0.5; ctx.stroke();
+    }
+    // Central core glow
+    var coreR = outerHex[0].x ? 12 : 12;  // just a size
+    var coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR);
+    coreGrad.addColorStop(0, hexToRgba(col, 0.6 * intensity + 0.1));
+    coreGrad.addColorStop(0.5, hexToRgba(col, 0.2 * intensity));
+    coreGrad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // === RESONANCE WAVES ===
+  var lastResWave = 0;
+  function maybeSpawnWave() {
+    if (state.rc_res > 0.1 && time - lastResWave > (1.5 - state.rc_res * 1.2)) {
+      resonanceWaves.push({
+        radius: 0, maxRadius: 150 + state.rc_res * 200,
+        speed: 0.8 + state.rc_res * 1.5, life: 1
+      });
+      lastResWave = time;
+    }
+  }
+  function updateWaves() {
+    for (var i = resonanceWaves.length - 1; i >= 0; i--) {
+      var w = resonanceWaves[i];
+      w.radius += w.speed;
+      w.life = 1 - (w.radius / w.maxRadius);
+      if (w.life <= 0) resonanceWaves.splice(i, 1);
+    }
+  }
+  function drawWaves(cx, cy) {
+    for (var i = 0; i < resonanceWaves.length; i++) {
+      var w = resonanceWaves[i];
+      ctx.beginPath(); ctx.arc(cx, cy, w.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = hexToRgba(currentColors.primary, 0.35 * w.life);
+      ctx.lineWidth = 1.5 * w.life + 0.5; ctx.stroke();
+    }
+  }
+
+  // === EXPLOSION PARTICLES ===
+  function spawnParticle(cx, cy, radius) {
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 0.5 + Math.random() * 3;
+    var regime = state.rc_regime;
+    var baseLife = regime === "SUPERRADIANT" ? 120 : regime === "STIMULATED" ? 80 : 50;
+    particles.push({
+      x: cx + (Math.random() - 0.5) * radius * 0.3,
+      y: cy + (Math.random() - 0.5) * radius * 0.3,
+      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      life: baseLife + Math.random() * 60, maxLife: baseLife + 60,
+      size: 1 + Math.random() * 2.5, color: currentColors.particle
+    });
+  }
+  function updateParticles() {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.995; p.vy *= 0.995;
+      p.life--;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+  function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var alpha = clamp(p.life / p.maxLife, 0, 1);
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba(p.color, alpha * 0.7); ctx.fill();
+      if (alpha > 0.3) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * alpha * 3, 0, Math.PI * 2);
+        ctx.fillStyle = hexToRgba(p.color, alpha * 0.1); ctx.fill();
+      }
+    }
+  }
+
+  // === INFO PARTICLES (content carriers) ===
+  function spawnInfoParticle(cx, cy, radius) {
+    var angle = Math.random() * Math.PI * 2;
+    var startR = radius * 0.6;
+    infoParticles.push({
+      x: cx + Math.cos(angle) * startR, y: cy + Math.sin(angle) * startR,
+      angle: angle, speed: 0.3 + Math.random() * 1.2,
+      dist: startR, maxDist: radius * 2.5 + Math.random() * 100,
+      size: 1.5 + Math.random() * 2, trail: [], life: 1
+    });
+  }
+  function updateInfoParticles(cx, cy) {
+    for (var i = infoParticles.length - 1; i >= 0; i--) {
+      var p = infoParticles[i];
+      p.dist += p.speed;
+      p.angle += Math.sin(time + i) * 0.01;
+      p.x = cx + Math.cos(p.angle) * p.dist;
+      p.y = cy + Math.sin(p.angle) * p.dist;
+      p.life = 1 - (p.dist / p.maxDist);
+      p.trail.push({ x: p.x, y: p.y });
+      if (p.trail.length > 8) p.trail.shift();
+      if (p.life <= 0) infoParticles.splice(i, 1);
+    }
+  }
+  function drawInfoParticles() {
+    for (var i = 0; i < infoParticles.length; i++) {
+      var p = infoParticles[i];
+      var alpha = clamp(p.life, 0, 1);
+      if (p.trail.length > 1) {
+        ctx.beginPath(); ctx.moveTo(p.trail[0].x, p.trail[0].y);
+        for (var t = 1; t < p.trail.length; t++) ctx.lineTo(p.trail[t].x, p.trail[t].y);
+        ctx.strokeStyle = hexToRgba(currentColors.primary, alpha * 0.15);
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba("#ffffff", alpha * 0.6); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * alpha * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba(currentColors.particle, alpha * 0.15); ctx.fill();
+    }
+  }
+
+  // === STATS RING ===
+  function drawStatsRing(cx, cy, radius) {
+    var ringR = radius + 8;
+    var col = currentColors.primary;
+    var metrics = [
+      { val: state.rc_coh }, { val: state.rc_fid },
+      { val: state.rc_pow }, { val: state.rc_amp }
+    ];
+    var gap = 0.08;
+    var segAngle = (Math.PI * 2 - gap * metrics.length) / metrics.length;
+    for (var i = 0; i < metrics.length; i++) {
+      var startA = -Math.PI / 2 + i * (segAngle + gap);
+      var endA = startA + segAngle * clamp(metrics[i].val, 0, 1);
+      ctx.beginPath(); ctx.arc(cx, cy, ringR, startA, startA + segAngle);
+      ctx.strokeStyle = hexToRgba(col, 0.06); ctx.lineWidth = 2; ctx.stroke();
+      if (metrics[i].val > 0.01) {
+        ctx.beginPath(); ctx.arc(cx, cy, ringR, startA, endA);
+        ctx.strokeStyle = hexToRgba(col, 0.35); ctx.lineWidth = 2.5; ctx.stroke();
+      }
+    }
+  }
+
+  // === SCANLINES ===
+  function drawScanlines(w, h) {
+    ctx.fillStyle = "rgba(0,0,0,0.015)";
+    for (var y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+  }
+
+  // === MAIN RENDER ===
+  function render() {
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.width / dpr;
+    var h = canvas.height / dpr;
+    var cx = w / 2;
+    var cy = h / 2;
+    var baseRadius = Math.min(w, h) * 0.22;
+    ctx.clearRect(0, 0, w, h);
+    time += 0.016;
+
+    // Smooth color transition
+    currentColors.primary = lerpColor(currentColors.primary, targetColors.primary, 0.03);
+    currentColors.glow = lerpColor(currentColors.glow, targetColors.glow, 0.03);
+    currentColors.particle = lerpColor(currentColors.particle, targetColors.particle, 0.03);
+
+    var geo = getCrystalGeometry(cx, cy, baseRadius, time);
+    var col = currentColors.primary;
+    var glowCol = currentColors.glow;
+    var intensity = getIntensity();
+
+    // Update systems
+    maybeSpawnWave(); updateWaves();
+    var regime = state.rc_regime;
+    var spawnRate = regime === "SUPERRADIANT" ? 5 : regime === "STIMULATED" ? 2 : regime === "SPONTANEOUS" ? 0.5 : 0.05;
+    if (Math.random() < spawnRate * 0.16) spawnParticle(cx, cy, geo.radius);
+    updateParticles();
+    if (Math.random() < state.rc_info * 0.05) spawnInfoParticle(cx, cy, geo.radius);
+    updateInfoParticles(cx, cy);
+
+    // Draw layers (back to front)
+    drawWaves(cx, cy);
+    drawShield(cx, cy, geo.radius, col);
+    drawOuterGlow(cx, cy, geo.radius, col, glowCol, intensity);
+    drawInfoParticles();
+    drawParticles();
+    drawFacets(geo.outerHex, geo.innerHex, cx, cy, col, intensity);
+    drawCrystalBody(geo.outerHex, cx, cy, geo.radius, col, intensity);
+    drawEnergyFill(geo.outerHex, cx, cy, geo.radius, col, glowCol, intensity);
+    drawSpectrum(geo.outerHex, cx, cy, geo.radius, col);
+    drawInnerStructure(geo.outerHex, geo.innerHex, cx, cy, col, intensity);
+    drawStatsRing(cx, cy, geo.radius);
+    if (regime !== "DARK") drawScanlines(w, h);
+
+    requestAnimationFrame(render);
+  }
+
+  // === EXPORTED UPDATE FUNCTION ===
+  window.updateResonantCrystal = function(data) {
+    if (!data) return;
+    if (data.rc_energy !== undefined) state.rc_energy = data.rc_energy;
+    if (data.rc_cap !== undefined) state.rc_cap = data.rc_cap;
+    if (data.rc_regime !== undefined) {
+      var nr = data.rc_regime.toUpperCase();
+      if (REGIME_COLORS[nr] && nr !== state.rc_regime) {
+        state.rc_regime = nr;
+        targetColors = { primary: REGIME_COLORS[nr].primary, glow: REGIME_COLORS[nr].glow, particle: REGIME_COLORS[nr].particle };
+        regimeLabel.textContent = nr;
+        regimeLabel.style.color = REGIME_COLORS[nr].primary;
+        regimeLabel.style.textShadow = "0 0 15px " + REGIME_COLORS[nr].glow;
+      }
+    }
+    if (data.rc_amp !== undefined) state.rc_amp = clamp(data.rc_amp, 0, 1);
+    if (data.rc_coh !== undefined) state.rc_coh = clamp(data.rc_coh, 0, 1);
+    if (data.rc_inv !== undefined) state.rc_inv = data.rc_inv;
+    if (data.rc_nex !== undefined) state.rc_nex = data.rc_nex;
+    if (data.rc_q !== undefined) state.rc_q = data.rc_q;
+    if (data.rc_forb !== undefined) state.rc_forb = data.rc_forb;
+    if (data.rc_fb !== undefined) state.rc_fb = data.rc_fb;
+    if (data.rc_boost !== undefined) state.rc_boost = data.rc_boost;
+    if (data.rc_info !== undefined) state.rc_info = clamp(data.rc_info, 0, 5);
+    if (data.rc_rich !== undefined) state.rc_rich = data.rc_rich;
+    if (data.rc_fid !== undefined) state.rc_fid = clamp(data.rc_fid, 0, 1);
+    if (data.rc_pow !== undefined) state.rc_pow = clamp(data.rc_pow, 0, 1);
+    if (data.rc_res !== undefined) state.rc_res = clamp(data.rc_res, 0, 1);
+    // Derive 12 dimension stabilities
+    state.dims = [
+      state.rc_coh, state.rc_fid, state.rc_pow, state.rc_amp,
+      clamp(state.rc_q / 50, 0, 1), state.rc_res,
+      clamp(state.rc_info / 3, 0, 1), clamp(state.rc_rich, 0, 1),
+      clamp(state.rc_energy / Math.max(state.rc_cap, 1), 0, 1),
+      clamp(state.rc_boost / 3, 0, 1),
+      clamp(1 - state.rc_forb / 5, 0, 1),
+      clamp(state.rc_nex / 5, 0, 1)
+    ];
+    energyLabel.textContent = "E: " + state.rc_energy.toFixed(3) + " / " + state.rc_cap.toFixed(1);
+    energyLabel.style.color = currentColors.primary;
+  };
+
+  // === DEMO MODE ===
+  function startDemo() {
+    var regimes = ["DARK", "SPONTANEOUS", "STIMULATED", "SUPERRADIANT"];
+    var idx = 0;
+    setInterval(function() {
+      idx = (idx + 1) % regimes.length;
+      var r = regimes[idx];
+      var e = r === "DARK" ? 0.1 : r === "SPONTANEOUS" ? 0.3 : r === "STIMULATED" ? 0.6 : 0.95;
+      window.updateResonantCrystal({
+        rc_energy: e * 5, rc_cap: 5, rc_regime: r,
+        rc_amp: e * 0.8, rc_coh: e, rc_inv: e * 3, rc_nex: e * 4,
+        rc_q: e * 40, rc_forb: (1 - e) * 3, rc_fb: e * 2, rc_boost: 1 + e * 2,
+        rc_info: e * 3, rc_rich: e * 0.8, rc_fid: e, rc_pow: e * 0.9, rc_res: e * 0.85
+      });
+    }, 4000);
+  }
+
+  render();
+  if (window.location === window.parent.location) setTimeout(startDemo, 2000);
+
+})();
+</script>
+</body>
+</html>

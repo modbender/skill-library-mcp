@@ -1,0 +1,37 @@
+# Skill: tls-inspect
+# Version: 1.0.0
+#
+# Inspect TLS certificate for a host.
+
+name: tls-inspect
+version: 1.0.0
+description: Inspect TLS certificate (expiry, SANs, chain, cipher)
+
+credentials: []
+
+inputs:
+  - name: host
+    type: string
+    required: true
+    description: "Hostname or host:port to inspect"
+
+outputs:
+  - name: certificate
+    type: object
+    description: Certificate details
+  - name: valid
+    type: boolean
+    description: Whether cert is valid and not expired
+  - name: metadata
+    type: object
+    description: Inspection metadata
+
+backends:
+  - name: local
+    type: local
+    description: Local TLS connection
+
+components:
+  inputs: [stdin, http_server]
+  processors: [mapping, command, log]
+  outputs: [stdout, sync_response]

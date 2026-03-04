@@ -1,0 +1,55 @@
+# Expanso Pipeline: json-to-csv (CLI mode)
+# =========================================
+#
+# Usage:
+#   echo '[{"name":"Alice","age":30}]' | expanso-edge run pipeline-cli.yaml
+#
+# No API key needed - runs entirely locally.
+
+name: "json-to-csv-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 10485760
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let delimiter = env("DELIMITER").or(",")
+
+          # Parse JSON input
+          let data = content().parse_json().catch([])
+          let data = if $data.type() == "array" { $data } else { [$data] }
+
+          # Get all unique keys from all objects
+          let columns = $data.fold([], pair -> pair.value.keys().or([]).fold(pair.tally, kp -> if kp.tally.contains(kp.value) { kp.tally } else { kp.tally.append(kp.value) }))
+
+          # Build CSV rows
+          let header = $columns.join($delimiter)
+          let rows = $data.map_each(obj -> $columns.map_each(col -> if obj.get(col).or("").string().contains($delimiter) || obj.get(col).or("").string().contains("\"") {
+            "\"" + obj.get(col).or("").string().re_replace_all("\"", "\"\"") + "\""
+          } else { obj.get(col).or("").string() }).join($delimiter))
+
+          root.csv = $header + "\n" + $rows.join("\n")
+          root.row_count = $data.length()
+          root.columns = $columns
+          root.metadata = {
+            "skill": "json-to-csv",
+            "mode": "cli",
+            "delimiter": $delimiter,
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [json-to-csv] Converted ${! root.row_count } rows (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

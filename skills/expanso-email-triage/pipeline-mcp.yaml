@@ -1,0 +1,124 @@
+# Expanso Pipeline: email-triage (MCP mode)
+# ==========================================
+#
+# HTTP endpoint for OpenClaw/MCP integration.
+#
+# Usage:
+#   # Start the server
+#   GMAIL_TOKEN=... OPENAI_API_KEY=... PORT=8080 expanso-edge run pipeline-mcp.yaml
+#
+#   # Call from OpenClaw
+#   "Triage my inbox and find any urgent emails"
+#   → Routes to POST /triage
+#
+#   # Or call directly
+#   curl -X POST http://localhost:8080/triage \
+#     -H "Content-Type: application/json" \
+#     -d '{"provider": "gmail", "limit": 50}'
+#
+# Validates against: docs.expanso.io/schemas/pipeline.schema.json
+
+name: email-triage-mcp
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /triage
+      allowed_verbs: [POST]
+      timeout: 120s  # Email processing can take time
+
+  pipeline:
+    processors:
+      # Initialize and validate
+      - mapping: |
+          meta trace_id = uuid_v4()
+          meta start_time = now()
+
+          let provider = this.provider.or("gmail")
+          let folder = this.folder.or("INBOX")
+          let limit = this.limit.or(50)
+
+          meta provider = $provider
+          meta folder = $folder
+          meta limit = $limit
+
+          root = if !["gmail", "outlook", "imap"].contains($provider) {
+            throw("Invalid provider. Use: gmail, outlook, or imap")
+          } else { "" }
+
+      - log:
+          level: INFO
+          message: |
+            [email-triage] MCP request: provider=${! meta("provider") } (trace: ${! meta("trace_id").slice(0, 8) })
+
+      # Fetch emails (simulated for demo)
+      - mapping: |
+          let sample_emails = [
+            {"id": "msg-001", "subject": "URGENT: Production issue", "from": "ops@company.com", "body": "Server needs attention.", "date": now()},
+            {"id": "msg-002", "subject": "Meeting: Sprint Review", "from": "pm@company.com", "body": "Let's meet Friday 3pm.", "date": now()},
+            {"id": "msg-003", "subject": "Weekly Digest", "from": "news@digest.com", "body": "This week's updates...", "date": now()}
+          ]
+
+          root.emails = $sample_emails.slice(0, meta("limit"))
+          meta emails = root.emails
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "Classify emails into: urgent, action-required, meeting, fyi, newsletter, spam. Return JSON array with id, category, priority (1-5), action."
+            },
+            {
+              "role": "user",
+              "content": "Classify: " + root.emails.format_json()
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      # Process results
+      - mapping: |
+          let classifications = this.choices.0.message.content.parse_json().catch([])
+          let emails = meta("emails")
+
+          let processed = $emails.map_each(email -> email.merge($classifications.filter(x -> x.id == email.id).index(0).or({"category": "fyi", "priority": 3, "action": "review"})))
+
+          let urgent = $processed.filter(e -> e.category == "urgent").length()
+
+          root.summary = {
+            "processed": $processed.length(),
+            "urgent_count": $urgent,
+            "by_category": {
+              "urgent": $urgent,
+              "action-required": $processed.filter(e -> e.category == "action-required").length(),
+              "meeting": $processed.filter(e -> e.category == "meeting").length(),
+              "fyi": $processed.filter(e -> e.category == "fyi").length()
+            }
+          }
+          root.emails = $processed
+          root.metadata = {
+            "skill": "email-triage",
+            "mode": "mcp",
+            "provider": meta("provider"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [email-triage] MCP complete: ${! this.summary.processed } emails (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}
+
+selector:
+  match_labels:
+    capability: llm
+    integration: email

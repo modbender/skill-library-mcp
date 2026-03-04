@@ -1,0 +1,53 @@
+# Skill: log-sanitize
+# Version: 1.0.0
+#
+# Sanitize log entries by removing sensitive data patterns.
+# Works without an LLM - uses local pattern matching.
+
+name: "log-sanitize"
+version: "1.0.0"
+description: "Sanitize log entries by removing passwords, tokens, and sensitive patterns"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials: []  # No API key needed - runs entirely locally
+
+inputs:
+  - name: log
+    type: string
+    required: true
+    description: Log entry or log file content to sanitize
+  - name: patterns
+    type: array
+    default: ["password", "token", "secret", "key", "auth"]
+    description: Additional patterns to redact
+
+outputs:
+  - name: sanitized
+    type: string
+    description: Log with sensitive data removed
+  - name: redactions
+    type: integer
+    description: Number of redactions made
+  - name: patterns_matched
+    type: array
+    description: List of patterns that matched
+
+backends:
+  - name: local
+    type: local
+    requires: []
+    description: Pure local processing, no external calls
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+  outputs:
+    - stdout
+    - sync_response

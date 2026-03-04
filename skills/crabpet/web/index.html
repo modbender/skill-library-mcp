@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrabPet - AI Pet Companion</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d1a;
+    color: #ccc;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    padding: 20px;
+  }
+  h1 {
+    color: #FF6B4A;
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+  #petCanvas {
+    border: 2px solid #FF6B4A;
+    border-radius: 8px;
+    background: #111128;
+    image-rendering: pixelated;
+    display: block;
+    margin: 0 auto 20px;
+  }
+  .info-panel {
+    background: #111128;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .pet-name {
+    color: #FF6B4A;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #1a1a2e;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: #666; }
+  .stat-value { color: #FF6B4A; }
+  .xp-bar-container {
+    background: #1a1a2e;
+    border-radius: 4px;
+    height: 8px;
+    margin: 8px 0;
+    overflow: hidden;
+  }
+  .xp-bar {
+    background: linear-gradient(90deg, #FF6B4A, #FFD700);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .mood-display {
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    margin: 8px 0;
+    font-style: italic;
+  }
+  .achievements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .achievement {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .achievement.locked { opacity: 0.3; }
+  .personality-bars {
+    margin-top: 8px;
+  }
+  .pers-row {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+  }
+  .pers-label {
+    width: 70px;
+    font-size: 11px;
+    color: #888;
+  }
+  .pers-bar-bg {
+    flex: 1;
+    background: #1a1a2e;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pers-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+  .pers-val {
+    width: 35px;
+    text-align: right;
+    font-size: 11px;
+    color: #666;
+  }
+  .controls {
+    margin-top: 16px;
+  }
+  .controls button {
+    background: #FF6B4A;
+    color: #0d0d1a;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 4px;
+  }
+  .controls button:hover {
+    background: #FF8866;
+  }
+  #fileInput { display: none; }
+  .footer {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #444;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>CrabPet</h1>
+  <p class="subtitle">AI Pet Companion</p>
+
+  <canvas id="petCanvas" width="256" height="256"></canvas>
+
+  <div class="mood-display" id="moodDisplay">...</div>
+
+  <div class="info-panel">
+    <div class="pet-name" id="petName">CrabPet</div>
+    <div class="xp-bar-container">
+      <div class="xp-bar" id="xpBar" style="width: 0%"></div>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Level</span>
+      <span class="stat-value" id="petLevel">1</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Stage</span>
+      <span class="stat-value" id="petStage">Baby</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">XP</span>
+      <span class="stat-value" id="petXP">0 / 40</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Personality</span>
+      <span class="stat-value" id="petPersonality">Neutral</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Mood</span>
+      <span class="stat-value" id="petMood">Energetic</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Streak</span>
+      <span class="stat-value" id="petStreak">0 days</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Total Days</span>
+      <span class="stat-value" id="petTotalDays">0</span>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <div style="color: #888; font-size: 12px; margin-bottom: 8px;">Personality Profile</div>
+    <div class="personality-bars" id="personalityBars"></div>
+  </div>
+
+  <div class="info-panel">
+    <div style="color: #888; font-size: 12px; margin-bottom: 8px;">Achievements</div>
+    <div class="achievements" id="achievementsList"></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="document.getElementById('fileInput').click()">Load pet_state.json</button>
+    <button onclick="loadDemo()">Demo Mode</button>
+  </div>
+  <input type="file" id="fileInput" accept=".json" onchange="handleFileLoad(event)">
+
+  <p class="footer">clawhub install crabpet</p>
+</div>
+
+<script>
+const canvas = document.getElementById('petCanvas');
+const ctx = canvas.getContext('2d');
+
+const PERSONALITY_LABELS = {
+  coder: 'Tech Nerd', writer: 'Literary', analyst: 'Scholar',
+  creative: 'Creative', hustle: 'Grinder', neutral: 'Newbie'
+};
+const PERSONALITY_COLORS = {
+  coder: '#4FC3F7', writer: '#CE93D8', analyst: '#81C784',
+  creative: '#FFB74D', hustle: '#FFD54F'
+};
+const MOOD_LABELS = {
+  energetic: 'Energetic', bored: 'Bored', slacking: 'Slacking',
+  hibernating: 'Hibernating', dusty: 'Dusty', frozen: 'Frozen'
+};
+const STAGE_LABELS = {
+  baby: 'Baby', teen: 'Teen', adult: 'Adult', legend: 'Legend'
+};
+
+const SPRITES = {
+  baby: [
+    '........',
+    '..RR.RR.',
+    '..RRRR..',
+    '.ROWWOR.',
+    '.ROOOR..',
+    '..RRRR..',
+    '.R.RR.R.',
+    '........'
+  ],
+  teen: [
+    '............',
+    '..RR....RR..',
+    '..RR....RR..',
+    '.RRRR..RRRR.',
+    '.ROOOOOROOR.',
+    '.ROOOOOOOR..',
+    '.ROWOOOWOR..',
+    '.ROOOOOOOR..',
+    '..RRRRRRRR..',
+    '..RR.RR.RR..',
+    '..R..RR..R..',
+    '............'
+  ],
+  adult: [
+    '................',
+    '...RR......RR...',
+    '...RR......RR...',
+    '..RRRR...RRRR...',
+    '..RRRRR.RRRRR...',
+    '.RROOOOOOOOORR..',
+    '.RROOOOOOOORR...',
+    '.RROWOOOOWOORRR.',
+    '.RROOOOOOOOORR..',
+    '.RROOMMMMOORRR..',
+    '..RRRRRRRRRRRR..',
+    '..RRRRRRRRRRR...',
+    '...RR.RRRR.RR...',
+    '...R..RRRR..R...',
+    '......RRRR......',
+    '................'
+  ],
+  legend: [
+    '....G......G....',
+    '...GRR.GG.RRG...',
+    '...GRR.GG.RRG...',
+    '..GRRRRGGRRRR...',
+    '..GRRRRRRRRRRG..',
+    '.GRROOOOOOOORRG.',
+    '.GRROOOOOOORRG..',
+    '.GRROWOOOOWOORG.',
+    '.GRROOOOOOOORGG.',
+    '.GRROOMMMMOORRG.',
+    '..GRRRRRRRRRRRG.',
+    '..GRRRRRRRRRRG..',
+    '...GR.GRRRG.RG..',
+    '...G..GRRG..G...',
+    '......GRRG......',
+    '......G..G......'
+  ]
+};
+
+const COLOR_MAPS = {
+  normal: { R: '#D4432F', O: '#FF7B54', W: '#FFFFFF', M: '#FF4757', G: '#FFD700' },
+  frozen: { R: '#5B9BD5', O: '#A0C4E8', W: '#E8E8E8', M: '#7BB8DE', G: '#87CEEB' },
+  dusty:  { R: '#6B5B4F', O: '#8B7B6F', W: '#CCCCCC', M: '#7B6B5F', G: '#A89880' }
+};
+
+let animFrame = 0;
+
+function getColorMap(mood) {
+  if (mood === 'frozen') return COLOR_MAPS.frozen;
+  if (mood === 'dusty' || mood === 'hibernating') return COLOR_MAPS.dusty;
+  return COLOR_MAPS.normal;
+}
+
+function drawSprite(sprite, colorMap, offsetX, offsetY, pixelSize) {
+  for (let row = 0; row < sprite.length; row++) {
+    for (let col = 0; col < sprite[row].length; col++) {
+      const ch = sprite[row][col];
+      if (ch !== '.' && colorMap[ch]) {
+        ctx.fillStyle = colorMap[ch];
+        ctx.fillRect(
+          offsetX + col * pixelSize,
+          offsetY + row * pixelSize,
+          pixelSize, pixelSize
+        );
+      }
+    }
+  }
+}
+
+function drawEffects(mood, centerX, centerY, size) {
+  const t = animFrame;
+  ctx.globalAlpha = 0.6;
+
+  if (mood === 'frozen') {
+    ctx.fillStyle = '#ADD8E6';
+    for (let i = 0; i < 6; i++) {
+      const x = centerX - size/2 + Math.sin(t * 0.05 + i) * size * 0.6;
+      const y = centerY - size/2 + Math.cos(t * 0.03 + i * 1.5) * size * 0.6;
+      ctx.fillRect(x, y, 3, 3);
+    }
+  } else if (mood === 'hibernating' || mood === 'dusty') {
+    ctx.fillStyle = '#888';
+    const wx = centerX + size * 0.3;
+    const wy = centerY - size * 0.4;
+    ctx.beginPath();
+    ctx.moveTo(wx, wy); ctx.lineTo(wx + 15, wy - 10);
+    ctx.moveTo(wx + 5, wy); ctx.lineTo(wx + 15, wy + 5);
+    ctx.moveTo(wx + 10, wy - 5); ctx.lineTo(wx + 20, wy);
+    ctx.strokeStyle = '#888'; ctx.lineWidth = 1; ctx.stroke();
+  } else if (mood === 'energetic') {
+    ctx.fillStyle = '#FFD700';
+    const sparkles = [[-0.4, -0.5], [0.4, -0.4], [-0.3, 0.4], [0.5, 0.3]];
+    sparkles.forEach(([dx, dy], i) => {
+      const pulse = Math.sin(t * 0.1 + i * 1.5) * 0.5 + 0.5;
+      if (pulse > 0.3) {
+        const sx = centerX + dx * size;
+        const sy = centerY + dy * size;
+        ctx.fillRect(sx - 1, sy, 3, 1);
+        ctx.fillRect(sx, sy - 1, 1, 3);
+      }
+    });
+  } else if (mood === 'slacking') {
+    ctx.fillStyle = '#FF7B54';
+    const snackX = centerX + size * 0.35;
+    const snackY = centerY + size * 0.1;
+    ctx.fillRect(snackX, snackY, 6, 4);
+    ctx.fillRect(snackX + 1, snackY - 1, 4, 1);
+  }
+
+  if (mood === 'hibernating') {
+    ctx.fillStyle = '#AABBDD';
+    const zx = centerX + size * 0.25;
+    const zy = centerY - size * 0.35;
+    ctx.font = '10px monospace';
+    const zOffset = Math.sin(t * 0.05) * 3;
+    ctx.fillText('z', zx, zy + zOffset);
+    ctx.fillText('Z', zx + 8, zy - 6 + zOffset);
+    ctx.fillText('Z', zx + 16, zy - 14 + zOffset);
+  }
+
+  ctx.globalAlpha = 1.0;
+}
+
+function renderPet(state) {
+  const W = canvas.width;
+  const H = canvas.height;
+
+  ctx.fillStyle = '#111128';
+  ctx.fillRect(0, 0, W, H);
+
+  const stage = state.appearance?.stage || 'baby';
+  const mood = state.mood || 'energetic';
+  const sprite = SPRITES[stage] || SPRITES.baby;
+  const colorMap = getColorMap(mood);
+
+  const spriteRows = sprite.length;
+  const spriteCols = Math.max(...sprite.map(r => r.length));
+  const maxPixelSize = Math.min(
+    Math.floor((W * 0.7) / spriteCols),
+    Math.floor((H * 0.7) / spriteRows)
+  );
+  const pixelSize = Math.max(4, maxPixelSize);
+
+  const totalW = spriteCols * pixelSize;
+  const totalH = spriteRows * pixelSize;
+  const ox = (W - totalW) / 2;
+  const oy = (H - totalH) / 2;
+
+  // Idle animation - gentle bob
+  const bobY = Math.sin(animFrame * 0.04) * 3;
+
+  drawSprite(sprite, colorMap, ox, oy + bobY, pixelSize);
+  drawEffects(mood, W / 2, H / 2, Math.max(totalW, totalH));
+}
+
+function updateUI(state) {
+  document.getElementById('petName').textContent = state.name || 'CrabPet';
+  document.getElementById('petLevel').textContent = state.level || 1;
+  const stage = state.appearance?.stage || 'baby';
+  document.getElementById('petStage').textContent = STAGE_LABELS[stage] || stage;
+
+  const xp = state.xp || 0;
+  const xpNext = state.xp_next || 40;
+  document.getElementById('petXP').textContent = `${xp} / ${xpNext}`;
+  const pct = Math.min(100, (xp / xpNext) * 100);
+  document.getElementById('xpBar').style.width = pct + '%';
+
+  const primaryPers = state.primary_personality || 'neutral';
+  document.getElementById('petPersonality').textContent =
+    state.personality_label || PERSONALITY_LABELS[primaryPers] || 'Neutral';
+
+  const mood = state.mood || 'energetic';
+  document.getElementById('petMood').textContent =
+    state.mood_label || MOOD_LABELS[mood] || mood;
+  document.getElementById('moodDisplay').textContent =
+    state.mood_message || '...';
+
+  document.getElementById('petStreak').textContent =
+    (state.stats?.streak_days || 0) + ' days';
+  document.getElementById('petTotalDays').textContent =
+    state.stats?.total_log_days || 0;
+
+  // Personality bars
+  const persContainer = document.getElementById('personalityBars');
+  persContainer.innerHTML = '';
+  const pers = state.personality || {};
+  ['coder', 'writer', 'analyst', 'creative', 'hustle'].forEach(dim => {
+    const val = pers[dim] || 0;
+    const row = document.createElement('div');
+    row.className = 'pers-row';
+    row.innerHTML = `
+      <span class="pers-label">${dim}</span>
+      <div class="pers-bar-bg">
+        <div class="pers-bar" style="width:${val*100}%;background:${PERSONALITY_COLORS[dim]||'#FF6B4A'}"></div>
+      </div>
+      <span class="pers-val">${(val*100).toFixed(0)}%</span>
+    `;
+    persContainer.appendChild(row);
+  });
+
+  // Achievements
+  const achContainer = document.getElementById('achievementsList');
+  achContainer.innerHTML = '';
+  const ACHIEVEMENTS = {
+    first_chat: { name: '初次见面', emoji: '🥚' },
+    day_3: { name: '三日之缘', emoji: '🌱' },
+    day_7: { name: '七日之约', emoji: '🔥' },
+    day_30: { name: '铁人虾', emoji: '🏆' },
+    day_100: { name: '百日传说', emoji: '👑' },
+    night_owl: { name: '夜猫子', emoji: '🦉' },
+    code_master: { name: '代码大师', emoji: '💻' },
+    wordsmith: { name: '妙笔生花', emoji: '✍️' },
+    data_wizard: { name: '数据巫师', emoji: '📊' },
+    chatterbox: { name: '话痨虾', emoji: '💬' },
+    comeback: { name: '浪子回头', emoji: '🔄' }
+  };
+  const unlocked = new Set(state.achievements || []);
+  Object.entries(ACHIEVEMENTS).forEach(([id, info]) => {
+    const el = document.createElement('span');
+    el.className = 'achievement' + (unlocked.has(id) ? '' : ' locked');
+    el.textContent = `${info.emoji} ${info.name}`;
+    el.title = id;
+    achContainer.appendChild(el);
+  });
+}
+
+function loadState(state) {
+  updateUI(state);
+  // Start animation loop
+  function animate() {
+    animFrame++;
+    renderPet(state);
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function handleFileLoad(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const state = JSON.parse(e.target.result);
+      loadState(state);
+    } catch (err) {
+      alert('Invalid JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function loadDemo() {
+  const demo = {
+    name: 'Demo Crab',
+    level: 12,
+    xp: 1440,
+    xp_next: 1690,
+    personality: { coder: 0.85, writer: 0.3, analyst: 0.15, creative: 0.1, hustle: 0.6 },
+    primary_personality: 'coder',
+    personality_label: '🔧 技术宅',
+    mood: 'energetic',
+    mood_label: '✨ 精力充沛',
+    mood_message: '今天也一起加油！⌨️🦞',
+    appearance: { stage: 'teen', accessories: ['glasses', 'tiny_laptop'], primary_color: '#FF6B4A' },
+    stats: { total_log_days: 45, streak_days: 12, max_streak: 15, first_log: '2026-01-10', last_log: '2026-02-26' },
+    achievements: ['first_chat', 'day_3', 'day_7', 'code_master'],
+    born: '2026-01-10'
+  };
+  loadState(demo);
+}
+
+// Auto-load demo on start
+loadDemo();
+</script>
+</body>
+</html>

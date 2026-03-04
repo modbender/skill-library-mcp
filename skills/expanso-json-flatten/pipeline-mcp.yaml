@@ -1,0 +1,30 @@
+name: "json-flatten-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /flatten
+      allowed_verbs: [POST]
+      timeout: 30s
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let input = this.object.or(content())
+
+          let parsed = if $input.type() == "object" { $input } else { $input.parse_json().catch({}) }
+          let keys = $parsed.keys()
+
+          root.original = $parsed
+          root.top_level_keys = $keys
+          root.key_count = $keys.length()
+          root.metadata = {"skill": "json-flatten", "mode": "mcp", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    sync_response: {}

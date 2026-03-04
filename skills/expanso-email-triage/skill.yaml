@@ -1,0 +1,126 @@
+# Skill: email-triage
+# Version: 1.0.0
+#
+# Intelligent email triage: categorize, prioritize, and sync calendar events.
+# Inspired by the user who cleared 6,000 emails on day one.
+#
+# Features:
+# - Categorize emails (urgent, action-required, FYI, spam)
+# - Extract calendar events and check availability
+# - Draft response suggestions
+# - Create follow-up reminders
+#
+# Security: All credentials stay local on Expanso Edge.
+
+name: email-triage
+version: 1.0.0
+description: AI-powered email triage with calendar sync and response drafting
+
+# Credentials (stored locally, never transmitted)
+credentials:
+  - name: GMAIL_TOKEN
+    required: false
+    description: Gmail OAuth token (or use IMAP credentials)
+  - name: OUTLOOK_TOKEN
+    required: false
+    description: Microsoft Graph API token
+  - name: IMAP_HOST
+    required: false
+    description: IMAP server hostname
+  - name: IMAP_USER
+    required: false
+    description: IMAP username
+  - name: IMAP_PASS
+    required: false
+    description: IMAP password
+  - name: OPENAI_API_KEY
+    required: true
+    description: OpenAI API key for AI processing
+  - name: CALENDAR_API_KEY
+    required: false
+    description: Google Calendar or Outlook Calendar API key
+
+# Skill inputs
+inputs:
+  - name: provider
+    type: string
+    required: true
+    enum: [gmail, outlook, imap]
+    description: Email provider to connect
+  - name: folder
+    type: string
+    default: INBOX
+    description: Email folder to process
+  - name: limit
+    type: integer
+    default: 50
+    description: Maximum emails to process per run
+  - name: since_hours
+    type: integer
+    default: 24
+    description: Process emails from last N hours
+  - name: categories
+    type: array
+    default: [urgent, action-required, meeting, fyi, newsletter, spam]
+    description: Categories to classify into
+  - name: auto_archive
+    type: boolean
+    default: false
+    description: Automatically archive processed emails
+  - name: create_calendar_events
+    type: boolean
+    default: true
+    description: Automatically create calendar events from meeting requests
+
+# Skill outputs
+outputs:
+  - name: summary
+    type: object
+    description: "Triage summary: {processed, by_category, urgent_count, meetings_found}"
+  - name: emails
+    type: array
+    description: "Processed emails with: {id, subject, from, category, priority, action, calendar_event?}"
+  - name: calendar_events
+    type: array
+    description: Calendar events extracted/created
+  - name: draft_responses
+    type: array
+    description: Suggested responses for action-required emails
+  - name: metadata
+    type: object
+    description: Processing metadata and audit trail
+
+# Backend options
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: OpenAI GPT-4o-mini for classification and drafting
+  - name: ollama
+    type: local
+    models: [llama3.2, mistral]
+    description: Local Ollama for privacy-sensitive email processing
+
+# Expanso components used
+components:
+  inputs:
+    - http_client     # Fetch emails from API
+    - http_server     # MCP endpoint
+  processors:
+    - mapping         # Data transformation
+    - openai_chat_completion  # AI classification
+    - branch          # Conditional processing
+    - log             # Audit trail
+  outputs:
+    - http_client     # Calendar API calls
+    - stdout          # CLI output
+    - sync_response   # MCP response
+
+# Rate limiting
+rate_limits:
+  - label: email_api
+    count: 10
+    interval: 1s
+  - label: openai_api
+    count: 20
+    interval: 1m

@@ -1,0 +1,169 @@
+{
+  "id": "deepgram-discord-voice",
+  "name": "Deepgram Discord Voice",
+  "description": "Low-latency Discord voice conversations using Deepgram streaming STT + TTS",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "streamingSTT": {
+        "type": "boolean",
+        "default": true,
+        "description": "Use streaming STT over WebSocket (recommended for lowest latency)"
+      },
+      "streamingTTS": {
+        "type": "boolean",
+        "default": true,
+        "description": "Use low-latency TTS (HTTP streamed Ogg/Opus output)"
+      },
+      "ttsVoice": {
+        "type": "string",
+        "default": "aura-2-thalia-en",
+        "description": "Deepgram Aura voice model (e.g., aura-2-thalia-en)"
+      },
+      "vadSensitivity": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "default": "medium"
+      },
+      "bargeIn": {
+        "type": "boolean",
+        "default": true,
+        "description": "Stop speaking when user starts talking"
+      },
+      "model": {
+        "type": "string",
+        "description": "LLM model for voice responses (e.g., anthropic/claude-3-5-haiku-latest)"
+      },
+      "thinkLevel": {
+        "type": "string",
+        "enum": [
+          "off",
+          "low",
+          "medium",
+          "high"
+        ],
+        "default": "off",
+        "description": "Thinking level for voice responses (lower = faster)"
+      },
+      "allowedUsers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": []
+      },
+      "silenceThresholdMs": {
+        "type": "number",
+        "default": 1000
+      },
+      "minAudioMs": {
+        "type": "number",
+        "default": 300
+      },
+      "maxRecordingMs": {
+        "type": "number",
+        "default": 30000
+      },
+      "heartbeatIntervalMs": {
+        "type": "number",
+        "default": 30000,
+        "description": "Connection health check interval in ms"
+      },
+      "autoJoinChannel": {
+        "type": "string",
+        "description": "Voice channel ID to auto-join on startup"
+      },
+      "deepgram": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "type": "string"
+          },
+          "sttModel": {
+            "type": "string",
+            "default": "nova-2"
+          },
+          "language": {
+            "type": "string",
+            "description": "BCP-47 language tag (optional). Example: en-US, es"
+          }
+        }
+      },
+      "primaryUser": {
+        "type": "string",
+        "description": "Discord user ID or name allowed by default (best: user ID). If set, only this user can talk unless switched."
+      },
+      "allowVoiceSwitch": {
+        "type": "boolean",
+        "default": true,
+        "description": "Allow voice commands (from primary user) to switch who the bot listens to"
+      },
+      "wakeWord": {
+        "type": "string",
+        "default": "openclaw",
+        "description": "Wake word for voice commands like 'openclaw allow John'"
+      }
+    }
+  },
+  "uiHints": {
+    "enabled": {
+      "label": "Enable Discord Voice",
+      "help": "Enable real-time voice conversations in Discord voice channels"
+    },
+    "streamingSTT": {
+      "label": "Streaming STT",
+      "help": "Use Deepgram WebSocket STT for lowest latency"
+    },
+    "streamingTTS": {
+      "label": "Low-latency TTS",
+      "help": "Stream Deepgram TTS audio as it is generated"
+    },
+    "ttsVoice": {
+      "label": "Deepgram TTS Voice Model",
+      "help": "Example: aura-2-thalia-en (see Deepgram Voices and Languages)"
+    },
+    "vadSensitivity": {
+      "label": "VAD Sensitivity",
+      "help": "Voice activity detection sensitivity (low/medium/high)"
+    },
+    "bargeIn": {},
+    "allowedUsers": {
+      "label": "Allowed Users",
+      "help": "Discord user IDs allowed to use voice (empty = all allowed)"
+    },
+    "deepgram.apiKey": {
+      "label": "Deepgram API Key",
+      "sensitive": true
+    },
+    "deepgram.sttModel": {
+      "label": "Deepgram STT Model",
+      "help": "Example: nova-2, nova-3, etc."
+    },
+    "deepgram.language": {
+      "label": "Language (optional)",
+      "help": "BCP-47 tag like en-US, es, es-EC"
+    },
+    "primaryUser": {
+      "label": "Primary Speaker",
+      "help": "Discord user ID (recommended) or name. Default speaker the bot listens to."
+    },
+    "allowVoiceSwitch": {
+      "label": "Allow Voice Speaker Switching",
+      "help": "Primary speaker can say voice commands to let someone else speak"
+    },
+    "wakeWord": {
+      "label": "Wake Word",
+      "help": "Example: openclaw. Use: 'openclaw allow <name>' or 'openclaw only me'."
+    }
+  }
+}

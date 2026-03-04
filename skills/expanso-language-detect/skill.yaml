@@ -1,0 +1,35 @@
+name: language-detect
+version: 1.0.0
+description: Detect the language of text using AI
+
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text to analyze
+
+outputs:
+  - name: language
+    type: string
+    description: Detected language
+  - name: confidence
+    type: number
+    description: Confidence score
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: OpenAI GPT-4o-mini
+  - name: ollama
+    type: local
+    models: [llama3.2]
+    description: Local Ollama
+
+author: expanso
+license: MIT

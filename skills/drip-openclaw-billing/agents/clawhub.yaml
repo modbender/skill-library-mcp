@@ -1,0 +1,127 @@
+skill:
+  name: "drip-openclaw-billing"
+  display_name: "Drip OpenClaw Billing"
+  description: "Instrument OpenClaw requests with Drip run/event/usage telemetry."
+  invocation_mode: "explicit_only"
+
+registry:
+  primary_credential: "DRIP_API_KEY"
+  required_env_vars:
+    - "DRIP_API_KEY"
+    - "DRIP_BASE_URL"
+    - "DRIP_WORKFLOW_ID"
+  optional_env_vars:
+    - "OPENCLAW_DEFAULT_CUSTOMER_ID"
+    - "OPENCLAW_TELEMETRY_FAIL_OPEN"
+    - "OPENCLAW_BILL_SKILL_CALLS"
+
+runtime:
+  model: "gpt-5"
+  timeout_ms: 60000
+  retries: 2
+  fail_open_telemetry: true
+
+credentials:
+  primary_env_var: "DRIP_API_KEY"
+  required_env_vars:
+    - "DRIP_API_KEY"
+    - "DRIP_BASE_URL"
+    - "DRIP_WORKFLOW_ID"
+  optional_env_vars:
+    - "OPENCLAW_DEFAULT_CUSTOMER_ID"
+    - "OPENCLAW_TELEMETRY_FAIL_OPEN"
+    - "OPENCLAW_BILL_SKILL_CALLS"
+
+environment:
+  required:
+    - "DRIP_API_KEY"
+    - "DRIP_BASE_URL"
+    - "DRIP_WORKFLOW_ID"
+  optional:
+    - "OPENCLAW_DEFAULT_CUSTOMER_ID"
+    - "OPENCLAW_TELEMETRY_FAIL_OPEN"
+    - "OPENCLAW_BILL_SKILL_CALLS"
+
+provenance:
+  vendor: "Drip"
+  homepage: "https://drippay.dev"
+  api_base_url_env_var: "DRIP_BASE_URL"
+  trusted_api_hosts:
+    - "api.drippay.dev"
+    - "drip-app-hlunj.ondigitalocean.app"
+
+identity_mapping:
+  request_id_priority:
+    - "request.requestId"
+    - "params.requestId"
+    - "params.runId"
+    - "deterministic_hash(action, requesterId, tenantId, params)"
+  customer_id_priority:
+    - "params.customerId"
+    - "tenant:{request.tenantId}"
+    - "tenant:{params.tenantId}"
+    - "requester:{request.requesterId}"
+    - "OPENCLAW_DEFAULT_CUSTOMER_ID"
+
+tools:
+  run_lifecycle:
+    start:
+      method: "POST"
+      path: "/v1/runs"
+    end:
+      method: "PATCH"
+      path: "/v1/runs/:id"
+  execution_events:
+    method: "POST"
+    path: "/v1/events"
+    event_type_default: "TOOL_CALL"
+    action_name_map:
+      brave: "brave_search"
+      google: "google_search"
+      default: "<provider>_call"
+  usage_billing:
+    method: "POST"
+    path: "/v1/usage"
+    usage_type_default: "api_calls"
+    provider_meter_pattern: "<provider>_api_calls"
+
+billing_meters:
+  - "api_calls"
+  - "brave_api_calls"
+  - "google_api_calls"
+  - "openclaw_track_usage_calls"
+  - "openclaw_record_run_calls"
+
+telemetry:
+  allowlist_fields:
+    - "integration"
+    - "requestId"
+    - "provider"
+    - "endpoint"
+    - "statusCode"
+    - "latencyMs"
+    - "queryHash"
+    - "tokens"
+    - "error"
+    - "source"
+    - "action"
+    - "tenantId"
+    - "requesterId"
+    - "runId"
+    - "workflowId"
+  prohibited_fields:
+    - "raw query text"
+    - "raw prompts"
+    - "raw model outputs"
+    - "authorization headers"
+    - "api keys"
+    - "passwords"
+    - "secrets"
+  query_policy: "Hash-only (sha256); never send raw query text."
+
+verification:
+  checks:
+    - "Run appears in timeline"
+    - "Event appears with provider/endpoint/status/latency/queryHash"
+    - "Usage appears with expected usageType and quantity"
+    - "Charge appears when pricing plan exists"

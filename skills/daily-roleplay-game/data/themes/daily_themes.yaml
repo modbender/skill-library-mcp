@@ -1,0 +1,78 @@
+# 主题日 / 倾向日配置
+# 生成器在抽取性癖（Step 2）之前按概率抽取「今日主题」；若抽中某主题，则按下方规则过滤或加权性癖池。
+# 主题结果写入 roleplay-active.md「今日主题」段，供 agent 把握当日风格。
+# 不改变当日性癖总数（仍为 3～5+1，共 4～6 个）。
+
+version: "1.0"
+
+# 主题抽取方式：probability = 按权重随机；若某主题 weight 为 0 表示不启用
+# 每日先掷一次：若落在某主题则应用该主题规则；否则为「无主题」正常抽
+default_weight: 1.0   # 无主题的权重（建议保持 1，使有主题日约占 1/3～1/2）
+
+themes:
+  - id: none
+    name: 无主题
+    description: 不施加额外过滤，按职业+年龄权重正常抽取
+    weight: 1.0
+    # 无规则，不写 rules
+
+  - id: passive_day
+    name: 被动日
+    description: 当日若抽到 B 类（行为偏好），仅从「被动倾向」池中抽取
+    weight: 0.5
+    rules:
+      - category: B
+        filter: allow_list
+        # 仅允许从以下 kink_id 中抽 B 类（与 category_b.yaml 对应）
+        kink_ids:
+          - b_be_commanded
+          - b_be_watched
+          - b_verbal_humiliation
+          - b_neck_held
+          - b_neck_grabbed_light
+          - b_be_praised
+          - b_be_fed
+          - b_licked_all_over
+          - b_suspended
+          - b_spooning
+          - b_face_to_face_sitting
+          - b_doggy
+          - b_oral_deep
+          - b_oral_lick
+          - b_slow_rhythm
+
+  - id: active_day
+    name: 主动日
+    description: 当日若抽到 B 类，仅从「主动倾向」池中抽取
+    weight: 0.5
+    rules:
+      - category: B
+        filter: allow_list
+        kink_ids:
+          - b_cowgirl
+          - b_show_initiative
+          - b_self_touch_show
+          - b_mirror
+          - b_69
+          - b_standing
+          - b_rough_rhythm
+          - b_roleplay_in_roleplay
+          - b_outdoor_car
+
+  - id: body_reaction_day
+    name: 身体反应日
+    description: D 类（体质反应）在「被选入 3～5 类」时权重提高，更容易被选中
+    weight: 0.5
+    rules:
+      - category: D
+        category_boost: 0.40
+        # 在随机「选哪 3～5 类」时，D 类被选中的概率 +40%（相对其他类）
+
+  - id: profession_deep_day
+    name: 职业深度日
+    description: 基础性癖（3～5 个）优先从当前职业的 boosted_kinks 中抽取；某类若 boosted 不足或全在 exclusion 内，则用该类正常加权池补足
+    weight: 0.4
+    rules:
+      - filter: profession_boosted_first
+        # 生成器逻辑：对每个被选中的基础类，先取 profession_kink_weights 中当前职业匹配规则的 boosted_kinks 里属于该类别的 id，排除 recent 后若非空则仅从该子集加权抽；否则从该类全池按职业+年龄权重抽
+        # 不写 kink_ids，由生成器根据当前职业动态解析

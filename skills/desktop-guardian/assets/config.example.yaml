@@ -1,0 +1,68 @@
+version: 2
+
+monitor:
+  interval: 60
+  osascript_timeout: 10
+
+browsers:
+  chrome:
+    enabled: true
+    max_windows: 3
+    max_tabs: 20
+    cdp_port: 9222
+  safari:
+    enabled: true
+    max_windows: 3
+    max_tabs: 10
+    webcontent_baseline: 1
+
+cleanup:
+  enabled: true
+  apps:
+    mode: whitelist
+    whitelist:
+      - Finder
+      - Google Chrome
+      - Safari
+      - Terminal
+      - TextEdit
+      - System Settings
+    action: close
+  browser_windows:
+    chrome:
+      action: close_oldest
+    safari:
+      action: close_oldest
+  browser_tabs:
+    chrome:
+      action: close_oldest
+      protect_pinned: true
+
+dialogs:
+  enabled: true
+  auto_dismiss:
+    - UserNotificationCenter
+    - CoreServicesUIAgent
+  ask_before_dismiss:
+    - SecurityAgent
+  ignore: []
+  dismiss_strategy: click_default
+
+alerts:
+  cooldown: 1800
+  methods:
+    - openclaw_wake
+    - osascript
+  notify_on_actions: true
+
+quiet_hours:
+  enabled: false
+  start: "23:00"
+  end: "07:00"
+
+reporting:
+  enabled: true
+  daily_summary: true
+  summary_time: "09:00"
+  log_file: ~/.openclaw/skills/desktop-guardian/violations.log
+  max_log_size_mb: 10

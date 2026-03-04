@@ -1,0 +1,69 @@
+{
+    "version": "1.0.0",
+    "security_settings": {
+        "default_action_unknown_sender": "block",
+        "require_spf_pass": true,
+        "require_dkim_pass": true,
+        "allow_partial_auth": false,
+        "attachment_policy": {
+            "allowed_extensions": [
+                ".pdf",
+                ".txt",
+                ".csv",
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".gif",
+                ".docx",
+                ".xlsx"
+            ],
+            "blocked_extensions": [
+                ".exe",
+                ".bat",
+                ".sh",
+                ".ps1",
+                ".js",
+                ".vbs",
+                ".jar",
+                ".py",
+                ".ics",
+                ".vcf"
+            ],
+            "max_size_mb": 25,
+            "ocr_trusted_only": true
+        },
+        "rate_limits": {
+            "owner": {
+                "commands_per_hour": -1,
+                "commands_per_day": -1
+            },
+            "admin": {
+                "commands_per_hour": 50,
+                "commands_per_day": 200
+            },
+            "trusted": {
+                "commands_per_hour": 10,
+                "commands_per_day": 30
+            }
+        },
+        "confirmation_required": [
+            "delete_email",
+            "send_email",
+            "forward_email",
+            "modify_rules",
+            "add_admin",
+            "add_trusted"
+        ],
+        "logging": {
+            "level": "flagged",
+            "log_all_unknown": true,
+            "alert_on_critical": true
+        }
+    },
+    "threat_detection": {
+        "enabled": true,
+        "block_on_critical": true,
+        "alert_owner_on_high": true,
+        "max_injection_score": 3
+    }
+}

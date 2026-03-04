@@ -1,0 +1,19 @@
+{
+  "name": "Morning Report (8 AM Daily)",
+  "schedule": {
+    "kind": "cron",
+    "expr": "0 8 * * *",
+    "tz": "America/Chicago"
+  },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "model": "haiku",
+    "message": "Generate morning report:\n\n1. Query main session history:\n   sessions_history('agent:main:telegram:direct:YOUR_USER_ID', limit=50)\n\n2. Read yesterday's memory:\n   memory_get('memory/YYYY-MM-DD.md')\n\n3. Get weather:\n   Use weather skill for your ZIP code\n\n4. Check email:\n   Use gog or himalaya skill\n\n5. Check calendar:\n   Use gog skill for today's events\n\nReport format:\n📍 WEATHER: [current conditions + forecast]\n🌙 OVERNIGHT WORK: [highlights from session history]\n📝 NOTES: [from memory file]\n📧 EMAIL: [urgent only]\n📅 CALENDAR: [today's events]\n🔗 DASHBOARD: [your mission control link]\n\nSend to:\n- Telegram: message tool, target=YOUR_USER_ID\n- Email: message tool or direct SMTP"
+  },
+  "delivery": {
+    "mode": "announce",
+    "to": "YOUR_USER_ID",
+    "channel": "telegram"
+  }
+}

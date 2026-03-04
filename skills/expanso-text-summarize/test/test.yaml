@@ -1,0 +1,36 @@
+# Test cases for text-summarize
+# Run with: uv run -s scripts/test-skills.py text-summarize
+
+name: text-summarize-tests
+description: Test cases for the text-summarize skill
+
+fixtures_dir: "./fixtures"
+
+tests:
+  - name: basic_article
+    description: Summarize a news article
+    input_file: fixtures/input.txt
+    expected:
+      has_field: summary
+      metadata_has: [trace_id, input_hash, timestamp, model]
+      summary_contains_bullets: true
+
+  - name: short_text
+    description: Summarize very short text
+    input: "The quick brown fox jumps over the lazy dog. This is a test."
+    expected:
+      has_field: summary
+      min_length: 10
+
+  - name: empty_input
+    description: Handle empty input gracefully
+    input: ""
+    expected:
+      # MCP mode should return error
+      # CLI mode may return empty or error
+      error_or_empty: true
+
+# Notes:
+# - Tests run against pipeline-cli.yaml by default
+# - Set OPENAI_API_KEY for live tests
+# - Set MOCK_LLM=true for faster mock tests (no API call)

@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "name": "trinity-compress",
+  "description": "Token compression rules for SKILL.md and system prompt files",
+  "targets": [
+    ".ai-workflow/skills/**/SKILL.md",
+    "skills/**/SKILL.md",
+    "scripts/ralph/CLAUDE.md",
+    "claude.md",
+    "openai.md",
+    ".cursorrules",
+    "system_prompt.md"
+  ],
+  "optimization_level": "balanced",
+  "levels": {
+    "light": ["remove_filler", "fix_whitespace", "deduplicate"],
+    "balanced": ["remove_filler", "fix_whitespace", "deduplicate", "compress_instructions", "shorten_examples"],
+    "aggressive": ["remove_filler", "fix_whitespace", "deduplicate", "compress_instructions", "shorten_examples", "shorten_xml_tags", "strip_formatting", "abbreviate"]
+  },
+  "strategies": {
+    "remove_filler": {
+      "replacements": {
+        "in order to": "to",
+        "due to the fact that": "because",
+        "in the event that": "if",
+        "for the purpose of": "for",
+        "with regard to": "regarding",
+        "with respect to": "regarding",
+        "at this point in time": "now",
+        "at the present time": "now",
+        "take into consideration": "consider",
+        "each and every": "every",
+        "any and all": "all",
+        "on a regular basis": "regularly",
+        "a large number of": "many",
+        "at all times": "always",
+        "is able to": "can",
+        "is unable to": "cannot",
+        "has the ability to": "can"
+      },
+      "remove_phrases": [
+        "please note that",
+        "it is important to note that",
+        "keep in mind that",
+        "it should be noted that",
+        "it is worth mentioning that"
+      ],
+      "remove_words": [
+        "basically",
+        "essentially",
+        "fundamentally",
+        "very",
+        "really",
+        "quite",
+        "rather",
+        "somewhat",
+        "fairly"
+      ]
+    },
+    "compress_instructions": {
+      "replacements": {
+        "You should always make sure to": "Always",
+        "You are expected to": "",
+        "You should": "",
+        "You must always": "Always",
+        "You need to": "",
+        "Make sure that you": "",
+        "It is essential that you": "",
+        "You are required to": "",
+        "When the user asks you to": "When asked to",
+        "the user": "user",
+        "do not": "don't",
+        "can not": "can't",
+        "will not": "won't",
+        "should not": "shouldn't"
+      }
+    },
+    "shorten_examples": {
+      "replacements": {
+        "For example, if": "E.g., if",
+        "For example, when": "E.g., when",
+        "For instance,": "E.g.,",
+        "As an example,": "E.g.,",
+        "Here is an example:": "Example:",
+        "Here are some examples:": "Examples:"
+      }
+    },
+    "shorten_xml_tags": {
+      "tag_map": {
+        "instructions": "inst",
+        "guidelines": "guide",
+        "constraints": "rules",
+        "examples": "ex",
+        "context": "ctx",
+        "description": "desc",
+        "requirements": "reqs",
+        "personality": "persona",
+        "response_format": "fmt",
+        "system_prompt": "sys",
+        "capabilities": "caps",
+        "limitations": "limits"
+      }
+    },
+    "deduplicate": {
+      "min_line_length": 5
+    },
+    "fix_whitespace": {
+      "max_consecutive_newlines": 2
+    },
+    "strip_formatting": {},
+    "abbreviate": {
+      "replacements": {
+        "information": "info",
+        "configuration": "config",
+        "application": "app",
+        "documentation": "docs",
+        "repository": "repo",
+        "development": "dev",
+        "environment": "env",
+        "authentication": "auth"
+      }
+    }
+  },
+  "cost_reference_per_1M_tokens_usd": {
+    "claude": {"haiku": 0.8, "sonnet": 3.0, "opus": 15.0},
+    "openai": {"mini": 0.15, "gpt": 2.5, "o1": 15.0}
+  }
+}

@@ -1,0 +1,74 @@
+# =============================================================================
+# Risk Management Configuration
+# =============================================================================
+
+global_limits:
+  # Maximum percentage of total portfolio per single position
+  max_position_size_pct: 25.0
+
+  # Maximum loss in EUR per day before emergency stop
+  max_daily_loss_eur: 50.0
+
+  # Maximum drawdown percentage from portfolio ATH before full stop
+  max_drawdown_pct: 15.0
+
+  # Maximum amount in EUR per single order
+  max_order_size_eur: 100.0
+
+  # Maximum number of open orders across all strategies
+  max_open_orders: 50
+
+  # Minimum cash reserve percentage
+  min_cash_reserve_pct: 10.0
+
+  # Emergency kill-switch: stop everything if total loss exceeds this
+  emergency_stop_loss_pct: 20.0
+
+# Per-strategy risk overrides (override global limits)
+strategy_overrides:
+  grid_trading:
+    max_order_size_eur: 50.0
+    max_open_orders: 20
+
+  dca:
+    max_order_size_eur: 25.0
+    max_open_orders: 5
+
+  trend_following:
+    max_order_size_eur: 75.0
+    max_open_orders: 3
+
+  scalping:
+    max_order_size_eur: 30.0
+    max_open_orders: 10
+
+  arbitrage:
+    max_order_size_eur: 100.0
+    max_open_orders: 4
+
+  swing_trading:
+    max_order_size_eur: 75.0
+    max_open_orders: 3
+
+  copy_trading:
+    max_order_size_eur: 50.0
+    max_open_orders: 5
+
+  rebalancing:
+    max_order_size_eur: 100.0
+    max_open_orders: 10
+
+# Stop-loss defaults
+stop_loss:
+  enabled: true
+  default_pct: 5.0
+  trailing_enabled: false
+  trailing_pct: 3.0
+
+# Take-profit defaults
+take_profit:
+  enabled: true
+  default_pct: 10.0
+  partial_exit_enabled: false
+  partial_exit_pct: 50.0
+  partial_exit_trigger_pct: 5.0

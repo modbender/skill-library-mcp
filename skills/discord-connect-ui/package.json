@@ -1,0 +1,133 @@
+{
+  "name": "discord-connect-hub",
+  "version": "1.0.0",
+  "description": "Complete Discord integration for Clawdbot with automatic UI installation, setup wizard, credential management, and plugin architecture hooks",
+  "author": "OpenClaw Community",
+  "license": "MIT",
+  "keywords": [
+    "discord",
+    "bot",
+    "chat",
+    "channels",
+    "ui",
+    "plugin",
+    "clawdbot",
+    "integration"
+  ],
+  "clawdbot": {
+    "type": "channel-ui-plugin",
+    "emoji": "🎮",
+    "category": "channels",
+    "tags": [
+      "discord",
+      "bot",
+      "chat",
+      "channels",
+      "ui",
+      "setup",
+      "plugin",
+      "automatic-install"
+    ],
+    "requires": {
+      "clawdbot": ">=2026.1.0",
+      "node": ">=18.0.0"
+    },
+    "provides": {
+      "ui": {
+        "tabs": ["discord"],
+        "views": ["discord-connect-view"],
+        "navigation": {
+          "group": "channels",
+          "path": "/discord",
+          "icon": "🎮",
+          "title": "Discord",
+          "subtitle": "Bot connection & servers"
+        }
+      },
+      "rpc": [
+        "discord.status",
+        "discord.health",
+        "discord.guilds",
+        "discord.guild",
+        "discord.channels",
+        "discord.invite",
+        "discord.testToken",
+        "discord.setToken",
+        "discord.permissions"
+      ],
+      "channelType": "discord",
+      "configSchema": "assets/config-schema.json"
+    },
+    "hooks": {
+      "install": "assets/install-hooks.js",
+      "navigation": "assets/navigation-hooks.js",
+      "cli": "scripts/install-plugin.js"
+    },
+    "capabilities": {
+      "discord_api": {
+        "description": "Makes API calls to Discord to fetch bot info, guilds, and channels",
+        "mitigation": "Only reads data; no destructive operations without explicit user action"
+      },
+      "token_validation": {
+        "description": "Tests Discord bot tokens against the API",
+        "mitigation": "Tokens are validated but not logged; masked in UI responses (last 4 chars only)"
+      },
+      "source_modification": {
+        "description": "Modifies Clawdbot source files to install UI components and handlers",
+        "mitigation": "Creates backups before modification; provides uninstall script"
+      },
+      "build_execution": {
+        "description": "Runs pnpm build commands to compile changes",
+        "mitigation": "Only runs standard build commands; can be skipped with --skip-build"
+      }
+    },
+    "securityNotes": {
+      "token_handling": "Bot tokens are never returned in full via RPC - only masked (last 4 chars). Store tokens securely using OpenBao vault references.",
+      "api_calls": "All Discord API calls use the configured bot token. The skill does not store tokens itself beyond config.",
+      "permissions": "The skill only reads data from Discord API by default. Destructive operations require explicit user action.",
+      "source_changes": "Installation modifies Clawdbot source files. Backups are created automatically."
+    },
+    "installInstructions": {
+      "automatic": "Run: node scripts/install-plugin.js",
+      "manual": "See SKILL.md for detailed manual installation steps",
+      "requirements": [
+        "Clawdbot source code access",
+        "Node.js/pnpm for building",
+        "Discord bot token from Developer Portal"
+      ]
+    },
+    "installWarnings": [
+      "Modifies Clawdbot source code (with backups)",
+      "Discord bot token required - create at discord.com/developers",
+      "Message Content Intent must be enabled in Discord Developer Portal",
+      "Requires rebuild after installation"
+    ]
+  },
+  "files": [
+    "SKILL.md",
+    "assets/discord-backend.ts",
+    "assets/discord-views.ts",
+    "assets/navigation-hooks.js",
+    "assets/install-hooks.js",
+    "assets/config-schema.json",
+    "scripts/install-plugin.js",
+    "scripts/test-token.py",
+    "scripts/health-check.py",
+    "references/bot-setup.md",
+    "references/troubleshooting.md"
+  ],
+  "scripts": {
+    "install": "node scripts/install-plugin.js",
+    "uninstall": "node scripts/install-plugin.js --uninstall",
+    "health": "python3 scripts/health-check.py",
+    "test-token": "python3 scripts/test-token.py"
+  },
+  "homepage": "https://clawdhub.com/skills/discord-connect-hub",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clawdbot/skills"
+  },
+  "bugs": {
+    "url": "https://github.com/clawdbot/skills/issues"
+  }
+}

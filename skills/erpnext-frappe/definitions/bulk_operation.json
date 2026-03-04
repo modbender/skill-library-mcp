@@ -1,0 +1,122 @@
+{
+  "name": "bulk_operation",
+  "version": "1.0.0",
+  "description": "Handle bulk operations - bulk create, update, delete, import/export for any DocType",
+  "author": "Business Claw Team",
+  "category": "utility",
+  
+  "triggers": [
+    "bulk create",
+    "bulk update",
+    "bulk delete",
+    "bulk import",
+    "batch import",
+    "mass update",
+    "import data",
+    "export data",
+    "bulk operation"
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["create", "update", "delete", "import", "export"],
+        "description": "Type of bulk operation"
+      },
+      "doctype": {
+        "type": "string",
+        "description": "Target DocType"
+      },
+      "data": {
+        "type": "array",
+        "description": "Array of documents for create/update"
+      },
+      "updates": {
+        "type": "array",
+        "description": "Array of updates for bulk update (name + data)"
+      },
+      "filters": {
+        "type": "object",
+        "description": "Filters for export or delete"
+      },
+      "fields": {
+        "type": "array",
+        "description": "Fields to export"
+      },
+      "update_existing": {
+        "type": "boolean",
+        "description": "Update existing documents on import",
+        "default": false
+      }
+    },
+    "required": ["operation", "doctype"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "validate_operation",
+        "tool": "get_doctype_meta",
+        "arguments": { "doctype": "${doctype}" }
+      },
+      {
+        "step": "execute_operation",
+        "tool": "bulk_smart_create_documents",
+        "condition": "operation == 'create' and data is provided",
+        "arguments": {
+          "doctype": "${doctype}",
+          "data": "${data}"
+        }
+      },
+      {
+        "step": "execute_update",
+        "tool": "bulk_update_documents",
+        "condition": "operation == 'update' and updates is provided",
+        "arguments": {
+          "doctype": "${doctype}",
+          "data": "${updates}"
+        }
+      },
+      {
+        "step": "execute_delete",
+        "tool": "bulk_delete_documents",
+        "condition": "operation == 'delete' and filters is provided",
+        "arguments": {
+          "doctype": "${doctype}",
+          "filters": "${filters}"
+        }
+      },
+      {
+        "step": "execute_import",
+        "tool": "smart_import_documents",
+        "condition": "operation == 'import' and data is provided",
+        "arguments": {
+          "doctype": "${doctype}",
+          "data": "${data}",
+          "update_existing": "${update_existing}"
+        }
+      },
+      {
+        "step": "execute_export",
+        "tool": "export_documents",
+        "condition": "operation == 'export'",
+        "arguments": {
+          "doctype": "${doctype}",
+          "filters": "${filters}",
+          "fields": "${fields}"
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "max_batch_size": 1000,
+    "require_confirmation_for_delete": true,
+    "validate_data_first": true,
+    "backup_before_delete": true
+  },
+  
+  "output_template": "Bulk {{operation}} completed on {{doctype}}\nProcessed: {{count}} records\n{{#if errors}}Errors: {{errors}}{{/if}}"
+}

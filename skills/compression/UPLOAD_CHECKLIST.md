@@ -1,0 +1,26 @@
+# Trinity Compress — Upload Checklist (ClawHub)
+
+- [ ] Confirm **no client branding** in this skill folder
+- [ ] Confirm README lists **Price: $9** and **License: MIT**
+- [ ] Confirm installers work:
+  - [ ] `scripts/install.ps1`
+  - [ ] `scripts/install.sh`
+- [ ] Confirm assets included:
+  - [ ] `assets/trinity-compress.config.json`
+  - [ ] `assets/trinity-compress.sh`
+  - [ ] `assets/Makefile.snippet`
+  - [ ] `assets/gitignore.snippet`
+- [ ] Confirm `LICENSE` present (MIT)
+- [ ] Confirm version in `skill.json` matches release tag
+- [ ] Run a folder search / scan for banned terms & secrets:
+  - [ ] Manual terms:
+    - [ ] GigaStudios
+    - [ ] Coin Bureau
+    - [ ] eGrowth
+  - [ ] Automated scan:
+    - [ ] `powershell -File scripts/scan-banned-terms.ps1 -FailOnFind`
+- [ ] Build upload ZIP:
+  - [ ] `powershell -File scripts/zip-skill.ps1 -ScanFirst` (outputs to `workspace/dist/`)
+  - [ ] (Optional) JSON output for automation: `powershell -File scripts/zip-skill.ps1 -ScanFirst -OutputJson`
+  - [ ] (Optional) Debugging: keep staging dir: `powershell -File scripts/zip-skill.ps1 -ScanFirst -KeepStage`
+- [ ] Verify the produced ZIP name matches `skill.json` (`<id>-v<version>.zip`) and SHA256 is recorded (zip script prints it)

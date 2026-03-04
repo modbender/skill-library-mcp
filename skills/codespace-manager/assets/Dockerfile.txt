@@ -1,0 +1,30 @@
+FROM codercom/code-server:4.96.4
+
+USER root
+
+# System essentials
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl git wget unzip ca-certificates build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Bun (latest)
+RUN curl -fsSL https://bun.sh/install | bash \
+    && mv /root/.bun/bin/bun /usr/local/bin/ \
+    && mv /root/.bun/bin/bunx /usr/local/bin/ \
+    && rm -rf /root/.bun
+
+# uv (latest)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && mv /root/.local/bin/uv /usr/local/bin/ \
+    && mv /root/.local/bin/uvx /usr/local/bin/ \
+    && rm -rf /root/.local
+
+# OpenCode (latest)
+RUN curl -fsSL https://opencode.ai/install | bash \
+    && find /root -name opencode -type f 2>/dev/null \
+    && cp /root/.opencode/bin/opencode /usr/local/bin/opencode || true
+
+# Verify installations
+RUN bun --version && uv --version
+
+USER 1000

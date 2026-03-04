@@ -1,0 +1,61 @@
+# Skill: pii-redact
+# Version: 1.0.0
+#
+# Redact personally identifiable information (PII) from text.
+# Replaces detected PII with [REDACTED] or configurable placeholders.
+
+name: "pii-redact"
+version: "1.0.0"
+description: "Redact PII from text, replacing sensitive data with placeholders"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key for LLM-based PII detection
+
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text containing PII to redact
+  - name: placeholder
+    type: string
+    default: "[REDACTED]"
+    description: Replacement text for redacted content
+
+outputs:
+  - name: redacted_text
+    type: string
+    description: Text with PII replaced by placeholders
+  - name: redaction_count
+    type: integer
+    description: Number of items redacted
+  - name: redacted_types
+    type: array
+    description: Types of PII that were redacted
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: OpenAI GPT-4o-mini for intelligent PII detection
+  - name: ollama
+    type: local
+    models: [llama3.2, mistral]
+    description: Local Ollama (private, no API key needed)
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+    - openai_chat_completion
+  outputs:
+    - stdout
+    - sync_response

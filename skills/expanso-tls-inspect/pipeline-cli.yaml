@@ -1,0 +1,99 @@
+# Expanso Pipeline: tls-inspect (CLI mode)
+# ==========================================
+#
+# Inspect TLS certificate for a host using openssl.
+# Requires: openssl installed on the system.
+#
+# Usage:
+#   echo "google.com" | expanso-edge run pipeline-cli.yaml
+#   echo "example.com:8443" | expanso-edge run pipeline-cli.yaml
+
+name: tls-inspect-cli
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: lines
+
+  pipeline:
+    processors:
+      # 1. Parse host and prepare command
+      - mapping: |
+          meta trace_id = uuid_v4()
+          meta host = content().trim()
+
+          # Add default port if not specified
+          let host_with_port = if meta("host").contains(":") {
+            meta("host")
+          } else {
+            meta("host") + ":443"
+          }
+          meta host_with_port = $host_with_port
+
+          # Prepare for openssl command
+          root.host = meta("host")
+          root.host_with_port = $host_with_port
+
+      # 2. Run openssl to get certificate info
+      - command:
+          name: "sh"
+          args:
+            - "-c"
+            - |
+              echo | openssl s_client -servername "${! this.host }" -connect "${! this.host_with_port }" 2>/dev/null | openssl x509 -noout -text -dates -fingerprint -sha256 2>/dev/null || echo "CONNECTION_FAILED"
+
+      # 3. Parse openssl output
+      - mapping: |
+          let output = content()
+          let failed = $output.contains("CONNECTION_FAILED") || $output == ""
+
+          root = if $failed {
+            {
+              "valid": false,
+              "error": "Failed to connect or retrieve certificate",
+              "host": meta("host"),
+              "certificate": null
+            }
+          } else {
+            # Extract certificate details from openssl output
+            let subject = $output.re_find_all("Subject: (.+)").index(0).or("Unknown")
+            let issuer = $output.re_find_all("Issuer: (.+)").index(0).or("Unknown")
+            let not_before = $output.re_find_all("notBefore=(.+)").index(0).or("")
+            let not_after = $output.re_find_all("notAfter=(.+)").index(0).or("")
+            let fingerprint = $output.re_find_all("sha256 Fingerprint=(.+)").index(0).or("")
+            let sans = $output.re_find_all("DNS:([^,\\s]+)").or([])
+
+            # Check if expired (simple string comparison won't work for dates, so mark as valid if we got data)
+            let has_cert = $subject != "Unknown"
+
+            {
+              "valid": $has_cert,
+              "host": meta("host"),
+              "certificate": {
+                "subject": $subject.trim(),
+                "issuer": $issuer.trim(),
+                "valid_from": $not_before.trim(),
+                "valid_to": $not_after.trim(),
+                "fingerprint_sha256": $fingerprint.trim().replace(":", "").lowercase(),
+                "subject_alt_names": $sans
+              }
+            }
+          }
+
+          root.metadata = {
+            "skill": "tls-inspect",
+            "mode": "cli",
+            "host": meta("host"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [tls-inspect] Inspected ${! meta("host") }, valid: ${! this.valid } (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

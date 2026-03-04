@@ -1,0 +1,21 @@
+# Test cases for json-validate skill
+
+tests:
+  - name: "Valid simple JSON"
+    input: '{"key": "value"}'
+    expected:
+      has_field: valid
+      has_field: parsed
+      metadata_has: [skill, trace_id, timestamp]
+
+  - name: "Valid complex JSON"
+    input_file: fixtures/input.txt
+    expected:
+      has_field: valid
+      has_field: stats
+
+  - name: "Invalid JSON"
+    input: '{"key": value}'
+    expected:
+      has_field: valid
+      has_field: error

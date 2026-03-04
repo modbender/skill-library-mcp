@@ -1,0 +1,231 @@
+{
+  "version": "0.1.0",
+  "cases": [
+    {
+      "id": "DG-001",
+      "name": "block on failed tests",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["TESTS_FAILED"],
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-001",
+          "environment": "staging",
+          "service": "api",
+          "version": "1.2.3",
+          "requested_at": "2026-03-01T00:00:00Z",
+          "checks": { "tests_passed": false, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-002",
+      "name": "block on missing rollback artifact",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["MISSING_ROLLBACK_ARTIFACT"],
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-002",
+          "environment": "prod",
+          "service": "worker",
+          "version": "2.0.1",
+          "requested_at": "2026-03-01T00:01:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": false, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-003",
+      "name": "block on schema incompatible",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["SCHEMA_INCOMPATIBLE"],
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-003",
+          "environment": "prod",
+          "service": "billing",
+          "version": "3.4.0",
+          "requested_at": "2026-03-01T00:02:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "incompatible" },
+          "rollout": { "strategy": "blue-green", "initial_percent": 50 }
+        }
+      }
+    },
+    {
+      "id": "DG-004",
+      "name": "block on error budget breach",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["ERROR_BUDGET_BREACHED"],
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-004",
+          "environment": "prod",
+          "service": "edge",
+          "version": "4.0.0",
+          "requested_at": "2026-03-01T00:03:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": false, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 5 }
+        }
+      }
+    },
+    {
+      "id": "DG-005",
+      "name": "rewrite prod requires canary",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["PROD_REQUIRES_CANARY"],
+      "input": {
+        "board_id": "board_dep",
+        "constraints": { "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-005",
+          "environment": "prod",
+          "service": "web",
+          "version": "1.9.0",
+          "requested_at": "2026-03-01T00:04:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "all-at-once", "initial_percent": 100 }
+        }
+      }
+    },
+    {
+      "id": "DG-006",
+      "name": "rewrite initial rollout too high",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["INITIAL_ROLLOUT_TOO_HIGH"],
+      "input": {
+        "board_id": "board_dep",
+        "constraints": { "max_initial_rollout_percent": 20, "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-006",
+          "environment": "staging",
+          "service": "api",
+          "version": "2.1.0",
+          "requested_at": "2026-03-01T00:05:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 50 }
+        }
+      }
+    },
+    {
+      "id": "DG-007",
+      "name": "rewrite on ci pending",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["CI_PENDING"],
+      "input": {
+        "board_id": "board_dep",
+        "constraints": { "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-007",
+          "environment": "staging",
+          "service": "jobs",
+          "version": "5.1.2",
+          "requested_at": "2026-03-01T00:06:00Z",
+          "checks": { "tests_passed": true, "ci_status": "pending", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-008",
+      "name": "rewrite on unknown schema compatibility",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["SCHEMA_COMPAT_UNKNOWN"],
+      "input": {
+        "board_id": "board_dep",
+        "constraints": { "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-008",
+          "environment": "staging",
+          "service": "reporting",
+          "version": "0.9.8",
+          "requested_at": "2026-03-01T00:07:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "unknown" },
+          "rollout": { "strategy": "blue-green", "initial_percent": 20 }
+        }
+      }
+    },
+    {
+      "id": "DG-009",
+      "name": "rewrite prod requires human confirm",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["PROD_REQUIRES_HUMAN_CONFIRM"],
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-009",
+          "environment": "prod",
+          "service": "api",
+          "version": "6.0.0",
+          "requested_at": "2026-03-01T00:08:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-010",
+      "name": "allow healthy staging rollout",
+      "expected_decision": "ALLOW",
+      "expected_flags": [],
+      "input": {
+        "board_id": "board_dep",
+        "constraints": { "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-010",
+          "environment": "staging",
+          "service": "api",
+          "version": "6.0.1",
+          "requested_at": "2026-03-01T00:09:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-011",
+      "name": "schema reject: missing checks",
+      "expected_error_code": "INVALID_INPUT",
+      "input": {
+        "board_id": "board_dep",
+        "proposed_deployment": {
+          "request_id": "dg-011",
+          "environment": "staging",
+          "service": "api",
+          "version": "6.0.2",
+          "requested_at": "2026-03-01T00:10:00Z",
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        }
+      }
+    },
+    {
+      "id": "DG-012",
+      "name": "external-agent deterministic allow",
+      "expected_decision": "ALLOW",
+      "expected_flags": [],
+      "input": {
+        "board_id": "board_dep",
+        "mode": "external_agent",
+        "constraints": { "require_human_confirm_for_prod": false },
+        "proposed_deployment": {
+          "request_id": "dg-012",
+          "environment": "staging",
+          "service": "ml-worker",
+          "version": "1.0.0",
+          "requested_at": "2026-03-01T00:11:00Z",
+          "checks": { "tests_passed": true, "ci_status": "passed", "error_budget_ok": true, "rollback_artifact_present": true, "schema_compatibility": "compatible" },
+          "rollout": { "strategy": "canary", "initial_percent": 10 }
+        },
+        "external_votes": [
+          { "persona_id": "p-sec", "name": "Security", "reputation_before": 0.45, "vote": "YES", "confidence": 0.8, "reasons": ["gates passed"], "red_flags": [], "suggested_edits": [] },
+          { "persona_id": "p-sre", "name": "SRE", "reputation_before": 0.35, "vote": "YES", "confidence": 0.78, "reasons": ["safe rollout"], "red_flags": [], "suggested_edits": [] },
+          { "persona_id": "p-gov", "name": "Governance", "reputation_before": 0.2, "vote": "REWRITE", "confidence": 0.6, "reasons": ["optional extra docs"], "red_flags": [], "suggested_edits": ["attach runbook"] }
+        ]
+      }
+    }
+  ]
+}

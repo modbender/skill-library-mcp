@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compliance Dashboard - OpenClaw</title>
+  <style>
+    :root {
+      --bg: #f2f5f9;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #5f6b7a;
+      --accent: #005f73;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --border: #d9e2ec;
+    }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #eaf2f8, var(--bg));
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(5, 23, 41, 0.06);
+    }
+    h1, h2 { margin: 0 0 10px 0; }
+    h1 { font-size: 28px; color: var(--accent); }
+    h2 { font-size: 18px; }
+    p { margin: 8px 0; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #f8fafc; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
+    .kpi { border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: #fcfdff; }
+    .kpi strong { display: block; font-size: 20px; margin-top: 6px; }
+    .risk-high { color: var(--bad); }
+    .risk-medium { color: var(--warn); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>ISO 27001 / NIST Compliance Dashboard</h1>
+      <p>System: OpenClaw</p>
+      <p>Generated: 2026-02-14T13:48:28.592362Z</p>
+    </div>
+
+    <div class="panel">
+      <h2>Risk and Status Overview</h2>
+      <div class="kpis">
+        <div class="kpi"><span>Violations</span><strong>2</strong></div>
+        <div class="kpi"><span>Partial</span><strong>2</strong></div>
+        <div class="kpi"><span>Compliant</span><strong>2</strong></div>
+        <div class="kpi"><span>Not Assessed</span><strong>0</strong></div>
+      </div>
+      <p class="risk-high">High/Critical risk findings: 3</p>
+      <p class="risk-medium">Medium risk findings: 3</p>
+    </div>
+
+    <div class="panel">
+      <h2>Controls Map View</h2>
+      <table>
+        <thead>
+          <tr><th>Check ID</th><th>Control</th><th>ISO 27001</th><th>NIST</th><th>Status</th><th>Risk</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>privilege_approval_required</td><td>Approval required before elevated access</td><td>A.5.15, A.5.18</td><td>PR.AA-01, PR.AA-05</td><td>violation</td><td>high</td></tr>
+<tr><td>least_privilege_enforced</td><td>Least privilege execution mode</td><td>A.5.15, A.5.18</td><td>PR.AA-01, PR.PS-01</td><td>compliant</td><td>high</td></tr>
+<tr><td>elevation_timeout_30m</td><td>Elevated session idle timeout</td><td>A.8.2, A.8.15</td><td>PR.AA-03, DE.CM-01</td><td>partial</td><td>medium</td></tr>
+<tr><td>audit_logging_privileged_actions</td><td>Privileged action audit logging</td><td>A.8.15, A.8.16</td><td>DE.AE-03, DE.CM-01</td><td>partial</td><td>medium</td></tr>
+<tr><td>open_ports_approved</td><td>Open ports baseline approval</td><td>A.8.20, A.8.21</td><td>PR.PS-02, DE.CM-01</td><td>violation</td><td>medium</td></tr>
+<tr><td>insecure_ports_remediated</td><td>Insecure ports remediated</td><td>A.8.20, A.8.21</td><td>PR.PS-02, PR.DS-02</td><td>compliant</td><td>high</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Violation View</h2>
+      <table>
+        <thead>
+          <tr><th>Check ID</th><th>Status</th><th>Risk</th><th>Gap</th><th>Evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>privilege_approval_required</td><td>violation</td><td>high</td><td>Runtime policy does not yet demonstrate universal approval enforcement for elevated actions.</td><td>openclaw.json and doctor outputs were evaluated for approval-first execution controls.</td></tr>
+<tr><td>elevation_timeout_30m</td><td>partial</td><td>medium</td><td>Global mandatory enforcement for all elevated paths is not yet guaranteed by runtime policy.</td><td>Timeout guard script is installed with preflight drop logic.</td></tr>
+<tr><td>audit_logging_privileged_actions</td><td>partial</td><td>medium</td><td>No single correlated privileged action audit timeline is guaranteed.</td><td>gateway status reports log paths; root_session_guard records transition metadata.</td></tr>
+<tr><td>open_ports_approved</td><td>violation</td><td>medium</td><td>Baseline missing or incomplete when unapproved findings exist.</td><td>port_monitor.py live output evaluated against approved_ports baseline.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Mitigation View</h2>
+      <table>
+        <thead>
+          <tr><th>Check ID</th><th>Mitigation</th><th>Owner</th><th>Due Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>privilege_approval_required</td><td>Route all privileged tasks through guarded_privileged_exec.py and enforce approval prompts for elevated execution.</td><td>Security Engineering</td><td>2026-03-15</td></tr>
+<tr><td>least_privilege_enforced</td><td>Fix state dir ownership/permissions and enforce command allowlist/approval defaults.</td><td>Platform Security</td><td>2026-03-07</td></tr>
+<tr><td>elevation_timeout_30m</td><td>Invoke guarded_privileged_exec.py for every elevated operation path.</td><td>Security Engineering</td><td>2026-03-15</td></tr>
+<tr><td>audit_logging_privileged_actions</td><td>Create append-only correlated audit records linking approval, execution, and drop events.</td><td>SecOps</td><td>2026-03-22</td></tr>
+<tr><td>open_ports_approved</td><td>Populate ~/.openclaw/security/approved_ports.json and remove unnecessary listeners.</td><td>Infrastructure</td><td>2026-02-28</td></tr>
+<tr><td>insecure_ports_remediated</td><td>Enforce baseline checks to block insecure service ports.</td><td>Network Security</td><td>2026-04-01</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

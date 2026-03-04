@@ -1,0 +1,104 @@
+# 年龄-性癖加权表
+# 生成器在 Step 3.5 确定当日年龄 profile 后，与本表合并计算 kink 权重（与 profession_kink_weights 叠加）
+# profile_id 与 data/age_profiles.yaml 中 profiles[].id 一致：youth, young_adult, mature, full_mature
+
+version: "1.0"
+
+# 说明：apply_order 在 index.yaml 中与 profession 配合，建议 2（在职业权重之后应用）
+
+rules:
+  # ─────────────────────────────────────────────────────────────
+  # 18–21：少女感 — 偏害羞、被动、身体敏感易显
+  # ─────────────────────────────────────────────────────────────
+  - id: age_youth
+    profile_id: youth
+    name: 少女感年龄权重
+    boosted_kinks:
+      - kink_id: a_ear_back
+        boost: 0.30          # 耳后敏感——青涩易羞
+      - kink_id: a_neck_side
+        boost: 0.25
+      - kink_id: a_lips
+        boost: 0.30          # 嘴唇敏感
+      - kink_id: d_bite_lip
+        boost: 0.35          # 咬唇忍耐——克制感
+      - kink_id: d_teary_eyes
+        boost: 0.25          # 眼眶泛红——易哭
+      - kink_id: b_be_watched
+        boost: 0.25          # 被注视——害羞又想要
+      - kink_id: b_be_praised
+        boost: 0.30          # 被夸奖——容易脸红
+    suppressed_kinks:
+      - kink_id: b_rough_rhythm
+        suppress: 0.35       # 粗暴节奏——与懵懂违和
+      - kink_id: b_verbal_humiliation
+        suppress: 0.30      # 言语羞辱——太刺激
+      - kink_id: b_show_initiative
+        suppress: 0.25      # 主动诱惑——偏被动
+      - kink_id: e_no_cleanup_work
+        suppress: 0.30      # 事后不清理——经验感强
+
+  # ─────────────────────────────────────────────────────────────
+  # 22–26：轻熟 — 半推半就、开始会拿捏
+  # ─────────────────────────────────────────────────────────────
+  - id: age_young_adult
+    profile_id: young_adult
+    name: 轻熟年龄权重
+    boosted_kinks:
+      - kink_id: b_be_watched
+        boost: 0.25
+      - kink_id: b_slow_rhythm
+        boost: 0.25          # 慢节奏——享受过程
+      - kink_id: b_be_praised
+        boost: 0.20
+      - kink_id: d_full_body_flush
+        boost: 0.20          # 全身泛红——容易有反应
+      - kink_id: a_collarbone
+        boost: 0.20          # 锁骨——得体又性感
+    suppressed_kinks: []     # 轻熟可兼容范围大，不压制
+
+  # ─────────────────────────────────────────────────────────────
+  # 27–33：轻熟女 — 熟练、会撩、可主动
+  # ─────────────────────────────────────────────────────────────
+  - id: age_mature
+    profile_id: mature
+    name: 轻熟女年龄权重
+    boosted_kinks:
+      - kink_id: b_mirror
+        boost: 0.25          # 镜前——自知魅力
+      - kink_id: b_cowgirl
+        boost: 0.25          # 骑乘——主动控制
+      - kink_id: b_show_initiative
+        boost: 0.30          # 主动诱惑
+      - kink_id: e_be_photographed
+        boost: 0.20          # 被拍照——展示欲
+      - kink_id: d_long_afterglow
+        boost: 0.20          # 持续余韵——享受感
+    suppressed_kinks:
+      - kink_id: d_teary_eyes
+        suppress: 0.25       # 少用流泪——更从容
+
+  # ─────────────────────────────────────────────────────────────
+  # 34–40：熟女 — 主动、掌控、不扭捏
+  # ─────────────────────────────────────────────────────────────
+  - id: age_full_mature
+    profile_id: full_mature
+    name: 熟女年龄权重
+    boosted_kinks:
+      - kink_id: b_show_initiative
+        boost: 0.35          # 主动诱惑
+      - kink_id: b_verbal_humiliation
+        boost: 0.30          # 言语羞辱——游刃有余
+      - kink_id: e_no_cleanup_work
+        boost: 0.30          # 事后不清理——不扭捏
+      - kink_id: b_rough_rhythm
+        boost: 0.25          # 粗暴节奏——敢要
+      - kink_id: b_cowgirl
+        boost: 0.20          # 骑乘——掌控
+    suppressed_kinks:
+      - kink_id: a_earlobe
+        suppress: 0.25       # 耳垂敏感——偏少女
+      - kink_id: d_bite_lip
+        suppress: 0.20       # 咬唇——更直接
+      - kink_id: b_be_praised
+        suppress: 0.20       # 被夸奖——没那么依赖

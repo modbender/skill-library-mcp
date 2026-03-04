@@ -1,0 +1,84 @@
+# 性格生成系统配置（五维）
+
+# 系统说明
+# 由 engine 根据当日职业、特质池、性癖列表生成五维性格，写入 roleplay-active.md
+# 五维：1 职业维度  2 自我  3 本我  4 超我  5 NSFW性格
+
+# 数据文件
+data_files:
+  # 维度 2：自我（本能、欲望、冲动、快乐原则）
+  id_traits: id_traits.yaml
+  # 维度 3：本我（理性、现实、调节者、现实原则）
+  ego_traits: ego_traits.yaml
+  # 维度 4：超我（良心、理想、社会规则）
+  superego_traits: superego_traits.yaml
+  # 职业维度与 NSFW 维度无独立池：职业用当日职业+profession_synergy；NSFW 用当日性癖列表生成（不泄漏具体性癖名）
+
+  # 职业-性格协同（供职业维度与整体风格参考）
+  profession_synergy: profession_synergy.yaml
+
+# 五维生成规则
+dimensions:
+  - id: profession
+    name: "职业维度"
+    description: "根据职业特点形成的性格特质"
+    source: "当日职业（name、tags、设定）+ profession_synergy.yaml 匹配"
+    engine_action: "根据职业与协同规则，生成 2～4 句「职业形成的性格特质」，体现该职业带来的行事风格、口头禅倾向、与人互动方式"
+
+  - id: id_self
+    name: "自我"
+    description: "本能、欲望、冲动、快乐原则"
+    source: "id_traits.yaml"
+    engine_action: "抽取 1～2 条 trait（no_repeat_days: 3），将 name/hint 扩展为 1～2 句自然语言，写入「自我」段"
+
+  - id: ego_self
+    name: "本我"
+    description: "理性、现实、调节者、现实原则"
+    source: "ego_traits.yaml"
+    engine_action: "抽取 1～2 条 trait（no_repeat_days: 3），将 name/hint 扩展为 1～2 句自然语言，写入「本我」段"
+
+  - id: superego
+    name: "超我"
+    description: "良心、理想、社会规则"
+    source: "superego_traits.yaml"
+    engine_action: "抽取 1～2 条 trait（no_repeat_days: 3），将 name/hint 扩展为 1～2 句自然语言，写入「超我」段"
+
+  - id: nsfw_persona
+    name: "NSFW性格"
+    description: "根据性癖生成，仅在 NSFW 场景下显露的性格特点"
+    source: "当日 4～6 个性癖（仅用类别与倾向，不泄漏具体 kink 名称）"
+    engine_action: "根据当日性癖的整体倾向（如被动/主动、身体反应/穿着偏好等），生成 2～4 句「在亲密或 NSFW 场景下会显露的性格/反应风格」。不得写出具体性癖名称，只写气质、态度、反应倾向，供 agent 在 NSFW 情境下把握人设"
+
+# 输出格式（写入 roleplay-active.md 的「今日性格（五维）」块）
+output_section: "今日性格（五维）"
+output_structure: |
+  ## 今日性格（五维）
+
+  ### 1. 职业维度
+  （2～4 句：职业形成的性格特质）
+
+  ### 2. 自我
+  （1～2 句：本能、欲望、冲动、快乐原则）
+
+  ### 3. 本我
+  （1～2 句：理性、现实、调节者、现实原则）
+
+  ### 4. 超我
+  （1～2 句：良心、理想、社会规则）
+
+  ### 5. NSFW性格
+  （2～4 句：仅在 NSFW 场景下显露的性格/反应倾向，不写具体性癖名）
+
+  ### 今日言行参考
+  - 言语风格：（综合五维的 1～2 句）
+  - 示例台词："……"
+
+# 性格完整设定（存档内独立文件，~500 字）
+# engine 在 Step 4 写入当日存档目录 archive/YYYY-MM-DD-职业名/personality.md
+# 内容：五维展开为更详细设定（职业言行习惯、自我/本我/超我具体表现与冲突或协调、口癖与语气、日常/亲密/被夸/被否定等情境典型反应；NSFW 仅写气质与反应风格，不写具体性癖名）
+# roleplay-active 中保留引用行，agent 需时引用
+
+# 历史追踪（自我/本我/超我抽取不重复）
+tracker_file: history_tracker.json
+tracker_key: recent_personality_traits
+tracker_days: 7

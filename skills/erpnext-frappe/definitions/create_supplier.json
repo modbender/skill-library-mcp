@@ -1,0 +1,106 @@
+{
+  "name": "create_supplier",
+  "version": "1.0.0",
+  "description": "Create a new supplier/vendor",
+  "author": "Business Claw Team",
+  "category": "procurement",
+  
+  "triggers": [
+    "create supplier",
+    "add supplier",
+    "new vendor",
+    "register supplier"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Supplier DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the supplier",
+      "required": true
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "supplier_name": {
+        "type": "string",
+        "description": "Supplier name"
+      },
+      "supplier_type": {
+        "type": "string",
+        "description": "Supplier type (e.g., Individual, Company)"
+      },
+      "supplier_group": {
+        "type": "string",
+        "description": "Supplier group (e.g., Local, Import)"
+      },
+      "country": {
+        "type": "string",
+        "description": "Country"
+      },
+      "default_currency": {
+        "type": "string",
+        "description": "Default currency"
+      },
+      "payment_terms": {
+        "type": "string",
+        "description": "Payment terms template"
+      },
+      "tax_id": {
+        "type": "string",
+        "description": "Tax ID / VAT number"
+      },
+      "email_id": {
+        "type": "string",
+        "description": "Email address"
+      },
+      "phone": {
+        "type": "string",
+        "description": "Phone number"
+      }
+    },
+    "required": ["supplier_name", "supplier_type"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Supplier"
+        }
+      },
+      {
+        "step": "create_supplier",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Supplier",
+          "data": {
+            "supplier_name": "${supplier_name}",
+            "supplier_type": "${supplier_type}",
+            "supplier_group": "${supplier_group}",
+            "country": "${country}",
+            "default_currency": "${default_currency}",
+            "payment_terms": "${payment_terms}",
+            "tax_id": "${tax_id}",
+            "email_id": "${email_id}",
+            "phone": "${phone}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "require_unique_tax_id": true
+  },
+  
+  "output_template": "Created Supplier {{name}}\nName: {{supplier_name}}\nType: {{supplier_type}}\nGroup: {{supplier_group}}"
+}

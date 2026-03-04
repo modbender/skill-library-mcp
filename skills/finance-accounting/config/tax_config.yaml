@@ -1,0 +1,87 @@
+# 税务配置
+tax:
+  # 增值税设置
+  vat:
+    rate: 0.13  # 增值税率 13%
+    small_scale_rate: 0.03  # 小规模纳税人税率 3%
+    threshold: 100000  # 月销售额起征点
+    declaration_period: "monthly"  # 申报周期：月度
+    
+  # 企业所得税设置
+  income_tax:
+    standard_rate: 0.25  # 标准税率 25%
+    preferential_rate: 0.15  # 高新技术企业优惠税率 15%
+    small_micro_rate: 0.20  # 小微企业优惠税率 20%
+    threshold: 300000  # 年应纳税所得额起征点
+    declaration_period: "quarterly"  # 申报周期：季度
+    
+  # 个人所得税设置
+  personal_income_tax:
+    # 综合所得税率表（年度）
+    brackets:
+      - threshold: 0
+        rate: 0.03
+        deduction: 0
+      - threshold: 36000
+        rate: 0.10
+        deduction: 2520
+      - threshold: 144000
+        rate: 0.20
+        deduction: 16920
+      - threshold: 300000
+        rate: 0.25
+        deduction: 31920
+      - threshold: 420000
+        rate: 0.30
+        deduction: 52920
+      - threshold: 660000
+        rate: 0.35
+        deduction: 85920
+      - threshold: 960000
+        rate: 0.45
+        deduction: 181920
+    
+    basic_deduction: 60000  # 基本减除费用（年度）
+    special_deductions:  # 专项附加扣除
+      children_education: 12000  # 子女教育
+      continuing_education: 4800  # 继续教育
+      serious_illness: 80000  # 大病医疗
+      housing_loan: 12000  # 住房贷款利息
+      housing_rent: 18000  # 住房租金
+      elderly_support: 24000  # 赡养老人
+    
+    declaration_period: "monthly"  # 预扣预缴周期
+  
+  # 其他税费
+  other_taxes:
+    urban_maintenance_tax: 0.07  # 城市维护建设税 7%
+    education_surcharge: 0.03  # 教育费附加 3%
+    local_education_surcharge: 0.02  # 地方教育附加 2%
+    stamp_duty: 0.0003  # 印花税 0.03%
+  
+  # 税务申报设置
+  declarations:
+    enabled: true
+    auto_calculate: true
+    generate_reports: true
+    archive_period: 10  # 档案保存年限（年）
+    
+  # 发票设置
+  invoice:
+    types:
+      - "增值税普通发票"
+      - "增值税专用发票"
+      - "电子普通发票"
+      - "电子专用发票"
+    
+    requirements:
+      minimum_amount: 1.00  # 最小开票金额
+      maximum_amount: 1000000.00  # 最大开票金额
+      validity_period: 360  # 发票有效期（天）
+    
+  # 合规性设置
+  compliance:
+    gdpr: true  # GDPR合规
+    local_regulations: true  # 本地法规合规
+    audit_trail: true  # 审计追踪
+    data_encryption: true  # 数据加密

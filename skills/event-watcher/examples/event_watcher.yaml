@@ -1,0 +1,25 @@
+watchers:
+  - name: weather_stream
+    source: redis_stream
+    stream: weather_events
+    group: eventwatcher
+    consumer: watcher-1
+    batch_count: 20
+    block_ms: 1000
+    payloadField: payload
+    payloadEncoding: json
+    filter:
+      field: "payload.type"
+      op: "!="
+      value: "sunny"
+    dedupe_ttl_seconds: 1800
+    ack_timeout_seconds: 30
+    retry:
+      max: 3
+      backoff_seconds: [60, 300, 900]
+    wake:
+      method: sessions_send
+      reply_channel: slack
+      reply_to: channel:YOUR_CHANNEL_ID
+      message_template: |
+        Weather event: id={{event_id}} type={{payload.type}} city={{payload.city}}

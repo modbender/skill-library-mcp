@@ -1,0 +1,63 @@
+# 报告调度配置示例
+# 配合 report_generator.py 使用
+# python3 scripts/report_generator.py run --schedule configs/schedule.yaml
+
+jobs:
+  # 每日门店审计报告（Demo 模式，可替换为真实 bitable 数据）
+  - id: daily_audit_demo
+    name: 每日门店审计（Demo）
+    type: audit
+    enabled: true
+    schedule:
+      frequency: daily
+      time: "09:00"
+    params:
+      use_demo: true
+      publish: false
+      output_local: /tmp/feishu-reports/daily_audit.md
+
+  # 每日门店审计报告（真实数据模板，启用前填入 app_token 和 table_id）
+  # - id: daily_audit_live
+  #   name: 每日门店审计
+  #   type: audit
+  #   enabled: false
+  #   schedule:
+  #     frequency: daily
+  #     time: "09:00"
+  #   params:
+  #     app_token: YOUR_APP_TOKEN
+  #     sales_table: YOUR_TABLE_ID
+  #     config: retail_default.yaml
+  #     publish: true
+  #     folder_token: YOUR_FOLDER_TOKEN
+
+  # 每周数据摘要报告
+  # - id: weekly_summary
+  #   name: 每周数据摘要
+  #   type: template
+  #   enabled: false
+  #   schedule:
+  #     frequency: weekly
+  #     day_of_week: 1
+  #     time: "10:00"
+  #   params:
+  #     app_token: YOUR_APP_TOKEN
+  #     table_id: YOUR_TABLE_ID
+  #     template: data_summary.md
+  #     title: "周报 {{WEEK_START}} ~ {{WEEK_END}}"
+  #     publish: true
+
+  # 每月汇总
+  # - id: monthly_report
+  #   name: 月度运营报告
+  #   type: audit
+  #   enabled: false
+  #   schedule:
+  #     frequency: monthly
+  #     day_of_month: 1
+  #     time: "09:00"
+  #   params:
+  #     app_token: YOUR_APP_TOKEN
+  #     sales_table: YOUR_TABLE_ID
+  #     config: fmcg.yaml
+  #     publish: true

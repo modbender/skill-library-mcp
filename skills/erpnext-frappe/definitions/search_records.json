@@ -1,0 +1,66 @@
+{
+  "name": "search_records",
+  "version": "1.0.0",
+  "description": "Search for documents across different DocTypes",
+  "author": "Business Claw Team",
+  "category": "utility",
+  
+  "triggers": [
+    "search",
+    "find",
+    "lookup",
+    "search records",
+    "find document"
+  ],
+  
+  "tools": [
+    {
+      "name": "search_documents",
+      "description": "Search for documents",
+      "required": true
+    },
+    {
+      "name": "list_documents",
+      "description": "List documents of a type",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query text"
+      },
+      "doctype": {
+        "type": "string",
+        "description": "Specific DocType to search (optional)"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum results to return",
+        "default": 20
+      }
+    },
+    "required": ["query"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "search",
+        "tool": "search_documents",
+        "arguments": {
+          "doctype": "${doctype}",
+          "query": "${query}",
+          "limit": "${limit}"
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {},
+  
+  "output_template": "Found {{count}} results for '{{query}}':\n{{results}}"
+}

@@ -1,0 +1,206 @@
+# 每日职业角色扮演玩法 —— 数据目录索引
+# 版本: 1.1
+# 说明: 生成每日内容时按此索引加载所有数据文件
+
+data_root: ".openclaw/workspace-role-play/data"
+
+# ══════════════════════════════════════════
+# 职业库 (Professions)
+# ══════════════════════════════════════════
+professions:
+  files:
+    - path: professions/medical.yaml
+      category: 医疗类
+      category_id: medical
+      count: 24           # 职业数量
+
+    - path: professions/education.yaml
+      category: 教育类
+      category_id: education
+      count: 17
+
+    - path: professions/law.yaml
+      category: 法律政务类
+      category_id: law
+      count: 10
+
+    - path: professions/enforcement.yaml
+      category: 执法军事类
+      category_id: enforcement
+      count: 9
+
+    - path: professions/business.yaml
+      category: 商务金融类
+      category_id: business
+      count: 8
+
+    - path: professions/culture.yaml
+      category: 文化艺术类
+      category_id: culture
+      count: 8
+
+    - path: professions/service.yaml
+      category: 服务类
+      category_id: service
+      count: 9
+
+    - path: professions/tech.yaml
+      category: 科技工程类
+      category_id: tech
+      count: 6
+
+    - path: professions/sports.yaml
+      category: 体育运动类
+      category_id: sports
+      count: 8
+
+    - path: professions/food.yaml
+      category: 餐饮美食类
+      category_id: food
+      count: 8
+
+    - path: professions/fashion.yaml
+      category: 时尚美妆类
+      category_id: fashion
+      count: 8
+
+    - path: professions/travel.yaml
+      category: 旅行航空类
+      category_id: travel
+      count: 8
+
+    - path: professions/special.yaml
+      category: 特殊幻想类
+      category_id: special
+      count: 15
+      restriction: weekend_or_holiday   # 仅周末/节日可抽
+
+  total: ~138
+  exclusion_window: 14    # 同一职业14天内不重复
+
+# ══════════════════════════════════════════
+# 性癖库 (Kinks)
+# ══════════════════════════════════════════
+kinks:
+  draw_rule: "每日从 A–E 中随机选 3～5 类各抽 1 个（基础性癖），再从 F 抽 1 个（特殊性癖），共 4～6 个"
+  base_count_min: 3       # 基础性癖最少 3 个（从 A–E 中选 3 类）
+  base_count_max: 5      # 基础性癖最多 5 个（从 A–E 中选 5 类）
+  special_count: 1       # 特殊性癖固定 1 个（来自 F）
+
+  categories:
+    - path: kinks/category_a.yaml
+      category: 敏感带
+      category_id: A
+      description: 身体哪里最敏感
+      count: 23
+
+    - path: kinks/category_b.yaml
+      category: 行为偏好
+      category_id: B
+      description: 喜欢怎么做
+      count: 24
+
+    - path: kinks/category_c.yaml
+      category: 穿着癖好
+      category_id: C
+      description: 穿什么有感觉
+      count: 24
+
+    - path: kinks/category_d.yaml
+      category: 体质反应
+      category_id: D
+      description: 身体怎么反应
+      count: 24
+
+    - path: kinks/category_e.yaml
+      category: 特殊嗜好
+      category_id: E
+      description: 隐藏的小癖好
+      count: 24
+
+    - path: kinks/category_f.yaml
+      category: 情境场合
+      category_id: F
+      description: 当日最想要的情境或场合（特殊性癖，每日必抽 1 个）
+      count: 12
+
+  total_pool: 131        # A–E 共 119 + F 共 12
+  exclusion_window: 3    # 同一性癖 3 天内不重复（按类别分别判断）
+  rare_rules_path: kinks/rare_kink_rules.yaml   # 稀有性癖：trigger_probability，抽完基础后按概率将 1 个基础性癖替换为同类别 rare: true 的 kink
+
+# ══════════════════════════════════════════
+# 主题日 (Daily Themes)
+# ══════════════════════════════════════════
+themes:
+  path: themes/daily_themes.yaml
+  description: 每日按权重抽取主题（被动日/主动日/身体反应日/职业深度日等），影响性癖池过滤或类别权重
+  apply: "Step 2 前抽取今日主题；Step 2 抽性癖时若主题非 none 则按 themes.rules 应用：B 类 allow_list 过滤、D 类 category_boost、职业深度日优先 boosted_kinks"
+  # 日历联动：先查 theme_calendar.yaml（节气/中国节假日/世界节日/世界日），若当日匹配则今日主题展示名用该条 name，可选绑定 theme_id 或 profession_tags_boost
+  calendar_path: themes/theme_calendar.yaml
+  # 用户日历/待办 → 职业偏好：读取今日日程摘要（与 WEEKLY_TODO 同源或 Apple Reminder），用 calendar_keywords.yaml 匹配关键词，对命中 tag 的职业加权
+  calendar_keywords_path: themes/calendar_keywords.yaml
+  # 自定义主题与每周固定：custom_themes.yaml 可合并自创主题、weekly_schedule 可指定周几固定某主题；若当日有 weekly_schedule 则直接使用该 theme_id
+  custom_path: themes/custom_themes.yaml
+  # 每周至少一个主题日：若 history_tracker 中本周已出现主题日次数为 0 且今日为周六(6)或周日(7)，则将 none 的 weight 置 0 再抽主题，保证本周至少 1 天为主题日
+  min_theme_days_per_week: 1
+
+# ══════════════════════════════════════════
+# 随机年龄 (Age)
+# ══════════════════════════════════════════
+age:
+  path: age_profiles.yaml
+  description: 每日 18-40 岁随机，匹配外形/打扮/心态/性经验/台词 profile
+  apply: "Step 3.5 抽年龄 → Step 4 写入 roleplay-active 今日年龄段 + 合并 ComfyUI 外形 tag"
+
+# ══════════════════════════════════════════
+# 性格生成 (Personality - 五维)
+# ══════════════════════════════════════════
+personality:
+  path: personality/index.yaml
+  description: 五维性格生成（职业维度、自我、本我、超我、NSFW性格）
+  data_files:
+    id_traits: personality/id_traits.yaml
+    ego_traits: personality/ego_traits.yaml
+    superego_traits: personality/superego_traits.yaml
+    profession_synergy: personality/profession_synergy.yaml
+  apply: "Step 3.6 生成五维性格（职业据当日职业+协同；自我/本我/超我从特质池各抽 1～2 条，3 天内不重复；NSFW 据当日性癖倾向生成）；Step 4 写入 roleplay-active「今日性格（五维）」；Step 7 更新 recent_personality_traits"
+
+# ══════════════════════════════════════════
+# 加权规则 (Weights)
+# ══════════════════════════════════════════
+weights:
+  - path: weights/profession_kink_weights.yaml
+    description: 职业-性癖联动加权表
+    apply_order: 1          # 先应用职业规则
+  - path: weights/age_kink_weights.yaml
+    description: 年龄-性癖联动加权表（Step 3.5 确定年龄 profile 后应用）
+    apply_order: 2          # 在职业权重之后叠加
+
+# ══════════════════════════════════════════
+# 生成逻辑说明
+# ══════════════════════════════════════════
+generation_flow:
+  step_1: "从职业库抽取当日职业（排除exclusion_window内的职业）；可选：读取今日用户日程/待办摘要，用 themes/calendar_keywords.yaml 匹配关键词，对命中 profession_tags_boost 的职业加权或仅从该 tag 池抽（如洗牙→牙科护士）"
+  step_1a: "日历联动主题：用当日 YYYY-MM-DD 与 MM-DD 查 themes/theme_calendar.yaml（中国节假日对 holidays_china.json、世界节日/世界日/节气按 M-D）；若匹配则今日主题展示名用该条 name，可选绑定 theme_id 与 profession_tags_boost"
+  step_1b: "若 themes/custom_themes.yaml 的 weekly_schedule 中今日星期几有固定 theme_id，则直接采用该主题；否则若本周尚未出现主题日（据 history_tracker.recent_daily_theme 与本周日期）且今日为周六/日，将 none 权重置 0 再抽；否则从 daily_themes + custom_themes.themes 按 weight 加权随机抽「今日主题」。若 step_1a 有日历匹配则展示名优先用日历 name"
+  step_2: "从 A–E 中随机选 3～5 类（每类最多选一次）；若今日主题含 category_boost（如身体反应日对 D），则选类时对该类加权；对每选中的类：若主题 rules 含该类别 allow_list 则仅从 kink_ids 中抽（排除 recent 后若为空则回退全类），若主题为 profession_boosted_first 则该类优先从职业 boosted_kinks 中该类的 id 抽、不足则全池；其余同「职业权重+年龄权重」加权抽 1 个。再从 F 抽 1 个。排除 exclusion_window 内已用 kink"
+  step_2b: "稀有替换（可选）：读取 kinks/rare_kink_rules.yaml，以 trigger_probability 掷骰；若触发则在已抽到的基础性癖（A–E）中随机选一类，将该类当日抽中的 1 个 kink 替换为同类别中 rare: true 且不在 recent_kinks 的 kink（若无可用稀有则不替换）"
+  step_3: "权重计算：先按职业 tags 应用 profession_kink_weights；Step 3.5 定年龄后按 profile_id 应用 age_kink_weights，与职业权重叠加（基础 1.0 ± boost ± suppress）；F 可均匀或单独配置"
+  step_4: "按权重加权随机抽取，得到 4～6 个性癖"
+  step_5: "根据 kink 数据生成三级暗示策略：优先查 kinks/hint_overrides.yaml（职业 tags + kink_id 匹配则用 override）；否则若该 kink 有 hint_variants 则随机选一套，无则用默认 hint_lv1/2/3"
+  step_5b: "查 kinks/synergies.yaml：若当日性癖列表中存在某 synergy 的 kink_ids 成对，则在暗示策略中追加「组合暗示」块（该对 name + hint_lv2/hint_lv3），供 HEARTBEAT 在 Lv.2/Lv.3 暗示该对中任一时优先使用"
+  step_6: "根据职业 comfyui.tags + 性癖 comfyui_hint + 年龄 profile 的 appearance.comfyui_tags 生成图片 prompt"
+  step_7: "写入 roleplay-active.md（含今日年龄段、今日性格五维、性癖、暗示、组合暗示若有）+ archive/.../bio.md"
+
+hint_timing:
+  lv1: "06:00-12:00"
+  lv2: "12:00-18:00"
+  lv3: "18:00-24:00"
+
+# ══════════════════════════════════════════
+# 成就系统 (Achievements)
+# ══════════════════════════════════════════
+achievements:
+  config_path: achievements.yaml
+  tracker_path: achievement_tracker.json
+  description: 追踪通关次数、连胜天数、职业探索数等，解锁成就奖励与连胜加成

@@ -1,0 +1,35 @@
+# Skill: data_format_converter
+
+convert_format(data: string, from: string, to: string) => string
+
+## Trigger Patterns
+- 格式转换
+- 格式互转
+- convert format
+- csv to json
+
+## Implementation
+
+在不同数据格式间转换：CSV、JSON、XML、YAML、TOML 等。
+
+```javascript
+function convertFormat(data, from, to) {
+  const converters = {
+    'csv->json': (csv) => {
+      const lines = csv.split('\n');
+      const headers = lines[0].split(',');
+      return JSON.stringify(lines.slice(1).map(line => 
+        Object.fromEntries(line.split(',').map((v, i) => [headers[i], v]))
+      ), null, 2);
+    },
+    'json->yaml': (json) => {
+      const obj = typeof json === 'string' ? JSON.parse(json) : json;
+      return Object.entries(obj).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join('\n');
+    },
+    'yaml->json': (yaml) => JSON.stringify(parseYaml(yaml), null, 2),
+    'xml->json': (xml) => JSON.stringify(parseXml(xml), null, 2)
+  };
+  
+  const key = `${from}->${to}`;
+  return converters[key]?.(data) || `Unsupported conversion: ${key}`;
+}
