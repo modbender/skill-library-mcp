@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/modbender/skill-library-mcp/compare/v1.1.1...v1.2.0) (2026-03-04)
+
+
+### Features
+
+* added claude code plugin support ([c8d27a4](https://github.com/modbender/skill-library-mcp/commit/c8d27a4b805d402c9f9062eab88e7ce469a83d50))
+
 ## [1.1.1](https://github.com/modbender/skill-library-mcp/compare/v1.1.0...v1.1.1) (2026-02-14)
 
 
