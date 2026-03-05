@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/modbender/skill-library-mcp/compare/v1.3.1...v1.3.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* marketplace schema ([19e6471](https://github.com/modbender/skill-library-mcp/commit/19e64716e33085c2b0a7475fc2be4dc286e66df9))
+* mcp installs ([3a8861a](https://github.com/modbender/skill-library-mcp/commit/3a8861aef5e09f596429de7781e890e037b1e0e1))
+
 ## [1.3.1](https://github.com/modbender/skill-library-mcp/compare/v1.3.0...v1.3.1) (2026-03-05)
 
 
