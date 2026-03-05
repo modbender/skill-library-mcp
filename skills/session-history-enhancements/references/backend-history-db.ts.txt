@@ -1,0 +1,258 @@
+import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
+
+export type SessionHistoryRow = {
+  sessionId: string;
+  agentId: string;
+  sessionKey: string;
+  displayName?: string;
+  createdAt: number;
+  updatedAt: number;
+  archivedAt?: number;
+  messageCount: number;
+  filePath: string;
+  firstMessage?: string;
+  channel?: string;
+  chatType: string;
+  totalTokens?: number;
+  status: "active" | "archived";
+};
+
+export type SessionHistoryListOptions = {
+  agentId?: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+  status?: "active" | "archived";
+};
+
+export type SessionHistoryListResult = {
+  sessions: SessionHistoryRow[];
+  total: number;
+};
+
+/**
+ * Initialize the session history database with required schema.
+ * DB location: {sessionsDir}/history.db
+ */
+export function initHistoryDb(sessionsDir: string): DatabaseSync {
+  const dbPath = path.join(sessionsDir, "history.db");
+  const db = new DatabaseSync(dbPath);
+
+  // Create schema
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS session_history (
+      sessionId TEXT PRIMARY KEY,
+      agentId TEXT NOT NULL,
+      sessionKey TEXT NOT NULL,
+      displayName TEXT,
+      createdAt INTEGER NOT NULL,
+      updatedAt INTEGER NOT NULL,
+      archivedAt INTEGER,
+      messageCount INTEGER DEFAULT 0,
+      filePath TEXT NOT NULL,
+      firstMessage TEXT,
+      channel TEXT,
+      chatType TEXT DEFAULT 'direct',
+      totalTokens INTEGER,
+      status TEXT DEFAULT 'archived'
+    );
+  `);
+
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_session_agent ON session_history(agentId, updatedAt DESC);
+  `);
+
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_session_status ON session_history(status);
+  `);
+
+  return db;
+}
+
+/**
+ * Insert or update a session history record
+ */
+export function indexSession(db: DatabaseSync, entry: SessionHistoryRow): void {
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO session_history (
+      sessionId, agentId, sessionKey, displayName, createdAt, updatedAt,
+      archivedAt, messageCount, filePath, firstMessage, channel, chatType,
+      totalTokens, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run(
+    entry.sessionId,
+    entry.agentId,
+    entry.sessionKey,
+    entry.displayName || null,
+    entry.createdAt,
+    entry.updatedAt,
+    entry.archivedAt || null,
+    entry.messageCount,
+    entry.filePath,
+    entry.firstMessage || null,
+    entry.channel || null,
+    entry.chatType,
+    entry.totalTokens || null,
+    entry.status,
+  );
+}
+
+/**
+ * List archived sessions with optional filtering and pagination
+ */
+export function listArchivedSessions(
+  db: DatabaseSync,
+  opts: SessionHistoryListOptions = {},
+): SessionHistoryListResult {
+  let whereClause = "WHERE 1=1";
+  const params: (string | number)[] = [];
+
+  if (opts.agentId) {
+    whereClause += " AND agentId = ?";
+    params.push(opts.agentId);
+  }
+
+  if (opts.status) {
+    whereClause += " AND status = ?";
+    params.push(opts.status);
+  } else {
+    // Default to archived sessions only
+    whereClause += " AND status = ?";
+    params.push("archived");
+  }
+
+  if (opts.search) {
+    whereClause += " AND (displayName LIKE ? OR firstMessage LIKE ? OR sessionKey LIKE ?)";
+    const searchTerm = `%${opts.search}%`;
+    params.push(searchTerm, searchTerm, searchTerm);
+  }
+
+  // Get total count
+  const countStmt = db.prepare(`SELECT COUNT(*) as count FROM session_history ${whereClause}`);
+  const countResult = countStmt.get(...params) as { count: number };
+  const total = countResult.count;
+
+  // Get sessions with pagination
+  const limit = Math.max(1, Math.min(opts.limit || 50, 200));
+  const offset = Math.max(0, opts.offset || 0);
+
+  const stmt = db.prepare(`
+    SELECT * FROM session_history
+    ${whereClause}
+    ORDER BY updatedAt DESC
+    LIMIT ? OFFSET ?
+  `);
+
+  const sessions = stmt.all(...params, limit, offset) as SessionHistoryRow[];
+
+  return { sessions, total };
+}
+
+/**
+ * Get a specific session by ID
+ */
+export function getSession(db: DatabaseSync, sessionId: string): SessionHistoryRow | null {
+  const stmt = db.prepare(`SELECT * FROM session_history WHERE sessionId = ?`);
+  const result = stmt.get(sessionId) as SessionHistoryRow | undefined;
+  return result || null;
+}
+
+/**
+ * Update the display name of a session
+ */
+export function updateSessionName(db: DatabaseSync, sessionId: string, name: string): void {
+  const stmt = db.prepare(`
+    UPDATE session_history 
+    SET displayName = ?, updatedAt = ?
+    WHERE sessionId = ?
+  `);
+  stmt.run(name, Date.now(), sessionId);
+}
+
+/**
+ * Delete a session record from the database
+ */
+export function deleteSessionRecord(db: DatabaseSync, sessionId: string): void {
+  const stmt = db.prepare(`DELETE FROM session_history WHERE sessionId = ?`);
+  stmt.run(sessionId);
+}
+
+/**
+ * Update the status of a session (active/archived)
+ */
+export function updateSessionStatus(
+  db: DatabaseSync,
+  sessionId: string,
+  status: "active" | "archived",
+): void {
+  const updates: Record<string, string | number> = {
+    status,
+    updatedAt: Date.now(),
+  };
+
+  if (status === "archived") {
+    updates.archivedAt = Date.now();
+  }
+
+  const setClause = Object.keys(updates)
+    .map((key) => `${key} = ?`)
+    .join(", ");
+  const values = Object.values(updates);
+
+  const stmt = db.prepare(`
+    UPDATE session_history 
+    SET ${setClause}
+    WHERE sessionId = ?
+  `);
+  stmt.run(...values, sessionId);
+}
+
+/**
+ * Get count of sessions by status
+ */
+export function getSessionCounts(
+  db: DatabaseSync,
+  agentId?: string,
+): { active: number; archived: number; total: number } {
+  let whereClause = "WHERE 1=1";
+  const params: (string | number)[] = [];
+
+  if (agentId) {
+    whereClause += " AND agentId = ?";
+    params.push(agentId);
+  }
+
+  const stmt = db.prepare(`
+    SELECT 
+      status,
+      COUNT(*) as count
+    FROM session_history
+    ${whereClause}
+    GROUP BY status
+  `);
+
+  const results = stmt.all(...params) as Array<{ status: string; count: number }>;
+
+  let active = 0;
+  let archived = 0;
+
+  for (const result of results) {
+    if (result.status === "active") {
+      active = result.count;
+    } else if (result.status === "archived") {
+      archived = result.count;
+    }
+  }
+
+  return { active, archived, total: active + archived };
+}

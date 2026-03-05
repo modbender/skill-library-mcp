@@ -1,0 +1,60 @@
+param (
+    [Parameter(Mandatory=$true)]
+    [ValidateSet("move", "click", "rightclick", "doubleclick")]
+    [string]$Action,
+
+    [int]$X = 0,
+    [int]$Y = 0
+)
+
+Add-Type -AssemblyName System.Windows.Forms
+
+switch ($Action) {
+    "move" {
+        [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($X, $Y)
+    }
+    "click" {
+        $source = @"
+using System;
+using System.Runtime.InteropServices;
+public class Mouse {
+    [DllImport("user32.dll")]
+    public static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+}
+"@
+        Add-Type -TypeDefinition $source -ErrorAction SilentlyContinue
+        [Mouse]::mouse_event(0x02, 0, 0, 0, 0) # Left Down
+        Start-Sleep -Milliseconds 50
+        [Mouse]::mouse_event(0x04, 0, 0, 0, 0) # Left Up
+    }
+    "rightclick" {
+        $source = @"
+using System;
+using System.Runtime.InteropServices;
+public class MouseRight {
+    [DllImport("user32.dll")]
+    public static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+}
+"@
+        Add-Type -TypeDefinition $source -ErrorAction SilentlyContinue
+        [MouseRight]::mouse_event(0x08, 0, 0, 0, 0) # Right Down
+        Start-Sleep -Milliseconds 50
+        [MouseRight]::mouse_event(0x10, 0, 0, 0, 0) # Right Up
+    }
+    "doubleclick" {
+        $source = @"
+using System;
+using System.Runtime.InteropServices;
+public class MouseDouble {
+    [DllImport("user32.dll")]
+    public static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+}
+"@
+        Add-Type -TypeDefinition $source -ErrorAction SilentlyContinue
+        [MouseDouble]::mouse_event(0x02, 0, 0, 0, 0)
+        [MouseDouble]::mouse_event(0x04, 0, 0, 0, 0)
+        Start-Sleep -Milliseconds 50
+        [MouseDouble]::mouse_event(0x02, 0, 0, 0, 0)
+        [MouseDouble]::mouse_event(0x04, 0, 0, 0, 0)
+    }
+}

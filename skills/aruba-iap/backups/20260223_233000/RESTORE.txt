@@ -1,0 +1,83 @@
+===========================================
+IAP Configuration Backup Restore Guide
+===========================================
+
+To restore from this backup:
+
+Option 1: Full Configuration Restore
+-----------------------------------
+1. Access the IAP web interface at https://<vc-ip>
+2. Navigate to Maintenance > Configuration Backup
+3. Upload the file: raw/show_running-config.txt
+4. Apply and restart the cluster
+
+Option 2: Manual CLI Restore
+-----------------------------
+1. SSH to the virtual controller:
+   ssh admin@<vc-ip>
+
+2. Enter configuration mode:
+   configure terminal
+
+3. Copy and paste the contents of: raw/show_running-config.txt
+
+4. Save configuration:
+   write memory
+
+Option 3: iapctl Apply (Recommended)
+------------------------------------
+1. Use iapctl to apply the configuration:
+   iapctl diff-cmd \
+     --cluster <cluster-name> \
+     --vc <vc-ip> \
+     --in ./changes/restore.json \
+     --out ./restore-diff
+
+2. Review and apply changes:
+   iapctl apply-cmd \
+     --cluster <cluster-name> \
+     --vc <vc-ip> \
+     --change-id restore_<timestamp> \
+     --in ./restore-diff/commands.json \
+     --out ./restore-apply
+
+===========================================
+Backup Metadata
+===========================================
+{
+  "cluster": "test-iap",
+  "vc": "192.168.20.56",
+  "timestamp": "20260223_233000",
+  "timestamp_iso": "2026-02-23T15:30:04Z",
+  "backup_type": "full_snapshot",
+  "files": [
+    {
+      "name": "show_running-config.txt",
+      "description": "Full running configuration"
+    },
+    {
+      "name": "show_version.txt",
+      "description": "IAP version and model info"
+    },
+    {
+      "name": "show_wlan.txt",
+      "description": "WLAN configuration"
+    },
+    {
+      "name": "show_ap_database.txt",
+      "description": "AP database and cluster info"
+    },
+    {
+      "name": "show_user-table.txt",
+      "description": "Connected clients"
+    },
+    {
+      "name": "show_interface.txt",
+      "description": "Network interface status"
+    },
+    {
+      "name": "show_radio.txt",
+      "description": "Radio configuration and status"
+    }
+  ]
+}

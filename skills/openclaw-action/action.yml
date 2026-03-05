@@ -1,0 +1,77 @@
+name: 'OpenClaw Security Scan'
+description: 'Scan agent skills for secrets, injection attacks, and exfiltration patterns'
+author: 'AtlasPA'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  workspace:
+    description: 'Path to scan (defaults to repository root)'
+    required: false
+    default: '.'
+  fail-on-findings:
+    description: 'Fail the check if any findings are detected'
+    required: false
+    default: 'true'
+  scan-secrets:
+    description: 'Run secret/credential scanning (sentry)'
+    required: false
+    default: 'true'
+  scan-injection:
+    description: 'Run prompt/shell injection scanning (bastion)'
+    required: false
+    default: 'true'
+  scan-egress:
+    description: 'Run data exfiltration scanning (egress)'
+    required: false
+    default: 'true'
+
+outputs:
+  findings-count:
+    description: 'Total number of security findings'
+    value: ${{ steps.scan.outputs.findings-count }}
+  has-critical:
+    description: 'Whether critical findings were detected'
+    value: ${{ steps.scan.outputs.has-critical }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Download OpenClaw scanners
+      shell: bash
+      run: |
+        mkdir -p ${{ runner.temp }}/openclaw-scanners
+
+        # Download scanner scripts directly from GitHub
+        curl -sL https://raw.githubusercontent.com/AtlasPA/openclaw-sentry/main/scripts/sentry.py \
+          -o ${{ runner.temp }}/openclaw-scanners/sentry.py
+        curl -sL https://raw.githubusercontent.com/AtlasPA/openclaw-bastion/main/scripts/bastion.py \
+          -o ${{ runner.temp }}/openclaw-scanners/bastion.py
+        curl -sL https://raw.githubusercontent.com/AtlasPA/openclaw-egress/main/scripts/egress.py \
+          -o ${{ runner.temp }}/openclaw-scanners/egress.py
+
+    - name: Run security scans
+      id: scan
+      shell: bash
+      env:
+        WORKSPACE: ${{ inputs.workspace }}
+        SCAN_SECRETS: ${{ inputs.scan-secrets }}
+        SCAN_INJECTION: ${{ inputs.scan-injection }}
+        SCAN_EGRESS: ${{ inputs.scan-egress }}
+        SCANNERS_DIR: ${{ runner.temp }}/openclaw-scanners
+      run: |
+        python3 "${{ github.action_path }}/scripts/scan.py"
+
+    - name: Check results
+      if: inputs.fail-on-findings == 'true' && steps.scan.outputs.has-critical == 'true'
+      shell: bash
+      run: |
+        echo "::error::Security scan found critical issues. Review the findings above."
+        exit 1

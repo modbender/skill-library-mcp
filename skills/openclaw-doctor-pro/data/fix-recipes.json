@@ -1,0 +1,491 @@
+{
+  "version": "1.0.0",
+  "recipes": [
+    {
+      "id": "fix-auth-key",
+      "title": "Reset API Authentication",
+      "safe_auto": false,
+      "description": "Reconfigure API key for the provider",
+      "steps": [
+        {
+          "type": "command",
+          "command": "openclaw models auth setup-token --provider {provider}",
+          "description": "Interactive API key setup"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": true
+    },
+    {
+      "id": "fix-auth-env",
+      "title": "Configure Environment Variable",
+      "safe_auto": true,
+      "description": "Guide to set missing API key environment variable",
+      "steps": [
+        {
+          "type": "info",
+          "message": "Set the {env_var} environment variable with your API key",
+          "description": "Environment variable configuration needed"
+        },
+        {
+          "type": "info",
+          "message": "Add to .env file: {env_var}=your-api-key-here",
+          "description": "Add to .env file for persistence"
+        },
+        {
+          "type": "info",
+          "message": "Or export temporarily: export {env_var}=your-api-key-here",
+          "description": "Temporary shell export"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": true
+    },
+    {
+      "id": "fix-rate-wait",
+      "title": "Rate Limit Wait Strategy",
+      "safe_auto": true,
+      "description": "Wait and retry with exponential backoff",
+      "steps": [
+        {
+          "type": "info",
+          "message": "Rate limit exceeded. Implementing backoff strategy",
+          "description": "Rate limiting detected"
+        },
+        {
+          "type": "info",
+          "message": "Wait for Retry-After header duration or implement exponential backoff",
+          "description": "Backoff recommendation"
+        },
+        {
+          "type": "info",
+          "message": "Consider upgrading provider tier or distributing load",
+          "description": "Long-term solution"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-port-change",
+      "title": "Change Gateway Port",
+      "safe_auto": true,
+      "description": "Update gateway port to an available port",
+      "steps": [
+        {
+          "type": "config",
+          "file": "openclaw.json",
+          "path": "gateway.port",
+          "value": 3001,
+          "description": "Change port to 3001 (or next available)"
+        },
+        {
+          "type": "info",
+          "message": "Port updated. Use ports > 1024 to avoid permission issues",
+          "description": "Port change guidance"
+        }
+      ],
+      "rollback": {
+        "type": "config",
+        "file": "openclaw.json",
+        "path": "gateway.port",
+        "value": "{original_port}"
+      },
+      "requires_restart": true
+    },
+    {
+      "id": "fix-port-kill",
+      "title": "Kill Process on Port",
+      "safe_auto": false,
+      "description": "Terminate process using the required port",
+      "steps": [
+        {
+          "type": "command",
+          "command": "lsof -ti :{port} | xargs kill -9",
+          "description": "Kill process on port (Unix/Linux/macOS)",
+          "platforms": ["linux", "darwin"]
+        },
+        {
+          "type": "command",
+          "command": "netstat -ano | findstr :{port} && taskkill /PID <PID> /F",
+          "description": "Kill process on port (Windows)",
+          "platforms": ["win32"]
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-config-validate",
+      "title": "Validate and Fix Configuration",
+      "safe_auto": true,
+      "description": "Run configuration validation and auto-fix",
+      "steps": [
+        {
+          "type": "command",
+          "command": "openclaw doctor --fix",
+          "description": "Validate and auto-fix configuration issues"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-config-reset",
+      "title": "Reset Configuration",
+      "safe_auto": false,
+      "description": "Backup current config and reset to defaults",
+      "steps": [
+        {
+          "type": "command",
+          "command": "cp openclaw.json openclaw.json.backup",
+          "description": "Backup current configuration"
+        },
+        {
+          "type": "command",
+          "command": "openclaw init --force",
+          "description": "Regenerate default configuration"
+        },
+        {
+          "type": "info",
+          "message": "Configuration reset. Previous config saved as openclaw.json.backup",
+          "description": "Reset confirmation"
+        }
+      ],
+      "rollback": {
+        "type": "command",
+        "command": "mv openclaw.json.backup openclaw.json"
+      },
+      "requires_restart": true
+    },
+    {
+      "id": "fix-channel-whatsapp-relink",
+      "title": "Re-link WhatsApp Channel",
+      "safe_auto": false,
+      "description": "Scan QR code to re-link WhatsApp device",
+      "steps": [
+        {
+          "type": "command",
+          "command": "openclaw channels whatsapp scan",
+          "description": "Display QR code for WhatsApp linking"
+        },
+        {
+          "type": "info",
+          "message": "Scan QR code with WhatsApp mobile app (Settings > Linked Devices)",
+          "description": "User action required"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": true
+    },
+    {
+      "id": "fix-channel-telegram-token",
+      "title": "Update Telegram Bot Token",
+      "safe_auto": false,
+      "description": "Configure new Telegram bot token",
+      "steps": [
+        {
+          "type": "info",
+          "message": "Get bot token from @BotFather on Telegram",
+          "description": "Obtain token from BotFather"
+        },
+        {
+          "type": "command",
+          "command": "openclaw channels telegram setup",
+          "description": "Interactive Telegram bot setup"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": true
+    },
+    {
+      "id": "fix-docker-start",
+      "title": "Start Docker Daemon",
+      "safe_auto": false,
+      "description": "Start Docker daemon for sandbox functionality",
+      "steps": [
+        {
+          "type": "command",
+          "command": "systemctl start docker",
+          "description": "Start Docker daemon (Linux systemd)",
+          "platforms": ["linux"]
+        },
+        {
+          "type": "command",
+          "command": "open -a Docker",
+          "description": "Start Docker Desktop (macOS)",
+          "platforms": ["darwin"]
+        },
+        {
+          "type": "info",
+          "message": "Start Docker Desktop from Start Menu (Windows)",
+          "description": "Manual start required (Windows)",
+          "platforms": ["win32"]
+        },
+        {
+          "type": "command",
+          "command": "docker ps",
+          "description": "Verify Docker is running"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-docker-pull",
+      "title": "Pull OpenClaw Sandbox Image",
+      "safe_auto": true,
+      "description": "Download latest OpenClaw sandbox Docker image",
+      "steps": [
+        {
+          "type": "command",
+          "command": "docker pull openclaw/sandbox:latest",
+          "description": "Pull sandbox image from registry"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-node-install",
+      "title": "Install Node.js v22+",
+      "safe_auto": false,
+      "description": "Install compatible Node.js version using fnm",
+      "steps": [
+        {
+          "type": "command",
+          "command": "fnm install 22",
+          "description": "Install Node.js v22 via fnm"
+        },
+        {
+          "type": "command",
+          "command": "fnm use 22",
+          "description": "Switch to Node.js v22"
+        },
+        {
+          "type": "command",
+          "command": "node --version",
+          "description": "Verify Node.js version"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-pnpm-install",
+      "title": "Install pnpm Package Manager",
+      "safe_auto": true,
+      "description": "Install pnpm globally",
+      "steps": [
+        {
+          "type": "command",
+          "command": "npm install -g pnpm",
+          "description": "Install pnpm via npm"
+        },
+        {
+          "type": "command",
+          "command": "pnpm --version",
+          "description": "Verify pnpm installation"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-openclaw-install",
+      "title": "Install OpenClaw CLI",
+      "safe_auto": true,
+      "description": "Install openclaw command globally",
+      "steps": [
+        {
+          "type": "command",
+          "command": "npm install -g openclaw",
+          "description": "Install openclaw globally via npm"
+        },
+        {
+          "type": "command",
+          "command": "openclaw --version",
+          "description": "Verify openclaw installation"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-openclaw-update",
+      "title": "Update OpenClaw CLI",
+      "safe_auto": true,
+      "description": "Update openclaw to latest version",
+      "steps": [
+        {
+          "type": "command",
+          "command": "npm update -g openclaw",
+          "description": "Update openclaw to latest version"
+        },
+        {
+          "type": "command",
+          "command": "openclaw --version",
+          "description": "Verify updated version"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": true
+    },
+    {
+      "id": "fix-permissions-fix",
+      "title": "Fix File Permissions",
+      "safe_auto": true,
+      "description": "Correct file and directory permissions",
+      "steps": [
+        {
+          "type": "command",
+          "command": "mkdir -p ~/.openclaw/credentials",
+          "description": "Ensure credentials directory exists"
+        },
+        {
+          "type": "command",
+          "command": "chmod 700 ~/.openclaw/credentials",
+          "description": "Set secure permissions on credentials directory"
+        },
+        {
+          "type": "command",
+          "command": "chmod 600 ~/.openclaw/credentials/*",
+          "description": "Set secure permissions on credential files"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-gateway-restart",
+      "title": "Restart Gateway",
+      "safe_auto": false,
+      "description": "Stop and restart OpenClaw gateway",
+      "steps": [
+        {
+          "type": "command",
+          "command": "openclaw gateway stop",
+          "description": "Stop gateway gracefully"
+        },
+        {
+          "type": "command",
+          "command": "openclaw gateway start",
+          "description": "Start gateway with current configuration"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-gateway-force",
+      "title": "Force Gateway Restart",
+      "safe_auto": false,
+      "description": "Force kill and restart gateway",
+      "steps": [
+        {
+          "type": "command",
+          "command": "pkill -9 -f 'openclaw gateway'",
+          "description": "Force kill gateway process",
+          "platforms": ["linux", "darwin"]
+        },
+        {
+          "type": "command",
+          "command": "taskkill /F /IM openclaw.exe",
+          "description": "Force kill gateway process (Windows)",
+          "platforms": ["win32"]
+        },
+        {
+          "type": "command",
+          "command": "openclaw gateway start --force",
+          "description": "Force start gateway"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-sandbox-reset",
+      "title": "Reset Sandbox Container",
+      "safe_auto": false,
+      "description": "Remove and recreate sandbox container",
+      "steps": [
+        {
+          "type": "command",
+          "command": "docker stop openclaw-sandbox",
+          "description": "Stop sandbox container"
+        },
+        {
+          "type": "command",
+          "command": "docker rm openclaw-sandbox",
+          "description": "Remove sandbox container"
+        },
+        {
+          "type": "command",
+          "command": "openclaw sandbox init",
+          "description": "Reinitialize sandbox"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-network-dns",
+      "title": "DNS Configuration Guidance",
+      "safe_auto": true,
+      "description": "Suggest DNS troubleshooting steps",
+      "steps": [
+        {
+          "type": "info",
+          "message": "Try using Google DNS (8.8.8.8) or Cloudflare DNS (1.1.1.1)",
+          "description": "Alternative DNS servers"
+        },
+        {
+          "type": "command",
+          "command": "ping -c 3 8.8.8.8",
+          "description": "Test basic network connectivity",
+          "platforms": ["linux", "darwin"]
+        },
+        {
+          "type": "command",
+          "command": "ping -n 3 8.8.8.8",
+          "description": "Test basic network connectivity (Windows)",
+          "platforms": ["win32"]
+        },
+        {
+          "type": "info",
+          "message": "Update /etc/resolv.conf or network settings to use alternative DNS",
+          "description": "DNS configuration location"
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    },
+    {
+      "id": "fix-disk-cleanup",
+      "title": "Cleanup Old Logs",
+      "safe_auto": false,
+      "description": "Remove old log files to free disk space",
+      "steps": [
+        {
+          "type": "command",
+          "command": "find ~/.openclaw/logs -name '*.log' -mtime +30 -delete",
+          "description": "Delete logs older than 30 days",
+          "platforms": ["linux", "darwin"]
+        },
+        {
+          "type": "command",
+          "command": "docker system prune -f",
+          "description": "Clean up Docker resources"
+        },
+        {
+          "type": "command",
+          "command": "du -sh ~/.openclaw",
+          "description": "Check OpenClaw directory size",
+          "platforms": ["linux", "darwin"]
+        }
+      ],
+      "rollback": null,
+      "requires_restart": false
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+services:
+  autotask-mcp:
+    image: ghcr.io/asachs01/autotask-mcp:latest
+    container_name: autotask-mcp
+    env_file:
+      - .env
+    environment:
+      # Run the MCP server in HTTP mode inside Docker
+      MCP_TRANSPORT: http
+      MCP_HTTP_PORT: 8080
+      MCP_HTTP_HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+    # Security hardening
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "1.0"
+        reservations:
+          memory: 128m
+    pids_limit: 64
+
+    # Network hardening — no DNS needed for outbound API calls via IP
+    dns: []
+
+    # Logging limits — prevent disk exhaustion from runaway logs
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,85 @@
+{
+  "name": "@GreatApe42069/dogecoin-node",
+  "version": "1.0.4",
+  "description": "Dogecoin Core node management and SQLite tipping system.",
+  "main": "index.js",
+  "openclaw": {
+    "type": "skill",
+    "category": "crypto",
+    "permissions": {
+      "filesystem": [
+        "~/.dogecoin",
+        "~/bin/dogecoin-1.14.9",
+        "~/.openwork/workspace/archive",
+        "~/dogecoin-cli",
+        "~/dogecoind"
+      ],
+      "network": [
+        "github.com",
+        "api.coingecko.com",
+        "127.0.0.1"
+      ],
+      "commands": [
+        "dogecoind",
+        "dogecoin-cli",
+        "sqlite3",
+        "python3",
+        "curl",
+        "jq"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "trigger": "/dogecoin-node balance",
+      "description": "Fetch the balance of a specific Dogecoin address",
+      "parameters": [
+        { "name": "address", "type": "string", "required": true }
+      ],
+      "handler": "bash",
+      "script": "$HOME/dogecoin-cli -datadir=$HOME/.dogecoin getreceivedbyaddress {{address}}"
+    },
+    {
+      "trigger": "/dogecoin-node price",
+      "description": "Fetch the current DOGE/USD price via CoinGecko",
+      "handler": "bash",
+      "script": "curl -s 'https://api.coingecko.com/api/v3/simple/price?ids=dogecoin&vs_currencies=usd' | jq -r '.dogecoin.usd'"
+    },
+    {
+      "trigger": "/dogecoin-node send",
+      "description": "Send DOGE to a recipient",
+      "parameters": [
+        { "name": "recipient", "type": "string", "required": true },
+        { "name": "amount", "type": "number", "required": true }
+      ],
+      "handler": "bash",
+      "script": "$HOME/dogecoin-cli -datadir=$HOME/.dogecoin sendtoaddress {{recipient}} {{amount}}"
+    },
+    {
+      "trigger": "/dogecoin-node txs",
+      "description": "List recent transactions for an address",
+      "parameters": [
+        { "name": "address", "type": "string", "required": true }
+      ],
+      "handler": "bash",
+      "script": "$HOME/dogecoin-cli -datadir=$HOME/.dogecoin listreceivedbyaddress 1 true true {{address}}"
+    },
+    {
+      "trigger": "/dogecoin-node health",
+      "description": "Run the automated health check script",
+      "handler": "bash",
+      "script": "bash $HOME/.openwork/workspace/archive/health/doge_health_check.sh"
+    },
+    {
+      "trigger": "/dogecoin-node help",
+      "description": "Display available Dogecoin commands",
+      "handler": "text",
+      "response": "Available commands:\n/dogecoin balance <address>\n/dogecoin send <address> <amount>\n/dogecoin txs <address>\n/dogecoin price\n/dogecoin health"
+    }
+  ],
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
+  "author": "GreatApe42069",
+  "license": "MIT"
+}

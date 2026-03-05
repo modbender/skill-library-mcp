@@ -1,0 +1,372 @@
+openapi: 3.0.3
+info:
+  title: Temporal Time Manager API
+  description: |
+    时间管理 AI 助手 API，支持任务、日程、灵感的增删改查。
+    当前覆盖接口：任务管理、日程管理、灵感捕获。
+  version: 1.0.0
+  contact:
+    name: aitimemg.cn
+    url: https://www.aitimemg.cn
+
+servers:
+  - url: "${TEMPORAL_BASE_URL:-https://api.aitimemg.cn}"
+    description: 生产 API 服务器（阿里云函数计算）
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "格式：Bearer <你的_TEMPORAL_API_TOKEN>"
+
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 任务唯一 ID
+        title:
+          type: string
+          description: 任务标题
+        notes:
+          type: string
+          description: 备注/详细描述
+        status:
+          type: string
+          enum: [todo, in_progress, done]
+          default: todo
+          description: 任务状态
+        group:
+          type: string
+          enum: [important_urgent, important_not_urgent, not_important_urgent, neither]
+          default: neither
+          description: 四象限分类
+        due_date:
+          type: string
+          format: date-time
+          description: 截止日期（ISO 8601）
+        priority:
+          type: string
+          enum: [high, medium, low]
+          default: medium
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 日程唯一 ID
+        title:
+          type: string
+          description: 日程标题
+        start_time:
+          type: string
+          format: date-time
+          description: 开始时间
+        end_time:
+          type: string
+          format: date-time
+          description: 结束时间
+        notes:
+          type: string
+          description: 备注
+        created_at:
+          type: string
+          format: date-time
+
+    Idea:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: 灵感内容
+        source:
+          type: string
+          description: 来源（如 openclaw / feishu）
+        created_at:
+          type: string
+          format: date-time
+
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          description: 返回数据
+
+paths:
+  # ─── 任务管理 ───────────────────────────────────────────
+  /api/tasks:
+    get:
+      operationId: list_tasks
+      summary: 获取所有任务
+      description: 返回用户的全部任务列表，可用于展示今日待办、未完成任务等场景。
+      tags: [Tasks]
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [todo, in_progress, done]
+          description: 按状态筛选（不传则返回全部）
+      responses:
+        '200':
+          description: 任务列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Task'
+
+    post:
+      operationId: create_task
+      summary: 创建新任务
+      description: 根据用户的描述创建一个任务。如果用户说"帮我添加一个任务"，调用此接口。
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: 可选，不传则后端自动生成
+                title:
+                  type: string
+                  description: 任务标题（必填）
+                notes:
+                  type: string
+                  description: 备注
+                status:
+                  type: string
+                  enum: [todo, in_progress, done]
+                  default: todo
+                group:
+                  type: string
+                  enum: [important_urgent, important_not_urgent, not_important_urgent, neither]
+                  default: neither
+                due_date:
+                  type: string
+                  description: 截止日期
+                priority:
+                  type: string
+                  enum: [high, medium, low]
+                  default: medium
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /api/tasks/{id}:
+    put:
+      operationId: update_task
+      summary: 更新任务
+      description: 修改任务的状态、标题、截止日期等。用户说"把任务标记为完成"时调用此接口。
+      tags: [Tasks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 任务 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    delete:
+      operationId: delete_task
+      summary: 删除任务
+      description: 删除指定 ID 的任务。用户说"删除这个任务"时调用此接口。
+      tags: [Tasks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 任务 ID
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ─── 日程管理 ───────────────────────────────────────────
+  /api/schedules:
+    get:
+      operationId: list_schedules
+      summary: 获取所有日程
+      description: 返回用户的日程列表。用户问"我今天有什么安排"时调用此接口。
+      tags: [Schedules]
+      responses:
+        '200':
+          description: 日程列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Schedule'
+
+    post:
+      operationId: create_schedule
+      summary: 创建日程
+      description: 创建一个新的日程安排。用户说"帮我排一个会议"时调用此接口。
+      tags: [Schedules]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+                  description: 日程标题（必填）
+                start_time:
+                  type: string
+                  description: 开始时间（ISO 8601）
+                end_time:
+                  type: string
+                  description: 结束时间（ISO 8601）
+                notes:
+                  type: string
+                  description: 备注
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /api/schedules/{id}:
+    put:
+      operationId: update_schedule
+      summary: 更新日程
+      description: 修改日程的时间或标题。
+      tags: [Schedules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    delete:
+      operationId: delete_schedule
+      summary: 删除日程
+      description: 删除指定日程。
+      tags: [Schedules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ─── 灵感捕获 ───────────────────────────────────────────
+  /api/v1/ideas:
+    post:
+      operationId: capture_idea
+      summary: 捕获灵感/备忘
+      description: |
+        快速记录一条灵感、想法或备忘到灵感池。
+        当用户随手说出一个想法或念头（没有明确的截止日期/行动），就用这个接口保存，而不是创建任务。
+      tags: [Ideas]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  description: 灵感内容文字
+                source:
+                  type: string
+                  default: openclaw
+                  description: 来源标记
+      responses:
+        '200':
+          description: 捕获成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'

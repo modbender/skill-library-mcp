@@ -1,0 +1,111 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+/**
+ * @title NFTMarketplace
+ * @dev Simple marketplace for listing and buying ERC721 NFTs.
+ */
+contract NFTMarketplace is ReentrancyGuard {
+    struct Listing {
+        address seller;
+        uint256 price;
+        bool active;
+    }
+
+    // nftAddress => tokenId => Listing
+    mapping(address => mapping(uint256 => Listing)) private _listings;
+
+    event ItemListed(
+        address indexed seller,
+        address indexed nftAddress,
+        uint256 indexed tokenId,
+        uint256 price
+    );
+
+    event ItemSold(
+        address indexed buyer,
+        address indexed nftAddress,
+        uint256 indexed tokenId,
+        uint256 price
+    );
+
+    event ItemCanceled(
+        address indexed seller,
+        address indexed nftAddress,
+        uint256 indexed tokenId
+    );
+
+    modifier isOwner(address nftAddress, uint256 tokenId, address caller) {
+        require(IERC721(nftAddress).ownerOf(tokenId) == caller, "Not the owner");
+        _;
+    }
+
+    modifier isListed(address nftAddress, uint256 tokenId) {
+        require(_listings[nftAddress][tokenId].active, "Not listed");
+        _;
+    }
+
+    /**
+     * @dev List an NFT for sale. Caller must have approved the marketplace first.
+     */
+    function listItem(address nftAddress, uint256 tokenId, uint256 price)
+        external
+        isOwner(nftAddress, tokenId, msg.sender)
+    {
+        require(price > 0, "Price must be > 0");
+        require(
+            IERC721(nftAddress).isApprovedForAll(msg.sender, address(this)) ||
+            IERC721(nftAddress).getApproved(tokenId) == address(this),
+            "Marketplace not approved"
+        );
+
+        _listings[nftAddress][tokenId] = Listing(msg.sender, price, true);
+        emit ItemListed(msg.sender, nftAddress, tokenId, price);
+    }
+
+    /**
+     * @dev Buy a listed NFT. Send exact ETH price.
+     */
+    function buyItem(address nftAddress, uint256 tokenId)
+        external
+        payable
+        nonReentrant
+        isListed(nftAddress, tokenId)
+    {
+        Listing memory listing = _listings[nftAddress][tokenId];
+        require(msg.value == listing.price, "Wrong price");
+
+        _listings[nftAddress][tokenId].active = false;
+
+        IERC721(nftAddress).safeTransferFrom(listing.seller, msg.sender, tokenId);
+        payable(listing.seller).transfer(msg.value);
+
+        emit ItemSold(msg.sender, nftAddress, tokenId, listing.price);
+    }
+
+    /**
+     * @dev Cancel a listing.
+     */
+    function cancelListing(address nftAddress, uint256 tokenId)
+        external
+        isOwner(nftAddress, tokenId, msg.sender)
+        isListed(nftAddress, tokenId)
+    {
+        delete _listings[nftAddress][tokenId];
+        emit ItemCanceled(msg.sender, nftAddress, tokenId);
+    }
+
+    /**
+     * @dev Get listing details for a token.
+     */
+    function getListing(address nftAddress, uint256 tokenId)
+        external
+        view
+        returns (Listing memory)
+    {
+        return _listings[nftAddress][tokenId];
+    }
+}

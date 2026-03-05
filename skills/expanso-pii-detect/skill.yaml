@@ -1,0 +1,59 @@
+# Skill: pii-detect
+# Version: 1.0.0
+#
+# Detect personally identifiable information (PII) in text.
+
+name: pii-detect
+version: 1.0.0
+description: Detect personally identifiable information (PII) in text
+
+author:
+  name: Expanso Team
+  url: https://expanso.io
+  avatar: EX
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key (optional - can use regex patterns only)
+
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text to scan for PII
+  - name: types
+    type: array
+    required: false
+    description: PII types to detect (email, phone, ssn, credit_card, etc.)
+
+outputs:
+  - name: findings
+    type: array
+    description: Detected PII with type, value, and position
+  - name: has_pii
+    type: boolean
+    description: Whether any PII was found
+  - name: metadata
+    type: object
+    description: Audit metadata
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: LLM-enhanced PII detection
+  - name: regex
+    type: local
+    description: Pattern-based detection (no API key needed)
+
+components:
+  inputs:
+    - stdin
+    - http_server
+  processors:
+    - mapping
+    - openai_chat_completion
+  outputs:
+    - stdout
+    - sync_response

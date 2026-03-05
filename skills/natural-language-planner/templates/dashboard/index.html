@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NL Planner — Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="header">
+      <div class="header-left">
+        <h1 class="logo">NL Planner</h1>
+      </div>
+      <div class="header-center">
+        <div class="search-box">
+          <svg class="icon icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search tasks..." autocomplete="off" />
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-ghost theme-toggle" id="btn-theme" title="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button class="btn btn-ghost" id="btn-refresh" title="Refresh data">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Stats bar ───────────────────────────────────────── -->
+    <section class="stats-bar" id="stats-bar">
+      <div class="stat-card">
+        <span class="stat-value" id="stat-total">—</span>
+        <span class="stat-label">Total Tasks</span>
+      </div>
+      <div class="stat-card stat-todo">
+        <span class="stat-value" id="stat-todo">—</span>
+        <span class="stat-label">To Do</span>
+      </div>
+      <div class="stat-card stat-progress">
+        <span class="stat-value" id="stat-progress">—</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+      <div class="stat-card stat-done">
+        <span class="stat-value" id="stat-done">—</span>
+        <span class="stat-label">Done</span>
+      </div>
+      <div class="stat-card stat-overdue">
+        <span class="stat-value" id="stat-overdue">—</span>
+        <span class="stat-label">Overdue</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-projects">—</span>
+        <span class="stat-label">Projects</span>
+      </div>
+    </section>
+
+    <!-- ── View tabs ───────────────────────────────────────── -->
+    <nav class="view-tabs">
+      <button class="tab active" data-view="focus">This Week</button>
+      <button class="tab" data-view="board">Board</button>
+      <button class="tab" data-view="projects">Projects</button>
+      <button class="tab" data-view="timeline">Timeline</button>
+      <button class="tab" data-view="archive">Archive</button>
+    </nav>
+
+    <!-- ── Main content ────────────────────────────────────── -->
+    <main class="main-content">
+      <!-- This Week focus view (default) -->
+      <div class="view view-focus active" id="view-focus">
+        <section class="week-section" id="week-section">
+          <div class="week-header">
+            <h2>This Week</h2>
+            <span class="week-date-range" id="week-date-range"></span>
+          </div>
+          <div class="week-grid" id="week-grid"></div>
+        </section>
+      </div>
+
+      <!-- Board view (Kanban) -->
+      <div class="view view-board" id="view-board">
+        <div class="kanban">
+          <div class="kanban-column" data-status="todo">
+            <div class="column-header">
+              <span class="column-dot dot-todo"></span>
+              <h2>To Do</h2>
+              <span class="column-count" id="col-count-todo">0</span>
+            </div>
+            <div class="column-body" id="col-todo"></div>
+          </div>
+          <div class="kanban-column" data-status="in-progress">
+            <div class="column-header">
+              <span class="column-dot dot-progress"></span>
+              <h2>In Progress</h2>
+              <span class="column-count" id="col-count-progress">0</span>
+            </div>
+            <div class="column-body" id="col-progress"></div>
+          </div>
+          <div class="kanban-column" data-status="done">
+            <div class="column-header">
+              <span class="column-dot dot-done"></span>
+              <h2>Done</h2>
+              <span class="column-count" id="col-count-done">0</span>
+            </div>
+            <div class="column-body" id="col-done"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects view -->
+      <div class="view view-projects" id="view-projects">
+        <div class="projects-grid" id="projects-grid"></div>
+      </div>
+
+      <!-- Timeline view -->
+      <div class="view view-timeline" id="view-timeline">
+        <div class="timeline" id="timeline"></div>
+      </div>
+
+      <!-- Archive view -->
+      <div class="view view-archive" id="view-archive">
+        <div class="archive-section">
+          <div class="archive-header">
+            <h2>Archive</h2>
+            <span class="archive-count" id="archive-count"></span>
+          </div>
+          <div class="archive-list" id="archive-list"></div>
+        </div>
+      </div>
+
+      <!-- Search results overlay -->
+      <div class="view view-search" id="view-search" style="display:none">
+        <h2 class="search-title">Search Results</h2>
+        <div id="search-results"></div>
+      </div>
+    </main>
+
+    <!-- ── Task detail modal ───────────────────────────────── -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" id="task-modal">
+        <button class="modal-close" id="modal-close">&times;</button>
+        <div class="modal-header">
+          <span class="badge" id="modal-status"></span>
+          <span class="badge badge-priority" id="modal-priority"></span>
+        </div>
+        <h2 class="modal-title" id="modal-title"></h2>
+        <div class="modal-meta">
+          <span id="modal-project"></span>
+          <span id="modal-due"></span>
+          <span id="modal-created"></span>
+        </div>
+        <div class="modal-tags" id="modal-tags"></div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-context" id="modal-context" style="display:none">
+          <div class="modal-context-label">Context</div>
+          <div id="modal-context-text"></div>
+        </div>
+        <div class="modal-deps" id="modal-deps"></div>
+        <div class="modal-gallery" id="modal-gallery" style="display:none">
+          <div class="modal-gallery-label">Attachments</div>
+          <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+        <div class="modal-agent-tips" id="modal-agent-tips" style="display:none">
+          <div class="agent-tips-header" id="agent-tips-header">
+            <svg class="agent-tips-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+              <line x1="9" y1="21" x2="15" y2="21"/><line x1="10" y1="24" x2="14" y2="24"/>
+            </svg>
+            <span class="agent-tips-label">Agent Tips &amp; Ideas</span>
+            <span class="agent-tips-toggle" id="agent-tips-chevron">&#9660;</span>
+          </div>
+          <div class="agent-tips-body" id="agent-tips-body">
+            <ul class="agent-tips-list" id="agent-tips-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Image lightbox ──────────────────────────────────── -->
+    <div class="lightbox-overlay" id="lightbox-overlay">
+      <img id="lightbox-img" src="" alt="Attachment preview" />
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

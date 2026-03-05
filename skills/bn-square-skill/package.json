@@ -1,0 +1,55 @@
+{
+  "name": "@phlegonlabs/bn-square-skill",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenClaw Binance Square publishing skill",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src/",
+    "scripts/bn-square.mjs",
+    "docs/cookie-guide.md",
+    "SKILL.md",
+    "HEARTBEAT.md",
+    "MESSAGING.md",
+    "RULES.md",
+    "skill.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Phlegonlabs/bn-square-skill.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "test": "bun test",
+    "analyze:api": "bun run scripts/analyze-api.ts",
+    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --format=esm --outfile=scripts/bn-square.mjs --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\""
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/node": "^24.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
+    "bun-types": "^1.3.2",
+    "eslint": "^9.35.0",
+    "esbuild": "^0.25.0",
+    "playwright": "^1.55.0",
+    "typescript": "^5.9.2"
+  }
+}

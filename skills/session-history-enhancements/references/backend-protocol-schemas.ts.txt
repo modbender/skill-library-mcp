@@ -1,0 +1,68 @@
+// Add these to: src/gateway/protocol/schema/sessions.ts
+// These TypeBox schemas define the RPC param validation for the 4 new session history endpoints.
+// Each schema must also be:
+//   1. Exported from src/gateway/protocol/schema/types.ts
+//   2. Compiled with ajv in src/gateway/protocol/index.ts:
+//      export const validateSessionsArchivedParams = ajv.compile<SessionsArchivedParams>(SessionsArchivedParamsSchema);
+//   3. Registered in the server methods list
+
+import { Type } from "@sinclair/typebox";
+
+// NonEmptyString is already defined in the schema file as:
+// const NonEmptyString = Type.String({ minLength: 1 });
+
+export const SessionsArchivedParamsSchema = Type.Object(
+  {
+    /** Agent ID to filter by (optional). */
+    agentId: Type.Optional(NonEmptyString),
+    /** Max sessions to return (default 50, max 200). */
+    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 200 })),
+    /** Pagination offset (default 0). */
+    offset: Type.Optional(Type.Integer({ minimum: 0 })),
+    /** Text search filter (case-insensitive substring match). */
+    search: Type.Optional(Type.String()),
+    /** Status filter: active or archived (default archived). */
+    status: Type.Optional(Type.Union([Type.Literal("active"), Type.Literal("archived")])),
+  },
+  { additionalProperties: false },
+);
+
+export const SessionsResumeParamsSchema = Type.Object(
+  {
+    /** Session ID to resume from archive. */
+    sessionId: NonEmptyString,
+    /** Agent ID (for validation). */
+    agentId: Type.Optional(NonEmptyString),
+  },
+  { additionalProperties: false },
+);
+
+export const SessionsRenameParamsSchema = Type.Object(
+  {
+    /** Session ID to rename. */
+    sessionId: NonEmptyString,
+    /** New display name for the session. */
+    displayName: Type.String(),
+    /** Agent ID (for validation). */
+    agentId: Type.Optional(NonEmptyString),
+  },
+  { additionalProperties: false },
+);
+
+export const SessionsDeleteArchivedParamsSchema = Type.Object(
+  {
+    /** Session ID to permanently delete from archive. */
+    sessionId: NonEmptyString,
+    /** Agent ID (for validation). */
+    agentId: Type.Optional(NonEmptyString),
+    /** Delete associated transcript file as well. */
+    deleteTranscript: Type.Optional(Type.Boolean()),
+  },
+  { additionalProperties: false },
+);
+
+// Type exports (add to types.ts):
+// export type SessionsArchivedParams = Static<typeof SessionsArchivedParamsSchema>;
+// export type SessionsResumeParams = Static<typeof SessionsResumeParamsSchema>;
+// export type SessionsRenameParams = Static<typeof SessionsRenameParamsSchema>;
+// export type SessionsDeleteArchivedParams = Static<typeof SessionsDeleteArchivedParamsSchema>;

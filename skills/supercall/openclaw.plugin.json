@@ -1,0 +1,71 @@
+{
+  "id": "supercall",
+  "name": "SuperCall",
+  "description": "AI-powered voice calls with persona support via OpenAI Realtime API + Twilio",
+  "version": "2.0.0",
+  "main": "index.ts",
+  "tools": ["supercall"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": { "type": "boolean", "default": true },
+      "provider": {
+        "type": "string",
+        "enum": ["twilio", "mock"],
+        "default": "twilio"
+      },
+      "fromNumber": { "type": "string" },
+      "toNumber": { "type": "string" },
+      "twilio": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountSid": { "type": "string" },
+          "authToken": { "type": "string" }
+        }
+      },
+      "streaming": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "openaiApiKey": { "type": "string" },
+          "silenceDurationMs": { "type": "number" },
+          "vadThreshold": { "type": "number" },
+          "streamPath": { "type": "string" }
+        }
+      },
+      "serve": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "port": { "type": "number", "default": 3335 },
+          "bind": { "type": "string", "default": "0.0.0.0" },
+          "path": { "type": "string", "default": "/supercall" }
+        }
+      },
+      "tunnel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": { "type": "string", "enum": ["none", "ngrok", "tailscale-serve", "tailscale-funnel"], "default": "ngrok" },
+          "ngrokAuthToken": { "type": "string" },
+          "ngrokDomain": { "type": "string" }
+        }
+      },
+      "publicUrl": { "type": "string" },
+      "maxDurationSeconds": { "type": "number", "default": 300 },
+      "maxConcurrentCalls": { "type": "number", "default": 5 }
+    }
+  },
+  "uiHints": {
+    "provider": { "label": "Provider", "placeholder": "twilio" },
+    "fromNumber": { "label": "From Number", "placeholder": "+1234567890" },
+    "twilio.accountSid": { "label": "Twilio Account SID", "placeholder": "ACxxxxxxxx" },
+    "twilio.authToken": { "label": "Twilio Auth Token", "sensitive": true },
+    "streaming.openaiApiKey": { "label": "OpenAI API Key", "sensitive": true },
+    "tunnel.ngrokAuthToken": { "label": "ngrok Auth Token", "sensitive": true },
+    "tunnel.ngrokDomain": { "label": "ngrok Domain", "placeholder": "your-domain.ngrok.app" },
+    "publicUrl": { "label": "Public URL (override)", "placeholder": "https://your-domain.com/supercall" }
+  }
+}

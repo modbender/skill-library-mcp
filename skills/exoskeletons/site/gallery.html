@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Gallery</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--panel:#111;--border:#222;--gold:#FFD700;--green:#00FFAA;--red:#FF4444;--cyan:#44FFFF;--text:#E0D0A0;--dim:#908060}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;font-size:13px;line-height:1.6}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.06) 0px,rgba(0,0,0,0.06) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;box-shadow:inset 0 0 150px rgba(0,0,0,0.7);pointer-events:none;z-index:9998}
+@media(prefers-reduced-motion:reduce){body::before,body::after{display:none}*{transition:none!important;animation:none!important}}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop-filter:blur(4px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+nav .logo{color:var(--gold);font-size:14px;font-weight:bold;letter-spacing:3px;text-decoration:none}
+nav a{color:var(--dim);font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:6px 0;transition:color 0.2s}
+nav a:hover,nav a.active{color:var(--green);text-decoration:none}
+nav .ext{margin-left:auto;font-size:10px}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:16px;margin:12px 0;animation:fadeIn 0.4s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel h2{color:var(--green);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.panel h2::before{content:'// '}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.badge-gold{background:#1a1500;color:var(--gold);border:1px solid #332a00}
+footer{margin-top:40px;padding:20px;text-align:center;font-size:10px;color:var(--dim);border-top:1px solid var(--border);line-height:2}
+
+/* Controls */
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.controls select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;font-family:inherit;font-size:12px}
+.controls label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.controls .count{margin-left:auto;font-size:11px;color:var(--dim)}
+
+/* Gallery grid */
+.gallery-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.token-card{display:block;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;transition:border-color 0.2s,transform 0.2s;text-decoration:none;overflow:hidden}
+.token-card:hover{border-color:var(--gold);transform:translateY(-2px);text-decoration:none}
+.token-card svg{width:100%;aspect-ratio:1;border-radius:4px;display:block}
+.token-card .card-info{padding:6px 0 2px;font-size:10px}
+.token-card .card-id{color:var(--text);font-weight:bold;letter-spacing:1px}
+.token-card .card-name{color:var(--dim);display:block;margin-top:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.token-card .card-rep{color:var(--green);font-size:9px;margin-top:2px}
+.token-card .genesis-dot{display:inline-block;width:6px;height:6px;background:var(--gold);border-radius:50%;margin-right:3px}
+.loading-placeholder{aspect-ratio:1;background:linear-gradient(110deg,#111 8%,#181818 18%,#111 33%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* Pagination */
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:20px;flex-wrap:wrap}
+.page-btn{padding:8px 14px;background:var(--panel);border:1px solid var(--border);border-radius:4px;color:var(--dim);font-family:inherit;font-size:12px;cursor:pointer;transition:all 0.2s;text-decoration:none;letter-spacing:1px}
+.page-btn:hover{border-color:var(--green);color:var(--green);text-decoration:none}
+.page-btn.active{border-color:var(--gold);color:var(--gold);background:#1a1500}
+.page-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* Marketplace banner */
+.marketplace{display:flex;justify-content:center;gap:16px;padding:16px;margin:12px 0;background:var(--panel);border:1px solid var(--border);border-radius:6px;text-align:center}
+.marketplace a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);padding:10px 20px;border:1px solid var(--border);border-radius:4px;text-decoration:none;transition:border-color 0.2s}
+.marketplace a:hover{border-color:var(--cyan);text-decoration:none}
+
+.loading{text-align:center;padding:40px;color:var(--dim);grid-column:1/-1}
+.empty{text-align:center;padding:40px;color:var(--dim);grid-column:1/-1}
+
+@media(max-width:1000px){.gallery-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:768px){.gallery-grid{grid-template-columns:repeat(3,1fr)}.container{padding:12px}nav{padding:10px 12px;gap:12px}}
+@media(max-width:500px){.gallery-grid{grid-template-columns:repeat(2,1fr)}}
+@media(orientation:landscape)and(max-height:500px){.gallery-grid{grid-template-columns:repeat(4,1fr)}nav{padding:8px 12px}}
+@media(pointer:coarse){nav a,.page-btn,.marketplace a{min-height:44px;display:inline-flex;align-items:center;justify-content:center}}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="index.html" class="logo">EXOSKELETONS</a>
+<a href="index.html" data-page="index.html">HOME</a>
+<a href="mint.html" data-page="mint.html">MINT</a>
+<a href="gallery.html" data-page="gallery.html">GALLERY</a>
+<a href="modules.html" data-page="modules.html">MODULES</a>
+<a href="https://opensea.io/assets/base/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank" rel="noopener" class="ext">OPENSEA ↗</a>
+</nav>
+
+<main class="container">
+
+<div class="marketplace">
+<a href="https://opensea.io/assets/base/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank">Buy on OpenSea ↗</a>
+<a href="https://basescan.org/token/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank">View on Basescan ↗</a>
+</div>
+
+<div class="panel">
+<h2>ALL EXOSKELETONS</h2>
+<div class="controls">
+<label>Sort:</label>
+<select id="sortBy" onchange="reload()">
+<option value="newest">Newest First</option>
+<option value="oldest">Oldest First</option>
+<option value="rep">Highest Reputation</option>
+</select>
+<label>Filter:</label>
+<select id="filterBy" onchange="reload()">
+<option value="all">All</option>
+<option value="genesis">Genesis Only</option>
+<option value="named">Named Only</option>
+</select>
+<span class="count" id="countLabel">Loading...</span>
+</div>
+<div class="gallery-grid" id="grid">
+<div class="loading">Loading Exoskeletons...</div>
+</div>
+<div class="pagination" id="pagination"></div>
+</div>
+
+</main>
+
+<footer>
+CC0 — No rights reserved<br>
+Built by <a href="https://github.com/Potdealer/exoskeletons" target="_blank">potdealer & Ollie</a><br>
+Core: <a href="https://basescan.org/address/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank">0x8241...Da0d</a> ·
+Registry: <a href="https://basescan.org/address/0x46fd56417dcd08cA8de1E12dd6e7f7E1b791B3E9" target="_blank">0x46fd...B3E9</a><br>
+<span style="color:var(--gold)">Base (8453)</span>
+</footer>
+
+<script>
+const CORE="0x8241BDD5009ed3F6C99737D2415994B58296Da0d";
+const REGISTRY="0x46fd56417dcd08cA8de1E12dd6e7f7E1b791B3E9";
+const RENDERER="0xE559f88f124AA2354B1570b85f6BE9536B6D60bC";
+const RPC_URL="https://mainnet.base.org";
+const PER_PAGE=20;
+
+const SEL={
+  netStats:"0x4a662f48",getProfile:"0xf08f4f64",
+  renderSVG:"0xd12a4c98",repBatch:"0x53ca2306",
+};
+
+function hInt(h){return(!h||h==="0x")?0n:BigInt(h)}
+function pad(n){return(typeof n==='bigint'?n:BigInt(n)).toString(16).padStart(64,"0")}
+function hStr(h){
+  h=h.replace("0x","");if(h.length<128)return"";
+  const len=parseInt(h.substring(64,128),16);if(!len)return"";
+  const d=h.substring(128,128+len*2);let s="";
+  for(let i=0;i<d.length;i+=2)s+=String.fromCharCode(parseInt(d.substring(i,i+2),16));
+  return s;
+}
+function dUint(h,s){return BigInt("0x"+(h.substring(s*64,s*64+64)||"0"))}
+function dBool(h,s){return dUint(h,s)>0n}
+function dAddr(h,s){return"0x"+h.substring(s*64+24,s*64+64)}
+function dStr(h,s){
+  const off=Number(dUint(h,s))*2;
+  const len=Number(BigInt("0x"+h.substring(off,off+64)));
+  if(!len)return"";
+  const d=h.substring(off+64,off+64+len*2);let r="";
+  for(let i=0;i<d.length;i+=2)r+=String.fromCharCode(parseInt(d.substring(i,i+2),16));
+  return r;
+}
+
+async function rpc(to,data){
+  const r=await fetch(RPC_URL,{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",method:"eth_call",params:[{to,data},"latest"],id:1})
+  });
+  const j=await r.json();
+  if(j.error)throw new Error(j.error.message||"RPC error");
+  return j.result||"0x";
+}
+
+// Nav
+document.addEventListener("DOMContentLoaded",()=>{
+  const pg=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('nav a[data-page]').forEach(a=>{
+    if(a.dataset.page===pg)a.classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// GALLERY
+// ═══════════════════════════════════════════════════════════════
+let allTokens=[];
+let totalMinted=0;
+let currentPage=1;
+
+function getPage(){
+  const h=location.hash.replace("#","");
+  const m=h.match(/page=(\d+)/);
+  return m?parseInt(m[1]):1;
+}
+
+async function loadAllProfiles(){
+  const statsHex=await rpc(REGISTRY,SEL.netStats);
+  const sh=statsHex.replace("0x","");
+  totalMinted=Number(BigInt("0x"+sh.substring(0,64)));
+  if(totalMinted===0)return;
+
+  // Load profiles for all tokens (batch approach - parallel)
+  const ids=[];
+  for(let i=1;i<=totalMinted;i++)ids.push(i);
+
+  const profiles=await Promise.all(ids.map(async id=>{
+    try{
+      const hex=await rpc(REGISTRY,SEL.getProfile+pad(id));
+      const h=hex.replace("0x","");
+      return{
+        id,
+        name:dStr(h,0),
+        genesis:dBool(h,2),
+        repScore:Number(dUint(h,7)),
+      };
+    }catch(e){return{id,name:"",genesis:false,repScore:0}}
+  }));
+
+  allTokens=profiles;
+}
+
+function getFilteredSorted(){
+  let tokens=[...allTokens];
+  const filter=document.getElementById("filterBy").value;
+  if(filter==="genesis")tokens=tokens.filter(t=>t.genesis);
+  if(filter==="named")tokens=tokens.filter(t=>t.name);
+
+  const sort=document.getElementById("sortBy").value;
+  if(sort==="newest")tokens.sort((a,b)=>b.id-a.id);
+  else if(sort==="oldest")tokens.sort((a,b)=>a.id-b.id);
+  else if(sort==="rep")tokens.sort((a,b)=>b.repScore-a.repScore);
+
+  return tokens;
+}
+
+async function renderPage(){
+  const tokens=getFilteredSorted();
+  const totalPages=Math.max(1,Math.ceil(tokens.length/PER_PAGE));
+  currentPage=Math.min(getPage(),totalPages);
+
+  document.getElementById("countLabel").textContent=tokens.length+" Exoskeletons";
+
+  const start=(currentPage-1)*PER_PAGE;
+  const pageTokens=tokens.slice(start,start+PER_PAGE);
+
+  const grid=document.getElementById("grid");
+  if(pageTokens.length===0){
+    grid.innerHTML='<div class="empty">No Exoskeletons found. <a href="mint.html">Mint the first →</a></div>';
+    document.getElementById("pagination").innerHTML="";
+    return;
+  }
+
+  // Show loading placeholders
+  grid.innerHTML=pageTokens.map(()=>'<div class="token-card"><div class="loading-placeholder"></div><div class="card-info">loading...</div></div>').join("");
+
+  // Load SVGs in parallel
+  const svgs=await Promise.all(pageTokens.map(async t=>{
+    try{
+      const hex=await rpc(RENDERER,SEL.renderSVG+pad(t.id));
+      return hStr(hex);
+    }catch(e){return null}
+  }));
+
+  // Render cards
+  grid.innerHTML="";
+  pageTokens.forEach((t,i)=>{
+    const card=document.createElement("a");
+    card.href="token.html#"+t.id;
+    card.className="token-card";
+
+    const svgWrap=document.createElement("div");
+    if(svgs[i]){
+      svgWrap.innerHTML=svgs[i];
+      const el=svgWrap.querySelector("svg");
+      if(el){el.style.width="100%";el.style.height="auto";el.style.display="block";el.style.borderRadius="4px"}
+    }else{
+      svgWrap.innerHTML='<div class="loading-placeholder"></div>';
+    }
+    card.appendChild(svgWrap);
+
+    const info=document.createElement("div");
+    info.className="card-info";
+    let h='';
+    if(t.genesis)h+='<span class="genesis-dot" style="display:inline-block;width:6px;height:6px;background:var(--gold);border-radius:50%;margin-right:3px"></span>';
+    h+='<span class="card-id">#'+t.id+'</span>';
+    if(t.name)h+='<span class="card-name">'+escHtml(t.name)+'</span>';
+    h+='<span class="card-rep">REP: '+t.repScore.toLocaleString()+'</span>';
+    info.innerHTML=h;
+    card.appendChild(info);
+
+    grid.appendChild(card);
+  });
+
+  // Pagination
+  const pag=document.getElementById("pagination");
+  if(totalPages<=1){pag.innerHTML="";return}
+  let ph='';
+  if(currentPage>1)ph+='<a class="page-btn" href="#page='+(currentPage-1)+'" onclick="goPage('+(currentPage-1)+')">← PREV</a>';
+  const startP=Math.max(1,currentPage-2);
+  const endP=Math.min(totalPages,currentPage+2);
+  for(let p=startP;p<=endP;p++){
+    ph+='<a class="page-btn'+(p===currentPage?' active':'')+'" href="#page='+p+'" onclick="goPage('+p+')">'+p+'</a>';
+  }
+  if(currentPage<totalPages)ph+='<a class="page-btn" href="#page='+(currentPage+1)+'" onclick="goPage('+(currentPage+1)+')">NEXT →</a>';
+  pag.innerHTML=ph;
+}
+
+function goPage(p){
+  location.hash="page="+p;
+  renderPage();
+  window.scrollTo(0,0);
+}
+
+function reload(){
+  currentPage=1;
+  location.hash="page=1";
+  renderPage();
+}
+
+function escHtml(s){
+  const d=document.createElement("div");d.textContent=s;return d.innerHTML;
+}
+
+async function init(){
+  await loadAllProfiles();
+  renderPage();
+}
+
+window.addEventListener("hashchange",()=>renderPage());
+init();
+</script>
+</body>
+</html>

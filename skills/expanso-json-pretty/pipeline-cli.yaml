@@ -1,0 +1,21 @@
+name: "json-pretty-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 10485760
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let parsed = content().parse_json()
+          root.formatted = $parsed.format_json()
+          root.valid = true
+          root.metadata = {"skill": "json-pretty", "mode": "cli", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    stdout:
+      codec: json_object

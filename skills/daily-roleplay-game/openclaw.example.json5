@@ -1,0 +1,101 @@
+// openclaw.example.json5 — 角色扮演系统 OpenClaw 配置参考
+// 将以下内容合并到 ~/.openclaw/openclaw.json 中
+// 完整部署指南见 docs/OPENCLAW_SETUP.md
+{
+  agents: {
+    // 心跳为全局配置，影响所有 agent；若只有 role-play 需要心跳，
+    // 建议将 role-play 设为默认 agent，或在其他 agent 的 HEARTBEAT.md 中写 HEARTBEAT_OK 跳过
+    defaults: {
+      heartbeat: {
+        every: "30m",
+        // "last" = 发到最近活跃的会话；也可填具体频道标识
+        target: "last",
+        // 限制心跳在 6:00-24:00 活跃（角色扮演时段）
+        activeHours: { start: "06:00", end: "23:59" },
+      },
+    },
+    list: [
+      // ... 你的其他 agent ...
+      {
+        id: "role-play",
+        name: "角色扮演",
+        // setup.sh 部署的目标路径
+        workspace: "~/.openclaw/workspace-role-play",
+        // model 为字符串格式（参考 OpenClaw 官方文档）
+        model: "anthropic/claude-sonnet-4-5",
+      },
+    ],
+  },
+
+  // 频道绑定：将消息路由到 role-play agent（按使用的平台选择）
+  // 详见 https://docs.openclaw.ai/concepts/multi-agent
+  bindings: [
+    // Discord — 将整个 bot 账号绑定到 role-play agent
+    // { agentId: "role-play", match: { channel: "discord", accountId: "default" } },
+
+    // Telegram — 将整个 bot 绑定到 role-play agent
+    // { agentId: "role-play", match: { channel: "telegram", accountId: "default" } },
+
+    // WhatsApp — 按 DM 绑定
+    // { agentId: "role-play", match: { channel: "whatsapp", peer: { kind: "direct", id: "+8613800000000" } } },
+  ],
+
+  // 频道账号配置（按需启用）
+  // channels: {
+  //   discord: {
+  //     groupPolicy: "allowlist",
+  //     accounts: {
+  //       default: {
+  //         token: "DISCORD_BOT_TOKEN",
+  //         guilds: {
+  //           "GUILD_ID": {
+  //             channels: { "CHANNEL_ID": { allow: true, requireMention: false } },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   telegram: {
+  //     accounts: {
+  //       default: { botToken: "TELEGRAM_BOT_TOKEN", dmPolicy: "pairing" },
+  //     },
+  //   },
+  // },
+
+  // Skill 配置（可选，仅当通过 clawhub 或 skills/ 目录安装时需要）
+  skills: {
+    entries: {
+      "daily-roleplay-game": {
+        enabled: true,
+      },
+    },
+  },
+}
+
+// ─── Cron 任务（通过 CLI 添加，不写在 json 中） ───
+//
+// 1) 每日 6:00 初始化（isolated session，agent 读取 ENGINE.md 执行 Step 0-8）
+//    --delivery none：agent 自行通过 message tool 发送早安消息，无需 cron 再发摘要
+//    --model opus：初始化逻辑复杂，建议使用高能力模型
+//
+//    openclaw cron add \
+//      --agent role-play \
+//      --name "每日角色生成" \
+//      --cron "0 6 * * *" \
+//      --tz "Asia/Shanghai" \
+//      --session isolated \
+//      --delivery none \
+//      --model opus \
+//      --message "读取 ENGINE.md 并按步骤执行每日初始化（Step 0-8）"
+//
+// 2) 每日 23:30 收尾归档（isolated session，执行 wrapup）
+//    --delivery none：收尾任务为内部归档，无需发送摘要
+//
+//    openclaw cron add \
+//      --agent role-play \
+//      --name "每日收尾归档" \
+//      --cron "30 23 * * *" \
+//      --tz "Asia/Shanghai" \
+//      --session isolated \
+//      --delivery none \
+//      --message "读取 docs/WRAPUP.md 按步骤执行收尾归档，完成后回复 WRAPUP_OK"

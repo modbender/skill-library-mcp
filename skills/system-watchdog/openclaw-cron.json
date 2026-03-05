@@ -1,0 +1,19 @@
+{
+  "name": "system-watchdog",
+  "description": "Nightly system resource check. Runs check.sh, parses JSON output, and sends a report only when issues are found.",
+  "schedule": {
+    "kind": "cron",
+    "expr": "0 4 * * *",
+    "tz": "America/New_York"
+  },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Run the system watchdog check:\n\n1. Run: `bash <SKILL_DIR>/check.sh`\n2. Parse the JSON output.\n3. If `suspicious` is `false` → reply SKIP (nothing to report).\n4. If `suspicious` is `true` → format a concise report and send it to the user using the `message` tool.\n\nReport format:\n```\n⚠️ System Watchdog Report\n\n📊 System: RAM {ram} | Swap {swap} | Load {load}\n💾 Disk: {disk}\n\n🔴 Issues Found:\n\n{issue_type} — {process_name} (PID {pid})\n  CPU: {cpu}% | RAM: {mem_mb} MB | Running: {elapsed}\n  → {recommendation}\n\n💡 Suggested: kill {pids}\n```\n\nIf check.sh fails with a JSON parse error, retry once before reporting failure.",
+    "model": "anthropic/claude-sonnet-4-5",
+    "timeoutSeconds": 120
+  },
+  "delivery": {
+    "mode": "none"
+  }
+}

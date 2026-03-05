@@ -1,0 +1,182 @@
+{
+  "id": "openclaw-voice-gpt-realtime",
+  "name": "openclaw-voice-gpt-realtime",
+  "displayName": "Voice Calls (OpenAI Realtime)",
+  "description": "Ultra-low-latency AI phone calls powered by OpenAI's Realtime API. Single-model speech-to-speech with ~200-300ms latency.",
+  "version": "0.1.4",
+  "author": "Connor Callison",
+  "license": "MIT",
+  "homepage": "https://github.com/connorcallison/openclaw-voice-gpt-realtime",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "twilio": {
+        "type": "object",
+        "title": "Twilio Configuration",
+        "properties": {
+          "accountSid": {
+            "type": "string",
+            "title": "Account SID",
+            "description": "Twilio Account SID (starts with AC)",
+            "pattern": "^AC[a-f0-9]{32}$"
+          },
+          "authToken": {
+            "type": "string",
+            "title": "Auth Token",
+            "description": "Twilio Auth Token",
+            "secret": true
+          }
+        },
+        "required": ["accountSid", "authToken"]
+      },
+      "fromNumber": {
+        "type": "string",
+        "title": "From Phone Number",
+        "description": "Twilio phone number in E.164 format (e.g. +17077024785)",
+        "pattern": "^\\+[1-9]\\d{1,14}$"
+      },
+      "openai": {
+        "type": "object",
+        "title": "OpenAI Configuration",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "title": "API Key",
+            "description": "OpenAI API key with Realtime API access",
+            "secret": true
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "OpenAI Realtime model to use",
+            "default": "gpt-realtime-1.5"
+          },
+          "voice": {
+            "type": "string",
+            "title": "Voice",
+            "description": "Voice for the AI assistant",
+            "enum": ["alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse"],
+            "default": "coral"
+          }
+        },
+        "required": ["apiKey"]
+      },
+      "vad": {
+        "type": "object",
+        "title": "Voice Activity Detection",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["semantic_vad", "server_vad"],
+            "default": "semantic_vad"
+          },
+          "eagerness": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "auto"],
+            "default": "medium"
+          }
+        }
+      },
+      "publicUrl": {
+        "type": "string",
+        "title": "Public URL",
+        "description": "Public-facing HTTPS origin for Twilio webhooks (e.g. https://your-domain.com). Must not be localhost/private/internal.",
+        "pattern": "^https://[^/?#]+$"
+      },
+      "server": {
+        "type": "object",
+        "title": "Server Settings",
+        "properties": {
+          "port": {
+            "type": "number",
+            "title": "Port",
+            "description": "HTTP/WebSocket server port",
+            "default": 3335
+          },
+          "bind": {
+            "type": "string",
+            "title": "Bind Address",
+            "default": "127.0.0.1"
+          }
+        }
+      },
+      "calls": {
+        "type": "object",
+        "title": "Call Settings",
+        "properties": {
+          "maxDurationSeconds": {
+            "type": "number",
+            "default": 600,
+            "description": "Maximum call duration in seconds"
+          },
+          "timeoutSeconds": {
+            "type": "number",
+            "default": 30,
+            "description": "Ring timeout before giving up"
+          },
+          "enableAmd": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable answering machine detection"
+          },
+          "maxConcurrent": {
+            "type": "number",
+            "default": 5,
+            "description": "Maximum number of concurrent active calls"
+          }
+        }
+      },
+      "inbound": {
+        "type": "object",
+        "title": "Inbound Call Settings",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable receiving inbound phone calls"
+          },
+          "policy": {
+            "type": "string",
+            "enum": ["disabled", "open", "allowlist"],
+            "default": "disabled",
+            "description": "Who can call in: disabled (nobody), open (anyone), allowlist (specific numbers)"
+          },
+          "allowFrom": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": [],
+            "description": "Phone numbers allowed to call in (E.164 format), used with allowlist policy"
+          },
+          "greeting": {
+            "type": "string",
+            "default": "Hey! What's up?",
+            "description": "What the AI says when it answers an inbound call"
+          },
+          "systemPrompt": {
+            "type": "string",
+            "description": "Custom system prompt for inbound calls (overrides default). Keep it truthful and non-deceptive."
+          }
+        }
+      },
+      "debug": {
+        "type": "boolean",
+        "title": "Debug Mode",
+        "description": "Enable call recording, verbose logging, and latency metrics",
+        "default": false
+      }
+    },
+    "required": ["twilio", "fromNumber", "openai", "publicUrl"]
+  },
+  "tools": [
+    {
+      "name": "make_phone_call",
+      "description": "Make an outbound phone call to a business on behalf of the user. Uses AI to have a natural, policy-compliant phone conversation for reservations, appointments, inquiries, etc."
+    }
+  ],
+  "services": [
+    {
+      "name": "voice-server",
+      "description": "HTTP + WebSocket server for Twilio media streams and OpenAI Realtime bridge"
+    }
+  ]
+}

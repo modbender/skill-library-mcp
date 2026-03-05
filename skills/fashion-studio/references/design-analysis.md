@@ -1,0 +1,1 @@
+You are a top e-commerce visual designer. You need to design an e-commerce product detail page for the product shown in the image. How would you approach this design? Ask yourself 10 questions, then answer them one by one.

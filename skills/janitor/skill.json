@@ -1,0 +1,184 @@
+{
+  "name": "janitor",
+  "version": "1.1.0",
+  "description": "Lightweight AI agent cleanup skill with session management - removes cache, logs, temp files, and manages OpenClaw context",
+  "author": "OpenClaw Team",
+  "license": "MIT",
+  "main": "janitor.js",
+  "type": "skill",
+  "commands": [
+    {
+      "name": "janitor",
+      "description": "Clean up cache, logs, and temporary files",
+      "subcommands": [
+        {
+          "name": "clean",
+          "description": "Run immediate cleanup"
+        },
+        {
+          "name": "stats",
+          "description": "Show cleanup statistics"
+        },
+        {
+          "name": "report",
+          "description": "Generate cleanup report"
+        },
+        {
+          "name": "context",
+          "description": "Show context usage dashboard",
+          "subcommands": [
+            {
+              "name": "status",
+              "description": "Show compact context status"
+            },
+            {
+              "name": "clean",
+              "description": "Clean context/sessions"
+            },
+            {
+              "name": "emergency",
+              "description": "Emergency cleanup (critical situations)"
+            },
+            {
+              "name": "dashboard",
+              "description": "Show full dashboard"
+            }
+          ]
+        },
+        {
+          "name": "dashboard",
+          "description": "Show context usage dashboard"
+        },
+        {
+          "name": "sessions",
+          "description": "List all sessions",
+          "subcommands": [
+            {
+              "name": "list",
+              "description": "List sessions by size/age/messages"
+            }
+          ]
+        },
+        {
+          "name": "monitor",
+          "description": "Background monitoring service",
+          "subcommands": [
+            {
+              "name": "start",
+              "description": "Start background monitoring"
+            },
+            {
+              "name": "stop",
+              "description": "Stop background monitoring"
+            },
+            {
+              "name": "status",
+              "description": "Show monitoring status"
+            }
+          ]
+        },
+        {
+          "name": "archives",
+          "description": "Manage session archives",
+          "subcommands": [
+            {
+              "name": "list",
+              "description": "List all archives"
+            },
+            {
+              "name": "restore",
+              "description": "Restore archived sessions"
+            },
+            {
+              "name": "cleanup",
+              "description": "Delete old archives"
+            },
+            {
+              "name": "stats",
+              "description": "Show archive statistics"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    "filesystem:read",
+    "filesystem:write",
+    "process:execute"
+  ],
+  "security": {
+    "classification": "high-privilege",
+    "requires_trust": true,
+    "risks": [
+      "File deletion (cache, logs, sessions)",
+      "Shell command execution (git, tar)",
+      "External network communication (optional)"
+    ],
+    "mitigations": [
+      "Protected file patterns prevent critical file deletion",
+      "All paths validated against traversal attacks",
+      "Shell commands use parameterized inputs with timeouts",
+      "All deletions logged and archived before removal",
+      "Dry-run mode available for testing",
+      "No external dependencies (Node.js built-ins only)"
+    ],
+    "safe_usage": [
+      "Review SECURITY.md before installation",
+      "Test with --dry-run before actual cleanup",
+      "Monitor logs during initial usage",
+      "Disable GitHub/notification features if not needed"
+    ],
+    "documentation": "See SECURITY.md for complete security guidelines"
+  },
+  "config": {
+    "defaults": {
+      "enabled": true,
+      "unusedFileAgeDays": 7,
+      "sessionManagement": {
+        "enabled": true,
+        "monitoring": {
+          "intervalMinutes": 5,
+          "alertThreshold": 80,
+          "emergencyThreshold": 95
+        },
+        "pruning": {
+          "maxSessionAge": 7,
+          "maxContextTokens": 160000,
+          "keepRecentHours": 24,
+          "keepMinimumSessions": 5
+        },
+        "archiving": {
+          "enabled": true,
+          "retentionDays": 30,
+          "compression": true
+        },
+        "preservation": {
+          "pinned": true,
+          "highEngagement": true,
+          "minMessagesForImportant": 10
+        }
+      }
+    }
+  },
+  "keywords": [
+    "cleanup",
+    "cache",
+    "maintenance",
+    "janitor",
+    "ai-agent",
+    "clawhub",
+    "session-management",
+    "context-management",
+    "openclaw",
+    "token-management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openclaw/janitor"
+  },
+  "links": {
+    "fullVersion": "https://github.com/openclaw/janitor",
+    "documentation": "https://github.com/openclaw/janitor#readme"
+  }
+}

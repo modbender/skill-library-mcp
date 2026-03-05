@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amber Call Log</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    header { text-align: center; margin-bottom: 2.5rem; padding: 2rem 0; }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d4ff, #7b2fff, #ff2d92);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle { color: #888; font-size: 1rem; font-weight: 300; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+    }
+
+    .stat-card.active {
+      border-color: rgba(255, 45, 146, 0.5);
+      box-shadow: 0 8px 32px rgba(255, 45, 146, 0.2);
+    }
+
+    .stat-card.messages {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 140, 0, 0.08));
+    }
+
+    .stat-card.messages:hover {
+      border-color: rgba(255, 215, 0, 0.35);
+      box-shadow: 0 8px 32px rgba(255, 215, 0, 0.12);
+    }
+
+    .stat-card.followup {
+      background: linear-gradient(135deg, rgba(255, 100, 100, 0.08), rgba(255, 60, 60, 0.08));
+    }
+
+    .stat-card.followup:hover {
+      border-color: rgba(255, 100, 100, 0.35);
+      box-shadow: 0 8px 32px rgba(255, 100, 100, 0.12);
+    }
+
+    .followup-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .followup-toggle input {
+      display: none;
+    }
+
+    .followup-toggle .icon {
+      font-size: 1.25rem;
+      opacity: 0.3;
+      transition: all 0.2s ease;
+    }
+
+    .followup-toggle:hover .icon {
+      opacity: 0.6;
+    }
+
+    .followup-toggle input:checked + .icon {
+      opacity: 1;
+      filter: drop-shadow(0 0 4px rgba(255, 100, 100, 0.5));
+    }
+
+    .entry {
+      position: relative;
+    }
+
+    .stat-icon { font-size: 1.25rem; margin-bottom: 0.25rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .stat-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 200px 220px;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input, select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(0, 212, 255, 0.35);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+    }
+
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, #00d4ff, #7b2fff, #ff2d92);
+      border-radius: 2px;
+    }
+
+    .entry {
+      margin-bottom: 1.25rem;
+      padding: 1.25rem 1.25rem;
+      padding-right: 3.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .entry:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .entry::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 1.6rem;
+      width: 12px;
+      height: 12px;
+      background: #0f0f23;
+      border: 2px solid #00d4ff;
+      border-radius: 50%;
+      transform: translateX(-5px);
+    }
+
+    .entry.inbound::before { border-color: #00d4ff; }
+    .entry.outbound::before { border-color: #7b2fff; }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .entry-meta { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+    .badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge.inbound { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+    .badge.outbound { background: rgba(123, 47, 255, 0.2); color: #a78bfa; }
+
+    .entry-time { font-size: 0.85rem; color: #666; white-space: nowrap; }
+
+    .numbers {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    .numbers .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .numbers .label { color: #777; font-weight: 600; }
+
+    .pill {
+      font-family: 'SF Mono', ui-monospace, Menlo, Monaco, monospace;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.2rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: rgba(230, 230, 230, 0.95);
+    }
+
+    .summary {
+      color: #aaa;
+      line-height: 1.6;
+      margin-top: 0.25rem;
+    }
+
+    details {
+      margin-top: 0.9rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+    }
+
+    summary { cursor: pointer; color: #fff; font-weight: 600; }
+
+    pre {
+      margin-top: 0.75rem;
+      white-space: pre-wrap;
+      font-family: 'SF Mono', ui-monospace, Menlo, Monaco, monospace;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: rgba(230, 230, 230, 0.92);
+    }
+
+    .captured {
+      margin-top: 0.9rem;
+      padding: 0.9rem;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 140, 0, 0.10));
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      color: #ffd27d;
+    }
+
+    .captured .title { font-weight: 700; margin-bottom: 0.4rem; color: #ffd27d; }
+
+    .loading, .no-entries {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #666;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fab-group {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, #00d4ff, #7b2fff);
+      border: none;
+      color: #fff;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4); }
+
+    .sync-btn {
+      background: linear-gradient(135deg, #00c853, #007b33);
+      border: none;
+      color: #fff;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 20px rgba(0, 200, 83, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .sync-btn:hover:not(:disabled) { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0, 200, 83, 0.5); }
+    .sync-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .sync-btn.syncing { animation: spin 1s linear infinite; }
+
+    .sync-toast {
+      position: fixed;
+      bottom: 8rem;
+      right: 2rem;
+      background: #1a1a2e;
+      border: 1px solid #00c853;
+      color: #00c853;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .sync-toast.show { opacity: 1; }
+
+    @media (max-width: 900px) {
+      .container { padding: 1rem; }
+      h1 { font-size: 1.75rem; }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+      .controls { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📞 Amber Call Log</h1>
+      <p class="subtitle">Twilio/OpenAI SIP Bridge call timeline</p>
+      <p class="subtitle" style="margin-top:0.5rem">Last update: <span id="last-update">-</span></p>
+    </header>
+
+    <div class="stats-grid" id="stats">
+      <div class="stat-card" data-filter="all">
+        <div class="stat-icon">📞</div>
+        <div class="stat-value" id="stat-total">-</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card" data-filter="inbound">
+        <div class="stat-icon">⬅️</div>
+        <div class="stat-value" id="stat-inbound">-</div>
+        <div class="stat-label">Inbound</div>
+      </div>
+      <div class="stat-card" data-filter="outbound">
+        <div class="stat-icon">➡️</div>
+        <div class="stat-value" id="stat-outbound">-</div>
+        <div class="stat-label">Outbound</div>
+      </div>
+      <div class="stat-card" data-filter="with-transcript">
+        <div class="stat-icon">📝</div>
+        <div class="stat-value" id="stat-transcripts">-</div>
+        <div class="stat-label">Transcripts</div>
+      </div>
+      <div class="stat-card" data-filter="missing-transcript">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-value" id="stat-missing">-</div>
+        <div class="stat-label">Missing</div>
+      </div>
+      <div class="stat-card followup" data-filter="followup">
+        <div class="stat-icon">🔔</div>
+        <div class="stat-value" id="stat-followup">-</div>
+        <div class="stat-label">Follow-ups</div>
+      </div>
+      <div class="stat-card messages" data-filter="messages">
+        <div class="stat-icon">📋</div>
+        <div class="stat-value" id="stat-messages">-</div>
+        <div class="stat-label">MESSAGES</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <input id="search" type="text" placeholder="Search names, numbers, transcript, callSid…" />
+      <select id="dir">
+        <option value="">Direction: All</option>
+        <option value="inbound">Inbound</option>
+        <option value="outbound">Outbound</option>
+      </select>
+      <select id="msg">
+        <option value="">Messages: All</option>
+        <option value="with">With captured message</option>
+        <option value="without">Without captured message</option>
+      </select>
+    </div>
+
+    <div class="timeline" id="timeline">
+      <div class="loading"><div class="spinner"></div><p>Loading calls…</p></div>
+    </div>
+  </div>
+
+  <div class="fab-group">
+    <button class="sync-btn" id="sync" title="Sync new calls from bridge logs">⬇</button>
+    <button class="refresh-btn" id="refresh" title="Refresh display">↻</button>
+  </div>
+  <div class="sync-toast" id="sync-toast"></div>
+
+  <script>
+    const basePath = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+    const API_BASE = `${basePath}/data`;
+
+    let allCalls = [];
+    let currentFilter = 'all';
+    let followups = new Set();
+
+    // Load followups from localStorage
+    function loadFollowups() {
+      try {
+        const stored = localStorage.getItem('calllog-followups');
+        if (stored) followups = new Set(JSON.parse(stored));
+      } catch {}
+    }
+
+    function saveFollowups() {
+      localStorage.setItem('calllog-followups', JSON.stringify([...followups]));
+    }
+
+    function toggleFollowup(callId, checked) {
+      if (checked) {
+        followups.add(callId);
+      } else {
+        followups.delete(callId);
+      }
+      saveFollowups();
+      updateStats();
+      // Re-filter if we're on followup view and unchecked
+      if (currentFilter === 'followup' && !checked) {
+        applyFilters();
+      }
+    }
+
+    loadFollowups();
+
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function formatDateTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function hasCaptured(call) {
+      return !!(call.hasCapturedMessage || (Array.isArray(call.capturedMessages) && call.capturedMessages.length));
+    }
+
+    function hasTranscript(call) {
+      return !!(call.transcript && String(call.transcript).trim().length);
+    }
+
+    function displayParty(name, number) {
+      const n = String(name ?? '').trim();
+      const p = String(number ?? '').trim();
+      if (n && p) return `${escapeHtml(n)} <span class="pill">${escapeHtml(p)}</span>`;
+      if (p) return `<span class="pill">${escapeHtml(p)}</span>`;
+      return '<span class="pill">Unknown</span>';
+    }
+
+    function renderCall(call) {
+      const dir = call.direction === 'outbound' ? 'outbound' : 'inbound';
+      const badge = `<span class="badge ${dir}">${dir}</span>`;
+
+      const fromLine = `<div class="row"><span class="label">From:</span> ${displayParty(call.fromName, call.from)}</div>`;
+      const toLine = `<div class="row"><span class="label">To:</span> ${displayParty(call.toName, call.to)}</div>`;
+
+      const sidLine = call.twilioCallSid ? `<div class="row"><span class="label">Sid:</span> <span class="pill">${escapeHtml(call.twilioCallSid)}</span></div>` : '';
+
+      const captured = Array.isArray(call.capturedMessages) ? call.capturedMessages : [];
+      const capturedHTML = captured.length ? `
+        <div class="captured">
+          <div class="title">📋 Captured message${captured.length > 1 ? 's' : ''}</div>
+          ${captured.map(m => {
+            const parts = [];
+            if (m?.name) parts.push(`<div><b>Name:</b> ${escapeHtml(m.name)}</div>`);
+            if (m?.callback) parts.push(`<div><b>Callback:</b> ${escapeHtml(m.callback)}</div>`);
+            if (m?.message) parts.push(`<div><b>Message:</b> ${escapeHtml(m.message)}</div>`);
+            if (!parts.length) parts.push(`<div><b>Data:</b> ${escapeHtml(JSON.stringify(m))}</div>`);
+            return `<div style="margin-top:0.4rem">${parts.join('')}</div>`;
+          }).join('')}
+        </div>
+      ` : '';
+
+      const cs = call.callSummary || null;
+      const hasCS = cs && (String(cs.intent||'').trim() || String(cs.outcome||'').trim() || String(cs.nextSteps||'').trim());
+      const summaryHTML = hasCS ? `
+        <div class="summary" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.9rem; margin-top: 0.25rem;">
+          <div style="display:grid; gap:0.35rem;">
+            <div><span style="color:#888;font-weight:700;">Intent:</span> <span>${escapeHtml(cs.intent||'')}</span></div>
+            <div><span style="color:#888;font-weight:700;">Outcome:</span> <span>${escapeHtml(cs.outcome||'')}</span></div>
+            <div><span style="color:#888;font-weight:700;">Next steps:</span> <span>${escapeHtml(cs.nextSteps||'')}</span></div>
+          </div>
+        </div>
+      ` : `<div class="summary" style="opacity:0.7">(no call summary yet)</div>`;
+
+      const transcript = String(call.transcript ?? '').trim();
+      const transcriptHTML = transcript ? `
+        <details>
+          <summary>Transcript</summary>
+          <pre>${escapeHtml(transcript)}</pre>
+        </details>
+      ` : `
+        <details>
+          <summary>Transcript</summary>
+          <pre>(missing)</pre>
+        </details>
+      `;
+
+      const isFollowup = followups.has(call.id);
+      const followupHTML = `
+        <label class="followup-toggle" title="Mark for follow-up">
+          <input type="checkbox" data-call-id="${escapeHtml(call.id)}" ${isFollowup ? 'checked' : ''} onchange="toggleFollowup('${escapeHtml(call.id)}', this.checked)">
+          <span class="icon">🔔</span>
+        </label>
+      `;
+
+      return `
+        <div class="entry ${dir}">
+          ${followupHTML}
+          <div class="entry-header">
+            <div class="entry-meta">
+              ${badge}
+              <span class="pill">${escapeHtml(call.id)}</span>
+            </div>
+            <div class="entry-time">${escapeHtml(formatDateTime(call.timestamp))}</div>
+          </div>
+          <div class="numbers">
+            ${fromLine}
+            ${toLine}
+            ${sidLine}
+          </div>
+          ${summaryHTML}
+          ${capturedHTML}
+          ${transcriptHTML}
+        </div>
+      `;
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const dir = document.getElementById('dir').value;
+      const msg = document.getElementById('msg').value;
+
+      let list = [...allCalls];
+
+      if (currentFilter === 'inbound') list = list.filter(c => c.direction === 'inbound');
+      if (currentFilter === 'outbound') list = list.filter(c => c.direction === 'outbound');
+      if (currentFilter === 'messages') list = list.filter(c => hasCaptured(c));
+      if (currentFilter === 'with-transcript') list = list.filter(c => hasTranscript(c));
+      if (currentFilter === 'missing-transcript') list = list.filter(c => !hasTranscript(c));
+      if (currentFilter === 'followup') list = list.filter(c => followups.has(c.id));
+
+      if (dir) list = list.filter(c => c.direction === dir);
+
+      if (msg === 'with') list = list.filter(c => hasCaptured(c));
+      if (msg === 'without') list = list.filter(c => !hasCaptured(c));
+
+      if (q) {
+        list = list.filter(c => {
+          const blob = [
+            c.id,
+            c.twilioCallSid,
+            c.from, c.fromName,
+            c.to, c.toName,
+            c.transcriptSummary,
+            c.transcript
+          ].map(x => String(x ?? '')).join(' ').toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      const timeline = document.getElementById('timeline');
+      if (!list.length) {
+        timeline.innerHTML = `<div class="no-entries"><p>No calls match your filters</p></div>`;
+        return;
+      }
+      timeline.innerHTML = list.map(renderCall).join('');
+    }
+
+    function setActiveStat(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.stat-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === filter);
+      });
+      applyFilters();
+    }
+
+    function updateStats() {
+      const total = allCalls.length;
+      const inbound = allCalls.filter(c => c.direction === 'inbound').length;
+      const outbound = allCalls.filter(c => c.direction === 'outbound').length;
+      const captured = allCalls.filter(c => hasCaptured(c)).length;
+      const transcripts = allCalls.filter(c => hasTranscript(c)).length;
+      const missing = total - transcripts;
+      const followupCount = allCalls.filter(c => followups.has(c.id)).length;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-inbound').textContent = inbound;
+      document.getElementById('stat-outbound').textContent = outbound;
+      document.getElementById('stat-messages').textContent = captured;
+      document.getElementById('stat-transcripts').textContent = transcripts;
+      document.getElementById('stat-missing').textContent = missing;
+      document.getElementById('stat-followup').textContent = followupCount;
+    }
+
+    async function load() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = `<div class="loading"><div class="spinner"></div><p>Loading calls…</p></div>`;
+
+      let meta = null;
+      try {
+        const metaResp = await fetch(`${API_BASE}/meta.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (metaResp.ok) meta = await metaResp.json();
+      } catch {}
+
+      try {
+        const resp = await fetch(`${API_BASE}/calls.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!resp.ok) throw new Error('fetch failed');
+        const calls = await resp.json();
+        allCalls = Array.isArray(calls) ? calls : [];
+      } catch {
+        allCalls = [];
+      }
+
+      const metaTs = meta?.updatedAt || meta?.generatedAt || meta?.generated_at || '-';
+      document.getElementById('last-update').textContent = metaTs;
+      
+      // Update lastMetaTimestamp for smart refresh
+      if (metaTs !== '-') {
+        lastMetaTimestamp = metaTs;
+      }
+
+      updateStats();
+      applyFilters();
+    }
+
+    // Wire up UI
+    document.querySelectorAll('.stat-card').forEach(card => {
+      card.addEventListener('click', () => setActiveStat(card.dataset.filter));
+    });
+
+    document.getElementById('search').addEventListener('input', applyFilters);
+    document.getElementById('dir').addEventListener('change', applyFilters);
+    document.getElementById('msg').addEventListener('change', applyFilters);
+
+    document.getElementById('refresh').addEventListener('click', load);
+
+    // Sync button — triggers process_logs.js via serve.js /api/sync endpoint
+    document.getElementById('sync').addEventListener('click', async () => {
+      const btn = document.getElementById('sync');
+      const toast = document.getElementById('sync-toast');
+
+      btn.disabled = true;
+      btn.classList.add('syncing');
+
+      const showToast = (msg, color = '#00c853') => {
+        toast.style.borderColor = color;
+        toast.style.color = color;
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+      };
+
+      showToast('⏳ Syncing call logs…', '#00d4ff');
+
+      try {
+        const resp = await fetch('/api/sync', { method: 'POST' });
+        const result = await resp.json();
+        if (result.success) {
+          showToast('✅ Sync complete — reloading…', '#00c853');
+          setTimeout(() => load(), 600);
+        } else {
+          showToast('⚠️ Sync finished with errors', '#ff9800');
+          console.warn('Sync errors:', result.error);
+        }
+      } catch (err) {
+        showToast('❌ Sync unavailable (use update_data.sh)', '#ff4444');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('syncing');
+      }
+    });
+
+    // Smart auto-refresh: only reload if data changed
+    let lastMetaTimestamp = null;
+
+    async function checkForUpdates() {
+      try {
+        const metaResp = await fetch(`${API_BASE}/meta.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!metaResp.ok) return;
+        const meta = await metaResp.json();
+        const currentTimestamp = meta?.updatedAt || meta?.generatedAt || meta?.generated_at || null;
+        
+        if (currentTimestamp && currentTimestamp !== lastMetaTimestamp) {
+          lastMetaTimestamp = currentTimestamp;
+          load();
+        }
+      } catch {}
+    }
+
+    // Initial load
+    setActiveStat('all');
+    load();
+
+    // Check for updates every 30s, but only reload if changed
+    setInterval(checkForUpdates, 30000);
+  </script>
+</body>
+</html>

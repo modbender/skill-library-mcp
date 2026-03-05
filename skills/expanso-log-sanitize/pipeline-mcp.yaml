@@ -1,0 +1,70 @@
+# Expanso Pipeline: log-sanitize (MCP mode)
+# ==========================================
+#
+# Usage:
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml &
+#   curl -X POST http://localhost:8080/sanitize \
+#     -d '{"log": "password=secret123 token=abc123"}'
+#
+# No API key needed - runs entirely locally.
+
+name: "log-sanitize-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /sanitize
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let input_log = this.log.or(content())
+          meta input_hash = $input_log.hash("sha256").encode("hex")
+          meta input_length = $input_log.length()
+          meta trace_id = uuid_v4()
+
+          let text = $input_log
+
+          # Password patterns
+          let text = $text.re_replace_all("(?i)(password|passwd|pwd)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # Token/API key patterns
+          let text = $text.re_replace_all("(?i)(token|api[_-]?key|apikey|access[_-]?key|secret[_-]?key)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # Bearer tokens
+          let text = $text.re_replace_all("(?i)bearer\\s+[a-zA-Z0-9._-]+", "Bearer ***REDACTED***")
+
+          # AWS keys
+          let text = $text.re_replace_all("AKIA[0-9A-Z]{16}", "***AWS_KEY_REDACTED***")
+
+          # Generic secret patterns
+          let text = $text.re_replace_all("(?i)(secret|auth|credential|private[_-]?key)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # JWT tokens
+          let text = $text.re_replace_all("eyJ[a-zA-Z0-9_-]*\\.eyJ[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]+", "***JWT_REDACTED***")
+
+          root.sanitized = $text
+          root.redactions = $input_log.length() - $text.length()
+          root.metadata = {
+            "skill": "log-sanitize",
+            "mode": "mcp",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [log-sanitize] Processed ${! meta("input_length") } chars (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}

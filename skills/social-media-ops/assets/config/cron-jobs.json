@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "daily-memory-review",
+      "name": "daily-memory-review",
+      "description": "Leader reviews daily notes and updates long-term memory",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 20 * * *"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Memory maintenance: Review today's memory file. Identify significant events, lessons, or insights worth keeping long-term. Update MEMORY.md. Remove stale entries. Deliver summary to Operations topic if noteworthy.",
+        "timeoutSeconds": 120
+      },
+      "delivery": {
+        "mode": "channel",
+        "channel": "{{OPERATIONS_CHANNEL}}",
+        "accountId": ""
+      }
+    },
+    {
+      "id": "weekly-kb-review",
+      "name": "weekly-kb-review",
+      "description": "Leader reviews knowledge base and agent performance weekly",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 20 * * 0"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly review: 1) Check shared/ files for outdated information. 2) Review agent performance from this week. 3) Check for stale PENDING APPROVAL items. 4) Update MEMORY.md with weekly summary. 5) Flag knowledge gaps. Deliver report to Operations topic.",
+        "timeoutSeconds": 180
+      },
+      "delivery": {
+        "mode": "channel",
+        "channel": "{{OPERATIONS_CHANNEL}}",
+        "accountId": ""
+      }
+    },
+    {
+      "id": "stale-task-check",
+      "name": "stale-task-check",
+      "description": "Scan tasks/ directory for stale dispatched tasks and recover lost agent callbacks",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "*/5 * * * *"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "[CRON:TASK_CHECK] 定期任務檢查。掃描 tasks/ 目錄中的 active task files（排除 archive/）。對每個 [⏳] 步驟，若 dispatched 超過 15 分鐘，執行 sessions_history 檢查 agent 是否已完成。已完成但未 callback → 按 Agent Callback Protocol 完整流程處理（更新 task file → cascade → 編輯 Telegram status → 交付 owner）。Agent 仍在執行且超過 30 分鐘 → 用 message tool 通知 owner（解析 task file 的 route 欄位：split on `:` → to = chatId, threadId = threadId）。無待處理項目 → 回覆 HEARTBEAT_OK。",
+        "timeoutSeconds": 60
+      },
+      "delivery": {
+        "mode": "none"
+      }
+    }
+  ]
+}

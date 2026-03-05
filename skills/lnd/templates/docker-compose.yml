@@ -1,0 +1,49 @@
+# Standalone litd (Lightning Terminal) — neutrino light client.
+#
+# Single container running litd with all sub-daemons integrated:
+# lnd, loop, pool, tapd, faraday. No full Bitcoin node required.
+#
+# All runtime configuration lives in the mounted config file
+# (litd.conf.template by default). Use docker-start.sh to generate
+# a config with custom network, profile, or debug level.
+#
+# Usage:
+#   skills/lnd/scripts/docker-start.sh              # Recommended
+#   docker compose up -d                             # Uses template defaults
+#   docker compose down                              # Stop (preserve data)
+#   docker compose down -v                           # Stop and remove volumes
+#
+# After starting, create a wallet:
+#   skills/lnd/scripts/create-wallet.sh --container litd
+#
+# Ports:
+#   8443  — litd HTTPS (UI + gRPC + REST unified endpoint)
+#   10009 — lnd gRPC (lncli access)
+#   9735  — Lightning P2P
+#   8080  — lnd REST API (wallet creation/unlock)
+
+services:
+  litd:
+    image: ${LITD_IMAGE:-lightninglabs/lightning-terminal}:${LITD_VERSION:-v0.16.0-alpha}
+    container_name: litd
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c", "touch /root/.lnd/wallet-password.txt && cp /tmp/lit.conf /root/.lit/lit.conf && exec litd"]
+    ports:
+      - "${LITD_HTTPS_PORT:-8443}:8443"
+      - "${LND_GRPC_PORT:-10009}:10009"
+      - "${LND_P2P_PORT:-9735}:9735"
+      - "${LND_REST_PORT:-8080}:8080"
+    volumes:
+      - litd-data:/root/.lnd
+      - litd-lit-data:/root/.lit
+      - ${LITD_CONF_PATH:-./litd.conf.template}:/tmp/lit.conf:ro
+    networks:
+      - litd-net
+
+volumes:
+  litd-data:
+  litd-lit-data:
+
+networks:
+  litd-net:
+    driver: bridge

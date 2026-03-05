@@ -1,0 +1,1 @@
+# ZEDEDA Skill — Test package

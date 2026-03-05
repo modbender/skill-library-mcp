@@ -1,0 +1,68 @@
+{
+  "name": "@gatewaystack/gatewaystack-governance",
+  "version": "0.2.0",
+  "description": "GatewayStack governance layer for OpenClaw — identity, scope, rate limiting, injection detection, and audit logging for every tool call",
+  "license": "MIT",
+  "author": "David Crowe <david@reducibl.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidcrowe/openclaw-gatewaystack-governance"
+  },
+  "main": "scripts/governance-gateway.js",
+  "bin": {
+    "gatewaystack-governance": "scripts/governance-gateway.js"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/plugin.js"
+    ]
+  },
+  "files": [
+    "scripts/governance-gateway.js",
+    "scripts/governance-gateway.d.ts",
+    "scripts/governance-gateway.ts",
+    "scripts/governance/*.js",
+    "scripts/governance/*.d.ts",
+    "src/plugin.js",
+    "src/plugin.d.ts",
+    "src/plugin.ts",
+    "openclaw.plugin.json",
+    "policy.example.json",
+    "SKILL.md",
+    "README.md",
+    "references/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node scripts/governance-gateway.js --action self-test",
+    "test:unit": "vitest run",
+    "test:all": "vitest run && npm test",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "peerDependencies": {
+    "@gatewaystack/transformabl-core": ">=0.1.0",
+    "@gatewaystack/limitabl-core": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@gatewaystack/transformabl-core": { "optional": true },
+    "@gatewaystack/limitabl-core": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "gatewaystack",
+    "governance",
+    "security",
+    "identity",
+    "audit",
+    "agentic-control-plane"
+  ]
+}

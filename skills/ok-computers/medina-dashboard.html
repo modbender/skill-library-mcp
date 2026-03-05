@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDINA STATION — Ring Gates Network Monitor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --green: #33ff33;
+  --green-dim: #1a8c1a;
+  --green-dark: #0d4d0d;
+  --amber: #ffaa00;
+  --red: #ff3333;
+  --cyan: #33ffff;
+  --bg: #0a0a0a;
+  --panel-bg: #0d1a0d;
+  --border: #1a3a1a;
+  --text: #33ff33;
+  --text-dim: #228822;
+}
+
+body {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* CRT scanline effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    transparent 0px, transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px, rgba(0, 0, 0, 0.15) 2px
+  );
+  z-index: 9999;
+}
+
+/* Glow effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(0, 50, 0, 0.3);
+  z-index: 9998;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-family: 'VT323', monospace;
+  font-size: 2.5em;
+  text-shadow: 0 0 10px var(--green), 0 0 20px rgba(51, 255, 51, 0.3);
+  letter-spacing: 4px;
+}
+
+.header .subtitle {
+  color: var(--text-dim);
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.header .status-line {
+  margin-top: 10px;
+  font-size: 0.85em;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.status-dot.scanning { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Grid layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.grid-full {
+  grid-column: 1 / -1;
+}
+
+/* Panels */
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.panel-header {
+  background: rgba(51, 255, 51, 0.05);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'VT323', monospace;
+  font-size: 1.2em;
+  letter-spacing: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-header .badge {
+  font-size: 0.7em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.badge-green { background: rgba(51, 255, 51, 0.15); color: var(--green); border: 1px solid var(--green-dark); }
+.badge-amber { background: rgba(255, 170, 0, 0.15); color: var(--amber); border: 1px solid #4d3300; }
+.badge-red { background: rgba(255, 51, 51, 0.15); color: var(--red); border: 1px solid #4d0d0d; }
+.badge-cyan { background: rgba(51, 255, 255, 0.15); color: var(--cyan); border: 1px solid #0d4d4d; }
+
+.panel-body {
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.panel-body::-webkit-scrollbar { width: 6px; }
+.panel-body::-webkit-scrollbar-track { background: var(--bg); }
+.panel-body::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 3px; }
+
+/* Fleet nodes */
+.node {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.node:hover {
+  border-color: var(--green-dim);
+  background: rgba(51, 255, 51, 0.03);
+}
+
+.node-id {
+  font-family: 'VT323', monospace;
+  font-size: 1.3em;
+  min-width: 100px;
+  color: var(--cyan);
+}
+
+.node-name {
+  flex: 1;
+  color: var(--green);
+}
+
+.node-role {
+  color: var(--text-dim);
+  font-size: 0.85em;
+}
+
+/* Transmissions */
+.transmission {
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.transmission:hover {
+  border-color: var(--amber);
+}
+
+.tx-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tx-id {
+  color: var(--amber);
+  font-family: 'VT323', monospace;
+  font-size: 1.1em;
+}
+
+.tx-size {
+  color: var(--text-dim);
+}
+
+.tx-progress {
+  height: 4px;
+  background: var(--green-dark);
+  border-radius: 2px;
+  margin: 6px 0;
+  overflow: hidden;
+}
+
+.tx-progress-bar {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width 0.5s;
+  box-shadow: 0 0 6px var(--green);
+}
+
+.tx-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85em;
+  color: var(--text-dim);
+}
+
+/* Activity feed */
+.feed-item {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(26, 58, 26, 0.5);
+  font-size: 0.9em;
+  display: flex;
+  gap: 10px;
+}
+
+.feed-time {
+  color: var(--text-dim);
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.feed-type {
+  min-width: 65px;
+  flex-shrink: 0;
+}
+
+.feed-type.manifest { color: var(--amber); }
+.feed-type.data { color: var(--green); }
+.feed-type.ping { color: var(--cyan); }
+.feed-type.error { color: var(--red); }
+
+.feed-detail {
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Network topology */
+.topology {
+  position: relative;
+  height: 300px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.topo-node {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 0.9em;
+  color: var(--green);
+  background: var(--panel-bg);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.2);
+}
+
+.topo-node:hover {
+  box-shadow: 0 0 20px rgba(51, 255, 51, 0.5);
+  transform: scale(1.1);
+}
+
+.topo-node.gateway {
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+}
+
+.topo-node.medina {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  width: 80px;
+  height: 80px;
+  box-shadow: 0 0 15px rgba(51, 255, 255, 0.3);
+}
+
+.topo-label {
+  position: absolute;
+  font-size: 0.7em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.topo-line {
+  position: absolute;
+  height: 1px;
+  background: var(--green-dark);
+  transform-origin: left center;
+}
+
+.topo-line.active {
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+  animation: data-flow 2s infinite;
+}
+
+@keyframes data-flow {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* Stats */
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-family: 'VT323', monospace;
+  font-size: 2em;
+  color: var(--green);
+  text-shadow: 0 0 8px rgba(51, 255, 51, 0.4);
+}
+
+.stat-label {
+  font-size: 0.8em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85em;
+  padding: 6px 16px;
+  border: 1px solid var(--green-dim);
+  background: rgba(51, 255, 51, 0.05);
+  color: var(--green);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: rgba(51, 255, 51, 0.15);
+  border-color: var(--green);
+  box-shadow: 0 0 8px rgba(51, 255, 51, 0.2);
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn.active {
+  background: rgba(51, 255, 51, 0.2);
+  border-color: var(--green);
+}
+
+.btn-amber { border-color: #664400; color: var(--amber); background: rgba(255, 170, 0, 0.05); }
+.btn-amber:hover { background: rgba(255, 170, 0, 0.15); border-color: var(--amber); }
+
+/* Config */
+.config-input {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85em;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  color: var(--green);
+  border-radius: 3px;
+  width: 120px;
+}
+
+.config-input:focus {
+  outline: none;
+  border-color: var(--green-dim);
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-dim);
+}
+
+.loading::after {
+  content: '';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .grid { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.8em; }
+  .stats-row { flex-wrap: wrap; gap: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>MEDINA STATION</h1>
+    <div class="subtitle">Ring Gates Network Monitor &mdash; OK Computers Inter-System Protocol</div>
+    <div class="status-line">
+      <span class="status-dot scanning" id="statusDot"></span>
+      <span id="statusText">Initializing...</span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span id="lastUpdate">--</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn active" onclick="scanNetwork()" id="btnScan">SCAN NETWORK</button>
+    <button class="btn" onclick="toggleAutoRefresh()" id="btnAuto">AUTO-REFRESH: OFF</button>
+    <label style="display:flex;align-items:center;gap:5px;color:var(--text-dim);font-size:0.85em">
+      Fleet IDs:
+      <input type="text" class="config-input" id="fleetInput" value="1399" placeholder="1399,22,42" style="width:180px">
+    </label>
+    <label style="display:flex;align-items:center;gap:5px;color:var(--text-dim);font-size:0.85em">
+      Channel:
+      <input type="text" class="config-input" id="channelInput" value="rg_1399_broadcast" placeholder="rg_1399_broadcast" style="width:220px">
+    </label>
+    <button class="btn btn-amber" onclick="scanChannel()">SCAN CHANNEL</button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat"><div class="stat-value" id="statFleet">0</div><div class="stat-label">FLEET NODES</div></div>
+    <div class="stat"><div class="stat-value" id="statTransmissions">0</div><div class="stat-label">TRANSMISSIONS</div></div>
+    <div class="stat"><div class="stat-value" id="statMessages">0</div><div class="stat-label">RG MESSAGES</div></div>
+    <div class="stat"><div class="stat-value" id="statBoard">-</div><div class="stat-label">BOARD MSGS</div></div>
+    <div class="stat"><div class="stat-value" id="statGm">-</div><div class="stat-label">GM MSGS</div></div>
+  </div>
+
+  <div class="grid">
+    <!-- Network Topology -->
+    <div class="panel grid-full">
+      <div class="panel-header">
+        NETWORK TOPOLOGY
+        <span class="badge badge-cyan">RING SPACE</span>
+      </div>
+      <div class="panel-body" style="max-height:320px;padding:0">
+        <div class="topology" id="topology">
+          <div class="empty-state" id="topoEmpty">Scan network to populate topology</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fleet Status -->
+    <div class="panel">
+      <div class="panel-header">
+        FLEET STATUS
+        <span class="badge badge-green" id="fleetBadge">0 NODES</span>
+      </div>
+      <div class="panel-body" id="fleetPanel">
+        <div class="empty-state">No fleet data. Click SCAN NETWORK.</div>
+      </div>
+    </div>
+
+    <!-- Active Transmissions -->
+    <div class="panel">
+      <div class="panel-header">
+        TRANSMISSIONS
+        <span class="badge badge-amber" id="txBadge">0 FOUND</span>
+      </div>
+      <div class="panel-body" id="txPanel">
+        <div class="empty-state">No transmissions detected.</div>
+      </div>
+    </div>
+
+    <!-- Channel Activity Feed -->
+    <div class="panel grid-full">
+      <div class="panel-header">
+        CHANNEL ACTIVITY FEED
+        <span class="badge badge-green" id="feedBadge">0 MESSAGES</span>
+      </div>
+      <div class="panel-body" id="feedPanel" style="max-height:350px">
+        <div class="empty-state">Scan a channel to see Ring Gate message activity.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:20px 0;color:var(--text-dim);font-size:0.8em">
+    Ring Gates Protocol v1 &mdash; Named after <em>The Expanse</em> by James S.A. Corey<br>
+    Built by potdealer &amp; Ollie &mdash; OK Computers on Base
+  </div>
+</div>
+
+<script>
+// =============================================================
+// MEDINA DASHBOARD — Ring Gates Network Monitor
+// =============================================================
+
+const RPC_URL = "https://base-mainnet.g.alchemy.com/v2/gx18Gx0VA7vJ9o_iYr4VkWUS8GE3AQ1G";
+const CONTRACT_STORAGE = "0x04D7C8b512D5455e20df1E808f12caD1e3d766E5";
+const CONTRACT_NFT = "0xce2830932889c7fb5e5206287c43554e673dcc88";
+
+// Ring Gate protocol constants
+const RG_PREFIX = "RG|";
+const MSG_TYPES = { MANIFEST: "M", DATA: "D", ACK: "A", PING: "P", PONG: "O", ROUTE: "R", ERROR: "E" };
+const TYPE_NAMES = { M: "MANIFEST", D: "DATA", A: "ACK", P: "PING", O: "PONG", R: "ROUTE", E: "ERROR" };
+
+let autoRefresh = false;
+let autoInterval = null;
+
+// --- Minimal ABI encoding/decoding (no ethers.js dependency) ---
+
+function keccak256(str) {
+  // Use SubtleCrypto for SHA-256 as a placeholder — BUT keccak256 is different.
+  // We'll use a tiny keccak implementation inline.
+  return keccak256Impl(new TextEncoder().encode(str));
+}
+
+// Tiny Keccak-256 (from https://github.com/nicbarker/keccak — public domain, minified)
+function keccak256Impl(input) {
+  const RC = [1n,0x8082n,0x800000000000808an,0x8000000080008000n,0x808bn,0x80000001n,0x8000000080008081n,0x8000000000008009n,0x8an,0x88n,0x80008009n,0x8000000an,0x8000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,0x8000000000008002n,0x8000000000000080n,0x800an,0x800000008000000an,0x8000000080008081n,0x8000000000008080n,0x80000001n,0x8000000080008008n];
+  const ROTC = [1,3,6,10,15,21,28,36,45,55,2,14,27,41,56,8,25,43,62,18,39,61,20,44];
+  const PI = [10,7,11,17,18,3,5,16,8,21,24,4,15,23,19,13,12,2,20,14,22,9,6,1];
+  const rate = 136;
+  const cap = 64;
+  const outputLen = 32;
+
+  let state = new BigUint64Array(25);
+  let buf = new Uint8Array(rate);
+  let bufIdx = 0;
+
+  for (let i = 0; i < input.length; i++) {
+    buf[bufIdx++] = input[i];
+    if (bufIdx === rate) {
+      absorb(state, buf);
+      bufIdx = 0;
+    }
+  }
+  // Padding
+  buf[bufIdx] = 0x01;
+  buf.fill(0, bufIdx + 1);
+  buf[rate - 1] |= 0x80;
+  absorb(state, buf);
+
+  // Squeeze
+  const out = new Uint8Array(outputLen);
+  const view = new DataView(state.buffer);
+  for (let i = 0; i < outputLen; i++) {
+    out[i] = view.getUint8(i);
+  }
+  return '0x' + Array.from(out).map(b => b.toString(16).padStart(2, '0')).join('');
+
+  function absorb(state, data) {
+    const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    for (let i = 0; i < rate / 8; i++) {
+      state[i] ^= view.getBigUint64(i * 8, true);
+    }
+    keccakF(state);
+  }
+
+  function keccakF(state) {
+    for (let round = 0; round < 24; round++) {
+      // Theta
+      let C = new BigUint64Array(5);
+      for (let x = 0; x < 5; x++) C[x] = state[x] ^ state[x+5] ^ state[x+10] ^ state[x+15] ^ state[x+20];
+      for (let x = 0; x < 5; x++) {
+        let D = C[(x+4)%5] ^ rotl64(C[(x+1)%5], 1n);
+        for (let y = 0; y < 25; y += 5) state[x+y] ^= D;
+      }
+      // Rho + Pi
+      let last = state[1];
+      for (let i = 0; i < 24; i++) {
+        let j = PI[i];
+        let tmp = state[j];
+        state[j] = rotl64(last, BigInt(ROTC[i]));
+        last = tmp;
+      }
+      // Chi
+      for (let y = 0; y < 25; y += 5) {
+        let t = new BigUint64Array(5);
+        for (let x = 0; x < 5; x++) t[x] = state[y+x];
+        for (let x = 0; x < 5; x++) state[y+x] = t[x] ^ (~t[(x+1)%5] & t[(x+2)%5]);
+      }
+      // Iota
+      state[0] ^= RC[round];
+    }
+  }
+
+  function rotl64(x, n) {
+    return ((x << n) | (x >> (64n - n))) & 0xFFFFFFFFFFFFFFFFn;
+  }
+}
+
+function channelKey(channel) {
+  return keccak256(channel);
+}
+
+function encodeUint256(n) {
+  return BigInt(n).toString(16).padStart(64, '0');
+}
+
+function encodeBytes32(hex) {
+  return hex.replace('0x', '').padStart(64, '0');
+}
+
+function encodeString(str) {
+  const utf8 = new TextEncoder().encode(str);
+  const len = utf8.length;
+  let hex = encodeUint256(len);
+  const padded = Math.ceil(len / 32) * 32;
+  for (let i = 0; i < utf8.length; i++) hex += utf8[i].toString(16).padStart(2, '0');
+  for (let i = utf8.length; i < padded; i++) hex += '00';
+  return hex;
+}
+
+function decodeString(hex, offset) {
+  const strOffset = parseInt(hex.slice(offset, offset + 64), 16) * 2;
+  const absOffset = strOffset;
+  const len = parseInt(hex.slice(absOffset, absOffset + 64), 16);
+  const dataStart = absOffset + 64;
+  const bytes = [];
+  for (let i = 0; i < len; i++) {
+    bytes.push(parseInt(hex.slice(dataStart + i*2, dataStart + i*2 + 2), 16));
+  }
+  return new TextDecoder().decode(new Uint8Array(bytes));
+}
+
+// --- RPC Calls ---
+
+async function rpcCall(to, data) {
+  const resp = await fetch(RPC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to, data }, 'latest'], id: 1 })
+  });
+  const result = await resp.json();
+  if (result.error) throw new Error(result.error.message);
+  return result.result;
+}
+
+// Function selectors
+const SEL_MESSAGE_COUNT = '0x' + keccak256Impl(new TextEncoder().encode("getMessageCount(bytes32)")).slice(2, 10);
+const SEL_GET_MESSAGE = '0x' + keccak256Impl(new TextEncoder().encode("getMessage(bytes32,uint256)")).slice(2, 10);
+const SEL_OWNER_OF = '0x' + keccak256Impl(new TextEncoder().encode("ownerOf(uint256)")).slice(2, 10);
+const SEL_GET_STRING = '0x' + keccak256Impl(new TextEncoder().encode("getStringOrDefault(uint256,bytes32,string)")).slice(2, 10);
+
+async function getMessageCount(channel) {
+  const key = channelKey(channel);
+  const data = SEL_MESSAGE_COUNT + encodeBytes32(key);
+  const result = await rpcCall(CONTRACT_STORAGE, data);
+  return parseInt(result, 16);
+}
+
+async function getMessage(channel, index) {
+  const key = channelKey(channel);
+  const data = SEL_GET_MESSAGE + encodeBytes32(key) + encodeUint256(index);
+  const result = await rpcCall(CONTRACT_STORAGE, data);
+  const hex = result.slice(2);
+
+  // Decode tuple: (bytes32, uint256 tokenId, uint256 timestamp, address sender, uint256 metadata, string text)
+  const tokenId = parseInt(hex.slice(64, 128), 16);
+  const timestamp = parseInt(hex.slice(128, 192), 16);
+  const sender = '0x' + hex.slice(216, 256);
+
+  // String is at dynamic offset
+  const textOffset = parseInt(hex.slice(320, 384), 16) * 2;
+  const textLen = parseInt(hex.slice(textOffset, textOffset + 64), 16);
+  const textBytes = [];
+  for (let i = 0; i < textLen; i++) {
+    textBytes.push(parseInt(hex.slice(textOffset + 64 + i*2, textOffset + 64 + i*2 + 2), 16));
+  }
+  const text = new TextDecoder().decode(new Uint8Array(textBytes));
+
+  return { index, tokenId, timestamp, time: new Date(timestamp * 1000).toISOString(), sender, text };
+}
+
+async function getOwner(tokenId) {
+  const data = SEL_OWNER_OF + encodeUint256(tokenId);
+  const result = await rpcCall(CONTRACT_NFT, data);
+  return '0x' + result.slice(-40);
+}
+
+async function getUsername(tokenId) {
+  const key = channelKey("username");
+  // ABI encode: (uint256, bytes32, string)
+  const offsetStr = 96; // 3 * 32 bytes
+  const strEnc = encodeString("");
+  const data = SEL_GET_STRING + encodeUint256(tokenId) + encodeBytes32(key) + encodeUint256(offsetStr) + strEnc;
+  try {
+    const result = await rpcCall(CONTRACT_STORAGE, data);
+    const hex = result.slice(2);
+    // Result is a string — find dynamic offset
+    const strOffset = parseInt(hex.slice(0, 64), 16) * 2;
+    const len = parseInt(hex.slice(strOffset, strOffset + 64), 16);
+    if (len === 0) return "";
+    const bytes = [];
+    for (let i = 0; i < len; i++) {
+      bytes.push(parseInt(hex.slice(strOffset + 64 + i*2, strOffset + 64 + i*2 + 2), 16));
+    }
+    return new TextDecoder().decode(new Uint8Array(bytes));
+  } catch {
+    return "";
+  }
+}
+
+// --- Ring Gate Protocol ---
+
+function isRingGate(text) {
+  return typeof text === 'string' && text.startsWith(RG_PREFIX);
+}
+
+function decodeRGMessage(text) {
+  if (!isRingGate(text)) return null;
+  const parts = [];
+  let idx = 0;
+  for (let i = 0; i < 7; i++) {
+    const next = text.indexOf('|', idx);
+    if (next === -1) return null;
+    parts.push(text.slice(idx, next));
+    idx = next + 1;
+  }
+  const payload = text.slice(idx);
+  const flags = parseInt(parts[6], 16);
+  return {
+    version: parts[1], type: parts[2], txid: parts[3],
+    seq: parseInt(parts[4], 16), total: parseInt(parts[5], 16),
+    flags, payload,
+    typeName: TYPE_NAMES[parts[2]] || parts[2]
+  };
+}
+
+// --- UI Updates ---
+
+function setStatus(text, state) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot ' + state;
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+}
+
+async function scanNetwork() {
+  const fleetIds = document.getElementById('fleetInput').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  if (fleetIds.length === 0) { alert('Enter at least one token ID'); return; }
+
+  setStatus('Scanning network...', 'scanning');
+  document.getElementById('btnScan').classList.add('active');
+
+  const fleet = [];
+  let totalRG = 0;
+  const transmissions = [];
+
+  for (const tokenId of fleetIds) {
+    try {
+      const owner = await getOwner(tokenId);
+      const username = await getUsername(tokenId) || '(not set)';
+      const node = { tokenId, owner, username, channels: {} };
+
+      // Check standard RG channels
+      const channels = [`rg_${tokenId}_broadcast`, `rg_control_${tokenId}`];
+      for (const ch of channels) {
+        try {
+          const count = await getMessageCount(ch);
+          if (count > 0) {
+            node.channels[ch] = { count, rgCount: 0 };
+            // Sample last messages for RG content
+            const sampleCount = Math.min(count, 30);
+            for (let i = count - sampleCount; i < count; i++) {
+              try {
+                const msg = await getMessage(ch, i);
+                if (isRingGate(msg.text)) {
+                  node.channels[ch].rgCount++;
+                  totalRG++;
+                  const parsed = decodeRGMessage(msg.text);
+                  if (parsed && parsed.type === 'M') {
+                    try {
+                      const meta = JSON.parse(parsed.payload);
+                      transmissions.push({
+                        txid: parsed.txid, type: meta.type, size: meta.size,
+                        chunks: meta.chunks, hash: meta.hash,
+                        sharded: !!(meta.shards && meta.shards.length),
+                        time: msg.time, channel: ch, computer: tokenId
+                      });
+                    } catch {}
+                  }
+                }
+              } catch {}
+            }
+          }
+        } catch {}
+      }
+
+      fleet.push(node);
+    } catch (e) {
+      fleet.push({ tokenId, error: e.message });
+    }
+  }
+
+  // Get network stats
+  let boardCount = '-', gmCount = '-';
+  try { boardCount = await getMessageCount('board'); } catch {}
+  try { gmCount = await getMessageCount('gm'); } catch {}
+
+  // Update UI
+  document.getElementById('statFleet').textContent = fleet.length;
+  document.getElementById('statTransmissions').textContent = transmissions.length;
+  document.getElementById('statMessages').textContent = totalRG;
+  document.getElementById('statBoard').textContent = boardCount;
+  document.getElementById('statGm').textContent = gmCount;
+  document.getElementById('fleetBadge').textContent = fleet.length + ' NODES';
+  document.getElementById('txBadge').textContent = transmissions.length + ' FOUND';
+
+  renderFleet(fleet);
+  renderTransmissions(transmissions);
+  renderTopology(fleet);
+
+  setStatus('Network scan complete', 'online');
+}
+
+function renderFleet(fleet) {
+  const panel = document.getElementById('fleetPanel');
+  if (fleet.length === 0) { panel.innerHTML = '<div class="empty-state">No fleet nodes found</div>'; return; }
+
+  const roles = { 0: 'Gateway (Rocinante)' };
+  panel.innerHTML = fleet.map((node, i) => {
+    if (node.error) {
+      return `<div class="node"><span class="node-id">#${node.tokenId}</span><span class="node-name" style="color:var(--red)">Error: ${node.error}</span></div>`;
+    }
+    const channelInfo = Object.entries(node.channels).map(([ch, info]) =>
+      `${ch.split('_').pop()}: ${info.count} msgs`
+    ).join(', ') || 'No RG channels';
+    return `
+      <div class="node">
+        <span class="status-dot online"></span>
+        <span class="node-id">#${node.tokenId}</span>
+        <span class="node-name">${node.username}</span>
+        <span class="node-role">${roles[i] || 'Fleet Node'}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTransmissions(txs) {
+  const panel = document.getElementById('txPanel');
+  if (txs.length === 0) { panel.innerHTML = '<div class="empty-state">No transmissions detected</div>'; return; }
+
+  panel.innerHTML = txs.map(tx => `
+    <div class="transmission">
+      <div class="tx-header">
+        <span class="tx-id">TX:${tx.txid}</span>
+        <span class="tx-size">${formatBytes(tx.size)}</span>
+      </div>
+      <div class="tx-progress"><div class="tx-progress-bar" style="width:100%"></div></div>
+      <div class="tx-meta">
+        <span>${tx.type}</span>
+        <span>${tx.chunks} chunks</span>
+        <span>${tx.sharded ? 'SHARDED' : 'SINGLE'}</span>
+        <span>${tx.hash ? tx.hash.slice(0, 12) + '...' : ''}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTopology(fleet) {
+  const container = document.getElementById('topology');
+  const empty = document.getElementById('topoEmpty');
+  if (fleet.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  const centerX = w / 2;
+  const centerY = h / 2;
+
+  // Medina at center, fleet nodes in a circle around it
+  let html = `
+    <div class="topo-node medina" style="left:${centerX - 40}px;top:${centerY - 40}px">
+      MEDINA<br>STATION
+    </div>
+  `;
+
+  const radius = Math.min(w, h) * 0.35;
+  fleet.forEach((node, i) => {
+    const angle = (i / fleet.length) * Math.PI * 2 - Math.PI / 2;
+    const x = centerX + Math.cos(angle) * radius - 30;
+    const y = centerY + Math.sin(angle) * radius - 30;
+    const isGateway = i === 0;
+
+    // Line from center to node
+    const dx = x + 30 - centerX;
+    const dy = y + 30 - centerY;
+    const lineLen = Math.sqrt(dx*dx + dy*dy) - 70;
+    const lineAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const lineX = centerX + Math.cos(angle) * 40;
+    const lineY = centerY + Math.sin(angle) * 40;
+
+    html += `
+      <div class="topo-line${isGateway ? ' active' : ''}" style="left:${lineX}px;top:${lineY}px;width:${lineLen}px;transform:rotate(${lineAngle}deg)"></div>
+      <div class="topo-node${isGateway ? ' gateway' : ''}" style="left:${x}px;top:${y}px">
+        #${node.tokenId}<br>
+        <span style="font-size:0.7em">${node.username || ''}</span>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+async function scanChannel() {
+  const channel = document.getElementById('channelInput').value.trim();
+  if (!channel) { alert('Enter a channel name'); return; }
+
+  setStatus(`Scanning ${channel}...`, 'scanning');
+
+  try {
+    const count = await getMessageCount(channel);
+    const messages = [];
+    const readCount = Math.min(count, 100);
+
+    for (let i = count - readCount; i < count; i++) {
+      try {
+        const msg = await getMessage(channel, i);
+        if (isRingGate(msg.text)) {
+          messages.push({ raw: msg, parsed: decodeRGMessage(msg.text) });
+        }
+      } catch {}
+    }
+
+    document.getElementById('feedBadge').textContent = messages.length + ' MESSAGES';
+    renderFeed(messages);
+    setStatus(`Channel scan complete: ${messages.length} RG messages / ${count} total`, 'online');
+  } catch (e) {
+    document.getElementById('feedPanel').innerHTML = `<div class="empty-state">Channel "${channel}" not found or empty</div>`;
+    setStatus('Channel scan failed: ' + e.message, 'offline');
+  }
+}
+
+function renderFeed(messages) {
+  const panel = document.getElementById('feedPanel');
+  if (messages.length === 0) {
+    panel.innerHTML = '<div class="empty-state">No Ring Gate messages found in this channel</div>';
+    return;
+  }
+
+  panel.innerHTML = messages.map(({ raw, parsed }) => {
+    const time = new Date(raw.timestamp * 1000).toLocaleTimeString();
+    const typeClass = parsed.type === 'M' ? 'manifest' : parsed.type === 'D' ? 'data' : parsed.type === 'P' ? 'ping' : parsed.type === 'E' ? 'error' : 'data';
+    let detail = `txid=${parsed.txid} seq=${parsed.seq}/${parsed.total}`;
+
+    if (parsed.type === 'M') {
+      try {
+        const meta = JSON.parse(parsed.payload);
+        detail = `${meta.type} | ${formatBytes(meta.size)} | ${meta.chunks} chunks${meta.shards ? ' | ' + meta.shards.length + ' shards' : ''}`;
+      } catch {}
+    } else {
+      detail += ` | ${parsed.payload.length} chars payload`;
+    }
+
+    return `
+      <div class="feed-item">
+        <span class="feed-time">${time}</span>
+        <span class="feed-type ${typeClass}">${parsed.typeName}</span>
+        <span class="feed-detail">${detail}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleAutoRefresh() {
+  autoRefresh = !autoRefresh;
+  const btn = document.getElementById('btnAuto');
+  if (autoRefresh) {
+    btn.textContent = 'AUTO-REFRESH: ON';
+    btn.classList.add('active');
+    autoInterval = setInterval(scanNetwork, 30000);
+  } else {
+    btn.textContent = 'AUTO-REFRESH: OFF';
+    btn.classList.remove('active');
+    if (autoInterval) clearInterval(autoInterval);
+  }
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// Initial status
+setStatus('Ready. Click SCAN NETWORK to begin.', 'online');
+</script>
+
+</body>
+</html>

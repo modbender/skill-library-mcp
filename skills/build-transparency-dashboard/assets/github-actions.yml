@@ -1,0 +1,103 @@
+##############################################################################
+# update-build-status.yml
+#
+# Copy to: .github/workflows/update-build-status.yml  (in your PRIVATE repo)
+#
+# What it does:
+#   1. Checks out your private repo (to read git log)
+#   2. Checks out your PUBLIC site repo (to write status.json)
+#   3. Runs scripts/update-status.js to generate status.json
+#   4. Commits + pushes status.json back to the public site repo
+#   5. (Optional) Deploys the public site to Fly.io
+#
+# Required secrets (Settings → Secrets and variables → Actions):
+#   GH_PAT          — GitHub Personal Access Token with "repo" scope
+#                     (needs write access to the public site repo)
+#   FLY_API_TOKEN   — (optional) Fly.io API token, only if deploying via Fly
+#
+# Customise the env block below before committing.
+##############################################################################
+
+name: Update Build Status
+
+on:
+  push:
+    branches: [main]          # fires on every push to main
+  schedule:
+    - cron: '0 * * * *'       # also runs hourly as a heartbeat
+  workflow_dispatch:          # allow manual trigger from GitHub UI
+
+env:
+  # ── CONFIGURE THESE ──────────────────────────────────────────────────────
+  # Your public site repo (username/repo-name)
+  SITE_REPO: username/my-public-site
+
+  # Directory name used for the checkout step (no slashes)
+  SITE_REPO_PATH: my-public-site
+
+  # Git committer identity for the status.json commit
+  BOT_NAME:  StatusBot
+  BOT_EMAIL: bot@example.com
+
+  # Optional: set these if you want update-status.js to embed them in status.json
+  PROJECT_NAME: MyProject
+  PROJECT_DESC: "A project being built in public."
+  PROJECT_BORN: "2026-01-01T00:00:00-05:00"
+  # ─────────────────────────────────────────────────────────────────────────
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the private repo (full history for git log)
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Check out the public site repo (into SITE_REPO_PATH subdirectory)
+      - name: Checkout public site repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SITE_REPO }}
+          path: ${{ env.SITE_REPO_PATH }}
+          token: ${{ secrets.GH_PAT }}
+
+      # 3. Node.js runtime
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 4. Generate status.json
+      - name: Generate status.json
+        env:
+          SITE_REPO_PATH: ${{ env.SITE_REPO_PATH }}
+          PROJECT_NAME:   ${{ env.PROJECT_NAME }}
+          PROJECT_DESC:   ${{ env.PROJECT_DESC }}
+          PROJECT_BORN:   ${{ env.PROJECT_BORN }}
+        run: node scripts/update-status.js
+
+      # 5. Commit + push status.json to the public site repo
+      - name: Commit status.json
+        run: |
+          cd ${{ env.SITE_REPO_PATH }}
+          git config user.name  "${{ env.BOT_NAME }}"
+          git config user.email "${{ env.BOT_EMAIL }}"
+          git add status.json
+          # Only commit if there are actual changes
+          git diff --staged --quiet || \
+            git commit -m "chore: update build status [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+          git push
+
+      # ── OPTIONAL: Deploy to Fly.io ────────────────────────────────────────
+      # Remove or comment out this step if you're not using Fly.io.
+      # Make sure FLY_API_TOKEN is set in your repo secrets.
+      # ──────────────────────────────────────────────────────────────────────
+      # - name: Setup flyctl
+      #   uses: superfly/flyctl-actions/setup-flyctl@master
+      # - name: Deploy to Fly.io
+      #   run: cd ${{ env.SITE_REPO_PATH }} && flyctl deploy --remote-only --depot=false
+      #   env:
+      #     FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Chat 测试页面</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a2e; color: #eee; }
+    .log { background: #000; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+    .success { color: #0f0; }
+    .error { color: #f00; }
+    .info { color: #0ff; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #4a4a6a; color: #fff; border: none; border-radius: 5px; }
+    button:hover { background: #5a5a7a; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Web Chat v15 连接测试</h1>
+  
+  <div>
+    <button onclick="testHealth()">1. 健康检查</button>
+    <button onclick="testAuth()">2. 认证测试</button>
+    <button onclick="testWebSocket()">3. WebSocket 连接</button>
+    <button onclick="testChat()">4. 发送消息</button>
+    <button onclick="clearLog()">清空日志</button>
+  </div>
+  
+  <h3>日志:</h3>
+  <div id="log" class="log"></div>
+  
+  <script>
+    const BASE_URL = window.location.origin;
+    let socket = null;
+    let sessionId = 'test-' + Date.now();
+    
+    function log(msg, type = 'info') {
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      document.getElementById('log').appendChild(div);
+      document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+    }
+    
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+    
+    async function testHealth() {
+      log('开始健康检查...', 'info');
+      try {
+        const res = await fetch(`${BASE_URL}/api/health`);
+        const data = await res.json();
+        if (data.status === 'ok') {
+          log(`✅ 服务正常 (v${data.version}, sessions: ${data.sessions})`, 'success');
+        } else {
+          log('❌ 服务异常', 'error');
+        }
+      } catch (e) {
+        log(`❌ 错误：${e.message}`, 'error');
+      }
+    }
+    
+    async function testAuth() {
+      log('开始认证测试...', 'info');
+      try {
+        const res = await fetch(`${BASE_URL}/api/auth/check`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: 'admin123' })
+        });
+        const data = await res.json();
+        if (data.authenticated) {
+          log('✅ 认证成功', 'success');
+        } else {
+          log('❌ 认证失败', 'error');
+        }
+      } catch (e) {
+        log(`❌ 错误：${e.message}`, 'error');
+      }
+    }
+    
+    function testWebSocket() {
+      log('开始 WebSocket 连接...', 'info');
+      
+      socket = io(BASE_URL);
+      
+      socket.on('connect', () => {
+        log(`✅ WebSocket 已连接 (ID: ${socket.id})`, 'success');
+        socket.emit('join', sessionId);
+      });
+      
+      socket.on('history', (messages) => {
+        log(`✅ 收到历史记录 (${messages.length}条)`, 'success');
+      });
+      
+      socket.on('session_config', (config) => {
+        log(`✅ 收到会话配置 (model: ${config.model})`, 'info');
+      });
+      
+      socket.on('stream_chunk', (data) => {
+        log(`✅ 收到流式片段: ${data.content.substring(0, 30)}...`, 'success');
+      });
+      
+      socket.on('stream_complete', (data) => {
+        log(`✅ 收到完成消息: ${data.content.substring(0, 50)}...`, 'success');
+      });
+      
+      socket.on('disconnect', () => {
+        log('❌ WebSocket 断开', 'error');
+      });
+      
+      socket.on('connect_error', (err) => {
+        log(`❌ 连接错误：${err.message}`, 'error');
+      });
+    }
+    
+    async function testChat() {
+      if (!socket || !socket.connected) {
+        log('❌ 请先连接 WebSocket', 'error');
+        return;
+      }
+      
+      log('开始发送消息...', 'info');
+      
+      try {
+        const res = await fetch(`${BASE_URL}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            message: '测试消息，请回复', 
+            sessionId: sessionId 
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          log('✅ 消息发送成功', 'success');
+          log('⏳ 等待 AI 回复...', 'info');
+        } else {
+          log(`❌ 发送失败：${data.error}`, 'error');
+        }
+      } catch (e) {
+        log(`❌ 错误：${e.message}`, 'error');
+      }
+    }
+    
+    // Socket.IO 客户端库（从主页面复制）
+    !function(n,t){for(var e=3,r=n.createElement("canvas"),u=n.getElementsByTagName("script")[0],i=0;i<e;i++)if(n.getElementById("tsocket"+i))return;for(;i<e;i++)n.getElementById("tsocket"+i)||(r=n.createElement("script"),r.id="tsocket"+i,r.src=t,u.parentNode.insertBefore(r,u))}(document,"https://cdn.socket.io/4.8.3/socket.io.min.js");
+  </script>
+</body>
+</html>

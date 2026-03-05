@@ -1,0 +1,170 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://clawhub.com/schemas/discord-connect-hub/config.json",
+  "title": "Discord Connect Configuration",
+  "description": "Configuration schema for the Discord Connect Hub skill",
+  "type": "object",
+  "properties": {
+    "channels": {
+      "type": "object",
+      "properties": {
+        "discord": {
+          "type": "object",
+          "description": "Discord channel configuration",
+          "properties": {
+            "botToken": {
+              "type": "string",
+              "description": "Discord bot token. Can be a direct token or OpenBao reference (bao:path#key)",
+              "pattern": "^(bao:|[A-Za-z0-9_.-]+).*$",
+              "minLength": 1
+            },
+            "applicationId": {
+              "type": "string",
+              "description": "Discord application ID (optional, auto-detected from token)",
+              "pattern": "^[0-9]+$"
+            },
+            "requireMention": {
+              "type": "boolean",
+              "description": "Require @mention to respond in servers",
+              "default": true
+            },
+            "dmPolicy": {
+              "type": "string",
+              "enum": ["pairing", "open", "closed"],
+              "description": "How to handle direct messages",
+              "default": "pairing"
+            },
+            "groupPolicy": {
+              "type": "string",
+              "enum": ["open", "mention", "closed"],
+              "description": "How to handle server messages",
+              "default": "open"
+            },
+            "guilds": {
+              "type": "object",
+              "description": "Per-guild configuration overrides",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Enable bot in this guild",
+                    "default": true
+                  },
+                  "requireMention": {
+                    "type": "boolean",
+                    "description": "Override global requireMention for this guild"
+                  },
+                  "channels": {
+                    "type": "object",
+                    "description": "Per-channel configuration",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Enable bot in this channel",
+                          "default": true
+                        },
+                        "requireMention": {
+                          "type": "boolean",
+                          "description": "Override requireMention for this channel"
+                        },
+                        "allowedRoles": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "description": "Role IDs allowed to interact (empty = all)"
+                        }
+                      }
+                    }
+                  },
+                  "allowedRoles": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Role IDs allowed to interact guild-wide"
+                  }
+                }
+              }
+            },
+            "presence": {
+              "type": "object",
+              "description": "Bot presence configuration",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["online", "idle", "dnd", "invisible"],
+                  "default": "online"
+                },
+                "activity": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["playing", "watching", "listening", "competing"],
+                      "default": "playing"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Activity text",
+                      "maxLength": 128
+                    }
+                  }
+                }
+              }
+            },
+            "advanced": {
+              "type": "object",
+              "description": "Advanced configuration options",
+              "properties": {
+                "retryAttempts": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "default": 3
+                },
+                "heartbeatInterval": {
+                  "type": "integer",
+                  "minimum": 10000,
+                  "maximum": 60000,
+                  "default": 30000
+                },
+                "reconnectDelay": {
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 30000,
+                  "default": 5000
+                },
+                "sharding": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "shardCount": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["botToken"]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "discordSnowflake": {
+      "type": "string",
+      "pattern": "^[0-9]{17,20}$",
+      "description": "Discord snowflake ID (17-20 digit number)"
+    },
+    "baoReference": {
+      "type": "string",
+      "pattern": "^bao:[a-zA-Z0-9/_-]+#[a-zA-Z0-9_-]+$",
+      "description": "OpenBao vault reference (bao:path/to/secret#key)"
+    }
+  }
+}

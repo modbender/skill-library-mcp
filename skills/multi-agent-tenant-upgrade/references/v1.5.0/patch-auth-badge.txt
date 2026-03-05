@@ -1,0 +1,335 @@
+diff --git a/src/agents/pi-embedded-runner/run.ts b/src/agents/pi-embedded-runner/run.ts
+index c2d964569..5faff2246 100644
+--- a/src/agents/pi-embedded-runner/run.ts
++++ b/src/agents/pi-embedded-runner/run.ts
+@@ -1,4 +1,5 @@
+ import { randomBytes } from "node:crypto";
++import { updateAgentRunContext } from "../../infra/agent-events.js";
+ import fs from "node:fs/promises";
+ import type { ThinkLevel } from "../../auto-reply/thinking.js";
+ import { generateSecureToken } from "../../infra/secure-random.js";
+@@ -450,6 +451,9 @@ export async function runEmbeddedPiAgent(
+           authStorage.setRuntimeApiKey(model.provider, apiKeyInfo.apiKey);
+         }
+         lastProfileId = apiKeyInfo.profileId;
++        if (lastProfileId) {
++          updateAgentRunContext(params.runId, { authProfileId: lastProfileId });
++        }
+       };
+ 
+       const advanceAuthProfile = async (): Promise<boolean> => {
+diff --git a/src/gateway/server-chat.ts b/src/gateway/server-chat.ts
+index 5ac16c4cb..1d5c37653 100644
+--- a/src/gateway/server-chat.ts
++++ b/src/gateway/server-chat.ts
+@@ -338,11 +338,13 @@ export function createAgentEventHandler({
+     chatRunState.buffers.delete(clientRunId);
+     chatRunState.deltaSentAt.delete(clientRunId);
+     if (jobState === "done") {
++      const runCtx = getAgentRunContext(sourceRunId);
+       const payload = {
+         runId: clientRunId,
+         sessionKey,
+         seq,
+         state: "final" as const,
++        authProfileId: runCtx?.authProfileId,
+         message:
+           text && !shouldSuppressSilent
+             ? {
+diff --git a/src/gateway/server-methods-list.ts b/src/gateway/server-methods-list.ts
+index 3c8281c98..d642b27fc 100644
+--- a/src/gateway/server-methods-list.ts
++++ b/src/gateway/server-methods-list.ts
+@@ -51,6 +51,7 @@ const BASE_METHODS = [
+   "voicewake.get",
+   "voicewake.set",
+   "secrets.reload",
++  "auth.status",
+   "sessions.list",
+   "sessions.preview",
+   "sessions.patch",
+diff --git a/src/gateway/server-methods/sessions.ts b/src/gateway/server-methods/sessions.ts
+index ac2b02eba..1e97835ae 100644
+--- a/src/gateway/server-methods/sessions.ts
++++ b/src/gateway/server-methods/sessions.ts
+@@ -47,6 +47,7 @@ import {
+   validateSessionsDeleteArchivedParams,
+ } from "../protocol/index.js";
+ import { archiveSessionToHistory, restoreSessionFromArchive } from "../session-archive.js";
++import { loadAuthProfileStore } from "../../agents/auth-profiles.js";
+ import {
+   archiveSessionTranscripts,
+   listSessionsFromStore,
+@@ -1027,4 +1028,25 @@ export const sessionsHandlers: GatewayRequestHandlers = {
+       respond(false, undefined, errorShape(ErrorCodes.InternalError, String(error), true));
+     }
+   },
++  "auth.status": ({ respond }) => {
++    try {
++      const store = loadAuthProfileStore();
++      const lastGood = store?.lastGood ?? {};
++      const profiles = store?.profiles ?? {};
++      const anthropicProfileId = lastGood["anthropic"] ?? null;
++      const cred = anthropicProfileId ? profiles[anthropicProfileId] : null;
++      let mode: "oauth" | "api" | "fallback" | "unknown" = "unknown";
++      if (cred?.type === "token") {
++        mode = "oauth";
++      } else if (cred?.type === "api_key" && anthropicProfileId?.startsWith("anthropic:")) {
++        mode = "api";
++      } else if (anthropicProfileId && !anthropicProfileId.startsWith("anthropic:")) {
++        mode = "fallback";
++      }
++      respond(true, { profileId: anthropicProfileId, mode }, undefined);
++    } catch (err) {
++      respond(false, undefined, String(err));
++    }
++  },
++
+ };
+diff --git a/src/infra/agent-events.ts b/src/infra/agent-events.ts
+index 23557cdda..2bfa6edd0 100644
+--- a/src/infra/agent-events.ts
++++ b/src/infra/agent-events.ts
+@@ -15,6 +15,7 @@ export type AgentRunContext = {
+   sessionKey?: string;
+   verboseLevel?: VerboseLevel;
+   isHeartbeat?: boolean;
++  authProfileId?: string;
+ };
+ 
+ // Keep per-run counters so streams stay strictly monotonic per runId.
+@@ -46,6 +47,13 @@ export function getAgentRunContext(runId: string) {
+   return runContextById.get(runId);
+ }
+ 
++export function updateAgentRunContext(runId: string, patch: Partial<AgentRunContext>) {
++  const existing = runContextById.get(runId);
++  if (existing) {
++    Object.assign(existing, patch);
++  }
++}
++
+ export function clearAgentRunContext(runId: string) {
+   runContextById.delete(runId);
+ }
+diff --git a/ui/src/styles/chat/grouped.css b/ui/src/styles/chat/grouped.css
+index c43743267..0bd135411 100644
+--- a/ui/src/styles/chat/grouped.css
++++ b/ui/src/styles/chat/grouped.css
+@@ -298,3 +298,31 @@ img.chat-avatar {
+     transform: translateY(0);
+   }
+ }
++
++/* Auth badge — shows OAuth / API / fallback per assistant message */
++.auth-badge {
++  font-size: 9px;
++  font-weight: 600;
++  letter-spacing: 0.04em;
++  padding: 1px 5px;
++  border-radius: 3px;
++  opacity: 0.75;
++  vertical-align: middle;
++  text-transform: uppercase;
++  line-height: 1.4;
++}
++.auth-badge--oauth {
++  background: rgba(34, 197, 94, 0.15);
++  color: #22c55e;
++  border: 1px solid rgba(34, 197, 94, 0.3);
++}
++.auth-badge--api {
++  background: rgba(99, 102, 241, 0.12);
++  color: #818cf8;
++  border: 1px solid rgba(99, 102, 241, 0.25);
++}
++.auth-badge--fallback {
++  background: rgba(251, 146, 60, 0.12);
++  color: #fb923c;
++  border: 1px solid rgba(251, 146, 60, 0.25);
++}
+diff --git a/ui/src/styles/chat/layout.css b/ui/src/styles/chat/layout.css
+index 25fa6742b..c8c81dde3 100644
+--- a/ui/src/styles/chat/layout.css
++++ b/ui/src/styles/chat/layout.css
+@@ -479,3 +479,16 @@
+     min-width: 120px;
+   }
+ }
++
++.chat-auth-badge {
++  font-size: 10px;
++  font-weight: 600;
++  padding: 2px 6px;
++  border-radius: 4px;
++  letter-spacing: 0.03em;
++  opacity: 0.85;
++  white-space: nowrap;
++}
++.chat-auth-badge--oauth { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
++.chat-auth-badge--api   { background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); }
++.chat-auth-badge--fallback { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+diff --git a/ui/src/ui/app-gateway.ts b/ui/src/ui/app-gateway.ts
+index 08f83aaa3..3ac3ef771 100644
+--- a/ui/src/ui/app-gateway.ts
++++ b/ui/src/ui/app-gateway.ts
+@@ -273,6 +273,14 @@ function handleChatGatewayEvent(host: GatewayHost, payload: ChatEventPayload | u
+   if (state === "final" && shouldReloadHistoryForFinalEvent(payload)) {
+     void loadChatHistory(host as unknown as OpenClawApp);
+   }
++  if (state === "final" && host.client) {
++    void host.client.request<{ profileId: string; mode: string }>("auth.status", {})
++      .then((res) => {
++        (host as unknown as { chatAuthMode: string | null }).chatAuthMode =
++          (res?.mode as "oauth" | "api" | "fallback" | "unknown") ?? null;
++      })
++      .catch(() => {});
++  }
+ }
+ 
+ function handleGatewayEventUnsafe(host: GatewayHost, evt: GatewayEventFrame) {
+diff --git a/ui/src/ui/app-render.helpers.ts b/ui/src/ui/app-render.helpers.ts
+index 76385d795..6fcda85c0 100644
+--- a/ui/src/ui/app-render.helpers.ts
++++ b/ui/src/ui/app-render.helpers.ts
+@@ -489,6 +489,13 @@ export function renderChatControls(state: AppViewState) {
+         </select>
+       </label>
+       ${renderContextGauge(state)}
++      ${(() => {
++        const mode = (state as unknown as { chatAuthMode?: string | null }).chatAuthMode;
++        if (!mode || mode === "unknown") return nothing;
++        const label = mode === "oauth" ? "OAuth" : mode === "api" ? "API" : "Fallback";
++        const cls = mode === "oauth" ? "chat-auth-badge--oauth" : mode === "api" ? "chat-auth-badge--api" : "chat-auth-badge--fallback";
++        return html`<span class="chat-auth-badge ${cls}" title="Auth: ${label}">${label}</span>`;
++      })()}
+       <button
+         class="btn btn--sm btn--icon"
+         ?disabled=${!state.connected}
+diff --git a/ui/src/ui/app-view-state.ts b/ui/src/ui/app-view-state.ts
+index c97edd7a5..c554c1c4f 100644
+--- a/ui/src/ui/app-view-state.ts
++++ b/ui/src/ui/app-view-state.ts
+@@ -79,6 +79,7 @@ export type AppViewState = {
+   chatStream: string | null;
+   chatStreamStartedAt: number | null;
+   chatRunId: string | null;
++  chatAuthMode: "oauth" | "api" | "fallback" | "unknown" | null;
+   compactionStatus: CompactionStatus | null;
+   fallbackStatus: FallbackStatus | null;
+   chatAvatarUrl: string | null;
+diff --git a/ui/src/ui/app.ts b/ui/src/ui/app.ts
+index 92037d608..cbca616d2 100644
+--- a/ui/src/ui/app.ts
++++ b/ui/src/ui/app.ts
+@@ -145,6 +145,7 @@ export class OpenClawApp extends LitElement {
+   @state() chatStream: string | null = null;
+   @state() chatStreamStartedAt: number | null = null;
+   @state() chatRunId: string | null = null;
++  @state() chatAuthMode: "oauth" | "api" | "fallback" | "unknown" | null = null;
+   @state() compactionStatus: CompactionStatus | null = null;
+   @state() backgroundJobToasts: BackgroundJobToast[] = [];
+   @state() fallbackStatus: FallbackStatus | null = null;
+diff --git a/ui/src/ui/chat/grouped-render.ts b/ui/src/ui/chat/grouped-render.ts
+index df4689b0f..23ec4a525 100644
+--- a/ui/src/ui/chat/grouped-render.ts
++++ b/ui/src/ui/chat/grouped-render.ts
+@@ -105,6 +105,28 @@ export function renderStreamingGroup(
+   `;
+ }
+ 
++function renderAuthBadge(profileId: string | undefined, role: string) {
++  if (role !== "assistant" || !profileId) {
++    return nothing;
++  }
++  let label: string;
++  let cls: string;
++  if (profileId.includes(":manual") || profileId.includes("claude-cli") || profileId.startsWith("anthropic:oat")) {
++    label = "OAuth";
++    cls = "auth-badge auth-badge--oauth";
++  } else if (profileId.startsWith("anthropic:")) {
++    label = "API";
++    cls = "auth-badge auth-badge--api";
++  } else if (profileId.startsWith("openai:")) {
++    label = "OpenAI";
++    cls = "auth-badge auth-badge--fallback";
++  } else {
++    label = profileId.split(":")[0] ?? "API";
++    cls = "auth-badge auth-badge--fallback";
++  }
++  return html`<span class="${cls}" title="${profileId}">${label}</span>`;
++}
++
+ export function renderMessageGroup(
+   group: MessageGroup,
+   opts: {
+@@ -148,6 +170,7 @@ export function renderMessageGroup(
+         )}
+         <div class="chat-group-footer">
+           <span class="chat-sender-name">${who}</span>
++          ${renderAuthBadge(group.authProfileId, normalizedRole)}
+           <span class="chat-group-timestamp">${timestamp}</span>
+         </div>
+       </div>
+diff --git a/ui/src/ui/controllers/chat.ts b/ui/src/ui/controllers/chat.ts
+index 5305bde0f..afc15fb0d 100644
+--- a/ui/src/ui/controllers/chat.ts
++++ b/ui/src/ui/controllers/chat.ts
+@@ -25,6 +25,7 @@ export type ChatEventPayload = {
+   state: "delta" | "final" | "aborted" | "error";
+   message?: unknown;
+   errorMessage?: string;
++  authProfileId?: string;
+ };
+ 
+ export async function loadChatHistory(state: ChatState) {
+@@ -250,7 +251,10 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
+   } else if (payload.state === "final") {
+     const finalMessage = normalizeFinalAssistantMessage(payload.message);
+     if (finalMessage) {
+-      state.chatMessages = [...state.chatMessages, finalMessage];
++      const annotated = payload.authProfileId
++        ? { ...(finalMessage as Record<string, unknown>), _authProfileId: payload.authProfileId }
++        : finalMessage;
++      state.chatMessages = [...state.chatMessages, annotated];
+     }
+     state.chatStream = null;
+     state.chatRunId = null;
+diff --git a/ui/src/ui/types/chat-types.ts b/ui/src/ui/types/chat-types.ts
+index aba1b1730..7a746aed4 100644
+--- a/ui/src/ui/types/chat-types.ts
++++ b/ui/src/ui/types/chat-types.ts
+@@ -17,6 +17,7 @@ export type MessageGroup = {
+   messages: Array<{ message: unknown; key: string }>;
+   timestamp: number;
+   isStreaming: boolean;
++  authProfileId?: string;
+ };
+ 
+ /** Content item types in a normalized message */
+diff --git a/ui/src/ui/views/chat.ts b/ui/src/ui/views/chat.ts
+index 77f076bb5..5f33da11d 100644
+--- a/ui/src/ui/views/chat.ts
++++ b/ui/src/ui/views/chat.ts
+@@ -499,6 +499,7 @@ function groupMessages(items: ChatItem[]): Array<ChatItem | MessageGroup> {
+     const role = normalizeRoleForGrouping(normalized.role);
+     const timestamp = normalized.timestamp || Date.now();
+ 
++    const msgAuthProfileId = (item.message as Record<string, unknown>)?._authProfileId as string | undefined;
+     if (!currentGroup || currentGroup.role !== role) {
+       if (currentGroup) {
+         result.push(currentGroup);
+@@ -510,9 +511,13 @@ function groupMessages(items: ChatItem[]): Array<ChatItem | MessageGroup> {
+         messages: [{ message: item.message, key: item.key }],
+         timestamp,
+         isStreaming: false,
++        authProfileId: msgAuthProfileId,
+       };
+     } else {
+       currentGroup.messages.push({ message: item.message, key: item.key });
++      if (msgAuthProfileId) {
++        currentGroup.authProfileId = msgAuthProfileId;
++      }
+     }
+   }
+ 

@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: Clawhub Skill - Intercom Conversations (Read)
+  version: 1.0.1
+  description: |
+    Clawhub module skill invoked as default(input).
+    Exposes Intercom ConversationsClient read operations:
+    - conversations.list
+    - conversations.find
+    - conversations.search
+
+paths:
+  /skill/intercom_conversations_read:
+    post:
+      summary: Invoke the Clawhub module skill (default(input))
+      operationId: intercomConversationsReadSkill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SkillInput"
+      responses:
+        "200":
+          description: Skill result (success or error)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillOutput"
+
+components:
+  schemas:
+    SkillInput:
+      oneOf:
+        - $ref: "#/components/schemas/ConversationsListInput"
+        - $ref: "#/components/schemas/ConversationsFindInput"
+        - $ref: "#/components/schemas/ConversationsSearchInput"
+      discriminator:
+        propertyName: action
+        mapping:
+          conversations.list: "#/components/schemas/ConversationsListInput"
+          conversations.find: "#/components/schemas/ConversationsFindInput"
+          conversations.search: "#/components/schemas/ConversationsSearchInput"
+
+    ConversationsListInput:
+      type: object
+      additionalProperties: false
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [conversations.list]
+        per_page:
+          type: integer
+          minimum: 1
+          maximum: 150
+        starting_after:
+          type: string
+
+    ConversationsFindInput:
+      type: object
+      additionalProperties: false
+      required: [action, conversation_id]
+      properties:
+        action:
+          type: string
+          enum: [conversations.find]
+        conversation_id:
+          type: string
+        display_as:
+          type: string
+          enum: [plaintext, html]
+        include_translations:
+          type: boolean
+
+    ConversationsSearchInput:
+      type: object
+      additionalProperties: false
+      required: [action, query]
+      properties:
+        action:
+          type: string
+          enum: [conversations.search]
+        query:
+          type: object
+          additionalProperties: true
+        pagination:
+          type: object
+          additionalProperties: true
+          properties:
+            per_page:
+              type: integer
+              minimum: 1
+              maximum: 150
+            starting_after:
+              type: string
+
+    SkillOutput:
+      oneOf:
+        - $ref: "#/components/schemas/ConversationsListOutput"
+        - $ref: "#/components/schemas/ConversationsFindOutput"
+        - $ref: "#/components/schemas/ConversationsSearchOutput"
+        - $ref: "#/components/schemas/ErrorOutput"
+
+    ConversationsListOutput:
+      type: object
+      additionalProperties: false
+      required: [ok, action, conversations, next_starting_after]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        action:
+          type: string
+          enum: [conversations.list]
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntercomConversationSummary"
+        next_starting_after:
+          type: string
+          nullable: true
+
+    ConversationsFindOutput:
+      type: object
+      additionalProperties: false
+      required: [ok, action, conversation]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        action:
+          type: string
+          enum: [conversations.find]
+        conversation:
+          $ref: "#/components/schemas/IntercomConversation"
+
+    ConversationsSearchOutput:
+      type: object
+      additionalProperties: false
+      required: [ok, action, conversations, next_starting_after]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        action:
+          type: string
+          enum: [conversations.search]
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntercomConversationSummary"
+        next_starting_after:
+          type: string
+          nullable: true
+
+    ErrorOutput:
+      type: object
+      additionalProperties: false
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [false]
+        action:
+          type: string
+          nullable: true
+        error:
+          type: string
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+        supported_actions:
+          type: array
+          nullable: true
+          items:
+            type: string
+
+    IntercomConversationSummary:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+        state:
+          type: string
+        title:
+          type: string
+
+    IntercomConversation:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        state:
+          type: string
+        conversation_parts:
+          type: object
+          additionalProperties: true

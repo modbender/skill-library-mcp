@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Editor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      /* ClawBuddy warm-light theme */
+      --bg: #fcf8f3;
+      --bg-secondary: #f6efe4;
+      --bg-tertiary: #ffffff;
+      --text: #2f2115;
+      --text-muted: #745d47;
+      --accent: #b7642b;
+      --accent-hover: #9f5522;
+      --border: #e2d5c2;
+      --success: #2f7d4f;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+    
+    /* Sidebar - File Tree */
+    .sidebar {
+      width: 250px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sidebar-header h1 {
+      font-size: 14px;
+      font-weight: 600;
+      flex: 1;
+    }
+    
+    .sidebar-header button {
+      padding: 4px 10px;
+      background: var(--accent);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .sidebar-header button:hover {
+      background: var(--accent-hover);
+    }
+    
+    .file-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    
+    .tree-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+    
+    .tree-item:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .tree-item.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    
+    .tree-item.folder {
+      font-weight: 500;
+    }
+    
+    .tree-item .icon {
+      width: 16px;
+      text-align: center;
+    }
+    
+    .breadcrumb {
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    
+    .breadcrumb span {
+      cursor: pointer;
+    }
+    
+    .breadcrumb span:hover {
+      color: var(--accent);
+    }
+    
+    /* Main Editor Area */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    
+    .toolbar {
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .toolbar .filename {
+      font-size: 14px;
+      font-weight: 500;
+      flex: 1;
+    }
+    
+    .toolbar button {
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    
+    .toolbar button:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .toolbar button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .toolbar button.primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    .toolbar .status {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .toolbar .status.saved {
+      color: var(--success);
+    }
+    
+    .editor-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .editor-pane, .preview-pane {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .editor-pane {
+      border-right: 1px solid var(--border);
+    }
+    
+    .pane-header {
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    #editor {
+      flex: 1;
+      width: 100%;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      border: none;
+      resize: none;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      outline: none;
+    }
+    
+    #preview {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+    
+    #preview h1, #preview h2, #preview h3, #preview h4 {
+      margin: 1em 0 0.5em;
+      color: var(--text);
+    }
+    
+    #preview h1 { font-size: 1.8em; }
+    #preview h2 { font-size: 1.5em; }
+    #preview h3 { font-size: 1.25em; }
+    
+    #preview p { margin: 0.75em 0; line-height: 1.7; }
+    
+    #preview code {
+      background: var(--bg-secondary);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    
+    #preview pre {
+      background: var(--bg-secondary);
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+    
+    #preview pre code {
+      background: none;
+      padding: 0;
+    }
+    
+    #preview ul, #preview ol {
+      margin: 0.75em 0;
+      padding-left: 2em;
+    }
+    
+    #preview li { margin: 0.25em 0; }
+    
+    #preview blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      margin: 1em 0;
+      color: var(--text-muted);
+    }
+    
+    #preview a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    #preview a:hover {
+      text-decoration: underline;
+    }
+    
+    #preview hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2em 0;
+    }
+    
+    #preview table {
+      border-collapse: collapse;
+      margin: 1em 0;
+      width: 100%;
+    }
+    
+    #preview th, #preview td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    
+    #preview th {
+      background: var(--bg-secondary);
+      font-weight: 600;
+    }
+    
+    #preview tr:nth-child(even) {
+      background: var(--bg-secondary);
+    }
+    
+    /* Chat Panel */
+    .chat-panel {
+      width: 350px;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .chat-panel.hidden {
+      display: none;
+    }
+    
+    .chat-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .chat-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    
+    .message {
+      margin-bottom: 16px;
+    }
+    
+    .message.user {
+      text-align: right;
+    }
+    
+    .message .bubble {
+      display: inline-block;
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .message.user .bubble {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    
+    .message.assistant .bubble {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    /* Markdown inside chat bubbles - smaller scale */
+    .message .bubble h1 { font-size: 1.1em; font-weight: 600; margin: 0.5em 0 0.3em; }
+    .message .bubble h2 { font-size: 1.05em; font-weight: 600; margin: 0.5em 0 0.3em; }
+    .message .bubble h3 { font-size: 1em; font-weight: 600; margin: 0.5em 0 0.3em; }
+    .message .bubble h4 { font-size: 0.95em; font-weight: 600; margin: 0.5em 0 0.3em; }
+    .message .bubble p { margin: 0.4em 0; }
+    .message .bubble ul, .message .bubble ol { margin: 0.4em 0; padding-left: 1.5em; }
+    .message .bubble li { margin: 0.2em 0; }
+    .message .bubble code { font-size: 0.85em; padding: 1px 4px; }
+    .message .bubble pre { margin: 0.5em 0; padding: 8px; font-size: 0.85em; }
+    .message .bubble hr { margin: 0.5em 0; }
+    .message .bubble blockquote { margin: 0.4em 0; padding-left: 10px; }
+    
+    .chat-input {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+    
+    .chat-input textarea {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+      font-family: inherit;
+    }
+    
+    .chat-input textarea:focus {
+      border-color: var(--accent);
+    }
+    
+    .chat-input button {
+      padding: 10px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .chat-input button:hover {
+      background: var(--accent-hover);
+    }
+    
+    .chat-input button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .message.loading .bubble {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    
+    /* Loading */
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- File Tree Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span>📝</span>
+        <h1 id="dirName">Markdown Editor</h1>
+        <button onclick="createFile()" title="New File">+ New</button>
+      </div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="file-tree" id="fileTree"></div>
+    </div>
+    
+    <!-- Main Editor -->
+    <div class="main">
+      <div class="toolbar" id="toolbar" style="display: none;">
+        <span class="filename" id="currentFile">No file selected</span>
+        <span class="status" id="status"></span>
+        <button onclick="saveFile()">Save (⌘S)</button>
+        <button onclick="toggleChat()" id="chatToggle" style="display: none;">💬 Chat</button>
+      </div>
+      
+      <div class="editor-container" id="editorContainer">
+        <div class="empty-state" id="emptyState">
+          Select a file to edit
+        </div>
+        
+        <div class="editor-pane" id="editorPane" style="display: none;">
+          <div class="pane-header">Editor</div>
+          <textarea id="editor" placeholder="Start writing..."></textarea>
+        </div>
+        
+        <div class="preview-pane" id="previewPane" style="display: none;">
+          <div class="pane-header">Preview</div>
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Panel -->
+    <div class="chat-panel hidden" id="chatPanel">
+      <div class="chat-header">
+        <h2>💬 Chat</h2>
+        <button onclick="toggleChat()" style="background: none; border: none; color: var(--text); cursor: pointer;">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+          <div class="bubble">Hi! I can help you with your markdown content. Ask me anything!</div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <textarea id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+        <button onclick="sendChat()" id="sendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentPath = '';
+    let currentFile = null;
+    let isDirty = false;
+    let chatEnabled = false;
+    let chatMessages = [];
+    let folderName = 'Root';
+    
+    // Initialize
+    async function init() {
+      // Load config
+      try {
+        const res = await fetch('/api/config');
+        const config = await res.json();
+        chatEnabled = config.chatEnabled;
+        folderName = config.folderName || 'Root';
+        document.getElementById('dirName').textContent = folderName;
+        if (chatEnabled) {
+          document.getElementById('chatToggle').style.display = '';
+        }
+      } catch (e) {
+        console.error('Failed to load config:', e);
+      }
+      
+      // Load file tree
+      await loadFiles('');
+      
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+          e.preventDefault();
+          saveFile();
+        }
+      });
+      
+      // Editor change listener
+      document.getElementById('editor').addEventListener('input', () => {
+        isDirty = true;
+        updateStatus();
+        updatePreview();
+      });
+    }
+    
+    // Load files for a path
+    async function loadFiles(path) {
+      try {
+        const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
+        const data = await res.json();
+        
+        if (data.error) {
+          console.error(data.error);
+          return;
+        }
+        
+        currentPath = data.path;
+        renderBreadcrumb();
+        renderFileTree(data.items);
+      } catch (e) {
+        console.error('Failed to load files:', e);
+      }
+    }
+    
+    // Render breadcrumb
+    function renderBreadcrumb() {
+      const bc = document.getElementById('breadcrumb');
+      const parts = currentPath ? currentPath.split('/').filter(Boolean) : [];
+      
+      let html = `<span onclick="loadFiles('')">📁 ${folderName}</span>`;
+      let accPath = '';
+      
+      for (const part of parts) {
+        accPath += (accPath ? '/' : '') + part;
+        const p = accPath;
+        html += ` / <span onclick="loadFiles('${p}')">${part}</span>`;
+      }
+      
+      bc.innerHTML = html;
+    }
+    
+    // Render file tree
+    function renderFileTree(items) {
+      const tree = document.getElementById('fileTree');
+      
+      if (items.length === 0) {
+        tree.innerHTML = '<div style="padding: 16px; color: var(--text-muted);">No markdown files</div>';
+        return;
+      }
+      
+      tree.innerHTML = items.map(item => {
+        const icon = item.type === 'folder' ? '📁' : '📄';
+        const cls = item.type === 'folder' ? 'tree-item folder' : 'tree-item';
+        const active = currentFile === item.path ? ' active' : '';
+        const onclick = item.type === 'folder' 
+          ? `loadFiles('${item.path}')`
+          : `openFile('${item.path}')`;
+        return `<div class="${cls}${active}" onclick="${onclick}">
+          <span class="icon">${icon}</span>
+          <span>${item.name}</span>
+        </div>`;
+      }).join('');
+    }
+    
+    // Open a file
+    async function openFile(path) {
+      if (isDirty && !confirm('You have unsaved changes. Discard?')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/files/${encodeURIComponent(path)}`);
+        const data = await res.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        currentFile = path;
+        isDirty = false;
+        
+        // Update UI
+        document.getElementById('toolbar').style.display = '';
+        document.getElementById('currentFile').textContent = path.split('/').pop();
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('editorPane').style.display = '';
+        document.getElementById('previewPane').style.display = '';
+        document.getElementById('editor').value = data.content;
+        
+        updateStatus();
+        updatePreview();
+        
+        // Re-render tree to show active file
+        await loadFiles(currentPath);
+        
+      } catch (e) {
+        console.error('Failed to open file:', e);
+        alert('Failed to open file');
+      }
+    }
+    
+    // Save file
+    async function saveFile() {
+      if (!currentFile) return;
+      
+      try {
+        const content = document.getElementById('editor').value;
+        const res = await fetch(`/api/files/${encodeURIComponent(currentFile)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        isDirty = false;
+        updateStatus();
+        
+      } catch (e) {
+        console.error('Failed to save file:', e);
+        alert('Failed to save file');
+      }
+    }
+    
+    // Create new file
+    async function createFile() {
+      const filename = prompt('Enter filename (without .md extension):');
+      if (!filename) return;
+      
+      // Sanitize filename
+      const sanitized = filename.trim().replace(/[^a-zA-Z0-9-_]/g, '-');
+      if (!sanitized) {
+        alert('Invalid filename');
+        return;
+      }
+      
+      const path = currentPath ? `${currentPath}/${sanitized}.md` : `${sanitized}.md`;
+      
+      try {
+        const res = await fetch(`/api/files/${encodeURIComponent(path)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: `# ${filename}\n\n` })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        // Reload files and open the new file
+        await loadFiles(currentPath);
+        await openFile(path);
+        
+      } catch (e) {
+        console.error('Failed to create file:', e);
+        alert('Failed to create file');
+      }
+    }
+    
+    // Update status indicator
+    function updateStatus() {
+      const status = document.getElementById('status');
+      if (isDirty) {
+        status.textContent = 'Unsaved changes';
+        status.className = 'status';
+      } else {
+        status.textContent = 'Saved';
+        status.className = 'status saved';
+      }
+    }
+    
+    // Update preview
+    function updatePreview() {
+      const content = document.getElementById('editor').value;
+      document.getElementById('preview').innerHTML = renderMarkdown(content);
+    }
+    
+    // Simple markdown renderer
+    function renderMarkdown(text) {
+      if (!text) return '';
+      
+      // Escape HTML
+      let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      // Code blocks (must be first to protect content)
+      html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+      
+      // GFM Tables
+      html = html.replace(/^(\|.+\|)\n(\|[-:\s|]+\|)\n((?:\|.+\|\n?)+)/gm, (match, headerRow, sepRow, bodyRows) => {
+        // Parse header
+        const headers = headerRow.split('|').slice(1, -1).map(h => h.trim());
+        
+        // Parse alignment from separator row
+        const alignments = sepRow.split('|').slice(1, -1).map(sep => {
+          sep = sep.trim();
+          if (sep.startsWith(':') && sep.endsWith(':')) return 'center';
+          if (sep.endsWith(':')) return 'right';
+          return 'left';
+        });
+        
+        // Parse body rows
+        const rows = bodyRows.trim().split('\n').map(row => 
+          row.split('|').slice(1, -1).map(cell => cell.trim())
+        );
+        
+        // Build table HTML
+        let table = '<table><thead><tr>';
+        headers.forEach((h, i) => {
+          const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+          table += `<th${align}>${h}</th>`;
+        });
+        table += '</tr></thead><tbody>';
+        rows.forEach(row => {
+          table += '<tr>';
+          row.forEach((cell, i) => {
+            const align = alignments[i] ? ` style="text-align:${alignments[i]}"` : '';
+            table += `<td${align}>${cell}</td>`;
+          });
+          table += '</tr>';
+        });
+        table += '</tbody></table>';
+        return table;
+      });
+      
+      // Inline code
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      
+      // Headers
+      html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+      html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+      
+      // Bold and italic
+      html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      
+      // Links
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      
+      // Blockquotes
+      html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+      
+      // Horizontal rules
+      html = html.replace(/^---$/gm, '<hr>');
+      
+      // Lists (simple)
+      html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
+      html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+      html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+      
+      // Wrap consecutive <li> in <ul>
+      html = html.replace(/(<li>[\s\S]*?<\/li>)+/g, '<ul>$&</ul>');
+      
+      // Paragraphs
+      html = html.split('\n\n').map(p => {
+        p = p.trim();
+        if (!p) return '';
+        if (p.startsWith('<h') || p.startsWith('<pre') || p.startsWith('<ul') || 
+            p.startsWith('<ol') || p.startsWith('<blockquote') || p.startsWith('<hr') ||
+            p.startsWith('<table')) {
+          return p;
+        }
+        return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+      }).join('\n');
+      
+      return html;
+    }
+    
+    // Toggle chat panel
+    function toggleChat() {
+      const panel = document.getElementById('chatPanel');
+      panel.classList.toggle('hidden');
+    }
+    
+    // Send chat message
+    async function sendChat() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      // Add user message
+      chatMessages.push({ role: 'user', content: message });
+      renderChatMessages();
+      input.value = '';
+      
+      // Disable send while waiting
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span>';
+      
+      // Show loading message
+      const loadingMsg = { role: 'assistant', content: '...', loading: true };
+      chatMessages.push(loadingMsg);
+      renderChatMessages();
+      
+      try {
+        // Include current file content as context
+        const editorContent = document.getElementById('editor').value;
+        const fileName = currentFile ? currentFile.split('/').pop() : 'untitled';
+        const contextMessages = [
+          { role: 'system', content: `You are a helpful assistant. The user is editing a markdown file called "${fileName}". Current content:\n\n${editorContent}` },
+          ...chatMessages.filter(m => !m.loading)
+        ];
+        
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: contextMessages })
+        });
+        
+        const data = await res.json();
+        
+        // Remove loading message
+        chatMessages = chatMessages.filter(m => !m.loading);
+        
+        if (data.error) {
+          chatMessages.push({ role: 'assistant', content: `Error: ${data.error}` });
+        } else if (data.choices && data.choices[0]) {
+          chatMessages.push({ role: 'assistant', content: data.choices[0].message.content });
+        }
+        
+      } catch (e) {
+        // Remove loading message
+        chatMessages = chatMessages.filter(m => !m.loading);
+        chatMessages.push({ role: 'assistant', content: `Error: ${e.message}` });
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Send';
+      renderChatMessages();
+    }
+    
+    // Render chat messages
+    function renderChatMessages() {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = chatMessages.map(m => {
+        let content;
+        if (m.loading) {
+          content = '<span class="loading-spinner"></span> Thinking...';
+        } else if (m.role === 'assistant') {
+          content = renderMarkdown(m.content);
+        } else {
+          content = escapeHtml(m.content);
+        }
+        return `<div class="message ${m.role}${m.loading ? ' loading' : ''}">
+          <div class="bubble">${content}</div>
+        </div>`;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    }
+    
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

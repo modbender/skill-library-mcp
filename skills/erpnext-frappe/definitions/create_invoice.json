@@ -1,0 +1,115 @@
+{
+  "name": "create_invoice",
+  "version": "1.0.0",
+  "description": "Create a sales invoice from a sales order or directly",
+  "author": "Business Claw Team",
+  "category": "accounts",
+  
+  "triggers": [
+    "create invoice",
+    "create sales invoice",
+    "bill customer",
+    "generate invoice"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_document",
+      "description": "Fetch sales order if provided",
+      "required": false
+    },
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Sales Invoice DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the invoice",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit the invoice",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_id": {
+        "type": "string",
+        "description": "Customer ID"
+      },
+      "sales_order": {
+        "type": "string",
+        "description": "Sales Order to invoice from (optional)"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_code": {"type": "string"},
+            "qty": {"type": "number"},
+            "rate": {"type": "number"}
+          }
+        },
+        "description": "List of items (if not using sales_order)"
+      },
+      "due_date": {
+        "type": "string",
+        "description": "Payment due date"
+      },
+      "transaction_date": {
+        "type": "string",
+        "description": "Invoice date"
+      }
+    },
+    "required": ["customer_id"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Sales Invoice"
+        }
+      },
+      {
+        "step": "fetch_order",
+        "tool": "get_document",
+        "arguments": {
+          "doctype": "Sales Order",
+          "name": "${sales_order}"
+        },
+        "condition": "sales_order is provided"
+      },
+      {
+        "step": "create_invoice",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Sales Invoice",
+          "data": {
+            "customer": "${customer_id}",
+            "due_date": "${due_date}",
+            "transaction_date": "${transaction_date}",
+            "sales_order": "${sales_order}",
+            "items": "${items}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "max_amount": 1000000,
+    "require_customer_credit_check": true,
+    "validate_tax_template": true
+  },
+  
+  "output_template": "Created Sales Invoice {{name}}\nCustomer: {{customer}}\nTotal: {{grand_total}}\nDue: {{due_date}}"
+}

@@ -1,0 +1,56 @@
+# Expanso Pipeline: csv-to-json (MCP mode)
+# =========================================
+#
+# Usage:
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml &
+#   curl -X POST http://localhost:8080/convert -d '{"csv": "name,age\nAlice,30"}'
+
+name: "csv-to-json-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /convert
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let csv_text = this.csv.or(content()).string().trim()
+          let delimiter = this.delimiter.or(",")
+
+          let lines = $csv_text.split("\n").filter(line -> line.trim().length() > 0)
+          let headers = if $lines.length() > 0 {
+            $lines.index(0).split($delimiter).map_each(h -> h.trim())
+          } else { [] }
+
+          let data = $lines.slice(1).map_each(line -> $headers.fold({"index": 0, "obj": {}}, pair -> {
+            "index": pair.tally.index + 1,
+            "obj": pair.tally.obj.merge({(pair.value): line.split($delimiter).index(pair.tally.index).or("").trim()})
+          }).obj)
+
+          root.data = $data
+          root.row_count = $data.length()
+          root.columns = $headers
+          root.metadata = {
+            "skill": "csv-to-json",
+            "mode": "mcp",
+            "delimiter": $delimiter,
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [csv-to-json] Converted ${! root.row_count } rows (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}

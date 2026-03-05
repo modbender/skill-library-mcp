@@ -1,0 +1,24 @@
+@echo off
+echo 🐰🤓 Switching Bunni to Qwen 3 Coder (Smart Bunny - SFW Mode)...
+echo.
+echo 📂 Loading professional personality...
+copy /Y "{{WORKSPACE_DIR}}\assets\SOUL_SFW.md" "{{WORKSPACE_DIR}}\SOUL.md" >nul
+echo ✅ Personality loaded!
+echo.
+echo 🧠 Switching brain to Qwen 3 Coder...
+call "{{OPENCLAW_CMD}}" models set openrouter/qwen/qwen3-coder-next
+echo.
+echo ⏳ Waiting for config to settle...
+timeout /t 3
+echo.
+echo 🔄 Force killing all OpenClaw gateway processes...
+powershell -Command "$procs = Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -like '*gateway*' }; foreach ($p in $procs) { $parent = $p.ParentProcessId; Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue; try { $pp = Get-Process -Id $parent -ErrorAction Stop; if ($pp.ProcessName -eq 'cmd') { Stop-Process -Id $parent -Force -ErrorAction SilentlyContinue } } catch {} }"
+echo.
+echo ⏳ Waiting for port to release...
+timeout /t 3
+echo.
+echo 🚀 Starting OpenClaw Gateway...
+schtasks /Run /TN "OpenClaw Gateway"
+echo.
+echo ✅ Done! Bunni is now in Smart Bunny Mode (Qwen 3 Coder - SFW).
+timeout /t 5

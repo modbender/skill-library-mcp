@@ -1,0 +1,42 @@
+{
+  "codex-account-switcher": [
+    {
+      "scanner": "VirusTotal",
+      "pattern": "handling of highly sensitive authentication",
+      "reason": "Reads/writes ~/.codex/auth.json by design — account switching requires credential file manipulation"
+    },
+    {
+      "scanner": "OpenClaw",
+      "pattern": "sensitive authentication",
+      "reason": "Reads/writes ~/.codex/auth.json by design — account switching requires credential file manipulation. Reviewed and acknowledged."
+    }
+  ],
+  "codex-quota": [
+    {
+      "scanner": "VirusTotal",
+      "pattern": "temporarily overwrite",
+      "reason": "Temporarily overwrites ~/.codex/auth.json during --all account scan — inherent to multi-account quota checking"
+    }
+  ],
+  "snapmaker-2": [
+    {
+      "scanner": "VirusTotal",
+      "pattern": "token is transmitted as a URL query parameter",
+      "reason": "Snapmaker firmware API requires token as query param — device does not support Authorization headers. LAN-only API."
+    }
+  ],
+  "tesla-fleet-api": [
+    {
+      "scanner": "VirusTotal",
+      "pattern": "go install",
+      "reason": "Installs official Tesla vehicle-command proxy from github.com/teslamotors/vehicle-command at pinned version v0.4.1 — required for local BLE/HTTP proxy"
+    }
+  ],
+  "revolut": [
+    {
+      "scanner": "VirusTotal",
+      "pattern": "storing any form of PIN in plaintext",
+      "reason": "PIN is a non-secret personal identification number for starting the Revolut auth flow, not a credential. Documented in SKILL.md."
+    }
+  ]
+}

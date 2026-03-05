@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Security Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-secure { background: #238636; color: white; }
+        .status-warning { background: #d29922; color: white; }
+        .status-critical { background: #da3633; color: white; }
+        .refresh-btn {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .refresh-btn:hover { background: #30363d; }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .metric-grid {
+            display: grid;
+            gap: 12px;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #21262d;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #8b949e;
+        }
+        .metric-value {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .value-good { color: #3fb950; }
+        .value-warning { color: #d29922; }
+        .value-critical { color: #f85149; }
+        .icon {
+            font-size: 20px;
+        }
+        .alert-box {
+            background: #1c1e26;
+            border-left: 3px solid #f85149;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .alert-box.warning {
+            border-left-color: #d29922;
+        }
+        .alert-box.info {
+            border-left-color: #58a6ff;
+        }
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .alert-message {
+            font-size: 13px;
+            color: #8b949e;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #6e7681;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6e7681;
+        }
+        .log-entry {
+            font-family: 'Monaco', monospace;
+            font-size: 11px;
+            padding: 6px;
+            background: #0d1117;
+            border-radius: 3px;
+            margin: 4px 0;
+            color: #8b949e;
+        }
+        .chart {
+            height: 100px;
+            background: #0d1117;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            🔒 OpenClaw Security Dashboard
+            <span id="overallStatus" class="status-badge status-secure">Loading...</span>
+        </h1>
+        <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+    </div>
+
+    <div id="alerts"></div>
+
+    <div class="dashboard">
+        <!-- OpenClaw Security -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">🦞</span>
+                    OpenClaw Security
+                </div>
+            </div>
+            <div class="metric-grid" id="openclawMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Network Security -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">🌐</span>
+                    Network Security
+                </div>
+            </div>
+            <div class="metric-grid" id="networkMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Public Exposure -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">🌍</span>
+                    Public Exposure
+                </div>
+            </div>
+            <div class="metric-grid" id="exposureMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- System Security -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">🖥️</span>
+                    System Security
+                </div>
+            </div>
+            <div class="metric-grid" id="systemMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- SSH & Access -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">🔑</span>
+                    SSH & Access Control
+                </div>
+            </div>
+            <div class="metric-grid" id="sshMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Certificates & TLS -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">📜</span>
+                    Certificates & TLS
+                </div>
+            </div>
+            <div class="metric-grid" id="certMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Resource Security -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="icon">📊</span>
+                    Resource Security
+                </div>
+            </div>
+            <div class="metric-grid" id="resourceMetrics">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="timestamp" id="lastUpdated"></div>
+
+    <script>
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/security');
+                const data = await response.json();
+                
+                renderOpenClawMetrics(data.openclaw);
+                renderNetworkMetrics(data.network);
+                renderExposureMetrics(data.exposure);
+                renderSystemMetrics(data.system);
+                renderSSHMetrics(data.ssh);
+                renderCertMetrics(data.certificates);
+                renderResourceMetrics(data.resources);
+                renderAlerts(data.alerts);
+                updateOverallStatus(data.status);
+                
+                document.getElementById('lastUpdated').textContent = 
+                    `Last updated: ${new Date(data.timestamp).toLocaleString()}`;
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        function renderOpenClawMetrics(openclaw) {
+            const container = document.getElementById('openclawMetrics');
+            container.innerHTML = `
+                ${metric('Gateway Status', openclaw.gatewayStatus, openclaw.gatewayStatus === 'Active' ? 'good' : 'critical')}
+                ${metric('Gateway Bind', openclaw.bind, openclaw.bind === 'loopback' ? 'good' : 'warning')}
+                ${metric('Token Length', `${openclaw.tokenLength} chars`, openclaw.tokenLength >= 32 ? 'good' : 'critical')}
+                ${metric('Auth Mode', openclaw.authMode, openclaw.authMode === 'token' ? 'good' : 'warning')}
+                ${metric('Main Sessions', openclaw.sessionCount)}
+                ${metric('Subagents', openclaw.subagentCount)}
+                ${metric('Skills Enabled', openclaw.skillsCount)}
+                ${metric('Current Version', openclaw.currentVersion)}
+                ${metric('Updates', openclaw.updateStatus, openclaw.updateAvailable ? 'warning' : 'good')}
+            `;
+        }
+
+        function renderNetworkMetrics(network) {
+            const container = document.getElementById('networkMetrics');
+            container.innerHTML = `
+                ${metric('Tailscale', network.tailscale, network.tailscale === 'Connected' ? 'good' : 'critical')}
+                ${metric('Tailscale IP', network.tailscaleIP)}
+                ${metric('Public Ports', network.openPorts, network.openPorts === 0 ? 'good' : 'warning')}
+                ${metric('Firewall', network.firewall, network.firewall === 'Active' ? 'good' : 'critical')}
+                ${metric('Active Connections', network.connections)}
+            `;
+        }
+
+        function renderExposureMetrics(exposure) {
+            const container = document.getElementById('exposureMetrics');
+            const exposureLevelClass = exposure.exposureLevel === 'Excellent' ? 'good' : 
+                                       exposure.exposureLevel === 'Minimal' ? 'good' :
+                                       exposure.exposureLevel === 'Warning' ? 'warning' : 'critical';
+            
+            const kanbanClass = exposure.dashboardBindings.kanban === 'localhost' ? 'good' : 'critical';
+            const securityClass = exposure.dashboardBindings.security === 'localhost' ? 'good' : 'critical';
+            
+            container.innerHTML = `
+                ${metric('Exposure Level', exposure.exposureLevel, exposureLevelClass)}
+                ${metric('Public Ports', exposure.publicPorts, exposure.publicPorts <= 1 ? 'good' : 'warning')}
+                ${metric('Kanban Binding', exposure.dashboardBindings.kanban, kanbanClass)}
+                ${metric('Security Dashboard', exposure.dashboardBindings.security, securityClass)}
+                ${metric('OpenClaw Gateway', exposure.openclawBind, exposure.openclawBind === 'loopback' ? 'good' : 'warning')}
+                ${metric('Tailscale Active', exposure.tailscaleActive ? 'Yes' : 'No', exposure.tailscaleActive ? 'good' : 'warning')}
+            `;
+        }
+
+        function renderSystemMetrics(system) {
+            const container = document.getElementById('systemMetrics');
+            container.innerHTML = `
+                ${metric('Updates Available', system.updates, system.updates === 0 ? 'good' : 'warning')}
+                ${metric('Uptime', system.uptime)}
+                ${metric('Load Average', system.load, parseFloat(system.load) < 2 ? 'good' : 'warning')}
+                ${metric('Failed Logins (24h)', system.failedLogins, system.failedLogins === 0 ? 'good' : 'warning')}
+                ${metric('Root Processes', system.rootProcesses, system.rootProcesses < 50 ? 'good' : 'warning')}
+            `;
+        }
+
+        function renderSSHMetrics(ssh) {
+            const container = document.getElementById('sshMetrics');
+            container.innerHTML = `
+                ${metric('SSH Status', ssh.status, ssh.status === 'Active' ? 'good' : 'critical')}
+                ${metric('Password Auth', ssh.passwordAuth, ssh.passwordAuth === 'Disabled' ? 'good' : 'critical')}
+                ${metric('fail2ban', ssh.fail2ban, ssh.fail2ban === 'Active' ? 'good' : 'warning')}
+                ${metric('Banned IPs', ssh.bannedIPs)}
+                ${metric('Active Sessions', ssh.activeSessions)}
+            `;
+        }
+
+        function renderCertMetrics(certs) {
+            const container = document.getElementById('certMetrics');
+            container.innerHTML = `
+                ${metric('Caddy Status', certs.caddyStatus, certs.caddyStatus === 'Stopped' ? 'good' : 'warning')}
+                ${metric('Public TLS', certs.publicTLS, certs.publicTLS === 'Disabled' ? 'good' : 'warning')}
+                ${metric('Tailscale Encryption', 'WireGuard', 'good')}
+            `;
+        }
+
+        function renderResourceMetrics(resources) {
+            const container = document.getElementById('resourceMetrics');
+            container.innerHTML = `
+                ${metric('CPU Usage', `${resources.cpu}%`, resources.cpu < 80 ? 'good' : 'warning')}
+                ${metric('Memory Usage', `${resources.memory}%`, resources.memory < 80 ? 'good' : 'warning')}
+                ${metric('Disk Usage', `${resources.disk}%`, resources.disk < 80 ? 'good' : 'warning')}
+                ${metric('Config Permissions', resources.configPerms, resources.configPerms === '600' ? 'good' : 'critical')}
+            `;
+        }
+
+        function renderAlerts(alerts) {
+            const container = document.getElementById('alerts');
+            if (!alerts || alerts.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert-box ${alert.level}">
+                    <div class="alert-title">${alert.title}</div>
+                    <div class="alert-message">${alert.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateOverallStatus(status) {
+            const badge = document.getElementById('overallStatus');
+            badge.textContent = status.text;
+            badge.className = `status-badge status-${status.level}`;
+        }
+
+        function metric(label, value, status) {
+            const statusClass = status ? `value-${status}` : '';
+            const icon = status === 'good' ? '✓' : status === 'critical' ? '✗' : status === 'warning' ? '⚠' : '';
+            return `
+                <div class="metric">
+                    <span class="metric-label">${label}</span>
+                    <span class="metric-value ${statusClass}">
+                        ${icon ? `<span>${icon}</span>` : ''}
+                        ${value}
+                    </span>
+                </div>
+            `;
+        }
+
+        // Load on page load
+        loadDashboard();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+</html>

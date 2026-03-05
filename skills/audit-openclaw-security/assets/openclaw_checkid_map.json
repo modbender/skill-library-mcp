@@ -1,0 +1,104 @@
+{
+  "fs.state_dir.perms_world_writable": {
+    "default_severity": "critical",
+    "why": "Other users/processes can modify OpenClaw state (full compromise risk)",
+    "primary_fix": "Filesystem permissions on ~/.openclaw",
+    "auto_fix": true
+  },
+  "fs.config.perms_writable": {
+    "default_severity": "critical",
+    "why": "Others can change auth/tool policy/config",
+    "primary_fix": "Filesystem permissions on ~/.openclaw/openclaw.json",
+    "auto_fix": true
+  },
+  "fs.config.perms_world_readable": {
+    "default_severity": "critical",
+    "why": "Config can leak tokens/credentials",
+    "primary_fix": "Filesystem permissions on ~/.openclaw/openclaw.json",
+    "auto_fix": true
+  },
+  "gateway.bind_no_auth": {
+    "default_severity": "critical",
+    "why": "Remote bind without shared secret",
+    "primary_fix": "gateway.bind + gateway.auth.*",
+    "auto_fix": false
+  },
+  "gateway.loopback_no_auth": {
+    "default_severity": "critical",
+    "why": "Reverse-proxied loopback can become unauthenticated",
+    "primary_fix": "gateway.auth.* + reverse proxy config",
+    "auto_fix": false
+  },
+  "gateway.tools_invoke_http.dangerous_allow": {
+    "default_severity": "warn",
+    "why": "Dangerous tools exposed over HTTP API",
+    "primary_fix": "gateway.tools.allow",
+    "auto_fix": false
+  },
+  "gateway.tailscale_funnel": {
+    "default_severity": "critical",
+    "why": "Public internet exposure via Tailscale Funnel",
+    "primary_fix": "gateway.tailscale.mode",
+    "auto_fix": false
+  },
+  "gateway.control_ui.insecure_auth": {
+    "default_severity": "critical",
+    "why": "Control UI token-only over HTTP, no device identity",
+    "primary_fix": "gateway.controlUi.allowInsecureAuth",
+    "auto_fix": false
+  },
+  "gateway.control_ui.device_auth_disabled": {
+    "default_severity": "critical",
+    "why": "Control UI device identity checks disabled",
+    "primary_fix": "gateway.controlUi.dangerouslyDisableDeviceAuth",
+    "auto_fix": false
+  },
+  "hooks.token_too_short": {
+    "default_severity": "warn",
+    "why": "Hook token easier to brute force",
+    "primary_fix": "hooks.token",
+    "auto_fix": false
+  },
+  "hooks.request_session_key_enabled": {
+    "default_severity": "warn",
+    "why": "External caller can choose sessionKey",
+    "primary_fix": "hooks.allowRequestSessionKey",
+    "auto_fix": false
+  },
+  "hooks.request_session_key_prefixes_missing": {
+    "default_severity": "warn",
+    "why": "No bound on externally supplied sessionKey shapes",
+    "primary_fix": "hooks.allowedSessionKeyPrefixes",
+    "auto_fix": false
+  },
+  "logging.redact_off": {
+    "default_severity": "warn",
+    "why": "Sensitive values may leak to logs/status",
+    "primary_fix": "logging.redactSensitive",
+    "auto_fix": true
+  },
+  "sandbox.docker_config_mode_off": {
+    "default_severity": "warn",
+    "why": "Sandbox config exists but sandboxing is off",
+    "primary_fix": "agents.*.sandbox.mode",
+    "auto_fix": false
+  },
+  "tools.profile_minimal_overridden": {
+    "default_severity": "warn",
+    "why": "Per-agent overrides bypass a minimal global profile",
+    "primary_fix": "agents.list[].tools.profile",
+    "auto_fix": false
+  },
+  "plugins.tools_reachable_permissive_policy": {
+    "default_severity": "warn",
+    "why": "Extension tools reachable in permissive contexts",
+    "primary_fix": "tools.profile + tools.allow/deny",
+    "auto_fix": false
+  },
+  "models.small_params": {
+    "default_severity": "info",
+    "why": "Smaller/weaker models increase prompt-injection risk with tools",
+    "primary_fix": "Model choice + sandbox/tool policy",
+    "auto_fix": false
+  }
+}

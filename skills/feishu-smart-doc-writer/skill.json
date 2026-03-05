@@ -1,0 +1,193 @@
+{
+  "name": "feishu-smart-doc-writer",
+  "version": "1.4.1",
+  "description": "Feishu/Lark Smart Document Writer v1.4.1 - 飞书智能文档写入器. Auto-chunk writing, auto ownership transfer, document index management with search/list. Config OpenID on first use.",
+  "author": "OpenClaw",
+  "license": "MIT",
+  "tools": [
+    {
+      "name": "write_smart",
+      "description": "Smart create Feishu/Lark doc with auto-chunk writing and ownership transfer. Guides OpenID config on first use. 智能创建飞书文档，自动分块写入，自动转移所有权。首次使用时引导配置OpenID。",
+      "handler": "feishu_smart_doc_writer.write_smart",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Document title / 文档标题"
+          },
+          "content": {
+            "type": "string",
+            "description": "Document content (long content auto-chunked) / 文档内容（支持长内容，会自动分块处理）"
+          },
+          "folder_token": {
+            "type": "string",
+            "description": "Optional folder token / 可选的文件夹token"
+          },
+          "chunk_size": {
+            "type": "integer",
+            "description": "Max chars per chunk, default 2000 / 每块最大字符数，默认2000",
+            "default": 2000
+          },
+          "show_progress": {
+            "type": "boolean",
+            "description": "Show progress / 是否显示写入进度",
+            "default": true
+          }
+        },
+        "required": ["title", "content"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "doc_url": {"type": "string"},
+          "doc_token": {"type": "string"},
+          "chunks_count": {"type": "integer"},
+          "owner_transferred": {"type": "boolean"},
+          "need_config": {"type": "boolean", "description": "Need config / 是否需要配置"},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "configure",
+      "description": "Configure Skill. Provide OpenID and confirm permission on first use. 配置Skill。首次使用时提供OpenID并确认权限已开通。",
+      "handler": "feishu_smart_doc_writer.configure",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "openid": {
+            "type": "string",
+            "description": "Your Feishu/Lark OpenID (format: ou_xxxxxxxx) / 你的飞书OpenID（格式：ou_xxxxxxxx）"
+          },
+          "permission_checked": {
+            "type": "boolean",
+            "description": "Confirmed docs:permission.member:transfer permission granted / 是否已确认开通docs:permission.member:transfer权限",
+            "default": false
+          }
+        },
+        "required": ["openid"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "openid": {"type": "string"},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "append_smart",
+      "description": "Smart append content to Feishu/Lark doc with auto-chunk. 智能追加内容到飞书文档，自动分块。",
+      "handler": "feishu_smart_doc_writer.append_smart",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "doc_url": {"type": "string"},
+          "content": {"type": "string"},
+          "chunk_size": {"type": "integer", "default": 2000},
+          "show_progress": {"type": "boolean", "default": true}
+        },
+        "required": ["doc_url", "content"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "chunks_count": {"type": "integer"},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "transfer_ownership",
+      "description": "Transfer Feishu/Lark doc ownership. Requires docs:permission.member:transfer permission. 转移飞书文档所有权。需要docs:permission.member:transfer权限。",
+      "handler": "feishu_smart_doc_writer.transfer_ownership",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "doc_url": {"type": "string"},
+          "owner_openid": {"type": "string"}
+        },
+        "required": ["doc_url", "owner_openid"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "get_config_status",
+      "description": "Get current config status to check if OpenID is configured. 获取当前配置状态，查看是否已配置OpenID。",
+      "handler": "feishu_smart_doc_writer.get_config_status",
+      "parameters": {"type": "object", "properties": {}},
+      "returns": {
+        "type": "object",
+        "properties": {
+          "configured": {"type": "boolean"},
+          "openid": {"type": "string"},
+          "first_time": {"type": "boolean"},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "search_docs",
+      "description": "Search local document index by keywords. Searches in document name, summary, and tags. 搜索本地文档索引，支持关键词搜索。",
+      "handler": "index_manager.search_docs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string",
+            "description": "Search keyword / 搜索关键词"
+          }
+        },
+        "required": ["keyword"]
+      },
+      "returns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "link": {"type": "string"},
+            "summary": {"type": "string"},
+            "tags": {"type": "string"}
+          }
+        }
+      }
+    },
+    {
+      "name": "list_docs",
+      "description": "List all Feishu documents from local index. Optionally filter by tag. 列出所有飞书文档，可按标签筛选。",
+      "handler": "index_manager.list_all_docs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string",
+            "description": "Optional tag filter / 可选的标签筛选"
+          }
+        }
+      },
+      "returns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "link": {"type": "string"},
+            "summary": {"type": "string"},
+            "tags": {"type": "string"}
+          }
+        }
+      }
+    }
+  ],
+  "dependencies": []
+}

@@ -1,0 +1,272 @@
+{
+  "name": "Social Metrics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define accounts to track\nconst accounts = [\n  { platform: 'twitter', username: 'example', metricType: 'followers' },\n  { platform: 'linkedin', username: 'example-company', metricType: 'followers' },\n  { platform: 'github', username: 'example', metricType: 'stars' }\n];\n\nreturn accounts.map(a => ({ json: a }));"
+      },
+      "id": "2",
+      "name": "Account List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/users/by/username/{{$json.username}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user.fields",
+              "value": "public_metrics,created_at"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Fetch Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 200],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "YOUR_TWITTER_CRED_ID",
+          "name": "Twitter OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/networkSizes/urn:li:organization:{{$json.username}}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Fetch LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 400],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKEDIN_CRED_ID",
+          "name": "LinkedIn OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.platform }}",
+              "rightValue": "twitter",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "5",
+      "name": "Platform Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2.1,
+      "position": [650, 300],
+      "rules": {
+        "rules": [
+          {
+            "value": "twitter"
+          },
+          {
+            "value": "linkedin"
+          },
+          {
+            "value": "github"
+          }
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract metrics from all platforms\nconst inputs = $input.all();\n\nconst metrics = inputs.map(item => {\n  const data = item.json;\n  const platform = data.platform;\n  \n  let metricValue = 0;\n  let metricLabel = '';\n  \n  if (platform === 'twitter' && data.data) {\n    metricValue = data.data.public_metrics?.followers_count || 0;\n    metricLabel = 'Followers';\n  } else if (platform === 'linkedin') {\n    metricValue = data.firstDegreeSize || 0;\n    metricLabel = 'Followers';\n  } else if (platform === 'github' && data.length > 0) {\n    metricValue = data.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);\n    metricLabel = 'Stars';\n  }\n  \n  return {\n    platform: platform,\n    username: data.username,\n    metric_type: metricLabel,\n    metric_value: metricValue,\n    collected_at: new Date().toISOString()\n  };\n});\n\nreturn metrics.map(m => ({ json: m }));"
+      },
+      "id": "6",
+      "name": "Extract Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format daily report\nconst metrics = $input.all();\n\nlet report = '\ud83d\udcca *Daily Social Metrics*\\n\\n';\n\nmetrics.forEach(m => {\n  const platformEmoji = {\n    twitter: '\ud83d\udc26',\n    linkedin: '\ud83d\udcbc',\n    github: '\ud83d�'\n  };\n  \n  const emoji = platformEmoji[m.json.platform] || '\ud83d\udcca';\n  report += `${emoji} *${m.json.platform.toUpperCase()}*\\n`;\n  report += `   ${m.json.metric_type}: ${m.json.metric_value.toLocaleString()}\\n\\n`;\n});\n\nreport += `\ud83d\udcc5 ${new Date().toLocaleDateString()}`;\n\nreturn [{\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: report,\n    parse_mode: 'Markdown'\n  }\n}];"
+      },
+      "id": "7",
+      "name": "Format Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "options": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "8",
+      "name": "Send Report",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [1250, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Account List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Account List": {
+      "main": [
+        [
+          {
+            "node": "Platform Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Router": {
+      "main": [
+        [
+          {
+            "node": "Fetch Twitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Twitter": {
+      "main": [
+        [
+          {
+            "node": "Extract Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Extract Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metrics": {
+      "main": [
+        [
+          {
+            "node": "Format Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "id": "1",
+      "name": "social-media",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "metrics",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "reporting",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    }
+  ]
+}

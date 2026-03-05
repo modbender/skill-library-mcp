@@ -1,0 +1,48 @@
+name: "Convert Meeting Notes to Organized Task List"
+id: "multi-step-meeting-to-tasks"
+version: "1.0"
+suite: "multi-step"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to extract action items from a conversational
+  meeting transcript and organize them into a structured task list. The
+  transcript contains 8 action items with varying levels of clarity,
+  assigned to different team members with some deadlines mentioned
+  explicitly and others not. Evaluates information extraction, organization,
+  and reasonable prioritization.
+
+user_message: |
+  Process the meeting notes in meeting-notes.txt into an organized task list:
+  1) Extract all action items mentioned in the conversation
+  2) Assign each to the person mentioned as responsible
+  3) Add deadlines where mentioned (mark as TBD where not)
+  4) Prioritize as High/Medium/Low based on context
+  5) Save as task-list.md organized by assignee
+
+input_files:
+  - name: "meeting-notes.txt"
+
+expected_outputs:
+  - pattern: "task-list.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "deadline"
+          - "priority"
+      - type: "word-count-range"
+        min: 200
+        max: 800
+
+expected_metrics:
+  tool_calls: [2, 10]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

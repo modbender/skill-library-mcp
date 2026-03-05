@@ -1,0 +1,196 @@
+name: "Prompt Performance Tester"
+id: "prompt-performance-tester"
+version: "1.1.8"
+description: "Model-agnostic prompt benchmarking across 9 providers. Pass any model ID from Claude, GPT, Gemini, DeepSeek, Grok, MiniMax, Qwen, Llama, Mistral — provider auto-detected. Measures latency, cost, quality, and consistency."
+
+homepage: "https://unisai.vercel.app"
+repository: "https://github.com/vedantsingh60/prompt-performance-tester"
+source: "included"
+
+intellectual_property:
+  license: "free-to-use"
+  license_file: "LICENSE.md"
+  copyright: "© 2026 UnisAI. All rights reserved."
+  distribution: "via-clawhub-only"
+  source_code_access: "included"
+  modification: "personal-use-only"
+  reverse_engineering: "allowed-for-security-audit"
+
+author:
+  company: "UnisAI"
+  contact: "hello@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+
+category: "ai-testing"
+tags:
+  - "prompt-testing"
+  - "performance-analysis"
+  - "cost-optimization"
+  - "multi-llm"
+  - "quality-assurance"
+  - "benchmarking"
+  - "llm-comparison"
+  - "ai-testing"
+
+pricing:
+  model: "free"
+
+runtime: "local"
+execution: "python"
+
+required_env_vars:
+  - "ANTHROPIC_API_KEY"   # Required if testing Claude models
+  - "OPENAI_API_KEY"      # Required if testing GPT models
+  - "GOOGLE_API_KEY"      # Required if testing Gemini models
+  - "MISTRAL_API_KEY"     # Required if testing Mistral models
+  - "DEEPSEEK_API_KEY"    # Required if testing DeepSeek models
+  - "XAI_API_KEY"         # Required if testing Grok/xAI models
+  - "MINIMAX_API_KEY"     # Required if testing MiniMax models
+  - "DASHSCOPE_API_KEY"   # Required if testing Qwen/Alibaba models
+  - "OPENROUTER_API_KEY"  # Required if testing Llama/OpenRouter models
+primary_credential: "At least ONE provider API key is required per provider you want to test"
+
+dependencies:
+  python: ">=3.9"
+  packages:
+    - "anthropic>=0.40.0"
+    - "openai>=1.60.0"
+    - "google-generativeai>=0.8.0"
+    - "mistralai>=1.3.0"
+  install_all: "pip install anthropic openai google-generativeai mistralai"
+  install_selective: |
+    pip install anthropic          # Claude
+    pip install openai             # GPT, DeepSeek, xAI, MiniMax, Qwen, Llama (OpenAI-compat)
+    pip install google-generativeai  # Gemini
+    pip install mistralai          # Mistral
+  note: "Install only the SDKs for the providers you plan to test. DeepSeek, xAI, MiniMax, Qwen, and Llama all use the openai package with a custom base URL."
+  requirements_file: "requirements.txt"
+
+security:
+  data_retention: "0 days"
+  data_flow: "prompts-sent-to-chosen-ai-providers"
+  third_party_data_sharing: |
+    WARNING: This skill sends your prompts to whichever AI providers you select for testing.
+    Each provider has their own data retention and privacy policies:
+    - Anthropic: https://www.anthropic.com/legal/privacy
+    - OpenAI: https://openai.com/policies/privacy-policy
+    - Google: https://ai.google.dev/gemini-api/terms
+    - Mistral: https://mistral.ai/terms/
+    - DeepSeek: https://www.deepseek.com/privacy_policy
+    - xAI: https://x.ai/privacy
+    - OpenRouter: https://openrouter.ai/privacy
+  api_key_storage: "Environment variables only — never hardcoded or logged"
+  network_access: "Required to call chosen AI provider APIs"
+
+capabilities:
+  functions:
+    - name: "testPrompt"
+      description: "Test a prompt across multiple LLM models and providers"
+      parameters:
+        prompt_text:
+          type: "string"
+          description: "The prompt to benchmark"
+          required: true
+        models:
+          type: "array"
+          description: "List of model IDs to test — any model matching a supported prefix works"
+          items:
+            type: "string"
+          examples:
+            - "claude-sonnet-4-6"
+            - "gpt-5.2"
+            - "deepseek-chat"
+            - "grok-4-1-fast"
+            - "gemini-2.5-flash"
+          required: false
+        num_runs:
+          type: "number"
+          description: "Number of runs per model for consistency testing"
+          default: 1
+          range: [1, 10]
+        system_prompt:
+          type: "string"
+          description: "Optional system prompt"
+        max_tokens:
+          type: "number"
+          description: "Maximum response tokens"
+          default: 1000
+          range: [100, 4000]
+
+environment_variables:
+  ANTHROPIC_API_KEY:
+    description: "Anthropic API key — required for any claude-* model"
+    required_for_prefix: "claude-"
+  OPENAI_API_KEY:
+    description: "OpenAI API key — required for any gpt-*, o1*, o3* model"
+    required_for_prefix: "gpt-, o1, o3"
+  GOOGLE_API_KEY:
+    description: "Google AI API key — required for any gemini-* model"
+    required_for_prefix: "gemini-"
+  MISTRAL_API_KEY:
+    description: "Mistral API key — required for mistral-*, mixtral-* models"
+    required_for_prefix: "mistral-, mixtral-"
+  DEEPSEEK_API_KEY:
+    description: "DeepSeek API key — required for any deepseek-* model"
+    required_for_prefix: "deepseek-"
+  XAI_API_KEY:
+    description: "xAI API key — required for any grok-* model"
+    required_for_prefix: "grok-"
+  MINIMAX_API_KEY:
+    description: "MiniMax API key — required for minimax* or MiniMax* models"
+    required_for_prefix: "minimax, MiniMax"
+  DASHSCOPE_API_KEY:
+    description: "Alibaba DashScope API key — required for any qwen* model"
+    required_for_prefix: "qwen"
+  OPENROUTER_API_KEY:
+    description: "OpenRouter API key — required for meta-llama/* or llama-* models"
+    required_for_prefix: "meta-llama/, llama-"
+
+support:
+  support_email: "support@unisai.vercel.app"
+  website: "https://unisai.vercel.app"
+  github: "https://github.com/vedantsingh60/prompt-performance-tester"
+  documentation: "See SKILL.md in this package"
+  response_time: "Best effort — community supported"
+
+restrictions:
+  - "No redistribution outside ClawhHub registry"
+  - "No resale or sublicensing"
+  - "No trademark usage without permission"
+  - "Modifications allowed for personal use only"
+
+changelog:
+  "1.1.8":
+    - "🏗️ Model-agnostic architecture — provider auto-detected from model name prefix, no hardcoded whitelist"
+    - "✨ Added DeepSeek, xAI Grok, MiniMax, Qwen as first-class providers (9 total)"
+    - "✨ Updated Claude to 4.6 series (claude-opus-4-6, claude-sonnet-4-6)"
+    - "✨ Any future model works automatically without code changes"
+    - "🔧 Lazy client initialization — only loads SDKs for providers actually used"
+    - "🔧 Unified OpenAI-compat path for DeepSeek, xAI, MiniMax, Qwen, OpenRouter"
+    - "📝 Fixed UnisAI branding (was UniAI)"
+    - "💰 Updated pricing table with 20 models across 9 providers"
+  "1.1.5":
+    - "🚀 Updated to latest 2026 models"
+    - "✨ GPT-5.2 series (Instant, Thinking, Pro)"
+    - "✨ Gemini 3 Pro and 2.5 series"
+    - "✨ Claude 4.5 pricing updates"
+    - "✨ 10 total models across 3 providers"
+  "1.1.0":
+    - "✨ Multi-provider support (Claude, GPT, Gemini)"
+    - "✨ Cross-provider cost comparison"
+    - "✨ Enhanced recommendations engine"
+  "1.0.0":
+    - "Initial release with Claude-only support"
+    - "Performance metrics: latency, cost, quality, consistency"
+
+metadata:
+  status: "active"
+  created_at: "2024-02-02T00:00:00Z"
+  updated_at: "2026-02-27T00:00:00Z"
+  maturity: "production"
+  maintenance: "actively-maintained"
+  compatibility:
+    - "OpenClaw v1.0+"
+    - "Claude Code"
+    - "ClawhHub v2.0+"
+  security_audit: "Source code included for security review and transparency"

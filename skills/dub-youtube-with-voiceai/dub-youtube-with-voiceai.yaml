@@ -1,0 +1,108 @@
+skill:
+  name: dub-youtube-with-voiceai
+  display_name: "Dub YouTube with Voice.ai"
+  description: |
+    Dub YouTube videos with Voice.ai TTS. Turn scripts into publish-ready
+    voiceovers with chapters, captions, and audio replacement for YouTube
+    long-form and Shorts.
+  version: "0.1.2"
+  author: "Voice.ai"
+  category: "audio"
+  tags:
+    - text-to-speech
+    - tts
+    - youtube
+    - voiceover
+    - dubbing
+    - ai-voice
+
+authentication:
+  type: bearer
+  header: Authorization
+  prefix: "Bearer "
+  description: |
+    Voice.ai uses Bearer token authentication. Get your API key from
+    https://voice.ai/dashboard and set it as: export VOICE_AI_API_KEY=your-key
+  environment_variable: VOICE_AI_API_KEY
+  required: true
+
+api:
+  base_url: "https://dev.voice.ai"
+  version: "v1"
+  content_type: "application/json"
+  timeout: 60000
+
+tools:
+  - name: build
+    display_name: "Build Voiceover"
+    description: |
+      Generate a YouTube voiceover from a script file. Produces segments,
+      master audio, chapters, captions, and optionally dubs a video.
+    command: "node voiceai-vo.cjs build"
+    parameters:
+      - name: input
+        type: string
+        required: true
+        description: "Path to script file (.txt or .md)"
+      - name: voice
+        type: string
+        required: true
+        description: "Voice alias (ellie, oliver, smooth, etc.) or UUID"
+      - name: title
+        type: string
+        required: false
+        description: "Video title (defaults to filename)"
+      - name: template
+        type: string
+        required: false
+        enum: ["youtube"]
+        description: "Auto-inject YouTube intro/outro"
+      - name: video
+        type: string
+        required: false
+        description: "Input video file to dub"
+      - name: mux
+        type: boolean
+        required: false
+        description: "Enable video dubbing (requires --video)"
+      - name: mock
+        type: boolean
+        required: false
+        description: "Run without API calls (placeholder audio)"
+
+  - name: replace_audio
+    display_name: "Replace Audio"
+    description: |
+      Replace the audio track of a video with a voiceover.
+    command: "node voiceai-vo.cjs replace-audio"
+    parameters:
+      - name: video
+        type: string
+        required: true
+        description: "Input video file"
+      - name: audio
+        type: string
+        required: true
+        description: "Audio file to mux in"
+      - name: sync
+        type: string
+        required: false
+        enum: ["shortest", "pad", "trim"]
+        default: "shortest"
+        description: "Sync policy for mismatched durations"
+
+  - name: voices
+    display_name: "List Voices"
+    description: |
+      List available Voice.ai voices for YouTube content.
+    command: "node voiceai-vo.cjs voices"
+    parameters:
+      - name: limit
+        type: integer
+        required: false
+        default: 20
+        description: "Max voices to return"
+      - name: query
+        type: string
+        required: false
+        description: "Search voices by name or style"

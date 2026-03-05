@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/schemas/diary_entry.schema.json",
+  "title": "Continuous User Research Diary Entry",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "mode",
+    "context",
+    "closed_answers",
+    "open_text",
+    "effort_minutes"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "event",
+        "interval",
+        "signal"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "participant_code"
+      ],
+      "properties": {
+        "study_id": {
+          "type": "string"
+        },
+        "participant_code": {
+          "type": "string",
+          "pattern": "^P[0-9]{1,4}$"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "device": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "event_name": {
+          "type": "string"
+        },
+        "external_factors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "closed_answers": {
+      "type": "object",
+      "properties": {
+        "frequency_bucket": {
+          "type": "string"
+        },
+        "duration_bucket": {
+          "type": "string"
+        },
+        "outcome_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "friction_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "confidence_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      }
+    },
+    "open_text": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "required": [
+            "event_description"
+          ],
+          "properties": {
+            "event_description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reflection": {
+              "type": "string"
+            },
+            "change_note": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "attachment_id",
+          "type",
+          "storage_ref"
+        ],
+        "properties": {
+          "attachment_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "photo",
+              "screenshot",
+              "audio",
+              "video",
+              "file"
+            ]
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "storage_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "redacted": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "effort_minutes": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 120
+    }
+  },
+  "additionalProperties": false
+}

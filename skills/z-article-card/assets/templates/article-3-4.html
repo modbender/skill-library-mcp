@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--
+  Template: article-3-4
+  Ratio: 3:4  (900×1200)
+  用途: 长文分页卡片，每张展示一页正文内容（支持完整 MD 语法）
+  Parameters:
+    {{TITLE}}           — 文章标题
+    {{CONTENT_HTML}}    — 该页内容（markdown 转换后的 HTML）
+    {{PAGE_LABEL}}      — 页码，如 "1 / 4"
+    {{BOTTOM_TIP}}      — 底部提示，如 "← 滑动查看更多" 或 "· 全文完"
+    {{HIGHLIGHT_COLOR}} — 品牌高亮色（默认 #3d6b4f）
+    {{BG_COLOR}}        — 背景色（默认 #f9fcfa）
+    {{FOOTER_TEXT}}     — 水印文字
+    {{ICON_PATH}}       — 顶部图标绝对路径
+    {{AVATAR_PATH}}     — 头像绝对路径
+    {{FONT_PATH}}       — 字体绝对路径
+    {{MD_CSS_PATH}}     — md.css 绝对路径（assets/styles/md.css）
+-->
+
+<!-- 布局样式（框架，不含 MD 内容样式） -->
+<style>
+  @font-face {
+    font-family: "AlimamaShuHeiTi";
+    src: url("{{FONT_PATH}}") format("truetype");
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 900px;
+    height: 1200px;
+    background-color: {{BG_COLOR}};
+    display: flex;
+    flex-direction: column;
+    padding: 60px 72px;
+    font-family: "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 顶部栏 */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+  .header img.logo { width: 44px; height: 44px; flex-shrink: 0; }
+  .header .title {
+    flex: 1;
+    font-size: 26px;
+    font-weight: 700;
+    font-family: "AlimamaShuHeiTi", "PingFang SC", sans-serif;
+    color: #888;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header .page-label {
+    font-size: 22px;
+    color: #bbb;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+    flex-shrink: 0;
+  }
+
+  .content {
+    flex: 1;
+    overflow: hidden;
+    font-size: 30px;
+    color: #2a2a2a;
+    line-height: 1.85;
+    letter-spacing: 0.3px;
+  }
+
+  .footer {
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .footer .watermark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.55;
+  }
+  .footer .watermark img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+  .footer .watermark span { font-size: 20px; color: #555; letter-spacing: 1px; }
+  .footer .tip { font-size: 19px; color: #aaa; }
+</style>
+
+<!-- MD 内容样式：用户可修改 assets/styles/md.css 自定义 -->
+<link rel="stylesheet" href="file://{{MD_CSS_PATH}}">
+
+<!-- 品牌色覆盖（将 md.css 中的默认色替换为当前 {{HIGHLIGHT_COLOR}}） -->
+<style>
+  .content strong, .content b { color: {{HIGHLIGHT_COLOR}}; }
+  .content h2 { border-left-color: {{HIGHLIGHT_COLOR}}; color: {{HIGHLIGHT_COLOR}}; }
+  .content h3 { color: {{HIGHLIGHT_COLOR}}; }
+  .content ul li::marker, .content ol li::marker { color: {{HIGHLIGHT_COLOR}}; }
+  .content blockquote { border-left-color: {{HIGHLIGHT_COLOR}}; }
+  .content code { color: {{HIGHLIGHT_COLOR}}; background: color-mix(in srgb, {{HIGHLIGHT_COLOR}} 12%, white); }
+</style>
+</head>
+<body>
+  <div class="header">
+    <img class="logo" src="{{ICON_PATH}}" alt="icon">
+    <span class="title">{{TITLE}}</span>
+    <span class="page-label">{{PAGE_LABEL}}</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="content">
+    {{CONTENT_HTML}}
+  </div>
+
+  <div class="footer">
+    <div class="watermark">
+      <img src="{{AVATAR_PATH}}" alt="Jinx">
+      <span>✦ {{FOOTER_TEXT}}</span>
+    </div>
+    <span class="tip">{{BOTTOM_TIP}}</span>
+  </div>
+</body>
+</html>

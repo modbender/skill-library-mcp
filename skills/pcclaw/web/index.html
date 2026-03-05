@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCClaw — OpenClaw for Windows | Native Skills for Your AI Agent</title>
+    <meta name="description" content="The missing Windows experience for OpenClaw. 16 skills (14 Windows-native + 2 cross-platform), one-command installer, and Moltbook integration. Get your AI agent running on Windows in 2 minutes.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="PCClaw — OpenClaw for Windows">
+    <meta property="og:description" content="14 Windows-native AI agent skills + one-command installer. The missing piece for OpenClaw on PC.">
+    <meta property="og:image" content="https://openclaw.irisgo.xyz/og-image.png">
+    <meta property="og:url" content="https://openclaw.irisgo.xyz">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PCClaw — OpenClaw for Windows">
+    <meta name="twitter:description" content="14 Windows-native AI agent skills + 2 cross-platform. The missing piece for OpenClaw on PC.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lobster: '#E63946',
+                        ocean: '#1D3557',
+                        sand: '#F1FAEE',
+                        wave: '#457B9D',
+                        foam: '#A8DADC',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        code, .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #1D3557 0%, #457B9D 50%, #1D3557 100%);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border-radius: 8px;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .copy-btn.copied {
+            background: #22c55e;
+        }
+
+        .skill-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .provider-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #E63946;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .gap-line {
+            position: relative;
+        }
+
+        .gap-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #E63946, #457B9D);
+            border-radius: 2px;
+        }
+
+        .ecosystem-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-sand min-h-screen">
+
+    <!-- Hero Section -->
+    <header class="gradient-bg text-white">
+        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🦞</span>
+                <span class="font-bold text-lg">PCClaw</span>
+                <span class="text-foam/40 text-sm">|</span>
+                <span class="text-foam/70 text-sm">OpenClaw for Windows</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="https://github.com/IrisGoLab/PCClaw"
+                   target="_blank"
+                   class="hidden md:flex items-center gap-1.5 text-foam/80 hover:text-white text-sm transition">
+                    <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    GitHub
+                </a>
+                <a href="https://join.slack.com/t/irisgo-community/shared_invite/zt-3i3qm7sds-A4WIKXk4rQHgG1FUg1i0Og"
+                   target="_blank"
+                   class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition">
+                    Join Community
+                </a>
+            </div>
+        </nav>
+
+        <div class="max-w-4xl mx-auto px-4 py-16 text-center">
+            <div class="inline-block bg-lobster/20 text-lobster-100 px-4 py-1.5 rounded-full text-sm font-medium mb-6 border border-lobster/30">
+                v2.0.0 — 16 Skills, 5+ Providers
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+                OpenClaw Skills are<br>
+                <span class="text-lobster">macOS-only.</span><br>
+                <span class="text-foam">Until now.</span>
+            </h1>
+
+            <p class="text-xl text-foam/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+                PCClaw brings 14 Windows-native skills to OpenClaw — screenshot, OCR, UI automation, clipboard, browser integration, task scheduling, local AI inference, file management, system diagnostics, speech (STT + TTS), notifications, and more. Plus a one-command installer.
+            </p>
+
+            <!-- Quick Install Command -->
+            <div class="code-block p-5 text-left max-w-xl mx-auto mb-3">
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                <code class="text-green-400 text-base md:text-lg">irm openclaw.irisgo.xyz/i | iex</code>
+            </div>
+            <p class="text-foam/60 text-sm">Run in PowerShell on Windows 10/11</p>
+        </div>
+    </header>
+
+    <!-- The Gap — Skills Ecosystem -->
+    <section class="py-16 px-4">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-3">The Skills Gap</h2>
+            <p class="text-gray-500 text-center mb-12 max-w-2xl mx-auto">
+                OpenClaw has a rich macOS skill ecosystem. Windows had nothing. PCClaw fills the gap.
+            </p>
+
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <!-- Header -->
+                <div class="ecosystem-row bg-ocean text-white px-6 py-3 text-sm font-semibold">
+                    <span></span>
+                    <span>macOS (built-in)</span>
+                    <span>Windows (PCClaw)</span>
+                </div>
+
+                <!-- Rows -->
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Notes</span>
+                    <span class="text-gray-500">apple-notes, bear</span>
+                    <span class="text-wave font-medium">sticky-notes</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">Tasks</span>
+                    <span class="text-gray-500">apple-reminders</span>
+                    <span class="text-wave font-medium">ms-todo, google-tasks</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Files</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-files</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">System</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-sysinfo (WMI)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Local AI</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-ai-local (Ollama)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">Notify</span>
+                    <span class="text-gray-500">osascript</span>
+                    <span class="text-wave font-medium">win-notify (WinRT)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Capture</span>
+                    <span class="text-gray-500">peekaboo</span>
+                    <span class="text-wave font-medium">win-screenshot</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">Clipboard</span>
+                    <span class="text-gray-500">pbcopy / pbpaste</span>
+                    <span class="text-wave font-medium">win-clipboard</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Packages</span>
+                    <span class="text-gray-500">homebrew</span>
+                    <span class="text-wave font-medium">winget</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">OCR</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-ocr (built-in)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">UI Auto</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-ui-auto (.NET)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">STT</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-whisper (GPU/NPU)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">TTS</span>
+                    <span class="text-gray-500">say</span>
+                    <span class="text-wave font-medium">win-tts (SAPI 5)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 bg-sand/50 text-sm">
+                    <span class="font-medium text-ocean">Browser</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-browser (Edge/Chrome)</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 border-b border-gray-100 text-sm">
+                    <span class="font-medium text-ocean">Scheduler</span>
+                    <span class="text-gray-400">—</span>
+                    <span class="text-wave font-medium">win-scheduler</span>
+                </div>
+                <div class="ecosystem-row px-6 py-3 text-sm">
+                    <span class="font-medium text-ocean">Messages</span>
+                    <span class="text-gray-500">imsg</span>
+                    <span class="text-gray-400">— (coming soon)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Showcase -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-3">16 Skills, Ready to Go</h2>
+            <p class="text-gray-500 text-center mb-12">Install once, use everywhere. Zero dependencies on most skills.</p>
+
+            <div class="grid md:grid-cols-3 gap-4">
+                <!-- Windows-Only Skills -->
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🔔</span>
+                        <span class="font-semibold text-ocean text-sm">win-notify</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Native Windows toast notifications via WinRT API. No dependencies.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📦</span>
+                        <span class="font-semibold text-ocean text-sm">winget</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Search, install, upgrade software with Windows Package Manager.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📸</span>
+                        <span class="font-semibold text-ocean text-sm">win-screenshot</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Full screen, region, or window capture. Built-in .NET, zero setup.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📋</span>
+                        <span class="font-semibold text-ocean text-sm">win-clipboard</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Read/write clipboard — text, images, file lists. Built-in .NET.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🖱️</span>
+                        <span class="font-semibold text-ocean text-sm">win-ui-auto</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">UI automation — inspect, click, type, manage windows. .NET + Win32.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">👁️</span>
+                        <span class="font-semibold text-ocean text-sm">win-ocr</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Extract text from images. Multilingual, offline, built-in Windows OCR.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🎤</span>
+                        <span class="font-semibold text-ocean text-sm">win-whisper</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Local speech-to-text with Whisper. GPU/NPU accelerated.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🔊</span>
+                        <span class="font-semibold text-ocean text-sm">win-tts</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Text-to-speech via SAPI 5. Speak aloud or save WAV. Multilingual.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📁</span>
+                        <span class="font-semibold text-ocean text-sm">win-files</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Search, browse, manage files and folders. Disk info, recent files.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📌</span>
+                        <span class="font-semibold text-ocean text-sm">sticky-notes</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Read, search, create Windows Sticky Notes. Built-in SQLite access.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">💻</span>
+                        <span class="font-semibold text-ocean text-sm">win-sysinfo</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">CPU, RAM, GPU, NPU, battery, network, processes. WMI diagnostics.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🧠</span>
+                        <span class="font-semibold text-ocean text-sm">win-ai-local</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Local LLM inference via Ollama. Generate, chat, embeddings — on-device.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🌐</span>
+                        <span class="font-semibold text-ocean text-sm">win-browser</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Bookmarks, history, downloads from Edge/Chrome. Open URLs, search.</p>
+                </div>
+
+                <div class="skill-card bg-sand rounded-xl p-5 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">⏰</span>
+                        <span class="font-semibold text-ocean text-sm">win-scheduler</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Create scheduled tasks — reminders, daily routines, startup automation.</p>
+                </div>
+
+                <!-- Cross-Platform -->
+                <div class="skill-card bg-wave/10 rounded-xl p-5 border border-wave/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">✅</span>
+                        <span class="font-semibold text-ocean text-sm">ms-todo</span>
+                        <span class="text-xs bg-wave/20 text-wave px-1.5 py-0.5 rounded">cross-platform</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Microsoft To Do via Graph API. The Windows counterpart to apple-reminders.</p>
+                </div>
+
+                <div class="skill-card bg-wave/10 rounded-xl p-5 border border-wave/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📝</span>
+                        <span class="font-semibold text-ocean text-sm">google-tasks</span>
+                        <span class="text-xs bg-wave/20 text-wave px-1.5 py-0.5 rounded">cross-platform</span>
+                    </div>
+                    <p class="text-gray-600 text-xs">Google Tasks via REST API. Works on any platform with a Google account.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-12">2 Minutes, Zero to Running</h2>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">1</div>
+                        <h3 class="font-semibold text-ocean">Run the Installer</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        One command in PowerShell. It installs Node.js, Git, and OpenClaw automatically if needed.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">2</div>
+                        <h3 class="font-semibold text-ocean">Pick Your LLM</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Choose from 5+ providers — Claude, GPT, Gemini, GLM, or your local Ollama. BYOK, keys stay local.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">3</div>
+                        <h3 class="font-semibold text-ocean">Agent Goes Live</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        OpenClaw launches with PCClaw skills loaded. Your agent auto-registers on Moltbook and posts its first message.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Options -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-12">Install</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Interactive -->
+                <div class="bg-sand rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">🪟</span>
+                        <div>
+                            <h3 class="font-semibold text-ocean">Interactive (Recommended)</h3>
+                            <p class="text-gray-500 text-xs">Guides you step by step</p>
+                        </div>
+                    </div>
+                    <div class="code-block p-4">
+                        <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                        <code class="text-green-400 text-sm">irm openclaw.irisgo.xyz/i | iex</code>
+                    </div>
+                </div>
+
+                <!-- One-liner -->
+                <div class="bg-sand rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">⚡</span>
+                        <div>
+                            <h3 class="font-semibold text-ocean">One-Liner</h3>
+                            <p class="text-gray-500 text-xs">For power users</p>
+                        </div>
+                    </div>
+                    <div class="code-block p-4">
+                        <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                        <code class="text-green-400 text-xs block">.\install.ps1 -ApiKey "sk-xxx" `</code>
+                        <code class="text-green-400 text-xs block">  -AgentName "my_agent" `</code>
+                        <code class="text-green-400 text-xs block">  -Provider "anthropic"</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Providers -->
+    <section class="py-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-3">Bring Your Own Key</h2>
+            <p class="text-gray-500 text-center mb-12">Your API key never leaves your machine.</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="provider-card bg-white rounded-lg p-4 text-center shadow-sm">
+                    <div class="text-2xl mb-2">🟠</div>
+                    <div class="font-medium text-sm">Anthropic</div>
+                    <div class="text-xs text-gray-500">Claude</div>
+                </div>
+                <div class="provider-card bg-white rounded-lg p-4 text-center shadow-sm">
+                    <div class="text-2xl mb-2">🟢</div>
+                    <div class="font-medium text-sm">OpenAI</div>
+                    <div class="text-xs text-gray-500">GPT</div>
+                </div>
+                <div class="provider-card bg-white rounded-lg p-4 text-center shadow-sm">
+                    <div class="text-2xl mb-2">🔵</div>
+                    <div class="font-medium text-sm">Google</div>
+                    <div class="text-xs text-gray-500">Gemini</div>
+                </div>
+                <div class="provider-card bg-white rounded-lg p-4 text-center shadow-sm">
+                    <div class="text-2xl mb-2">🟣</div>
+                    <div class="font-medium text-sm">GLM</div>
+                    <div class="text-xs text-gray-500">Zhipu AI</div>
+                </div>
+                <div class="provider-card bg-white rounded-lg p-4 text-center shadow-sm">
+                    <div class="text-2xl mb-2">⚪</div>
+                    <div class="font-medium text-sm">Local LLM</div>
+                    <div class="text-xs text-gray-500">Ollama, LM Studio</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Moltbook Bonus -->
+    <section class="py-16 px-4 bg-foam/30">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl p-8 shadow-sm flex flex-col md:flex-row gap-8 items-center">
+                <div class="flex-1">
+                    <div class="inline-block bg-lobster/10 text-lobster px-3 py-1 rounded-full text-xs font-medium mb-4">Bonus</div>
+                    <h2 class="text-2xl font-bold text-ocean mb-3">Auto-Join Moltbook</h2>
+                    <p class="text-gray-600 mb-4">
+                        The installer automatically registers your AI agent on
+                        <a href="https://moltbook.com" target="_blank" class="text-wave font-semibold hover:underline">Moltbook</a>
+                        — the social network for AI agents. Your agent gets a profile, posts its first message, and starts interacting with other AIs. No extra setup needed.
+                    </p>
+                    <a href="https://moltbook.com" target="_blank" class="text-wave text-sm font-medium hover:underline">
+                        What is Moltbook? &rarr;
+                    </a>
+                </div>
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-20 h-20 bg-ocean rounded-2xl flex items-center justify-center text-4xl">
+                        🤖
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">AI Social Network</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why This Exists -->
+    <section class="py-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl p-8 shadow-sm">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-ocean mb-4">Why PCClaw?</h2>
+                        <p class="text-gray-600 mb-4">
+                            <a href="https://openclaw.ai" target="_blank" class="text-wave font-semibold hover:underline">OpenClaw</a>
+                            is a fantastic open-source AI agent framework. But its skill ecosystem was built for macOS — Apple Notes, Reminders, iMessage, Peekaboo, Things...
+                        </p>
+                        <p class="text-gray-600 mb-4">
+                            <strong class="text-ocean">Windows users got left behind.</strong>
+                            No native skills, no easy installer, no ecosystem parity.
+                        </p>
+                        <p class="text-gray-600">
+                            PCClaw is our contribution back to the community. Built by
+                            <a href="https://irisgo.ai" target="_blank" class="text-wave font-semibold hover:underline">IrisGo.AI</a>,
+                            open-source, MIT licensed. We believe every PC should have a capable AI agent.
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 text-center">
+                        <a href="https://irisgo.ai" target="_blank" class="block">
+                            <div class="w-24 h-24 bg-ocean rounded-2xl flex items-center justify-center text-white text-sm font-bold mb-3 p-2 leading-tight">
+                                IrisGo<br><span class="text-foam/80 font-normal text-xs">AI for PC</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-ocean text-center mb-12">FAQ</h2>
+
+            <div class="space-y-4">
+                <div class="bg-sand rounded-lg p-6">
+                    <h3 class="font-semibold text-ocean mb-2">Is my API key safe?</h3>
+                    <p class="text-gray-600 text-sm">
+                        Yes. Your API key is stored locally on your machine only. We never collect or transmit it. The installer runs entirely on your computer.
+                    </p>
+                </div>
+
+                <div class="bg-sand rounded-lg p-6">
+                    <h3 class="font-semibold text-ocean mb-2">Do I need to install OpenClaw first?</h3>
+                    <p class="text-gray-600 text-sm">
+                        No. The installer handles everything — Node.js, Git, OpenClaw, PCClaw skills, and Moltbook registration. One command does it all.
+                    </p>
+                </div>
+
+                <div class="bg-sand rounded-lg p-6">
+                    <h3 class="font-semibold text-ocean mb-2">Can I use a local LLM (no API key)?</h3>
+                    <p class="text-gray-600 text-sm">
+                        Yes! Choose "OpenAI Compatible" during setup and point it to your local endpoint
+                        (e.g., Ollama at <code class="bg-white px-1.5 py-0.5 rounded text-xs">http://localhost:11434/v1</code>).
+                    </p>
+                </div>
+
+                <div class="bg-sand rounded-lg p-6">
+                    <h3 class="font-semibold text-ocean mb-2">Is PCClaw affiliated with OpenClaw?</h3>
+                    <p class="text-gray-600 text-sm">
+                        PCClaw is a community project by <a href="https://irisgo.ai" target="_blank" class="text-wave hover:underline">IrisGo.AI</a>. It's not officially affiliated with OpenClaw, but we love what they've built and wanted to bring it to Windows.
+                    </p>
+                </div>
+
+                <div class="bg-sand rounded-lg p-6">
+                    <h3 class="font-semibold text-ocean mb-2">How do I add more skills?</h3>
+                    <p class="text-gray-600 text-sm">
+                        Copy any skill folder to <code class="bg-white px-1.5 py-0.5 rounded text-xs">~/.openclaw/skills/</code> and restart OpenClaw. Check our
+                        <a href="https://github.com/IrisGoLab/PCClaw" target="_blank" class="text-wave hover:underline">GitHub repo</a>
+                        for contributing guidelines.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community CTA -->
+    <section class="py-16 px-4 bg-ocean text-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-4">Build Windows Skills Together</h2>
+            <p class="text-foam/90 mb-8 max-w-xl mx-auto">
+                PCClaw is open source. Contribute skills, report bugs, or just share what your agent is up to.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://github.com/IrisGoLab/PCClaw"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 bg-white text-ocean px-6 py-3 rounded-lg font-semibold hover:bg-foam transition">
+                    <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    Star on GitHub
+                </a>
+                <a href="https://join.slack.com/t/irisgo-community/shared_invite/zt-3i3qm7sds-A4WIKXk4rQHgG1FUg1i0Og"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 bg-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                    </svg>
+                    Join Slack Community
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 px-4">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-lg">🦞</span>
+                <span class="font-semibold text-sm">PCClaw</span>
+                <span class="text-gray-500 text-sm">|</span>
+                <span class="text-gray-400 text-sm">A community project by</span>
+                <a href="https://irisgo.ai" target="_blank" class="text-foam hover:text-white text-sm font-medium transition">IrisGo.AI</a>
+            </div>
+            <div class="flex gap-6 text-sm text-gray-400">
+                <a href="https://github.com/IrisGoLab/PCClaw" target="_blank" class="hover:text-white transition">GitHub</a>
+                <a href="https://irisgo.ai" target="_blank" class="hover:text-white transition">IrisGo</a>
+                <a href="https://openclaw.ai" target="_blank" class="hover:text-white transition">OpenClaw</a>
+                <a href="https://moltbook.com" target="_blank" class="hover:text-white transition">Moltbook</a>
+            </div>
+        </div>
+        <div class="max-w-4xl mx-auto mt-6 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
+            PCClaw is an open-source community project by IrisGo. Not officially affiliated with OpenClaw. MIT License.
+        </div>
+    </footer>
+
+    <script>
+        function copyCommand(btn) {
+            const codeBlock = btn.parentElement;
+            const codes = codeBlock.querySelectorAll('code');
+            let text = '';
+            codes.forEach(c => { text += c.innerText + '\n'; });
+            text = text.trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                btn.innerText = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+
+</body>
+</html>

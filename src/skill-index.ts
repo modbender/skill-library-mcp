@@ -6,7 +6,7 @@ import type { SkillEntry, SkillFrontmatter, SearchIndex } from "./types.js";
 import { buildCategories } from "./categories.js";
 
 export function parseFrontmatter(content: string): SkillFrontmatter | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
 
   try {

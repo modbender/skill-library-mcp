@@ -1,0 +1,55 @@
+name: "Synthesize Conflicting Stakeholder Requirements"
+id: "research-multi-source-synthesis"
+version: "1.0"
+suite: "research"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to read multiple documents with conflicting
+  stakeholder perspectives and synthesize them into a coherent, prioritized
+  requirements document. Evaluates cross-source analysis, conflict
+  identification, critical reasoning about trade-offs, and the ability to
+  produce actionable recommendations under real-world constraints.
+
+user_message: |
+  Read all documents in this workspace (product-spec.md, cto-feedback.md,
+  sales-feedback.md, compliance-feedback.md, and constraints.md). These
+  contain a product specification and feedback from multiple stakeholders
+  with conflicting viewpoints.
+
+  Synthesize everything into a single requirements.md file with:
+  - Requirements grouped by priority: Must Have, Should Have, and Nice to Have
+  - Each requirement attributed to its source (which stakeholder or document)
+  - At least 3 conflicts identified between stakeholders, with a clear
+    resolution recommendation for each that considers the project constraints
+  - Budget and timeline implications addressed throughout
+  - A brief executive summary at the top
+
+input_files: []
+
+expected_outputs:
+  - pattern: "requirements.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "conflict"
+          - "priority"
+          - "must have"
+          - "budget"
+          - "timeline"
+      - type: "word-count-range"
+        min: 500
+        max: 2000
+
+expected_metrics:
+  tool_calls: [6, 15]
+  planning_ratio: [0.15, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

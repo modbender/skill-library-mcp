@@ -1,0 +1,269 @@
+# ============================================================
+# self-evolving-agent 설정 파일
+# 이 파일을 수정하면 스킬 동작이 바뀝니다.
+# 재시작 없이 다음 크론 실행 시 자동 반영됩니다.
+# ============================================================
+
+# ── LLM 제공자 설정 ────────────────────────────────────────
+# synthesize-proposal.sh의 제안 합성 단계에서 사용할 LLM을 선택합니다.
+# provider: "anthropic" | "openai" | "ollama" | "none"
+#
+# 💡 Ollama = 완전 무료! 로컬 LLM (API 키 불필요, 인터넷 불필요)
+#    설치: brew install ollama && ollama pull llama3.1:8b
+#    이후 ollama serve 실행 후 provider: "ollama" 설정
+#
+# 💡 none = 순수 휴리스틱 모드 (LLM 호출 없음, API 비용 $0)
+#    분석+합성 모두 로컬 쉘 스크립트로만 처리됩니다.
+llm:
+  provider: "anthropic"   # anthropic | openai | ollama | none
+
+  anthropic:
+    model: "claude-sonnet-4-5"
+    # API 키: 환경변수 ANTHROPIC_API_KEY (설정 파일에 직접 기입 금지)
+
+  openai:
+    model: "gpt-4.1"
+    # API 키: 환경변수 OPENAI_API_KEY (설정 파일에 직접 기입 금지)
+
+  ollama:
+    model: "llama3.1:8b"
+    url: "http://localhost:11434"
+    # API 키 불필요 — 완전 로컬, 완전 무료
+    # 다른 모델 예시: "mistral:7b", "gemma3:9b", "qwen2.5:7b"
+
+  none: {}  # 순수 휴리스틱 모드 — LLM 호출 없이 패턴 분석만 수행
+
+# ── 분석 설정 ──────────────────────────────────────────────
+analysis:
+  # 분석 엔진 선택: auto | embedding | heuristic
+  # auto: Ollama 가용 → embedding, 아니면 heuristic 자동 선택
+  # embedding: 무조건 임베딩 시도 (Ollama 또는 OpenAI 필요)
+  # heuristic: v4 키워드 기반 분석 (API 키 불필요)
+  engine: "auto"
+
+  # 시맨틱 임베딩 설정 (v5.0 신규)
+  embedding:
+    # 임베딩 제공자: ollama | openai
+    # ollama: 완전 무료, 로컬 실행 (API 키 불필요!)
+    # openai: text-embedding-3-small 사용 (OPENAI_API_KEY 필요, ~$0.02/M tokens)
+    provider: "ollama"
+
+    # Ollama 서버 주소
+    ollama_url: "http://localhost:11434"
+
+    # 임베딩 모델 (Ollama 제공자용)
+    # nomic-embed-text: 빠르고 강력한 다국어 임베딩 모델
+    # mxbai-embed-large: 더 큰 모델 (더 정확, 더 느림)
+    # all-minilm: 가볍고 빠름 (덜 정확)
+    model: "nomic-embed-text"
+
+    # 좌절 감지 임계값 (코사인 유사도)
+    # 0.75: 적절한 균형 (권장)
+    # 0.80: 보수적 (거짓 양성 줄임, 놓치는 것 많음)
+    # 0.70: 공격적 (더 많이 감지, 거짓 양성 증가)
+    similarity_threshold: 0.75
+
+    # exec 명령 클러스터링 임계값
+    # 0.82: 유사한 명령끼리만 묶음 (권장)
+    cluster_threshold: 0.82
+
+    # 임베딩 캐시 TTL (일) — 캐시 재사용으로 속도 최적화
+    cache_ttl_days: 7
+
+    # 모델 설치 명령 (설치되지 않은 경우 안내)
+    # ollama pull nomic-embed-text
+
+  # 최근 몇 일치 세션을 분석할지 (기본: 7일)
+  days: 7
+
+  # 한 번에 분석할 최대 세션 수 (성능: 대규모 환경에서 제한)
+  # 0 = 제한 없음 (1000+ 세션은 느릴 수 있음)
+  max_sessions: 30
+
+  # 분석 대상 에이전트 목록 (빈 배열 = 전체)
+  # 예: ["opus", "sonnet"]
+  agent_filter: []
+
+  # 불만 패턴 키워드 (한국어/영어 분리 구조, v4.1)
+  # auto_detect: true 시 세션의 첫 10개 user 메시지 중 >50%에 [가-힣]이 있으면 ko, 아니면 en 적용
+  # 주의: 일반 요청 표현("다시 확인해줘", "계속 해줘")과 구별되는 패턴만 사용
+  complaint_patterns:
+    ko:
+      - "확인중"
+      - "다시"
+      - "아까"
+      - "반복"
+      - "기억"
+      - "말했잖아"
+      - "했잖아"
+      - "이미 말했"
+      - "계속"
+      - "물어보지 말고"
+      - "전부 다 해줘"
+      - "왜 또"
+      - "몇 번"
+      - "또?"
+      - "저번에도"
+      - "왜 자꾸"
+      - "또 그러네"
+      - "안 되잖아"
+      - "또 하네"
+      - "다시 또"
+      - "다시 해야"
+    en:
+      - "you forgot"
+      - "again?"
+      - "same mistake"
+      - "stop doing that"
+      - "how many times"
+      - "wrong again"
+      - "you already"
+      - "I told you"
+      - "keep doing"
+      - "still broken"
+      - "not what I asked"
+      - "try again"
+      - "that's not right"
+      - "still not working"
+      - "told you"
+      - "as I said"
+    auto_detect: true  # セッション内容から言語を自動検出 | Detect language from session content
+
+  # AGENTS.md 위반 패턴 (정규식)
+  violation_patterns:
+    - pattern: "git (?:pull|push|fetch)"
+      rule: "git 작업은 git-sync.sh 사용 필수"
+      severity: "high"
+    - pattern: "(?:추가로|그리고\n|또한\n)"
+      rule: "메시지 단편화 금지"
+      severity: "low"
+      min_hits: 5
+
+  # 에러 로그 분석 대상 파일 (~/.openclaw/logs/ 기준)
+  log_files:
+    - "cron-catchup.log"
+    - "heartbeat-cron.log"
+    - "context-monitor.log"
+    - "metrics-cron.log"
+
+  # .learnings/ 경로 (self-improving-agent 연동)
+  # 상대경로: $HOME 기준, 절대경로 가능
+  learnings_paths:
+    - "openclaw/.learnings"         # 프로젝트 루트
+    - ".openclaw/.learnings"        # 홈 디렉토리 숨김 폴더
+
+  # MEMORY.md 분석 포함 여부
+  include_memory_md: true
+
+# ── 제안 설정 ──────────────────────────────────────────────
+proposals:
+  # 제안 최소 발동 임계값
+  complaint_min_hits: 2        # 불만 패턴 최소 감지 수
+  repeat_request_min: 3        # 반복 요청 최소 횟수
+
+  # 제안 저장 경로 (스킬 디렉토리 기준 상대경로)
+  save_dir: "data/proposals"
+
+  # 거부 기록 파일
+  rejection_log: "data/rejected-proposals.json"
+
+  # 제안 만료: N일 이상 된 제안 자동 아카이브
+  expire_days: 30
+
+# ── 크론 설정 ──────────────────────────────────────────────
+cron:
+  # 크론 실행 스케줄 (cron 표현식, Asia/Seoul 기준)
+  schedule: "0 22 * * 0"    # 매주 일요일 22:00
+
+  # 사용할 AI 모델
+  model: "anthropic/claude-sonnet-4-5"
+
+  # 결과 전송 Discord 채널 ID
+  discord_channel: ""   # Required: set your Discord channel ID
+
+  # 크론 에이전트 ID
+  agent_id: "opus"
+
+# ── 출력 설정 ──────────────────────────────────────────────
+output:
+  # 분석 결과 JSON 임시 저장 경로
+  analysis_json: "/tmp/self-evolving-analysis.json"
+
+  # 디버그 로그 출력 여부 (stderr)
+  verbose: true
+
+  # 결과 Discord 메시지 최대 길이 (Discord 제한: 4000)
+  max_message_length: 3500
+
+# ── 배달 설정 ──────────────────────────────────────────────
+delivery:
+  # 플랫폼 선택: discord | slack | telegram | webhook
+  # discord: OpenClaw 네이티브 배달 (크론 delivery 설정 사용, deliver.sh 미호출)
+  # slack/telegram/webhook: deliver.sh가 직접 전송
+  platform: "discord"
+
+  discord:
+    channel_id: ""    # Your Discord channel ID (크론 delivery.to에서도 설정 필요)
+
+  slack:
+    webhook_url: ""   # Slack Incoming Webhook URL
+                      # https://api.slack.com/messaging/webhooks 에서 생성
+
+  telegram:
+    bot_token: ""     # BotFather에서 발급한 토큰 (예: 123456:ABC-DEF...)
+    chat_id: ""       # 채널 또는 채팅방 ID (예: -1001234567890)
+
+  webhook:
+    url: ""           # Generic webhook endpoint URL
+    method: "POST"
+    headers:
+      Content-Type: "application/json"
+
+# ── GitHub 통합 설정 ──────────────────────────────────────
+github:
+  # GitHub Personal Access Token (repo 권한 필요)
+  # 실제 토큰은 환경변수 GH_TOKEN에 설정 권장 (보안)
+  token: ""           # 또는 환경변수: GH_TOKEN
+
+  # 레포 (owner/repo 형식)
+  # 비어 있으면 git remote에서 자동 감지
+  repo: ""            # 예: "yourname/openclaw"
+
+  # 기본 Assignee (빈 값 = 레포 소유자 자동)
+  assignee: ""
+
+  # 제안 생성 시 자동으로 GitHub 이슈 생성
+  auto_create_issues: false
+
+  # 승인 시 자동으로 이슈 종료
+  auto_close_on_approve: true
+
+  # 기본 레이블 (자동 생성)
+  labels:
+    base:
+      - "self-evolving"
+      - "agent-proposal"
+    severity_prefix: "severity:"   # severity:high, severity:medium, etc.
+    status_prefix: "status:"       # status:pending-review, status:approved
+
+# ── 인터랙티브 승인 설정 ─────────────────────────────────
+interactive:
+  # sea watch 폴링 간격 (초)
+  watch_interval: 30
+
+  # macOS 데스크탑 알림 소리
+  notify_sound: "on"
+
+  # Telegram 인라인 버튼 활성화 (TG_TOKEN, TG_CHAT_ID 필요)
+  telegram_buttons: false
+
+# ── 리포트 내보내기 설정 ─────────────────────────────────
+export:
+  # 기본 출력 디렉토리
+  output_dir: ""      # 기본: 현재 디렉토리
+
+  # 리포트 제목
+  title: "Self-Evolving Agent 주간 리포트"
+
+  # HTML 생성 시 pandoc 우선 사용
+  prefer_pandoc: true

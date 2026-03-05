@@ -1,0 +1,37 @@
+# 用户日历/待办 → 职业偏好
+# 生成器在抽取职业前，读取「今日用户日程摘要」（来自 iOS 日历 / Apple Reminder 等，与早安模板 {{WEEKLY_TODO}} 同源或单独接口）。
+# 若日程/待办文本与下方某条 keywords 匹配（包含关键词即算），则抽职业时对该条 profession_tags_boost 中的 tag 做加权（或仅从含该 tag 的职业中抽，由生成器配置）。
+# 实现每周至少一个主题日时，可依赖 history_tracker 中本周是否已有主题日；若无且已到周末，则强制抽主题。
+
+version: "1.0"
+
+# 关键词 → 职业 tag 加权（匹配到任一词则 boost 对应 tag）
+# 生成器：获取今日日程/待办摘要后，与 keywords 做包含匹配；合并所有命中的 profession_tags_boost，在抽职业时对含这些 tag 的职业提高权重
+keyword_rules:
+  - keywords: [洗牙, 牙科, 补牙, 拔牙, 看牙, 口腔, dentist, 牙医]
+    profession_tags_boost: [牙科, 医疗]
+  - keywords: [体检, 挂号, 看病, 医院, 门诊, 护士]
+    profession_tags_boost: [护士, 医疗]
+  - keywords: [健身, 瑜伽, 私教, 跑步, 游泳, gym]
+    profession_tags_boost: [健身, 瑜伽, 舞蹈, 体育]
+  - keywords: [开庭, 律师, 法务, 合同]
+    profession_tags_boost: [律师, 法务]
+  - keywords: [面试, 入职, 出差, 会议, 汇报]
+    profession_tags_boost: [商务, 秘书]
+  - keywords: [上课, 培训, 讲座, 老师]
+    profession_tags_boost: [老师, 教育]
+  - keywords: [航班, 机场, 飞机, 旅行]
+    profession_tags_boost: [空乘, 旅行]
+  - keywords: [美甲, 美发, 理发, 化妆]
+    profession_tags_boost: [美妆, 时尚]
+  - keywords: [宠物, 遛狗, 猫, 狗, 兽医]
+    profession_tags_boost: [宠物]
+  - keywords: [咖啡, 探店, 餐厅, 约会]
+    profession_tags_boost: [餐饮, 服务]
+  - keywords: [直播, 拍摄, 摄影]
+    profession_tags_boost: [文化, 传媒]
+
+# 说明：
+# - 数据源：与 ENGINE Step 6 早安消息中 {{WEEKLY_TODO}} 一致，或由脚本/快捷指令从 Apple Reminder / Calendar 拉取「今日」事件标题与备注，拼成一段摘要文本。
+# - 匹配：摘要文本中若包含某条 keywords 中任意一词，则应用该条 profession_tags_boost；多条命中则合并 tag 列表。
+# - 职业抽取：在 data/professions 中，职业的 tags 与 boost 列表有交集的，权重 × 1.5（或可配置 boost_multiplier）；若无交集则正常权重。

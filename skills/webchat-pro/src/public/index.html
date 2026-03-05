@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌐 OpenClaw Web Chat - 贝贝</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #00d9ff;
+      --primary-dark: #00b8d4;
+      --secondary: #7b2cbf;
+      --bg-dark: #0f0f23;
+      --bg-card: #1a1a2e;
+      --bg-message-user: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
+      --bg-message-bot: #16213e;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border: rgba(255, 255, 255, 0.1);
+      --glow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+    
+    body {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(123, 44, 191, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 217, 255, 0.2) 0%, transparent 50%);
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+    
+    .container {
+      max-width: 1200px;
+      height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      padding: 20px 30px;
+      background: rgba(26, 26, 46, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo {
+      font-size: 28px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(0, 217, 255, 0.1);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--primary);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .model-select {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .model-select option {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none;
+      color: var(--bg-dark);
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      box-shadow: var(--glow);
+    }
+    
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .chat-area::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .chat-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .chat-area::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .message.assistant .message-avatar {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .message.user .message-avatar {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .message-content {
+      padding: 16px 20px;
+      border-radius: 16px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    
+    .message.assistant .message-content {
+      background: var(--bg-message-bot);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+    }
+    
+    .message.user .message-content {
+      background: var(--bg-message-user);
+      color: white;
+      border-top-right-radius: 4px;
+    }
+    
+    .message-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .web-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: rgba(0, 217, 255, 0.15);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .token-info {
+      opacity: 0.6;
+    }
+    
+    /* Input Area */
+    .input-area {
+      padding: 20px 30px;
+      background: rgba(26, 26, 46, 0.8);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .message-input {
+      flex: 1;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    .message-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+    
+    .message-input::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none;
+      color: var(--bg-dark);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .send-btn:hover {
+      transform: scale(1.05);
+      box-shadow: var(--glow);
+    }
+    
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Auth Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay:not(.active) {
+      display: none;
+    }
+    
+    .auth-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .auth-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .auth-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    
+    .auth-input {
+      width: 100%;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+    
+    .auth-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+    
+    .auth-error {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none;
+      border-radius: 12px;
+      color: var(--bg-dark);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow);
+    }
+    
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 4px 0;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50% { transform: translateY(-6px); opacity: 1; }
+    }
+    
+    /* Streaming cursor */
+    .streaming .message-content::after {
+      content: '▊';
+      animation: blink 1s infinite;
+      color: var(--primary);
+      margin-left: 2px;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">🌐 OpenClaw Chat</div>
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span>Web Chat</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <select class="model-select" id="modelSelect" onchange="changeModel()">
+          <option value="qwen3.5-plus">Qwen3.5-Plus (平衡)</option>
+          <option value="glm-4-flash">GLM-4-Flash (快速)</option>
+          <option value="glm-4">GLM-4 (强大)</option>
+          <option value="gpt-5">GPT-5 (最强)</option>
+        </select>
+        <button class="btn" onclick="exportChat('json')">导出</button>
+        <button class="btn" onclick="clearChat()">清空</button>
+      </div>
+    </header>
+    
+    <!-- Chat Area -->
+    <div class="chat-area" id="messages"></div>
+    
+    <!-- Input Area -->
+    <div class="input-area">
+      <input 
+        type="text" 
+        class="message-input" 
+        id="messageInput" 
+        placeholder="输入消息..." 
+        onkeypress="if(event.key==='Enter')sendMessage()"
+      >
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+  
+  <!-- Auth Modal -->
+  <div class="modal-overlay active" id="authModal">
+    <div class="auth-modal">
+      <h1 class="auth-title">🔐 访问验证</h1>
+      <p class="auth-subtitle">请输入访问密码以继续使用</p>
+      <input 
+        type="password" 
+        class="auth-input" 
+        id="passwordInput" 
+        placeholder="密码"
+        onkeypress="if(event.key==='Enter')checkAuth()"
+      >
+      <div class="auth-error" id="authError">密码错误</div>
+      <button class="auth-btn" onclick="checkAuth()">进入聊天</button>
+    </div>
+  </div>
+
+  <script>
+    // 持久化 SESSION_ID
+    let SESSION_ID = localStorage.getItem('webchat_session_id');
+    if (!SESSION_ID) {
+      SESSION_ID = 'web-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('webchat_session_id', SESSION_ID);
+    }
+    
+    let socket = null;
+    let currentStreamingMessage = null;
+    let isStreaming = false;
+    let currentModel = 'qwen3.5-plus';
+    let isAuthenticated = false;
+
+    // 主题设置
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+    
+    setTheme(currentTheme);
+
+    // 认证检查
+    async function checkAuthStatus() {
+      const savedAuth = sessionStorage.getItem('webchat_authenticated');
+      const savedPassword = sessionStorage.getItem('webchat_password');
+      
+      if (savedAuth === 'true' && savedPassword) {
+        try {
+          const res = await fetch('/api/auth/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: savedPassword })
+          });
+          
+          const data = await res.json();
+          
+          if (data.authenticated) {
+            isAuthenticated = true;
+            document.getElementById('passwordInput').value = savedPassword;
+            document.getElementById('authModal').classList.remove('active');
+            return;
+          }
+        } catch (e) {
+          console.error('自动认证失败:', e);
+        }
+      }
+      
+      document.getElementById('authModal').classList.add('active');
+    }
+    
+    async function checkAuth() {
+      const password = document.getElementById('passwordInput').value;
+      
+      try {
+        const res = await fetch('/api/auth/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        
+        const data = await res.json();
+        
+        if (data.authenticated) {
+          isAuthenticated = true;
+          sessionStorage.setItem('webchat_authenticated', 'true');
+          sessionStorage.setItem('webchat_password', password);
+          document.getElementById('authModal').classList.remove('active');
+          appendSystemMessage('✅ 欢迎使用 OpenClaw Web Chat！[WEB]');
+        } else {
+          document.getElementById('authError').textContent = '密码错误';
+          document.getElementById('authError').style.display = 'block';
+        }
+      } catch (e) {
+        console.error('认证失败:', e);
+      }
+    }
+
+    // 连接 WebSocket
+    function connectWebSocket() {
+      socket = io();
+      
+      socket.on('connect', () => {
+        console.log('[WS] 已连接');
+        socket.emit('join', SESSION_ID);
+      });
+      
+      socket.on('history', (messages) => {
+        console.log('[WS] 历史:', messages.length, '条');
+        messages.forEach(msg => {
+          appendMessage(msg.role, msg.content, msg.timestamp, false, msg.model, msg.stats);
+        });
+      });
+      
+      socket.on('session_config', (config) => {
+        currentModel = config.model || 'qwen3.5-plus';
+        document.getElementById('modelSelect').value = currentModel;
+      });
+      
+      socket.on('stream_chunk', (data) => {
+        console.log('[WS] 收到流式片段');
+        if (!currentStreamingMessage) {
+          currentStreamingMessage = appendMessage('assistant', '', Date.now(), true);
+        }
+        currentStreamingMessage.content += data.content;
+        const contentEl = currentStreamingMessage.element.querySelector('.message-content');
+        if (contentEl) {
+          contentEl.innerHTML = marked.parse(currentStreamingMessage.content) + '<span class="cursor"></span>';
+        }
+        scrollToBottom();
+      });
+      
+      socket.on('stream_complete', (data) => {
+        console.log('[WS] 流式完成');
+        if (currentStreamingMessage) {
+          currentStreamingMessage.element.classList.remove('streaming');
+          const meta = createMessageMeta(data.model, data.stats, true);
+          currentStreamingMessage.element.querySelector('.message-meta').innerHTML = meta;
+          currentStreamingMessage = null;
+        }
+        isStreaming = false;
+        document.getElementById('messageInput').disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('messageInput').focus();
+      });
+      
+      socket.on('model_changed', (data) => {
+        appendSystemMessage(`已切换到 ${getModelName(data.model)}`);
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('[WS] 断开，重连中...');
+        setTimeout(connectWebSocket, 2000);
+      });
+      
+      socket.on('connect_error', (err) => {
+        console.error('[WS] 连接错误:', err);
+      });
+    }
+
+    // 切换模型
+    async function changeModel() {
+      const model = document.getElementById('modelSelect').value;
+      currentModel = model;
+      
+      try {
+        const res = await fetch(`/api/session/${SESSION_ID}/model`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model })
+        });
+        const data = await res.json();
+        if (data.success) {
+          socket.emit('change_model', { sessionId: SESSION_ID, model });
+        }
+      } catch (e) {
+        console.error('切换模型失败:', e);
+      }
+    }
+
+    // 发送消息
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message || isStreaming) return;
+      
+      input.value = '';
+      input.disabled = true;
+      document.getElementById('sendBtn').disabled = true;
+      isStreaming = true;
+      currentStreamingMessage = null;
+
+      appendMessage('user', message, Date.now(), false, null, null, true);
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            message, 
+            sessionId: SESSION_ID,
+            model: currentModel
+          })
+        });
+        const data = await res.json();
+        
+        if (!data.streaming) {
+          appendMessage('assistant', data.message, Date.now(), false);
+          input.disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+          isStreaming = false;
+        }
+      } catch (e) {
+        console.error('发送失败:', e);
+        appendMessage('assistant', '⚠️ 发送失败：' + e.message, Date.now(), false);
+        input.disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        isStreaming = false;
+      }
+    }
+
+    // 添加消息
+    function appendMessage(role, content, timestamp, streaming = false, model = null, stats = null, isWeb = false) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `message ${role}${streaming ? ' streaming' : ''}`;
+      
+      const timeStr = new Date(timestamp).toLocaleTimeString();
+      const avatar = role === 'user' ? '👤' : '🤖';
+      const webBadge = isWeb ? '<span class="web-badge">🌐 WEB</span>' : '';
+      
+      div.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div style="flex: 1;">
+          <div class="message-content">${streaming ? content : marked.parse(content)}</div>
+          <div class="message-meta">
+            <span>${timeStr}</span>
+            ${webBadge}
+            ${!streaming && model ? createMessageMeta(model, stats, false) : ''}
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(div);
+      scrollToBottom();
+      
+      return { element: div, content: content };
+    }
+
+    // 创建消息元信息
+    function createMessageMeta(model, stats, showTokens) {
+      const modelName = getModelName(model);
+      if (!showTokens || !stats) return `<span class="model-name">${modelName}</span>`;
+      
+      const tokens = stats.totalTokens || 0;
+      const cost = stats.cost || '0.0000';
+      return `
+        <span class="model-name">${modelName}</span>
+        <span class="token-info">⚡ ${tokens} tokens</span>
+        <span class="token-info">💰 ¥${cost}</span>
+      `;
+    }
+
+    // 获取模型名称
+    function getModelName(modelId) {
+      const models = {
+        'qwen3.5-plus': 'Qwen3.5-Plus',
+        'glm-4-flash': 'GLM-4-Flash',
+        'glm-4': 'GLM-4',
+        'gpt-5': 'GPT-5'
+      };
+      return models[modelId] || modelId;
+    }
+
+    // 添加系统消息
+    function appendSystemMessage(content) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.style.cssText = 'text-align: center; color: var(--text-secondary); font-size: 13px; margin: 10px 0;';
+      div.textContent = content;
+      container.appendChild(div);
+      scrollToBottom();
+    }
+
+    // 滚动到底部
+    function scrollToBottom() {
+      const container = document.getElementById('messages');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // 导出对话
+    function exportChat(format) {
+      window.open(`/api/export/${SESSION_ID}?format=${format}`, '_blank');
+    }
+
+    // 清空对话
+    function clearChat() {
+      if (confirm('确定要清空对话记录吗？')) {
+        document.getElementById('messages').innerHTML = '';
+        appendSystemMessage('对话已清空');
+      }
+    }
+
+    // 初始化 - 先连接 WebSocket（不需要认证）
+    setTheme(currentTheme);
+    connectWebSocket();  // 直接连接 WebSocket
+    checkAuthStatus();   // 然后检查认证状态
+  </script>
+</body>
+</html>

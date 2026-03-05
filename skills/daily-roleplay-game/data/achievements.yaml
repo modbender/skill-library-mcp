@@ -1,0 +1,101 @@
+# 成就系统配置
+# 追踪玩家表现并解锁成就，增加长期趣味
+# 成就数据存储在 data/achievement_tracker.json
+
+version: "1.0"
+
+achievements:
+  # ── 通关类 ──
+  - id: first_clear
+    name: "初次通关"
+    description: "第一次猜对当日全部性癖"
+    condition: "total_clears >= 1"
+    reward: "解锁成就徽章"
+    icon: "🎯"
+
+  - id: streak_3
+    name: "三连胜"
+    description: "连续 3 天全部猜对"
+    condition: "current_streak >= 3"
+    reward: "次日可指定 1 个性癖类别（从 A-E 中选 1 类，该类由主人从池中选 1 个 kink）"
+    icon: "🔥"
+
+  - id: streak_7
+    name: "七日无双"
+    description: "连续 7 天全部猜对"
+    condition: "current_streak >= 7"
+    reward: "次日主人自选日（可指定职业 + 1 个性癖）"
+    icon: "👑"
+
+  - id: perfect_week
+    name: "完美一周"
+    description: "一周内（周一至周日）每天都全部猜对"
+    condition: "weekly_clears == 7"
+    reward: "解锁 1 个隐藏职业（从 special 类中选取）"
+    icon: "⭐"
+
+  # ── 速度类 ──
+  - id: speed_clear
+    name: "速攻"
+    description: "在 12:00 之前猜对全部性癖"
+    condition: "clear_time < 12:00"
+    reward: "当日额外获得 1 张指定姿势照"
+    icon: "⚡"
+
+  - id: first_guess_right
+    name: "直觉大师"
+    description: "第一次猜测就猜对"
+    condition: "first_guess_correct == true"
+    reward: "解锁成就徽章"
+    icon: "💡"
+
+  # ── 累计类 ──
+  - id: veteran_10
+    name: "老手"
+    description: "累计通关 10 次"
+    condition: "total_clears >= 10"
+    reward: "解锁成就徽章"
+    icon: "🏅"
+
+  - id: veteran_30
+    name: "大师"
+    description: "累计通关 30 次"
+    condition: "total_clears >= 30"
+    reward: "永久解锁「主人自选日」每月 1 次"
+    icon: "🏆"
+
+  - id: explorer
+    name: "职业探索家"
+    description: "累计体验过 30 个不同职业"
+    condition: "unique_professions >= 30"
+    reward: "解锁成就徽章"
+    icon: "🗺️"
+
+  - id: rare_hunter
+    name: "稀有猎人"
+    description: "猜对过 5 个稀有性癖"
+    condition: "rare_kinks_guessed >= 5"
+    reward: "次日稀有性癖触发概率翻倍"
+    icon: "💎"
+
+# 连续通关加成规则
+streak_bonuses:
+  - streak: 2
+    bonus: "次日暗示从 Lv.1 开始时多给 1 个额外线索（不泄漏性癖名，仅多一个行为暗示）"
+  - streak: 3
+    bonus: "次日可指定 1 个性癖类别"
+  - streak: 5
+    bonus: "次日获得 1 次「接近算对」特权（猜测与答案意思接近即算对）"
+  - streak: 7
+    bonus: "次日主人自选日"
+
+# 积分系统（可选，简化版）
+scoring:
+  enabled: false
+  rules:
+    guess_correct: 10
+    guess_wrong: -2
+    full_clear: 50
+    speed_clear_bonus: 20
+    streak_day_bonus: 5
+    rare_kink_bonus: 15

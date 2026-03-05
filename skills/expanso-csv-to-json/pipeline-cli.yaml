@@ -1,0 +1,58 @@
+# Expanso Pipeline: csv-to-json (CLI mode)
+# =========================================
+#
+# Usage:
+#   echo "name,age\nAlice,30\nBob,25" | expanso-edge run pipeline-cli.yaml
+#   cat data.csv | expanso-edge run pipeline-cli.yaml
+#
+# No API key needed - runs entirely locally.
+
+name: "csv-to-json-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 10485760
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let csv_text = content().trim()
+          let delimiter = env("DELIMITER").or(",")
+
+          # Split into lines
+          let lines = $csv_text.split("\n").filter(line -> line.trim().length() > 0)
+
+          # First line is headers
+          let headers = if $lines.length() > 0 {
+            $lines.index(0).split($delimiter).map_each(h -> h.trim())
+          } else { [] }
+
+          # Convert remaining lines to objects
+          let data = $lines.slice(1).map_each(line -> $headers.fold({"index": 0, "obj": {}}, pair -> {
+            "index": pair.tally.index + 1,
+            "obj": pair.tally.obj.merge({(pair.value): line.split($delimiter).index(pair.tally.index).or("").trim()})
+          }).obj)
+
+          root.data = $data
+          root.row_count = $data.length()
+          root.columns = $headers
+          root.metadata = {
+            "skill": "csv-to-json",
+            "mode": "cli",
+            "delimiter": $delimiter,
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [csv-to-json] Converted ${! root.row_count } rows (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

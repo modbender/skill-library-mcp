@@ -1,0 +1,45 @@
+name: "Find Data Anomalies in Sales Data"
+id: "data-analysis-find-anomalies"
+version: "1.0"
+suite: "data-analysis"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to analyze a CSV dataset and identify data
+  quality issues and anomalies. The dataset contains deliberate errors
+  including a negative quantity, a mismatched total, a duplicate row,
+  a future date, and an absurd price outlier. Evaluates analytical
+  thoroughness and structured reporting.
+
+user_message: |
+  Analyze sales-data.csv for data quality issues and anomalies. Create
+  anomaly-report.md listing each issue found with its row number, what's
+  wrong, and suggested correction.
+
+input_files:
+  - name: "sales-data.csv"
+
+expected_outputs:
+  - pattern: "anomaly-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "anomal"
+          - "row"
+          - "correction"
+      - type: "word-count-range"
+        min: 200
+        max: 1000
+
+expected_metrics:
+  tool_calls: [3, 12]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

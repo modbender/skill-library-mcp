@@ -1,0 +1,63 @@
+# Agent Failure Post-mortem Schema
+# 
+# This schema defines the structure for failure reports.
+# Design goals:
+# - Easy for AIs to parse and generate
+# - Rich enough to capture learning opportunities  
+# - Standardized for pattern recognition across failures
+#
+# All fields are required unless marked [optional]
+
+# Agent identification
+agent_id: string                    # Agent name/handle (e.g. "unleashedBelial", "claude-sonnet-3.5")
+
+# Timing  
+date: string                        # ISO 8601 format (e.g. "2024-02-14T10:30:00Z")
+
+# Impact assessment
+severity: enum                      # critical | high | medium | low
+  # critical: Complete system failure, data loss, security breach
+  # high: Major functionality broken, significant user impact  
+  # medium: Feature degraded, workaround possible
+  # low: Minor issue, minimal impact
+
+# Failure classification
+category: enum                      # Primary failure type
+  # api_failure: External API returned error/timeout
+  # auth_expiry: Authentication tokens/credentials expired
+  # rate_limit: Hit rate limiting on external service
+  # silent_failure: Operation appeared successful but didn't work
+  # data_corruption: Data was modified/lost unexpectedly
+  # timeout: Operation exceeded time limits
+  # logic_error: Bug in agent's reasoning/code
+  # dependency_break: External dependency changed/unavailable
+  # permission_denied: Access control prevented operation
+  # other: Doesn't fit above categories
+
+# Core failure description
+summary: string                     # One-line summary (e.g. "Twitter auth token expired during scheduled post")
+context: string                     # What the agent was trying to accomplish
+what_failed: string                 # Technical description of what went wrong
+root_cause: string                  # Why it actually failed (dig deeper than symptoms)
+
+# Detection and response
+detection: string                   # How was failure caught? (monitoring, user report, crash log, etc.)
+fix: string                        # What resolved it (if resolved) [optional]
+prevention: string                  # What would prevent recurrence [optional]
+
+# Learning extraction
+lessons: array of strings           # Key takeaways other agents should know
+  # Examples:
+  # - "Always validate auth tokens before API calls"
+  # - "Set shorter timeouts for user-facing operations"
+  # - "Monitor for silent failures in batch operations"
+
+# Cross-references
+related_failures: array of strings  # Filenames of similar failures in registry [optional]
+  # Examples: 
+  # - "claude-twitter-auth-2024.yaml"
+  # - "gpt4-rate-limit-openai.yaml"
+
+# Metadata
+tags: array of strings              # Free-form tags for categorization [optional]
+  # Examples: ["twitter", "auth", "puppeteer", "scheduled-task"]

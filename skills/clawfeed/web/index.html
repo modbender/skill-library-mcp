@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClawFeed</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; word-break: break-word; transition: background .3s, color .3s; }
+  body.light { background: #f5f5f5; color: #1a1a1a; }
+  body.light .subtitle { color: #888; }
+  body.light .tab { background: #e8e8e8; border-color: #ccc; color: #666; }
+  body.light .tab:hover { border-color: #999; color: #333; }
+  body.light .tab.active { background: #ddd; border-color: #999; color: #111; }
+  body.light .digest-card { background: #fff; border-color: #ddd; }
+  body.light .digest-card:hover { background: #fafafa; border-color: #bbb; }
+  body.light .digest-card .excerpt { color: #888; }
+  body.light .digest-card .time-badge { background: #f0f0f0; border-color: #ddd; color: #666; }
+  body.light .date-group-header { color: #888; border-color: #e0e0e0; }
+  body.light .date-group-header .count { color: #aaa; }
+  body.light .digest-viewer { background: #fff; border-color: #ddd; color: #333; }
+  body.light .back-btn { background: #e8e8e8; border-color: #ccc; color: #666; }
+  body.light .back-btn:hover { color: #111; border-color: #999; }
+  body.light .login-banner { background: #fff; border-color: #ddd; color: #666; }
+  body.light .mark-card { background: #fff; border-color: #ddd; }
+  body.light .mark-card:hover { background: #fafafa; border-color: #bbb; }
+  body.light .source-card { background: #fff; border-color: #ddd; }
+  body.light .source-card:hover { background: #fafafa; border-color: #bbb; }
+  body.light .source-form { background: #fff; border-color: #ddd; }
+  body.light .source-form input, body.light .source-form select, body.light .source-form textarea { background: #f5f5f5; border-color: #ccc; color: #333; }
+  body.light .auth-btn { background: #e8e8e8; border-color: #ccc; color: #555; }
+  body.light .auth-btn:hover { border-color: #999; color: #111; }
+  body.light .mark-stat { background: #fff; border-color: #ddd; }
+  body.light .toast { background: #333; }
+  body.light .changelog-overlay { background: rgba(255,255,255,0.92); }
+  body.light .changelog-inner { color: #333; }
+  body.light .changelog-inner h1 { color: #111; }
+  body.light .changelog-inner h2 { color: #0066cc; border-color: #ddd; }
+  body.light .changelog-inner h3 { color: #444; }
+  body.light .changelog-inner li { color: #555; }
+  body.light .changelog-inner code { background: #e8f0fe; color: #0066cc; }
+  body.light .user-dropdown { background: #fff; border-color: #ddd; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+  body.light .user-dropdown a { color: #555; }
+  body.light .user-dropdown a:hover { background: #f0f0f0; color: #111; }
+  body.light .pack-card { background: #fff; border-color: #ddd; }
+  body.light .empty { color: #999; }
+  .theme-toggle { background: none; border: 1px solid #333; border-radius: 6px; cursor: pointer; font-size: 16px; padding: 4px 8px; line-height: 1; transition: all .2s; color: #888; }
+  .theme-toggle:hover { border-color: #555; color: #ccc; }
+  body.light .theme-toggle { border-color: #ccc; color: #666; }
+  body.light .theme-toggle:hover { border-color: #999; color: #333; }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.8em; margin-bottom: 8px; }
+  @media (max-width: 480px) { h1 { font-size: 1.3em; } }
+  .subtitle { color: #888; margin-bottom: 24px; }
+  /* Changelog modal */
+  .changelog-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; overflow-y:auto; display:none; }
+  .changelog-overlay.open { display:flex; justify-content:center; }
+  .changelog-inner { max-width:750px; width:100%; padding:40px 24px 60px; color:#e0e0e0; position:relative; }
+  .changelog-close { position:fixed; top:16px; right:24px; font-size:28px; color:#888; cursor:pointer; z-index:10000; background:none; border:none; }
+  .changelog-close:hover { color:#fff; }
+  .changelog-inner h1 { font-size:2em; margin-bottom:24px; color:#fff; }
+  .changelog-inner h2 { font-size:1.4em; margin:32px 0 8px; color:#6cf; border-bottom:1px solid #333; padding-bottom:8px; }
+  .changelog-inner h3 { font-size:1.1em; margin:16px 0 8px; color:#ccc; }
+  .changelog-inner ul { margin:0 0 8px 20px; }
+  .changelog-inner li { margin:4px 0; line-height:1.6; color:#bbb; }
+  .changelog-inner code { background:#1a1a2e; padding:2px 6px; border-radius:3px; font-size:0.9em; color:#6cf; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { padding: 8px 16px; border-radius: 8px; background: #1a1a1a; border: 1px solid #333; cursor: pointer; color: #aaa; font-size: 14px; transition: all 0.2s; }
+  .tab:hover { border-color: #555; color: #fff; }
+  .tab.active { background: #2a2a2a; border-color: #666; color: #fff; }
+  .digest-list { display: flex; flex-direction: column; gap: 16px; }
+  .date-group { margin-bottom: 4px; }
+  .date-group-header { font-size: 13px; color: #666; font-weight: 600; letter-spacing: 0.5px; padding: 8px 0 6px; border-bottom: 1px solid #1e1e1e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .date-group-header .count { font-size: 11px; color: #444; font-weight: 400; }
+  .date-group-items { display: flex; flex-direction: column; gap: 8px; }
+  .digest-card { background: #1a1a1a; border: 1px solid #282828; border-radius: 12px; padding: 14px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .digest-card:hover { border-color: #444; background: #1e1e1e; }
+  .digest-card .card-body { flex: 1; min-width: 0; }
+  .digest-card .title { font-size: 14px; font-weight: 500; }
+  .digest-card .excerpt { font-size: 12px; color: #666; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+  .digest-card .time-badge { font-size: 12px; color: #666; background: #141414; padding: 3px 10px; border-radius: 6px; border: 1px solid #222; white-space: nowrap; }
+  .digest-viewer { display: none; background: #1a1a1a; border: 1px solid #282828; border-radius: 12px; padding: 24px; margin-top: 16px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; font-size: 14px; max-height: 80vh; overflow-y: auto; overflow-x: hidden; }
+  .digest-viewer a { color: #58a6ff; text-decoration: none; }
+  .digest-viewer a:hover { text-decoration: underline; }
+  .back-btn { display: inline-block; margin-bottom: 16px; padding: 6px 14px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #aaa; cursor: pointer; font-size: 13px; }
+  .back-btn:hover { color: #fff; border-color: #666; }
+  .empty { color: #555; text-align: center; padding: 40px; font-size: 14px; }
+  .loading { color: #555; text-align: center; padding: 20px; }
+  .mark-btn { display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: 11px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: #f0b040; cursor: pointer; vertical-align: middle; transition: all .15s; text-decoration: none; }
+  .mark-btn:hover { background: #3a3a1a; border-color: #f0b040; text-decoration: none; }
+  .mark-btn.marked { color: #40c040; border-color: #40c040; cursor: default; }
+  .mark-btn.disabled { color: #555; border-color: #333; cursor: pointer; opacity: .6; }
+  .mark-btn.disabled:hover { background: #2a2a2a; border-color: #555; }
+  .login-prompt { text-align: center; padding: 60px 20px; }
+  .login-prompt .icon { font-size: 48px; margin-bottom: 16px; }
+  .login-prompt .msg { color: #888; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+  .login-prompt .auth-btn { display: inline-block; padding: 10px 24px; font-size: 14px; }
+  .login-banner { background: #1a1a1a; border: 1px solid #282828; border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: #999; }
+  .login-banner a { color: #58a6ff; text-decoration: none; }
+  .login-banner a:hover { text-decoration: underline; }
+  .login-banner .dismiss { cursor: pointer; color: #555; font-size: 16px; padding: 0 4px; line-height: 1; }
+  .login-banner .dismiss:hover { color: #aaa; }
+  .auth-bar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .auth-tools { display: flex; align-items: center; gap: 6px; padding-left: 8px; border-left: 1px solid #333; margin-left: 2px; }
+  .auth-bar img { width: 32px; height: 32px; border-radius: 50%; }
+  .auth-bar .user-name { font-size: 13px; color: #aaa; }
+  .user-menu { position: relative; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .user-dropdown { display: none; position: absolute; top: 100%; right: 0; margin-top: 6px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 6px 0; min-width: 120px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+  .user-dropdown.show { display: block; }
+  .user-dropdown a { display: block; padding: 8px 16px; color: #aaa; text-decoration: none; font-size: 13px; transition: all .15s; }
+  .user-dropdown a:hover { background: #2a2a2a; color: #fff; }
+  .auth-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #ccc; cursor: pointer; font-size: 12px; text-decoration: none; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .auth-btn:hover { border-color: #666; color: #fff; }
+  .auth-btn .g-logo { width:14px;height:14px; }
+  .container { }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .mark-card { background: #1a1a1a; border: 1px solid #282828; border-radius: 12px; padding: 16px 20px; transition: all 0.2s; }
+  .mark-card:hover { border-color: #444; background: #1e1e1e; }
+  .mark-card .mark-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .mark-card .mark-date { font-size: 12px; color: #666; }
+  .mark-card .mark-status { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+  .mark-card .mark-status.pending { background: #3a2a00; color: #f0b040; }
+  .mark-card .mark-status.done { background: #0a2a0a; color: #40c040; }
+  .mark-card .mark-author { font-size: 14px; font-weight: 600; color: #58a6ff; }
+  .mark-card .mark-link { margin-top: 6px; }
+  .mark-card .mark-link a { font-size: 12px; color: #666; text-decoration: none; word-break: break-all; }
+  .mark-card .mark-link a:hover { color: #58a6ff; text-decoration: underline; }
+  .mark-stats { display: flex; gap: 16px; margin-bottom: 16px; }
+  .mark-stat { background: #1a1a1a; border: 1px solid #282828; border-radius: 8px; padding: 12px 16px; flex: 1; text-align: center; }
+  .mark-stat .num { font-size: 24px; font-weight: 700; }
+  .mark-stat .label { font-size: 12px; color: #888; margin-top: 2px; }
+  .source-card { background: #1a1a1a; border: 1px solid #282828; border-radius: 12px; padding: 16px 20px; transition: all 0.2s; }
+  .source-card:hover { border-color: #444; background: #1e1e1e; }
+  .source-card .source-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .source-card .source-name { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .source-card .source-meta { font-size: 12px; color: #666; margin-top: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .source-actions { display: flex; gap: 6px; align-items: center; }
+  .source-actions button { padding: 4px 10px; font-size: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #aaa; cursor: pointer; transition: all .15s; }
+  .source-actions button:hover { border-color: #666; color: #fff; }
+  .source-actions button.danger:hover { border-color: #f04040; color: #f04040; }
+  .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 20px; transition: .3s; }
+  .toggle-slider:before { content: ''; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #888; border-radius: 50%; transition: .3s; }
+  .toggle-switch input:checked + .toggle-slider { background: #2a5a2a; }
+  .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); background: #40c040; }
+  .source-form { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .source-form .form-row { margin-bottom: 12px; }
+  .source-form label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+  .source-form input, .source-form select, .source-form textarea { width: 100%; padding: 8px 12px; background: #0f0f0f; border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-size: 13px; font-family: inherit; }
+  .source-form textarea { min-height: 60px; resize: vertical; font-family: monospace; }
+  .source-form .form-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .source-form .form-actions button { padding: 8px 20px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #ccc; cursor: pointer; font-size: 13px; transition: all .2s; }
+  .source-form .form-actions button.primary { background: #1a3a1a; border-color: #40c040; color: #40c040; }
+  .source-form .form-actions button:hover { border-color: #666; color: #fff; }
+  .pack-card { background: #1a1a1a; border: 1px solid #282828; border-radius: 12px; padding: 16px 20px; transition: all 0.2s; }
+  .pack-card:hover { border-color: #444; background: #1e1e1e; }
+  .pack-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .pack-name { font-size: 16px; font-weight: 600; }
+  .pack-desc { font-size: 13px; color: #888; margin-top: 4px; }
+  .pack-meta { display: flex; gap: 12px; align-items: center; margin-top: 10px; font-size: 12px; color: #666; flex-wrap: wrap; }
+  .pack-meta img { width: 20px; height: 20px; border-radius: 50%; }
+  .pack-sources-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .pack-source-tag { font-size: 11px; padding: 3px 8px; background: #141414; border: 1px solid #282828; border-radius: 6px; color: #aaa; }
+  .pack-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .pack-actions button { padding: 6px 16px; font-size: 12px; border-radius: 6px; cursor: pointer; transition: all .2s; }
+  .pack-install-btn { background: #1a3a1a; border: 1px solid #40c040; color: #40c040; }
+  .pack-install-btn:hover { background: #2a4a2a; }
+  .pack-install-btn.done { background: #1a2a1a; border-color: #336633; color: #666; cursor: default; }
+  .pack-delete-btn { background: #2a2a2a; border: 1px solid #444; color: #aaa; }
+  .pack-delete-btn:hover { border-color: #f04040; color: #f04040; }
+  .pack-detail-page { max-width: 700px; margin: 0 auto; }
+  .pack-detail-sources { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .pack-detail-source { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #141414; border: 1px solid #222; border-radius: 8px; }
+  .pack-detail-source .icon { font-size: 18px; }
+  .pack-detail-source .info { flex: 1; }
+  .pack-detail-source .info .name { font-size: 14px; font-weight: 500; }
+  .pack-detail-source .info .type { font-size: 11px; color: #666; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;">
+    <h1 style="margin:0;cursor:pointer" onclick="goHome()">☀️ ClawFeed</h1>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="https://t.me/CocoAIxyz" target="_blank" rel="noopener" class="theme-toggle" title="Telegram" style="text-decoration:none;display:inline-flex;align-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <div class="auth-bar" id="authBar"></div>
+    </div>
+  </div>
+  <p class="subtitle" id="subtitleText">AI news digest — powered by <a href="https://x.com/ZylosAI" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Jessie@ZylosAI</a>, <a href="https://x.com/OpenClaw" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Lisa@OpenClaw</a></p>
+  <p class="info-banner" id="infoBanner" style="color:#e8a838;font-size:0.85em;margin:-16px 0 16px 0;"></p>
+  <div class="tabs">
+    <div class="tab active" data-type="4h">4H 简报</div>
+    <div class="tab" data-type="daily">日报</div>
+    <div class="tab" data-type="weekly">周报</div>
+    <div class="tab" data-type="monthly">月报</div>
+    <div class="tab" data-type="marks">📌 Mark 收藏</div>
+  </div>
+  <div id="loginBanner" class="login-banner" style="display:none;">
+    <span>💡 登录 Google 账号即可收藏文章、管理个人书签</span>
+    <span style="display:flex;align-items:center;gap:10px;">
+      <a href="#" id="bannerLogin">登录</a>
+      <span class="dismiss" onclick="dismissBanner()">✕</span>
+    </span>
+  </div>
+  <div id="list" class="digest-list"><div class="loading">⏳</div></div>
+  <div id="viewer" class="digest-viewer"></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="changelog-overlay" id="changelogOverlay">
+  <button class="changelog-close" onclick="hideChangelog()">✕</button>
+  <div class="changelog-inner" id="changelogContent"></div>
+</div>
+
+<script>
+window.onerror = function(msg, src, line) {
+  document.getElementById('list').innerHTML = '<div class="empty">JS Error: ' + msg + ' (line ' + line + ')</div>';
+};
+
+// ── Theme ──
+function initTheme() {
+  const saved = localStorage.getItem('clawfeed_theme') || 'dark';
+  if (saved === 'light') document.body.classList.add('light');
+  updateThemeIcon();
+}
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('clawfeed_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+}
+initTheme();
+
+// ── i18n ──
+const I18N = {
+  zh: {
+    title: '☀️ ClawFeed',
+    subtitle: 'AI 新闻简报 — powered by <a href="https://x.com/ZylosAI" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Jessie@ZylosAI</a>, <a href="https://x.com/OpenClaw" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Lisa@OpenClaw</a>',
+    tab4h: '4H 简报', tabDaily: '日报', tabWeekly: '周报', tabMonthly: '月报', tabMarks: '📌 Mark 收藏',
+    loginBanner: '💡 登录 Google 账号即可收藏文章、管理个人书签',
+    loginBtn: '登录', logout: '退出', signIn: '登录',
+    loading: '加载中...', noData: '暂无数据', loadMore: '加载更多', loadingMore: '加载中...',
+    loadFail: '加载失败', back: '← 返回列表', cantLoad: '无法加载',
+    today: '今天', yesterday: '昨天', articles: '篇',
+    weekLabel: (y, w) => `📅 ${y} 第 ${w} 周`,
+    monthLabel: (y, m) => `📅 ${y} 年 ${m} 月`,
+    yearLabel: (y) => `📅 ${y} 年`,
+    totalMarks: '总 Mark', deepDived: '已 Deep Dive', pending: '待处理',
+    byTopic: '🏷️ 按话题', byTime: '🕐 按时间',
+    noMarks: '暂无 Mark 记录', marksDone: '✅ 已解读', marksPending: '⏳ 待处理',
+    loginToMark: '🔐 登录后可收藏',
+    loginPromptTitle: '登录后可使用收藏功能',
+    loginPromptDesc: '收藏感兴趣的内容，随时回顾',
+    markSuccess: '📌 Mark 成功！', markDup: '已经 Mark 过了', markFail: '❌ Mark 失败',
+    marked: '✅ 已 Mark', mark: '📌 Mark',
+    items: '条', cannotLoadMarks: '无法加载 Marks 数据',
+    weekdays: ['周日','周一','周二','周三','周四','周五','周六'],
+    tabSources: '📡 数据源',
+    sourcesTotal: '总数', sourcesActive: '活跃', sourcesTypes: '类型',
+    addSource: '➕ 添加源', editSource: '编辑', deleteSource: '删除',
+    sourceName: '名称', sourceType: '类型', sourceConfig: '配置 (JSON)', sourcePublic: '公开',
+    save: '保存', cancel: '取消',
+    noSources: '暂无数据源', confirmDelete: '确定删除此数据源？',
+    emptySourcesTitle: '📡 选择你的信息源',
+    emptySourcesDesc: 'AI 编辑部会从这些源中为你精选内容。\n源越多，筛选质量越高，但你收到的 Digest 篇幅不变。',
+    emptySourcesPackHint: '🚀 安装推荐包，快速开始',
+    emptySourcesAddBtn: '+ 自己添加 Source',
+    subscribedSources: '已订阅',
+    createdByMe: '我创建的',
+    activeCount: (a, t) => `${a}/${t} 活跃`,
+    explorePacks: '🔍 探索更多',
+    emptyMarksTitle: '📌 你的收藏夹',
+    emptyMarksDesc: '浏览简报时点击 "Mark" 按钮收藏感兴趣的文章。\n收藏的内容会出现在这里。',
+    welcomeToast: '🎉 欢迎！点击 📡 管理你的信息源',
+    sharePack2: '🔗 分享',
+    lastFetched: '上次抓取', fetchCount: '抓取次数', never: '从未',
+    sourceCreated: '✅ 数据源已创建', sourceUpdated: '✅ 已更新', sourceDeleted: '✅ 已删除',
+    pasteUrl: '🔗 粘贴 URL 添加信息源', detect: '识别', detecting: '识别中...', detected: '识别成功', previewRecent: '最近内容',
+    cannotDetect: '无法自动识别，', manualAdd: '手动添加', confirmAdd: '确认添加',
+    urlPlaceholder: 'https://...', publicSource: '公开',
+    changelog: '更新日志', roadmap: '产品路线图',
+    sharePack: '📦 分享为 Pack', browsePacks: '🔍 浏览 Packs',
+    packName: 'Pack 名称', packDesc: '描述（可选）',
+    createPack: '创建 Pack', packCreated: '✅ Pack 已创建！',
+    packInstalled: '✅ 已安装！', packAlreadyHave: '你已有所有这些源',
+    installPack: '安装', installed: '已安装 ✅', loginToInstall: '登录后安装',
+    packSources: '包含的源', packInstalls: '次安装', packBy: '创建者',
+    deletePack: '删除', packDeleted: '✅ Pack 已删除',
+    shareLink: '分享链接', copied: '已复制！', noPacks: '暂无 Pack',
+    myPacks: '我的 Packs', backToPacks: '← 返回 Packs',
+    newAdded: '新增', skipped: '跳过（已有）',
+    feedbackTitle: '💬 反馈', feedbackPlaceholder: '说点什么...', feedbackEmailPlaceholder: '邮箱（可选）',
+    feedbackSend: '发送', feedbackEmpty: '有什么想说的？我们会认真看每一条反馈 😊',
+    feedbackSent: '✅ 已发送', feedbackNamePlaceholder: '名字（可选）',
+    infoBanner: '🔥 感谢大家热情！线上版本今天会快速迭代修掉一些 bug，进 <a href="https://t.me/CocoAIxyz" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:underline;">TG 交流群</a>保持更新',
+  },
+  en: {
+    title: '☀️ ClawFeed',
+    subtitle: 'AI news digest — powered by <a href="https://x.com/ZylosAI" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Jessie@ZylosAI</a>, <a href="https://x.com/OpenClaw" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;">Lisa@OpenClaw</a>',
+    tab4h: '4H Briefs', tabDaily: 'Daily', tabWeekly: 'Weekly', tabMonthly: 'Monthly', tabMarks: '📌 Marks',
+    loginBanner: '💡 Sign in with Google to bookmark articles and manage your reading list',
+    loginBtn: 'Login', logout: 'Logout', signIn: 'Sign in',
+    loading: 'Loading...', noData: 'No data', loadMore: 'Load More', loadingMore: 'Loading...',
+    loadFail: 'Failed to load', back: '← Back', cantLoad: 'Cannot load',
+    today: 'Today', yesterday: 'Yesterday', articles: 'articles',
+    weekLabel: (y, w) => `📅 ${y} Week ${w}`,
+    monthLabel: (y, m) => `📅 ${['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m]} ${y}`,
+    yearLabel: (y) => `📅 ${y}`,
+    totalMarks: 'Total', deepDived: 'Deep Dived', pending: 'Pending',
+    byTopic: '🏷️ By Topic', byTime: '🕐 By Time',
+    noMarks: 'No marks yet', marksDone: '✅ Done', marksPending: '⏳ Pending',
+    loginToMark: '🔐 Sign in to bookmark',
+    loginPromptTitle: 'Sign in to use bookmarks',
+    loginPromptDesc: 'Save interesting content and revisit anytime',
+    markSuccess: '📌 Marked!', markDup: 'Already marked', markFail: '❌ Mark failed',
+    marked: '✅ Marked', mark: '📌 Mark',
+    items: 'items', cannotLoadMarks: 'Cannot load marks',
+    weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    tabSources: '📡 Sources',
+    sourcesTotal: 'Total', sourcesActive: 'Active', sourcesTypes: 'Types',
+    addSource: '➕ Add Source', editSource: 'Edit', deleteSource: 'Delete',
+    sourceName: 'Name', sourceType: 'Type', sourceConfig: 'Config (JSON)', sourcePublic: 'Public',
+    save: 'Save', cancel: 'Cancel',
+    noSources: 'No sources yet', confirmDelete: 'Delete this source?',
+    emptySourcesTitle: '📡 Choose Your Sources',
+    emptySourcesDesc: 'AI editors curate content from your sources.\nMore sources = better curation, but your Digest stays the same length.',
+    emptySourcesPackHint: '🚀 Install a recommended pack to get started',
+    emptySourcesAddBtn: '+ Add Source manually',
+    subscribedSources: 'Subscribed',
+    createdByMe: 'Created by me',
+    activeCount: (a, t) => `${a}/${t} active`,
+    explorePacks: '🔍 Explore more',
+    emptyMarksTitle: '📌 Your Bookmarks',
+    emptyMarksDesc: 'Click the "Mark" button while browsing digests to save interesting articles.\nSaved items will appear here.',
+    welcomeToast: '🎉 Welcome! Click 📡 to manage your sources',
+    sharePack2: '🔗 Share',
+    lastFetched: 'Last fetched', fetchCount: 'Fetches', never: 'Never',
+    sourceCreated: '✅ Source created', sourceUpdated: '✅ Updated', sourceDeleted: '✅ Deleted',
+    pasteUrl: '🔗 Paste URL to add source', detect: 'Detect', detecting: 'Detecting...', detected: 'Detected', previewRecent: 'Recent items',
+    cannotDetect: 'Cannot auto-detect. ', manualAdd: 'Manual add', confirmAdd: 'Confirm',
+    urlPlaceholder: 'https://...', publicSource: 'Public',
+    changelog: 'Changelog', roadmap: 'Roadmap',
+    sharePack: '📦 Share as Pack', browsePacks: '🔍 Browse Packs',
+    packName: 'Pack Name', packDesc: 'Description (optional)',
+    createPack: 'Create Pack', packCreated: '✅ Pack created!',
+    packInstalled: '✅ Installed!', packAlreadyHave: 'You already have all these sources',
+    installPack: 'Install', installed: 'Installed ✅', loginToInstall: 'Login to install',
+    packSources: 'Sources', packInstalls: 'installs', packBy: 'By',
+    deletePack: 'Delete', packDeleted: '✅ Pack deleted',
+    shareLink: 'Share link', copied: 'Copied!', noPacks: 'No packs yet',
+    myPacks: 'My Packs', backToPacks: '← Back to Packs',
+    newAdded: 'added', skipped: 'skipped (existing)',
+    feedbackTitle: '💬 Feedback', feedbackPlaceholder: 'Type your message...', feedbackEmailPlaceholder: 'Email (optional)',
+    feedbackSend: 'Send', feedbackEmpty: 'Have something to say? We read every piece of feedback 😊',
+    feedbackSent: '✅ Sent', feedbackNamePlaceholder: 'Name (optional)',
+    infoBanner: '🔥 Thanks for the enthusiasm! We\'re shipping bug fixes today — join our <a href="https://t.me/CocoAIxyz" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:underline;">TG group</a> for updates',
+  }
+};
+
+let lang = localStorage.getItem('digest_lang') || 'en';
+function t(key) { return I18N[lang]?.[key] ?? I18N.en[key] ?? key; }
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('digest_lang', l);
+  applyLang();
+  renderList();
+}
+
+function applyLang() {
+  document.querySelector('h1').textContent = t('title');
+  document.getElementById('subtitleText').innerHTML = t('subtitle');
+  const ib = document.getElementById('infoBanner'); if (ib) ib.innerHTML = t('infoBanner');
+  const cl = document.getElementById('changelogLink'); if (cl) cl.textContent = t('changelog');
+  document.querySelector('[data-type="4h"]').textContent = t('tab4h');
+  document.querySelector('[data-type="daily"]').textContent = t('tabDaily');
+  document.querySelector('[data-type="weekly"]').textContent = t('tabWeekly');
+  document.querySelector('[data-type="monthly"]').textContent = t('tabMonthly');
+  document.querySelector('[data-type="marks"]').textContent = t('tabMarks');
+  const banner = document.getElementById('loginBanner');
+  if (banner) banner.querySelector('span').textContent = t('loginBanner');
+  renderAuthBar();
+}
+
+// ── Changelog ──
+function parseChangelogMd(md) {
+  return md.split('\n').map(line => {
+    // headers
+    if (line.startsWith('### ')) return `<h3>${esc(line.slice(4))}</h3>`;
+    if (line.startsWith('## ')) return `<h2>${esc(line.slice(3))}</h2>`;
+    if (line.startsWith('# ')) return `<h1>${esc(line.slice(2))}</h1>`;
+    // list items with bold and code
+    if (line.startsWith('- ')) {
+      let content = esc(line.slice(2));
+      content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+      return `<li>${content}</li>`;
+    }
+    if (line.trim() === '') return '';
+    return `<p>${esc(line)}</p>`;
+  }).join('\n')
+    .replace(/(<li>)/g, m => m) // wrap consecutive li in ul
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function showChangelog() {
+  const overlay = document.getElementById('changelogOverlay');
+  const content = document.getElementById('changelogContent');
+  content.innerHTML = '<p style="text-align:center;padding:40px;">⏳</p>';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  try {
+    const r = await fetch(`${API}/changelog?lang=${lang}`);
+    const d = await r.json();
+    content.innerHTML = parseChangelogMd(d.content);
+  } catch { content.innerHTML = '<p>Failed to load changelog.</p>'; }
+}
+function hideChangelog() {
+  document.getElementById('changelogOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function showRoadmap() {
+  const overlay = document.getElementById('changelogOverlay');
+  const content = document.getElementById('changelogContent');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  content.innerHTML = '<p>Loading...</p>';
+  try {
+    const r = await fetch(`${API}/roadmap?lang=${lang}`);
+    const d = await r.json();
+    content.innerHTML = parseChangelogMd(d.content);
+  } catch { content.innerHTML = '<p>Failed to load roadmap.</p>'; }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideChangelog(); });
+
+// API base — auto-detect: if served under /digest/, use /digest/api; otherwise /api
+const API = (() => {
+  const p = location.pathname;
+  if (p.startsWith('/staging/clawfeed')) return '/staging/clawfeed/api';
+  if (p.startsWith('/digest')) return '/digest/api';
+  return '/api';
+})();
+
+let currentUser = null;
+
+let authEnabled = true;
+async function checkAuth() {
+  try {
+    const cfg = await fetch(`${API}/auth/config`).then(r => r.json());
+    authEnabled = !!cfg.authEnabled;
+  } catch { authEnabled = false; }
+  if (authEnabled) {
+    try {
+      const r = await fetch(`${API}/auth/me`, { credentials: 'same-origin' });
+      if (r.ok) {
+        const data = await r.json();
+        currentUser = data.user;
+      }
+    } catch {}
+  }
+  renderAuthBar();
+  updateMarkVisibility();
+  if (currentUser && currentType === 'marks') renderMarks();
+  // Welcome toast for first-time login
+  if (currentUser && !localStorage.getItem('digest_welcomed')) {
+    localStorage.setItem('digest_welcomed', '1');
+    setTimeout(() => showToast(t('welcomeToast')), 500);
+  }
+}
+
+function ghLangHtml() {
+  const label = lang === 'zh' ? 'EN' : '中文';
+  return `<span class="auth-tools"><span id="langToggle" style="display:inline-flex;align-items:center;gap:4px;color:#888;cursor:pointer;font-size:12px;padding:3px 8px;border:1px solid #333;border-radius:6px;transition:all .2s;text-decoration:none;" onmouseover="this.style.borderColor='#555';this.style.color='#ccc'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">🌐 ${label}</span></span>`;
+}
+
+function renderAuthBar() {
+  const bar = document.getElementById('authBar');
+  const ghSvg = `<svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
+  const sourcesBtn = `<span onclick="currentType='sources';document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));currentOffset=0;allLoaded=false;renderSources();location.hash='sources'" style="cursor:pointer;font-size:16px;line-height:0;padding:2px;color:#666;transition:color .2s;" onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#666'" title="${t('tabSources')}">📡</span>`;
+  const moreMenu = `<div class="user-menu" onclick="document.getElementById('moreDropdown').classList.toggle('show')">
+    <span style="cursor:pointer;font-size:14px;color:#666;transition:color .2s;padding:2px 4px;" onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#666'">⋯</span>
+    <div id="moreDropdown" class="user-dropdown">
+      <a href="https://github.com/kevinho/clawfeed" target="_blank" onclick="event.stopPropagation();">${ghSvg} GitHub <span style="color:#555;font-size:12px;">v0.7.0</span></a>
+      <a href="#" onclick="event.stopPropagation();showChangelog();return false;">📋 ${t('changelog')}</a>
+      <a href="#" onclick="event.stopPropagation();showRoadmap();return false;">🗺️ ${t('roadmap')}</a>
+    </div>
+  </div>`;
+  if (currentUser) {
+    bar.innerHTML = ghLangHtml() + sourcesBtn
+      + `<div class="user-menu" onclick="document.getElementById('userDropdown').classList.toggle('show')">
+        <img src="${currentUser.avatar}" alt="">
+        <span class="user-name">${currentUser.name}</span>
+        <div id="userDropdown" class="user-dropdown">
+          <a href="#" onclick="event.stopPropagation();showFeedInfo();return false;">📡 My Feed</a>
+          <a href="#" onclick="event.stopPropagation();doLogout();return false;">${t('logout')}</a>
+        </div>
+      </div>` + moreMenu;
+  } else {
+    bar.innerHTML = ghLangHtml() + sourcesBtn
+      + (authEnabled ? `<a class="auth-btn" href="${API}/auth/google?origin=${encodeURIComponent(location.origin)}"><svg class="g-logo" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>${t('signIn')}</a>` : '')
+      + moreMenu;
+  }
+  const lt = document.getElementById('langToggle');
+  if (lt) lt.onclick = (e) => { e.preventDefault(); e.stopPropagation(); setLang(lang === 'zh' ? 'en' : 'zh'); };
+}
+
+function updateMarkVisibility() {
+  // Always show marks tab — show login prompt when clicked if not logged in
+  // Show/hide login banner
+  const banner = document.getElementById('loginBanner');
+  if (banner) {
+    if (authEnabled && !currentUser && !localStorage.getItem('digest_banner_dismissed')) {
+      banner.style.display = '';
+      document.getElementById('bannerLogin').href = `${API}/auth/google?origin=${encodeURIComponent(location.origin)}`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
+function dismissBanner() {
+  localStorage.setItem('digest_banner_dismissed', '1');
+  document.getElementById('loginBanner').style.display = 'none';
+}
+
+async function doLogout() {
+  await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'same-origin' });
+  currentUser = null;
+  renderAuthBar();
+  updateMarkVisibility();
+  if (currentType === 'marks') {
+    renderList(); // Will show login prompt
+  }
+}
+
+function WEEKDAYS() { return t('weekdays'); }
+let currentType = '4h';
+let markedUrls = new Map(); // url → mark id
+const PAGE_SIZE = 10;
+let currentOffset = 0;
+let allLoaded = false;
+
+function parseCreatedAt(d) {
+  const ca = d.created_at;
+  // Handle week format: "2026-W07"
+  if (/^\d{4}-W\d{2}$/.test(ca)) {
+    const [y, w] = ca.split('-W').map(Number);
+    // Approximate: week 1 starts Jan 1
+    const jan1 = new Date(y, 0, 1);
+    return new Date(jan1.getTime() + (w - 1) * 7 * 86400000);
+  }
+  // Handle month format: "2026-02"
+  if (/^\d{4}-\d{2}$/.test(ca)) {
+    return new Date(ca + '-01T00:00:00+08:00');
+  }
+  // Handle year format: "2026"
+  if (/^\d{4}$/.test(ca)) {
+    return new Date(ca + '-01-01T00:00:00+08:00');
+  }
+  return new Date(ca.replace(' ', 'T') + (ca.includes('+') ? '' : '+08:00'));
+}
+
+function getWeekKey(dt) {
+  const d = new Date(dt); d.setHours(0,0,0,0);
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const days = Math.floor((d - jan1) / 86400000);
+  const week = Math.ceil((days + jan1.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+
+function groupDigests(digests) {
+  const groups = {}; const order = [];
+  function localDateStr(dt) { return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+  function localMonthStr(dt) { return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`; }
+  for (const d of digests) {
+    const dt = parseCreatedAt(d);
+    let key;
+    if (currentType === '4h') {
+      key = localDateStr(dt); // by local day
+    } else if (currentType === 'daily') {
+      key = getWeekKey(dt); // by week
+    } else if (currentType === 'weekly') {
+      key = localMonthStr(dt); // by local month
+    } else {
+      key = String(dt.getFullYear()); // by local year
+    }
+    if (!groups[key]) { groups[key] = []; order.push(key); }
+    groups[key].push({ ...d, _dt: dt });
+  }
+  return { groups, order };
+}
+
+function formatGroupLabel(type, key) {
+  if (type === '4h') {
+    const d = new Date(key + 'T00:00:00+08:00');
+    const wd = WEEKDAYS()[d.getDay()];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((today - new Date(d.toDateString())) / 86400000);
+    if (diff === 0) return `📅 ${t('today')} · ${key} ${wd}`;
+    if (diff === 1) return `📅 ${t('yesterday')} · ${key} ${wd}`;
+    return `📅 ${key} ${wd}`;
+  }
+  if (type === 'daily') {
+    const [y, w] = key.split('-W');
+    return t('weekLabel')(y, parseInt(w));
+  }
+  if (type === 'weekly') {
+    const [y, m] = key.split('-');
+    return t('monthLabel')(y, parseInt(m));
+  }
+  if (type === 'monthly') {
+    return t('yearLabel')(key);
+  }
+  return `📅 ${key}`;
+}
+
+function extractExcerpt(content) {
+  if (!content) return '';
+  const lines = content.split('\n');
+  const highlights = [];
+  let inImportant = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Detect 🔥重要 section
+    if (trimmed.includes('🔥')) { inImportant = true; continue; }
+    // Stop at next section header
+    if (inImportant && (trimmed.startsWith('📰') || trimmed.startsWith('🔖') || trimmed.startsWith('🔍') || trimmed.startsWith('👀') || trimmed.startsWith('🧹') || trimmed.startsWith('💤'))) break;
+    if (inImportant && trimmed.startsWith('•')) {
+      let clean = trimmed.replace(/^•\s*/, '').replace(/\*\*/g, '').replace(/https?:\/\/\S+/g, '').replace(/（来源[^）]*）/g, '').trim();
+      if (clean.length > 8) highlights.push(clean.length > 80 ? clean.slice(0, 80) + '…' : clean);
+      if (highlights.length >= 2) break;
+    }
+  }
+  if (highlights.length) return highlights.join(' · ');
+  // Fallback: find first bullet with substance
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('>') || trimmed === '---' || /^[☀️🔥📰📅]/.test(trimmed) || trimmed.startsWith('*基于')) continue;
+    let clean = trimmed.replace(/^[•\-\*]\s*/, '').replace(/\*\*/g, '').replace(/https?:\/\/\S+/g, '').trim();
+    if (clean.length > 15) return clean.length > 120 ? clean.slice(0, 120) + '…' : clean;
+  }
+  return '';
+}
+
+let loadedDigests = [];
+
+function goHome() {
+  currentType = '4h';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-type="4h"]').classList.add('active');
+  currentOffset = 0; allLoaded = false;
+  renderList(); location.hash = '4h';
+}
+
+async function renderList(append = false) {
+  const list = document.getElementById('list');
+  const viewer = document.getElementById('viewer');
+  viewer.style.display = 'none';
+
+  if (currentType === 'marks') { renderMarks(); return; }
+  if (currentType === 'sources') { renderSources(); return; }
+
+  if (!append) {
+    currentOffset = 0;
+    allLoaded = false;
+    loadedDigests = [];
+    list.innerHTML = `<div class="loading">${t('loading')}</div>`;
+  }
+
+  try {
+    const resp = await fetch(`${API}/digests?type=${currentType}&limit=${PAGE_SIZE}&offset=${currentOffset}`);
+    const digests = await resp.json();
+    if (digests.length < PAGE_SIZE) allLoaded = true;
+    loadedDigests = loadedDigests.concat(digests);
+    currentOffset += digests.length;
+
+    if (!loadedDigests.length) { list.innerHTML = `<div class="empty">${t('noData')}</div>`; return; }
+
+    const { groups, order } = groupDigests(loadedDigests);
+    let html = '';
+    for (const gk of order) {
+      const items = groups[gk];
+      const label = formatGroupLabel(currentType, gk);
+      html += `<div class="date-group"><div class="date-group-header">${label} <span class="count">${items.length} ${t('articles')}</span></div><div class="date-group-items">`;
+      for (const d of items) {
+        const dt = d._dt;
+        const time = dt.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+        let title, badge;
+        if (currentType === '4h') {
+          title = `${time} SGT`; badge = `<span class="time-badge">${time}</span>`;
+        } else if (currentType === 'daily') {
+          const dateStr = dt.toISOString().slice(0, 10);
+          const wd = WEEKDAYS()[dt.getDay()];
+          title = `${dateStr} ${wd}`; badge = '';
+        } else if (currentType === 'weekly') {
+          const wk = getWeekKey(dt);
+          title = `第 ${parseInt(wk.split('-W')[1])} 周`; badge = '';
+        } else {
+          const mon = dt.toISOString().slice(0, 7);
+          title = `${parseInt(mon.split('-')[1])} 月`; badge = '';
+        }
+        const excerpt = extractExcerpt(d.content);
+        html += `<div class="digest-card" data-id="${d.id}"><div class="card-body"><div class="title">${title}</div>${excerpt ? `<div class="excerpt">${excerpt}</div>` : ''}</div>${badge}</div>`;
+      }
+      html += `</div></div>`;
+    }
+    if (!allLoaded) {
+      html += `<div id="load-more" style="text-align:center;padding:16px;"><button onclick="loadMore()" style="padding:10px 32px;background:#2a2a2a;border:1px solid #444;border-radius:8px;color:#aaa;cursor:pointer;font-size:14px;transition:all .2s;">${t('loadMore')}</button></div>`;
+    }
+    list.innerHTML = html;
+    list.querySelectorAll('.digest-card').forEach(card => {
+      card.onclick = () => loadDigest(card.dataset.id);
+    });
+  } catch (e) {
+    if (!append) list.innerHTML = `<div class="empty">${t('loadFail')}: ${e.message}</div>`;
+  }
+}
+
+// (smart add is rendered inside renderSources)
+
+async function loadMore() {
+  const btn = document.querySelector('#load-more button');
+  if (btn) { btn.textContent = t('loadingMore'); btn.disabled = true; }
+  await renderList(true);
+}
+
+async function loadDigest(id) {
+  const list = document.getElementById('list');
+  const viewer = document.getElementById('viewer');
+  list.innerHTML = '';
+  try {
+    const resp = await fetch(`${API}/digests/${id}`);
+    const d = await resp.json();
+    let text = d.content;
+    // Hide private sections for non-logged-in users
+    if (!currentUser) {
+      text = text.replace(/🧹\s*建议取关[\s\S]*?(?=\n(?:💤|🔍|👀|📰|🔖|🔥|—|$))/g, '');
+      text = text.replace(/🔖\s*Bookmarks\s*精选[\s\S]*?(?=\n(?:💤|🔍|👀|📰|🧹|🔥|—|$))/g, '');
+    }
+    await loadMarkedUrls();
+
+    text = text.replace(/(https?:\/\/x\.com\/[^\s<)]+)/g, (match) => {
+      const clean = match.split('?')[0];
+      const isMarked = markedUrls.has(clean);
+      const markId = markedUrls.get(clean);
+      let markHtml;
+      if (currentUser) {
+        markHtml = isMarked
+          ? `<span class="mark-btn marked" onclick="doUnmark('${clean}', ${markId}, this)">${t('marked')}</span>`
+          : `<span class="mark-btn" onclick="doMark('${clean}', this)">${t('mark')}</span>`;
+      } else {
+        markHtml = `<span class="mark-btn disabled" onclick="showToast('${t('loginToMark')}')" title="${t('loginToMark')}">${t('mark')}</span>`;
+      }
+      return `<a href="${match}" target="_blank">${match}</a>${markHtml}`;
+    });
+    text = text.replace(/(https?:\/\/(?!x\.com)[^\s<)]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+    viewer.innerHTML = `<div class="back-btn" onclick="renderList()">${t('back')}</div>\n${text}`;
+    viewer.style.display = 'block';
+  } catch (e) {
+    viewer.innerHTML = `<div class="back-btn" onclick="renderList()">${t('back')}</div>\n<div class="empty">${t('cantLoad')}</div>`;
+    viewer.style.display = 'block';
+  }
+}
+
+let markViewMode = 'topic'; // 'topic' or 'time'
+
+function getMarkTopic(m) {
+  return m.title || '其他';
+}
+
+async function renderMarks() {
+  const list = document.getElementById('list');
+  if (!currentUser) {
+    list.innerHTML = authEnabled ? `<div class="login-prompt">
+      <div class="icon">🔐</div>
+      <div class="msg">${t('loginPromptTitle')}<br>${t('loginPromptDesc')}</div>
+      <a class="auth-btn" href="${API}/auth/google?origin=${encodeURIComponent(location.origin)}"><svg class="g-logo" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>${t('signIn')}</a>
+    </div>` : `<div class="login-prompt"><div class="icon">🔐</div><div class="msg">${t('loginPromptTitle')}</div></div>`;
+    return;
+  }
+  list.innerHTML = `<div class="loading">${t('loading')}</div>`;
+  try {
+    const resp = await fetch(`${API}/marks`, { credentials: 'same-origin' });
+    const marks = await resp.json();
+    const pending = marks.filter(m => m.status === 'pending');
+    const processed = marks.filter(m => m.status === 'processed');
+
+    let html = `<div class="mark-stats">
+      <div class="mark-stat"><div class="num">${marks.length}</div><div class="label">${t('totalMarks')}</div></div>
+      <div class="mark-stat"><div class="num">${processed.length}</div><div class="label">${t('deepDived')}</div></div>
+      <div class="mark-stat"><div class="num" style="color:#f0b040">${pending.length}</div><div class="label">${t('pending')}</div></div>
+    </div>`;
+
+    // View toggle
+    html += `<div style="display:flex;gap:8px;margin-bottom:16px;">
+      <div class="tab ${markViewMode==='topic'?'active':''}" onclick="markViewMode='topic';renderMarks()">${t('byTopic')}</div>
+      <div class="tab ${markViewMode==='time'?'active':''}" onclick="markViewMode='time';renderMarks()">${t('byTime')}</div>
+    </div>`;
+
+    if (!marks.length) {
+      html += `<div style="text-align:center;padding:50px 20px;">
+        <div style="font-size:36px;margin-bottom:12px;">📌</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:10px;">${t('emptyMarksTitle')}</div>
+        <div style="color:#888;font-size:14px;line-height:1.7;white-space:pre-line;">${t('emptyMarksDesc')}</div>
+      </div>`;
+    } else if (markViewMode === 'topic') {
+      // Group by topic
+      const topicGroups = {};
+      for (const m of marks) {
+        const topic = getMarkTopic(m);
+        if (!topicGroups[topic]) topicGroups[topic] = [];
+        topicGroups[topic].push(m);
+      }
+      // Sort topics by count desc
+      const sortedTopics = Object.entries(topicGroups).sort((a,b) => b[1].length - a[1].length);
+      for (const [topic, items] of sortedTopics) {
+        html += `<div class="date-group"><div class="date-group-header">${topic} <span class="count">${items.length} ${t('items')}</span></div><div class="date-group-items">`;
+        for (const m of items) html += renderMarkCard(m);
+        html += `</div></div>`;
+      }
+    } else {
+      // Group by date
+      const dateGroups = {}; const dateOrder = [];
+      for (const m of marks) {
+        const dt = new Date(m.created_at);
+        const key = dt.toISOString().slice(0, 10);
+        if (!dateGroups[key]) { dateGroups[key] = []; dateOrder.push(key); }
+        dateGroups[key].push(m);
+      }
+      for (const key of dateOrder) {
+        const items = dateGroups[key];
+        html += `<div class="date-group"><div class="date-group-header">📅 ${key} <span class="count">${items.length} ${t('items')}</span></div><div class="date-group-items">`;
+        for (const m of items) html += renderMarkCard(m);
+        html += `</div></div>`;
+      }
+    }
+    list.innerHTML = html;
+  } catch (e) {
+    list.innerHTML = `<div class="empty">${t('cannotLoadMarks')}</div>`;
+  }
+}
+
+function renderMarkCard(m) {
+  const authorMatch = m.url.match(/x\.com\/([^/]+)/);
+  const author = authorMatch ? authorMatch[1] : '?';
+  const isDone = m.status === 'processed';
+  const topic = getMarkTopic(m);
+  const summary = m.note || '';
+  return `<div class="mark-card">
+    <div class="mark-meta">
+      <span class="mark-author">@${author}</span>
+      <span class="mark-status ${isDone ? 'done' : 'pending'}">${isDone ? t('marksDone') : t('marksPending')}</span>
+    </div>
+    ${summary ? `<div style="font-size:13px;color:#bbb;margin:6px 0;line-height:1.5;">${summary}</div>` : ''}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+      <a href="${m.url}" target="_blank" style="font-size:12px;color:#555;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">${m.url.replace('https://x.com/','x.com/')}</a>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span style="font-size:11px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:3px;border:1px solid #282828;">${topic}</span>
+        <span class="mark-btn" onclick="doUnmark('${m.url}', ${m.id}, this)" style="font-size:11px;color:#e55;border-color:#e55;">✕</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+const SOURCE_ICONS = { twitter_feed: '🐦', twitter_list: '🐦', rss: '📡', website: '🌐', hackernews: '🔶', reddit: '👽', github_trending: '⭐', custom_api: '🔌', digest_feed: '📰' };
+const SOURCE_TYPES = ['twitter_feed', 'twitter_list', 'rss', 'website', 'hackernews', 'reddit', 'github_trending', 'custom_api', 'digest_feed'];
+let showSourceForm = false;
+let editingSource = null;
+
+let createdByMeExpanded = false;
+
+function renderSourceCard(s, opts = {}) {
+  const icon = SOURCE_ICONS[s.type] || '📦';
+  const lastFetch = s.last_fetched_at ? s.last_fetched_at.slice(0, 16).replace('T', ' ') : t('never');
+  const showToggle = opts.showToggle !== false;
+  const showEdit = !!opts.showEdit;
+  const showDelete = !!opts.showDelete;
+  const showUnsub = !!opts.showUnsub;
+  return `<div class="source-card" style="padding:12px 16px;">
+    <div class="source-header">
+      <span class="source-name" style="font-size:14px;">${icon} ${s.name}${s.is_public ? ' <span style="font-size:11px;color:#666;font-weight:400;">🌐</span>' : ''}
+        <span style="font-size:11px;color:#6cf;background:#1a1a2e;padding:1px 6px;border-radius:3px;margin-left:4px;">${s.type}</span>
+      </span>
+      <div class="source-actions" style="gap:6px;">
+        ${showToggle ? `<label class="toggle-switch" title="Active"><input type="checkbox" ${s.is_active ? 'checked' : ''} onchange="toggleSource(${s.id}, this.checked)"><span class="toggle-slider"></span></label>` : ''}
+        ${showUnsub ? `<button class="danger" onclick="unsubSource(${s.id})" style="font-size:11px;padding:3px 8px;" title="${lang==='zh'?'退订':'Unsubscribe'}">✕</button>` : ''}
+        ${showEdit ? `<button onclick="editSourceForm(${s.id})" style="font-size:11px;padding:3px 8px;">${t('editSource')}</button>` : ''}
+        ${showDelete ? `<button class="danger" onclick="delSource(${s.id})" style="font-size:11px;padding:3px 8px;">${t('deleteSource')}</button>` : ''}
+      </div>
+    </div>
+    <div class="source-meta" style="font-size:11px;">
+      <span>${t('lastFetched')}: ${lastFetch}</span>
+    </div>
+  </div>`;
+}
+
+function renderDeletedSourceCard(s) {
+  const icon = SOURCE_ICONS[s.type] || '📦';
+  return `<div class="source-card" style="padding:12px 16px;opacity:0.4;pointer-events:none;filter:grayscale(1);">
+    <div class="source-header">
+      <span class="source-name" style="font-size:14px;">${icon} ${s.name}
+        <span style="font-size:11px;color:#f0b040;background:#3a2a00;padding:1px 6px;border-radius:3px;margin-left:4px;">⚠️ ${lang==='zh'?'已停用':'Deactivated'}</span>
+      </span>
+    </div>
+    <div class="source-meta" style="font-size:11px;">
+      <span style="color:#666;">${s.type}</span>
+    </div>
+  </div>`;
+}
+
+async function renderSources() {
+  const list = document.getElementById('list');
+  list.innerHTML = `<div class="loading">${t('loading')}</div>`;
+  try {
+    const resp = await fetch(`${API}/sources`, { credentials: 'same-origin' });
+    const sources = await resp.json();
+    const isLoggedIn = !!currentUser;
+
+    let html = '';
+
+    // ── Not logged in: show read-only sources list ──
+    if (!isLoggedIn) {
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h2 style="margin:0;font-size:16px;color:#e0e0e0;">📡 ${lang==='zh'?'信息源':'Sources'} <span style="font-size:13px;color:#666;font-weight:400;">${sources.length} ${lang==='zh'?'个公开源':'public sources'}</span></h2>
+      </div>`;
+      if (sources.length) html += `<div style="font-size:12px;color:#555;margin-bottom:16px;">${lang==='zh'?'以下是为本站 Digest 提供内容的信息源':'These are the sources powering this digest'}</div>`;
+      html += '<div class="digest-list" style="gap:8px;">';
+      for (const s of sources) {
+        const icon = SOURCE_ICONS[s.type] || '📦';
+        html += `<div class="source-card" style="padding:10px 16px;opacity:0.7;">
+          <div class="source-header">
+            <span class="source-name" style="font-size:13px;">${icon} ${s.name}</span>
+          </div>
+          <div class="source-meta" style="font-size:11px;">
+            <span style="background:#1a1a2e;padding:1px 6px;border-radius:3px;color:#6cf;">${s.type}</span>
+          </div>
+        </div>`;
+      }
+      html += '</div>';
+      list.innerHTML = html;
+      return;
+    }
+
+    // Fetch subscriptions
+    const subsResp = await fetch(`${API}/subscriptions`, { credentials: 'same-origin' });
+    const subscriptions = await subsResp.json();
+    const mySources = sources.filter(s => s.created_by === currentUser.id);
+    const activeSubscriptions = subscriptions.filter(s => s.is_active);
+
+    // ── Logged in: Empty state (no subscriptions) ──
+    if (!subscriptions.length) {
+      html += `<div style="text-align:center;padding:40px 20px;">
+        <div style="font-size:28px;margin-bottom:12px;">📡</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">${t('emptySourcesTitle')}</div>
+        <div style="color:#888;font-size:14px;margin-bottom:24px;white-space:pre-line;">${t('emptySourcesDesc')}</div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="renderPacksSection()" style="padding:10px 24px;background:#1a3a1a;border:1px solid #40c040;border-radius:8px;color:#40c040;cursor:pointer;font-size:14px;transition:all .2s;">${t('emptySourcesPackHint')}</button>
+          <button onclick="document.getElementById('smart_url')?.focus()" style="padding:10px 24px;background:#2a2a2a;border:1px solid #444;border-radius:8px;color:#aaa;cursor:pointer;font-size:14px;transition:all .2s;">${t('emptySourcesAddBtn')}</button>
+        </div>
+      </div>`;
+      html += `<div id="smartAddContainer"></div>`;
+      html += `<div id="sourceFormContainer"></div>`;
+      // Recommended packs
+      html += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #222;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px;">📦 ${lang==='zh'?'推荐 Packs':'Recommended Packs'}</div>
+        <div id="emptyPacksList"><div class="loading">${t('loading')}</div></div>
+      </div>`;
+      list.innerHTML = html;
+      renderSmartAdd();
+      // Load packs inline
+      fetch(`${API}/packs`, { credentials: 'same-origin' }).then(r => r.json()).then(packs => {
+        const container = document.getElementById('emptyPacksList');
+        if (!container) return;
+        if (!packs.length) { container.innerHTML = `<div style="color:#555;font-size:13px;">${t('noPacks')}</div>`; return; }
+        container.innerHTML = '<div class="digest-list" style="gap:8px;">' + packs.map(p => {
+          const sources = p.sources || [];
+          return `<div class="pack-card">
+            <div class="pack-header">
+              <div style="flex:1;">
+                <div class="pack-name">📦 ${esc(p.name)}</div>
+                ${p.description ? `<div class="pack-desc">${esc(p.description)}</div>` : ''}
+                <div class="pack-sources-list">
+                  ${sources.slice(0, 6).map(s => `<span class="pack-source-tag">${SOURCE_ICONS[s.type] || '📦'} ${esc(s.name)}</span>`).join('')}
+                  ${sources.length > 6 ? `<span class="pack-source-tag">+${sources.length - 6}</span>` : ''}
+                </div>
+                <div class="pack-meta">
+                  ${p.creator_avatar ? `<img src="${p.creator_avatar}" alt="">` : ''}
+                  <span>${p.creator_name || 'Anonymous'}</span>
+                  <span>·</span>
+                  <span>${sources.length} ${t('packSources')}</span>
+                </div>
+              </div>
+              <div class="pack-actions">
+                <button class="pack-install-btn" onclick="installPack('${p.slug}', this)">${t('installPack')}</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('') + '</div>';
+      }).catch(() => {});
+      return;
+    }
+
+    // ── Logged in, has subscriptions: Non-empty state ──
+
+    // Page title
+    html += `<h2 style="margin:0 0 16px;font-size:16px;color:#e0e0e0;">📡 ${lang==='zh'?'我的信息源':'My Sources'}</h2>`;
+
+    // Section 1: Subscribed (from subscriptions API)
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #282828;">
+      <span style="font-size:13px;color:#888;font-weight:600;letter-spacing:0.5px;">${t('subscribedSources')}</span>
+      <span style="font-size:12px;color:#555;">${t('activeCount')(activeSubscriptions.length, subscriptions.length)}</span>
+    </div>`;
+    html += '<div class="digest-list" style="gap:8px;margin-bottom:16px;">';
+    for (const s of subscriptions) {
+      if (s.sourceDeleted) {
+        html += renderDeletedSourceCard(s);
+      } else {
+        html += renderSourceCard(s, { showToggle: true, showUnsub: true });
+      }
+    }
+    html += '</div>';
+
+    // Section 2: Add Source + Explore more (action buttons)
+    html += `<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <div id="smartAddContainer" style="flex:1;min-width:280px;"></div>
+    </div>`;
+    html += `<div id="sourceFormContainer"></div>`;
+    html += `<div style="margin-bottom:20px;">
+      <button onclick="renderPacksSection()" style="padding:6px 16px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;cursor:pointer;font-size:13px;transition:all .2s;" onmouseover="this.style.borderColor='#6cf';this.style.color='#6cf'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">${t('explorePacks')}</button>
+    </div>`;
+
+    // Section 3: Created by me (collapsible)
+    html += `<div style="border-top:1px solid #222;padding-top:16px;margin-bottom:20px;">
+      <div onclick="createdByMeExpanded=!createdByMeExpanded;renderSources()" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:${createdByMeExpanded ? '12' : '0'}px;user-select:none;">
+        <span style="font-size:12px;color:#666;transition:transform .2s;display:inline-block;transform:rotate(${createdByMeExpanded ? '90' : '0'}deg);">▶</span>
+        <span style="font-size:13px;color:#888;font-weight:600;">${t('createdByMe')}</span>
+        <span style="font-size:12px;color:#555;">(${mySources.length})</span>
+      </div>
+      ${createdByMeExpanded ? `<div class="digest-list" style="gap:8px;">
+        ${mySources.map(s => renderSourceCard(s, { showToggle: false, showEdit: true, showDelete: true })).join('')}
+      </div>` : ''}
+    </div>`;
+
+    // Section 4: Source Packs
+    html += `<div style="border-top:1px solid #222;padding-top:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h2 style="margin:0;font-size:16px;color:#e0e0e0;">📦 Source Packs</h2>
+        <div style="display:flex;gap:8px;">
+          <button onclick="showCreatePackModal()" style="padding:5px 12px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;cursor:pointer;font-size:12px;transition:all .2s;" onmouseover="this.style.borderColor='#40c040';this.style.color='#40c040'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">${lang==='zh'?'分享':'Share'}</button>
+          <button onclick="renderPacksSection()" style="padding:5px 12px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;cursor:pointer;font-size:12px;transition:all .2s;" onmouseover="this.style.borderColor='#6cf';this.style.color='#6cf'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">${lang==='zh'?'浏览':'Explore'}</button>
+        </div>
+      </div>
+      <div style="color:#555;font-size:12px;">${lang==='zh'?'把你的信息源打包分享给别人，或安装别人的源合集':'Package your sources to share, or install curated packs from others'}</div>
+    </div>`;
+
+    list.innerHTML = html;
+    renderSmartAdd();
+    if (showSourceForm) renderSourceForm();
+  } catch (e) {
+    list.innerHTML = `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+let resolvedSource = null;
+let smartAddState = 'input'; // 'input' | 'loading' | 'preview' | 'error'
+let smartAddError = '';
+
+function renderSmartAdd() {
+  const container = document.getElementById('smartAddContainer');
+  if (!container) return;
+
+  let html = `<div class="source-form" style="margin-bottom:16px;">`;
+  html += `<div style="font-size:13px;color:#888;margin-bottom:10px;">${t('pasteUrl')}</div>`;
+  html += `<div style="display:flex;gap:8px;">
+    <input id="smart_url" type="url" placeholder="${t('urlPlaceholder')}" style="flex:1;padding:8px 12px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:13px;" value="${document.getElementById('smart_url')?.value || ''}" onkeydown="if(event.key==='Enter')detectSource()">
+    <button onclick="detectSource()" id="detectBtn" style="padding:8px 18px;background:#1a3a1a;border:1px solid #40c040;border-radius:8px;color:#40c040;cursor:pointer;font-size:13px;white-space:nowrap;transition:all .2s;" ${smartAddState==='loading'?'disabled':''}>${smartAddState==='loading' ? t('detecting') : t('detect')}</button>
+  </div>`;
+
+  if (smartAddState === 'preview' && resolvedSource) {
+    html += `<div style="margin-top:14px;padding:14px;background:#0f0f0f;border:1px solid #333;border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:18px;">${resolvedSource.icon || '📦'}</span>
+        <span style="font-size:12px;color:#888;background:#1a1a1a;padding:2px 8px;border-radius:4px;border:1px solid #282828;">${resolvedSource.type}</span>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span id="resolvedName" style="font-size:15px;font-weight:600;cursor:pointer;border-bottom:1px dashed #555;" onclick="this.contentEditable=true;this.focus();this.style.borderBottom='1px solid #40c040'" onblur="this.contentEditable=false;this.style.borderBottom='1px dashed #555';resolvedSource.name=this.textContent.trim()">${resolvedSource.name}</span>
+      </div>
+      <div style="font-size:12px;color:#555;margin-bottom:8px;word-break:break-all;">${document.getElementById('smart_url')?.value || ''}</div>
+      ${resolvedSource.preview && resolvedSource.preview.length ? `<div style="margin-bottom:12px;padding:10px;background:#141414;border-radius:6px;border:1px solid #222;">
+        <div style="font-size:11px;color:#666;margin-bottom:6px;">📄 ${t('previewRecent')}</div>
+        ${resolvedSource.preview.slice(0,5).map(p => `<div style="font-size:12px;color:#aaa;padding:2px 0;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.url ? `<a href="${p.url}" target="_blank" style="color:#58a6ff;text-decoration:none;" title="${p.title}">` : ''}• ${p.title}${p.url ? '</a>' : ''}</div>`).join('')}
+      </div>` : ''}
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;cursor:pointer;">
+          <input type="checkbox" id="smart_public" style="width:14px;height:14px;"> ${t('publicSource')}
+        </label>
+        <div style="display:flex;gap:8px;">
+          <button onclick="confirmSmartAdd()" style="padding:8px 18px;background:#1a3a1a;border:1px solid #40c040;border-radius:8px;color:#40c040;cursor:pointer;font-size:13px;">✓ ${t('confirmAdd')}</button>
+          <button onclick="smartAddState='input';resolvedSource=null;renderSmartAdd()" style="padding:8px 18px;background:#2a2a2a;border:1px solid #444;border-radius:8px;color:#aaa;cursor:pointer;font-size:13px;">${t('cancel')}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (smartAddState === 'error') {
+    html += `<div style="margin-top:10px;font-size:12px;color:#f04040;">${t('cannotDetect')}<a href="#" onclick="event.preventDefault();toggleSourceForm()" style="color:#58a6ff;">${t('manualAdd')} ›</a></div>`;
+  } else {
+    html += `<div style="margin-top:8px;"><a href="#" onclick="event.preventDefault();toggleSourceForm()" style="font-size:12px;color:#555;text-decoration:none;">${t('manualAdd')} ›</a></div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+async function detectSource() {
+  const input = document.getElementById('smart_url');
+  const url = (input?.value || '').trim();
+  if (!url) return;
+  smartAddState = 'loading';
+  resolvedSource = null;
+  renderSmartAdd();
+  try {
+    const r = await fetch(`${API}/sources/resolve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ url }) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'failed');
+    resolvedSource = data;
+    smartAddState = 'preview';
+  } catch (e) {
+    smartAddState = 'error';
+    smartAddError = e.message;
+  }
+  renderSmartAdd();
+}
+
+async function confirmSmartAdd() {
+  if (!resolvedSource) return;
+  const isPublic = document.getElementById('smart_public')?.checked || false;
+  try {
+    await fetch(`${API}/sources`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+      body: JSON.stringify({ name: resolvedSource.name, type: resolvedSource.type, config: JSON.stringify(resolvedSource.config), isPublic }) });
+    showToast(t('sourceCreated'));
+    smartAddState = 'input'; resolvedSource = null;
+    renderSources();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+function toggleSourceForm() {
+  showSourceForm = !showSourceForm;
+  editingSource = null;
+  renderSourceForm();
+}
+
+async function editSourceForm(id) {
+  try {
+    const r = await fetch(`${API}/sources/${id}`, { credentials: 'same-origin' });
+    editingSource = await r.json();
+    showSourceForm = true;
+    renderSourceForm();
+  } catch {}
+}
+
+const SOURCE_EXAMPLES = {
+  twitter_feed: { handle: "@elonmusk", keywords: ["AI", "LLM"] },
+  twitter_list: { list_url: "https://x.com/i/lists/123456789" },
+  rss: { url: "https://hnrss.org/frontpage" },
+  website: { url: "https://news.ycombinator.com", selector: ".titleline > a" },
+  hackernews: { filter: "top", min_score: 100 },
+  reddit: { subreddit: "MachineLearning", sort: "hot", limit: 20 },
+  github_trending: { language: "python", since: "daily" },
+  custom_api: { endpoint: "https://api.example.com/feed", headers: { "Authorization": "Bearer xxx" } },
+  digest_feed: { url: "https://digest.kevinhe.io/feed/kevin.json" }
+};
+
+function showFeedInfo() {
+  document.getElementById('userDropdown').classList.remove('show');
+  if (!currentUser) return;
+  // Fetch user slug from /api/auth/me (slug is included)
+  fetch(`${API}/auth/me`, { credentials: 'same-origin' }).then(r => r.json()).then(data => {
+    const slug = data.user.slug || 'unknown';
+    const base = location.origin;
+    const jsonUrl = `${base}/feed/${slug}.json`;
+    const rssUrl = `${base}/feed/${slug}.rss`;
+    const apiUrl = `${base}/feed/${slug}`;
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:24px;max-width:480px;width:90%;">
+      <h3 style="margin:0 0 16px;font-size:16px;">📡 Your Feed</h3>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px;color:#888;">JSON Feed</label>
+        <div style="display:flex;gap:6px;margin-top:4px;"><input readonly value="${jsonUrl}" style="flex:1;padding:6px 10px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:12px;" onclick="this.select()"><button onclick="navigator.clipboard.writeText('${jsonUrl}');showToast('Copied!')" style="padding:6px 12px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:12px;">📋</button></div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px;color:#888;">RSS Feed</label>
+        <div style="display:flex;gap:6px;margin-top:4px;"><input readonly value="${rssUrl}" style="flex:1;padding:6px 10px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:12px;" onclick="this.select()"><button onclick="navigator.clipboard.writeText('${rssUrl}');showToast('Copied!')" style="padding:6px 12px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:12px;">📋</button></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;color:#888;">Simple API</label>
+        <div style="display:flex;gap:6px;margin-top:4px;"><input readonly value="${apiUrl}" style="flex:1;padding:6px 10px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:12px;" onclick="this.select()"><button onclick="navigator.clipboard.writeText('${apiUrl}');showToast('Copied!')" style="padding:6px 12px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:12px;">📋</button></div>
+      </div>
+      <div style="text-align:right;"><button onclick="this.closest('div[style*=fixed]').remove()" style="padding:8px 20px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:13px;">Close</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  });
+}
+
+function onTypeChange() {
+  const sel = document.getElementById('sf_type');
+  const ta = document.getElementById('sf_config');
+  if (!sel || !ta) return;
+  if (editingSource) return; // don't overwrite when editing
+  ta.value = JSON.stringify(SOURCE_EXAMPLES[sel.value] || {}, null, 2);
+}
+
+function renderSourceForm() {
+  const container = document.getElementById('sourceFormContainer');
+  if (!container) return;
+  if (!showSourceForm) { container.innerHTML = ''; return; }
+  const s = editingSource;
+  const typeOptions = SOURCE_TYPES.map(t => `<option value="${t}" ${s && s.type === t ? 'selected' : ''}>${SOURCE_ICONS[t] || ''} ${t}</option>`).join('');
+  const configVal = s ? (typeof s.config === 'string' ? s.config : JSON.stringify(JSON.parse(s.config), null, 2)) : JSON.stringify(SOURCE_EXAMPLES['twitter_feed'], null, 2);
+  container.innerHTML = `<div class="source-form">
+    <div class="form-row"><label>${t('sourceName')}</label><input id="sf_name" value="${s ? s.name : ''}" placeholder="e.g. AI Twitter Feed"></div>
+    <div class="form-row"><label>${t('sourceType')}</label><select id="sf_type" onchange="onTypeChange()">${typeOptions}</select></div>
+    <div class="form-row"><label>${t('sourceConfig')}</label><textarea id="sf_config" style="font-family:monospace;font-size:12px;min-height:100px;">${configVal}</textarea></div>
+    <div class="form-row" style="flex-direction:row;align-items:center;gap:10px;"><label style="cursor:pointer;display:flex;align-items:center;gap:6px;margin:0;"><input type="checkbox" id="sf_public" style="width:16px;height:16px;" ${s && s.is_public ? 'checked' : ''}> ${t('sourcePublic')}</label></div>
+    <div class="form-actions">
+      <button class="primary" onclick="saveSource()">${t('save')}</button>
+      <button onclick="showSourceForm=false;editingSource=null;renderSourceForm()">${t('cancel')}</button>
+    </div>
+  </div>`;
+}
+
+async function saveSource() {
+  const name = document.getElementById('sf_name').value.trim();
+  const type = document.getElementById('sf_type').value;
+  const config = document.getElementById('sf_config').value.trim();
+  const isPublic = document.getElementById('sf_public').checked;
+  if (!name) return;
+  try { JSON.parse(config); } catch { showToast('Invalid JSON config'); return; }
+  try {
+    if (editingSource) {
+      await fetch(`${API}/sources/${editingSource.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ name, type, config, isPublic }) });
+      showToast(t('sourceUpdated'));
+    } else {
+      await fetch(`${API}/sources`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ name, type, config, isPublic }) });
+      showToast(t('sourceCreated'));
+    }
+    showSourceForm = false; editingSource = null;
+    renderSources();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+async function toggleSource(id, active) {
+  await fetch(`${API}/sources/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ isActive: active }) });
+}
+
+async function unsubSource(id) {
+  await fetch(`${API}/subscriptions/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+  showToast(lang==='zh'?'已退订':'Unsubscribed');
+  renderSources();
+}
+
+async function delSource(id) {
+  if (!confirm(t('confirmDelete'))) return;
+  await fetch(`${API}/sources/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+  showToast(t('sourceDeleted'));
+  renderSources();
+}
+
+async function loadMarkedUrls() {
+  if (!currentUser) return;
+  try {
+    const r = await fetch(`${API}/marks`, { credentials: 'same-origin' });
+    if (r.ok) {
+      const marks = await r.json();
+      marks.forEach(m => markedUrls.set(m.url, m.id));
+    }
+  } catch {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+async function doMark(url, btn) {
+  try {
+    const r = await fetch(`${API}/marks`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ url })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      // Reload marks to get the new mark id
+      const mr = await fetch(`${API}/marks`, { credentials: 'same-origin' });
+      if (mr.ok) { const marks = await mr.json(); markedUrls.clear(); marks.forEach(m => markedUrls.set(m.url, m.id)); }
+      const newId = markedUrls.get(url);
+      btn.textContent = t('marked');
+      btn.classList.add('marked');
+      btn.onclick = () => doUnmark(url, newId, btn);
+      showToast(d.duplicate ? t('markDup') : t('markSuccess'));
+    }
+  } catch (e) { showToast(t('markFail') + ': ' + e.message); }
+}
+
+async function doUnmark(url, markId, btn) {
+  if (!confirm(lang === 'zh' ? '确定取消收藏？' : 'Remove this mark?')) return;
+  try {
+    const r = await fetch(`${API}/marks/${markId}`, { method: 'DELETE', credentials: 'same-origin' });
+    const d = await r.json();
+    if (d.ok) {
+      markedUrls.delete(url);
+      btn.textContent = t('mark');
+      btn.classList.remove('marked');
+      btn.onclick = () => doMark(url, btn);
+      showToast(lang === 'zh' ? '已取消收藏' : 'Unmarked');
+      if (currentType === 'marks') renderMarks();
+    }
+  } catch (e) { showToast('❌ ' + e.message); }
+}
+
+// ── Source Packs ──
+
+let packsViewMode = 'browse'; // 'browse' | 'detail'
+let currentPackSlug = null;
+
+async function renderPacksSection() {
+  const list = document.getElementById('list');
+  list.innerHTML = `<div class="loading">${t('loading')}</div>`;
+  try {
+    const r = await fetch(`${API}/packs`, { credentials: 'same-origin' });
+    const packs = await r.json();
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <h2 style="margin:0;font-size:16px;color:#e0e0e0;">📦 ${lang==='zh'?'Source Packs 市场':'Source Packs Market'}</h2>
+        <div style="font-size:12px;color:#555;margin-top:4px;">${lang==='zh'?'发现和安装他人分享的信息源合集':'Discover and install curated source packs from others'}</div>
+      </div>
+      <button onclick="renderSources()" class="back-btn">${t('back')}</button>
+    </div>`;
+    if (!packs.length) {
+      html += `<div class="empty">${lang==='zh'?'还没有公开的 Pack，成为第一个分享者！':'No public packs yet. Be the first to share!'}</div>`;
+    } else {
+      html += '<div class="digest-list">';
+      for (const p of packs) {
+        const sources = p.sources || [];
+        html += `<div class="pack-card">
+          <div class="pack-header">
+            <div style="flex:1;">
+              <div class="pack-name">📦 ${esc(p.name)}</div>
+              ${p.description ? `<div class="pack-desc">${esc(p.description)}</div>` : ''}
+              <div class="pack-sources-list">
+                ${sources.slice(0, 8).map(s => `<span class="pack-source-tag">${SOURCE_ICONS[s.type] || '📦'} ${esc(s.name)}</span>`).join('')}
+                ${sources.length > 8 ? `<span class="pack-source-tag">+${sources.length - 8}</span>` : ''}
+              </div>
+              <div class="pack-meta">
+                ${p.creator_avatar ? `<img src="${p.creator_avatar}" alt="">` : ''}
+                <span>${p.creator_name || 'Anonymous'}</span>
+                <span>·</span>
+                <span>${sources.length} ${t('packSources')}</span>
+                <span>·</span>
+                <span>${p.install_count} ${t('packInstalls')}</span>
+              </div>
+            </div>
+            <div class="pack-actions">
+              ${currentUser && p.created_by === currentUser.id
+                ? `<button class="pack-install-btn" style="background:#1a1a2e;border-color:#6cf;color:#6cf;" onclick="navigator.clipboard.writeText(location.origin+'/pack/${p.slug}');showToast('${lang==='zh'?'链接已复制':'Link copied'}')">${t('sharePack2')}</button>
+                   <button class="pack-delete-btn" onclick="delPack(${p.id})">${t('deletePack')}</button>`
+                : currentUser
+                  ? `<button class="pack-install-btn" onclick="installPack('${p.slug}', this)">${t('installPack')}</button>`
+                  : `<button class="pack-install-btn" onclick="showToast(t('loginToInstall'))" style="opacity:.5">${t('loginToInstall')}</button>`
+              }
+            </div>
+          </div>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    list.innerHTML = html;
+  } catch (e) {
+    list.innerHTML = `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+async function installPack(slug, btn) {
+  if (btn.classList.contains('done')) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const r = await fetch(`${API}/packs/${slug}/install`, { method: 'POST', credentials: 'same-origin' });
+    const d = await r.json();
+    if (d.ok) {
+      let msg = t('packInstalled');
+      if (d.added > 0) msg += ` ${d.added} ${t('newAdded')}`;
+      if (d.skipped > 0) msg += `, ${d.skipped} ${t('skipped')}`;
+      showToast(msg);
+      // Force refresh sources view so user sees their new subscriptions
+      currentType = 'sources';
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      await renderSources();
+    } else {
+      showToast(d.error || 'Error');
+      btn.textContent = t('installPack');
+      btn.disabled = false;
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message);
+    btn.textContent = t('installPack');
+    btn.disabled = false;
+  }
+}
+
+async function delPack(id) {
+  if (!confirm(t('confirmDelete'))) return;
+  await fetch(`${API}/packs/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+  showToast(t('packDeleted'));
+  renderPacksSection();
+}
+
+function showCreatePackModal() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:24px;max-width:480px;width:90%;">
+    <h3 style="margin:0 0 16px;font-size:16px;">📦 ${t('sharePack')}</h3>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;color:#888;">${t('packName')}</label>
+      <input id="pack_name" style="width:100%;padding:8px 12px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:13px;margin-top:4px;" placeholder="${currentUser ? currentUser.name + "'s AI Sources" : 'My AI Sources'}" value="${currentUser ? currentUser.name + "'s AI Sources" : ''}">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;color:#888;">${t('packDesc')}</label>
+      <textarea id="pack_desc" style="width:100%;padding:8px 12px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:13px;margin-top:4px;min-height:60px;resize:vertical;font-family:inherit;" placeholder="A curated set of AI news sources..."></textarea>
+    </div>
+    <div id="pack_preview" style="margin-bottom:12px;padding:10px;background:#0a0a0a;border:1px solid #222;border-radius:6px;font-size:12px;color:#666;">⏳</div>
+    <div style="font-size:11px;color:#555;margin-bottom:12px;line-height:1.5;">${lang==='zh' ? '💡 将你所有活跃的信息源打包生成一个公开链接，其他人可以一键安装到自己的 dashboard' : '💡 Packages all your active sources into a shareable link. Others can install them to their dashboard in one click.'}</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="padding:8px 20px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:13px;">${t('cancel')}</button>
+      <button onclick="doCreatePack(this)" style="padding:8px 20px;background:#1a3a1a;border:1px solid #40c040;border-radius:6px;color:#40c040;cursor:pointer;font-size:13px;">${t('createPack')}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  // Auto-generate name & description from sources
+  fetch(`${API}/sources`, { credentials: 'same-origin' }).then(r => r.json()).then(sources => {
+    const mySources = sources.filter(s => s.is_active && currentUser && s.created_by === currentUser.id);
+    if (!mySources.length) {
+      const prev = document.getElementById('pack_preview');
+      if (prev) prev.innerHTML = `<div style="color:#f85149;">${lang==='zh'?'你还没有自己创建的源，只能打包自己创建的源':'You have no sources created by you. Only sources you created can be packaged.'}</div>`;
+      return;
+    }
+    const types = [...new Set(mySources.map(s => s.type))];
+    const typeLabels = { twitter_feed: 'Twitter', twitter_list: 'Twitter Lists', rss: 'RSS', website: 'Web', hackernews: 'Hacker News', reddit: 'Reddit', github_trending: 'GitHub', custom_api: 'API', digest_feed: 'Digest Feeds' };
+    const labels = types.map(t => typeLabels[t] || t);
+    const nameEl = document.getElementById('pack_name');
+    const descEl = document.getElementById('pack_desc');
+    if (nameEl && !nameEl._edited) nameEl.value = `${currentUser?.name || 'My'}'s ${labels.slice(0,2).join(' + ')} Pack`;
+    const prev = document.getElementById('pack_preview');
+    if (prev) prev.innerHTML = `<div style="color:#888;margin-bottom:6px;">${lang==='zh'?'将打包以下':'Will include'} <b style="color:#40c040;">${mySources.length}</b> ${lang==='zh'?'个源：':'sources:'}</div>` + mySources.map(s => `<div style="padding:2px 0;">${SOURCE_ICONS[s.type]||'📦'} ${s.name} <span style="color:#444;">· ${s.type}</span></div>`).join('');
+    if (descEl && !descEl._edited) descEl.value = `${mySources.length} curated sources: ${mySources.map(s => s.name).join(', ')}`;
+  }).catch(() => {});
+  document.getElementById('pack_name').oninput = function() { this._edited = true; };
+  document.getElementById('pack_desc').oninput = function() { this._edited = true; };
+}
+
+async function doCreatePack(btn) {
+  const nameEl = document.getElementById('pack_name');
+  const name = nameEl.value.trim() || nameEl.placeholder || 'My AI Sources';
+  const description = document.getElementById('pack_desc').value.trim();
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    // Get user's active sources
+    const sr = await fetch(`${API}/sources`, { credentials: 'same-origin' });
+    const sources = await sr.json();
+    const mySources = sources.filter(s => currentUser && s.created_by === currentUser.id && s.is_active);
+    if (!mySources.length) { showToast('No active sources to share'); btn.disabled = false; btn.textContent = t('createPack'); return; }
+    const sourcesJson = JSON.stringify(mySources.map(s => ({ name: s.name, type: s.type, config: typeof s.config === 'string' ? JSON.parse(s.config) : s.config })));
+    const r = await fetch(`${API}/packs`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+      body: JSON.stringify({ name, description, sourcesJson }) });
+    const d = await r.json();
+    if (d.slug) {
+      btn.closest('div[style*=fixed]').remove();
+      showToast(t('packCreated'));
+      // Show share link
+      const shareUrl = `${location.origin}/pack/${d.slug}`;
+      const linkModal = document.createElement('div');
+      linkModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;';
+      linkModal.onclick = e => { if (e.target === linkModal) linkModal.remove(); };
+      linkModal.innerHTML = `<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:24px;max-width:480px;width:90%;">
+        <h3 style="margin:0 0 16px;font-size:16px;">🔗 ${t('shareLink')}</h3>
+        <div style="display:flex;gap:6px;"><input readonly value="${shareUrl}" style="flex:1;padding:8px 12px;background:#0f0f0f;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:13px;" onclick="this.select()"><button onclick="navigator.clipboard.writeText('${shareUrl}');showToast(t('copied'))" style="padding:8px 14px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:13px;">📋</button></div>
+        <div style="text-align:right;margin-top:16px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="padding:8px 20px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#aaa;cursor:pointer;font-size:13px;">Close</button></div>
+      </div>`;
+      document.body.appendChild(linkModal);
+    } else {
+      showToast(d.error || 'Error');
+      btn.disabled = false; btn.textContent = t('createPack');
+    }
+  } catch (e) { showToast('Error: ' + e.message); btn.disabled = false; btn.textContent = t('createPack'); }
+}
+
+async function renderPackDetailPage(slug) {
+  const list = document.getElementById('list');
+  const viewer = document.getElementById('viewer');
+  viewer.style.display = 'none';
+  list.innerHTML = `<div class="loading">${t('loading')}</div>`;
+  try {
+    const r = await fetch(`${API}/packs/${slug}`, { credentials: 'same-origin' });
+    if (!r.ok) { list.innerHTML = `<div class="empty">Pack not found</div>`; return; }
+    const p = await r.json();
+    const sources = p.sources || [];
+    let html = `<div class="pack-detail-page">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:24px;font-weight:700;">📦 ${esc(p.name)}</div>
+        ${p.description ? `<div style="font-size:14px;color:#888;margin-top:8px;">${esc(p.description)}</div>` : ''}
+        <div class="pack-meta" style="margin-top:12px;">
+          ${p.creator_avatar ? `<img src="${p.creator_avatar}" style="width:24px;height:24px;border-radius:50%;" alt="">` : ''}
+          <span>${t('packBy')} ${p.creator_name || 'Anonymous'}</span>
+          <span>·</span>
+          <span>${sources.length} ${t('packSources')}</span>
+          <span>·</span>
+          <span>${p.install_count} ${t('packInstalls')}</span>
+        </div>
+      </div>
+      <div style="margin-bottom:20px;">
+        ${currentUser ? `<button class="pack-install-btn" onclick="installPack('${p.slug}', this)" style="padding:10px 28px;font-size:14px;border-radius:8px;">${t('installPack')}</button>` : `<a class="auth-btn" href="${API}/auth/google?origin=${encodeURIComponent(location.origin)}" style="padding:10px 28px;font-size:14px;">${t('loginToInstall')}</a>`}
+      </div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:8px;">${t('packSources')} (${sources.length})</div>
+      <div class="pack-detail-sources">
+        ${sources.map(s => `<div class="pack-detail-source">
+          <span class="icon">${SOURCE_ICONS[s.type] || '📦'}</span>
+          <div class="info"><div class="name">${esc(s.name)}</div><div class="type">${s.type}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+    list.innerHTML = html;
+  } catch (e) {
+    list.innerHTML = `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelector('.tab.active')?.classList.remove('active');
+    tab.classList.add('active');
+    currentType = tab.dataset.type;
+    currentOffset = 0; allLoaded = false;
+    location.hash = currentType;
+    document.getElementById('viewer').style.display = 'none';
+    renderList();
+  };
+});
+
+if (location.hash) {
+  const h = location.hash.substring(1);
+  if (['4h','daily','weekly','monthly','marks','sources'].includes(h)) {
+    currentType = h;
+    document.querySelector('.tab.active')?.classList.remove('active');
+    const t = document.querySelector('.tab[data-type="'+h+'"]');
+    if (t) t.classList.add('active');
+  } else if (h.startsWith('pack/')) {
+    currentPackSlug = h.slice(5);
+  }
+}
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.user-dropdown.show').forEach(dd => {
+    if (!e.target.closest('.user-menu')) dd.classList.remove('show');
+  });
+});
+applyLang();
+
+// ── Feedback Chat Bubble ──
+(async function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .fb-bubble { position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:#40c040; border:none; cursor:pointer; font-size:24px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,.3); z-index:1000; transition:transform .2s; }
+    .fb-bubble:hover { transform:scale(1.1); }
+    .fb-bubble .fb-dot { position:absolute; top:2px; right:2px; width:12px; height:12px; background:#f44; border-radius:50%; display:none; border:2px solid #0f0f0f; }
+    body.light .fb-bubble .fb-dot { border-color:#f5f5f5; }
+    .fb-panel { position:fixed; bottom:90px; right:24px; width:320px; height:400px; background:#1a1a1a; border:1px solid #333; border-radius:12px; z-index:1001; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,.4); transform:translateY(20px); opacity:0; pointer-events:none; transition:transform .25s ease, opacity .25s ease; }
+    .fb-panel.open { transform:translateY(0); opacity:1; pointer-events:auto; }
+    body.light .fb-panel { background:#fff; border-color:#ddd; box-shadow:0 8px 32px rgba(0,0,0,.1); }
+    .fb-header { padding:12px 16px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; }
+    body.light .fb-header { border-color:#ddd; color:#333; }
+    .fb-close { background:none; border:none; color:#888; cursor:pointer; font-size:18px; padding:0 4px; }
+    .fb-close:hover { color:#fff; }
+    body.light .fb-close:hover { color:#333; }
+    .fb-messages { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+    .fb-msg { max-width:85%; padding:8px 12px; border-radius:12px; font-size:13px; line-height:1.5; word-break:break-word; }
+    .fb-msg.user { align-self:flex-end; background:#2d5a2d; color:#e0e0e0; border-bottom-right-radius:4px; }
+    .fb-msg.reply { align-self:flex-start; background:#2a2a2a; color:#ccc; border-bottom-left-radius:4px; }
+    body.light .fb-msg.user { background:#d4edda; color:#333; }
+    body.light .fb-msg.reply { background:#e8e8e8; color:#333; }
+    .fb-msg .fb-time { font-size:10px; color:#666; margin-top:4px; }
+    .fb-empty { flex:1; display:flex; align-items:center; justify-content:center; padding:20px; text-align:center; color:#666; font-size:13px; line-height:1.6; }
+    .fb-input { padding:10px 12px; border-top:1px solid #333; display:flex; flex-direction:column; gap:6px; }
+    body.light .fb-input { border-color:#ddd; }
+    .fb-input textarea { width:100%; resize:none; background:#0f0f0f; border:1px solid #333; border-radius:8px; color:#e0e0e0; padding:8px 10px; font-size:13px; font-family:inherit; height:60px; }
+    body.light .fb-input textarea { background:#f5f5f5; border-color:#ccc; color:#333; }
+    .fb-input textarea:focus { outline:none; border-color:#40c040; }
+    .fb-input input { width:100%; background:#0f0f0f; border:1px solid #333; border-radius:6px; color:#e0e0e0; padding:6px 10px; font-size:12px; font-family:inherit; }
+    body.light .fb-input input { background:#f5f5f5; border-color:#ccc; color:#333; }
+    .fb-input input:focus { outline:none; border-color:#40c040; }
+    .fb-send { padding:6px 16px; background:#40c040; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:500; align-self:flex-end; transition:background .2s; }
+    .fb-send:hover { background:#35a535; }
+    .fb-send:disabled { opacity:.5; cursor:default; }
+    @media (max-width:480px) { .fb-panel { left:12px; right:12px; width:auto; bottom:84px; height:60vh; } .fb-bubble { bottom:16px; right:16px; } }
+  `;
+  document.head.appendChild(style);
+
+  // Check if feedback is enabled via API config
+  try {
+    const fcfg = await fetch(`${API}/config`).then(r => r.json()).catch(() => ({}));
+    if (fcfg.feedbackEnabled === false) return; // Don't show bubble
+  } catch {}
+
+  const bubble = document.createElement('button');
+  bubble.className = 'fb-bubble';
+  bubble.innerHTML = '💬<span class="fb-dot"></span>';
+  document.body.appendChild(bubble);
+
+  const panel = document.createElement('div');
+  panel.className = 'fb-panel';
+  panel.innerHTML = `
+    <div class="fb-header"><span class="fb-title"></span><button class="fb-close">×</button></div>
+    <div class="fb-messages"></div>
+    <div class="fb-input">
+      <div class="fb-anon-fields" style="display:none;"><input class="fb-email" type="email"><input class="fb-name" style="margin-top:4px;"></div>
+      <textarea class="fb-text"></textarea>
+      <button class="fb-send"></button>
+    </div>`;
+  document.body.appendChild(panel);
+
+  let fbOpen = false, fbLoaded = false, fbLastCount = 0;
+
+  function fbUpdateI18n() {
+    panel.querySelector('.fb-title').textContent = t('feedbackTitle');
+    panel.querySelector('.fb-text').placeholder = t('feedbackPlaceholder');
+    panel.querySelector('.fb-email').placeholder = t('feedbackEmailPlaceholder');
+    panel.querySelector('.fb-name').placeholder = t('feedbackNamePlaceholder');
+    panel.querySelector('.fb-send').textContent = t('feedbackSend');
+  }
+
+  function fbRender(items) {
+    const msgs = panel.querySelector('.fb-messages');
+    if (!items.length) {
+      msgs.innerHTML = `<div class="fb-empty">${t('feedbackEmpty')}</div>`;
+      return;
+    }
+    msgs.innerHTML = items.map(m => {
+      let html = `<div class="fb-msg user">${esc(m.message)}<div class="fb-time">${m.created_at}</div></div>`;
+      if (m.reply) html += `<div class="fb-msg reply">${esc(m.reply)}<div class="fb-time">${m.replied_at || ''}</div></div>`;
+      return html;
+    }).join('');
+    msgs.scrollTop = msgs.scrollHeight;
+    // Check unread
+    const replied = items.filter(i => i.reply).length;
+    if (replied > fbLastCount) panel.querySelector('.fb-dot')?.style && (bubble.querySelector('.fb-dot').style.display = 'block');
+    fbLastCount = replied;
+  }
+
+  async function fbLoad() {
+    try {
+      const r = await fetch(`${API}/feedback`, { credentials:'same-origin' });
+      const items = await r.json();
+      fbRender(Array.isArray(items) ? items : []);
+      fbLoaded = true;
+    } catch { fbRender([]); }
+  }
+
+  bubble.onclick = () => {
+    fbOpen = !fbOpen;
+    panel.classList.toggle('open', fbOpen);
+    if (fbOpen) {
+      fbUpdateI18n();
+      // Show anon fields if not logged in
+      panel.querySelector('.fb-anon-fields').style.display = currentUser ? 'none' : 'block';
+      if (!fbLoaded || currentUser) fbLoad();
+      bubble.querySelector('.fb-dot').style.display = 'none';
+    }
+  };
+  panel.querySelector('.fb-close').onclick = () => { fbOpen = false; panel.classList.remove('open'); };
+
+  panel.querySelector('.fb-send').onclick = async () => {
+    const text = panel.querySelector('.fb-text').value.trim();
+    if (!text) return;
+    const btn = panel.querySelector('.fb-send');
+    btn.disabled = true;
+    const body = { message: text };
+    if (!currentUser) {
+      const email = panel.querySelector('.fb-email').value.trim();
+      const name = panel.querySelector('.fb-name').value.trim();
+      if (email) body.email = email;
+      if (name) body.name = name;
+    }
+    try {
+      const r = await fetch(`${API}/feedback`, { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const d = await r.json();
+      if (d.ok) {
+        panel.querySelector('.fb-text').value = '';
+        showToast(t('feedbackSent'));
+        if (currentUser) fbLoad();
+        else {
+          // For anon, just show the sent message
+          const msgs = panel.querySelector('.fb-messages');
+          const empty = msgs.querySelector('.fb-empty');
+          if (empty) empty.remove();
+          msgs.insertAdjacentHTML('beforeend', `<div class="fb-msg user">${esc(text)}<div class="fb-time">just now</div></div>`);
+          msgs.scrollTop = msgs.scrollHeight;
+        }
+      }
+    } catch {}
+    btn.disabled = false;
+  };
+
+  // Send on Ctrl+Enter
+  panel.querySelector('.fb-text').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { panel.querySelector('.fb-send').click(); }
+  });
+
+  // Periodically check for new replies (every 60s when panel open)
+  setInterval(() => { if (fbOpen && currentUser) fbLoad(); }, 60000);
+})();
+
+// Detect /pack/:slug URL
+const packPageMatch = location.pathname.match(/\/pack\/([a-z0-9_-]+)/);
+checkAuth().then(() => {
+  if (packPageMatch) {
+    renderPackDetailPage(packPageMatch[1]);
+  } else if (currentPackSlug) {
+    renderPackDetailPage(currentPackSlug);
+  } else {
+    renderList();
+  }
+});
+
+// ClawMark — only on staging
+if (location.pathname.startsWith('/staging/')) {
+  const cmScript = document.createElement('script');
+  cmScript.type = 'module';
+  cmScript.textContent = `
+    import ClawMark from '/widget/index.js';
+    const cm = new ClawMark({
+      api: location.origin + '/api/clawmark',
+      app: 'staging-clawfeed',
+      user: (document.querySelector('.user-name')?.textContent || 'guest').trim()
+    });
+    cm.use(ClawMark.Fab);
+    cm.mount();
+  `;
+  document.body.appendChild(cmScript);
+}
+</script>
+</body>
+</html>

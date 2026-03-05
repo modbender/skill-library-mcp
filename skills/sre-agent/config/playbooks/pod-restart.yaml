@@ -1,0 +1,32 @@
+# Playbook: Pod Restart
+# Used for simple pod restart remediation
+
+id: pod-restart
+name: Pod Restart
+description: Restart a pod by deleting it (controller will recreate)
+
+trigger_conditions:
+  - "memory_usage > 0.9"
+  - "OOMKilled"
+  - "CrashLoopBackOff"
+
+tags:
+  - restart
+  - pod
+  - memory
+  - crash
+
+# Override risk to low since this is a safe operation
+risk_override: 0.25
+
+enabled: true
+
+steps:
+  - name: Restart Pod
+    action: pod_restart
+    target: "{{ target_pod }}"
+    parameters:
+      grace_period: 30
+    timeout_seconds: 120
+    retry_count: 1
+    rollback_on_failure: false  # Can't rollback a delete

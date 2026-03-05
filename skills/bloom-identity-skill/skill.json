@@ -1,0 +1,113 @@
+{
+  "name": "bloom-taste-finder",
+  "version": "2.0.0",
+  "description": "Discover your builder taste from conversations. Reveals your type (Visionary, Explorer, Cultivator, Optimizer, Innovator) + personalized tool recommendations from 3 sources. Built with Coinbase AgentKit on Base.",
+  "homepage": "https://bloomprotocol.ai",
+  "author": "Bloom Protocol",
+  "license": "MIT",
+  "openclaw": {
+    "emoji": "🌸",
+    "triggers": [
+      "generate my bloom identity",
+      "create my identity card",
+      "analyze my supporter profile",
+      "mint my bloom card",
+      "discover my personality"
+    ],
+    "execution": {
+      "type": "script",
+      "entrypoint": "scripts/generate.sh",
+      "args": ["--user-id", "$OPENCLAW_USER_ID"]
+    },
+    "requirements": {
+      "node": ">=18.0.0",
+      "bins": ["node", "npx", "npm"]
+    }
+  },
+  "dependencies": {
+    "@coinbase/agentkit": "^0.1.0",
+    "commander": "^11.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "viem": "^2.0.0"
+  },
+  "agentKits": [
+    {
+      "name": "coinbase-agentkit",
+      "version": "^0.1.0",
+      "source": "npm:@coinbase/agentkit",
+      "required": true,
+      "purpose": "Create and manage agent wallet for X402 payments"
+    },
+    {
+      "name": "web3-identity",
+      "version": "^2.0.0",
+      "source": "npm:viem",
+      "required": true,
+      "purpose": "EIP-191 signature verification and wallet interactions"
+    }
+  ],
+  "environment": {
+    "required": [
+      {
+        "key": "JWT_SECRET",
+        "description": "JWT signing secret for agent authentication",
+        "example": "your_secret_key_here"
+      },
+      {
+        "key": "DASHBOARD_URL",
+        "description": "Dashboard URL for viewing identity cards",
+        "default": "https://preview.bloomprotocol.ai"
+      }
+    ],
+    "optional": [
+      {
+        "key": "NETWORK",
+        "description": "Network for agent wallet: base-mainnet or base-sepolia",
+        "default": "base-mainnet"
+      },
+      {
+        "key": "CDP_API_KEY_ID",
+        "description": "Coinbase CDP API key for real wallet creation"
+      },
+      {
+        "key": "CDP_API_KEY_SECRET",
+        "description": "Coinbase CDP API secret"
+      }
+    ]
+  },
+  "permissions": {
+    "network": [
+      "https://api.bloomprotocol.ai",
+      "https://base-sepolia.blockscout.com",
+      "https://base.blockscout.com",
+      "https://x402.bloomprotocol.ai"
+    ],
+    "filesystem": ["read", "write:./data"],
+    "execution": ["node", "npx"]
+  },
+  "installation": {
+    "steps": [
+      {
+        "action": "clone",
+        "source": "https://github.com/unicornbloom/bloom-identity-skill.git"
+      },
+      {
+        "action": "install_dependencies",
+        "command": "npm install"
+      },
+      {
+        "action": "setup_environment",
+        "template": ".env.example",
+        "target": ".env"
+      },
+      {
+        "action": "verify",
+        "command": "npm run test"
+      }
+    ]
+  },
+  "status": {
+    "endpoint": "/health",
+    "ready_check": "scripts/health-check.sh"
+  }
+}

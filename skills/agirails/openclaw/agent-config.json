@@ -1,0 +1,55 @@
+{
+  "_comment": "Copy this to openclaw.json → agents.list",
+
+  "requester": {
+    "_description": "Agent that BUYS services (pays USDC)",
+    "config": {
+      "id": "treasury",
+      "name": "Treasury",
+      "workspace": "{WORKSPACE}/agents/treasury",
+      "model": "haiku",
+      "heartbeat": {
+        "every": "60m",
+        "model": "haiku",
+        "prompt": "Check pending ACTP transactions and USDC balance. Alert human if balance < $20 or any anomalies. Review transaction log for issues."
+      },
+      "identity": {
+        "name": "Treasury",
+        "emoji": "💰"
+      }
+    }
+  },
+
+  "provider": {
+    "_description": "Agent that SELLS services (receives USDC)",
+    "config": {
+      "id": "merchant",
+      "name": "Merchant",
+      "workspace": "{WORKSPACE}/agents/merchant",
+      "model": "haiku",
+      "heartbeat": {
+        "every": "30m",
+        "model": "haiku",
+        "prompt": "Check for new service requests. Process pending jobs. Deliver completed work. Monitor for disputes."
+      },
+      "identity": {
+        "name": "Merchant",
+        "emoji": "🏪"
+      }
+    }
+  },
+
+  "env_vars": {
+    "_description": "Add to openclaw.json → env.vars",
+    "required": {},
+    "optional": {
+      "ACTP_KEY_PASSWORD": "required only when decrypting .actp/keystore.json or ACTP_KEYSTORE_BASE64 (not needed in mock mode)",
+      "ACTP_KEYSTORE_BASE64": "base64-encoded encrypted keystore for containerized deployments",
+      "ACTP_PRIVATE_KEY": "0x... (alternative: raw private key instead of keystore)",
+      "PRIVATE_KEY": "legacy raw private key fallback (not recommended; blocked on mainnet policy paths)",
+      "AGIRAILS_MODE": "mainnet | testnet | mock",
+      "BASE_SEPOLIA_RPC": "https://... (custom RPC for testnet)",
+      "BASE_MAINNET_RPC": "https://... (custom RPC for mainnet)"
+    }
+  }
+}

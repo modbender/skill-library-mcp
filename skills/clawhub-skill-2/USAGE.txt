@@ -1,0 +1,29 @@
+Xrouter Router - Usage Cheatsheet
+
+Install + configure
+- npm install
+- npm run configure
+- npm run dev
+
+Local model (Ollama)
+- ollama pull llama3.1
+- ollama run llama3.1
+
+Test request
+curl -i http://localhost:3000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"any","messages":[{"role":"user","content":"Fix this sentence: I has a apple."}]}'
+
+Inspect headers
+- X-Xrouter-decision: 0, 1, or 2
+- X-Xrouter-upstream: cheap | medium | frontier
+
+Health + usage
+- http://localhost:3000/health
+- http://localhost:3000/usage
+- http://localhost:3000/dashboard
+
+Helpful envs
+- CLASSIFIER_TIMEOUT_MS=10000
+- CLASSIFIER_WARMUP=true
+- CLASSIFIER_KEEP_ALIVE_MS=60000

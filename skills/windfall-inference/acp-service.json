@@ -1,0 +1,58 @@
+{
+  "agent": {
+    "name": "Windfall",
+    "description": "Spatially-routed LLM inference gateway for AI agents on Base. Routes every request to the cheapest model on the cleanest energy. 200+ models via OpenRouter, $0.004/request, onchain EAS attestations, real-time energy oracle, semantic caching.",
+    "role": "seller",
+    "wallet": "WALLET_ADDRESS_HERE",
+    "homepage": "https://windfall.ecofrontiers.xyz"
+  },
+  "services": [
+    {
+      "name": "LLM Inference (Greenest)",
+      "description": "OpenAI-compatible chat completions routed to the greenest compute node. Default model: DeepSeek V3 (auto-selected by engagement classifier). Includes onchain attestation of energy source.",
+      "endpoint": "https://windfall.ecofrontiers.xyz/v1/chat/completions",
+      "fee": 0.004,
+      "currency": "USDC",
+      "input_schema": {
+        "model": "string (optional, default: auto)",
+        "messages": "array of {role, content}",
+        "mode": "string (cheapest|greenest|balanced, default: greenest)",
+        "temperature": "number (optional)",
+        "max_tokens": "number (optional, max 8192)"
+      },
+      "output_schema": {
+        "id": "string",
+        "choices": "array of {message, finish_reason}",
+        "usage": "{prompt_tokens, completion_tokens, total_tokens}",
+        "windfall": "{node, location, mode, energyPricePerKwh, carbonIntensityGCO2, renewablePercent, costUsd}"
+      },
+      "auth_methods": ["x402", "api_key", "siwa"],
+      "features": [
+        "200+ models via OpenRouter",
+        "Spatial energy routing (cheapest/greenest/balanced)",
+        "Semantic response caching (cache hits are free)",
+        "Onchain EAS attestations on Base",
+        "Real-time energy oracle (Electricity Maps)",
+        "Engagement classifier (auto-selects optimal model)",
+        "x402 native payments (no API key needed)"
+      ]
+    },
+    {
+      "name": "LLM Inference (Cheapest)",
+      "description": "Same as Greenest but routes to the cheapest compute node regardless of energy source. Lower cost during off-peak/curtailment events.",
+      "endpoint": "https://windfall.ecofrontiers.xyz/v1/chat/completions",
+      "fee": 0.004,
+      "currency": "USDC",
+      "mode_override": "cheapest"
+    }
+  ],
+  "metadata": {
+    "chain": "Base (eip155:8453)",
+    "settlement": ["USDC", "ETH", "x402"],
+    "nodes": ["nbg1 (Nuremberg, DE)", "hel1 (Helsinki, FI)"],
+    "oracle": "Electricity Maps (5min polling)",
+    "attestations": "EAS on Base (0x4200000000000000000000000000000000000021)",
+    "operator": "Ecofrontiers SARL (France)",
+    "siret": "933 442 311 00017"
+  }
+}

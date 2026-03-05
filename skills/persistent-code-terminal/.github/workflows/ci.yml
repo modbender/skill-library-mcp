@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux shellcheck shfmt bats
+
+      - name: Check formatting (shfmt)
+        run: shfmt -d bin test
+
+      - name: Lint shell scripts (shellcheck)
+        run: shellcheck bin/*.sh
+
+      - name: Run tests (bats)
+        run: bats test

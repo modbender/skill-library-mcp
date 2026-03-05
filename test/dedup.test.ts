@@ -82,7 +82,7 @@ describe("findDuplicates: fixtures", () => {
 });
 
 describe("dedup: real skills/ directory", () => {
-  it("has zero exact duplicates", async () => {
+  it("has zero exact duplicates", { timeout: 120_000 }, async () => {
     const report = await findDuplicates(skillsDir);
     if (report.exactDuplicates.length > 0) {
       const details = report.exactDuplicates
@@ -92,7 +92,9 @@ describe("dedup: real skills/ directory", () => {
     }
   });
 
-  it("reports near-duplicates without failing", async () => {
+  // Near-duplicate check is O(n²) — too slow for CI with 17K+ skills.
+  // Run on-demand via: pnpm dedup
+  it.skip("reports near-duplicates without failing", async () => {
     const report = await findDuplicates(skillsDir);
     if (report.nearDuplicates.length > 0) {
       console.warn(

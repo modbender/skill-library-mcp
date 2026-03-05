@@ -1,0 +1,63 @@
+{
+  "name": "whistle-rpc",
+  "description": "Solana RPC infrastructure -- unlimited requests, 1 SOL/month",
+  "version": "1.0.0",
+  "website": "https://whistle.ninja",
+  "skill": "https://whistle.ninja/skill.md",
+  "base_urls": {
+    "rpc": "https://rpc.whistle.ninja",
+    "websocket": "wss://rpc.whistle.ninja/ws",
+    "dex_api": "https://dex.whistle.ninja/v1",
+    "agent_api": "https://api.whistle.ninja"
+  },
+  "authentication": {
+    "methods": ["query_param", "header"],
+    "query_param": "api_key",
+    "header": "X-API-Key"
+  },
+  "subscription": {
+    "price": "1 SOL",
+    "duration": "30 days",
+    "cli": "npx whistle-rpc subscribe",
+    "endpoints": {
+      "quote": "POST https://api.whistle.ninja/api/agent/subscribe",
+      "activate": "POST https://api.whistle.ninja/api/agent/activate",
+      "status": "GET https://api.whistle.ninja/api/agent/status/:apiKey"
+    }
+  },
+  "tools": [
+    {
+      "name": "solana_rpc",
+      "description": "Full Solana JSON-RPC 2.0 -- all standard methods",
+      "url": "https://rpc.whistle.ninja",
+      "methods": ["getBalance", "getAccountInfo", "getSlot", "getBlockHeight", "getTransaction", "sendTransaction", "simulateTransaction", "getLatestBlockhash", "getMultipleAccounts", "getTokenAccountsByOwner", "getBlock", "getEpochInfo", "getHealth", "getVersion"]
+    },
+    {
+      "name": "websocket",
+      "description": "Real-time Solana subscriptions",
+      "url": "wss://rpc.whistle.ninja/ws",
+      "methods": ["slotSubscribe", "accountSubscribe", "programSubscribe", "signatureSubscribe", "logsSubscribe"]
+    },
+    {
+      "name": "dex_api",
+      "description": "DEX and market data",
+      "url": "https://dex.whistle.ninja/v1",
+      "endpoints": ["/trending", "/token/:mint", "/volume", "/trades/:mint", "/holders/:mint"]
+    },
+    {
+      "name": "historical",
+      "description": "Enriched transaction history",
+      "url": "https://rpc.whistle.ninja/v1",
+      "endpoints": ["/transactions/:address", "/token-transfers/:address", "/swaps/:address"]
+    }
+  ],
+  "rate_limits": "unlimited",
+  "mcp_config": {
+    "mcpServers": {
+      "whistle-rpc": {
+        "url": "https://rpc.whistle.ninja",
+        "tools": ["solana_rpc", "websocket", "dex_api", "historical"]
+      }
+    }
+  }
+}

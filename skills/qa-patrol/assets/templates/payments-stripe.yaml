@@ -1,0 +1,227 @@
+# QA Patrol - Stripe Payments Template
+# Level 2: Payment flow testing for Stripe-integrated apps
+# Usage: qa-patrol --plan payments-stripe.yaml --url https://your-app.com
+#
+# SECURITY: All credentials use ${env.VAR} interpolation
+# Test cards are Stripe's PUBLIC test card numbers (not real cards)
+# NEVER use live mode in automated tests
+# Set FREE_EMAIL, FREE_PASSWORD in your environment for auth
+
+app:
+  url: ${APP_URL}
+  name: ${APP_NAME:-My App}
+  stack: auto
+
+auth:
+  provider: ${AUTH_PROVIDER:-supabase}
+  login_path: /auth
+  accounts:
+    free:
+      email: ${FREE_EMAIL}
+      password: ${FREE_PASSWORD}
+
+payments:
+  provider: stripe
+  mode: test  # test | live (never use live in automated tests!)
+  pricing_path: /pricing
+  success_path: /success
+  cancel_path: /pricing
+  
+  # Stripe test card numbers
+  test_cards:
+    success: "4242424242424242"
+    decline: "4000000000000002"
+    requires_auth: "4000002500003155"
+  
+  tiers:
+    - name: pro
+      button_ref: pro_subscribe_button
+      price_text: "$9.99/month"
+    - name: max
+      button_ref: max_subscribe_button
+      price_text: "$19.99/month"
+    - name: lifetime
+      button_ref: lifetime_buy_button
+      price_text: "$99.99"
+      one_time: true
+
+tests:
+  smoke:
+    - name: Pricing page loads
+      navigate: ${payments.pricing_path}
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+
+    - name: Pricing tiers displayed
+      navigate: ${payments.pricing_path}
+      assert:
+        - element_exists: pro_tier
+        - element_exists: max_tier
+        - text_contains: ${payments.tiers[0].price_text}
+
+  payments:
+    # Checkout Creation Tests
+    - name: Pro checkout redirects to Stripe
+      requires: signed_in
+      account: free
+      tier: pro
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[0].button_ref}
+        - wait:
+            url_contains: checkout.stripe.com
+            timeout: 15000
+      assert:
+        - url_contains: checkout.stripe.com
+        - element_exists: cardNumber  # Stripe's card input
+
+    - name: Max checkout redirects to Stripe
+      requires: signed_in
+      account: free
+      tier: max
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[1].button_ref}
+        - wait:
+            url_contains: checkout.stripe.com
+            timeout: 15000
+      assert:
+        - url_contains: checkout.stripe.com
+
+    - name: Lifetime checkout redirects to Stripe
+      requires: signed_in
+      account: free
+      tier: lifetime
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[2].button_ref}
+        - wait:
+            url_contains: checkout.stripe.com
+            timeout: 15000
+      assert:
+        - url_contains: checkout.stripe.com
+
+    # Guest Checkout Behavior
+    - name: Guest prompted to sign in before checkout
+      mode: guest
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[0].button_ref}
+        - wait: 3000
+      assert:
+        - url_contains: ${auth.login_path}
+      # OR for inline auth:
+      # assert:
+      #   - element_exists: sign_in_modal
+
+    # Checkout Completion (requires Stripe test mode)
+    - name: Successful payment flow
+      requires: signed_in
+      account: free
+      tier: pro
+      skip_if: live_mode  # Never auto-complete in live mode
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[0].button_ref}
+        - wait:
+            url_contains: checkout.stripe.com
+            timeout: 15000
+        # In Stripe checkout:
+        - type:
+            ref: cardNumber
+            text: ${payments.test_cards.success}
+        - type:
+            ref: cardExpiry
+            text: "12/28"
+        - type:
+            ref: cardCvc
+            text: "123"
+        - type:
+            ref: billingName
+            text: "Test User"
+        - click:
+            ref: submitButton  # "Pay" or "Subscribe" button
+        - wait:
+            url_contains: ${payments.success_path}
+            timeout: 30000
+      assert:
+        - url_contains: ${payments.success_path}
+        - text_contains: "success"
+      cleanup:
+        - cancel_subscription: true  # Clean up test subscription
+
+    # Cancel Flow
+    - name: Cancel from Stripe checkout returns to app
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click:
+            ref: ${payments.tiers[0].button_ref}
+        - wait:
+            url_contains: checkout.stripe.com
+            timeout: 15000
+        - click:
+            ref: back_button  # Stripe's back/cancel link
+        - wait: 3000
+      assert:
+        - url_contains: ${app.url}
+        - url_contains: ${payments.cancel_path}
+
+    # Customer Portal (if enabled)
+    - name: Customer portal accessible
+      requires: signed_in
+      requires: has_subscription
+      account: subscribed_user
+      steps:
+        - navigate: /account
+        - click:
+            ref: manage_subscription_button
+        - wait:
+            url_contains: billing.stripe.com
+            timeout: 15000
+      assert:
+        - url_contains: billing.stripe.com
+      skip_if: no_customer_portal
+
+  # Webhook Verification (manual check)
+  webhooks:
+    - name: Webhook endpoint responds
+      type: api_check
+      method: POST
+      url: ${app.url}/api/webhooks/stripe
+      headers:
+        Content-Type: application/json
+      body: '{"type": "ping"}'
+      assert:
+        - status_code: 400  # Should reject invalid signature
+        - not_status_code: 500  # Should not error
+      note: "Webhook signature verification working if 400 returned"
+
+  # Price Accuracy
+  pricing_accuracy:
+    - name: Pro price matches expected
+      navigate: ${payments.pricing_path}
+      assert:
+        - text_contains: "$9.99"
+        - text_contains: "month"
+
+    - name: No hidden fees displayed
+      navigate: ${payments.pricing_path}
+      assert:
+        - text_not_contains: "processing fee"
+        - text_not_contains: "additional charge"
+
+settings:
+  screenshot_on_failure: true
+  screenshot_format: png
+  timeout_default: 15000
+  stripe_timeout: 30000  # Stripe can be slow
+  never_use_live_cards: true  # Safety check
+  cleanup_test_subscriptions: true

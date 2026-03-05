@@ -1,0 +1,14 @@
+services:
+  openclaw:
+    # NOTE: OpenClaw image name/tag may change. Keep it overrideable.
+    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./openclaw.config.yml:/app/openclaw.config.yml:ro
+    command: ["--config", "/app/openclaw.config.yml"]
+
+# Notes:
+# - This starter kit assumes OpenClaw can read a config file that defines MCP/tool connections.
+# - If OpenClaw expects a different path/flags, adjust `command` + volume mount.

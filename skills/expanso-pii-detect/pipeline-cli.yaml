@@ -1,0 +1,72 @@
+# Expanso Pipeline: pii-detect (CLI mode)
+# ==========================================
+#
+# Detect personally identifiable information (PII) in text.
+#
+# Usage:
+#   echo "Contact John at john@example.com or 555-123-4567" | \
+#     expanso-edge run pipeline-cli.yaml
+#
+#   # Specific PII types only
+#   echo "SSN: 123-45-6789" | PII_TYPES="ssn,credit_card" expanso-edge run pipeline-cli.yaml
+
+name: pii-detect-cli
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 1048576
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          meta trace_id = uuid_v4()
+
+          let pii_types = env("PII_TYPES").or("email,phone,ssn,credit_card,name,address,dob,ip_address")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a PII detection specialist. Scan text for personally identifiable information and return structured findings. Be thorough but avoid false positives. Only report actual PII, not generic references."
+            },
+            {
+              "role": "user",
+              "content": "Scan this text for the following PII types: " + $pii_types + "\n\nReturn a JSON object:\n{\n  \"findings\": [\n    {\"type\": \"email|phone|ssn|credit_card|name|address|dob|ip_address\", \"value\": \"the actual PII\", \"start\": 0, \"end\": 0, \"confidence\": 0.0-1.0}\n  ],\n  \"summary\": \"Brief summary of what was found\"\n}\n\nIf no PII is found, return {\"findings\": [], \"summary\": \"No PII detected\"}.\nReturn valid JSON only.\n\nText to scan:\n" + content()
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let raw = this.choices.0.message.content
+          let parsed = $raw.parse_json().catch({"findings": [], "summary": "Parse error"})
+
+          root.findings = $parsed.findings.or([])
+          root.has_pii = $parsed.findings.or([]).length() > 0
+          root.summary = $parsed.summary.or("")
+          root.metadata = {
+            "skill": "pii-detect",
+            "mode": "cli",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "pii_types_scanned": env("PII_TYPES").or("all"),
+            "findings_count": $parsed.findings.or([]).length(),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [pii-detect] Found ${! root.findings.length() } PII items in ${! meta("input_length") } chars (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

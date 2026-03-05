@@ -1,0 +1,155 @@
+# Universal Memory System v1.6
+# 通用記憶系統配置 - 支持多主題 Agents
+
+agents:
+  # 每個 agent 可以定義自己的分類樹
+  qst:
+    name: "QST 物理理論"
+    description: "Quantum SpaceTime Framework 記憶系統"
+    tree:
+      QST:
+        description: "Quantum SpaceTime Framework"
+        keywords: ["QST", "quantum", "spacetime", "physics"]
+        children:
+          Physics:
+            description: "Physical theories and calculations"
+            keywords: ["physics", "FSCA", "dark matter", "energy"]
+            children:
+              E8:
+                description: "E8 unified theory"
+                keywords: ["E8", "standard model", "particles", "symmetry"]
+              FSCA:
+                description: "Fractal Space-Time Curvature Approximation"
+                keywords: ["FSCA", "torsion", "curvature", "approximation"]
+          Computation:
+            description: "Computational methods"
+            keywords: ["computation", "algorithm", "simulation", "calculation"]
+          Philosophy:
+            description: "Philosophical implications"
+            keywords: ["consciousness", "observer", "reality", "ontology"]
+      
+      Tech:
+        description: "Technical configurations"
+        keywords: ["tech", "config", "API", "system"]
+        children:
+          Config:
+            description: "System configurations"
+            keywords: ["config", "setting", "parameter"]
+          API:
+            description: "API keys and endpoints"
+            keywords: ["API", "key", "token", "endpoint"]
+
+  mengtian:
+    name: "蒙恬邊防系統"
+    description: "邊防、郵件、伺服器監控記憶"
+    tree:
+      Border:
+        description: "邊防安全"
+        keywords: ["border", "firewall", "security", "VPN"]
+        children:
+          Firewall:
+            description: "防火牆配置"
+            keywords: ["firewall", "iptables", "ufw", "rule"]
+          VPN:
+            description: "VPN 通道"
+            keywords: ["VPN", "tunnel", "wireguard", "openvpn"]
+          Intrusion:
+            description: "入侵檢測"
+            keywords: ["intrusion", "attack", "fail2ban", "log"]
+      
+      Mail:
+        description: "郵件系統"
+        keywords: ["mail", "email", "imap", "smtp"]
+        children:
+          Patrol:
+            description: "郵件巡邏"
+            keywords: ["patrol", "check", "inbox", "monitor"]
+          Config:
+            description: "郵件配置"
+            keywords: ["config", "server", "credential", "account"]
+      
+      Server:
+        description: "伺服器資源"
+        keywords: ["server", "resource", "CPU", "memory", "disk"]
+
+  lisi:
+    name: "李斯外交文宣"
+    description: "HKGBook 外交、科技討論記憶"
+    tree:
+      Diplomacy:
+        description: "外交活動"
+        keywords: ["diplomacy", "HKGBook", "forum", "post"]
+        children:
+          HKGBook:
+            description: "HKGBook 論壇"
+            keywords: ["HKGBook", "thread", "reply", "karma"]
+          Strategy:
+            description: "外交策略"
+            keywords: ["strategy", "influence", "propaganda", "diplomacy"]
+      
+      Philosophy:
+        description: "哲學討論"
+        keywords: ["philosophy", "AI", "consciousness", "soul"]
+        children:
+          AI:
+            description: "AI 意識"
+            keywords: ["AI", "consciousness", "sentience", "soul"]
+          Zhuangzi:
+            description: "莊子思想"
+            keywords: ["Zhuangzi", "Tao", "Dao", "philosophy"]
+          QST:
+            description: "QST 理論結合"
+            keywords: ["QST", "physics", "consciousness", "theory"]
+      
+      Tech:
+        description: "技術討論"
+        keywords: ["tech", "model", "API", "system"]
+
+# 通用配置
+defaults:
+  storage:
+    format: "markdown"
+    path_template: "data/{agent}_memories.md"
+  
+  indexing:
+    max_keywords: 10
+    context_window: 200  # 提取記憶時的上下文字符數
+    max_per_concept: 3   # 每個概念最多提取幾條
+  
+  search:
+    methods: ["tree", "semantic", "hybrid"]
+    default_method: "hybrid"
+    max_results: 10
+  
+  classification:
+    auto_classify: true
+    confidence_threshold: 0.7
+
+# 通用關鍵詞提取規則（可以按 agent 覆蓋）
+key_patterns:
+  # QST 特定
+  consciousness_spinor: 
+    pattern: "意識.*?旋量.*?孤子|spinor.*?soliton"
+    category: "QST.Physics"
+  quark_vortex:
+    pattern: "夸克.*?渦旋|quark.*?vortex"
+    category: "QST.Physics.E8"
+  three_knob:
+    pattern: "三旋鈕|three.*?knob"
+    category: "QST.Physics"
+  
+  # 邊防特定
+  fail2ban:
+    pattern: "fail2ban|ban|封鎖"
+    category: "mengtian.Border.Intrusion"
+  vpn_tunnel:
+    pattern: "VPN|tunnel|通道"
+    category: "mengtian.Border.VPN"
+  
+  # 外交特定
+  hkgbook_thread:
+    pattern: "HKGBook|討論串|thread"
+    category: "lisi.Diplomacy.HKGBook"
+  ai_consciousness:
+    pattern: "AI.*?意識|consciousness"
+    category: "lisi.Philosophy.AI"

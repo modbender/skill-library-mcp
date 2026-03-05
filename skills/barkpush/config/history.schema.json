@@ -1,0 +1,306 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bark Push History Record",
+  "description": "历史推送记录数据结构，用于保存每次推送的详细信息，支持后续的查询、更新和删除操作",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "推送记录的唯一标识符（UUID 或时间戳+随机数生成），用于更新和删除操作",
+        "examples": [
+          "push_1234567890_abc123",
+          "550e8400-e29b-41d4-a716-446655440000"
+        ]
+      },
+      "timestamp": {
+        "type": "integer",
+        "description": "推送时间戳（Unix 时间戳，秒），用于排序和 FIFO 管理",
+        "examples": [1234567890, 1704067200]
+      },
+      "datetime": {
+        "type": "string",
+        "description": "推送时间的人类可读格式（ISO 8601），便于查看和调试",
+        "format": "date-time",
+        "examples": ["2024-01-01T12:00:00Z", "2024-12-25T08:30:00+08:00"]
+      },
+      "device_keys": {
+        "type": "array",
+        "description": "接收推送的设备密钥列表（支持多用户推送，每个用户的 device_key）",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "examples": [
+          ["device_key_alice_abc123"],
+          ["device_key_alice_abc123", "device_key_bob_def456", "device_key_charlie_ghi789"]
+        ]
+      },
+      "user_aliases": {
+        "type": "array",
+        "description": "接收推送的用户别名列表（与 device_keys 一一对应，便于识别用户）",
+        "items": {
+          "type": "string"
+        },
+        "examples": [
+          ["alice"],
+          ["alice", "bob", "charlie"]
+        ]
+      },
+      "title": {
+        "type": "string",
+        "description": "推送消息的标题",
+        "examples": ["重要通知", "系统告警", "会议提醒"]
+      },
+      "subtitle": {
+        "type": "string",
+        "description": "推送消息的副标题（可选）",
+        "default": "",
+        "examples": ["请及时查看", "优先级：高"]
+      },
+      "body": {
+        "type": "string",
+        "description": "推送消息的正文内容",
+        "examples": ["会议将在10分钟后开始", "服务器CPU使用率超过90%"]
+      },
+      "content_type": {
+        "type": "string",
+        "description": "内容类型：image_only(纯图片), url_only(纯链接), text_only(纯文本), mixed(混合内容)",
+        "enum": ["image_only", "url_only", "text_only", "mixed"],
+        "examples": ["text_only", "image_only"]
+      },
+      "parameters": {
+        "type": "object",
+        "description": "推送时使用的所有参数（包括用户指定和默认参数）",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["passive", "active", "time-sensitive", "critical"]
+          },
+          "volume": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "badge": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sound": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "call": {
+            "type": "boolean"
+          },
+          "autoCopy": {
+            "type": "boolean"
+          },
+          "copy": {
+            "type": "string"
+          },
+          "isArchive": {
+            "type": "boolean"
+          },
+          "action": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "status": {
+        "type": "string",
+        "description": "推送状态：success(成功), partial_success(部分成功), failed(失败)",
+        "enum": ["success", "partial_success", "failed"],
+        "default": "success"
+      },
+      "success_count": {
+        "type": "integer",
+        "description": "成功推送的用户数量",
+        "minimum": 0
+      },
+      "failed_count": {
+        "type": "integer",
+        "description": "失败推送的用户数量",
+        "minimum": 0
+      },
+      "failed_users": {
+        "type": "array",
+        "description": "推送失败的用户别名列表",
+        "items": {
+          "type": "string"
+        },
+        "default": []
+      },
+      "error_messages": {
+        "type": "object",
+        "description": "失败用户的错误信息映射（用户别名 -> 错误消息）",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "default": {}
+      },
+      "bark_response": {
+        "type": "object",
+        "description": "Bark API 的原始响应信息（用于调试和问题排查）",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应状态码（200 表示成功）"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "服务器时间戳"
+          }
+        }
+      },
+      "updated_at": {
+        "type": "integer",
+        "description": "最后更新时间戳（用于追踪消息是否被更新过）",
+        "examples": [1234567890]
+      },
+      "update_count": {
+        "type": "integer",
+        "description": "消息被更新的次数",
+        "minimum": 0,
+        "default": 0
+      }
+    },
+    "required": ["id", "timestamp", "device_keys", "user_aliases", "title", "body", "content_type", "parameters", "status"],
+    "additionalProperties": false
+  },
+  
+  "examples": [
+    [
+      {
+        "id": "push_1704067200_abc123",
+        "timestamp": 1704067200,
+        "datetime": "2024-01-01T12:00:00Z",
+        "device_keys": ["device_key_alice_abc123"],
+        "user_aliases": ["alice"],
+        "title": "会议提醒",
+        "subtitle": "",
+        "body": "会议将在10分钟后开始",
+        "content_type": "text_only",
+        "parameters": {
+          "level": "active",
+          "volume": 10,
+          "badge": 1,
+          "sound": "bell",
+          "group": "work"
+        },
+        "status": "success",
+        "success_count": 1,
+        "failed_count": 0,
+        "failed_users": [],
+        "error_messages": {},
+        "bark_response": {
+          "code": 200,
+          "message": "success",
+          "timestamp": 1704067200
+        },
+        "updated_at": 1704067200,
+        "update_count": 0
+      },
+      {
+        "id": "push_1704153600_def456",
+        "timestamp": 1704153600,
+        "datetime": "2024-01-02T12:00:00Z",
+        "device_keys": ["device_key_alice_abc123", "device_key_bob_def456"],
+        "user_aliases": ["alice", "bob"],
+        "title": "系统告警",
+        "subtitle": "紧急",
+        "body": "服务器CPU使用率超过90%",
+        "content_type": "text_only",
+        "parameters": {
+          "level": "critical",
+          "volume": 10,
+          "badge": 5,
+          "sound": "alarm",
+          "group": "urgent"
+        },
+        "status": "partial_success",
+        "success_count": 1,
+        "failed_count": 1,
+        "failed_users": ["bob"],
+        "error_messages": {
+          "bob": "Network timeout"
+        },
+        "bark_response": {
+          "code": 200,
+          "message": "success",
+          "timestamp": 1704153600
+        },
+        "updated_at": 1704153600,
+        "update_count": 0
+      },
+      {
+        "id": "push_1704240000_ghi789",
+        "timestamp": 1704240000,
+        "datetime": "2024-01-03T12:00:00Z",
+        "device_keys": ["device_key_charlie_ghi789"],
+        "user_aliases": ["charlie"],
+        "title": "图片分享",
+        "subtitle": "",
+        "body": "",
+        "content_type": "image_only",
+        "parameters": {
+          "level": "active",
+          "image": "https://example.com/photo.jpg",
+          "group": "personal"
+        },
+        "status": "success",
+        "success_count": 1,
+        "failed_count": 0,
+        "failed_users": [],
+        "error_messages": {},
+        "bark_response": {
+          "code": 200,
+          "message": "success",
+          "timestamp": 1704240000
+        },
+        "updated_at": 1704240000,
+        "update_count": 0
+      }
+    ]
+  ],
+  
+  "definitions": {
+    "fifo_strategy": {
+      "description": "FIFO 管理策略说明",
+      "notes": [
+        "1. 历史记录按 timestamp 升序排列（最旧的在前）",
+        "2. 当记录数量超过 history_limit 时，自动删除最旧的记录",
+        "3. 删除操作在每次新增记录时触发，确保记录数量不超过限制",
+        "4. 建议 history_limit 设置为 100-1000 之间，平衡存储空间和查询性能"
+      ]
+    },
+    "query_optimization": {
+      "description": "查询优化说明",
+      "notes": [
+        "1. 为提高查询性能，建议在内存中维护 id -> record 的索引字典",
+        "2. 为提高用户查询性能，建议维护 user_alias -> [record_ids] 的索引",
+        "3. 查询历史记录时，优先使用索引，避免全表扫描",
+        "4. 定期清理过期记录（超过 30 天的记录可选择性删除）"
+      ]
+    }
+  }
+}

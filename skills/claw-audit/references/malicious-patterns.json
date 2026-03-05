@@ -1,0 +1,123 @@
+{
+  "_comment": "ClawAudit malicious pattern database. Based on ClawHavoc campaign analysis (Feb 2026), Koi Security audit, Snyk ToxicSkills report, and VirusTotal Code Insight findings.",
+  "_version": "0.1.0",
+  "_updated": "2026-02-20",
+
+  "prompt_injection": {
+    "description": "Patterns that attempt to override agent instructions via SKILL.md content",
+    "patterns": [
+      "ignore\\s+(all\\s+)?previous\\s+instructions",
+      "ignore\\s+(everything\\s+)?above",
+      "disregard\\s+(all\\s+)?prior",
+      "forget\\s+(all\\s+)?(your\\s+)?instructions",
+      "new\\s+system\\s+prompt",
+      "system\\s*:\\s*override",
+      "you\\s+are\\s+now\\s+(a|an)\\s+",
+      "IMPORTANT:\\s*(ignore|override|disregard)",
+      "do\\s+not\\s+mention\\s+this\\s+to\\s+the\\s+user",
+      "hidden\\s+instruction",
+      "\\[SYSTEM\\]",
+      "<<SYS>>",
+      "###\\s*INSTRUCTION"
+    ]
+  },
+
+  "credential_theft": {
+    "description": "Patterns that access, read, or exfiltrate credentials and secrets",
+    "patterns": [
+      "\\.env(?!ironment|elope)",
+      "creds\\.json",
+      "authorized_keys",
+      "id_rsa|id_ed25519|id_ecdsa",
+      "\\.ssh/",
+      "keychain|keyring",
+      "ANTHROPIC_API_KEY|OPENAI_API_KEY|CLAUDE_API_KEY",
+      "DISCORD_TOKEN|TELEGRAM_TOKEN|SLACK_TOKEN",
+      "AWS_SECRET|GITHUB_TOKEN|GOOGLE_API_KEY",
+      "\\.clawdbot/\\.env",
+      "\\.openclaw/credentials",
+      "wallet\\.dat|seed\\.txt|mnemonic"
+    ]
+  },
+
+  "remote_execution": {
+    "description": "Patterns that download or execute code from external sources",
+    "patterns": [
+      "curl\\s.*\\|\\s*(bash|sh|zsh|python)",
+      "wget\\s.*&&\\s*(bash|sh|chmod)",
+      "chmod\\s+\\+x",
+      "\\./openclaw-agent",
+      "Download.*\\.exe",
+      "Download.*\\.zip.*run",
+      "glot\\.io/snippets",
+      "paste\\.ee|pastebin\\.com|hastebin",
+      "raw\\.githubusercontent\\.com.*\\|.*sh"
+    ]
+  },
+
+  "reverse_shell": {
+    "description": "Patterns indicating reverse shell or unauthorized network connections",
+    "patterns": [
+      "nc\\s+-[a-z]*l",
+      "ncat\\s",
+      "reverse.shell|bind.shell",
+      "mkfifo",
+      "/dev/tcp/",
+      "socket\\.connect",
+      "net\\.createConnection",
+      "\\bssh\\s+-R\\b",
+      "socat\\s"
+    ]
+  },
+
+  "obfuscation": {
+    "description": "Patterns that hide code intent through encoding or obfuscation",
+    "patterns": [
+      "base64\\s+-d",
+      "atob\\s*\\(",
+      "Buffer\\.from\\s*\\(.*base64",
+      "\\\\x[0-9a-fA-F]{2}(?:\\\\x[0-9a-fA-F]{2}){3,}",
+      "\\\\u[0-9a-fA-F]{4}(?:\\\\u[0-9a-fA-F]{4}){3,}",
+      "String\\.fromCharCode",
+      "eval\\s*\\(",
+      "Function\\s*\\("
+    ]
+  },
+
+  "exfiltration": {
+    "description": "Known exfiltration endpoints and data exfiltration patterns",
+    "patterns": [
+      "webhook\\.site",
+      "requestbin",
+      "ngrok\\.io",
+      "pipedream\\.net",
+      "burpcollaborator",
+      "oastify\\.com",
+      "interact\\.sh",
+      "canarytokens\\.com"
+    ]
+  },
+
+  "destructive_operations": {
+    "description": "Patterns that delete, overwrite, or destroy data",
+    "patterns": [
+      "rm\\s+-rf\\s+[~/]",
+      "rm\\s+-rf\\s+/",
+      "find\\s.*-delete",
+      "shred\\s",
+      "dd\\s+if.*of.*dev",
+      "mkfs\\s",
+      ":\\(\\)\\{\\s*:\\|:\\s*&\\s*\\}\\s*;"
+    ]
+  },
+
+  "typosquat_names": {
+    "description": "Known typosquat package names from ClawHavoc campaign",
+    "names": [
+      "clawhub", "clawhub1", "clawhubb", "clawhubcli",
+      "clawwhub", "cllawhub", "openclaw-agent",
+      "clawdbot-agent", "moltbot-agent", "openclaw-update",
+      "auto-updater-agent", "clawdbot-update"
+    ]
+  }
+}

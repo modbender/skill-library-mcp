@@ -1,0 +1,70 @@
+# === LLM API 配置（支持 DeepSeek / OpenAI / Gemini / Claude 等多厂商）===
+LLM_API_KEY=your_api_key_here
+LLM_BASE_URL=https://api.deepseek.com
+LLM_MODEL=deepseek-chat
+# LLM_PROVIDER: 可选，显式指定模型厂商（google / anthropic / deepseek / openai）
+# 不设置时根据模型名自动推断（gemini→google, claude→anthropic, deepseek→deepseek），
+# 推断失败则 fallback 到 openai 兼容格式
+# LLM_PROVIDER=
+# 是否支持图片识别（vision），可选，不设置时根据模型名自动推断：
+#   gpt-4o/gpt-5/o1/o3/o4/gemini/claude → 自动开启
+#   deepseek/qwen/glm 等 → 自动关闭
+# 如需强制覆盖，显式设为 true 或 false
+# LLM_VISION_SUPPORT=
+
+# === TTS 文本转语音配置（可选，使用与 LLM 相同的 API 代理）===
+# TTS_MODEL=gemini-2.5-flash-preview-tts
+# TTS_VOICE=charon
+
+# === 前端与 Agent 通信模式 ===
+# true: 前端使用 OpenAI 标准 /v1/chat/completions 格式与 agent 交互
+# false: 使用自定义 WebSocket 协议（默认）
+OPENAI_STANDARD_MODE=false
+
+# === 端口配置（可选，以下为默认值，一般无需修改）===
+PORT_SCHEDULER=51201
+PORT_AGENT=51200
+PORT_FRONTEND=51209
+
+# === 指令执行模块配置（可选，以下为默认值）===
+# 命令白名单，逗号分隔。留空或不设置则使用内置默认白名单
+# ALLOWED_COMMANDS=ls,cat,head,tail,wc,du,find,file,stat,grep,awk,sed,sort,uniq,cut,tr,diff,comm,echo,date,cal,whoami,uname,hostname,uptime,free,df,env,printenv,pwd,which,expr,seq,yes,true,false,base64,md5sum,sha256sum,xxd,python,python3,ping,curl,wget
+# 命令执行超时（秒）
+# EXEC_TIMEOUT=30
+# 输出最大字符数
+# MAX_OUTPUT_LENGTH=8000
+
+# === OASIS 论坛服务配置（可选，以下为默认值）===
+PORT_OASIS=51202
+OASIS_BASE_URL=http://127.0.0.1:51202
+
+# === Bark 推送服务配置（可选）===
+# Bark Server 监听端口
+PORT_BARK=58010
+# 以下两项由 tunnel.py 自动写入，无需手动配置
+# PUBLIC_DOMAIN=https://xxx.trycloudflare.com
+# BARK_PUBLIC_URL=https://xxx.trycloudflare.com
+
+# === 内部服务通信密钥（可选）===
+# 保护 /system_trigger、/oasis/ask、/_internal/oasis_response 等内部端点
+# 留空则 mainagent 首次启动时自动生成并写入 .env
+# INTERNAL_TOKEN=
+
+# === QQ Bot 配置 ===
+QQ_APP_ID=your_qq_app_id
+QQ_BOT_SECRET=your_qq_bot_secret
+# QQ Bot 以哪个系统用户身份调用 Agent（默认 qquser）
+QQ_BOT_USERNAME=qquser
+
+# === Telegram Bot 配置 ===
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+# 白名单由 data/telegram_whitelist.json 管理（Agent 设置 chat_id 时自动维护）
+# 也可通过 chatbot/setup.py 查看白名单状态
+# [已废弃] TELEGRAM_ALLOWED_USERS — 请勿再使用此变量
+
+# === Chatbot 通用配置 ===
+# TG/QQ Bot 通过 INTERNAL_TOKEN + 白名单中的用户名以用户身份调用 Agent
+# 无需单独配置 AI_API_KEY（已按用户隔离，白名单自动维护）
+AI_API_URL=http://127.0.0.1:51200/v1/chat/completions
+AI_MODEL_QQ=gemini-3-flash-preview
+AI_MODEL_TG=gemini-2.0-flash

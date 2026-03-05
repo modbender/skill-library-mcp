@@ -1,0 +1,60 @@
+{
+  "_comment": "Intelligent Router Configuration - Define your available LLM models here. Customize tiers, costs, and providers to match your setup. The router.py script uses this file to classify tasks and estimate costs.",
+  "_instructions": {
+    "id": "Unique identifier for the model (e.g., 'provider/model-name')",
+    "alias": "Human-friendly name for the model",
+    "tier": "One of: SIMPLE, MEDIUM, COMPLEX, CRITICAL",
+    "provider": "Provider name (anthropic, openai, google, nvidia, local, etc.)",
+    "input_cost_per_m": "Cost per million input tokens in USD",
+    "output_cost_per_m": "Cost per million output tokens in USD",
+    "context_window": "Maximum context size in tokens",
+    "capabilities": "Array of capabilities: [text, code, reasoning, vision, function-calling]",
+    "notes": "Optional notes about the model's strengths or limitations"
+  },
+  "models": [
+    {
+      "id": "provider/cheap-model",
+      "alias": "Budget Model",
+      "tier": "SIMPLE",
+      "provider": "generic-provider",
+      "input_cost_per_m": 0.10,
+      "output_cost_per_m": 0.10,
+      "context_window": 32768,
+      "capabilities": ["text"],
+      "notes": "Best for monitoring, status checks, and simple summarization"
+    },
+    {
+      "id": "provider/mid-model",
+      "alias": "Mid-Tier Model",
+      "tier": "MEDIUM",
+      "provider": "generic-provider",
+      "input_cost_per_m": 0.50,
+      "output_cost_per_m": 1.50,
+      "context_window": 131072,
+      "capabilities": ["text", "code", "reasoning"],
+      "notes": "Good balance of cost and capability for general coding tasks"
+    },
+    {
+      "id": "provider/advanced-model",
+      "alias": "Advanced Model",
+      "tier": "COMPLEX",
+      "provider": "generic-provider",
+      "input_cost_per_m": 3.00,
+      "output_cost_per_m": 15.00,
+      "context_window": 200000,
+      "capabilities": ["text", "code", "reasoning", "vision"],
+      "notes": "High-quality model for complex multi-file development and debugging"
+    },
+    {
+      "id": "provider/premium-model",
+      "alias": "Premium Model",
+      "tier": "CRITICAL",
+      "provider": "generic-provider",
+      "input_cost_per_m": 5.00,
+      "output_cost_per_m": 25.00,
+      "context_window": 1000000,
+      "capabilities": ["text", "code", "reasoning", "vision", "function-calling"],
+      "notes": "Best available model for security audits and production-critical work"
+    }
+  ]
+}

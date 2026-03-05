@@ -1,0 +1,45 @@
+name: "Navigate Large Codebase Efficiently"
+id: "tool-efficiency-large-codebase-navigation"
+version: "1.0"
+suite: "tool-efficiency"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests efficient codebase navigation across 30+ files. The agent must find
+  all callers of calculate_discount using Grep (not bash grep), then Read
+  only the relevant files. Penalizes opening irrelevant files, re-reading
+  files, and using bash for searches.
+
+user_message: |
+  Find all callers of the `calculate_discount` function in this codebase
+  and document how each caller uses it. Write usage-report.md with:
+  - File path and line number of each call site
+  - The arguments passed in each call
+  - A brief description of why that caller uses the function
+  - Any differences in how callers use it (e.g., different argument patterns)
+
+input_files: []
+
+expected_outputs:
+  - pattern: "usage-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "orders.py"
+          - "dashboard.py"
+          - "analytics.py"
+          - "test_pricing.py"
+          - "calculate_discount"
+
+expected_metrics:
+  tool_calls: [5, 12]
+  planning_ratio: [0.10, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.40
+  layer2_weight: 0.25
+  layer3_weight: 0.20

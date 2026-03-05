@@ -1,0 +1,166 @@
+# 主题日 · 日历联动
+# 生成器在抽取「今日主题」前，先检查本日是否匹配以下日历：农历节气、中国节假日、世界节日、世界日（公益日等）。
+# 若匹配，则今日主题展示名（写入 roleplay-active）优先使用本条 name；可选绑定 theme_id（应用该主题的性癖规则）或仅作展示。
+# 匹配顺序：世界节日/世界日（按 M-D）→ 中国节假日（见 data/holidays_china.json，按日期匹配）→ 节气（按 M-D 近似）。
+# 若多条匹配，取第一条（或可配置 priority 字段，数字小的优先）。
+
+version: "1.0"
+
+# 世界知名节日（公历 M-D，每年同一天）
+world_holidays:
+  - date: "02-14"
+    name: 情人节
+    theme_id: active_day          # 可选：绑定主题规则
+    profession_tags_boost: []      # 可选：抽职业时加权这些 tag，无则不改
+  - date: "10-31"
+    name: 万圣节
+    theme_id: null
+    profession_tags_boost: []
+  - date: "12-25"
+    name: 圣诞节
+    theme_id: null
+    profession_tags_boost: []
+  - date: "11-11"
+    name: 光棍节
+    theme_id: null
+    profession_tags_boost: []
+  - date: "03-08"
+    name: 妇女节
+    theme_id: null
+    profession_tags_boost: []
+  - date: "05-20"
+    name: 网络情人节
+    theme_id: active_day
+    profession_tags_boost: []
+  # 七夕为农历七月初七，公历每年不同，此处用近似 08-09
+  - date: "08-09"
+    name: 七夕
+    theme_id: active_day
+    profession_tags_boost: []
+  - date: "01-01"
+    name: 元旦
+    theme_id: null
+    profession_tags_boost: []
+
+# 世界日 / 公益日（公历 M-D）
+world_days:
+  - date: "04-22"
+    name: 世界地球日
+    theme_id: null
+    profession_tags_boost: [环保, 自然]
+  - date: "06-05"
+    name: 世界环境日
+    theme_id: null
+    profession_tags_boost: [环保]
+  - date: "12-01"
+    name: 世界艾滋病日
+    theme_id: null
+    profession_tags_boost: [医疗, 护士]
+  - date: "05-31"
+    name: 世界无烟日
+    theme_id: null
+    profession_tags_boost: [医疗]
+  - date: "03-22"
+    name: 世界水日
+    theme_id: null
+    profession_tags_boost: []
+  - date: "09-10"
+    name: 世界预防自杀日
+    theme_id: null
+    profession_tags_boost: [心理, 医疗]
+  - date: "10-10"
+    name: 世界精神卫生日
+    theme_id: null
+    profession_tags_boost: [心理, 医疗]
+  - date: "11-20"
+    name: 世界儿童日
+    theme_id: null
+    profession_tags_boost: [教育, 儿童]
+
+# 中国节假日：与 data/holidays_china.json 的 name 或 dates 匹配；生成器用当日 YYYY-MM-DD 查 holidays.dates 或 partial_holidays
+# 此处仅配置「若匹配到该假期，展示名与可选 theme_id」
+chinese_holiday_themes:
+  - holiday_name: 春节
+    name: 春节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 清明节
+    name: 清明节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 劳动节
+    name: 劳动节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 端午节
+    name: 端午节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 中秋节
+    name: 中秋节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 国庆节
+    name: 国庆节
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 元旦
+    name: 元旦
+    theme_id: null
+    profession_tags_boost: []
+  - holiday_name: 妇女节
+    name: 妇女节
+    theme_id: null
+    profession_tags_boost: []
+
+# 二十四节气（公历近似 M-D，年际相差约 1～2 天，生成器用 MM-DD 匹配）
+# 若当日为某节气，今日主题展示名可用「节气名」或「节气名 · 原随机主题名」
+solar_terms:
+  - date: "02-04"
+    name: 立春
+  - date: "02-18"
+    name: 雨水
+  - date: "03-05"
+    name: 惊蛰
+  - date: "03-20"
+    name: 春分
+  - date: "04-05"
+    name: 清明
+  - date: "04-20"
+    name: 谷雨
+  - date: "05-05"
+    name: 立夏
+  - date: "05-21"
+    name: 小满
+  - date: "06-05"
+    name: 芒种
+  - date: "06-21"
+    name: 夏至
+  - date: "07-07"
+    name: 小暑
+  - date: "07-23"
+    name: 大暑
+  - date: "08-07"
+    name: 立秋
+  - date: "08-23"
+    name: 处暑
+  - date: "09-07"
+    name: 白露
+  - date: "09-23"
+    name: 秋分
+  - date: "10-08"
+    name: 寒露
+  - date: "10-23"
+    name: 霜降
+  - date: "11-07"
+    name: 立冬
+  - date: "11-22"
+    name: 小雪
+  - date: "12-07"
+    name: 大雪
+  - date: "12-22"
+    name: 冬至
+  - date: "01-05"
+    name: 小寒
+  - date: "01-20"
+    name: 大寒

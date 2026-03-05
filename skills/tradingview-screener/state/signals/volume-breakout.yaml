@@ -1,0 +1,37 @@
+# Volume Breakout Signal
+# Detects stocks with unusual volume surge (2x+ average) and strong price momentum
+
+name: volume-breakout
+description: "Volume > 2x 30-day average with strong price momentum"
+asset_class: stock
+timeframe: "1D"
+
+# Pre-filter: large-cap stocks with momentum
+filters:
+  - field: MARKET_CAPITALIZATION
+    op: ">"
+    value: 1000000000
+  - field: CHANGE_PERCENT
+    op: ">"
+    value: 2
+
+columns:
+  - NAME
+  - PRICE
+  - CHANGE_PERCENT
+  - VOLUME
+  - AVERAGE_VOLUME_30_DAY
+  - RELATIVE_STRENGTH_INDEX_14
+
+# Signals: volume spike + strong price action
+computed:
+  - type: expression
+    expr: "VOLUME > AVERAGE_VOLUME_30_DAY * 2"
+  - type: threshold
+    field: CHANGE_PERCENT
+    op: ">"
+    value: 3
+
+sort_by: CHANGE_PERCENT
+sort_order: desc
+limit: 20

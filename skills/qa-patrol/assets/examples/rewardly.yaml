@@ -1,0 +1,384 @@
+# QA Patrol - Rewardly Test Plan
+# EXAMPLE template showing a real-world React Native Web test plan structure
+# NOTE: All credentials use ${env.VAR} interpolation - NEVER hardcode secrets
+# This is a TEMPLATE - replace placeholder URLs with your own app URL
+
+app:
+  url: ${APP_URL:-https://your-app.example.com}  # Set APP_URL env var or replace
+  name: Rewardly
+  stack: expo-web
+  repo_path: ./  # For static analysis - YOUR local repo
+
+auth:
+  provider: supabase
+  login_path: /auth
+  dashboard_path: /home
+  accounts:
+    # SECURITY: All credentials use ${env.VAR} interpolation
+    # Set these in your local environment - NEVER commit real passwords
+    admin:
+      email: ${ADMIN_EMAIL}           # Your admin test account email
+      password: ${ADMIN_PASSWORD}     # Your admin test account password
+      role: admin
+    free:
+      email: ${FREE_EMAIL}            # Your free-tier test account email
+      password: ${FREE_PASSWORD}      # Your free-tier test account password
+      role: free
+    guest: true
+
+payments:
+  provider: stripe
+  mode: test
+  pricing_path: /paywall
+  success_path: /home
+  tiers:
+    - name: pro
+      button_ref: pro_purchase_button
+      price: 4.99
+      interval: month
+    - name: max
+      button_ref: max_purchase_button
+      price: 9.99
+      interval: month
+    - name: lifetime
+      button_ref: lifetime_purchase_button
+      price: 49.99
+      one_time: true
+
+tests:
+  smoke:
+    - name: Homepage loads
+      navigate: /
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+
+    - name: App renders (not blank screen)
+      navigate: /home
+      assert:
+        - element_exists: "#root"
+        - text_not_empty: true
+
+    - name: No critical JS errors
+      navigate: /home
+      wait: 3000
+      assert:
+        - console_not_contains: "Uncaught"
+        - console_not_contains: "ChunkLoadError"
+
+  navigation:
+    # Test all 6 main tabs
+    - name: Home tab loads
+      navigate: /home
+      assert:
+        - element_exists: body
+        - url_contains: /home
+
+    - name: Calculator tab loads
+      navigate: /calculator
+      assert:
+        - element_exists: body
+        - url_contains: /calculator
+
+    - name: Compare tab loads
+      navigate: /compare
+      assert:
+        - element_exists: body
+        - url_contains: /compare
+
+    - name: Wallet tab loads
+      navigate: /wallet
+      assert:
+        - element_exists: body
+        - url_contains: /wallet
+
+    - name: Deals tab loads
+      navigate: /deals
+      assert:
+        - element_exists: body
+        - url_contains: /deals
+
+    - name: Settings tab loads
+      navigate: /settings
+      assert:
+        - element_exists: body
+        - url_contains: /settings
+
+  auth:
+    - name: Guest can browse calculators
+      mode: guest
+      steps:
+        - navigate: /calculator
+        - snapshot: true
+      assert:
+        - element_exists: body
+        - no_403_errors: true
+
+    - name: Guest sees paywall for premium
+      mode: guest
+      steps:
+        - navigate: /calculator
+        - click: { ref: first_calculator }
+        - wait: 2000
+      assert:
+        - element_exists: paywall_modal
+      # OR redirect to paywall:
+      # assert:
+      #   - url_contains: /paywall
+
+    - name: Sign in with email/password
+      account: free
+      steps:
+        - navigate: /auth
+        - clear_auth: true
+        - type: { ref: email_input, text: ${auth.accounts.free.email} }
+        - type: { ref: password_input, text: ${auth.accounts.free.password} }
+        - click: { ref: sign_in_button }
+        - wait: { url_contains: /home, timeout: 10000 }
+      assert:
+        - url_contains: /home
+        - element_exists: user_avatar
+
+    - name: Session persists after refresh
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: /home
+        - refresh: true
+        - wait: 3000
+      assert:
+        - element_exists: user_avatar
+        - url_not_contains: /auth
+
+    - name: Sign out works
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: /settings
+        - scroll_to: { ref: sign_out_button }
+        - click: { ref: sign_out_button }
+        - wait: 2000
+      assert:
+        - element_not_exists: user_avatar
+
+    # Known bug pattern: RLS blocking authenticated users
+    - name: Authenticated user can load cards
+      account: free
+      requires: signed_in
+      steps:
+        - navigate: /home
+        - wait: 3000
+      assert:
+        - element_exists: card_list
+        - console_not_contains: "403"
+        - console_not_contains: "permission denied"
+
+  calculator:
+    # Test all 9 calculator categories
+    categories:
+      - name: Groceries
+        path: /calculator/groceries
+      - name: Gas
+        path: /calculator/gas
+      - name: Dining
+        path: /calculator/dining
+      - name: Travel
+        path: /calculator/travel
+      - name: Online Shopping
+        path: /calculator/online
+      - name: Drugstore
+        path: /calculator/drugstore
+      - name: Entertainment
+        path: /calculator/entertainment
+      - name: Transit
+        path: /calculator/transit
+      - name: Other
+        path: /calculator/other
+
+    tests:
+      - name: Groceries calculator loads
+        navigate: /calculator/groceries
+        assert:
+          - element_exists: calculator_input
+          - element_exists: results_display
+
+      - name: Calculator computes results
+        navigate: /calculator/groceries
+        steps:
+          - type: { ref: amount_input, text: "100" }
+          - wait: 1000
+        assert:
+          - element_exists: results_list
+          - text_contains: "$"  # Shows dollar values
+
+      - name: All categories accessible
+        iterate: categories
+        steps:
+          - navigate: ${category.path}
+          - wait: 1000
+        assert:
+          - element_exists: body
+          - no_console_errors: true
+
+  payments:
+    - name: Paywall displays all tiers
+      navigate: /paywall
+      assert:
+        - element_exists: pro_tier
+        - element_exists: max_tier
+        - element_exists: lifetime_tier
+        - text_contains: "$4.99"
+        - text_contains: "$9.99"
+        - text_contains: "$49.99"
+
+    - name: Pro checkout creates Stripe session
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: /paywall
+        - click: { ref: pro_purchase_button }
+        - wait: { url_contains: checkout.stripe.com, timeout: 15000 }
+      assert:
+        - url_contains: checkout.stripe.com
+
+    - name: Lifetime checkout creates Stripe session
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: /paywall
+        - click: { ref: lifetime_purchase_button }
+        - wait: { url_contains: checkout.stripe.com, timeout: 15000 }
+      assert:
+        - url_contains: checkout.stripe.com
+
+  data_integrity:
+    # Known bug: UI showed 225 CA cards, DB had different count
+    - name: Canadian card count matches DB
+      query: "SELECT COUNT(*) FROM cards WHERE country = 'CA' AND active = true"
+      ui_path: /settings
+      ui_selector: "[data-testid='ca-card-count']"
+      tolerance: 0
+      note: "Previously showed 225 but DB had 220"
+
+    # Known bug: Air Miles showed 12x multiplier, should be 1x
+    - name: Air Miles multiplier accurate
+      query: "SELECT grocery_rate FROM cards WHERE issuer = 'Air Miles'"
+      ui_path: /calculator/groceries
+      ui_selector: "[data-card='airmiles'] .rate"
+      tolerance: 0
+      note: "Bug found: UI showed 12x, DB had 1x"
+
+    # Check for duplicates
+    - name: No duplicate cards in DB
+      query: |
+        SELECT name, COUNT(*) as cnt 
+        FROM cards 
+        GROUP BY name 
+        HAVING COUNT(*) > 1
+      assert:
+        - row_count: 0
+      note: "Found duplicates during testing"
+
+  static_analysis:
+    scan_path: ./src
+    patterns:
+      # Known React Native Web issues
+      - name: Alert.alert without Platform check
+        grep: "Alert\\.alert"
+        exclude_grep: "Platform\\.OS"
+        severity: high
+        note: "Alert.alert callbacks don't fire on web"
+
+      - name: Alert.prompt usage
+        grep: "Alert\\.prompt"
+        severity: critical
+        note: "Alert.prompt doesn't exist on web"
+
+      - name: Linking.openURL in components
+        grep: "Linking\\.openURL"
+        severity: high
+        note: "Fails silently inside Modal on web"
+
+      # Supabase patterns
+      - name: Direct Supabase queries without error handling
+        grep: "supabase\\.from\\("
+        exclude_grep: "\\.catch\\(|try\\s*{|await.*\\.error"
+        severity: medium
+
+      - name: Missing RLS policy check
+        grep: "supabase\\.from\\("
+        note: "Verify RLS policies exist for all tables"
+
+      # General
+      - name: Console.log in production
+        grep: "console\\.log"
+        exclude_path: ["*.test.*"]
+        severity: low
+        report_count: true
+
+      - name: Exposed Supabase service key
+        grep: "SUPABASE_SERVICE_ROLE_KEY|service_role"
+        severity: critical
+
+  cross_platform:
+    # React Native Web specific tests
+    - name: Alert works on web
+      steps:
+        - navigate: /settings
+        - click: { ref: delete_account_button }
+        - wait: 1000
+      assert:
+        - dialog_appeared: true  # Browser confirm or custom modal
+      note: "Test that confirm dialogs work on web"
+
+    - name: External links open correctly
+      steps:
+        - navigate: /settings
+        - click: { ref: privacy_policy_link }
+        - wait: 2000
+      assert:
+        - new_tab_opened: true
+        - url_contains: "privacy"
+
+  cache_testing:
+    # Test as new user (no cache)
+    - name: Fresh user experience
+      mode: incognito
+      steps:
+        - clear_all_storage: true
+        - navigate: /home
+        - wait: 3000
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+        - element_exists: onboarding_prompt  # Or whatever new users see
+
+    - name: App works after clearing cache
+      requires: signed_in
+      account: free
+      steps:
+        - execute: "localStorage.clear(); sessionStorage.clear();"
+        - refresh: true
+        - wait: 3000
+      assert:
+        - no_console_errors: true
+        - no_blank_screen: true
+
+settings:
+  screenshot_on_failure: true
+  screenshot_format: png
+  timeout_default: 10000
+  retry_failed: true
+  retry_count: 2
+  
+  # Rewardly-specific
+  known_issues:
+    - "Alert.alert callbacks don't fire on web"
+    - "Air Miles rate inflation bug"
+    - "Onboarding state not synced to cloud"
+  
+  test_accounts_note: |
+    Create test accounts in Supabase dashboard:
+    - Free user: Use for basic flow testing
+    - Admin: Use for admin panel testing
+    - Pro user: Use for premium feature testing

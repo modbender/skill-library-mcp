@@ -1,0 +1,83 @@
+# 零售运营审计规则配置 — 默认（服装行业）
+# 每条规则可独立开关、调整阈值、修改级别
+
+industry: 服装零售
+version: 1
+
+rules:
+  sell_through_high:
+    enabled: true
+    level: critical
+    name: 售罄率过高
+    description: 库存即将售罄，需立即补货或调拨
+    thresholds:
+      sell_through_min: 0.85    # 售罄率超过此值触发
+      days_left_max: 3          # 剩余可售天数低于此值触发
+
+  sell_through_low:
+    enabled: true
+    level: warning
+    name: 售罄率过低
+    description: 商品滞销，需促销或调拨处理
+    thresholds:
+      sell_through_max: 0.20    # 售罄率低于此值触发
+      days_on_shelf_min: 14     # 上架天数超过此值才检查
+
+  target_achievement_low:
+    enabled: true
+    level: critical
+    name: 目标达成率不足
+    description: 销售严重落后于目标
+    thresholds:
+      achievement_min: 0.60     # 达成率低于此值触发
+
+  negative_inventory:
+    enabled: true
+    level: critical
+    name: 负库存
+    description: 系统库存为负，数据异常
+    thresholds: {}
+
+  zero_sales:
+    enabled: true
+    level: critical
+    name: 零销售
+    description: 营业日无任何销售
+    thresholds: {}
+
+  inventory_turnover_slow:
+    enabled: true
+    level: warning
+    name: 库存周转过慢
+    description: 资金占用过大
+    thresholds:
+      turnover_days_max: 45     # 周转天数超过此值触发
+
+  low_sell_rate:
+    enabled: true
+    level: warning
+    name: 动销率过低
+    description: 大量SKU无销售
+    thresholds:
+      sell_rate_min: 0.60       # 动销率低于此值触发
+
+# 字段映射 — 不同 bitable 表的字段名可能不同，在此映射
+field_mapping:
+  store_name: 门店名称
+  initial_stock: 期初库存
+  sold_qty: 销售数量
+  current_stock: 当前库存
+  days_on_shelf: 上架天数
+  actual_sales: 实际销售额
+  target_sales: 目标销售额
+  total_sku: 总SKU数
+  active_sku: 有销SKU数
+  avg_inventory_value: 平均库存金额
+  daily_cogs: 日均销售成本
+  status: 营业状态
+
+# 评分权重
+scoring:
+  critical_penalty: 25
+  warning_penalty: 10
+  info_penalty: 3

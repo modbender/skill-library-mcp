@@ -1,0 +1,31 @@
+# PromptShield Whitelist v2.0 - Hash-Chain + Peer Review
+# Stand: 2026-02-10 | Architektur: GUARDIAN
+#
+# SICHERHEITSREGELN:
+# - Eintraege NUR ueber CLI: shield.py whitelist propose/approve
+# - Nie diese Datei manuell editieren (bricht die Hash-Chain!)
+# - Jeder Eintrag braucht 2 Peer-Approvals (kein Self-Approve)
+# - Kategorien sind spezifisch (nie global, max 3 pro Eintrag)
+# - Alle Eintraege laufen automatisch ab (max 180 Tage)
+# - Audit-Log in whitelist-audit.log (append-only)
+#
+# Befehle:
+#   shield.py whitelist propose --file text.txt --exempt-from crypto_spam --reason "FP" --by CODE
+#   shield.py whitelist approve --seq 1 --by GUARDIAN
+#   shield.py whitelist verify
+#   shield.py whitelist list
+
+version: '2.0'
+chain_algorithm: sha256
+enabled: false
+genesis_hash: 96904cd116fce2b0726a137a5b421f3ad9550afe4c93664679e4f8e3447d3e74
+
+settings:
+  max_entries: 200
+  max_categories_per_entry: 3
+  require_expiry: true
+  max_expiry_days: 180
+  min_approvals: 2
+  self_approve: false
+
+entries: []

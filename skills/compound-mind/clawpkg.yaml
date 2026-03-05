@@ -1,0 +1,72 @@
+name: compound-mind
+version: 0.1.0
+description: Makes agents permanently smarter. Distills memory into searchable wisdom, briefs before tasks, tracks growth over time.
+author: Nix
+license: MIT
+
+tags:
+  - memory
+  - learning
+  - intelligence
+  - growth
+  - experience
+  - briefing
+
+category: core-agent
+
+entry: compound_mind.py
+
+files:
+  - compound_mind.py
+  - distill.py
+  - index.py
+  - brief.py
+  - growth.py
+  - SKILL.md
+
+requires:
+  python: ">=3.10"
+  packages:
+    - anthropic
+
+env:
+  - ANTHROPIC_API_KEY
+
+data_dirs:
+  - data/experiences
+  - data/briefs
+
+commands:
+  sync:
+    description: "Distill all new memory files and rebuild wisdom index"
+    run: "python compound_mind.py sync"
+  search:
+    description: "Search accumulated wisdom (e.g. 'python compound_mind.py search Polymarket')"
+    run: "python compound_mind.py search"
+  brief:
+    description: "Generate pre-session briefing for a task"
+    run: "python compound_mind.py brief"
+  report:
+    description: "Generate growth report"
+    run: "python compound_mind.py report"
+  mistakes:
+    description: "Show repeated mistake patterns"
+    run: "python compound_mind.py mistakes"
+
+integration:
+  memory_dir: /root/.openclaw/workspace/memory
+  suggested_cron: "0 3 * * * cd {skill_dir} && python compound_mind.py sync >> /tmp/compound-mind.log 2>&1"
+  heartbeat_hook: |
+    # Add to HEARTBEAT.md to auto-brief on session start:
+    # python /root/.openclaw/workspace/compound-mind/compound_mind.py sync --limit 2 --quiet
+
+changelog:
+  - version: 0.1.0
+    date: 2026-02-24
+    notes:
+      - Initial release
+      - Experience Distiller with Claude Haiku extraction
+      - SQLite FTS5 Wisdom Index with recency + importance weighting
+      - Pre-Session Briefing generator with domain detection
+      - Growth Tracker with repeated mistake detection
+      - Full pipeline CLI (compound_mind.py)

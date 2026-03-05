@@ -1,0 +1,54 @@
+{
+  "version": "0.0.1",
+  "timeout": 60,
+  "tasks": [
+    {
+      "id": "smoke-01",
+      "description": "Generate a daily digest from overlapping tech news feeds with deduplication and importance ranking",
+      "input": "I subscribe to these RSS feeds: TechCrunch (https://techcrunch.com/feed/), Ars Technica (https://feeds.arstechnica.com/arstechnica/index), The Verge (https://www.theverge.com/rss/index.xml), and Hacker News (https://hnrss.org/frontpage). Generate a morning digest for today. Several of these feeds are likely covering the same stories -- deduplicate them, score by importance, group by topic, and give me a concise summary of the top stories. I care most about AI/ML, open source, and cybersecurity topics.",
+      "rubric": [
+        {
+          "criterion": "Feed Parsing & Extraction",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Correctly identifies all 4 feed formats, extracts titles, URLs, dates, authors, and body content; handles namespace extensions (content:encoded); normalizes dates to consistent format",
+            "3": "Parses most feeds correctly but misses some metadata fields or struggles with one feed format",
+            "1": "Extracts only basic title and link; ignores body content and metadata",
+            "0": "Cannot parse feeds or produces garbled output"
+          }
+        },
+        {
+          "criterion": "Deduplication Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Identifies cross-source duplicates using URL canonicalization and content similarity; merges same-story coverage from multiple outlets with proper attribution; distinguishes true duplicates from related-but-different articles",
+            "3": "Catches obvious URL duplicates but misses content-level duplicates across different domains; or over-deduplicates by merging distinct stories with similar titles",
+            "1": "Minimal deduplication; same stories appear multiple times from different feeds",
+            "0": "No deduplication attempted"
+          }
+        },
+        {
+          "criterion": "Importance Scoring & Topic Relevance",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Top stories reflect genuine importance weighted by source authority, cross-source corroboration, and user interest alignment (AI/ML, open source, cybersecurity); importance scores are explained; lower-priority items are appropriately ranked below",
+            "3": "Ranking is reasonable but does not clearly account for user topic preferences; or importance scores are present but not justified",
+            "1": "Articles ranked by recency only with no importance differentiation",
+            "0": "No ranking or scoring applied"
+          }
+        },
+        {
+          "criterion": "Digest Structure & Readability",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Digest is organized by topic clusters with clear labels; each entry has source attribution, date, importance score, and a concise summary; includes a feed health summary and related article counts; respects morning brief sizing limits",
+            "3": "Articles are grouped but labels are vague; summaries present but inconsistent in quality; missing some attribution or metadata",
+            "1": "Flat list of articles with no topic grouping or inconsistent formatting",
+            "0": "Unstructured output or raw feed data"
+          }
+        }
+      ],
+      "passThreshold": 60
+    }
+  ]
+}

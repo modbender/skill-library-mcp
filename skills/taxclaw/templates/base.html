@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or 'TaxClaw' }}</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --panel2: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #1f2937;
+      --accent: #60a5fa;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --ok: #22c55e;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    body { margin:0; background: var(--bg); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display:flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--panel); border-right: 1px solid var(--border); padding: 18px; }
+    .brand-logo { font-size: 2.2rem; line-height: 1; margin-bottom: 4px; }
+    .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.3px; margin-bottom: 6px; }
+    .nav a { display:block; padding: 10px 10px; border-radius: 8px; color: var(--text); }
+    .nav a:hover { background: rgba(148,163,184,0.1); }
+    .main { flex:1; padding: 22px; }
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .row { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; }
+    .muted { color: var(--muted); }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px 8px; text-align:left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    input, select { background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+    button { background: rgba(96,165,250,0.15); color: var(--text); border: 1px solid rgba(96,165,250,0.35); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+    button.danger { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+    a.btn { display:inline-block; background: rgba(96,165,250,0.15); color: var(--text); border: 1px solid rgba(96,165,250,0.35); border-radius: 10px; padding: 10px 12px; text-decoration: none; }
+    a.btn:hover { text-decoration: none; filter: brightness(1.08); }
+    .pill { display:inline-block; font-size: 12px; padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
+    .pill.ok { color: var(--ok); border-color: rgba(34,197,94,0.35); }
+    .pill.warn { color: var(--warn); border-color: rgba(245,158,11,0.35); }
+    .pill.bad { color: var(--bad); border-color: rgba(239,68,68,0.35); }
+    pre { white-space: pre-wrap; word-wrap: break-word; background: #060b14; border: 1px solid var(--border); padding: 12px; border-radius: 12px; overflow:auto; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand-logo">🧾🦀</div>
+      <div class="brand">TaxClaw</div>
+      <div class="muted" style="margin-bottom:14px;">Local-first tax doc extraction</div>
+      <nav class="nav">
+        <a href="/">🏠 Dashboard</a>
+        <a href="/documents">📄 Documents</a>
+        <a href="/review">🔍 Review queue</a>
+        <a href="/upload">⬆️ Upload</a>
+        <a href="/digital_assets">🪙 Crypto tools</a>
+        <a href="/settings">⚙️ Settings</a>
+        <a href="/faq">📖 FAQ</a>
+        <a href="/contact">📬 Contact</a>
+        <hr style="border-color: var(--border); margin: 10px 0;" />
+        <a href="/terms" style="font-size: 11px; color: var(--muted);">Terms of Use</a>
+        <a href="/privacy" style="font-size: 11px; color: var(--muted);">Privacy Policy</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <footer style="text-align:center; padding: 12px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); margin-top: 24px;">
+    TaxClaw extracts data only — not tax advice. Verify all values against your source documents.
+    <a href="/terms" style="color:var(--muted)">Terms</a> · <a href="/privacy" style="color:var(--muted)">Privacy</a> · <a href="https://github.com/sponsors/DougButdorf" target="_blank" style="color:var(--muted)">💛 Sponsor</a>
+    · © 2026 Outbranch Network LLC
+  </footer>
+</body>
+</html>

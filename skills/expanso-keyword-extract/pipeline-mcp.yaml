@@ -1,0 +1,77 @@
+# Expanso Pipeline: keyword-extract (MCP mode)
+# =============================================
+#
+# Usage:
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml &
+#   curl -X POST http://localhost:8080/extract -d '{"text": "..."}'
+
+name: "keyword-extract-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /extract
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let input_text = this.text.or(content())
+          let max_keywords = this.max_keywords.or(10)
+          meta trace_id = uuid_v4()
+          meta input_hash = $input_text.hash("sha256").encode("hex")
+          meta input_length = $input_text.length()
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a keyword extraction expert. Extract keywords from text and return JSON with: 'keywords' (array of single words with 'word' and 'relevance' 0-1), 'phrases' (array of 2-3 word key phrases), 'topics' (array of main themes). Limit to " + $max_keywords.string() + " keywords. Focus on nouns and important terms."
+            },
+            {
+              "role": "user",
+              "content": $input_text
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let response = this.choices.0.message.content.parse_json().catch({
+            "keywords": [],
+            "phrases": [],
+            "topics": []
+          })
+
+          root.keywords = $response.keywords.or([])
+          root.phrases = $response.phrases.or([])
+          root.topics = $response.topics.or([])
+          root.keyword_count = $response.keywords.or([]).length()
+          root.metadata = {
+            "skill": "keyword-extract",
+            "mode": "mcp",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [keyword-extract] Extracted ${! root.keyword_count } keywords (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}
+
+selector:
+  match_labels:
+    capability: llm

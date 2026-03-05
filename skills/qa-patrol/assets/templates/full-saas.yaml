@@ -1,0 +1,400 @@
+# QA Patrol - Full SaaS Template
+# Level 3: Complete test plan for SaaS applications
+# Usage: qa-patrol --plan full-saas.yaml
+#
+# SECURITY NOTES:
+# - All credentials use ${env.VAR} interpolation - NEVER hardcode secrets
+# - Static analysis scans YOUR codebase to help YOU find bugs
+# - Secret detection patterns help identify exposed credentials for rotation
+# - Data integrity checks query YOUR database to verify UI accuracy
+# - All tests run locally - no data leaves your machine
+
+app:
+  url: ${APP_URL}
+  name: ${APP_NAME:-My SaaS App}
+  stack: auto  # expo-web | nextjs | spa | static
+  repo_path: ${REPO_PATH:-./}  # For static analysis
+
+auth:
+  provider: ${AUTH_PROVIDER:-supabase}
+  login_path: /auth
+  signup_path: /auth/signup
+  dashboard_path: /dashboard
+  profile_path: /profile
+  accounts:
+    admin:
+      email: ${ADMIN_EMAIL}
+      password: ${ADMIN_PASSWORD}
+      role: admin
+    pro:
+      email: ${PRO_EMAIL}
+      password: ${PRO_PASSWORD}
+      role: pro_user
+      has_subscription: true
+    free:
+      email: ${FREE_EMAIL}
+      password: ${FREE_PASSWORD}
+      role: free_user
+    guest: true
+
+payments:
+  provider: stripe
+  mode: test
+  pricing_path: /pricing
+  success_path: /success
+  tiers:
+    - name: free
+      features: ["Basic features", "5 items"]
+    - name: pro
+      button_ref: pro_subscribe
+      price: 9.99
+      interval: month
+      features: ["All features", "Unlimited items", "Priority support"]
+    - name: enterprise
+      button_ref: enterprise_contact
+      price: custom
+      features: ["Custom integration", "SLA", "Dedicated support"]
+
+database:
+  provider: ${DB_PROVIDER:-supabase}
+  # Connection for data integrity checks (optional)
+  # connection_string: ${DATABASE_URL}
+
+tests:
+  smoke:
+    - name: Homepage loads
+      navigate: /
+      assert:
+        - element_exists: body
+        - no_console_errors: true
+        - load_time_under: 5000
+
+    - name: All main routes accessible
+      routes:
+        - /
+        - ${auth.login_path}
+        - ${payments.pricing_path}
+        - /about
+        - /contact
+      assert:
+        - status_not_404: true
+        - no_console_errors: true
+
+    - name: Mobile viewport renders
+      viewport: [375, 667]  # iPhone SE
+      navigate: /
+      assert:
+        - element_exists: body
+        - no_horizontal_scroll: true
+
+    - name: SEO basics present
+      navigate: /
+      assert:
+        - meta_title_exists: true
+        - meta_description_exists: true
+        - canonical_url_exists: true
+
+  auth:
+    # Full auth flow tests
+    - name: Sign in flow (free user)
+      account: free
+      steps:
+        - navigate: ${auth.login_path}
+        - clear_auth: true
+        - type: { ref: email_input, text: ${auth.accounts.free.email} }
+        - type: { ref: password_input, text: ${auth.accounts.free.password} }
+        - click: { ref: sign_in_button }
+        - wait: { url_contains: ${auth.dashboard_path}, timeout: 10000 }
+      assert:
+        - url_contains: ${auth.dashboard_path}
+        - element_exists: user_indicator
+
+    - name: Session persistence
+      requires: signed_in
+      account: free
+      steps:
+        - refresh: true
+        - wait: 2000
+      assert:
+        - element_exists: user_indicator
+        - url_not_contains: ${auth.login_path}
+
+    - name: Sign out clears session
+      requires: signed_in
+      account: free
+      steps:
+        - click: { ref: user_menu }
+        - click: { ref: sign_out }
+        - wait: 2000
+        - navigate: ${auth.dashboard_path}
+        - wait: 2000
+      assert:
+        - url_contains: ${auth.login_path}
+
+    - name: Admin access control
+      account: admin
+      steps:
+        - sign_in: admin
+        - navigate: /admin
+      assert:
+        - element_exists: admin_panel
+        - no_403_errors: true
+
+    - name: Non-admin blocked from admin
+      account: free
+      steps:
+        - sign_in: free
+        - navigate: /admin
+      assert:
+        - element_not_exists: admin_panel
+      # Could be 403 or redirect:
+      assert_any:
+        - status_code: 403
+        - url_contains: ${auth.dashboard_path}
+
+  payments:
+    - name: Pricing page displays all tiers
+      navigate: ${payments.pricing_path}
+      assert:
+        - element_exists: free_tier
+        - element_exists: pro_tier
+        - text_contains: "$9.99"
+
+    - name: Pro checkout creates Stripe session
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${payments.pricing_path}
+        - click: { ref: pro_subscribe }
+        - wait: { url_contains: checkout.stripe.com, timeout: 15000 }
+      assert:
+        - url_contains: checkout.stripe.com
+
+    - name: Pro user sees upgraded UI
+      account: pro
+      requires: has_subscription
+      steps:
+        - sign_in: pro
+        - navigate: ${auth.dashboard_path}
+      assert:
+        - element_exists: pro_badge
+        - element_not_exists: upgrade_prompt
+
+    - name: Free user sees upgrade prompts
+      account: free
+      steps:
+        - sign_in: free
+        - navigate: ${auth.dashboard_path}
+      assert:
+        - element_exists: upgrade_prompt
+        - element_not_exists: pro_badge
+
+  data_integrity:
+    # Compare DB values to UI
+    - name: User count matches
+      query: "SELECT COUNT(*) as count FROM users WHERE deleted_at IS NULL"
+      ui_path: /admin/users
+      ui_selector: "[data-testid='user-count']"
+      tolerance: 0
+      requires: admin_access
+
+    - name: Revenue calculation accurate
+      query: |
+        SELECT SUM(amount) as total 
+        FROM payments 
+        WHERE status = 'completed' 
+        AND created_at > NOW() - INTERVAL '30 days'
+      ui_path: /admin/dashboard
+      ui_selector: "[data-testid='monthly-revenue']"
+      tolerance: 0.01  # 1% tolerance for rounding
+      requires: admin_access
+
+    - name: Feature flags match config
+      query: "SELECT * FROM feature_flags WHERE enabled = true"
+      ui_path: /admin/features
+      assert:
+        - db_ui_match: true
+
+  feature_tests:
+    # Core feature tests
+    - name: Create new item
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - click: { ref: create_button }
+        - type: { ref: item_name, text: "Test Item ${TIMESTAMP}" }
+        - click: { ref: save_button }
+        - wait: 2000
+      assert:
+        - text_contains: "Test Item"
+        - element_exists: item_card
+
+    - name: Edit item
+      requires: signed_in
+      requires: has_item
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - click: { ref: first_item }
+        - click: { ref: edit_button }
+        - clear: { ref: item_name }
+        - type: { ref: item_name, text: "Updated Item ${TIMESTAMP}" }
+        - click: { ref: save_button }
+        - wait: 2000
+      assert:
+        - text_contains: "Updated Item"
+
+    - name: Delete item
+      requires: signed_in
+      requires: has_item
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - click: { ref: first_item }
+        - click: { ref: delete_button }
+        - click: { ref: confirm_delete }
+        - wait: 2000
+      assert:
+        - element_not_exists: deleted_item
+        - text_contains: "deleted"
+
+    - name: Search works
+      requires: signed_in
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - type: { ref: search_input, text: "test query" }
+        - wait: 1000
+      assert:
+        - element_exists: search_results
+        - no_console_errors: true
+
+    - name: Pagination works
+      requires: signed_in
+      requires: many_items
+      account: free
+      steps:
+        - navigate: ${auth.dashboard_path}
+        - scroll_to: { ref: pagination }
+        - click: { ref: next_page }
+        - wait: 1000
+      assert:
+        - url_contains: "page=2"
+        - element_exists: item_list
+
+  static_analysis:
+    # PURPOSE: These patterns help YOU find bugs in YOUR OWN codebase
+    # Secret detection patterns help identify accidentally exposed credentials
+    # so they can be rotated - same approach as GitHub secret scanning
+    scan_path: ${app.repo_path}/src
+    patterns:
+      # Critical - SECRET DETECTION (helps devs find & rotate leaked secrets)
+      # These patterns identify exposed credentials in YOUR code so you can fix them
+      - name: Exposed API keys
+        grep: "(sk_live_|pk_live_|SUPABASE_SERVICE_ROLE|api[_-]?key\\s*=\\s*['\"][a-zA-Z0-9]{20,})"
+        severity: critical
+        purpose: "Detect accidentally committed API keys for rotation"
+        
+      - name: Hardcoded credentials
+        grep: "(password|secret)\\s*[:=]\\s*['\"][^'\"]{8,}"
+        exclude_grep: "(test|example|placeholder)"
+        severity: critical
+        purpose: "Detect hardcoded passwords that should use env vars"
+
+      # High
+      - name: Alert.alert without Platform guard
+        grep: "Alert\\.alert"
+        exclude_grep: "Platform\\.OS"
+        severity: high
+        applies_to: expo-web
+        fix_hint: "Use Platform.OS check or cross-platform alert"
+
+      - name: Linking.openURL usage
+        grep: "Linking\\.openURL"
+        severity: high
+        applies_to: expo-web
+        fix_hint: "May fail in Modal on web; use window.open fallback"
+
+      - name: Console.log in production
+        grep: "console\\.log"
+        exclude_path: ["*.test.*", "*.spec.*", "debug/"]
+        severity: medium
+
+      # Medium
+      - name: TODO/FIXME comments
+        grep: "(TODO|FIXME|HACK|XXX):"
+        severity: low
+        report_count: true
+
+      - name: TypeScript any usage
+        grep: ":\\s*any\\b"
+        severity: low
+        report_count: true
+
+      - name: Disabled ESLint rules
+        grep: "eslint-disable"
+        severity: low
+        report_count: true
+
+  performance:
+    - name: Homepage loads under 3s
+      navigate: /
+      assert:
+        - load_time_under: 3000
+
+    - name: Dashboard loads under 5s
+      requires: signed_in
+      account: free
+      navigate: ${auth.dashboard_path}
+      assert:
+        - load_time_under: 5000
+
+    - name: No large bundle warnings
+      navigate: /
+      check_console: true
+      assert:
+        - console_not_contains: "large bundle"
+        - console_not_contains: "chunk too large"
+
+  accessibility:
+    - name: Homepage passes basic a11y
+      navigate: /
+      assert:
+        - has_lang_attribute: true
+        - images_have_alt: true
+        - buttons_have_labels: true
+
+    - name: Forms have labels
+      navigate: ${auth.login_path}
+      assert:
+        - inputs_have_labels: true
+        - form_has_submit: true
+
+  security:
+    - name: HTTPS enforced
+      navigate: http://${app.url.replace('https://', '')}
+      assert:
+        - redirected_to_https: true
+
+    - name: No sensitive data in URL
+      navigate: ${auth.login_path}
+      steps:
+        - type: { ref: email_input, text: "test@example.com" }
+        - type: { ref: password_input, text: "password123" }
+        - click: { ref: sign_in_button }
+      assert:
+        - url_not_contains: "password"
+        - url_not_contains: "token"
+
+settings:
+  screenshot_on_failure: true
+  screenshot_format: png
+  timeout_default: 10000
+  retry_failed: true
+  retry_count: 2
+  parallel: false  # Sequential for data integrity
+  clear_storage_between_tests: false
+  clear_storage_between_accounts: true
+  generate_json_report: true
+  generate_markdown_report: true

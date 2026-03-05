@@ -1,0 +1,40 @@
+# Prometheus Configuration for Local Development
+# Production environments should use Mimir for long-term storage
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'local'
+    env: 'development'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # SRE Agent metrics
+  - job_name: 'sre-agent'
+    static_configs:
+      - targets: ['sre-agent:8000']
+    metrics_path: /metrics
+
+  # Example trading system targets (customize for your environment)
+  # - job_name: 'trading-engine'
+  #   kubernetes_sd_configs:
+  #     - role: pod
+  #       namespaces:
+  #         names:
+  #           - trading
+  #   relabel_configs:
+  #     - source_labels: [__meta_kubernetes_pod_label_app]
+  #       action: keep
+  #       regex: trading-engine

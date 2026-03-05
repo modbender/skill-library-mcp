@@ -1,0 +1,200 @@
+{
+  "name": "RSS Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://example.com/feed.xml",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Fetch RSS Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter items by keywords and check for duplicates\nconst items = $input.all();\nconst keywords = ['update', 'release', 'announcement', 'new'];\nconst excludeKeywords = ['draft', 'internal'];\n\nconst filtered = items.filter(item => {\n  const title = (item.json.title || '').toLowerCase();\n  const description = (item.json.description || '').toLowerCase();\n  \n  // Check include keywords\n  const hasKeyword = keywords.some(k => title.includes(k) || description.includes(k));\n  \n  // Check exclude keywords\n  const hasExclude = excludeKeywords.some(k => title.includes(k) || description.includes(k));\n  \n  return hasKeyword && !hasExclude;\n}).map(item => ({\n  json: {\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate,\n    description: item.json.description?.substring(0, 200) + '...'\n  }\n}));\n\nreturn filtered.length > 0 ? filtered : [{ json: { _noMatch: true } }];"
+      },
+      "id": "3",
+      "name": "Filter Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ !$json._noMatch }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "4",
+      "name": "Has New Items?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format message for Telegram\nconst items = $input.all().filter(i => !i.json._noMatch);\n\nif (items.length === 0) return [];\n\nlet message = '\ud83d\udcf0 *New RSS Items Found*\\n\\n';\n\nitems.forEach((item, idx) => {\n  message += `${idx + 1}. *${item.json.title}*\\n`;\n  message += `   ${item.json.description}\\n`;\n  message += `   [Read more](${item.json.link})\\n\\n`;\n});\n\nreturn [{\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: message,\n    parse_mode: 'Markdown',\n    disable_web_page_preview: false\n  }\n}];"
+      },
+      "id": "5",
+      "name": "Format Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "options": {
+          "parse_mode": "Markdown",
+          "disable_web_page_preview": false
+        }
+      },
+      "id": "6",
+      "name": "Send Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [1250, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log no new items\nconsole.log('RSS check complete: No new matching items found');\nreturn [{ json: { checked: new Date().toISOString(), result: 'no_new_items' } }];"
+      },
+      "id": "7",
+      "name": "Log No Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch RSS Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch RSS Feed": {
+      "main": [
+        [
+          {
+            "node": "Filter Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Items": {
+      "main": [
+        [
+          {
+            "node": "Has New Items?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Items?": {
+      "main": [
+        [
+          {
+            "node": "Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log No Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "id": "1",
+      "name": "rss",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "monitoring",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    }
+  ]
+}

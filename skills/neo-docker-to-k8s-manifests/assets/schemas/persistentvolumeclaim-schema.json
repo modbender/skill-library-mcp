@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kubernetes PersistentVolumeClaim",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": { "type": "string", "enum": ["v1"] },
+    "kind": { "type": "string", "enum": ["PersistentVolumeClaim"] },
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "namespace": { "type": "string" },
+        "labels": { "type": "object" }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["accessModes", "resources"],
+      "properties": {
+        "accessModes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "storage": { "type": "string" }
+              }
+            }
+          }
+        },
+        "storageClassName": { "type": "string" }
+      }
+    }
+  }
+}

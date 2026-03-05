@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DesignSpec.v1",
+  "description": "Canonical design specification extracted from Figma",
+  "type": "object",
+  "properties": {
+    "version": { "const": "1.0.0" },
+    "fileKey": { "type": "string" },
+    "fileName": { "type": "string" },
+    "lastModified": { "type": "string", "format": "date-time" },
+    "frames": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/DesignNode" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/DesignNode" }
+    },
+    "variants": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/VariantGroup" }
+    },
+    "textStyles": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/TextStyle" }
+    },
+    "colorStyles": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ColorStyle" }
+    },
+    "effectStyles": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/EffectStyle" }
+    },
+    "tokens": { "$ref": "#/definitions/DesignTokens" },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Asset" }
+    }
+  },
+  "required": ["version", "fileKey", "fileName", "lastModified"],
+  "definitions": {
+    "DesignNode": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Stable deterministic ID" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["FRAME", "COMPONENT", "INSTANCE", "GROUP", "TEXT", "RECTANGLE", "ELLIPSE", "VECTOR", "LINE", "BOOLEAN_OPERATION", "SECTION"] },
+        "figmaNodeId": { "type": "string" },
+        "properties": { "$ref": "#/definitions/NodeProperties" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/DesignNode" }
+        }
+      },
+      "required": ["id", "name", "type", "figmaNodeId"]
+    },
+    "NodeProperties": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "opacity": { "type": "number" },
+        "visible": { "type": "boolean" },
+        "rotation": { "type": "number" },
+        "cornerRadius": { "type": ["number", "null"] },
+        "cornerRadii": {
+          "type": "object",
+          "properties": {
+            "topLeft": { "type": "number" },
+            "topRight": { "type": "number" },
+            "bottomRight": { "type": "number" },
+            "bottomLeft": { "type": "number" }
+          }
+        },
+        "fills": { "type": "array", "items": { "$ref": "#/definitions/Paint" } },
+        "strokes": { "type": "array", "items": { "$ref": "#/definitions/Paint" } },
+        "strokeWeight": { "type": "number" },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/Effect" } },
+        "constraints": { "$ref": "#/definitions/Constraints" },
+        "autoLayout": { "$ref": "#/definitions/AutoLayout" },
+        "textContent": { "type": "string" },
+        "textStyle": { "$ref": "#/definitions/TextStyleProps" },
+        "componentPropertyDefinitions": { "type": "object" }
+      }
+    },
+    "Paint": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["SOLID", "GRADIENT_LINEAR", "GRADIENT_RADIAL", "GRADIENT_ANGULAR", "GRADIENT_DIAMOND", "IMAGE"] },
+        "color": { "$ref": "#/definitions/RGBA" },
+        "opacity": { "type": "number" },
+        "visible": { "type": "boolean" }
+      }
+    },
+    "RGBA": {
+      "type": "object",
+      "properties": {
+        "r": { "type": "number" },
+        "g": { "type": "number" },
+        "b": { "type": "number" },
+        "a": { "type": "number" }
+      },
+      "required": ["r", "g", "b", "a"]
+    },
+    "Effect": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["DROP_SHADOW", "INNER_SHADOW", "LAYER_BLUR", "BACKGROUND_BLUR"] },
+        "visible": { "type": "boolean" },
+        "radius": { "type": "number" },
+        "color": { "$ref": "#/definitions/RGBA" },
+        "offset": {
+          "type": "object",
+          "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+        },
+        "spread": { "type": "number" }
+      }
+    },
+    "Constraints": {
+      "type": "object",
+      "properties": {
+        "horizontal": { "type": "string", "enum": ["LEFT", "RIGHT", "CENTER", "LEFT_RIGHT", "SCALE"] },
+        "vertical": { "type": "string", "enum": ["TOP", "BOTTOM", "CENTER", "TOP_BOTTOM", "SCALE"] }
+      }
+    },
+    "AutoLayout": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string", "enum": ["HORIZONTAL", "VERTICAL", "WRAP"] },
+        "paddingTop": { "type": "number" },
+        "paddingRight": { "type": "number" },
+        "paddingBottom": { "type": "number" },
+        "paddingLeft": { "type": "number" },
+        "itemSpacing": { "type": "number" },
+        "counterAxisSpacing": { "type": "number" },
+        "primaryAxisAlignItems": { "type": "string", "enum": ["MIN", "CENTER", "MAX", "SPACE_BETWEEN"] },
+        "counterAxisAlignItems": { "type": "string", "enum": ["MIN", "CENTER", "MAX", "BASELINE"] },
+        "primaryAxisSizingMode": { "type": "string", "enum": ["FIXED", "AUTO"] },
+        "counterAxisSizingMode": { "type": "string", "enum": ["FIXED", "AUTO"] }
+      }
+    },
+    "TextStyleProps": {
+      "type": "object",
+      "properties": {
+        "fontFamily": { "type": "string" },
+        "fontWeight": { "type": "number" },
+        "fontSize": { "type": "number" },
+        "lineHeight": { "type": ["number", "string"] },
+        "letterSpacing": { "type": "number" },
+        "textAlignHorizontal": { "type": "string" },
+        "textAlignVertical": { "type": "string" },
+        "textDecoration": { "type": "string" },
+        "textCase": { "type": "string" }
+      }
+    },
+    "TextStyle": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "figmaStyleId": { "type": "string" },
+        "properties": { "$ref": "#/definitions/TextStyleProps" }
+      },
+      "required": ["id", "name"]
+    },
+    "ColorStyle": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "figmaStyleId": { "type": "string" },
+        "color": { "$ref": "#/definitions/RGBA" }
+      },
+      "required": ["id", "name", "color"]
+    },
+    "EffectStyle": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "figmaStyleId": { "type": "string" },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/Effect" } }
+      },
+      "required": ["id", "name", "effects"]
+    },
+    "DesignTokens": {
+      "type": "object",
+      "properties": {
+        "colors": { "type": "object", "additionalProperties": { "type": "string" } },
+        "typography": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "fontFamily": { "type": "string" },
+              "fontWeight": { "type": "number" },
+              "fontSize": { "type": "number" },
+              "lineHeight": { "type": ["number", "string"] },
+              "letterSpacing": { "type": "number" }
+            }
+          }
+        },
+        "spacing": { "type": "object", "additionalProperties": { "type": "number" } },
+        "radii": { "type": "object", "additionalProperties": { "type": "number" } },
+        "shadows": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "blur": { "type": "number" },
+              "spread": { "type": "number" },
+              "color": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "VariantGroup": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "figmaNodeId": { "type": "string" },
+        "properties": { "type": "object" },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "figmaNodeId": { "type": "string" },
+              "propertyValues": { "type": "object" }
+            }
+          }
+        }
+      },
+      "required": ["id", "name", "variants"]
+    },
+    "Asset": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "figmaNodeId": { "type": "string" },
+        "exportSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "format": { "type": "string", "enum": ["PNG", "SVG", "JPG", "PDF"] },
+              "scale": { "type": "number" }
+            }
+          }
+        },
+        "url": { "type": "string" }
+      },
+      "required": ["id", "name", "figmaNodeId"]
+    }
+  }
+}

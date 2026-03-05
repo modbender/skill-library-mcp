@@ -1,0 +1,16 @@
+{
+  "id": "git-safety",
+  "title": "Git Safety — Never Use Raw Git Commands",
+  "description": "Raw git commands fail in ways that expose errors to users and corrupt repo state. Agents must use wrapper scripts that handle pre-checks, conflict detection, and graceful failure. Direct `git pull`, `git push`, `git rebase` are forbidden without guards.",
+  "severity": "high",
+  "category": "safety",
+  "tags": ["git", "exec", "wrapper", "safety", "version-control"],
+  "before": "<!-- Agent runs git commands directly -->\n\n# Bad patterns:\ngit pull --rebase          # Fails if merge conflict → error exposed to user\ngit push origin main       # Fails if remote has diverged → error exposed\ngit rebase origin/main     # Leaves repo in detached HEAD silently\ngit stash pop              # Drops stash if conflicts → data loss",
+  "after": "## Git Safety Rules\n\n**Never use raw git commands.** Always use the git-sync wrapper:\n\n```bash\n# ✅ Always\nbash ~/openclaw/scripts/git-sync.sh\n\n# ❌ Never\ngit pull --rebase\ngit push origin main\ngit merge origin/main\n```\n\n**Before any git operation:**\n1. `git status` — check for unstaged changes\n2. Stash if dirty: `git stash`\n3. Then sync via wrapper\n4. Pop stash if applicable\n\n**Why wrapper?**\n- Handles pre-checks automatically\n- Graceful failure (exit 0) → no error exposure\n- Logs details to file for debugging\n- Prevents divergence accumulation (learned: 109 commits divergence in one session)",
+  "evidence": "2026-02-12: 109 commits diverged because agent ran git pull directly in a cron. Conflict resolution required 45 minutes of manual work. Follow-up: git-sync.sh wrapper created, zero conflicts since.",
+  "effectiveness": "Zero git-related error exposures after adopting wrapper. Previously: ~3 per week average.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

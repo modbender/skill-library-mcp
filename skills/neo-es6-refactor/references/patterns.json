@@ -1,0 +1,260 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Legacy ES5/ES3 → Modern ES6+ transformation patterns",
+    "author": "OpenClaw Skill Factory",
+    "lastUpdated": "2025-06-16"
+  },
+  "patterns": {
+    "var_to_const_let": {
+      "description": "Convert var declarations to const/let based on reassignment detection",
+      "category": "variable-declarations",
+      "legacy": "var {name} = {value};",
+      "modern": "const {name} = {value};",
+      "conditions": {
+        "reassigns": false,
+        "scope": "block"
+      },
+      "confidence": 0.95,
+      "priority": 1
+    },
+    "var_to_let": {
+      "description": "Convert var to let when variable is reassigned",
+      "category": "variable-declarations",
+      "legacy": "var {name} = {value};",
+      "modern": "let {name} = {value};",
+      "conditions": {
+        "reassigns": true
+      },
+      "confidence": 0.90,
+      "priority": 2
+    },
+    "function_to_arrow": {
+      "description": "Convert function expressions to arrow functions",
+      "category": "functions",
+      "legacy": "function ({params}) {\n  {body}\n}",
+      "modern": "({params}) => {\n  {body}\n}",
+      "conditions": {
+        "preservesThis": false,
+        "isExpression": true
+      },
+      "confidence": 0.85,
+      "priority": 3
+    },
+    "function_to_arrow_implicit_return": {
+      "description": "Convert single-expression arrow functions to implicit return",
+      "category": "functions",
+      "legacy": "({params}) => {\n  return {expression};\n}",
+      "modern": "({params}) => {expression}",
+      "conditions": {
+        "singleReturn": true,
+        "noSideEffects": true
+      },
+      "confidence": 0.80,
+      "priority": 4
+    },
+    "object_literal_shorthand": {
+      "description": "Convert object properties with same name to shorthand",
+      "category": "objects",
+      "legacy": "{name: name, age: age}",
+      "modern": "{name, age}",
+      "conditions": {
+        "keyMatchesValue": true
+      },
+      "confidence": 0.98,
+      "priority": 5
+    },
+    "object_method_shorthand": {
+      "description": "Convert object method definitions to shorthand",
+      "category": "objects",
+      "legacy": "sayHello: function() {}",
+      "modern": "sayHello() {}",
+      "conditions": {},
+      "confidence": 0.95,
+      "priority": 6
+    },
+    "template_literal": {
+      "description": "Convert string concatenation to template literals",
+      "category": "strings",
+      "legacy": "'Hello ' + name + '! You have ' + count + ' messages.'",
+      "modern": "`Hello ${name}! You have ${count} messages.`",
+      "conditions": {
+        "containsConcatenation": true,
+        "hasInterpolation": true
+      },
+      "confidence": 0.92,
+      "priority": 7
+    },
+    "for_to_for_of": {
+      "description": "Convert traditional for loops to for...of when index is not needed",
+      "category": "loops",
+      "legacy": "for (var i = 0; i < {array}.length; i++) {\n  var item = {array}[i];\n  {body}\n}",
+      "modern": "for (const item of {array}) {\n  {body}\n}",
+      "conditions": {
+        "usesIndexOnlyForAccess": true,
+        "noModifications": true
+      },
+      "confidence": 0.88,
+      "priority": 8
+    },
+    "for_to_for_in": {
+      "description": "Convert traditional for...in to Object.keys/entries iteration",
+      "category": "loops",
+      "legacy": "for (var key in obj) {\n  if (obj.hasOwnProperty(key)) {\n    {body}\n  }\n}",
+      "modern": "for (const key of Object.keys(obj)) {\n  {body}\n}",
+      "conditions": {
+        "objectIteration": true,
+        "hasOwnCheck": true
+      },
+      "confidence": 0.90,
+      "priority": 9
+    },
+    "destructuring_array": {
+      "description": "Convert array element access to array destructuring",
+      "category": "destructuring",
+      "legacy": "var first = arr[0];\nvar second = arr[1];",
+      "modern": "const [first, second] = arr;",
+      "conditions": {
+        "sequentialAccess": true,
+        "multipleExtractions": true
+      },
+      "confidence": 0.93,
+      "priority": 10
+    },
+    "destructuring_object": {
+      "description": "Convert repeated object property access to destructuring",
+      "category": "destructuring",
+      "legacy": "var name = user.name;\nvar email = user.email;",
+      "modern": "const {name, email} = user;",
+      "conditions": {
+        "sameSourceObject": true,
+        "propertyCount": "multiple"
+      },
+      "confidence": 0.94,
+      "priority": 11
+    },
+    "default_params": {
+      "description": "Add default parameters instead of manual checks",
+      "category": "functions",
+      "legacy": "function greet(name) {\n  name = name || 'World';\n  {body}\n}",
+      "modern": "function greet(name = 'World') {\n  {body}\n}",
+      "conditions": {
+        "hasDefaultAssignment": true
+      },
+      "confidence": 0.96,
+      "priority": 12
+    },
+    "rest_spread": {
+      "description": "Convert arguments object to rest parameters",
+      "category": "functions",
+      "legacy": "function sum() {\n  var args = Array.prototype.slice.call(arguments);\n  {body}\n}",
+      "modern": "function sum(...args) {\n  {body}\n}",
+      "conditions": {
+        "usesArguments": true
+      },
+      "confidence": 0.91,
+      "priority": 13
+    },
+    "spread_merge": {
+      "description": "Convert Object.assign to spread syntax",
+      "category": "objects",
+      "legacy": "Object.assign({}, defaults, options)",
+      "modern": "{...defaults, ...options}",
+      "conditions": {
+        "objectMerging": true,
+        "createsNewObject": true
+      },
+      "confidence": 0.90,
+      "priority": 14
+    },
+    "array_spread_concat": {
+      "description": "Convert concat calls to spread syntax",
+      "category": "arrays",
+      "legacy": "[].concat(arr1, arr2, arr3)",
+      "modern": "[...arr1, ...arr2, ...arr3]",
+      "conditions": {},
+      "confidence": 0.89,
+      "priority": 15
+    },
+    "map_filter_reduce_arrow": {
+      "description": "Convert anonymous functions in array methods to arrow functions",
+      "category": "arrays",
+      "legacy": "arr.map(function(x) { return x * 2; })",
+      "modern": "arr.map(x => x * 2)",
+      "conditions": {
+        "simpleReturn": true,
+        "singleParam": true
+      },
+      "confidence": 0.92,
+      "priority": 16
+    },
+    "promisify_callback": {
+      "description": "Convert callback-based async to Promise-based",
+      "category": "async",
+      "legacy": "fs.readFile(path, function(err, data) {\n  {body}\n});",
+      "modern": "fs.promises.readFile(path).then(data => {\n  {body}\n})",
+      "conditions": {
+        "nodeBuiltin": true,
+        "errorFirstCallback": true
+      },
+      "confidence": 0.75,
+      "priority": 17
+    },
+    "commonjs_to_esm": {
+      "description": "Convert CommonJS require/module.exports to ES6 imports/exports",
+      "category": "modules",
+      "legacy": "var mod = require('module');\nmodule.exports = {foo: bar};",
+      "modern": "import mod from 'module';\nexport const foo = bar;",
+      "conditions": {
+        "isModuleFile": true
+      },
+      "confidence": 0.85,
+      "priority": 18
+    },
+    "export_default": {
+      "description": "Convert module.exports = to export default",
+      "category": "modules",
+      "legacy": "module.exports = MyClass;",
+      "modern": "export default MyClass;",
+      "conditions": {
+        "singleExport": true
+      },
+      "confidence": 0.95,
+      "priority": 19
+    },
+    "class_properties": {
+      "description": "Convert constructor assignments to class properties",
+      "category": "classes",
+      "legacy": "constructor() {\n  this.name = name;\n  this.age = age;\n}",
+      "modern": "name;\nage;\nconstructor(){}",
+      "conditions": {
+        "simpleAssignment": true,
+        "noComputation": true
+      },
+      "confidence": 0.88,
+      "priority": 20
+    },
+    "computed_property_names": {
+      "description": "Use computed property names in object literals",
+      "category": "objects",
+      "legacy": "var obj = {};\nobj['prop_' + key] = value;",
+      "modern": "const obj = {\n  ['prop_' + key]: value\n};",
+      "conditions": {
+        "dynamicKey": true
+      },
+      "confidence": 0.87,
+      "priority": 21
+    },
+    "binary_literals": {
+      "description": "Convert parseInt to numeric literals when applicable",
+      "category": "literals",
+      "legacy": "parseInt('010', 8) // octal\nparseInt('0xFF', 16) // hex",
+      "modern": "0o10 // octal\n0xFF // hex\n0b1010 // binary",
+      "conditions": {
+        "literalValue": true
+      },
+      "confidence": 0.95,
+      "priority": 22
+    }
+  }
+}

@@ -1,0 +1,260 @@
+# Production-Ready Kubernetes CronJob Template
+# Replace all <placeholders> with actual values
+# Lines marked with # CUSTOMIZE require modification for your workload
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: <job-name>  # CUSTOMIZE: cronjob name (max 52 chars, Job adds 11-char suffix)
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <job-name>
+    app.kubernetes.io/instance: <instance-name>
+    app.kubernetes.io/version: "<version>"  # CUSTOMIZE: application version
+    app.kubernetes.io/component: cronjob
+    app.kubernetes.io/part-of: <system-name>  # CUSTOMIZE: parent system name
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "<job description>"  # CUSTOMIZE: what this job does
+    contact: "<team-email>"  # CUSTOMIZE: responsible team contact
+spec:
+  # Cron schedule expression (UTC timezone)
+  # CUSTOMIZE: choose the appropriate schedule
+  # ┌───────── minute (0-59)
+  # │ ┌───────── hour (0-23)
+  # │ │ ┌───────── day of month (1-31)
+  # │ │ │ ┌───────── month (1-12)
+  # │ │ │ │ ┌───────── day of week (0-6, Sunday=0)
+  # │ │ │ │ │
+  # * * * * *
+  #
+  # Common patterns:
+  # "*/5 * * * *"    - Every 5 minutes
+  # "0 * * * *"      - Every hour (on the hour)
+  # "0 */6 * * *"    - Every 6 hours
+  # "0 0 * * *"      - Daily at midnight
+  # "0 2 * * *"      - Daily at 2:00 AM
+  # "0 0 * * 0"      - Weekly on Sunday at midnight
+  # "0 0 1 * *"      - Monthly on the 1st at midnight
+  # "0 0 1 1 *"      - Yearly on January 1st at midnight
+  schedule: "0 2 * * *"  # CUSTOMIZE: cron schedule expression
+
+  # Timezone for the schedule (K8s 1.27+, requires TimeZoneName feature gate)
+  # timeZone: "America/New_York"  # CUSTOMIZE: IANA timezone
+
+  # Concurrency policy controls what happens when a new job is due while a previous one is still running
+  # Allow (default): allows concurrent jobs
+  # Forbid: skips the new job if previous is still running
+  # Replace: cancels the running job and starts a new one
+  concurrencyPolicy: Forbid  # CUSTOMIZE: Allow, Forbid, or Replace
+
+  # Job history retention
+  successfulJobsHistoryLimit: 3  # CUSTOMIZE: number of successful jobs to retain (default: 3)
+  failedJobsHistoryLimit: 5  # CUSTOMIZE: number of failed jobs to retain (default: 1)
+
+  # Deadline for starting the job (in seconds)
+  # If the job misses its scheduled time by this much, it is skipped
+  startingDeadlineSeconds: 300  # CUSTOMIZE: 5 minutes (set based on schedule frequency)
+
+  # Suspend the cronjob without deleting it
+  suspend: false  # Set to true to temporarily pause scheduling
+
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: <job-name>
+        app.kubernetes.io/instance: <instance-name>
+    spec:
+      # Time limit for the entire job (all pods)
+      activeDeadlineSeconds: 3600  # CUSTOMIZE: max runtime in seconds (1 hour)
+
+      # Number of retries before marking the job as failed
+      backoffLimit: 3  # CUSTOMIZE: retry count (default: 6)
+
+      # Backoff limit per index (K8s 1.29+, for indexed jobs)
+      # backoffLimitPerIndex: 1
+
+      # TTL for cleaning up finished jobs automatically (seconds)
+      ttlSecondsAfterFinished: 86400  # CUSTOMIZE: cleanup after 24 hours
+
+      # Parallelism and completions
+      # For simple jobs: leave both at 1
+      # For parallel work queues: set parallelism > 1, completions to desired count
+      parallelism: 1  # CUSTOMIZE: number of pods to run in parallel
+      completions: 1  # CUSTOMIZE: number of successful completions required
+
+      # Completion mode (K8s 1.24+)
+      # NonIndexed (default): any pod completion counts
+      # Indexed: each index (0 to completions-1) must complete
+      completionMode: NonIndexed
+
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: <job-name>
+            app.kubernetes.io/instance: <instance-name>
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "9090"
+            prometheus.io/path: "/metrics"
+
+        spec:
+          # Restart policy for job pods (must be Never or OnFailure)
+          # Never: failed pods are not restarted (new pods are created per backoffLimit)
+          # OnFailure: failed containers are restarted in the same pod
+          restartPolicy: OnFailure  # CUSTOMIZE: Never or OnFailure
+
+          serviceAccountName: <job-name>  # CUSTOMIZE: service account with appropriate RBAC
+
+          # Pod-level security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000  # CUSTOMIZE: application user ID
+            runAsGroup: 1000  # CUSTOMIZE: application group ID
+            fsGroup: 1000  # CUSTOMIZE: volume filesystem group
+            seccompProfile:
+              type: RuntimeDefault
+
+          # Node selection (optional)
+          # nodeSelector:
+          #   node-type: batch  # CUSTOMIZE: target specific node pools for jobs
+
+          # Tolerations for dedicated job nodes (optional)
+          # tolerations:
+          # - key: "dedicated"
+          #   operator: "Equal"
+          #   value: "batch"
+          #   effect: "NoSchedule"
+
+          # Init containers (optional - e.g., wait for dependencies)
+          initContainers:
+          - name: init-wait
+            image: busybox:1.36
+            command:
+            - sh
+            - -c
+            - |
+              # CUSTOMIZE: wait for dependencies before running the job
+              echo "Checking dependencies..."
+              # Example: wait for database
+              # until nc -z $DATABASE_HOST $DATABASE_PORT; do
+              #   echo "Waiting for database..."
+              #   sleep 2
+              # done
+              echo "Dependencies ready."
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+
+          containers:
+          - name: <container-name>  # CUSTOMIZE: container name
+            image: <registry>/<image>:<tag>  # CUSTOMIZE: container image (never use :latest)
+            imagePullPolicy: IfNotPresent
+
+            # Command and arguments
+            # CUSTOMIZE: job command to execute
+            command:
+            - /bin/sh
+            - -c
+            args:
+            - |
+              echo "Job started at $(date)"
+              # CUSTOMIZE: replace with actual job logic
+              # Example: database backup, report generation, data cleanup
+              echo "Job completed at $(date)"
+
+            # Environment variables
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: JOB_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['batch.kubernetes.io/job-name']
+
+            # Load from ConfigMap and Secret
+            envFrom:
+            - configMapRef:
+                name: <job-name>-config  # CUSTOMIZE: configmap name
+            - secretRef:
+                name: <job-name>-secret  # CUSTOMIZE: secret name
+
+            # Resource limits
+            # CUSTOMIZE: set based on job workload (batch jobs may need burst capacity)
+            resources:
+              requests:
+                memory: "256Mi"  # CUSTOMIZE: memory request
+                cpu: "250m"  # CUSTOMIZE: CPU request
+              limits:
+                memory: "1Gi"  # CUSTOMIZE: memory limit
+                cpu: "1000m"  # CUSTOMIZE: CPU limit
+                # Ephemeral storage limit (prevents runaway disk usage)
+                ephemeral-storage: "1Gi"  # CUSTOMIZE: temp disk limit
+
+            # Volume mounts
+            volumeMounts:
+            - name: config
+              mountPath: /etc/<job-name>  # CUSTOMIZE: config mount path
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: output
+              mountPath: /output  # CUSTOMIZE: output directory for job results
+            # Optional: mount scripts from ConfigMap
+            # - name: scripts
+            #   mountPath: /scripts
+            #   readOnly: true
+
+            # Container security context
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop:
+                - ALL
+
+          # Volumes
+          volumes:
+          - name: config
+            configMap:
+              name: <job-name>-config  # CUSTOMIZE: configmap name
+          - name: tmp
+            emptyDir: {}
+          - name: output
+            emptyDir:
+              sizeLimit: 1Gi  # CUSTOMIZE: output volume size limit
+          # Optional: mount scripts
+          # - name: scripts
+          #   configMap:
+          #     name: <job-name>-scripts
+          #     defaultMode: 0755  # Make scripts executable
+
+          # Image pull secrets (if using private registry)
+          # imagePullSecrets:
+          # - name: regcred  # CUSTOMIZE: registry credential secret name
+
+---
+# Usage Notes:
+#
+# 1. List cronjob runs: kubectl get jobs --selector=app.kubernetes.io/name=<job-name>
+#
+# 2. View logs of most recent run:
+#    kubectl logs job/$(kubectl get jobs --sort-by=.metadata.creationTimestamp \
+#      --selector=app.kubernetes.io/name=<job-name> -o jsonpath='{.items[-1].metadata.name}')
+#
+# 3. Manually trigger a run: kubectl create job <job-name>-manual --from=cronjob/<job-name>
+#
+# 4. Suspend a cronjob: kubectl patch cronjob <job-name> -p '{"spec":{"suspend":true}}'
+#
+# 5. Resume a cronjob: kubectl patch cronjob <job-name> -p '{"spec":{"suspend":false}}'
+#
+# 6. Check schedule: kubectl get cronjob <job-name> -o jsonpath='{.spec.schedule}'

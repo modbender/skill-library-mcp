@@ -1,0 +1,209 @@
+# Curated Search Configuration
+# Edit this file to customize domains and crawl behavior
+# See DOMAIN_GUIDE.md for rationale behind each domain
+
+# =============================================================================
+# DOMAIN WHITELIST
+# =============================================================================
+# These are the ONLY domains allowed in the search index.
+# Crawler will reject any URL not matching these domains.
+
+domains:
+  # --- Programming Languages & Runtimes ---
+  - python.org                    # Official Python docs
+  - docs.python.org               # Python documentation subdomain
+  - nodejs.org                    # Node.js runtime documentation
+  - docs.nodejs.org               # Node docs subdomain (if exists)
+  
+  # --- Web Development ---
+  - developer.mozilla.org         # MDN Web Docs (HTML, CSS, JS, Web APIs)
+  
+  # --- System Administration & Linux ---
+  - man7.org                      # Linux man pages (system calls, C APIs)
+  - linux.die.net                 # Alternative Linux man pages
+  
+  # --- Q&A and Community ---
+  - stackoverflow.com             # Programming Q&A (high value, use carefully)
+  - stackprinter.appspot.com      # Stack Overflow text-only (crawl-friendly)
+  
+  # --- Code Repositories ---
+  - github.com                    # Code repos, READMEs
+  - raw.githubusercontent.com     # Raw markdown files from GitHub
+  
+  # --- Encyclopedia & Reference ---
+  - en.wikipedia.org              # Wikipedia (Computing/Technology topics)
+  
+  # --- Self-Documentation ---
+  - docs.openclaw.ai              # OpenClaw own docs
+
+# =============================================================================
+# SEED URLS (Start Points for Crawling)
+# =============================================================================
+# These are the entry points where crawling begins.
+# Using specific docs paths instead of homepages for better content.
+
+seeds:
+  # Python documentation
+  - "https://docs.python.org/3/"
+  - "https://docs.python.org/3/library/"
+  - "https://docs.python.org/3/tutorial/"
+  
+  # Node.js documentation
+  - "https://nodejs.org/api/"
+  - "https://nodejs.org/docs/"
+  
+  # MDN Web Docs (focus on JavaScript and Web APIs)
+  - "https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+  - "https://developer.mozilla.org/en-US/docs/Web/API"
+  - "https://developer.mozilla.org/en-US/docs/Web/HTML"
+  - "https://developer.mozilla.org/en-US/docs/Web/CSS"
+  
+  # Linux man pages
+  - "https://man7.org/linux/man-pages/"
+  - "https://linux.die.net/man/"
+  
+  # Stack Overflow (specific tags via text-friendly StackPrinter)
+  # Note: These are examples. Full SO crawling requires different strategy.
+  - "http://stackprinter.appspot.com/export?service=stackoverflow&language=en&width=640&height=800&tag=python&height=10"
+  
+  # GitHub (specific high-value repos - examples)
+  - "https://github.com/nodejs/node/blob/main/README.md"
+  - "https://github.com/python/cpython/blob/main/README.rst"
+  
+  # Wikipedia (Computing category entry point)
+  - "https://en.wikipedia.org/wiki/Computer_programming"
+  - "https://en.wikipedia.org/wiki/Linux"
+  - "https://en.wikipedia.org/wiki/JavaScript"
+  
+  # OpenClaw docs
+  - "https://docs.openclaw.ai/"
+
+# =============================================================================
+# CRAWL SETTINGS
+# =============================================================================
+
+crawl:
+  # Depth: How many link hops from seeds to follow
+  # 0 = index seeds only
+  # 1 = seeds + direct links
+  # 2 = recommended for MVP (covers most docs sites)
+  # 3+ = deep crawl (use with caution)
+  depth: 2
+  
+  # Delay: Milliseconds between requests to same host
+  # 1000ms = 1 second = 60 requests/minute (polite)
+  # 500ms = 120 requests/minute (aggressive, use on your own sites only)
+  delay: 1000
+  
+  # Timeout: Seconds before giving up on a request
+  timeout: 30
+  
+  # User agent: Identify yourself properly
+  user_agent: "CuratedSearch/1.0 (OpenClaw Bot; +https://github.com/openclaw/openclaw)"
+  
+  # Max documents: Stop after indexing this many pages
+  # Protects against runaway crawls
+  max_documents: 10000
+  
+  # Concurrent requests: Parallel fetches per domain
+  # 1 = sequential (safest for unknown sites)
+  # 2-3 = moderate (use with known good sites)
+  # 5+ = aggressive (risk of being blocked)
+  concurrent_requests: 1
+  
+  # Respect robots.txt: Should we honor robots.txt disallow rules?
+  respect_robots: true
+
+# =============================================================================
+# CONTENT FILTERING
+# =============================================================================
+
+# URL patterns to NEVER index (regular expressions)
+# These are skipped regardless of domain
+skip_patterns:
+  - '^/search'                    # Internal search pages
+  - '^/login'                     # Login forms
+  - '^/logout'                    # Logout links
+  - '^/admin'                     # Admin areas
+  - '^/user/'                     # User profile pages (often low value)
+  - '\.(pdf|zip|tar|gz|rar|exe|dmg|pkg|deb|rpm)$'  # Binary downloads
+  - '\.(jpg|jpeg|png|gif|svg|ico|woff|woff2|ttf|eot)$'  # Images/fonts
+  - '\.(css|js|map)$'             # Static assets
+  - '\?(source|ref|utm)_'         # Tracking parameters
+  - '#'                           # Fragment-only URLs
+  - '/tag/'                       # Tag pages (often duplicate content)
+  - '/category/'                  # Category listings (often duplicate)
+
+# Content must be at least this many characters to be indexed
+min_content_length: 200
+
+# Maximum content size to index (characters)
+# Prevents indexing huge pages (PDFs rendered as HTML, etc.)
+max_content_length: 50000
+
+# =============================================================================
+# INDEX SETTINGS
+# =============================================================================
+
+index:
+  # Path to index files (relative to skill directory)
+  # Format: JSON files (MiniSearch serialized format)
+  path: "data/index"
+  
+  # Auto-save: Save index after every N documents
+  # 0 = only save at end of crawl
+  # 10 = save frequently (slower but safer)
+  # 100 = balanced
+  auto_save_after: 100
+
+# =============================================================================
+# SEARCH SETTINGS
+# =============================================================================
+
+search:
+  # Default result limit for queries
+  default_limit: 10
+  
+  # Maximum results allowed per query
+  max_limit: 100
+  
+  # Minimum score threshold for results
+  # Results below this score are filtered out
+  # 0.0 = no filtering
+  # 0.3 = moderate quality filter
+  min_score: 0.0
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+
+logging:
+  # Log level: debug, info, warn, error
+  level: "info"
+  
+  # Log file path (relative to skill directory)
+  file: "logs/curated-search.log"
+  
+  # Also print to console?
+  console: true
+
+# =============================================================================
+# ENVIRONMENT OVERRIDES
+# =============================================================================
+# Uncomment to override for specific environments
+# 
+# development:
+#   crawl:
+#     depth: 1
+#     delay: 100
+#   logging:
+#     level: "debug"
+#
+# production:
+#   crawl:
+#     depth: 2
+#     delay: 2000
+#     max_documents: 50000
+#   logging:
+#     level: "warn"
+#     file: "/var/log/curated-search.log"

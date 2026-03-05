@@ -1,0 +1,16 @@
+{
+  "id": "cron-isolation",
+  "title": "Cron Isolation — Never Use Message Tool in Isolated Crons",
+  "description": "Isolated cron jobs (running without a specific channel context) must not call the message tool directly. Without a clear recipient/channel, the platform throws 'Ambiguous Discord recipient' errors, and the message goes nowhere or goes to the wrong place. Cron output should be text-only; the delivery mechanism is configured at the cron level, not called explicitly inside the cron.",
+  "severity": "high",
+  "category": "safety",
+  "tags": ["cron", "message", "isolation", "discord", "delivery"],
+  "before": "<!-- Bad: cron tries to send message directly -->\n#!/bin/bash\n# morning-briefing cron\nBRIEFING=$(generate_briefing.sh)\nmessage send --channel '#jarvis' \"$BRIEFING\"   # ❌ FAILS\n# → Error: Ambiguous Discord recipient\n# → Message never delivered\n# → Cron silently fails every morning",
+  "after": "## Cron Isolation Rule\n\n**Isolated crons must NOT call the message tool directly.**\n\n### How Cron Delivery Works\n\n```\nCron job runs\n    ↓\nScript outputs text to stdout\n    ↓\nOpenClaw cron delivery config routes to channel\n    ↓\nMessage appears in correct channel\n```\n\nThe delivery channel is set in cron configuration, not in the script.\n\n### Correct Pattern\n\n```bash\n#!/bin/bash\n# ✅ Correct: just print output, let cron config deliver it\necho \"☀️ Morning Briefing\"\necho \"- Calendar: $(get_events.sh)\"\necho \"- Weather: $(get_weather.sh)\"\n# cron config handles the rest\n```\n\n### Wrong Pattern\n\n```bash\n#!/bin/bash\n# ❌ Wrong: trying to send message from inside cron\nsend_discord_message '#jarvis' \"Morning briefing ready\"\nmessage --channel jarvis \"$(briefing)\"\n```\n\n### Exception\nIf a cron is explicitly configured with channel context and the platform documentation confirms message tool is safe to use — you may use it. But this is the exception, not the rule. Default: text output only.\n\n### Diagnosis\nIf your cron message isn't appearing:\n1. Check cron config for delivery channel setting\n2. Confirm script outputs to stdout (not stderr)\n3. Never add message tool calls to 'fix' silent delivery",
+  "evidence": "Morning briefing cron silently failed for 11 days. Root cause: message tool called inside isolated cron without channel context. 'Ambiguous Discord recipient' error swallowed silently. User thought briefings just stopped.",
+  "effectiveness": "Removing direct message calls from crons eliminated all cron delivery failures. 100% delivery rate for correctly configured crons.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

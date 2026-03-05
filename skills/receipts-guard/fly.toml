@@ -1,0 +1,56 @@
+# RECEIPTS Guard - Fly.io Sprites Configuration
+# Persistent agent with auto-sleep and fast wake-up
+
+app = "receipts-guard"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Persistent volume for identity and receipts data
+[mounts]
+  source = "receipts_data"
+  destination = "/data"
+
+[env]
+  NODE_ENV = "production"
+  RECEIPTS_DATA_DIR = "/data/receipts"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+
+  # Fly.io Sprites: auto-stop when idle, auto-start on request
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 100
+    soft_limit = 50
+
+# Machine configuration for cost efficiency
+[vm]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+# Health checks
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+
+  [[services.http_checks]]
+    interval = "30s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+    protocol = "http"
+    timeout = "5s"
+
+# Secrets (set via `fly secrets set KEY=value`)
+# RECEIPTS_WALLET_PRIVATE_KEY - For on-chain transactions (encrypted)
+# ETHEREUM_RPC - Ethereum RPC endpoint
+# BASE_RPC - Base RPC endpoint
+# RECEIPTS_MOLTBOOK_KEY - Moltbook API key (optional)

@@ -1,0 +1,26 @@
+# Test: email-triage
+# ==================
+#
+# Validates email triage pipeline behavior.
+
+tests:
+  - name: "Processes emails and categorizes correctly"
+    skip: true  # Requires API credentials
+    input: '{"provider": "gmail", "limit": 5}'
+    expected_output:
+      summary:
+        processed: 5
+
+  - name: "Extracts meeting requests"
+    skip: true
+    input: '{"provider": "gmail", "create_calendar_events": true}'
+    output_conditions:
+      - path: "calendar_events"
+        condition: "length >= 0"
+
+  - name: "Handles empty inbox"
+    skip: true
+    input: '{"provider": "gmail", "folder": "EMPTY"}'
+    expected_output:
+      summary:
+        processed: 0

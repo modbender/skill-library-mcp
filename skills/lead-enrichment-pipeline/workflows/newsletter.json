@@ -1,0 +1,294 @@
+{
+  "updatedAt": "2026-02-17T22:44:31.000Z",
+  "createdAt": "2026-02-17T01:47:31.316Z",
+  "id": "Y0LZV1p3zVIwA072",
+  "name": "Newsletter Signup Form",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "newsletter",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        256,
+        304
+      ],
+      "typeVersion": 2,
+      "webhookId": "newsletter-signup-wh",
+      "id": "47dfa886-548a-4cc1-9ffd-2701394b548a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\nreturn [{ json: {\n  Email: input.email || '',\n  Source: input.source || 'newsletter',\n  Timestamp: input.timestamp || new Date().toISOString(),\n  'Received At': new Date().toISOString(),\n  Score: 10,\n  Tags: 'subscriber'\n}}];"
+      },
+      "name": "Format Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        636,
+        304
+      ],
+      "typeVersion": 2,
+      "id": "70ec9234-e841-47bc-8e1c-eb370106835a"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_LEADS_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Newsletter",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Received At",
+              "displayName": "Received At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tags",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        860,
+        304
+      ],
+      "typeVersion": 4.7,
+      "id": "d3f5d3e4-d313-447f-ae6c-21ca5686fde6",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"message\": \"Subscription received\" }",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1068,
+        304
+      ],
+      "typeVersion": 1.1,
+      "id": "fab3ffc4-4043-40dd-814e-f74c631c12bb"
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "={{ $json.Email }}",
+        "subject": "Welcome — you're in.",
+        "emailType": "html",
+        "html": "<!DOCTYPE html>\n<html>\n<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head>\n<body style=\"margin: 0; padding: 0; background: #f7f7f7;\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background: #f7f7f7; padding: 32px 0;\">\n<tr><td align=\"center\">\n<table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background: #ffffff; border-radius: 4px; overflow: hidden;\">\n  <tr><td style=\"padding: 32px 40px 16px 40px; text-align: center; border-bottom: 1px solid #eee;\">\n    <p style=\"font-family: Outfit, -apple-system, sans-serif; font-size: 13px; color: #666; margin: 0; letter-spacing: 1px;\">YOUR_NAME</p>\n    <p style=\"font-family: Outfit, -apple-system, sans-serif; font-size: 11px; color: #999; margin: 4px 0 0 0;\">Architect of Alignment</p>\n  </td></tr>\n  <tr><td style=\"padding: 32px 40px;\">\n    <h2 style=\"font-family: Fraunces, Georgia, serif; color: #0A0A0A; font-size: 22px; margin: 24px 0 12px 0;\">Welcome aboard.</h2><p style=\"font-family: Outfit, -apple-system, sans-serif; color: #0A0A0A; font-size: 15px; line-height: 1.65; margin: 0 0 16px 0;\">You've just joined a small group of people who think carefully about the systems that shape their work and lives.</p><p style=\"font-family: Outfit, -apple-system, sans-serif; color: #0A0A0A; font-size: 15px; line-height: 1.65; margin: 0 0 16px 0;\">Here's what to expect:</p><ul style=\"font-family: Outfit, -apple-system, sans-serif; color: #0A0A0A; font-size: 15px; line-height: 1.65; padding-left: 20px; margin: 0 0 16px 0;\"><li style=\"margin-bottom: 8px;\"><strong>Weekly insights</strong> on building aligned systems — technology, process, and people</li><li style=\"margin-bottom: 8px;\"><strong>Behind-the-scenes</strong> breakdowns of real infrastructure decisions</li><li style=\"margin-bottom: 8px;\"><strong>Practical frameworks</strong> you can apply immediately to your own work</li></ul><p style=\"font-family: Outfit, -apple-system, sans-serif; color: #0A0A0A; font-size: 15px; line-height: 1.65; margin: 0 0 16px 0;\">No fluff, no spam. Just clear thinking about building things that matter.</p><p style=\"text-align: center; margin: 28px 0;\"><a href=\"https://YOUR_DOMAIN/blog\" style=\"font-family: Outfit, -apple-system, sans-serif; background: #0A0A0A; color: #ffffff; padding: 12px 32px; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 4px;\">Visit the Blog</a></p><p style=\"font-family: Outfit, -apple-system, sans-serif; color: #0A0A0A; font-size: 15px; line-height: 1.65; margin: 0 0 16px 0;\">Talk soon,<br>YOUR_NAME</p>\n  </td></tr>\n  <tr><td style=\"padding: 24px 40px; border-top: 1px solid #eee; text-align: center;\">\n    <p style=\"font-family: Outfit, -apple-system, sans-serif; font-size: 12px; color: #999; margin: 0;\">\n      <a href=\"https://YOUR_DOMAIN\" style=\"color: #666; text-decoration: none;\">YOUR_DOMAIN</a>\n    </p>\n  </td></tr>\n</table>\n</td></tr></table>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        636,
+        520
+      ],
+      "id": "6b008a0d-cc0c-452b-8ad8-5bc9cfc1d149",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst ip = $input.first().json.headers?.['x-forwarded-for'] || \n           $input.first().json.headers?.['x-real-ip'] || \n           'unknown';\nconst now = Date.now();\nconst windowMs = 3600000; // 1 hour\nconst maxRequests = 10;\n\n// Clean old entries\nif (!staticData.rateLimits) staticData.rateLimits = {};\nconst limits = staticData.rateLimits;\nfor (const key of Object.keys(limits)) {\n  limits[key] = (limits[key] || []).filter(ts => now - ts < windowMs);\n  if (limits[key].length === 0) delete limits[key];\n}\n\n// Check rate limit\nconst requests = limits[ip] || [];\nif (requests.length >= maxRequests) {\n  throw new Error(`Rate limit exceeded for ${ip}`);\n}\n\n// Record this request\nrequests.push(now);\nlimits[ip] = requests;\n\n// Pass through\nreturn $input.all();"
+      },
+      "name": "Rate Limiter",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        436,
+        304
+      ],
+      "typeVersion": 2,
+      "id": "3fb673c0-9eb5-4959-8084-115cc0e7a566"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Rate Limiter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limiter": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "giNAXrg0oK2y3Q7d"
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "adbd4d0b-9e4a-4006-8d11-392d75296ad6",
+  "activeVersionId": "adbd4d0b-9e4a-4006-8d11-392d75296ad6",
+  "versionCounter": 49,
+  "triggerCount": 1,
+  "tags": [
+    {
+      "updatedAt": "2026-02-17T23:05:31.644Z",
+      "createdAt": "2026-02-17T23:05:31.644Z",
+      "id": "1yICTZeB3klJFYAE",
+      "name": "Lead Gen"
+    },
+    {
+      "updatedAt": "2026-02-17T23:05:31.816Z",
+      "createdAt": "2026-02-17T23:05:31.816Z",
+      "id": "JYrNxtf2FRHRMW8a",
+      "name": "Production"
+    },
+    {
+      "updatedAt": "2026-02-17T23:05:31.599Z",
+      "createdAt": "2026-02-17T23:05:31.599Z",
+      "id": "OmIMMlN4VpTdmGSH",
+      "name": "Aethon Core"
+    },
+    {
+      "updatedAt": "2026-02-17T23:05:31.526Z",
+      "createdAt": "2026-02-17T23:05:31.526Z",
+      "id": "RKoWkV72uXPgu54V",
+      "name": "P0 — Critical"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+name: signup_lead
+description: |
+  Create a signup lead in the AgenticCreed system using the public HTTP endpoint.
+  This skill sends lead details (email, name, contact info, etc.) to
+  https://gateway.agenticcreed.ai/signup-leads.
+
+type: http
+
+request:
+  method: POST
+  url: https://gateway.agenticcreed.ai/signup-leads
+
+  headers:
+    accept: application/json
+    Content-Type: application/json
+    # API key is read from the environment variable AGENTICCREED_API_KEY.
+    # Set it before running `openclaw up`, e.g.:
+    #   export AGENTICCREED_API_KEY="your-real-key-here"
+    x-api-key: "{{env.AGENTICCREED_API_KEY}}"
+
+  # These are the fields your endpoint expects.
+  # In OpenClaw, you will typically bind these to agent inputs/slots.
+  body:
+    email: "{{email}}"
+    firstName: "{{firstName}}"
+    lastName: "{{lastName}}"
+    address: "{{address}}"
+    dateOfBirth: "{{dateOfBirth}}"
+    phoneNumber: "{{phoneNumber}}"
+    whatsAppNumber: "{{whatsAppNumber}}"
+    jobTitle: "{{jobTitle}}"
+    dateOfJoining: "{{dateOfJoining}}"
+
+response:
+  type: json
+  # You can customize this mapping based on the actual API response shape.
+  # For now, we just expose the whole JSON body as `raw`.
+  mapping:
+    raw: "$"
+
+

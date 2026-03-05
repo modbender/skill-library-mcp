@@ -1,0 +1,322 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EVE Dashboard Config",
+  "description": "Modular config schema for the EVE Command Center. Each user configures which alerts, reports, and market trackers they need.",
+  "type": "object",
+  "properties": {
+
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version for future migrations",
+      "default": "1.0",
+      "enum": ["1.0"]
+    },
+
+    "notification_channels": {
+      "type": "object",
+      "description": "Connection details for notification channels. Values can be literal or $ENV:VARIABLE_NAME references.",
+      "properties": {
+        "telegram": {
+          "type": "object",
+          "properties": {
+            "bot_token": {
+              "type": "string",
+              "description": "Telegram Bot Token (e.g. '123456:ABC-DEF...' or '$ENV:TELEGRAM_BOT_TOKEN')"
+            },
+            "chat_id": {
+              "type": "string",
+              "description": "Telegram Chat ID (e.g. '-100123456789' or '$ENV:TELEGRAM_CHAT_ID')"
+            }
+          },
+          "required": ["bot_token", "chat_id"]
+        },
+        "discord": {
+          "type": "object",
+          "properties": {
+            "webhook_url": {
+              "type": "string",
+              "description": "Discord Webhook URL (or '$ENV:DISCORD_WEBHOOK_URL')"
+            }
+          },
+          "required": ["webhook_url"]
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "characters": {
+      "type": "array",
+      "description": "EVE characters to monitor, with auth tokens and granted scopes",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "EVE Character ID (from SSO /oauth/verify)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name (optional, for readability)"
+          },
+          "token": {
+            "type": "string",
+            "description": "ESI Access Token (or '$ENV:EVE_TOKEN_MAIN'). Expires after ~20min."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "ESI Refresh Token for automatic renewal (or '$ENV:EVE_REFRESH_MAIN')"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "EVE Developer App Client ID (or '$ENV:EVE_CLIENT_ID')"
+          },
+          "scopes": {
+            "type": "array",
+            "description": "List of granted ESI scopes. Validated against required scopes during config check.",
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              ["esi-wallet.read_character_wallet.v1", "esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"]
+            ]
+          },
+          "corporation": {
+            "type": "object",
+            "description": "Corporation association (optional, otherwise derived from ESI)",
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" }
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether to actively monitor this character",
+            "default": true
+          }
+        },
+        "required": ["id", "token", "refresh_token", "client_id", "scopes"]
+      },
+      "minItems": 1
+    },
+
+    "alerts": {
+      "type": "object",
+      "description": "Real-time alerts via ESI polling. Checks for changes at regular intervals.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "check_interval": {
+          "type": "string",
+          "description": "Polling interval (e.g. '5m', '15m', '1h')",
+          "default": "5m",
+          "pattern": "^[0-9]+(s|m|h)$"
+        },
+        "channels": {
+          "type": "array",
+          "description": "Which notification channels to use for alerts",
+          "items": {
+            "type": "string",
+            "enum": ["telegram", "discord"]
+          }
+        },
+        "rules": {
+          "type": "array",
+          "description": "Alert rules. Each rule defines a trigger type with optional thresholds.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "war_declared",
+                  "war_surrendered",
+                  "structure_fuel_low",
+                  "structure_under_attack",
+                  "skill_complete",
+                  "wallet_large_deposit",
+                  "wallet_large_withdrawal",
+                  "contract_expired",
+                  "industry_job_complete",
+                  "pi_extractor_expired",
+                  "clone_jump_available",
+                  "mail_received",
+                  "killmail"
+                ],
+                "description": "Alert type. Each type requires specific ESI scopes."
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "critical"],
+                "default": "info",
+                "description": "Severity level — affects notification formatting and priority"
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Numeric threshold (e.g. ISK amount for wallet alerts, fuel hours for structure alerts)"
+              },
+              "cooldown": {
+                "type": "string",
+                "description": "Minimum time between repeated alerts of the same type",
+                "default": "1h",
+                "pattern": "^[0-9]+(s|m|h)$"
+              },
+              "character_filter": {
+                "type": "array",
+                "items": { "type": "integer" },
+                "description": "Only trigger for specific character IDs. Empty = all characters."
+              }
+            },
+            "required": ["type"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "reports": {
+      "type": "object",
+      "description": "Scheduled reports — generated and sent on a cron schedule.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "schedule": {
+          "type": "string",
+          "description": "Cron expression (e.g. '0 9 * * *' = daily at 9am, '0 9,21 * * *' = 9am and 9pm)",
+          "default": "0 9 * * *"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone for the cron schedule",
+          "default": "Europe/Berlin"
+        },
+        "channels": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["telegram", "discord"] }
+        },
+        "templates": {
+          "type": "array",
+          "description": "Which reports to generate",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": [
+                  "net_worth",
+                  "skill_queue",
+                  "industry_jobs",
+                  "market_orders",
+                  "wallet_summary",
+                  "assets_summary"
+                ],
+                "description": "Report template name"
+              },
+              "format": {
+                "type": "string",
+                "enum": ["short", "detailed"],
+                "default": "short",
+                "description": "'short' = compact summary, 'detailed' = full report"
+              },
+              "character_filter": {
+                "type": "array",
+                "items": { "type": "integer" },
+                "description": "Only include specific character IDs. Empty = all characters."
+              }
+            },
+            "required": ["name"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "market": {
+      "type": "object",
+      "description": "Price tracking for items with threshold and trend alerts.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "check_interval": {
+          "type": "string",
+          "description": "Polling interval for market prices",
+          "default": "30m",
+          "pattern": "^[0-9]+(s|m|h)$"
+        },
+        "channels": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["telegram", "discord"] },
+          "description": "Where to send market alerts. If empty, falls back to alerts.channels."
+        },
+        "items": {
+          "type": "array",
+          "description": "Items to track with price thresholds",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type_id": {
+                "type": "integer",
+                "description": "EVE Type ID (e.g. 44992 = PLEX). Resolve via /universe/types/{id}/"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name of the item"
+              },
+              "region_id": {
+                "type": "integer",
+                "description": "Region ID for market data",
+                "default": 10000002
+              },
+              "region_name": {
+                "type": "string",
+                "description": "Region display name",
+                "default": "The Forge"
+              },
+              "alert_above": {
+                "type": "number",
+                "description": "Alert when price exceeds this value (ISK)"
+              },
+              "alert_below": {
+                "type": "number",
+                "description": "Alert when price drops below this value (ISK)"
+              },
+              "trend_alert": {
+                "type": "object",
+                "description": "Percentage price change within a time window",
+                "properties": {
+                  "change_percent": {
+                    "type": "number",
+                    "description": "Percentage change that triggers an alert",
+                    "default": 10
+                  },
+                  "time_window": {
+                    "type": "string",
+                    "description": "Time window for trend calculation",
+                    "default": "1h",
+                    "pattern": "^[0-9]+(m|h|d)$"
+                  }
+                }
+              },
+              "cooldown": {
+                "type": "string",
+                "description": "Cooldown between market alerts for this item",
+                "default": "1h",
+                "pattern": "^[0-9]+(s|m|h)$"
+              }
+            },
+            "required": ["type_id", "name"]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+
+  },
+  "required": ["schema_version", "characters", "notification_channels"],
+  "additionalProperties": false
+}

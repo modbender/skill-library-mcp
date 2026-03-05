@@ -1,0 +1,30 @@
+name: "json-flatten-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 1048576
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          let input = content().trim()
+
+          let parsed = $input.parse_json().catch({})
+          let keys = $parsed.keys()
+
+          # Get depth info
+          let has_nested = $input.contains("{\"") || $input.contains(": {")
+
+          root.original = $parsed
+          root.top_level_keys = $keys
+          root.key_count = $keys.length()
+          root.has_nested_objects = $has_nested
+          root.metadata = {"skill": "json-flatten", "mode": "cli", "trace_id": meta("trace_id"), "timestamp": now()}
+
+  output:
+    stdout:
+      codec: json_object

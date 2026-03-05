@@ -1,0 +1,53 @@
+name: "Recall Details After Distraction Task"
+id: "memory-recall-distraction"
+version: "1.0"
+suite: "memory"
+difficulty: "medium"
+mode: "sandboxed"
+type: "multi-turn"
+
+description: |
+  Tests the agent's ability to retain information across turns when
+  an unrelated intermediate task is given. The agent must remember
+  specific details (budget, name, deadline, stack) after completing
+  a completely separate file creation task.
+
+turns:
+  - role: user
+    message: |
+      Remember these details for later: Project deadline is March 15th,
+      Budget is $42,000, Lead engineer is Sarah Chen, Preferred stack
+      is Python + FastAPI.
+    expect: "acknowledgment"
+    validators:
+      - type: "response-contains"
+        values: ["March 15", "42,000", "Sarah Chen", "Python", "FastAPI"]
+
+  - role: user
+    message: |
+      Unrelated task: Create a pros/cons list comparing PostgreSQL vs
+      MongoDB for a new project. Save as db-comparison.md
+    expect: "file-output"
+    validators:
+      - type: "file-exists"
+        pattern: "db-comparison.md"
+
+  - role: user
+    message: |
+      What was the budget I mentioned earlier, and who is the lead engineer?
+    expect: "correct-recall"
+    validators:
+      - type: "response-contains"
+        values: ["42,000", "Sarah Chen"]
+      - type: "response-not-contains"
+        values: ["don't remember", "not sure", "I don't recall"]
+
+expected_metrics:
+  tool_calls: [2, 10]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

@@ -1,0 +1,89 @@
+{
+  "version": "1.0.0",
+  "description": "Scholar Research Skill - Default Configuration",
+  
+  "sources": {
+    "enabled": [
+      "arxiv",
+      "pubmed", 
+      "openalex",
+      "crossref"
+    ],
+    "custom_sources": []
+  },
+  
+  "scoring": {
+    "paper_quality": {
+      "citation_count": 15,
+      "publication_recency": 10,
+      "author_reputation": 12,
+      "journal_impact": 12,
+      "peer_review_status": 10,
+      "open_access": 8,
+      "retraction_status": 10,
+      "author_network": 8,
+      "funder_acknowledgment": 5,
+      "reproducibility": 5
+    },
+    "bonus": {
+      "author_trust_max": 20,
+      "journal_reputation_max": 20
+    },
+    "custom_factors": {}
+  },
+  
+  "profiles": {
+    "balanced": {
+      "description": "Default balanced scoring",
+      "weights": {}
+    },
+    "strict": {
+      "description": "Strict - prioritizes peer review and credibility",
+      "weights": {
+        "peer_review_status": 25,
+        "retraction_status": 20,
+        "open_access": 0,
+        "citation_count": 10
+      }
+    },
+    "recent_only": {
+      "description": "Prioritizes recent papers",
+      "weights": {
+        "publication_recency": 30,
+        "citation_count": 5,
+        "journal_impact": 5
+      }
+    },
+    "highly_cited": {
+      "description": "Prioritizes highly cited papers",
+      "weights": {
+        "citation_count": 30,
+        "author_reputation": 15,
+        "journal_impact": 15
+      }
+    }
+  },
+  
+  "display": {
+    "top_papers_count": 5,
+    "min_score_threshold": 0,
+    "show_distribution_chart": true,
+    "show_timeline": true,
+    "extract_figures_for_top": 3,
+    "max_papers_to_fetch": 100
+  },
+  
+  "api": {
+    "openalex_token": "",
+    "semantic_scholar_token": "",
+    "crossref_email": "",
+    "rate_limit_delay_ms": 1000
+  },
+  
+  "search": {
+    "default_fields": [],
+    "semantic_search": true,
+    "exact_match_boost": 1.2,
+    "related_topic_boost": 0.8
+  }
+}

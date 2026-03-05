@@ -1,0 +1,13 @@
+param (
+    [string]$Text,
+    [string]$Key
+)
+
+Add-Type -AssemblyName System.Windows.Forms
+
+if ($Text) {
+    [System.Windows.Forms.SendKeys]::SendWait($Text)
+}
+if ($Key) {
+    [System.Windows.Forms.SendKeys]::SendWait($Key)
+}

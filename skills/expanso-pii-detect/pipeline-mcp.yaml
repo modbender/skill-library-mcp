@@ -1,0 +1,72 @@
+# Expanso Pipeline: pii-detect (MCP mode)
+# ==========================================
+
+name: pii-detect-mcp
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /detect
+      allowed_verbs: [POST]
+      timeout: 60s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let text = this.text.or("")
+
+          root = if $text.length() == 0 {
+            throw("text field is required")
+          }
+
+          meta input_hash = $text.hash("sha256").encode("hex")
+          meta input_length = $text.length()
+          meta trace_id = uuid_v4()
+
+          let pii_types = this.types.or(["email", "phone", "ssn", "credit_card", "name", "address"]).join(",")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a PII detection specialist. Scan text for personally identifiable information and return structured findings. Be thorough but avoid false positives."
+            },
+            {
+              "role": "user",
+              "content": "Scan this text for the following PII types: " + $pii_types + "\n\nReturn a JSON object:\n{\n  \"findings\": [\n    {\"type\": \"...\", \"value\": \"the actual PII\", \"start\": 0, \"end\": 0, \"confidence\": 0.0-1.0}\n  ],\n  \"summary\": \"Brief summary\"\n}\n\nReturn valid JSON only.\n\nText:\n" + $text
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let raw = this.choices.0.message.content
+          let parsed = $raw.parse_json().catch({"findings": []})
+
+          root.findings = $parsed.findings.or([])
+          root.has_pii = $parsed.findings.or([]).length() > 0
+          root.summary = $parsed.summary.or("")
+          root.metadata = {
+            "skill": "pii-detect",
+            "mode": "mcp",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "findings_count": $parsed.findings.or([]).length(),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [pii-detect] Found ${! root.findings.length() } PII items (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}

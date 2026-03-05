@@ -1,0 +1,69 @@
+# Expanso Pipeline: keyword-extract (CLI mode)
+# =============================================
+#
+# Usage:
+#   cat article.txt | expanso-edge run pipeline-cli.yaml
+#
+# Requires OPENAI_API_KEY.
+
+name: "keyword-extract-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 1048576
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta trace_id = uuid_v4()
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          let max_keywords = env("MAX_KEYWORDS").or("10").number().or(10)
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a keyword extraction expert. Extract keywords from text and return JSON with: 'keywords' (array of single words with 'word' and 'relevance' 0-1), 'phrases' (array of 2-3 word key phrases), 'topics' (array of main themes). Limit to " + $max_keywords.string() + " keywords. Focus on nouns and important terms."
+            },
+            {
+              "role": "user",
+              "content": content()
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let response = this.choices.0.message.content.parse_json().catch({
+            "keywords": [],
+            "phrases": [],
+            "topics": []
+          })
+
+          root.keywords = $response.keywords.or([])
+          root.phrases = $response.phrases.or([])
+          root.topics = $response.topics.or([])
+          root.keyword_count = $response.keywords.or([]).length()
+          root.metadata = {
+            "skill": "keyword-extract",
+            "mode": "cli",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [keyword-extract] Extracted ${! root.keyword_count } keywords (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

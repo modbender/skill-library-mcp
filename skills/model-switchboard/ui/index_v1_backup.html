@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Switchboard — OpenClaw</title>
+<style>
+  :root {
+    --bg: #09090b; --surface: #18181b; --surface2: #1f1f23;
+    --border: #27272a; --border-hover: #3f3f46;
+    --text: #fafafa; --text-dim: #a1a1aa; --text-muted: #71717a;
+    --blue: #3b82f6; --purple: #8b5cf6; --green: #22c55e;
+    --amber: #f59e0b; --red: #ef4444; --cyan: #06b6d4;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .header { text-align: center; margin-bottom: 24px; }
+  .header h1 {
+    font-size: 24px; font-weight: 700;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+  .safety {
+    max-width: 940px; margin: 0 auto 20px;
+    padding: 8px 14px; border-radius: 6px;
+    background: linear-gradient(90deg, #0c1929, #1a0c29);
+    border: 1px solid #1e3a5f;
+    font-size: 12px; color: var(--blue); text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; max-width: 940px; margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .card:hover { border-color: var(--border-hover); }
+  .card.full { grid-column: 1 / -1; }
+  .card .accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .card .accent.blue { background: var(--blue); }
+  .card .accent.purple { background: var(--purple); }
+  .card .accent.amber { background: var(--amber); }
+  .card .accent.green { background: var(--green); }
+  .card .accent.cyan { background: var(--cyan); }
+
+  .card-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-muted); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card-value {
+    font-size: 17px; font-weight: 600;
+    word-break: break-all; line-height: 1.3;
+  }
+  .card-value.blue { color: var(--blue); }
+  .card-value.purple { color: var(--purple); }
+  .card-value.unset { color: var(--red); font-style: italic; font-size: 14px; }
+  .card-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .fb-list { list-style: none; margin-top: 8px; }
+  .fb-list li {
+    padding: 7px 10px; background: var(--surface2);
+    border-radius: 6px; margin-bottom: 4px;
+    font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid transparent; transition: border-color 0.15s;
+  }
+  .fb-list li:hover { border-color: var(--border-hover); }
+  .fb-list .order { color: var(--text-muted); font-size: 11px; min-width: 22px; font-weight: 600; }
+  .fb-list .empty { color: var(--text-muted); font-style: italic; }
+
+  /* ── Clickable Provider Grid ── */
+  .providers { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 8px; }
+  .provider {
+    padding: 10px 12px; background: var(--surface2);
+    border-radius: 8px; font-size: 12px;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid transparent;
+    cursor: pointer; transition: all 0.2s;
+    user-select: none;
+  }
+  .provider:hover { border-color: var(--blue); background: #1a1a2e; transform: translateY(-1px); }
+  .provider:active { transform: translateY(0); }
+  .provider.authenticated { border-color: rgba(34,197,94,0.3); }
+  .provider.authenticated:hover { border-color: var(--green); }
+  .provider .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .provider .dot.on { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+  .provider .dot.off { background: var(--red); opacity: 0.6; }
+  .provider .name { font-weight: 500; color: var(--text); flex: 1; }
+  .provider .auth { color: var(--text-muted); font-size: 11px; }
+  .provider .action-hint {
+    font-size: 10px; color: var(--blue); opacity: 0;
+    transition: opacity 0.2s; margin-left: auto;
+  }
+  .provider:hover .action-hint { opacity: 1; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 16px;
+    font-size: 11px; color: var(--text-dim); font-weight: 500;
+  }
+
+  .issues { margin-top: 8px; }
+  .issue {
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+    font-size: 12px; display: flex; align-items: center; gap: 10px;
+    transition: all 0.15s;
+  }
+  .issue.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+  .issue.warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
+  .issue.success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: var(--green); }
+  .issue .issue-icon { font-size: 16px; flex-shrink: 0; }
+  .issue .issue-body { flex: 1; }
+  .issue .issue-title { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+  .issue.error .issue-title { color: #fca5a5; }
+  .issue.warning .issue-title { color: #fcd34d; }
+  .issue .issue-desc { color: var(--text-muted); font-size: 11px; line-height: 1.4; }
+  .issue .issue-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .issue .fix-btn {
+    padding: 5px 14px; border-radius: 6px; font-size: 11px;
+    font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .issue .fix-btn.auto {
+    background: var(--blue); color: white;
+  }
+  .issue .fix-btn.auto:hover { background: #2563eb; transform: translateY(-1px); }
+  .issue .fix-btn.auto:disabled { opacity: 0.5; cursor: wait; }
+  .issue .fix-btn.manual {
+    background: rgba(139,92,246,0.15); color: var(--purple);
+    border: 1px solid rgba(139,92,246,0.3);
+  }
+  .issue .fix-btn.manual:hover { background: rgba(139,92,246,0.25); }
+  .issue .fix-btn.choose {
+    background: rgba(6,182,212,0.15); color: var(--cyan);
+    border: 1px solid rgba(6,182,212,0.3);
+  }
+  .issue .fix-btn.choose:hover { background: rgba(6,182,212,0.25); }
+
+  /* ── Fix Picker Modal ── */
+  .picker-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1100; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .picker-overlay.active { opacity: 1; pointer-events: all; }
+  .picker {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; width: 520px; max-width: 90vw;
+    max-height: 80vh; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .picker h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .picker .picker-sub { color: var(--text-muted); font-size: 12px; margin-bottom: 12px; }
+  .picker .picker-search {
+    width: 100%; padding: 8px 12px; margin-bottom: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px;
+    outline: none;
+  }
+  .picker .picker-search:focus { border-color: var(--blue); }
+  .picker .picker-list {
+    flex: 1; overflow-y: auto; margin-bottom: 12px;
+    max-height: 400px;
+  }
+  .picker .picker-item {
+    padding: 10px 12px; background: var(--surface2);
+    border-radius: 6px; margin-bottom: 4px;
+    font-size: 12px; display: flex; align-items: center; gap: 8px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .picker .picker-item:hover { border-color: var(--blue); background: #1a1a2e; }
+  .picker .picker-item.selected { border-color: var(--green); background: rgba(34,197,94,0.08); }
+  .picker .picker-item .pi-name { flex: 1; font-weight: 500; }
+  .picker .picker-item .pi-provider { color: var(--text-muted); font-size: 10px; }
+  .picker .picker-item .pi-cost { color: var(--text-muted); font-size: 10px; min-width: 50px; text-align: right; }
+  .picker .picker-item .pi-auth { font-size: 10px; }
+  .picker .picker-item .pi-auth.yes { color: var(--green); }
+  .picker .picker-item .pi-auth.no { color: var(--red); opacity: 0.6; }
+
+  .status-bar {
+    max-width: 940px; margin: 16px auto 0;
+    padding: 10px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .status-bar .val { color: var(--green); font-weight: 600; }
+
+  /* ── Model Browser ── */
+  .model-browser { margin-top: 8px; }
+  .model-group-header {
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    margin: 12px 0 6px; padding-left: 4px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .model-item {
+    padding: 8px 12px; background: var(--surface2);
+    border-radius: 6px; margin-bottom: 4px;
+    font-size: 12px; display: flex; align-items: center; gap: 8px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .model-item:hover { border-color: var(--blue); background: #1a1a2e; }
+  .model-item .model-name { font-weight: 500; flex: 1; }
+  .model-item .model-caps {
+    display: flex; gap: 4px;
+  }
+  .cap-badge {
+    padding: 1px 6px; border-radius: 10px;
+    font-size: 9px; font-weight: 600; text-transform: uppercase;
+  }
+  .cap-badge.llm { background: rgba(59,130,246,0.2); color: var(--blue); }
+  .cap-badge.vision { background: rgba(139,92,246,0.2); color: var(--purple); }
+  .cap-badge.code { background: rgba(34,197,94,0.2); color: var(--green); }
+  .cap-badge.reasoning { background: rgba(245,158,11,0.2); color: var(--amber); }
+  .cap-badge.tools { background: rgba(6,182,212,0.2); color: var(--cyan); }
+  .cap-badge.search { background: rgba(239,68,68,0.2); color: var(--red); }
+  .model-item .cost-tier {
+    font-size: 10px; color: var(--text-muted); min-width: 50px; text-align: right;
+  }
+
+  /* ── Search box ── */
+  .search-box {
+    width: 100%; padding: 8px 12px; margin-bottom: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--blue); }
+  .search-box::placeholder { color: var(--text-muted); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; width: 460px; max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transform: translateY(10px); transition: transform 0.2s;
+  }
+  .modal-overlay.active .modal { transform: translateY(0); }
+  .modal h2 {
+    font-size: 18px; font-weight: 700; margin-bottom: 4px;
+  }
+  .modal .modal-sub { color: var(--text-muted); font-size: 12px; margin-bottom: 16px; }
+  .modal label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-dim); margin-bottom: 4px;
+  }
+  .modal input[type="text"], .modal input[type="password"] {
+    width: 100%; padding: 10px 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 13px;
+    font-family: 'SF Mono', Menlo, monospace;
+    outline: none; transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .modal input:focus { border-color: var(--blue); }
+  .modal .env-var-display {
+    padding: 6px 10px; background: var(--surface2);
+    border-radius: 6px; font-size: 11px;
+    font-family: 'SF Mono', Menlo, monospace;
+    color: var(--cyan); margin-bottom: 12px;
+  }
+  .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .btn {
+    padding: 8px 18px; border-radius: 8px; font-size: 13px;
+    font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--blue); color: white;
+  }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-danger {
+    background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3);
+  }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-ghost {
+    background: transparent; color: var(--text-dim); border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+  .modal .website-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--blue); text-decoration: none;
+    margin-bottom: 12px;
+  }
+  .modal .website-link:hover { text-decoration: underline; }
+  .modal .note {
+    font-size: 11px; color: var(--text-muted);
+    padding: 6px 10px; background: rgba(245,158,11,0.08);
+    border-radius: 6px; margin-bottom: 12px;
+    border-left: 2px solid var(--amber);
+  }
+  .modal .status-msg {
+    font-size: 12px; margin-top: 8px; padding: 6px 10px;
+    border-radius: 6px; display: none;
+  }
+  .modal .status-msg.success { display: block; background: rgba(34,197,94,0.1); color: var(--green); }
+  .modal .status-msg.error { display: block; background: rgba(239,68,68,0.1); color: var(--red); }
+
+  .toggle-vis {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 14px; padding: 4px;
+  }
+  .input-wrap { position: relative; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    z-index: 2000; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .toast.success { background: var(--green); color: #000; }
+  .toast.error { background: var(--red); color: #fff; }
+
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .providers { grid-template-columns: 1fr; }
+    body { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔀 Model Switchboard</h1>
+  <p class="subtitle">Safe AI Model Configuration for OpenClaw</p>
+</div>
+
+<div class="safety">
+  <span>🛡️</span>
+  <span>Auto-backup · Type validation · Blocks unsafe assignments · Click a provider to configure API keys</span>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="accent blue"></div>
+    <div class="card-label"><span class="icon">🧠</span> Primary LLM</div>
+    <div class="card-value blue" id="primary">Loading...</div>
+    <div class="card-desc">Main conversational model for all interactions</div>
+  </div>
+
+  <div class="card">
+    <div class="accent purple"></div>
+    <div class="card-label"><span class="icon">👁️</span> Image Model</div>
+    <div class="card-value purple" id="imageModel">Loading...</div>
+    <div class="card-desc">Vision & image processing when primary can't</div>
+  </div>
+
+  <div class="card">
+    <div class="accent amber"></div>
+    <div class="card-label"><span class="icon">🔄</span> LLM Fallbacks</div>
+    <ul class="fb-list" id="fallbacks"><li class="empty">Loading...</li></ul>
+  </div>
+
+  <div class="card">
+    <div class="accent amber"></div>
+    <div class="card-label"><span class="icon">🔄</span> Image Fallbacks</div>
+    <ul class="fb-list" id="imageFallbacks"><li class="empty">Loading...</li></ul>
+  </div>
+
+  <div class="card full">
+    <div class="accent green"></div>
+    <div class="card-label"><span class="icon">🔑</span> Provider Auth Status — click to configure</div>
+    <div class="providers" id="providers">Loading...</div>
+  </div>
+
+  <div class="card full">
+    <div class="accent cyan"></div>
+    <div class="card-label"><span class="icon">📋</span> Model Registry (56 models) — click to view</div>
+    <input type="text" class="search-box" id="modelSearch" placeholder="Search models... (e.g. claude, gpt, gemini, free)">
+    <div class="model-browser" id="modelBrowser"></div>
+  </div>
+
+  <div class="card full">
+    <div class="accent cyan"></div>
+    <div class="card-label"><span class="icon">✅</span> Model Allowlist</div>
+    <div class="tags" id="allowlist">Loading...</div>
+  </div>
+
+  <div class="card full" id="issuesCard">
+    <div class="accent" style="background:var(--red)"></div>
+    <div class="card-label"><span class="icon">⚠️</span> Config Issues — click to fix</div>
+    <div class="issues" id="issues"></div>
+  </div>
+</div>
+
+<!-- Model Picker Modal (for fix actions) -->
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker">
+    <h2 id="pickerTitle">Select Model</h2>
+    <p class="picker-sub" id="pickerSub"></p>
+    <input type="text" class="picker-search" id="pickerSearch" placeholder="Search models...">
+    <div class="picker-list" id="pickerList"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closePicker()">Cancel</button>
+      <button class="btn btn-primary" id="pickerConfirm" onclick="confirmPicker()" disabled>Add Selected</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span>Registry: <span class="val" id="regVersion">—</span></span>
+  <span>Models: <span class="val" id="modelCount">—</span></span>
+  <span>Providers: <span class="val" id="providerCount">—</span></span>
+  <span>Updated: <span id="timestamp">—</span></span>
+</div>
+
+<!-- Provider API Key Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">Configure Provider</h2>
+    <p class="modal-sub" id="modalSub"></p>
+
+    <a class="website-link" id="modalWebsite" href="#" target="_blank" style="display:none">
+      🔗 <span id="modalWebsiteText">Get API key</span>
+    </a>
+
+    <div class="note" id="modalNote" style="display:none"></div>
+
+    <div id="modalKeyFields"></div>
+
+    <div class="status-msg" id="modalStatus"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-danger" id="modalDelete" style="display:none" onclick="handleDelete()">Remove Key</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modalSave" onclick="handleSave()">Save to .env</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+var API_BASE = window.location.origin;
+var currentProvider = null;
+var statusData = null;
+
+// ── Safe DOM helpers ──
+function esc(s) { return String(s || ''); }
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = esc(text);
+  return e;
+}
+
+// ── Toast ──
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+
+// ── API ──
+function api(method, path, body) {
+  var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(API_BASE + path, opts).then(function(r) { return r.json(); });
+}
+
+// ── Render Dashboard ──
+function render(d) {
+  statusData = d;
+
+  var pr = document.getElementById('primary');
+  pr.textContent = esc(d.primary) || '(not configured)';
+  pr.className = 'card-value ' + (d.primary ? 'blue' : 'unset');
+
+  var im = document.getElementById('imageModel');
+  im.textContent = esc(d.imageModel) || '(not configured)';
+  im.className = 'card-value ' + (d.imageModel ? 'purple' : 'unset');
+
+  // Fallbacks
+  renderFallbacks('fallbacks', d.fallbacks, 'No fallbacks — primary failure = no response');
+  renderFallbacks('imageFallbacks', d.imageFallbacks, 'No image fallbacks configured');
+
+  // Providers (clickable)
+  var prov = document.getElementById('providers');
+  prov.replaceChildren();
+  if (d.providers) {
+    var sorted = Object.entries(d.providers).sort(function(a,b) {
+      // Authenticated first, then alphabetical
+      if (a[1].hasAuth !== b[1].hasAuth) return a[1].hasAuth ? -1 : 1;
+      return a[1].displayName.localeCompare(b[1].displayName);
+    });
+    sorted.forEach(function(entry) {
+      var id = entry[0], p = entry[1];
+      var div = el('div', 'provider' + (p.hasAuth ? ' authenticated' : ''));
+      div.setAttribute('data-provider', id);
+      div.appendChild(el('div', 'dot ' + (p.hasAuth ? 'on' : 'off')));
+      div.appendChild(el('span', 'name', p.displayName || id));
+      div.appendChild(el('span', 'action-hint', p.hasAuth ? '✏️ Edit' : '+ Add Key'));
+      div.appendChild(el('span', 'auth', p.hasAuth ? '✓' : '✗'));
+      div.addEventListener('click', function() { openProviderModal(id, p); });
+      prov.appendChild(div);
+    });
+  }
+
+  // Allowlist
+  var al = document.getElementById('allowlist');
+  al.replaceChildren();
+  if (d.allowlist && d.allowlist.length) {
+    d.allowlist.forEach(function(m) { al.appendChild(el('span', 'tag', m)); });
+  } else {
+    var span = el('span', '', 'No allowlist — all models permitted');
+    span.style.color = 'var(--text-muted)';
+    al.appendChild(span);
+  }
+
+  // Issues (interactive)
+  var ic = document.getElementById('issuesCard');
+  var iss = document.getElementById('issues');
+  iss.replaceChildren();
+  var issueList = detectIssues(d);
+  if (issueList.length) {
+    ic.style.display = '';
+    issueList.forEach(function(issue) { iss.appendChild(buildIssueRow(issue)); });
+  } else {
+    ic.style.display = '';
+    var allGood = el('div', 'issue success');
+    allGood.appendChild(el('span', 'issue-icon', '✅'));
+    var body = el('div', 'issue-body');
+    body.appendChild(el('div', 'issue-title', 'All clear'));
+    body.appendChild(el('div', 'issue-desc', 'No configuration issues detected. Your model setup looks solid.'));
+    allGood.appendChild(body);
+    iss.appendChild(allGood);
+  }
+
+  // Model browser
+  renderModels(d.models || {});
+
+  // Status bar
+  document.getElementById('regVersion').textContent = d.registryVersion || '?';
+  document.getElementById('modelCount').textContent = d.models ? Object.keys(d.models).length : '?';
+  document.getElementById('providerCount').textContent = d.providers ? Object.keys(d.providers).length : '?';
+  document.getElementById('timestamp').textContent = new Date().toLocaleString();
+}
+
+function renderFallbacks(id, arr, emptyMsg) {
+  var ul = document.getElementById(id);
+  ul.replaceChildren();
+  if (arr && arr.length) {
+    arr.forEach(function(m, i) {
+      var li = el('li');
+      li.appendChild(el('span', 'order', '#' + (i + 1)));
+      li.appendChild(document.createTextNode(' ' + esc(m)));
+      ul.appendChild(li);
+    });
+  } else {
+    ul.appendChild(el('li', 'empty', emptyMsg));
+  }
+}
+
+function detectIssues(d) {
+  var issues = [];
+
+  if (!d.fallbacks || !d.fallbacks.length) {
+    issues.push({
+      id: 'no_llm_fallbacks', level: 'error',
+      title: 'No LLM Fallbacks',
+      desc: 'If your primary model goes down, there\'s no backup. Gateway will fail silently.',
+      autoFix: true, autoLabel: '⚡ Auto-Fix',
+      chooseFix: true, chooseLabel: '🎯 Choose Models',
+      chooseRole: 'fallback'
+    });
+  } else if (d.fallbacks.length < 2) {
+    issues.push({
+      id: 'few_llm_fallbacks', level: 'warning',
+      title: 'Only 1 LLM Fallback',
+      desc: 'Recommended: at least 2 fallbacks from different providers for resilience.',
+      chooseFix: true, chooseLabel: '+ Add Fallback',
+      chooseRole: 'fallback'
+    });
+  }
+
+  if (!d.imageFallbacks || !d.imageFallbacks.length) {
+    issues.push({
+      id: 'no_image_fallbacks', level: 'warning',
+      title: 'No Image Fallbacks',
+      desc: 'If ' + (d.imageModel || 'your image model') + ' goes down, vision/image processing fails completely.',
+      autoFix: true, autoLabel: '⚡ Auto-Fix',
+      chooseFix: true, chooseLabel: '🎯 Choose Model',
+      chooseRole: 'image'
+    });
+  }
+
+  if (d.allowlist && d.allowlist.length > 0 && d.allowlist.length < 5) {
+    var totalModels = d.models ? Object.keys(d.models).length : 0;
+    issues.push({
+      id: 'small_allowlist', level: 'warning',
+      title: 'Restrictive Allowlist (' + d.allowlist.length + '/' + totalModels + ' models)',
+      desc: 'Only ' + d.allowlist.length + ' models allowed. Fallback options are limited. Add models from your authenticated providers.',
+      autoFix: true, autoLabel: '⚡ Add All Auth\'d Models',
+      chooseFix: true, chooseLabel: '🎯 Pick Models',
+      chooseRole: 'allowlist'
+    });
+  }
+
+  if (d.providers) {
+    var authCount = Object.values(d.providers).filter(function(p) { return p.hasAuth; }).length;
+    var totalProviders = Object.keys(d.providers).length;
+    if (authCount < 3) {
+      issues.push({
+        id: 'few_providers', level: authCount < 2 ? 'error' : 'warning',
+        title: 'Only ' + authCount + '/' + totalProviders + ' Providers Authenticated',
+        desc: 'More providers = better redundancy. Free options: Qwen Portal, Google Antigravity, Groq, Cerebras.',
+        manualFix: true, manualLabel: '🔑 Configure Providers',
+        manualAction: 'scroll_providers'
+      });
+    }
+  }
+
+  // Check provider diversity in fallbacks
+  if (d.fallbacks && d.fallbacks.length > 0 && d.primary) {
+    var primaryProvider = d.primary.split('/')[0];
+    var allSameProvider = d.fallbacks.every(function(f) { return f.split('/')[0] === primaryProvider; });
+    if (allSameProvider) {
+      issues.push({
+        id: 'no_provider_diversity', level: 'warning',
+        title: 'No Provider Diversity in Fallbacks',
+        desc: 'All fallbacks use ' + primaryProvider + '. If that provider has an outage, all models fail.',
+        chooseFix: true, chooseLabel: '🎯 Add Different Provider',
+        chooseRole: 'fallback'
+      });
+    }
+  }
+
+  return issues;
+}
+
+function buildIssueRow(issue) {
+  var div = el('div', 'issue ' + esc(issue.level));
+  div.appendChild(el('span', 'issue-icon', issue.level === 'error' ? '🔴' : '🟡'));
+
+  var body = el('div', 'issue-body');
+  body.appendChild(el('div', 'issue-title', issue.title));
+  body.appendChild(el('div', 'issue-desc', issue.desc));
+  div.appendChild(body);
+
+  var actions = el('div', 'issue-actions');
+
+  if (issue.autoFix) {
+    var autoBtn = el('button', 'fix-btn auto', issue.autoLabel || '⚡ Auto-Fix');
+    autoBtn.addEventListener('click', function() { handleAutoFix(issue.id, autoBtn); });
+    actions.appendChild(autoBtn);
+  }
+
+  if (issue.chooseFix) {
+    var chooseBtn = el('button', 'fix-btn choose', issue.chooseLabel || '🎯 Choose');
+    chooseBtn.addEventListener('click', function() { openPicker(issue.chooseRole, issue.id); });
+    actions.appendChild(chooseBtn);
+  }
+
+  if (issue.manualFix) {
+    var manualBtn = el('button', 'fix-btn manual', issue.manualLabel || '🔧 Fix');
+    manualBtn.addEventListener('click', function() {
+      if (issue.manualAction === 'scroll_providers') {
+        document.getElementById('providers').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+    actions.appendChild(manualBtn);
+  }
+
+  div.appendChild(actions);
+  return div;
+}
+
+function handleAutoFix(issueId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Fixing...';
+  api('POST', '/api/config/auto-fix', { issue: issueId })
+    .then(function(res) {
+      if (res.ok) {
+        toast('✓ ' + (res.message || 'Fixed!'), 'success');
+        loadStatus();
+      } else if (res.redirect === 'providers') {
+        document.getElementById('providers').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast(res.message || 'Configure providers above', 'success');
+      } else {
+        toast(res.error || 'Fix failed', 'error');
+      }
+    })
+    .catch(function() { toast('Connection error', 'error'); })
+    .finally(function() { btn.disabled = false; btn.textContent = '⚡ Auto-Fix'; });
+}
+
+// ── Model Picker ──
+var pickerCallback = null;
+var pickerSelected = null;
+
+function openPicker(role, issueId) {
+  pickerSelected = null;
+  document.getElementById('pickerConfirm').disabled = true;
+
+  var titles = {
+    fallback: 'Add LLM Fallback',
+    image: 'Add Image Fallback',
+    allowlist: 'Add to Allowlist'
+  };
+  var subs = {
+    fallback: 'Select a model to add as an LLM fallback. Models from authenticated providers are marked ✓.',
+    image: 'Select a vision-capable model to add as an image fallback.',
+    allowlist: 'Select models to add to your allowlist.'
+  };
+
+  document.getElementById('pickerTitle').textContent = titles[role] || 'Select Model';
+  document.getElementById('pickerSub').textContent = subs[role] || '';
+  document.getElementById('pickerSearch').value = '';
+
+  var apiPath = {
+    fallback: '/api/config/add-fallback',
+    image: '/api/config/add-image-fallback',
+    allowlist: '/api/config/add-allowlist'
+  };
+
+  pickerCallback = function(ref) {
+    return api('POST', apiPath[role] || '/api/config/add-fallback', { model: ref });
+  };
+
+  renderPickerList(role, '');
+  document.getElementById('pickerOverlay').classList.add('active');
+  setTimeout(function() { document.getElementById('pickerSearch').focus(); }, 200);
+
+  // Wire up search
+  document.getElementById('pickerSearch').oninput = function(e) {
+    renderPickerList(role, e.target.value);
+  };
+}
+
+function renderPickerList(role, filter) {
+  var list = document.getElementById('pickerList');
+  list.replaceChildren();
+  if (!statusData || !statusData.models) return;
+
+  var f = (filter || '').toLowerCase();
+  var items = [];
+
+  Object.entries(statusData.models).forEach(function(entry) {
+    var ref = entry[0], m = entry[1];
+    if (m.blocked) return;
+
+    // Filter by role
+    var safeRoles = m.safeRoles || [];
+    if (role === 'image' && safeRoles.indexOf('image') === -1) return;
+    if (role === 'fallback' && safeRoles.indexOf('fallback') === -1) return;
+
+    // Skip already in list
+    if (role === 'fallback' && statusData.fallbacks && statusData.fallbacks.indexOf(ref) > -1) return;
+    if (role === 'fallback' && ref === statusData.primary) return;
+    if (role === 'image' && statusData.imageFallbacks && statusData.imageFallbacks.indexOf(ref) > -1) return;
+    if (role === 'image' && ref === statusData.imageModel) return;
+    if (role === 'allowlist' && statusData.allowlist && statusData.allowlist.indexOf(ref) > -1) return;
+
+    // Search filter
+    if (f && ref.toLowerCase().indexOf(f) === -1 &&
+        (m.displayName || '').toLowerCase().indexOf(f) === -1 &&
+        (m.costTier || '').toLowerCase().indexOf(f) === -1) return;
+
+    // Check if provider is authenticated
+    var provider = ref.split('/')[0];
+    var pinfo = statusData.providers ? statusData.providers[provider] : null;
+    var hasAuth = pinfo ? pinfo.hasAuth : false;
+
+    items.push({ ref: ref, model: m, hasAuth: hasAuth, provider: provider });
+  });
+
+  // Sort: authenticated first, then by cost tier
+  var costOrder = { free: 0, 'very-low': 1, low: 2, medium: 3, high: 4, subscription: 5, proxy: 3, variable: 3 };
+  items.sort(function(a, b) {
+    if (a.hasAuth !== b.hasAuth) return a.hasAuth ? -1 : 1;
+    var ca = costOrder[a.model.costTier] || 3;
+    var cb = costOrder[b.model.costTier] || 3;
+    if (ca !== cb) return ca - cb;
+    return a.ref.localeCompare(b.ref);
+  });
+
+  if (!items.length) {
+    var empty = el('div', '', 'No matching models found');
+    empty.style.cssText = 'color:var(--text-muted);padding:16px;text-align:center;font-size:13px;';
+    list.appendChild(empty);
+    return;
+  }
+
+  items.forEach(function(item) {
+    var div = el('div', 'picker-item');
+    div.setAttribute('data-ref', item.ref);
+    div.appendChild(el('span', 'pi-auth ' + (item.hasAuth ? 'yes' : 'no'), item.hasAuth ? '✓' : '✗'));
+    div.appendChild(el('span', 'pi-name', item.ref));
+    div.appendChild(el('span', 'pi-cost', item.model.costTier || ''));
+    div.addEventListener('click', function() {
+      // Deselect others
+      list.querySelectorAll('.picker-item.selected').forEach(function(s) { s.classList.remove('selected'); });
+      div.classList.add('selected');
+      pickerSelected = item.ref;
+      document.getElementById('pickerConfirm').disabled = false;
+    });
+    list.appendChild(div);
+  });
+}
+
+function closePicker() {
+  document.getElementById('pickerOverlay').classList.remove('active');
+  pickerCallback = null;
+  pickerSelected = null;
+}
+
+function confirmPicker() {
+  if (!pickerSelected || !pickerCallback) return;
+  var btn = document.getElementById('pickerConfirm');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  pickerCallback(pickerSelected)
+    .then(function(res) {
+      if (res.ok) {
+        toast('✓ Added ' + pickerSelected, 'success');
+        closePicker();
+        loadStatus();
+      } else {
+        toast(res.error || 'Failed to add', 'error');
+      }
+    })
+    .catch(function() { toast('Connection error', 'error'); })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = 'Add Selected';
+    });
+}
+
+// Close picker on overlay click / escape
+document.getElementById('pickerOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePicker();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('pickerOverlay').classList.contains('active')) closePicker();
+    else closeModal();
+  }
+});
+
+// ── Model Browser ──
+function renderModels(models, filter) {
+  var container = document.getElementById('modelBrowser');
+  container.replaceChildren();
+  var f = (filter || '').toLowerCase();
+
+  // Group by provider
+  var groups = {};
+  Object.entries(models).forEach(function(entry) {
+    var ref = entry[0], m = entry[1];
+    if (m.blocked) return;
+    if (f && ref.toLowerCase().indexOf(f) === -1 &&
+        (m.displayName || '').toLowerCase().indexOf(f) === -1 &&
+        (m.costTier || '').toLowerCase().indexOf(f) === -1 &&
+        !(m.capabilities || []).some(function(c) { return c.indexOf(f) > -1; })) return;
+
+    var provider = ref.split('/')[0];
+    if (!groups[provider]) groups[provider] = [];
+    groups[provider].push({ ref: ref, model: m });
+  });
+
+  var providers = Object.keys(groups).sort();
+  if (!providers.length) {
+    container.appendChild(el('div', 'empty', 'No models match "' + (filter || '') + '"'));
+    container.lastChild.style.cssText = 'color:var(--text-muted);padding:12px;text-align:center;font-size:13px;';
+    return;
+  }
+
+  providers.forEach(function(pid) {
+    container.appendChild(el('div', 'model-group-header', pid + ' (' + groups[pid].length + ')'));
+    groups[pid].forEach(function(entry) {
+      var div = el('div', 'model-item');
+      div.appendChild(el('span', 'model-name', entry.ref));
+      var caps = el('span', 'model-caps');
+      (entry.model.capabilities || []).forEach(function(c) {
+        if (c === 'image-generation') return;
+        caps.appendChild(el('span', 'cap-badge ' + c, c));
+      });
+      div.appendChild(caps);
+      div.appendChild(el('span', 'cost-tier', entry.model.costTier || ''));
+      container.appendChild(div);
+    });
+  });
+}
+
+// Search handler
+document.getElementById('modelSearch').addEventListener('input', function(e) {
+  if (statusData && statusData.models) {
+    renderModels(statusData.models, e.target.value);
+  }
+});
+
+// ── Provider Modal ──
+function openProviderModal(id, info) {
+  currentProvider = { id: id, info: info };
+  document.getElementById('modalTitle').textContent = (info.displayName || id) + ' Configuration';
+
+  var authMethod = info.authMethod || 'api-key';
+  var sub = '';
+  if (authMethod === 'oauth' || authMethod === 'oauth-plugin') {
+    sub = 'This provider uses ' + authMethod + ' authentication (not API keys).';
+  } else if (authMethod === 'local') {
+    sub = 'Local provider — no API key required.';
+  } else if (authMethod === 'gcloud-adc') {
+    sub = 'Uses Google Cloud Application Default Credentials.';
+  } else if (authMethod === 'github-token') {
+    sub = 'Uses GitHub token authentication.';
+  } else {
+    sub = 'Enter your API key below. It will be saved to .env (chmod 600).';
+  }
+  document.getElementById('modalSub').textContent = sub;
+
+  // Website link
+  var wl = document.getElementById('modalWebsite');
+  if (info.website) {
+    wl.style.display = '';
+    wl.href = info.website;
+    document.getElementById('modalWebsiteText').textContent = 'Get API key → ' + info.website;
+  } else { wl.style.display = 'none'; }
+
+  // Note
+  var noteEl = document.getElementById('modalNote');
+  if (info.note) { noteEl.style.display = ''; noteEl.textContent = info.note; }
+  else { noteEl.style.display = 'none'; }
+
+  // Key fields
+  var fields = document.getElementById('modalKeyFields');
+  fields.replaceChildren();
+
+  var envVars = info.authEnvVars || [];
+  if (envVars.length === 0 || authMethod === 'oauth' || authMethod === 'oauth-plugin' || authMethod === 'local' || authMethod === 'gcloud-adc') {
+    var notice = el('div', 'env-var-display', authMethod === 'api-key'
+      ? 'No env vars configured for this provider'
+      : 'Auth method: ' + authMethod + ' (configure via openclaw CLI)');
+    fields.appendChild(notice);
+    document.getElementById('modalSave').style.display = 'none';
+    document.getElementById('modalDelete').style.display = 'none';
+  } else {
+    document.getElementById('modalSave').style.display = '';
+    // Show primary env var input
+    var primaryVar = envVars[0];
+    var envDisp = el('div', 'env-var-display');
+    envDisp.textContent = 'Env variable: ' + primaryVar;
+    if (envVars.length > 1) {
+      envDisp.textContent += ' (also accepts: ' + envVars.slice(1).join(', ') + ')';
+    }
+    fields.appendChild(envDisp);
+
+    var label = el('label', '', primaryVar);
+    fields.appendChild(label);
+
+    var wrap = el('div', 'input-wrap');
+    var input = document.createElement('input');
+    input.type = 'password';
+    input.id = 'keyInput';
+    input.placeholder = 'sk-... or paste your API key';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    wrap.appendChild(input);
+
+    var toggle = el('button', 'toggle-vis', '👁️');
+    toggle.type = 'button';
+    toggle.addEventListener('click', function() {
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+    wrap.appendChild(toggle);
+    fields.appendChild(wrap);
+
+    // Show delete button if already authenticated
+    document.getElementById('modalDelete').style.display = info.hasAuth ? '' : 'none';
+  }
+
+  // Reset status
+  var st = document.getElementById('modalStatus');
+  st.className = 'status-msg';
+  st.textContent = '';
+
+  document.getElementById('modalOverlay').classList.add('active');
+  var ki = document.getElementById('keyInput');
+  if (ki) setTimeout(function() { ki.focus(); }, 200);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  currentProvider = null;
+}
+
+function handleSave() {
+  if (!currentProvider) return;
+  var input = document.getElementById('keyInput');
+  if (!input || !input.value.trim()) {
+    showModalStatus('error', 'Please enter an API key');
+    return;
+  }
+
+  var envVar = currentProvider.info.authEnvVars[0];
+  var saveBtn = document.getElementById('modalSave');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
+
+  api('POST', '/api/key', { key: envVar, value: input.value.trim() })
+    .then(function(res) {
+      if (res.ok) {
+        showModalStatus('success', '✓ Saved ' + envVar + ' to .env');
+        toast('✓ ' + envVar + ' saved to .env', 'success');
+        setTimeout(function() {
+          closeModal();
+          loadStatus();
+        }, 1000);
+      } else {
+        showModalStatus('error', res.error || 'Save failed');
+      }
+    })
+    .catch(function(err) {
+      showModalStatus('error', 'Connection error — is the server running?');
+    })
+    .finally(function() {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save to .env';
+    });
+}
+
+function handleDelete() {
+  if (!currentProvider || !currentProvider.info.authEnvVars) return;
+  if (!confirm('Remove ' + currentProvider.info.authEnvVars[0] + ' from .env?')) return;
+
+  var envVar = currentProvider.info.authEnvVars[0];
+  api('POST', '/api/key/delete', { key: envVar })
+    .then(function(res) {
+      if (res.ok) {
+        toast('Removed ' + envVar + ' from .env', 'success');
+        closeModal();
+        loadStatus();
+      }
+    })
+    .catch(function() { toast('Failed to remove key', 'error'); });
+}
+
+function showModalStatus(type, msg) {
+  var st = document.getElementById('modalStatus');
+  st.className = 'status-msg ' + type;
+  st.textContent = msg;
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// (Escape handled in picker section below)
+
+// ── Load from API ──
+function loadStatus() {
+  api('GET', '/api/status')
+    .then(function(d) { render(d); })
+    .catch(function() {
+      // Fallback: if injected data exists, use it
+      if (window.__switchboardData) render(window.__switchboardData);
+    });
+}
+
+// Initial load
+loadStatus();
+</script>
+</body>
+</html>

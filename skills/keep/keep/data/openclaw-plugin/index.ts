@@ -1,0 +1,117 @@
+/**
+ * keep — OpenClaw plugin
+ *
+ * Hooks:
+ *   before_agent_start  → inject `keep now` context
+ *   after_agent_stop    → update intentions
+ *   after_compaction    → index workspace memory files into keep
+ *
+ * The after_compaction hook uses `keep put` with file-stat fast-path:
+ * unchanged files (same mtime+size) are skipped without reading.
+ * This makes it safe to run on every compaction even with many files.
+ */
+
+import { execSync } from "child_process";
+import path from "node:path";
+import fs from "node:fs";
+
+function keepAvailable(): boolean {
+  try {
+    execSync("keep config", { timeout: 3000, stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function runKeep(args: string, input?: string): string | null {
+  try {
+    return execSync(`keep ${args}`, {
+      encoding: "utf-8",
+      timeout: 5000,
+      input: input ?? "",
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function runKeepLong(args: string, timeoutMs: number = 60000): string | null {
+  try {
+    return execSync(`keep ${args}`, {
+      encoding: "utf-8",
+      timeout: timeoutMs,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+export default function register(api: any) {
+  if (!keepAvailable()) {
+    api.logger?.warn("[keep] keep CLI not found, plugin inactive");
+    return;
+  }
+
+  // Agent start: inject current intentions + similar context
+  api.on(
+    "before_agent_start",
+    async (_event: any, _ctx: any) => {
+      const now = runKeep("now -n 10");
+      if (!now) return;
+
+      return {
+        prependContext: `\`keep now\`:\n${now}`,
+      };
+    },
+    { priority: 10 },
+  );
+
+  // Agent stop: update intentions
+  api.on(
+    "after_agent_stop",
+    async (_event: any, _ctx: any) => {
+      runKeep("now 'Session ended'");
+    },
+    { priority: 10 },
+  );
+
+  // After compaction: index workspace memory files into keep.
+  // Memory flush writes files right before compaction, so they're fresh here.
+  // Uses `keep put` with file-stat fast-path (mtime+size check) — unchanged
+  // files skip without even reading the file. Safe to run on every compaction.
+  // Also indexes MEMORY.md if it exists at the workspace root.
+  api.on(
+    "after_compaction",
+    async (_event: any, ctx: any) => {
+      const workspaceDir = ctx?.workspaceDir;
+      if (!workspaceDir) return;
+
+      const memoryDir = path.join(workspaceDir, "memory");
+      const memoryMd = path.join(workspaceDir, "MEMORY.md");
+      let indexed = 0;
+
+      // Index memory/ directory (all files, directory mode)
+      if (fs.existsSync(memoryDir)) {
+        api.logger?.debug("[keep] Indexing memory/ after compaction");
+        if (runKeepLong(`put "${memoryDir}/"`, 30000)) indexed++;
+      }
+
+      // Index MEMORY.md (single file)
+      if (fs.existsSync(memoryMd)) {
+        api.logger?.debug("[keep] Indexing MEMORY.md after compaction");
+        if (runKeepLong(`put "${memoryMd}"`, 10000)) indexed++;
+      }
+
+      if (indexed > 0) {
+        api.logger?.info("[keep] Post-compaction memory sync complete");
+      }
+    },
+    { priority: 20 },
+  );
+
+  api.logger?.info(
+    "[keep] Registered hooks: before_agent_start, after_agent_stop, after_compaction",
+  );
+}

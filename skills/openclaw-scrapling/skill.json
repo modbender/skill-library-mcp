@@ -1,0 +1,52 @@
+{
+  "name": "scrapling",
+  "version": "1.0.0",
+  "displayName": "Scrapling Web Scraper",
+  "description": "Advanced web scraping with anti-bot bypass, adaptive selectors, and JavaScript support. Handles Cloudflare, dynamic content, and website structure changes automatically.",
+  "author": "Dan Kuhlman",
+  "tags": ["web-scraping", "automation", "cloudflare", "anti-bot", "javascript", "adaptive"],
+  "capabilities": [
+    "HTTP scraping (fast)",
+    "Stealth mode (bypass Cloudflare, anti-bot)",
+    "Dynamic content (JavaScript/React/Vue)",
+    "Adaptive selectors (survives website redesigns)",
+    "Session management (login, cookies)",
+    "Proxy rotation",
+    "Multiple output formats (JSON, CSV, Markdown)"
+  ],
+  "dependencies": {
+    "python": ">=3.10",
+    "packages": [
+      "scrapling[all]>=0.3.0",
+      "pyyaml>=6.0"
+    ]
+  },
+  "files": [
+    "SKILL.md",
+    "scrape.py",
+    "requirements.txt",
+    "examples/"
+  ],
+  "installCommand": "pip install -r requirements.txt && scrapling install",
+  "testCommand": "python scrape.py --url https://quotes.toscrape.com --selector .quote --extract text --output /tmp/test_quotes.txt",
+  "usage": {
+    "basic": "python scrape.py --url URL --selector SELECTOR",
+    "stealth": "python scrape.py --url URL --stealth --selector SELECTOR",
+    "dynamic": "python scrape.py --url URL --dynamic --selector SELECTOR",
+    "adaptive": "python scrape.py --url URL --adaptive --selector SELECTOR"
+  },
+  "examples": [
+    {
+      "name": "Scrape Hacker News",
+      "command": "python scrape.py --url https://news.ycombinator.com --selector .athing --fields 'title:.titleline>a::text,link:.titleline>a::attr(href)' --output hn.json"
+    },
+    {
+      "name": "Bypass Cloudflare",
+      "command": "python scrape.py --url https://protected-site.com --stealth --selector .content --output data.json"
+    },
+    {
+      "name": "Scrape JavaScript SPA",
+      "command": "python scrape.py --url https://react-app.com --dynamic --wait-for .loaded --selector .item --output items.json"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+name: "Handle Corrupted JSON Input"
+id: "error-handling-corrupted-input"
+version: "1.0"
+suite: "error-handling"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to gracefully handle corrupted input data.
+  The JSON file contains three deliberate errors: a missing closing bracket
+  (no closing ] and }), a trailing comma after a value, and an unquoted key.
+  The agent should detect and report the corruption, and either fix it to
+  proceed or clearly explain the issues found.
+
+user_message: |
+  Analyze the product data in data.json and create a summary of all
+  products with their prices. Save as product-summary.md
+
+input_files:
+  - name: "data.json"
+
+expected_outputs:
+  - pattern: "product-summary.md"
+    required: false
+    validators:
+      - type: "file-exists"
+
+expected_behavior:
+  - description: "Agent detects JSON corruption and handles gracefully"
+    validators:
+      - type: "content-contains"
+        in: "any-output"
+        sections:
+          - "error"
+          - "invalid"
+          - "corrupt"
+          - "malformed"
+          - "parse"
+          - "broken"
+        match: "any"
+      - type: "no-crash"
+
+expected_metrics:
+  tool_calls: [2, 8]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

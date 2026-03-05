@@ -1,0 +1,39 @@
+# Skill: sentiment-score
+name: "sentiment-score"
+version: "1.0.0"
+description: "Score text sentiment from -1 (negative) to +1 (positive)"
+
+author:
+  name: "Expanso Team"
+  url: "https://expanso.io"
+  avatar: "EX"
+
+credentials:
+  - name: OPENAI_API_KEY
+    required: false
+
+inputs:
+  - name: text
+    type: string
+    required: true
+
+outputs:
+  - name: score
+    type: number
+    description: Sentiment score -1 to +1
+  - name: label
+    type: string
+    description: positive, negative, or neutral
+
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+  - name: ollama
+    type: local
+    models: [llama3.2]
+
+components:
+  inputs: [stdin, http_server]
+  processors: [mapping, openai_chat_completion]
+  outputs: [stdout, sync_response]

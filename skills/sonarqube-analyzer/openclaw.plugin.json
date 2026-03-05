@@ -1,0 +1,135 @@
+{
+  "$schema": "https://schemas.openclaw.ai/plugin.json",
+  "id": "sonarqube-analyzer",
+  "name": "SonarQube Analyzer",
+  "description": "Analyze SonarQube issues and suggest intelligent solutions for code quality improvement",
+  "version": "1.0.0",
+  "author": {
+    "name": "FelipeOFF",
+    "email": "felipeoliveireferreira@gmail.com",
+    "url": "https://github.com/FelipeOFF"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FelipeOFF/sonarqube-analyzer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FelipeOFF/sonarqube-analyzer/issues"
+  },
+  "homepage": "https://github.com/FelipeOFF/sonarqube-analyzer#readme",
+  "engines": {
+    "openclaw": ">=1.0.0",
+    "node": ">=18.0.0"
+  },
+  "categories": [
+    "code-quality",
+    "analysis",
+    "ci-cd"
+  ],
+  "keywords": [
+    "sonarqube",
+    "code-quality",
+    "static-analysis",
+    "code-review",
+    "linter"
+  ],
+  "tools": [
+    {
+      "name": "sonar_get_issues",
+      "description": "Fetch issues from SonarQube for a project or pull request",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectKey": {
+            "type": "string",
+            "description": "SonarQube project key"
+          },
+          "pullRequest": {
+            "type": "string",
+            "description": "Pull request number (optional)"
+          },
+          "severities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["BLOCKER", "CRITICAL", "MAJOR", "MINOR", "INFO"]
+            },
+            "description": "Filter by severities"
+          },
+          "limit": {
+            "type": "number",
+            "default": 100,
+            "description": "Maximum number of issues to return"
+          }
+        },
+        "required": ["projectKey"]
+      }
+    },
+    {
+      "name": "sonar_analyze_and_suggest",
+      "description": "Analyze issues and suggest solutions based on SonarQube rules",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectKey": {
+            "type": "string",
+            "description": "SonarQube project key"
+          },
+          "pullRequest": {
+            "type": "string",
+            "description": "Pull request number (optional)"
+          },
+          "autoFix": {
+            "type": "boolean",
+            "default": false,
+            "description": "Attempt to apply automatic fixes"
+          }
+        },
+        "required": ["projectKey"]
+      }
+    },
+    {
+      "name": "sonar_quality_gate",
+      "description": "Check the Quality Gate status of a project",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectKey": {
+            "type": "string",
+            "description": "SonarQube project key"
+          },
+          "pullRequest": {
+            "type": "string",
+            "description": "Pull request number (optional)"
+          }
+        },
+        "required": ["projectKey"]
+      }
+    }
+  ],
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "sonarHostUrl": {
+          "type": "string",
+          "format": "uri",
+          "default": "http://127.0.0.1:9000",
+          "description": "URL of the SonarQube server"
+        },
+        "sonarToken": {
+          "type": "string",
+          "description": "Authentication token for SonarQube API"
+        },
+        "defaultProject": {
+          "type": "string",
+          "description": "Default project key to analyze when none is specified"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "analyze": "node scripts/analyze.js"
+  }
+}

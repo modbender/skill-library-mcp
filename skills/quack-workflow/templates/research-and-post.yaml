@@ -1,0 +1,23 @@
+name: research-and-post
+description: Search the web, summarize findings, and post to social media
+
+steps:
+  - id: research
+    action: web_search
+    params:
+      query: "latest AI agent news"
+      count: 5
+
+  - id: summarize
+    action: llm
+    params:
+      model: claude
+      prompt: "Summarize these search results into a concise social media post: {{research.output}}"
+    depends_on: [research]
+
+  - id: post
+    action: social_post
+    params:
+      text: "{{summarize.output}}"
+      platform: twitter
+    depends_on: [summarize]

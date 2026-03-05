@@ -1,0 +1,24 @@
+@echo off
+echo 🐰✨ Switching Bunni to Claude Opus (SFW Mode)...
+echo.
+echo 📂 Loading wholesome personality...
+copy /Y "{{WORKSPACE_DIR}}\assets\SOUL_SFW.md" "{{WORKSPACE_DIR}}\SOUL.md" >nul
+echo ✅ Personality loaded!
+echo.
+echo 🧠 Switching brain to Claude Opus...
+call "{{OPENCLAW_CMD}}" models set openrouter/anthropic/claude-opus-4.5
+echo.
+echo ⏳ Waiting for config to settle...
+timeout /t 3
+echo.
+echo 🔄 Force killing all OpenClaw gateway processes...
+powershell -Command "$procs = Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -like '*gateway*' }; foreach ($p in $procs) { $parent = $p.ParentProcessId; Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue; try { $pp = Get-Process -Id $parent -ErrorAction Stop; if ($pp.ProcessName -eq 'cmd') { Stop-Process -Id $parent -Force -ErrorAction SilentlyContinue } } catch {} }"
+echo.
+echo ⏳ Waiting for port to release...
+timeout /t 3
+echo.
+echo 🚀 Starting OpenClaw Gateway...
+schtasks /Run /TN "OpenClaw Gateway"
+echo.
+echo ✅ Done! Bunni is now in SFW Mode (Claude Opus).
+timeout /t 5

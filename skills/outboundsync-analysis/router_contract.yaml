@@ -1,0 +1,233 @@
+# Field requirements and preflight logic. SKILL.md is the authoritative workflow source.
+# This file owns: field sets, unsupported conditions, fallback requirements, exploratory signal definitions.
+version: "0.1"
+modes:
+  default: strict
+  allowed: [strict, exploratory]
+verdicts: [SUPPORTED, PARTIAL, UNSUPPORTED, EXPERIMENTAL_LIMITED]
+preflight_schema:
+  default_format: compact
+  compact_required:
+    - intent_id
+    - mode
+    - verdict
+    - confidence
+    - missing_fields
+    - fallback_plan
+  verbose_opt_in_token: verbose preflight
+defaults:
+  missing_required_policy: fail_or_fallback
+  unsupported_field_policy: explicit_limitation
+  no_match_policy: strict_unsupported_with_exploratory_handoff
+  verdict_order:
+    - unsupported_condition_match
+    - required_fields_match
+    - fallback_requirements_match
+    - unsupported_no_path
+intents:
+  - id: top_campaigns_by_replies_30d
+    question_examples:
+      - Top campaigns by replies in the last 30 days
+      - Which campaigns got the most replies this month?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_email_campaign_name, os_last_reply_time]
+          - [os_last_campaign_name, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+    fallback_requirements:
+      hubspot:
+        any_of:
+          - [os_last_email_campaign_name]
+          - [os_last_campaign_name]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c]
+    unsupported_conditions: []
+    optional_fields:
+      hubspot: [os_last_update_source, os_last_sent_time]
+      salesforce: [OSLast UpdateSource__c, OSLast SentTime__c]
+    fallback_steps:
+      - Rank campaigns by contact volume only.
+      - State missing reply-time limitation.
+
+  - id: high_opens_low_replies
+    question_examples:
+      - Which campaigns have high opens but low replies?
+      - Where are opens not converting into replies?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_campaign_name, os_number_of_email_opens, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c, OSLast OpenTime__c, OSLast ReplyTime__c]
+    fallback_requirements:
+      hubspot:
+        any_of:
+          - [os_last_campaign_name, os_number_of_email_opens]
+          - [os_last_campaign_name, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c, OSLast OpenTime__c]
+          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+    unsupported_conditions: []
+    optional_fields:
+      hubspot: [os_number_of_email_link_clicks, os_last_link_click_time]
+      salesforce: [OSLast LinkClickTime__c]
+    fallback_steps:
+      - Use available open or reply signal only.
+      - In Salesforce, state open-count limitation and use open-time proxy.
+
+  - id: fastest_replies_after_first_send
+    question_examples:
+      - Which campaigns get the fastest replies after send?
+      - What is quickest reply latency by campaign?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_campaign_name, os_last_sent_time, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c, OSLast SentTime__c, OSLast ReplyTime__c]
+    fallback_requirements:
+      hubspot:
+        any_of:
+          - [os_last_campaign_name, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+    unsupported_conditions: []
+    optional_fields:
+      hubspot: [os_last_email_sequence_step]
+      salesforce: []
+    fallback_steps:
+      - Replace latency output with reply volume and reply recency.
+
+  - id: follow_up_prioritization
+    question_examples:
+      - Who should we prioritize for follow-up?
+      - Which contacts are warm but unanswered?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_open_time, os_last_link_click_time, os_last_reply_time]
+          - [os_number_of_email_opens, os_last_link_click_time, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast OpenTime__c, OSLast LinkClickTime__c, OSLast ReplyTime__c]
+    fallback_requirements:
+      hubspot:
+        any_of:
+          - [os_last_open_time, os_last_reply_time]
+          - [os_number_of_email_opens, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast OpenTime__c, OSLast ReplyTime__c]
+    unsupported_conditions: []
+    optional_fields:
+      hubspot: [os_last_campaign_name, os_last_sent_time]
+      salesforce: [OSLast CampaignName__c, OSLast SentTime__c]
+    fallback_steps:
+      - Prioritize by opens plus recency when click signals are missing.
+      - Exclude recent repliers unless explicitly requested.
+
+  - id: platform_engagement_attribution
+    question_examples:
+      - Which outbound platform drives best engagement?
+      - Is Instantly or Smartlead performing better?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_update_source, os_number_of_email_opens]
+          - [os_last_update_source, os_last_reply_time]
+      salesforce:
+        any_of:
+          - [OSLast UpdateSource__c, OSLast OpenTime__c]
+          - [OSLast UpdateSource__c, OSLast ReplyTime__c]
+    fallback_requirements:
+      hubspot:
+        any_of: []
+      salesforce:
+        any_of: []
+    unsupported_conditions:
+      - when:
+          hubspot:
+            missing_any: [os_last_update_source]
+          salesforce:
+            missing_any: [OSLast UpdateSource__c]
+        reason: missing_update_source
+    optional_fields:
+      hubspot: [os_number_of_email_link_clicks]
+      salesforce: [OSLast LinkClickTime__c]
+    fallback_steps:
+      - Do not attribute by platform when update source is missing.
+      - Return explicit limitation and required field.
+
+  - id: deliverability_unsubscribes_bounces
+    question_examples:
+      - What are our unsubscribe and bounce issues?
+      - Where is deliverability failing?
+    required_fields:
+      hubspot:
+        any_of:
+          - [os_last_bounce_time, os_last_unsubscribe_time, os_last_sent_time, os_last_sent_address]
+      salesforce:
+        any_of:
+          - [OSLast BounceTime__c, OSLast UnsubscribeTime__c, OSLast SentTime__c, OSLast SentAddress__c]
+    fallback_requirements:
+      hubspot:
+        any_of:
+          - [os_last_bounce_time, os_last_unsubscribe_time, os_last_sent_time]
+          - [os_last_bounce_time, os_last_sent_time]
+          - [os_last_unsubscribe_time, os_last_sent_time]
+      salesforce:
+        any_of:
+          - [OSLast BounceTime__c, OSLast UnsubscribeTime__c, OSLast SentTime__c]
+          - [OSLast BounceTime__c, OSLast SentTime__c]
+          - [OSLast UnsubscribeTime__c, OSLast SentTime__c]
+    unsupported_conditions: []
+    optional_fields:
+      hubspot: [os_last_campaign_name]
+      salesforce: [OSLast CampaignName__c]
+    fallback_steps:
+      - Analyze deliverability at campaign or aggregate level without sent-address breakdown.
+      - If only bounce or unsubscribe data is available, analyze the available signal only and state which signal is missing.
+
+exploratory_paths:
+  - id: heyreach_social_summary
+    mode: exploratory_only
+    crm_scope: hubspot
+    platform_scope: heyreach
+    required_signals:
+      any_of:
+        - [os_last_social_campaign_name, os_last_reply_social_time]
+        - [os_last_campaign_name, os_last_reply_social_time]
+        - [os_last_social_campaign_name, os_last_sent_social_time]
+        - [os_last_campaign_name, os_last_sent_social_time]
+    optional_signals:
+      - os_last_sent_social_time
+      - os_last_update_occurred
+      - os_last_social_campaign_id
+    verdict: EXPERIMENTAL_LIMITED
+    confidence_rules:
+      high:
+        - os_last_social_campaign_name
+        - os_last_reply_social_time
+        - os_last_sent_social_time
+      medium:
+        - os_last_campaign_name
+        - os_last_reply_social_time
+      low:
+        - os_last_campaign_name
+        - os_last_sent_social_time
+    output_requirements:
+      - Report campaign volume summary.
+      - Report social reply recency summary.
+      - Report activity trend direction as up, flat, or down.
+      - Include non-causal caveat.
+    caveats:
+      - Exploratory output is best-effort and non-causal.
+      - Do not treat social summary as equivalent to strict email-reply analysis.

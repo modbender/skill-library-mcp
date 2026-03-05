@@ -1,0 +1,2565 @@
+ocui_version: "1.0"
+skill: propclaw
+skill_version: "1.0.0"
+display_name: Property Management
+icon: building
+color: "#8b5cf6"
+default_entity: property
+
+domains:
+  - key: properties
+    label: Properties
+    entities: [property, unit]
+  - key: leases
+    label: Leases
+    entities: [lease, rent_schedule, lease_charge]
+  - key: tenants
+    label: Tenants
+    entities: [application, screening, tenant_document]
+  - key: maintenance
+    label: Maintenance
+    entities: [work_order, inspection]
+  - key: accounting
+    label: Accounting
+    entities: [trust_account, owner_statement, security_deposit, deposit_deduction]
+
+entities:
+  # ---------------------------------------------------------------------------
+  # Properties domain
+  # ---------------------------------------------------------------------------
+  property:
+    label: Property
+    label_plural: Properties
+    table: propclaw_property
+    id_col: id
+    name_col: name
+    primary_field: name
+    secondary_field: property_type
+    identifier_field: id
+    status_field: status
+    status_colors:
+      active: green
+      inactive: yellow
+      archived: gray
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Property No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      name:
+        type: text
+        label: Property Name
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      property_type:
+        type: select
+        label: Property Type
+        required: true
+        options:
+          - value: residential
+            label: Residential
+          - value: commercial
+            label: Commercial
+          - value: mixed
+            label: Mixed
+        default: residential
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      address_line1:
+        type: text
+        label: Address Line 1
+        required: true
+        in_form_view: true
+        form_group: address
+        form_order: 4
+      address_line2:
+        type: text
+        label: Address Line 2
+        in_form_view: true
+        form_group: address
+        form_order: 5
+      city:
+        type: text
+        label: City
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: address
+        form_order: 6
+      state:
+        type: select
+        label: State
+        required: true
+        options:
+          - { value: AL, label: Alabama }
+          - { value: AK, label: Alaska }
+          - { value: AZ, label: Arizona }
+          - { value: AR, label: Arkansas }
+          - { value: CA, label: California }
+          - { value: CO, label: Colorado }
+          - { value: CT, label: Connecticut }
+          - { value: DE, label: Delaware }
+          - { value: DC, label: District of Columbia }
+          - { value: FL, label: Florida }
+          - { value: GA, label: Georgia }
+          - { value: HI, label: Hawaii }
+          - { value: ID, label: Idaho }
+          - { value: IL, label: Illinois }
+          - { value: IN, label: Indiana }
+          - { value: IA, label: Iowa }
+          - { value: KS, label: Kansas }
+          - { value: KY, label: Kentucky }
+          - { value: LA, label: Louisiana }
+          - { value: ME, label: Maine }
+          - { value: MD, label: Maryland }
+          - { value: MA, label: Massachusetts }
+          - { value: MI, label: Michigan }
+          - { value: MN, label: Minnesota }
+          - { value: MS, label: Mississippi }
+          - { value: MO, label: Missouri }
+          - { value: MT, label: Montana }
+          - { value: NE, label: Nebraska }
+          - { value: NV, label: Nevada }
+          - { value: NH, label: New Hampshire }
+          - { value: NJ, label: New Jersey }
+          - { value: NM, label: New Mexico }
+          - { value: NY, label: New York }
+          - { value: NC, label: North Carolina }
+          - { value: ND, label: North Dakota }
+          - { value: OH, label: Ohio }
+          - { value: OK, label: Oklahoma }
+          - { value: OR, label: Oregon }
+          - { value: PA, label: Pennsylvania }
+          - { value: RI, label: Rhode Island }
+          - { value: SC, label: South Carolina }
+          - { value: SD, label: South Dakota }
+          - { value: TN, label: Tennessee }
+          - { value: TX, label: Texas }
+          - { value: UT, label: Utah }
+          - { value: VT, label: Vermont }
+          - { value: VA, label: Virginia }
+          - { value: WA, label: Washington }
+          - { value: WV, label: West Virginia }
+          - { value: WI, label: Wisconsin }
+          - { value: WY, label: Wyoming }
+        in_list_view: true
+        in_form_view: true
+        form_group: address
+        form_order: 7
+      zip_code:
+        type: text
+        label: Zip Code
+        required: true
+        in_form_view: true
+        form_group: address
+        form_order: 8
+      county:
+        type: text
+        label: County
+        in_form_view: true
+        form_group: address
+        form_order: 9
+      year_built:
+        type: integer
+        label: Year Built
+        in_form_view: true
+        form_group: details
+        form_order: 10
+      total_units:
+        type: integer
+        label: Total Units
+        default: 1
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 11
+      owner_name:
+        type: text
+        label: Owner Name
+        in_form_view: true
+        form_group: details
+        form_order: 12
+      owner_contact:
+        type: text
+        label: Owner Contact
+        in_form_view: true
+        form_group: details
+        form_order: 13
+      management_fee_pct:
+        type: text
+        label: Management Fee %
+        in_form_view: true
+        form_group: details
+        form_order: 14
+      status:
+        type: select
+        label: Status
+        options:
+          - value: active
+            label: Active
+          - value: inactive
+            label: Inactive
+          - value: archived
+            label: Archived
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 15
+    form_groups:
+      header:
+        label: Property Information
+        order: 1
+        columns: 2
+      address:
+        label: Address
+        order: 2
+        columns: 2
+      details:
+        label: Additional Details
+        order: 3
+        columns: 2
+
+  unit:
+    label: Unit
+    label_plural: Units
+    table: propclaw_unit
+    id_col: id
+    name_col: unit_number
+    primary_field: unit_number
+    identifier_field: id
+    status_field: status
+    status_colors:
+      available: green
+      occupied: blue
+      maintenance: yellow
+      reserved: gray
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Unit No.
+        read_only: true
+        in_list_view: true
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      unit_number:
+        type: text
+        label: Unit Number
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      unit_type:
+        type: select
+        label: Unit Type
+        options:
+          - value: apartment
+            label: Apartment
+          - value: house
+            label: House
+          - value: condo
+            label: Condo
+          - value: townhouse
+            label: Townhouse
+          - value: commercial
+            label: Commercial
+          - value: storage
+            label: Storage
+          - value: parking
+            label: Parking
+        default: apartment
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      bedrooms:
+        type: integer
+        label: Bedrooms
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 4
+      bathrooms:
+        type: text
+        label: Bathrooms
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      sq_ft:
+        type: integer
+        label: Sq Ft
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      floor:
+        type: integer
+        label: Floor
+        in_form_view: true
+        form_group: details
+        form_order: 7
+      market_rent:
+        type: currency
+        label: Market Rent
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 8
+      status:
+        type: select
+        label: Status
+        options:
+          - value: available
+            label: Available
+          - value: occupied
+            label: Occupied
+          - value: maintenance
+            label: Maintenance
+          - value: reserved
+            label: Reserved
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 9
+    form_groups:
+      header:
+        label: Unit Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+
+  amenity:
+    label: Amenity
+    label_plural: Amenities
+    table: propclaw_amenity
+    id_col: id
+    name_col: name
+    primary_field: name
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      property_id:
+        type: link
+        label: Property
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      unit_id:
+        type: link
+        label: Unit
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      name:
+        type: text
+        label: Amenity Name
+        required: true
+        param_name: amenity-name
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      description:
+        type: textarea
+        label: Description
+        in_form_view: true
+        form_group: details
+        form_order: 4
+    form_groups:
+      header:
+        label: Amenity Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 1
+
+  property_photo:
+    label: Photo
+    label_plural: Photos
+    table: propclaw_property_photo
+    id_col: id
+    name_col: file_url
+    primary_field: file_url
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      property_id:
+        type: link
+        label: Property
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      unit_id:
+        type: link
+        label: Unit
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      file_url:
+        type: text
+        label: File URL
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      description:
+        type: text
+        label: Description
+        in_form_view: true
+        form_group: details
+        form_order: 4
+      photo_scope:
+        type: select
+        label: Scope
+        options:
+          - value: property
+            label: Property
+          - value: unit
+            label: Unit
+          - value: inspection
+            label: Inspection
+        in_form_view: true
+        form_group: header
+        form_order: 5
+    form_groups:
+      header:
+        label: Photo Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 1
+
+  # ---------------------------------------------------------------------------
+  # Leases domain
+  # ---------------------------------------------------------------------------
+  lease:
+    label: Lease
+    label_plural: Leases
+    table: propclaw_lease
+    id_col: id
+    name_col: naming_series
+    primary_field: naming_series
+    identifier_field: id
+    status_field: status
+    status_colors:
+      draft: gray
+      active: green
+      expired: orange
+      terminated: red
+      renewed: blue
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Lease No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      unit_id:
+        type: link
+        label: Unit
+        required: true
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      customer_id:
+        type: link
+        label: Tenant
+        required: true
+        link_entity: customer
+        link_display_field: name
+        link_search_action: list-customers
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      lease_type:
+        type: select
+        label: Lease Type
+        options:
+          - value: fixed
+            label: Fixed Term
+          - value: month_to_month
+            label: Month to Month
+        default: fixed
+        in_form_view: true
+        form_group: terms
+        form_order: 5
+      start_date:
+        type: date
+        label: Start Date
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: terms
+        form_order: 6
+      end_date:
+        type: date
+        label: End Date
+        in_list_view: true
+        in_form_view: true
+        form_group: terms
+        form_order: 7
+      monthly_rent:
+        type: currency
+        label: Monthly Rent
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: terms
+        form_order: 8
+      security_deposit_amount:
+        type: currency
+        label: Security Deposit
+        precision: 2
+        in_form_view: true
+        form_group: terms
+        form_order: 9
+      deposit_account_id:
+        type: link
+        label: Deposit Account
+        link_entity: account
+        link_display_field: name
+        link_search_action: list-accounts
+        in_form_view: true
+        form_group: accounting
+        form_order: 10
+      move_in_date:
+        type: date
+        label: Move-in Date
+        in_form_view: true
+        form_group: terms
+        form_order: 11
+      status:
+        type: select
+        label: Status
+        options:
+          - value: draft
+            label: Draft
+          - value: active
+            label: Active
+          - value: expired
+            label: Expired
+          - value: terminated
+            label: Terminated
+          - value: renewed
+            label: Renewed
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 12
+    form_groups:
+      header:
+        label: Lease Information
+        order: 1
+        columns: 2
+      terms:
+        label: Lease Terms
+        order: 2
+        columns: 2
+      accounting:
+        label: Accounting
+        order: 3
+        columns: 2
+
+  rent_schedule:
+    label: Rent Schedule
+    label_plural: Rent Schedules
+    table: propclaw_rent_schedule
+    id_col: id
+    name_col: charge_type
+    primary_field: charge_type
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      lease_id:
+        type: link
+        label: Lease
+        required: true
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      charge_type:
+        type: select
+        label: Charge Type
+        required: true
+        options:
+          - value: base_rent
+            label: Base Rent
+          - value: pet_rent
+            label: Pet Rent
+          - value: parking
+            label: Parking
+          - value: storage
+            label: Storage
+          - value: utility
+            label: Utility
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      description:
+        type: text
+        label: Description
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      amount:
+        type: currency
+        label: Amount
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      frequency:
+        type: select
+        label: Frequency
+        options:
+          - value: weekly
+            label: Weekly
+          - value: biweekly
+            label: Biweekly
+          - value: monthly
+            label: Monthly
+        default: monthly
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      start_date:
+        type: date
+        label: Start Date
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      end_date:
+        type: date
+        label: End Date
+        in_form_view: true
+        form_group: details
+        form_order: 7
+    form_groups:
+      header:
+        label: Schedule Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+
+  lease_charge:
+    label: Lease Charge
+    label_plural: Lease Charges
+    table: propclaw_lease_charge
+    id_col: id
+    name_col: charge_type
+    primary_field: charge_type
+    identifier_field: id
+    status_field: status
+    status_colors:
+      pending: gray
+      invoiced: blue
+      paid: green
+      waived: yellow
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      lease_id:
+        type: link
+        label: Lease
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      charge_date:
+        type: date
+        label: Charge Date
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      charge_type:
+        type: text
+        label: Charge Type
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      description:
+        type: text
+        label: Description
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      amount:
+        type: currency
+        label: Amount
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 5
+      status:
+        type: select
+        label: Status
+        options:
+          - value: pending
+            label: Pending
+          - value: invoiced
+            label: Invoiced
+          - value: paid
+            label: Paid
+          - value: waived
+            label: Waived
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 6
+    form_groups:
+      header:
+        label: Charge Information
+        order: 1
+        columns: 2
+
+  late_fee_rule:
+    label: Late Fee Rule
+    label_plural: Late Fee Rules
+    table: propclaw_late_fee_rule
+    id_col: id
+    name_col: state
+    primary_field: state
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      state:
+        type: text
+        label: State
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      fee_type:
+        type: select
+        label: Fee Type
+        required: true
+        options:
+          - value: flat
+            label: Flat
+          - value: percentage
+            label: Percentage
+          - value: lower_of
+            label: Lower Of
+          - value: greater_of
+            label: Greater Of
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      flat_amount:
+        type: currency
+        label: Flat Amount
+        precision: 2
+        in_form_view: true
+        form_group: details
+        form_order: 4
+      percentage_rate:
+        type: text
+        label: Percentage Rate
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      grace_days:
+        type: integer
+        label: Grace Days
+        default: 0
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      max_cap:
+        type: currency
+        label: Max Cap
+        precision: 2
+        in_form_view: true
+        form_group: details
+        form_order: 7
+    form_groups:
+      header:
+        label: Rule Information
+        order: 1
+        columns: 2
+      details:
+        label: Fee Details
+        order: 2
+        columns: 2
+
+  lease_renewal:
+    label: Lease Renewal
+    label_plural: Lease Renewals
+    table: propclaw_lease_renewal
+    id_col: id
+    name_col: id
+    primary_field: id
+    identifier_field: id
+    status_field: status
+    status_colors:
+      proposed: blue
+      accepted: green
+      rejected: red
+      expired: gray
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      lease_id:
+        type: link
+        label: Lease
+        required: true
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      new_start_date:
+        type: date
+        label: New Start Date
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+        param_name: start-date
+      new_end_date:
+        type: date
+        label: New End Date
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      new_monthly_rent:
+        type: currency
+        label: New Monthly Rent
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+        param_name: monthly-rent
+      rent_increase_pct:
+        type: text
+        label: Rent Increase %
+        in_form_view: true
+        form_group: header
+        form_order: 5
+      status:
+        type: select
+        label: Status
+        options:
+          - value: proposed
+            label: Proposed
+          - value: accepted
+            label: Accepted
+          - value: rejected
+            label: Rejected
+          - value: expired
+            label: Expired
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 6
+    form_groups:
+      header:
+        label: Renewal Information
+        order: 1
+        columns: 2
+
+  # ---------------------------------------------------------------------------
+  # Tenants domain
+  # ---------------------------------------------------------------------------
+  application:
+    label: Application
+    label_plural: Applications
+    table: propclaw_application
+    id_col: id
+    name_col: applicant_name
+    primary_field: applicant_name
+    secondary_field: applicant_email
+    identifier_field: id
+    status_field: status
+    status_colors:
+      received: blue
+      screening: yellow
+      approved: green
+      denied: red
+      withdrawn: gray
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Application No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      unit_id:
+        type: link
+        label: Unit
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      applicant_name:
+        type: text
+        label: Applicant Name
+        required: true
+        param_name: name
+        in_list_view: true
+        in_form_view: true
+        form_group: applicant
+        form_order: 4
+      applicant_email:
+        type: text
+        label: Email
+        in_list_view: true
+        in_form_view: true
+        form_group: applicant
+        form_order: 5
+      applicant_phone:
+        type: text
+        label: Phone
+        in_form_view: true
+        form_group: applicant
+        form_order: 6
+      desired_move_in:
+        type: date
+        label: Desired Move-in
+        in_form_view: true
+        form_group: applicant
+        form_order: 7
+      monthly_income:
+        type: currency
+        label: Monthly Income
+        precision: 2
+        in_form_view: true
+        form_group: applicant
+        form_order: 8
+      employer:
+        type: text
+        label: Employer
+        in_form_view: true
+        form_group: applicant
+        form_order: 9
+      status:
+        type: select
+        label: Status
+        options:
+          - value: received
+            label: Received
+          - value: screening
+            label: Screening
+          - value: approved
+            label: Approved
+          - value: denied
+            label: Denied
+          - value: withdrawn
+            label: Withdrawn
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 10
+    form_groups:
+      header:
+        label: Application Details
+        order: 1
+        columns: 2
+      applicant:
+        label: Applicant Information
+        order: 2
+        columns: 2
+
+  screening:
+    label: Screening
+    label_plural: Screenings
+    table: propclaw_screening_request
+    id_col: id
+    name_col: screening_type
+    primary_field: screening_type
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      application_id:
+        type: link
+        label: Application
+        required: true
+        link_entity: application
+        link_display_field: applicant_name
+        link_search_action: list-applications
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      screening_type:
+        type: select
+        label: Screening Type
+        required: true
+        options:
+          - value: credit
+            label: Credit
+          - value: criminal
+            label: Criminal
+          - value: eviction
+            label: Eviction
+          - value: income
+            label: Income
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      consent_obtained:
+        type: boolean
+        label: Consent Obtained
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      consent_date:
+        type: date
+        label: Consent Date
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      result:
+        type: select
+        label: Result
+        options:
+          - value: pending
+            label: Pending
+          - value: pass
+            label: Pass
+          - value: fail
+            label: Fail
+          - value: review
+            label: Review
+        in_list_view: true
+        read_only: true
+      notes:
+        type: textarea
+        label: Notes
+        in_form_view: true
+        form_group: notes
+        form_order: 5
+    form_groups:
+      header:
+        label: Screening Details
+        order: 1
+        columns: 2
+      notes:
+        label: Notes
+        order: 2
+        columns: 1
+
+  tenant_document:
+    label: Document
+    label_plural: Documents
+    table: propclaw_tenant_document
+    id_col: id
+    name_col: document_type
+    primary_field: document_type
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      customer_id:
+        type: link
+        label: Tenant
+        required: true
+        link_entity: customer
+        link_display_field: name
+        link_search_action: list-customers
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      lease_id:
+        type: link
+        label: Lease
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      document_type:
+        type: select
+        label: Document Type
+        required: true
+        options:
+          - value: lease
+            label: Lease
+          - value: lead_paint_disclosure
+            label: Lead Paint Disclosure
+          - value: move_in_inspection
+            label: Move-in Inspection
+          - value: move_out_inspection
+            label: Move-out Inspection
+          - value: application
+            label: Application
+          - value: id_copy
+            label: ID Copy
+          - value: insurance
+            label: Insurance
+          - value: w9
+            label: W-9
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      file_url:
+        type: text
+        label: File URL
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      description:
+        type: text
+        label: Description
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      expiry_date:
+        type: date
+        label: Expiry Date
+        in_form_view: true
+        form_group: details
+        form_order: 6
+    form_groups:
+      header:
+        label: Document Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+
+  # ---------------------------------------------------------------------------
+  # Maintenance domain
+  # ---------------------------------------------------------------------------
+  work_order:
+    label: Work Order
+    label_plural: Work Orders
+    table: propclaw_work_order
+    id_col: id
+    name_col: naming_series
+    primary_field: naming_series
+    secondary_field: category
+    identifier_field: id
+    status_field: status
+    status_colors:
+      open: blue
+      assigned: yellow
+      in_progress: blue
+      completed: green
+      cancelled: red
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Work Order No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      unit_id:
+        type: link
+        label: Unit
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      customer_id:
+        type: link
+        label: Tenant
+        link_entity: customer
+        link_display_field: name
+        link_search_action: list-customers
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      category:
+        type: select
+        label: Category
+        required: true
+        options:
+          - value: plumbing
+            label: Plumbing
+          - value: electrical
+            label: Electrical
+          - value: hvac
+            label: HVAC
+          - value: appliance
+            label: Appliance
+          - value: structural
+            label: Structural
+          - value: general
+            label: General
+          - value: landscaping
+            label: Landscaping
+          - value: pest
+            label: Pest
+          - value: safety
+            label: Safety
+        default: general
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      priority:
+        type: select
+        label: Priority
+        required: true
+        options:
+          - value: emergency
+            label: Emergency
+          - value: urgent
+            label: Urgent
+          - value: routine
+            label: Routine
+        default: routine
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      description:
+        type: textarea
+        label: Description
+        required: true
+        in_form_view: true
+        form_group: details
+        form_order: 7
+      reported_date:
+        type: date
+        label: Reported Date
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 8
+      scheduled_date:
+        type: date
+        label: Scheduled Date
+        in_form_view: true
+        form_group: details
+        form_order: 9
+      estimated_cost:
+        type: currency
+        label: Estimated Cost
+        precision: 2
+        in_form_view: true
+        form_group: costs
+        form_order: 10
+      actual_cost:
+        type: currency
+        label: Actual Cost
+        precision: 2
+        in_form_view: true
+        form_group: costs
+        form_order: 11
+      supplier_id:
+        type: link
+        label: Vendor
+        link_entity: supplier
+        link_display_field: name
+        link_search_action: list-suppliers
+        in_form_view: true
+        form_group: vendor
+        form_order: 12
+      permission_to_enter:
+        type: boolean
+        label: Permission to Enter
+        in_form_view: true
+        form_group: details
+        form_order: 13
+      status:
+        type: select
+        label: Status
+        options:
+          - value: open
+            label: Open
+          - value: assigned
+            label: Assigned
+          - value: in_progress
+            label: In Progress
+          - value: completed
+            label: Completed
+          - value: cancelled
+            label: Cancelled
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 14
+    form_groups:
+      header:
+        label: Work Order
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+      costs:
+        label: Costs
+        order: 3
+        columns: 2
+      vendor:
+        label: Vendor
+        order: 4
+        columns: 2
+
+  work_order_item:
+    label: Work Order Item
+    label_plural: Work Order Items
+    table: propclaw_work_order_item
+    id_col: id
+    name_col: description
+    primary_field: description
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      work_order_id:
+        type: link
+        label: Work Order
+        required: true
+        link_entity: work_order
+        link_display_field: naming_series
+        link_search_action: list-work-orders
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      description:
+        type: text
+        label: Description
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      item_type:
+        type: select
+        label: Item Type
+        required: true
+        options:
+          - value: labor
+            label: Labor
+          - value: material
+            label: Material
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      quantity:
+        type: text
+        label: Quantity
+        default: "1"
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      rate:
+        type: currency
+        label: Rate
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 5
+      amount:
+        type: currency
+        label: Amount
+        precision: 2
+        read_only: true
+        in_list_view: true
+    form_groups:
+      header:
+        label: Item Details
+        order: 1
+        columns: 2
+
+  inspection:
+    label: Inspection
+    label_plural: Inspections
+    table: propclaw_inspection
+    id_col: id
+    name_col: naming_series
+    primary_field: naming_series
+    secondary_field: inspection_type
+    identifier_field: id
+    status_field: status
+    status_colors:
+      scheduled: blue
+      completed: green
+      reviewed: gray
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Inspection No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      unit_id:
+        type: link
+        label: Unit
+        link_entity: unit
+        link_display_field: unit_number
+        link_search_action: list-units
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      lease_id:
+        type: link
+        label: Lease
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      inspection_type:
+        type: select
+        label: Inspection Type
+        required: true
+        options:
+          - value: move_in
+            label: Move-in
+          - value: move_out
+            label: Move-out
+          - value: routine
+            label: Routine
+          - value: pre_listing
+            label: Pre-listing
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      inspection_date:
+        type: date
+        label: Inspection Date
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      inspector_name:
+        type: text
+        label: Inspector Name
+        in_form_view: true
+        form_group: details
+        form_order: 7
+      overall_condition:
+        type: select
+        label: Overall Condition
+        options:
+          - value: excellent
+            label: Excellent
+          - value: good
+            label: Good
+          - value: fair
+            label: Fair
+          - value: poor
+            label: Poor
+        in_form_view: true
+        form_group: details
+        form_order: 8
+      notes:
+        type: textarea
+        label: Notes
+        in_form_view: true
+        form_group: notes
+        form_order: 9
+      status:
+        type: select
+        label: Status
+        options:
+          - value: scheduled
+            label: Scheduled
+          - value: completed
+            label: Completed
+          - value: reviewed
+            label: Reviewed
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 10
+    form_groups:
+      header:
+        label: Inspection Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+      notes:
+        label: Notes
+        order: 3
+        columns: 1
+
+  inspection_item:
+    label: Inspection Item
+    label_plural: Inspection Items
+    table: propclaw_inspection_item
+    id_col: id
+    name_col: area
+    primary_field: area
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      inspection_id:
+        type: link
+        label: Inspection
+        required: true
+        link_entity: inspection
+        link_display_field: naming_series
+        link_search_action: list-inspections
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      area:
+        type: select
+        label: Area
+        required: true
+        options:
+          - value: kitchen
+            label: Kitchen
+          - value: bathroom
+            label: Bathroom
+          - value: bedroom
+            label: Bedroom
+          - value: living_room
+            label: Living Room
+          - value: dining_room
+            label: Dining Room
+          - value: exterior
+            label: Exterior
+          - value: garage
+            label: Garage
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      item:
+        type: select
+        label: Item
+        required: true
+        options:
+          - value: walls
+            label: Walls
+          - value: floors
+            label: Floors
+          - value: ceiling
+            label: Ceiling
+          - value: windows
+            label: Windows
+          - value: doors
+            label: Doors
+          - value: fixtures
+            label: Fixtures
+          - value: appliances
+            label: Appliances
+          - value: cabinets
+            label: Cabinets
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      condition:
+        type: select
+        label: Condition
+        required: true
+        options:
+          - value: good
+            label: Good
+          - value: fair
+            label: Fair
+          - value: poor
+            label: Poor
+          - value: damaged
+            label: Damaged
+          - value: missing
+            label: Missing
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      description:
+        type: textarea
+        label: Description
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      photo_url:
+        type: text
+        label: Photo URL
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      estimated_repair_cost:
+        type: currency
+        label: Estimated Repair Cost
+        precision: 2
+        in_form_view: true
+        form_group: details
+        form_order: 7
+    form_groups:
+      header:
+        label: Item Details
+        order: 1
+        columns: 2
+      details:
+        label: Additional Details
+        order: 2
+        columns: 2
+
+  # ---------------------------------------------------------------------------
+  # Accounting domain
+  # ---------------------------------------------------------------------------
+  trust_account:
+    label: Trust Account
+    label_plural: Trust Accounts
+    table: propclaw_trust_account
+    id_col: id
+    name_col: bank_name
+    primary_field: bank_name
+    identifier_field: id
+    status_field: status
+    status_colors:
+      active: green
+      frozen: yellow
+      closed: red
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      account_id:
+        type: link
+        label: GL Account
+        required: true
+        link_entity: account
+        link_display_field: name
+        link_search_action: list-accounts
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      bank_name:
+        type: text
+        label: Bank Name
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      status:
+        type: select
+        label: Status
+        options:
+          - value: active
+            label: Active
+          - value: frozen
+            label: Frozen
+          - value: closed
+            label: Closed
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 5
+    form_groups:
+      header:
+        label: Trust Account Information
+        order: 1
+        columns: 2
+
+  security_deposit:
+    label: Security Deposit
+    label_plural: Security Deposits
+    table: propclaw_security_deposit
+    id_col: id
+    name_col: id
+    primary_field: id
+    identifier_field: id
+    status_field: status
+    status_colors:
+      held: blue
+      partially_returned: yellow
+      returned: green
+      forfeited: red
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      lease_id:
+        type: link
+        label: Lease
+        required: true
+        link_entity: lease
+        link_display_field: naming_series
+        link_search_action: list-leases
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      amount:
+        type: currency
+        label: Amount
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      deposit_date:
+        type: date
+        label: Deposit Date
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      trust_account_id:
+        type: link
+        label: Trust Account
+        link_entity: trust_account
+        link_display_field: bank_name
+        link_search_action: list-trust-accounts
+        in_form_view: true
+        form_group: header
+        form_order: 4
+        param_name: trust-account-id-ref
+      interest_rate:
+        type: text
+        label: Interest Rate
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      return_amount:
+        type: currency
+        label: Return Amount
+        precision: 2
+        in_form_view: true
+        form_group: details
+        form_order: 6
+      status:
+        type: select
+        label: Status
+        options:
+          - value: held
+            label: Held
+          - value: partially_returned
+            label: Partially Returned
+          - value: returned
+            label: Returned
+          - value: forfeited
+            label: Forfeited
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 7
+    form_groups:
+      header:
+        label: Deposit Information
+        order: 1
+        columns: 2
+      details:
+        label: Details
+        order: 2
+        columns: 2
+
+  deposit_deduction:
+    label: Deposit Deduction
+    label_plural: Deposit Deductions
+    table: propclaw_deposit_deduction
+    id_col: id
+    name_col: deduction_type
+    primary_field: deduction_type
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      security_deposit_id:
+        type: link
+        label: Security Deposit
+        required: true
+        link_entity: security_deposit
+        link_display_field: id
+        link_search_action: list-deposit-deductions
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      deduction_type:
+        type: select
+        label: Deduction Type
+        required: true
+        options:
+          - value: damages
+            label: Damages
+          - value: unpaid_rent
+            label: Unpaid Rent
+          - value: cleaning
+            label: Cleaning
+          - value: other
+            label: Other
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      description:
+        type: text
+        label: Description
+        required: true
+        param_name: deduction-description
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      amount:
+        type: currency
+        label: Amount
+        required: true
+        precision: 2
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      invoice_url:
+        type: text
+        label: Invoice URL
+        in_form_view: true
+        form_group: details
+        form_order: 5
+      receipt_url:
+        type: text
+        label: Receipt URL
+        in_form_view: true
+        form_group: details
+        form_order: 6
+    form_groups:
+      header:
+        label: Deduction Information
+        order: 1
+        columns: 2
+      details:
+        label: Supporting Documents
+        order: 2
+        columns: 2
+
+  owner_statement:
+    label: Owner Statement
+    label_plural: Owner Statements
+    table: propclaw_owner_statement
+    id_col: id
+    name_col: naming_series
+    primary_field: naming_series
+    identifier_field: id
+    status_field: status
+    status_colors:
+      draft: gray
+      sent: blue
+      paid: green
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      naming_series:
+        type: text
+        label: Statement No.
+        read_only: true
+        in_list_view: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      property_id:
+        type: link
+        label: Property
+        required: true
+        link_entity: property
+        link_display_field: name
+        link_search_action: list-properties
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      period_start:
+        type: date
+        label: Period Start
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      period_end:
+        type: date
+        label: Period End
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 4
+      gross_rent:
+        type: currency
+        label: Gross Rent
+        precision: 2
+        read_only: true
+        in_list_view: true
+      management_fee:
+        type: currency
+        label: Management Fee
+        precision: 2
+        read_only: true
+      net_distribution:
+        type: currency
+        label: Net Distribution
+        precision: 2
+        read_only: true
+        in_list_view: true
+        emphasis: true
+      status:
+        type: select
+        label: Status
+        options:
+          - value: draft
+            label: Draft
+          - value: sent
+            label: Sent
+          - value: paid
+            label: Paid
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 5
+    form_groups:
+      header:
+        label: Statement Information
+        order: 1
+        columns: 2
+
+  tax_1099:
+    label: 1099 Report
+    label_plural: 1099 Reports
+    table: propclaw_tax_1099
+    id_col: id
+    name_col: tax_year
+    primary_field: tax_year
+    identifier_field: id
+    fields:
+      id:
+        type: text
+        label: ID
+        read_only: true
+        hidden: true
+      company_id:
+        type: link
+        label: Company
+        required: true
+        link_entity: company
+        link_display_field: name
+        link_search_action: list-companies
+        in_form_view: true
+        form_group: header
+        form_order: 1
+      supplier_id:
+        type: link
+        label: Vendor
+        link_entity: supplier
+        link_display_field: name
+        link_search_action: list-suppliers
+        in_form_view: true
+        form_group: header
+        form_order: 2
+      tax_year:
+        type: integer
+        label: Tax Year
+        required: true
+        in_list_view: true
+        in_form_view: true
+        form_group: header
+        form_order: 3
+      total_payments:
+        type: currency
+        label: Total Payments
+        precision: 2
+        in_list_view: true
+        read_only: true
+      form_type:
+        type: select
+        label: Form Type
+        options:
+          - value: 1099_nec
+            label: 1099-NEC
+          - value: 1099_misc
+            label: 1099-MISC
+        in_list_view: true
+        read_only: true
+      filing_status:
+        type: select
+        label: Filing Status
+        options:
+          - value: pending
+            label: Pending
+          - value: filed
+            label: Filed
+          - value: corrected
+            label: Corrected
+        in_list_view: true
+        read_only: true
+    form_groups:
+      header:
+        label: Report Information
+        order: 1
+        columns: 2
+
+# ---------------------------------------------------------------------------
+# Action map — routes each action to a UI component
+# ---------------------------------------------------------------------------
+action_map:
+  # Properties
+  add-property:
+    component: FormView
+    entity: property
+    mode: create
+  update-property:
+    component: FormView
+    entity: property
+    mode: edit
+  get-property:
+    component: DetailView
+    entity: property
+  list-properties:
+    component: DataTable
+    entity: property
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-property
+  add-unit:
+    component: FormView
+    entity: unit
+    mode: create
+  update-unit:
+    component: FormView
+    entity: unit
+    mode: edit
+  get-unit:
+    component: DetailView
+    entity: unit
+  list-units:
+    component: DataTable
+    entity: unit
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-unit
+  add-amenity:
+    component: FormView
+    entity: amenity
+    mode: create
+  list-amenities:
+    component: DataTable
+    entity: amenity
+    tab_hidden: true
+    default_sort: created_at
+    default_sort_dir: desc
+  delete-amenity:
+    component: FormView
+    mode: create
+  add-photo:
+    component: FormView
+    entity: property_photo
+    mode: create
+  list-photos:
+    component: DataTable
+    entity: property_photo
+    tab_hidden: true
+    default_sort: uploaded_at
+    default_sort_dir: desc
+  delete-photo:
+    component: FormView
+    mode: create
+
+  # Leases
+  add-lease:
+    component: FormView
+    entity: lease
+    mode: create
+  update-lease:
+    component: FormView
+    entity: lease
+    mode: edit
+  get-lease:
+    component: DetailView
+    entity: lease
+  list-leases:
+    component: DataTable
+    entity: lease
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-lease
+  activate-lease:
+    component: FormView
+    mode: create
+  terminate-lease:
+    component: FormView
+    mode: create
+  add-rent-schedule:
+    component: FormView
+    entity: rent_schedule
+    mode: create
+  list-rent-schedules:
+    component: DataTable
+    entity: rent_schedule
+    default_sort: created_at
+    default_sort_dir: desc
+  delete-rent-schedule:
+    component: FormView
+    mode: create
+  generate-charges:
+    component: FormView
+    mode: create
+  list-charges:
+    component: DataTable
+    entity: lease_charge
+    default_sort: charge_date
+    default_sort_dir: desc
+  add-late-fee-rule:
+    component: FormView
+    entity: late_fee_rule
+    mode: create
+  list-late-fee-rules:
+    component: DataTable
+    entity: late_fee_rule
+    tab_hidden: true
+    default_sort: created_at
+    default_sort_dir: desc
+  apply-late-fees:
+    component: FormView
+    mode: create
+  propose-renewal:
+    component: FormView
+    entity: lease_renewal
+    mode: create
+  accept-renewal:
+    component: FormView
+    mode: create
+
+  # Tenants
+  add-application:
+    component: FormView
+    entity: application
+    mode: create
+  update-application:
+    component: FormView
+    entity: application
+    mode: edit
+  get-application:
+    component: DetailView
+    entity: application
+  list-applications:
+    component: DataTable
+    entity: application
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-application
+  approve-application:
+    component: FormView
+    mode: create
+  deny-application:
+    component: FormView
+    mode: create
+  add-screening:
+    component: FormView
+    entity: screening
+    mode: create
+  get-screening:
+    component: DetailView
+    entity: screening
+  list-screenings:
+    component: DataTable
+    entity: screening
+    default_sort: created_at
+    default_sort_dir: desc
+  add-document:
+    component: FormView
+    entity: tenant_document
+    mode: create
+  list-documents:
+    component: DataTable
+    entity: tenant_document
+    default_sort: uploaded_at
+    default_sort_dir: desc
+    add_action: add-document
+  delete-document:
+    component: FormView
+    mode: create
+
+  # Maintenance
+  add-work-order:
+    component: FormView
+    entity: work_order
+    mode: create
+  update-work-order:
+    component: FormView
+    entity: work_order
+    mode: edit
+  get-work-order:
+    component: DetailView
+    entity: work_order
+  list-work-orders:
+    component: DataTable
+    entity: work_order
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-work-order
+  assign-vendor:
+    component: FormView
+    mode: create
+  update-vendor-assignment:
+    component: FormView
+    mode: create
+  complete-work-order:
+    component: FormView
+    mode: create
+  add-work-order-item:
+    component: FormView
+    entity: work_order_item
+    mode: create
+  list-work-order-items:
+    component: DataTable
+    entity: work_order_item
+    tab_hidden: true
+    default_sort: created_at
+    default_sort_dir: desc
+  add-inspection:
+    component: FormView
+    entity: inspection
+    mode: create
+  get-inspection:
+    component: DetailView
+    entity: inspection
+  list-inspections:
+    component: DataTable
+    entity: inspection
+    default_sort: created_at
+    default_sort_dir: desc
+    searchable: true
+    add_action: add-inspection
+  add-inspection-item:
+    component: FormView
+    entity: inspection_item
+    mode: create
+  list-inspection-items:
+    component: DataTable
+    entity: inspection_item
+    tab_hidden: true
+    default_sort: created_at
+    default_sort_dir: desc
+
+  # Accounting
+  setup-trust-account:
+    component: FormView
+    entity: trust_account
+    mode: create
+  get-trust-account:
+    component: DetailView
+    entity: trust_account
+  list-trust-accounts:
+    component: DataTable
+    entity: trust_account
+    default_sort: created_at
+    default_sort_dir: desc
+    add_action: setup-trust-account
+  generate-owner-statement:
+    component: FormView
+    entity: owner_statement
+    mode: create
+  list-owner-statements:
+    component: DataTable
+    entity: owner_statement
+    default_sort: created_at
+    default_sort_dir: desc
+  record-security-deposit:
+    component: FormView
+    entity: security_deposit
+    mode: create
+  return-security-deposit:
+    component: FormView
+    mode: create
+  add-deposit-deduction:
+    component: FormView
+    entity: deposit_deduction
+    mode: create
+  list-deposit-deductions:
+    component: DataTable
+    entity: deposit_deduction
+    default_sort: created_at
+    default_sort_dir: desc
+  generate-1099-report:
+    component: FormView
+    entity: tax_1099
+    mode: create
+
+  # Status
+  status:
+    component: DashboardView

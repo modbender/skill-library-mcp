@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Store — 智能安装顾问</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --text-dim: #8b949e; --accent: #58a6ff;
+  --green: #3fb950; --yellow: #d29922; --orange: #db6d28; --red: #f85149;
+  --radius: 8px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+header { padding: 24px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+header h1 { font-size: 24px; font-weight: 600; }
+header h1 span { color: var(--accent); }
+.stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-dim); }
+.stats .stat { background: var(--surface); padding: 6px 12px; border-radius: var(--radius); border: 1px solid var(--border); }
+.stats .stat strong { color: var(--text); }
+
+/* Controls */
+.controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.search-box { flex: 1; min-width: 200px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 14px; outline: none; }
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text-dim); }
+.filter-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); cursor: pointer; font-size: 13px; transition: all 0.15s; }
+.filter-btn:hover { border-color: var(--text-dim); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+
+/* Card */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: border-color 0.15s; cursor: pointer; position: relative; }
+.card:hover { border-color: var(--accent); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.card-name { font-size: 16px; font-weight: 600; color: var(--accent); }
+.card-version { font-size: 12px; color: var(--text-dim); background: var(--bg); padding: 2px 8px; border-radius: 12px; }
+.card-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 39px; }
+.card-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 500; }
+.badge-a { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-b { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-c { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge-d { background: rgba(219,109,40,0.15); color: var(--orange); }
+.badge-f { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-na { background: rgba(139,148,158,0.1); color: var(--text-dim); }
+.badge-doc { background: rgba(139,148,158,0.1); color: var(--text-dim); font-style: italic; }
+.badge-rec { font-size: 11px; padding: 3px 8px; border-radius: 12px; }
+.rec-install { background: rgba(63,185,80,0.15); color: var(--green); }
+.rec-review { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.rec-no { background: rgba(248,81,73,0.15); color: var(--red); }
+.rec-doc { background: rgba(139,148,158,0.1); color: var(--text-dim); }
+
+/* Detail Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 28px; }
+.modal h2 { font-size: 20px; margin-bottom: 4px; color: var(--accent); }
+.modal .version { color: var(--text-dim); font-size: 13px; margin-bottom: 16px; }
+.modal .desc { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+.modal .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.modal .detail-row:last-child { border-bottom: none; }
+.modal .detail-label { color: var(--text-dim); }
+.modal .close-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+.modal-actions { margin-top: 20px; display: flex; gap: 8px; }
+.modal-actions code { background: var(--bg); padding: 8px 14px; border-radius: var(--radius); font-size: 13px; color: var(--green); flex: 1; user-select: all; }
+
+/* Empty state */
+.empty { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+.empty h3 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+
+/* Footer */
+footer { margin-top: 40px; padding: 20px 0; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-dim); }
+footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🏪 <span>Skill Store</span></h1>
+    <div class="stats">
+      <div class="stat" id="stat-total">Skills: <strong>—</strong></div>
+      <div class="stat" id="stat-safe">安全 (A/B): <strong>—</strong></div>
+      <div class="stat" id="stat-risky">需审查: <strong>—</strong></div>
+      <div class="stat" id="stat-doc">纯文档: <strong>—</strong></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input type="text" class="search-box" id="search" placeholder="搜索 skill 名称或描述...">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="safe">✅ 安全</button>
+    <button class="filter-btn" data-filter="risky">⚠️ 需审查</button>
+    <button class="filter-btn" data-filter="doc">📄 纯文档</button>
+    <button class="filter-btn" data-filter="code">💻 有代码</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">
+    <h3>没有匹配的 skill</h3>
+    <p>试试其他关键词或筛选条件</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal" style="position:relative">
+    <button class="close-btn" onclick="closeModal()">&times;</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<footer>
+  Powered by <a href="#">skill-shield</a> v0.3.0 安全扫描 &middot; 数据来自 ClawHub &middot; 共 <span id="footer-count">—</span> 个 skill
+</footer>
+
+<script>
+let skills = [];
+let currentFilter = 'all';
+
+function ratingBadge(rating, label) {
+  const cls = {'A':'badge-a','B':'badge-b','C':'badge-c','D':'badge-d','F':'badge-f','N/A':'badge-na'}[rating] || 'badge-na';
+  return `<span class="badge ${cls}">${label}: ${rating}</span>`;
+}
+
+function recBadge(rec) {
+  const map = {
+    'install': ['✅ 推荐安装', 'rec-install'],
+    'install_with_review': ['⚠️ 审查后安装', 'rec-review'],
+    'review_required': ['⚠️ 需要审查', 'rec-review'],
+    'do_not_install': ['❌ 不建议安装', 'rec-no'],
+    'documentation_only': ['📄 纯文档', 'rec-doc'],
+  };
+  const [text, cls] = map[rec] || [rec, 'rec-doc'];
+  return `<span class="badge-rec ${cls}">${text}</span>`;
+}
+
+function renderCard(s) {
+  return `<div class="card" onclick="showDetail('${s.name}')">
+    <div class="card-header">
+      <span class="card-name">${s.name}</span>
+      <span class="card-version">v${s.version}</span>
+    </div>
+    <div class="card-desc">${s.description || '暂无描述'}</div>
+    <div class="card-badges">
+      ${ratingBadge(s.security_rating, '安全')}
+      ${ratingBadge(s.compliance_rating, '合规')}
+      ${recBadge(s.recommendation)}
+    </div>
+  </div>`;
+}
+
+function filterSkills() {
+  const q = document.getElementById('search').value.toLowerCase();
+  return skills.filter(s => {
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || (s.description||'').toLowerCase().includes(q);
+    let matchFilter = true;
+    if (currentFilter === 'safe') matchFilter = ['A','B'].includes(s.security_rating);
+    else if (currentFilter === 'risky') matchFilter = ['C','D','F'].includes(s.security_rating);
+    else if (currentFilter === 'doc') matchFilter = s.is_doc_only;
+    else if (currentFilter === 'code') matchFilter = !s.is_doc_only;
+    return matchSearch && matchFilter;
+  });
+}
+
+function render() {
+  const filtered = filterSkills();
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    grid.innerHTML = filtered.map(renderCard).join('');
+    empty.style.display = 'none';
+  }
+}
+
+function showDetail(name) {
+  const s = skills.find(x => x.name === name);
+  if (!s) return;
+  document.getElementById('modal-content').innerHTML = `
+    <h2>${s.name}</h2>
+    <div class="version">v${s.version} ${s.is_doc_only ? '· 纯文档 skill' : ''}</div>
+    <div class="desc">${s.description || '暂无描述'}</div>
+    <div class="detail-row"><span class="detail-label">安全评级</span>${ratingBadge(s.security_rating, '安全')}</div>
+    <div class="detail-row"><span class="detail-label">合规评级</span>${ratingBadge(s.compliance_rating, '合规')}</div>
+    <div class="detail-row"><span class="detail-label">安装建议</span>${recBadge(s.recommendation)}</div>
+    <div class="detail-row"><span class="detail-label">发现问题数</span><span>${s.total_findings}</span></div>
+    <div class="detail-row"><span class="detail-label">声明权限</span><span>${s.permissions_declared}</span></div>
+    <div class="detail-row"><span class="detail-label">代码中使用权限</span><span>${s.permissions_found}</span></div>
+    <div class="modal-actions"><code>clawhub install ${s.name}</code></div>
+  `;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('search').addEventListener('input', render);
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+// Load data
+fetch('data/skills.json')
+  .then(r => r.json())
+  .then(data => {
+    skills = data.sort((a, b) => {
+      const order = {'A':0,'B':1,'C':2,'D':3,'F':4,'N/A':5,'?':6};
+      return (order[a.security_rating]||9) - (order[b.security_rating]||9);
+    });
+    document.querySelector('#stat-total strong').textContent = skills.length;
+    document.querySelector('#stat-safe strong').textContent = skills.filter(s => ['A','B'].includes(s.security_rating)).length;
+    document.querySelector('#stat-risky strong').textContent = skills.filter(s => ['C','D','F'].includes(s.security_rating)).length;
+    document.querySelector('#stat-doc strong').textContent = skills.filter(s => s.is_doc_only).length;
+    document.getElementById('footer-count').textContent = skills.length;
+    render();
+  });
+</script>
+</body>
+</html>

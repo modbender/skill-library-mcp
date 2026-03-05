@@ -1,0 +1,37 @@
+# Skill: api_doc_generator
+
+generate_api_doc(code: string, format: string) => string
+
+## Trigger Patterns
+- 生成API文档
+- API文档
+- 生成接口文档
+- openapi
+- swagger
+
+## Implementation
+
+分析代码中的函数/方法签名，生成 OpenAPI/Swagger 格式的 API 文档。
+
+```javascript
+function generateApiDoc(code, format = 'openapi') {
+  // 提取函数签名
+  const functions = code.match(/def \w+\([^)]*\)|function \w+\([^)]*\)|const \w+ = \([^)]*\)/g);
+  
+  let doc = {
+    openapi: '3.0.0',
+    paths: {}
+  };
+  
+  for (const fn of functions) {
+    doc.paths['/' + fn.name] = {
+      get: {
+        summary: fn.name,
+        parameters: extractParams(fn)
+      }
+    };
+  }
+  
+  return JSON.stringify(doc, null, 2);
+}
+```

@@ -1,0 +1,38 @@
+Endpoint: POST /api/openclaw/integrations/connected-account
+Auth: X-Org-Token header (org service token)
+CORS: Enabled (OPTIONS preflight supported)
+
+Purpose: Check if a specific integration is connected for the organization and retrieve the connected account details.
+
+Request Headers:
+  X-Org-Token: <org-service-token>
+  Content-Type: application/json
+
+Request Body:
+  integration (required, string): The integration slug to look up (e.g. "gmail", "slack")
+
+Behavior:
+  - Validates org token against database
+  - Uses org.id as Composio user_id (connections are org-scoped)
+  - Lists all ACTIVE connected accounts for the org
+  - Finds the account matching the requested integration toolkit slug
+
+Response 200:
+  {
+    "accountId": "conn_abc123",
+    "userId": "org_xyz",
+    "integration": "gmail",
+    "status": "ACTIVE"
+  }
+
+Response 404 (not connected):
+  {
+    "error": "No active connected account found for integration gmail",
+    "availableIntegrations": ["slack", "github"]
+  }
+
+Error Responses:
+  401 - Missing or invalid X-Org-Token
+  400 - integration is required
+  404 - No active connected account found
+  500 - Server error

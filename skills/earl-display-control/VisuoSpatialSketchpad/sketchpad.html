@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earl's Mind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --plank-dark: #2a1c10;
+    --plank-mid: #3d2a18;
+    --plank-light: #4e3824;
+    --plank-lighter: #5c4430;
+    --accent: #d4a574;
+    --accent2: #c8956c;
+    --warm: #e8a838;
+    --ember: #c87038;
+    --cool: #9ab0c4;
+    --text: #f0e4d4;
+    --text-dim: #a08870;
+    --border: rgba(90, 65, 38, 0.6);
+    --nail: #8a7058;
+    --nail-shine: #c0a888;
+  }
+
+  html, body {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  body {
+    background:
+      repeating-linear-gradient(2deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px),
+      repeating-linear-gradient(1deg, transparent, transparent 20px, rgba(0,0,0,0.06) 20px, rgba(0,0,0,0.06) 22px, transparent 22px, transparent 45px, rgba(0,0,0,0.03) 45px, rgba(0,0,0,0.03) 47px),
+      linear-gradient(180deg, #241810 0%, #1e140c 25%, #261a10 50%, #1c1208 75%, #221810 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* === TV DASHBOARD LAYOUT === */
+  .dashboard {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* === NAIL === */
+  .nail {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--nail-shine), var(--nail) 60%, #5a4838 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 0.5px 1px rgba(255,255,255,0.15);
+    z-index: 5;
+  }
+
+  /* === HEADER BAR === */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 28px;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.03) 4px, rgba(0,0,0,0.03) 5px),
+      linear-gradient(180deg, #3a2818 0%, #2e2014 50%, #342418 100%);
+    border-bottom: 3px solid var(--plank-lighter);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+    flex-shrink: 0;
+  }
+
+  .earl-photo {
+    width: 60px; height: 60px;
+    border-radius: 8px;
+    border: 3px solid var(--plank-lighter);
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+
+  .earl-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .earl-photo-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--plank-mid), var(--plank-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+  }
+
+  .header-id {
+    flex-shrink: 0;
+  }
+
+  .header-id h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .header-id .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+
+  .header-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* weather in header */
+  .header-weather {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .hw-current {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hw-icon { font-size: 32px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+
+  .hw-temp {
+    font-family: 'Space Mono', monospace;
+    font-size: 26px;
+    color: var(--accent);
+    line-height: 1;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .hw-desc {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .hw-stats {
+    display: flex;
+    gap: 12px;
+  }
+
+  .hw-stat {
+    text-align: center;
+  }
+
+  .hw-stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .hw-stat-label {
+    font-size: 9px;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+  }
+
+  .hw-forecast {
+    display: flex;
+    gap: 8px;
+  }
+
+  .hw-day {
+    text-align: center;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    border: 1px solid rgba(90,65,38,0.2);
+  }
+
+  .hw-day-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+
+  .hw-day-icon { font-size: 16px; }
+
+  .hw-day-temps {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+  }
+
+  .hw-day-temps .hi { color: var(--warm); }
+  .hw-day-temps .lo { color: var(--text-dim); }
+
+  .hw-day-rain {
+    font-size: 9px;
+    color: var(--cool);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .hw-loading {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* vibe + mood in header */
+  .header-vibe {
+    flex: 1;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .vibe {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: var(--text);
+    line-height: 1.3;
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-mood {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .mood-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .mood-bar {
+    width: 100px;
+    height: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(90,65,38,0.3);
+  }
+
+  .mood-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+    background: linear-gradient(90deg, var(--ember), var(--warm));
+    box-shadow: 0 0 6px rgba(232,168,56,0.3);
+  }
+
+  /* === MAIN 3-COLUMN AREA === */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 16px 28px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .panel {
+    position: relative;
+    background:
+      repeating-linear-gradient(89deg, transparent, transparent 6px, rgba(0,0,0,0.035) 6px, rgba(0,0,0,0.035) 7px),
+      repeating-linear-gradient(91deg, transparent, transparent 35px, rgba(0,0,0,0.05) 35px, rgba(0,0,0,0.05) 37px, transparent 37px, transparent 70px, rgba(255,255,255,0.015) 70px, rgba(255,255,255,0.015) 71px),
+      linear-gradient(175deg, var(--plank-mid) 0%, #30220e 40%, var(--plank-dark) 100%);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+    z-index: 2;
+    position: relative;
+  }
+
+  .panel-title .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px rgba(212,165,116,0.3);
+    animation: blink 3s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
+  /* === SKETCHPAD (CORKBOARD) === */
+  .sketch-canvas {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    background:
+      radial-gradient(ellipse 2px 2px at 15% 25%, rgba(0,0,0,0.08) 50%, transparent 50%),
+      radial-gradient(ellipse 1px 2px at 45% 60%, rgba(0,0,0,0.06) 50%, transparent 50%),
+      radial-gradient(ellipse 2px 1px at 70% 15%, rgba(0,0,0,0.07) 50%, transparent 50%),
+      radial-gradient(ellipse 1px 1px at 85% 80%, rgba(0,0,0,0.06) 50%, transparent 50%),
+      radial-gradient(ellipse 2px 2px at 30% 85%, rgba(0,0,0,0.05) 50%, transparent 50%),
+      linear-gradient(175deg, #a07840 0%, #8c6838 30%, #947040 60%, #886630 100%);
+    border-radius: 6px;
+    border: 3px solid var(--plank-lighter);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+
+  .sketch-canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px),
+      repeating-linear-gradient(-30deg, transparent, transparent 5px, rgba(255,255,255,0.02) 5px, rgba(255,255,255,0.02) 6px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .sketch-item {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: default;
+    z-index: 1;
+  }
+
+  .sketch-item.type-doodle {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  .sketch-item.type-note {
+    font-family: 'Caveat', cursive;
+    font-weight: 600;
+    padding: 4px 12px;
+    background: rgba(255,248,220,0.88);
+    color: #3a2818;
+    border-radius: 2px;
+    white-space: nowrap;
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%) rotate(-1deg);
+  }
+
+  .sketch-item.type-note:nth-child(even) {
+    transform: translate(-50%, -50%) rotate(1.5deg);
+  }
+
+  .sketch-pin {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    z-index: 2;
+  }
+
+  /* === HOUSE STUFF === */
+  .house-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    z-index: 2;
+    position: relative;
+  }
+
+  .house-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(90,65,38,0.3);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    flex-shrink: 0;
+  }
+
+  .house-item-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 30px;
+    text-align: center;
+  }
+
+  .house-item-priority {
+    width: 4px;
+    border-radius: 2px;
+    min-height: 30px;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+
+  .house-item-priority.priority-high { background: #c85040; box-shadow: 0 0 6px rgba(200,80,64,0.3); }
+  .house-item-priority.priority-medium { background: var(--warm); }
+  .house-item-priority.priority-low { background: var(--accent); opacity: 0.4; }
+
+  .house-item-content { flex: 1; min-width: 0; }
+
+  .house-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .house-item-detail {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    line-height: 1.3;
+    font-family: 'Caveat', cursive;
+  }
+
+  .house-item-cat {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 9px;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    background: rgba(212,165,116,0.08);
+    border-radius: 4px;
+    color: var(--text-dim);
+  }
+
+  /* === EARL UNPLUGGED === */
+  .unplugged-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    z-index: 2;
+    position: relative;
+  }
+
+  .take-card {
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px),
+      rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 10px 14px;
+    border-left: 3px solid;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    flex-shrink: 0;
+  }
+
+  .take-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .take-emoji { font-size: 18px; }
+
+  .take-topic {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .take-heat {
+    margin-left: auto;
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .take-heat-label {
+    font-size: 9px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-dim);
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .take-heat .bar {
+    width: 3px; height: 10px;
+    border-radius: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .take-heat .bar.filled { background: var(--warm); box-shadow: 0 0 4px rgba(232,168,56,0.2); }
+
+  .take-text {
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .take-date {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* === FOOTER (patterns + meta) === */
+  .footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 28px;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.02) 4px, rgba(0,0,0,0.02) 5px),
+      linear-gradient(180deg, var(--plank-mid), #1e140c);
+    border-top: 3px solid var(--border);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .footer-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-label .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 3s ease-in-out infinite;
+  }
+
+  .patterns-scroll {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .pattern-chip {
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(90,65,38,0.3);
+    border-radius: 6px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 240px;
+  }
+
+  .pattern-empty {
+    flex-shrink: 0;
+    border: 1px dashed rgba(90,65,38,0.4);
+    border-radius: 6px;
+    padding: 12px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.12);
+    max-width: 260px;
+    text-align: center;
+  }
+
+  .pattern-text {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .pattern-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .confidence-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .confidence-dots .cdot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .confidence-dots .cdot.filled { background: var(--accent); }
+
+  .pattern-obs {
+    font-size: 9px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .footer-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    text-align: right;
+    opacity: 0.6;
+  }
+
+  .footer-meta .accent { color: var(--accent); }
+
+  /* === LOADING === */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  /* hide scrollbars for the overflow-y panels on TV */
+  .house-items::-webkit-scrollbar,
+  .unplugged-list::-webkit-scrollbar { width: 0; }
+  .house-items, .unplugged-list { scrollbar-width: none; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="app">
+  <div class="loading">
+    <span>SYNCING WITH EARL'S MIND<span class="loading-dots"></span></span>
+  </div>
+</div>
+
+<script>
+// === FLOATING EMBERS ===
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let embers = [];
+  const COUNT = 35;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  class Ember {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * canvas.width;
+      this.y = init ? Math.random() * canvas.height : canvas.height + 10;
+      this.vx = (Math.random() - 0.5) * 0.15;
+      this.vy = -(Math.random() * 0.3 + 0.08);
+      this.r = Math.random() * 2.2 + 0.4;
+      this.maxAlpha = Math.random() * 0.18 + 0.04;
+      this.a = init ? this.maxAlpha * Math.random() : 0;
+      this.fadeIn = !init;
+      this.life = Math.random() * 700 + 250;
+      this.age = init ? Math.random() * this.life : 0;
+      const hue = 18 + Math.random() * 22;
+      this.color = `hsla(${hue}, 75%, 55%,`;
+    }
+    update() {
+      this.x += this.vx + Math.sin(this.age * 0.006) * 0.12;
+      this.y += this.vy;
+      this.age++;
+      if (this.fadeIn && this.a < this.maxAlpha) {
+        this.a += 0.002;
+        if (this.a >= this.maxAlpha) this.fadeIn = false;
+      }
+      if (this.age > this.life * 0.7) this.a -= 0.0015;
+      if (this.a <= 0 || this.y < -20) this.reset(false);
+    }
+    draw() {
+      if (this.a <= 0) return;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color + Math.max(0, this.a) + ')';
+      ctx.fill();
+      if (this.r > 1.2) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = this.color + (Math.max(0, this.a) * 0.12) + ')';
+        ctx.fill();
+      }
+    }
+  }
+
+  for (let i = 0; i < COUNT; i++) embers.push(new Ember());
+
+  function frame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    embers.forEach(e => { e.update(); e.draw(); });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// === ICON MAPS ===
+const MOOD_EMOJIS = {
+  content: '😊', contemplative: '🤔', happy: '😊', alert: '⚡',
+  relaxed: '😌', concerned: '😟', proud: '😤', sleepy: '😴',
+  excited: '🎉', thoughtful: '💭', default: '🧙🏻'
+};
+
+const PIN_COLORS = ['#c85040','#4080c8','#40a060','#c8a040','#a060c0','#c86040','#6080c0'];
+
+// === LOAD ===
+async function loadMind() {
+  try {
+    const r = await fetch('earl_mind.json?t=' + Date.now());
+    if (!r.ok) throw new Error('fail');
+    return await r.json();
+  } catch(e) {
+    document.getElementById('app').innerHTML = `
+      <div class="loading" style="flex-direction:column;gap:10px;">
+        <span style="color:#c85040;">Earl is sleeping, text to wake him up.</span>
+        <span style="font-size:12px;color:#a08870;">(I auto-wake by restarting the server + reloading this page.)</span>
+      </div>`;
+    return null;
+  }
+}
+
+// === RENDER ===
+function renderMind(mind) {
+  const app = document.getElementById('app');
+  const moodEmoji = MOOD_EMOJIS[mind.identity.mood] || MOOD_EMOJIS.default;
+  const gnomeEmoji = '🧙🏻‍♂️';
+  const hasPhoto = mind.identity.photo && mind.identity.photo.length > 0;
+  const takeColors = ['#d4a574','#e8a838','#9ab0c4','#c89090','#a896b8','#c87038','#88a870'];
+  const patterns = mind.long_term_patterns || [];
+  const patternChips = patterns.length ? patterns.map(p => {
+            const dots = Array.from({length: 5}, (_, i) =>
+              `<div class="cdot ${i < Math.round(p.confidence * 5) ? 'filled' : ''}"></div>`
+            ).join('');
+            return `
+              <div class="pattern-chip">
+                <div class="pattern-text">${p.pattern}</div>
+                <div class="pattern-meta">
+                  <div class="confidence-dots">${dots}</div>
+                  <span class="pattern-obs">${p.observations} obs</span>
+                </div>
+              </div>`;
+          }).join('') : '';
+
+  app.innerHTML = `
+    <div class="dashboard">
+      <div class="header">
+        <div class="earl-photo" title="Mood: ${mind.identity.mood}">
+          ${hasPhoto
+            ? `<img src="${mind.identity.photo}" alt="Earl">`
+            : `<div class="earl-photo-placeholder">${gnomeEmoji}</div>`
+          }
+        </div>
+        <div class="header-id">
+          <h1>${mind.identity.name}</h1>
+          <div class="subtitle">${mind.identity.role} · ${mind.spatial_awareness.house_name}</div>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <div class="header-weather" id="weather-container">
+          <div class="hw-loading">Loading weather...</div>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <div class="header-vibe">
+          <div class="vibe">"${mind.identity.current_vibe}"</div>
+          <div class="header-mood">
+            <span class="mood-label">${mind.identity.mood}</span>
+            <span class="mood-label">·</span>
+            <span class="mood-label">Energy</span>
+            <div class="mood-bar">
+              <div class="mood-bar-fill" style="width:${mind.identity.energy * 100}%"></div>
+            </div>
+            <span class="mood-label">${Math.round(mind.identity.energy * 100)}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="panel">
+          <div class="nail" style="top:8px;left:8px;"></div>
+          <div class="nail" style="top:8px;right:8px;"></div>
+          <div class="nail" style="bottom:8px;left:8px;"></div>
+          <div class="nail" style="bottom:8px;right:8px;"></div>
+          <div class="panel-title"><span class="dot"></span> Earl's Sketchpad</div>
+          <div class="sketch-canvas">
+            ${(mind.sketchpad?.canvas || []).map((s, i) => {
+              if (s.type === 'doodle') {
+                return `<div class="sketch-item type-doodle"
+                  style="left:${s.x*100}%;top:${s.y*100}%;font-size:${s.size}px;"
+                  title="${s.note}">${s.label}</div>`;
+              } else {
+                const pinColor = PIN_COLORS[i % PIN_COLORS.length];
+                return `<div class="sketch-item type-note"
+                  style="left:${s.x*100}%;top:${s.y*100}%;font-size:${s.size * 1.3}px;"
+                  title="${s.note}">
+                  <div class="sketch-pin" style="background:radial-gradient(circle at 35% 35%, #fff, ${pinColor} 50%, ${pinColor});"></div>
+                  ${s.label}
+                </div>`;
+              }
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="nail" style="top:8px;left:8px;"></div>
+          <div class="nail" style="top:8px;right:8px;"></div>
+          <div class="nail" style="bottom:8px;left:8px;"></div>
+          <div class="nail" style="bottom:8px;right:8px;"></div>
+          <div class="panel-title"><span class="dot"></span> Important House Stuff</div>
+          <div class="house-items">
+            ${(mind.house_stuff?.items || []).map(item => `
+              <div class="house-item">
+                <div class="house-item-priority priority-${item.priority}"></div>
+                <div class="house-item-icon">${item.icon || '📌'}</div>
+                <div class="house-item-content">
+                  <div class="house-item-title">${item.title}</div>
+                  <div class="house-item-detail">${item.detail}</div>
+                  <div class="house-item-cat">${item.category}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="nail" style="top:8px;left:8px;"></div>
+          <div class="nail" style="top:8px;right:8px;"></div>
+          <div class="nail" style="bottom:8px;left:8px;"></div>
+          <div class="nail" style="bottom:8px;right:8px;"></div>
+          <div class="panel-title"><span class="dot"></span> Earl Unplugged</div>
+          <div class="unplugged-list">
+            ${(mind.earl_unplugged || []).map((t, i) => {
+              const heatBars = Array.from({length: 5}, (_, j) =>
+                `<div class="bar ${j < Math.round(t.heat * 5) ? 'filled' : ''}"></div>`
+              ).join('');
+              const color = takeColors[i % takeColors.length];
+              return `
+                <div class="take-card" style="border-left-color:${color}">
+                  <div class="take-header">
+                    <span class="take-emoji">${t.emoji}</span>
+                    <span class="take-topic">${t.topic}</span>
+                    <div class="take-heat">
+                      <span class="take-heat-label">heat</span>
+                      ${heatBars}
+                    </div>
+                  </div>
+                  <div class="take-text">"${t.take}"</div>
+                  <div class="take-date">since ${t.date}</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="footer-label"><span class="dot"></span> Things I've Noticed</div>
+        <div class="patterns-scroll">
+          ${patternChips}
+        </div>
+        <div class="footer-meta">
+          v${mind.meta.schema_version} · <span class="accent">#${mind.meta.update_count}</span><br>
+          ${new Date(mind.meta.last_updated).toLocaleTimeString()}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // re-render weather into the new container
+  if (cachedWeather) renderWeather(cachedWeather);
+}
+
+// === WEATHER (Open-Meteo — free, no API key) ===
+// Location is read from earl_mind.json (spatial_awareness.location)
+// Set your coordinates in earl_mind.json to enable weather
+let WEATHER_URL = null;
+
+function buildWeatherUrl(loc) {
+  if (!loc || !loc.latitude || !loc.longitude) return null;
+  const unit = loc.temperature_unit || 'fahrenheit';
+  const wind = loc.wind_speed_unit || 'mph';
+  const tz = loc.timezone || 'America/New_York';
+  return `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&temperature_unit=${unit}&windspeed_unit=${wind}&timezone=${tz}&forecast_days=4`;
+}
+
+const WMO_CODES = {
+  0: { icon: '☀️', desc: 'Clear' },
+  1: { icon: '🌤️', desc: 'Mostly clear' },
+  2: { icon: '⛅', desc: 'Partly cloudy' },
+  3: { icon: '☁️', desc: 'Overcast' },
+  45: { icon: '🌫️', desc: 'Fog' },
+  48: { icon: '🌫️', desc: 'Rime fog' },
+  51: { icon: '🌦️', desc: 'Light drizzle' },
+  53: { icon: '🌦️', desc: 'Drizzle' },
+  55: { icon: '🌦️', desc: 'Heavy drizzle' },
+  56: { icon: '🌧️', desc: 'Freezing drizzle' },
+  57: { icon: '🌧️', desc: 'Hvy freezing drizzle' },
+  61: { icon: '🌧️', desc: 'Light rain' },
+  63: { icon: '🌧️', desc: 'Rain' },
+  65: { icon: '🌧️', desc: 'Heavy rain' },
+  66: { icon: '🌧️', desc: 'Freezing rain' },
+  67: { icon: '🌧️', desc: 'Hvy freezing rain' },
+  71: { icon: '🌨️', desc: 'Light snow' },
+  73: { icon: '🌨️', desc: 'Snow' },
+  75: { icon: '❄️', desc: 'Heavy snow' },
+  77: { icon: '🌨️', desc: 'Snow grains' },
+  80: { icon: '🌧️', desc: 'Showers' },
+  81: { icon: '🌧️', desc: 'Mod. showers' },
+  82: { icon: '⛈️', desc: 'Violent showers' },
+  85: { icon: '🌨️', desc: 'Snow showers' },
+  86: { icon: '❄️', desc: 'Hvy snow showers' },
+  95: { icon: '⛈️', desc: 'Thunderstorm' },
+  96: { icon: '⛈️', desc: 'T-storm + hail' },
+  99: { icon: '⛈️', desc: 'T-storm + hvy hail' }
+};
+
+function getWeatherInfo(code) {
+  return WMO_CODES[code] || { icon: '🌡️', desc: 'Unknown' };
+}
+
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let cachedWeather = null;
+
+async function fetchWeather() {
+  if (!WEATHER_URL) {
+    const container = document.getElementById('weather-container');
+    if (container) {
+      container.innerHTML = `<div class="hw-loading" style="opacity:0.5;">Set location in earl_mind.json</div>`;
+    }
+    return;
+  }
+  try {
+    const r = await fetch(WEATHER_URL);
+    if (!r.ok) throw new Error('Weather fetch failed');
+    cachedWeather = await r.json();
+    renderWeather(cachedWeather);
+  } catch(e) {
+    const container = document.getElementById('weather-container');
+    if (container) {
+      container.innerHTML = `<div class="hw-loading" style="opacity:0.5;">Weather unavailable</div>`;
+    }
+  }
+}
+
+function renderWeather(data) {
+  const container = document.getElementById('weather-container');
+  if (!container) return;
+
+  const cur = data.current;
+  const daily = data.daily;
+  const now = getWeatherInfo(cur.weather_code);
+  const temp = Math.round(cur.temperature_2m);
+  const feelsLike = Math.round(cur.apparent_temperature);
+  const humidity = cur.relative_humidity_2m;
+  const wind = Math.round(cur.wind_speed_10m);
+
+  let forecastHTML = '';
+  for (let i = 1; i <= 3; i++) {
+    if (!daily.time[i]) continue;
+    const date = new Date(daily.time[i] + 'T12:00:00');
+    const dayName = DAY_NAMES[date.getDay()];
+    const fc = getWeatherInfo(daily.weather_code[i]);
+    const hi = Math.round(daily.temperature_2m_max[i]);
+    const lo = Math.round(daily.temperature_2m_min[i]);
+    const rain = daily.precipitation_probability_max[i] || 0;
+    forecastHTML += `
+      <div class="hw-day">
+        <div class="hw-day-name">${dayName}</div>
+        <div class="hw-day-icon">${fc.icon}</div>
+        <div class="hw-day-temps"><span class="hi">${hi}°F</span>/<span class="lo">${lo}°F</span></div>
+        ${rain > 0 ? `<div class="hw-day-rain">💧${rain}%</div>` : ''}
+      </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="hw-current">
+      <div class="hw-icon">${now.icon}</div>
+      <div>
+        <div class="hw-temp">${temp}°F</div>
+        <div class="hw-desc">${now.desc}</div>
+      </div>
+    </div>
+    <div class="hw-stats">
+      <div class="hw-stat">
+        <div class="hw-stat-val">${feelsLike}°F</div>
+        <div class="hw-stat-label">Feels</div>
+      </div>
+      <div class="hw-stat">
+        <div class="hw-stat-val">${humidity}%</div>
+        <div class="hw-stat-label">Humid</div>
+      </div>
+      <div class="hw-stat">
+        <div class="hw-stat-val">${wind}</div>
+        <div class="hw-stat-label">mph</div>
+      </div>
+    </div>
+    <div class="hw-forecast">${forecastHTML}</div>
+  `;
+}
+
+// === AUTO-REFRESH ===
+let currentMind = null;
+
+async function init() {
+  currentMind = await loadMind();
+  if (currentMind) {
+    renderMind(currentMind);
+    const loc = currentMind.spatial_awareness && currentMind.spatial_awareness.location;
+    WEATHER_URL = buildWeatherUrl(loc);
+  }
+  fetchWeather();
+}
+
+setInterval(async () => {
+  const m = await loadMind();
+  if (m && JSON.stringify(m) !== JSON.stringify(currentMind)) {
+    currentMind = m;
+    renderMind(currentMind);
+  }
+}, 5000);
+
+setInterval(fetchWeather, 15 * 60 * 1000);
+
+init();
+</script>
+</body>
+</html>

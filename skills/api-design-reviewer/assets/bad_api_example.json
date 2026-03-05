@@ -1,0 +1,140 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "User API",
+    "version": "1.0"
+  },
+  "host": "api.example.com",
+  "schemes": ["http"],
+  "paths": {
+    "/getUsers": {
+      "get": {
+        "summary": "get users",
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      }
+    },
+    "/getUserById": {
+      "post": {
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      }
+    },
+    "/createNewUser": {
+      "get": {
+        "parameters": [
+          {
+            "name": "user_name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "user_password",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      }
+    },
+    "/user_profile_data": {
+      "get": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "integer"
+                },
+                "first_name": {
+                  "type": "string"
+                },
+                "LastName": {
+                  "type": "string"
+                },
+                "email_address": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                },
+                "ROLE": {
+                  "type": "string"
+                },
+                "internal_user_ref": {
+                  "type": "string"
+                },
+                "db_created_timestamp": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user-actions": {
+      "post": {
+        "parameters": [
+          {
+            "name": "action_data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": ["create_user", "update_user", "delete_user", "send_email"]
+                },
+                "user_id": {
+                  "type": "string"
+                },
+                "user_data": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "action completed"
+          }
+        }
+      }
+    }
+  }
+}

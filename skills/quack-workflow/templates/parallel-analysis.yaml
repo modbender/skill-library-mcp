@@ -1,0 +1,28 @@
+name: parallel-analysis
+description: Analyze a topic from multiple angles in parallel
+
+steps:
+  - id: technical
+    action: llm
+    params:
+      model: claude
+      prompt: "Provide a technical analysis of: {{input.topic}}"
+
+  - id: business
+    action: llm
+    params:
+      model: gpt-4
+      prompt: "Provide a business impact analysis of: {{input.topic}}"
+
+  - id: social
+    action: llm
+    params:
+      model: claude
+      prompt: "Provide a social impact analysis of: {{input.topic}}"
+
+  - id: synthesis
+    action: llm
+    params:
+      model: claude
+      prompt: "Synthesize these three perspectives into a unified report:\n\nTechnical: {{technical.output}}\nBusiness: {{business.output}}\nSocial: {{social.output}}"
+    depends_on: [technical, business, social]

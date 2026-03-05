@@ -1,0 +1,175 @@
+{
+  "schema": "https://openagents.com/schema/v1",
+  "name": "HL Privateer",
+  "description": "Open Hyperliquid discretionary trading desk. Autonomous agents making discretionary long/short calls. Follow trades, read analysis, copy positions, integrate signals. Pay per call via x402 (USDC on Base).",
+  "url": "https://hlprivateer.xyz",
+  "logo": "https://hlprivateer.xyz/icon.svg",
+  "provider": {
+    "name": "HL Privateer",
+    "url": "https://hlprivateer.xyz"
+  },
+  "capabilities": [
+    "trading-signals",
+    "position-data",
+    "market-analysis",
+    "copy-trading",
+    "risk-monitoring",
+    "real-time-streaming"
+  ],
+  "api": {
+    "type": "rest",
+    "base_url": "https://api.hlprivateer.xyz",
+    "docs": "https://hlprivateer.xyz/skills/api.md",
+    "websocket": "wss://ws.hlprivateer.xyz",
+    "authentication": {
+      "type": "x402",
+      "scheme": "exact",
+      "version": 2,
+      "network": "eip155:8453",
+      "asset": "USDC",
+      "asset_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "facilitator": "https://facilitator.payai.network"
+    }
+  },
+  "endpoints": [
+    {
+      "path": "/v1/agent/stream/snapshot",
+      "method": "GET",
+      "description": "Live desk snapshot: mode, PnL%, health, open positions, recent ops tape",
+      "price": "$0.01",
+      "price_raw": "10000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "stream.read.public"
+    },
+    {
+      "path": "/v1/agent/positions",
+      "method": "GET",
+      "description": "Current open positions with symbols, sides, sizes, entry prices, unrealized PnL",
+      "price": "$0.01",
+      "price_raw": "10000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "command.positions"
+    },
+    {
+      "path": "/v1/agent/orders",
+      "method": "GET",
+      "description": "Open orders currently on the book",
+      "price": "$0.01",
+      "price_raw": "10000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "command.positions"
+    },
+    {
+      "path": "/v1/agent/analysis?latest=true",
+      "method": "GET",
+      "description": "Latest AI strategist analysis with thesis, signals, and confidence",
+      "price": "$0.01",
+      "price_raw": "10000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "analysis.read"
+    },
+    {
+      "path": "/v1/agent/analysis",
+      "method": "GET",
+      "description": "Analysis history (paginated, filterable by correlationId)",
+      "price": "$0.01",
+      "price_raw": "10000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "analysis.read"
+    },
+    {
+      "path": "/v1/agent/insights?scope=market",
+      "method": "GET",
+      "description": "Risk config, signal timeline, account snapshot",
+      "price": "$0.02",
+      "price_raw": "20000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "market.data.read"
+    },
+    {
+      "path": "/v1/agent/insights?scope=ai",
+      "method": "GET",
+      "description": "Full AI dashboard: floor state, risk posture, analysis summary, copy-trade overview",
+      "price": "$0.02",
+      "price_raw": "20000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "agent.insights.read"
+    },
+    {
+      "path": "/v1/agent/copy/trade?kind=signals",
+      "method": "GET",
+      "description": "Audit trail of proposals, analysis outputs, risk decisions, and basket events",
+      "price": "$0.03",
+      "price_raw": "30000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "copy.signals.read"
+    },
+    {
+      "path": "/v1/agent/copy/trade?kind=positions",
+      "method": "GET",
+      "description": "Position data formatted for copy-trading integration",
+      "price": "$0.03",
+      "price_raw": "30000",
+      "price_decimals": 6,
+      "auth": "x402",
+      "capability": "copy.positions.read"
+    },
+    {
+      "path": "/v1/public/pnl",
+      "method": "GET",
+      "description": "Current PnL percentage and runtime mode",
+      "price": "free",
+      "auth": "none"
+    },
+    {
+      "path": "/v1/public/floor-snapshot",
+      "method": "GET",
+      "description": "Public floor snapshot with mode, PnL%, health, account value, positions, ops tape",
+      "price": "free",
+      "auth": "none"
+    },
+    {
+      "path": "/v1/public/floor-tape",
+      "method": "GET",
+      "description": "Recent ops log lines from all agent roles",
+      "price": "free",
+      "auth": "none"
+    },
+    {
+      "path": "/healthz",
+      "method": "GET",
+      "description": "Service health check",
+      "price": "free",
+      "auth": "none"
+    }
+  ],
+  "websocket": {
+    "url": "wss://ws.hlprivateer.xyz",
+    "protocol": "json",
+    "client_messages": ["sub.add", "sub.remove", "cmd.exec", "ping"],
+    "server_messages": ["sub.ack", "event", "cmd.result", "error", "pong"],
+    "event_types": [
+      "market.tick",
+      "strategy.proposal",
+      "risk.decision",
+      "execution.order",
+      "execution.fill",
+      "ui.floor",
+      "payment.entitlement",
+      "system.alert"
+    ]
+  },
+  "runtime_modes": ["INIT", "WARMUP", "READY", "IN_TRADE", "REBALANCE", "HALT", "SAFE_MODE"],
+  "skill_package": "https://hlprivateer.xyz/skills/hl-privateer.md",
+  "llms_txt": "https://hlprivateer.xyz/skills/llms.txt",
+  "api_docs": "https://hlprivateer.xyz/skills/api.md",
+  "x402_guide": "https://hlprivateer.xyz/skills/x402.md"
+}

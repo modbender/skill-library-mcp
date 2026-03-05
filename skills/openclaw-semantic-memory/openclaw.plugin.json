@@ -1,0 +1,102 @@
+{
+  "id": "semantic-memory",
+  "kind": "memory",
+  "name": "Semantic Memory",
+  "version": "1.0.0",
+  "description": "本地语义记忆系统（向量搜索 + Transformers.js，完全本地运行）",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "qdrantUrl": {
+        "type": "string",
+        "description": "Qdrant 服务地址（留空使用内存模式）"
+      },
+      "persistToDisk": {
+        "type": "boolean",
+        "default": true,
+        "description": "Save memories to disk in memory mode (stored in ~/.openclaw-memory/)"
+      },
+      "storagePath": {
+        "type": "string",
+        "description": "Custom storage path for disk persistence (leave empty for default ~/.openclaw-memory/)"
+      },
+      "collectionName": {
+        "type": "string",
+        "default": "openclaw_memories"
+      },
+      "autoCapture": {
+        "type": "boolean",
+        "default": false
+      },
+      "allowPIICapture": {
+        "type": "boolean",
+        "default": false,
+        "description": "Allow capturing text containing PII (emails, phone numbers). Only applies when autoCapture is enabled."
+      },
+      "autoRecall": {
+        "type": "boolean",
+        "default": true
+      },
+      "captureMaxChars": {
+        "type": "number",
+        "minimum": 100,
+        "maximum": 10000,
+        "default": 500
+      },
+      "maxMemorySize": {
+        "type": "number",
+        "minimum": 100,
+        "maximum": 1000000,
+        "default": 1000,
+        "description": "Maximum number of memories in in-memory mode. Set to 999999 for unlimited (oldest memories are auto-deleted when limit is reached, except when set to 999999)"
+      }
+    }
+  },
+  "uiHints": {
+    "qdrantUrl": {
+      "label": "Qdrant URL",
+      "placeholder": "Leave empty for in-memory mode (zero config)",
+      "advanced": true,
+      "help": "External Qdrant server URL. Leave empty to use in-memory storage."
+    },
+    "persistToDisk": {
+      "label": "Persist to Disk",
+      "help": "Save memories to disk in memory mode. Data will be stored in ~/.openclaw-memory/ and survive restarts. Only applies when Qdrant URL is empty."
+    },
+    "storagePath": {
+      "label": "Storage Path",
+      "placeholder": "~/.openclaw-memory/",
+      "help": "Custom directory for storing memories. Leave empty to use default (~/.openclaw-memory/). Only applies when persistToDisk is enabled.",
+      "advanced": true
+    },
+    "collectionName": {
+      "label": "Collection Name",
+      "placeholder": "openclaw_memories",
+      "advanced": true
+    },
+    "autoCapture": {
+      "label": "Auto Capture",
+      "help": "⚠️ PRIVACY: Auto-save conversation content. Text containing PII (emails, phone numbers) will be skipped unless 'Allow PII Capture' is enabled. Disabled by default for privacy."
+    },
+    "allowPIICapture": {
+      "label": "Allow PII Capture",
+      "help": "⚠️ PRIVACY RISK: Allow capturing text with emails/phone numbers when autoCapture is enabled. Only enable if you understand the privacy implications. Requires autoCapture to be enabled.",
+      "advanced": true
+    },
+    "autoRecall": {
+      "label": "Auto Recall",
+      "help": "Auto-inject relevant memories before conversations"
+    },
+    "captureMaxChars": {
+      "label": "Capture Max Length",
+      "help": "Maximum characters per captured memory",
+      "advanced": true
+    },
+    "maxMemorySize": {
+      "label": "Max Memory Size (In-Memory Mode)",
+      "help": "Maximum number of memories stored in in-memory mode. When limit is reached, oldest memories are automatically deleted (LRU eviction). Set to 999999 for unlimited storage. Only applies to in-memory mode, not external Qdrant.",
+      "advanced": true
+    }
+  }
+}

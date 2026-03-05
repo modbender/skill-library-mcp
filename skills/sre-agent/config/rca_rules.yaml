@@ -1,0 +1,226 @@
+# Root Cause Analysis Rules
+# These rules define common failure patterns and their root causes
+
+rules:
+  # High Latency Rules
+  - id: high_latency_cpu
+    name: High Latency due to CPU Saturation
+    condition:
+      primary_metric: "api_latency_p99"
+      primary_threshold: 0.5  # seconds
+      correlated_metrics:
+        - metric: "cpu_usage"
+          threshold: 0.85
+          correlation: positive
+    root_cause: "CPU saturation causing increased latency"
+    remediation:
+      - action: hpa_scale
+        target: deployment
+        priority: 1
+    severity: high
+
+  - id: high_latency_memory
+    name: High Latency due to Memory Pressure
+    condition:
+      primary_metric: "api_latency_p99"
+      primary_threshold: 0.5
+      correlated_metrics:
+        - metric: "memory_usage"
+          threshold: 0.9
+          correlation: positive
+    root_cause: "Memory pressure causing garbage collection pauses"
+    remediation:
+      - action: pod_restart
+        target: pod
+        priority: 1
+      - action: hpa_scale
+        target: deployment
+        priority: 2
+    severity: high
+
+  - id: high_latency_db
+    name: High Latency due to Database Slowdown
+    condition:
+      primary_metric: "api_latency_p99"
+      primary_threshold: 0.5
+      correlated_metrics:
+        - metric: "db_query_latency_p99"
+          threshold: 0.2
+          correlation: positive
+    root_cause: "Database query slowdown affecting API latency"
+    remediation:
+      - action: investigate
+        target: database
+        priority: 1
+    severity: high
+
+  # Trading Engine Rules
+  - id: order_latency_queue
+    name: Order Latency due to Queue Backlog
+    condition:
+      primary_metric: "order_latency_p99"
+      primary_threshold: 0.1
+      correlated_metrics:
+        - metric: "queue_depth"
+          threshold: 1000
+          correlation: positive
+    root_cause: "Message queue backlog causing order processing delays"
+    remediation:
+      - action: hpa_scale
+        target: consumer
+        priority: 1
+    severity: critical
+
+  - id: order_latency_matching
+    name: Order Latency due to Matching Engine
+    condition:
+      primary_metric: "order_latency_p99"
+      primary_threshold: 0.1
+      correlated_metrics:
+        - metric: "matching_latency_p99"
+          threshold: 0.05
+          correlation: positive
+    root_cause: "Matching engine slowdown affecting order processing"
+    remediation:
+      - action: investigate
+        target: matching-engine
+        priority: 1
+    severity: critical
+
+  # Error Rate Rules
+  - id: error_rate_upstream
+    name: High Error Rate due to Upstream Failure
+    condition:
+      primary_metric: "api_error_rate"
+      primary_threshold: 0.05
+      correlated_metrics:
+        - metric: "upstream_error_rate"
+          threshold: 0.1
+          correlation: positive
+    root_cause: "Upstream service failures causing cascading errors"
+    remediation:
+      - action: circuit_breaker
+        target: upstream
+        priority: 1
+    severity: high
+
+  - id: error_rate_timeout
+    name: High Error Rate due to Timeouts
+    condition:
+      primary_metric: "api_error_rate"
+      primary_threshold: 0.05
+      log_patterns:
+        - "timeout"
+        - "deadline exceeded"
+    root_cause: "Timeout errors due to slow downstream services"
+    remediation:
+      - action: investigate
+        target: downstream
+        priority: 1
+    severity: medium
+
+  # Resource Exhaustion Rules
+  - id: oom_killed
+    name: OOMKilled Pod
+    condition:
+      event_type: "OOMKilled"
+      frequency: 2  # times in 30 minutes
+    root_cause: "Pod killed due to memory limit exceeded"
+    remediation:
+      - action: pod_restart
+        target: pod
+        priority: 1
+      - action: adjust_limits
+        target: deployment
+        priority: 2
+    severity: high
+
+  - id: disk_pressure
+    name: Disk Pressure
+    condition:
+      primary_metric: "disk_usage"
+      primary_threshold: 0.9
+    root_cause: "Disk space running low"
+    remediation:
+      - action: cleanup
+        target: disk
+        priority: 1
+    severity: medium
+
+  # Network Rules
+  - id: network_partition
+    name: Network Partition
+    condition:
+      primary_metric: "network_errors"
+      primary_threshold: 100
+      correlated_metrics:
+        - metric: "pod_not_ready_count"
+          threshold: 3
+          correlation: positive
+    root_cause: "Network issues causing connectivity problems"
+    remediation:
+      - action: investigate
+        target: network
+        priority: 1
+    severity: critical
+
+  # Deployment Rules
+  - id: deployment_regression
+    name: Performance Regression after Deployment
+    condition:
+      primary_metric: "api_latency_p99"
+      primary_threshold: 0.5
+      recent_events:
+        - type: "deployment"
+          within_minutes: 30
+    root_cause: "Recent deployment causing performance regression"
+    remediation:
+      - action: deployment_rollback
+        target: deployment
+        priority: 1
+    severity: high
+
+  - id: config_change_issue
+    name: Issue after Config Change
+    condition:
+      primary_metric: "api_error_rate"
+      primary_threshold: 0.05
+      recent_events:
+        - type: "configmap_update"
+          within_minutes: 15
+    root_cause: "Recent configuration change causing issues"
+    remediation:
+      - action: config_rollback
+        target: configmap
+        priority: 1
+    severity: high
+
+# Correlation patterns for multi-metric analysis
+correlations:
+  - name: latency_cpu_correlation
+    metrics:
+      - api_latency_p99
+      - cpu_usage
+    expected_correlation: positive
+    lag_minutes: 0
+
+  - name: latency_memory_correlation
+    metrics:
+      - api_latency_p99
+      - memory_usage
+    expected_correlation: positive
+    lag_minutes: 0
+
+  - name: error_rate_latency_correlation
+    metrics:
+      - api_error_rate
+      - api_latency_p99
+    expected_correlation: positive
+    lag_minutes: 1
+
+  - name: queue_latency_correlation
+    metrics:
+      - queue_depth
+      - order_latency_p99
+    expected_correlation: positive
+    lag_minutes: 2

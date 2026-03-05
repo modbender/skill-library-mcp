@@ -1,0 +1,48 @@
+{
+  "id": "openclaw-model-orchestrator",
+  "name": "OpenClaw Model Orchestrator",
+  "version": "0.1.0",
+  "description": "Multi-LLM orchestration: fan-out, pipeline, and consensus patterns with AAHP-inspired handoffs. Dispatch tasks across 40+ models from chat.",
+  "entry": "index.ts",
+  "type": "extension",
+  "configSchema": {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "config": {
+    "enabled": true,
+    "defaultPlanner": "copilot-opus",
+    "defaultReviewer": "copilot-sonnet46",
+    "defaultWorkers": ["copilot52c", "grokfast", "copilot51"],
+    "maxConcurrent": 4,
+    "handoffFormat": "aahp-v3",
+    "taskProfiles": {
+      "coding": {
+        "planner": "copilot-opus",
+        "workers": ["copilot52c", "grokfast"],
+        "reviewer": "copilot-sonnet46"
+      },
+      "research": {
+        "planner": "gemini25",
+        "workers": ["gemini-flash", "copilot-flash"],
+        "reviewer": "copilot-opus"
+      },
+      "security": {
+        "planner": "copilot-opus",
+        "workers": ["copilot-sonnet46", "gemini25"],
+        "reviewer": "sonnet"
+      },
+      "review": {
+        "planner": "copilot-opus",
+        "workers": ["copilot-sonnet46", "copilot-sonnet"],
+        "reviewer": "copilot-opus"
+      },
+      "bulk": {
+        "planner": "haiku",
+        "workers": ["copilot-flash", "gemini25-flash", "gpt5mini"],
+        "reviewer": "haiku"
+      }
+    }
+  }
+}
+}

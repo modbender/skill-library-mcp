@@ -1,0 +1,170 @@
+# Feishu Automation Configuration
+# Copy this file to config.yaml and customize for your environment
+
+feishu:
+  # App credentials (from Feishu developer console)
+  app_id: "cli_xxxxxxxx"
+  app_secret: "xxxxxxxxxxxxxxxxxxxxxxxx"
+  
+  # Default tokens (optional, can be overridden per operation)
+  default_folder_token: "fldcnxxxxxxxxxxxx"
+  default_space_id: "xxxxxxxx"
+  
+  # API settings
+  api_timeout: 30  # seconds
+  max_retries: 3
+  retry_delay: 2   # seconds (exponential backoff base)
+
+automation:
+  # Batch processing
+  batch_size: 10
+  max_concurrent: 5
+  
+  # Scheduling
+  timezone: "Asia/Shanghai"
+  business_hours_start: "09:00"
+  business_hours_end: "18:00"
+  
+  # Notification settings
+  notify_on_success: true
+  notify_on_failure: true
+  notification_channel: "feishu_chat"  # or "email", "slack"
+
+templates:
+  # Paths to template files (relative to skill directory)
+  weekly_report: "assets/templates/weekly_report.md"
+  meeting_notes: "assets/templates/meeting_notes.md"
+  project_status: "assets/templates/project_status.md"
+  
+  # Default variables
+  default_variables:
+    company_name: "Your Company"
+    department: "Your Department"
+    report_contact: "automation@example.com"
+
+bitable:
+  # Bitable connections
+  connections:
+    tasks:
+      app_token: "basxxxxxxxxxxxx"
+      table_id: "tblxxxxxxxxxxxx"
+      name_field: "Task Name"
+      status_field: "Status"
+      
+    metrics:
+      app_token: "basxxxxxxxxxxxx"
+      table_id: "tblyyyyyyyyyyyy"
+      name_field: "Metric Name"
+      value_field: "Value"
+    
+    projects:
+      app_token: "baszzzzzzzzzzzz"
+      table_id: "tblzzzzzzzzzzzz"
+      name_field: "Project Name"
+      status_field: "Project Status"
+
+workflows:
+  # Predefined workflows
+  weekly_report:
+    enabled: true
+    schedule: "0 9 * * 1"  # Monday 9 AM
+    bitable_connection: "tasks"
+    template: "weekly_report"
+    output_folder: "fldcnreports"
+    recipients: ["ou_user1", "ou_user2"]
+    
+  daily_standup:
+    enabled: false
+    schedule: "0 10 * * 1-5"  # Weekdays 10 AM
+    template: "meeting_notes"
+    output_folder: "fldcnmeetings"
+    
+  project_review:
+    enabled: true
+    schedule: "0 16 * * 5"  # Friday 4 PM
+    bitable_connection: "projects"
+    template: "project_status"
+    output_folder: "fldcnprojects"
+
+logging:
+  # Logging configuration
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/feishu_automation.log"
+  max_size: "10MB"
+  backup_count: 5
+  
+  # Structured logging
+  json_format: false
+  include_timestamps: true
+
+security:
+  # Security settings
+  encrypt_sensitive_data: true
+  mask_tokens_in_logs: true
+  audit_all_operations: true
+  
+  # Access control
+  allowed_users: ["ou_admin1", "ou_admin2"]
+  allowed_ips: ["192.168.1.0/24", "10.0.0.0/8"]
+
+backup:
+  # Backup configuration
+  enabled: true
+  schedule: "0 2 * * *"  # Daily 2 AM
+  retention_days: 30
+  backup_locations:
+    - "local:./backups"
+    # - "s3:bucket-name/feishu-backups"
+  
+  # What to backup
+  backup_wiki: true
+  backup_documents: true
+  backup_bitables: false  # Note: Bitable backup requires export
+
+monitoring:
+  # Health checks
+  health_check_interval: 300  # seconds
+  
+  # Alerting
+  alerts:
+    - condition: "error_rate > 10%"
+      action: "notify_admin"
+      
+    - condition: "api_latency > 5000"
+      action: "reduce_load"
+      
+    - condition: "rate_limit_usage > 80%"
+      action: "pause_non_essential"
+  
+  # Metrics collection
+  collect_metrics: true
+  metrics_port: 9090  # Prometheus metrics endpoint
+
+integration:
+  # External integrations
+  slack:
+    webhook_url: "https://hooks.slack.com/services/xxx"
+    channel: "#automation-alerts"
+    
+  email:
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    sender: "automation@example.com"
+    
+  webhooks:
+    - name: "project_management"
+      url: "https://api.example.com/webhook/feishu"
+      secret: "xxxxxxxx"
+
+# Environment-specific overrides
+# Use environment variables to override sensitive values
+# Example: export FEISHU_APP_SECRET="actual_secret"
+
+# To use this configuration:
+# 1. Copy to config.yaml in your working directory
+# 2. Update with your actual values
+# 3. Set environment variables for sensitive data
+# 4. Reference in scripts using config.get('feishu.app_id')
+
+# Note: Never commit actual secrets to version control!
+# Use environment variables or secret management tools.

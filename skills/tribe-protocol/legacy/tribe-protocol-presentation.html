@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tribe Protocol - Design Presentation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Tribe Protocol - Design Presentation</h1>
+</header>
+<h1 id="tribe-protocol---design-presentation">Tribe Protocol - Design
+Presentation</h1>
+<p><strong>Decentralized Trust &amp; Collaboration for AI
+Agents</strong></p>
+<hr />
+<h2 id="problem-statement">🎯 Problem Statement</h2>
+<p><strong>Current state:</strong> Bot-bot collaboration is clunky - Too
+formal (asking permission for everything) - No trust framework (treat
+everyone as stranger) - No persistent identity across platforms - Manual
+coordination overhead</p>
+<p><strong>Goal:</strong> Seamless collaboration between trusted bots +
+humans - Recognize tribe members across platforms - Automatic
+trust-based behavior - Secure, decentralized (no central server) -
+Privacy-first (everyone owns their data)</p>
+<hr />
+<h2 id="core-architecture">🏗️ Core Architecture</h2>
+<h3 id="two-key-system">Two-Key System</h3>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│                  IDENTITY LAYER                         │
+│  Individual Keypair (Ed25519)                          │
+│  - Proves WHO you are (Cheenu, Chhotu, Yajat, etc.)   │
+│  - Your personal DID: did:tribe:cheenu:abc123          │
+│  - Never shared                                         │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│                 MEMBERSHIP LAYER                        │
+│  Tribe Keypair (Ed25519)                               │
+│  - Proves you&#39;re IN THE TRIBE                          │
+│  - Shared secret among tribe members only              │
+│  - Used for authentication                              │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│                 COMMUNICATION LAYER                     │
+│  Session Keys (Diffie-Hellman → AES)                   │
+│  - Fast symmetric encryption                            │
+│  - 24h expiry, auto-renew                              │
+│  - Pairwise (Alice ↔ Bob)                              │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="four-trust-tiers">Four Trust Tiers</h3>
+<pre><code>┌──────────────────────────────────────────────────────────┐
+│ Tier 4: MY HUMAN                                         │
+│ - Special relationship (USER.md defines it)              │
+│ - Example: Nag for Cheenu, Yajat for Chhotu            │
+│ - Full trust, but respects their privacy boundaries     │
+└──────────────────────────────────────────────────────────┘
+                          ↓
+┌──────────────────────────────────────────────────────────┐
+│ Tier 3: TRIBE MEMBERS (Humans + Bots)                   │
+│ - Trusted collaborators                                  │
+│ - Direct communication, share work freely                │
+│ - Respect personal data boundaries                       │
+│ - Examples: Yajat, Chhotu, other tribe bots             │
+└──────────────────────────────────────────────────────────┘
+                          ↓
+┌──────────────────────────────────────────────────────────┐
+│ Tier 2: ACQUAINTANCES                                    │
+│ - Known but not trusted                                  │
+│ - Polite but bounded interaction                         │
+│ - No information sharing                                 │
+└──────────────────────────────────────────────────────────┘
+                          ↓
+┌──────────────────────────────────────────────────────────┐
+│ Tier 1: STRANGERS                                        │
+│ - Unknown entities                                       │
+│ - Avoid/ignore, approach with caution                    │
+│ - Minimal engagement                                     │
+└──────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="handshake-flow">🔄 Handshake Flow</h2>
+<h3 id="scenario-yajat-joins-nags-tribe-discclawd-core">Scenario: Yajat
+joins Nag’s tribe “DiscClawd Core”</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Y as Yajat
+    participant C as Chhotu (Yajat&#39;s bot)
+    participant Ch as Cheenu (Nag&#39;s bot)
+    participant N as Nag (Founder)
+    
+    Note over N: Step 1: Tribe Creation
+    N-&gt;&gt;Ch: tribe create --name &quot;DiscClawd Core&quot;
+    Ch-&gt;&gt;Ch: Generate tribe keypair
+    Ch-&gt;&gt;Ch: Create TRIBE.md (Nag as Tier 4)
+    Ch--&gt;&gt;N: ✅ Tribe created&lt;br/&gt;ID: tribe:discclawd-core:abc123
+    
+    Note over Y,C: Step 2: Join Request
+    Y-&gt;&gt;C: tribe join --tribe-id abc123
+    C-&gt;&gt;Ch: Join request + Yajat&#39;s DID + Public Key
+    Ch-&gt;&gt;N: 📬 Join request from Yajat&lt;br/&gt;Approve at Tier 3? [y/N]
+    
+    Note over N,Ch: Step 3: Approval &amp; Handshake
+    N-&gt;&gt;Ch: yes (approve)
+    Ch-&gt;&gt;C: Challenge: Sign this nonce [random_XYZ]
+    C-&gt;&gt;C: Sign nonce with private key
+    C-&gt;&gt;Ch: Signed challenge
+    Ch-&gt;&gt;Ch: Verify signature ✅
+    
+    Note over Ch,C: Step 4: Tribe Key Transfer
+    Ch-&gt;&gt;Ch: Encrypt tribe private key&lt;br/&gt;with Yajat&#39;s public key
+    Ch-&gt;&gt;C: Encrypted tribe key package
+    C-&gt;&gt;C: Decrypt with private key
+    C-&gt;&gt;C: Store tribe key securely
+    C--&gt;&gt;Y: ✅ Joined tribe! (Tier 3)
+    
+    Note over Ch,C: Step 5: Announcement
+    Ch-&gt;&gt;Ch: Update TRIBE.md (add Yajat)
+    C-&gt;&gt;C: Update TRIBE.md (add all members)
+    Ch-&gt;&gt;N: ✅ Yajat added to tribe</code></pre>
+<hr />
+<h2 id="session-establishment">🔐 Session Establishment</h2>
+<h3 id="when-two-tribe-members-first-communicate">When two tribe members
+first communicate</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Ch as Cheenu
+    participant C as Chhotu
+    
+    Note over Ch,C: Both already have tribe key
+    
+    Ch-&gt;&gt;C: Session request&lt;br/&gt;+ Challenge nonce&lt;br/&gt;+ DH public param&lt;br/&gt;+ Signed with tribe key + Cheenu key
+    
+    Note over C: Verify dual signatures
+    C-&gt;&gt;C: ✅ Tribe signature valid (is member)
+    C-&gt;&gt;C: ✅ Individual signature valid (is Cheenu)
+    
+    C-&gt;&gt;Ch: Session response&lt;br/&gt;+ Challenge echo&lt;br/&gt;+ DH public param&lt;br/&gt;+ Signed with tribe key + Chhotu key
+    
+    Note over Ch,C: Both compute shared secret via DH
+    Ch-&gt;&gt;Ch: sessionKey = DH(myPrivate, theirPublic)
+    C-&gt;&gt;C: sessionKey = DH(myPrivate, theirPublic)
+    
+    Note over Ch,C: Same key on both sides!
+    Ch-&gt;&gt;Ch: Store session (expires in 24h)
+    C-&gt;&gt;C: Store session (expires in 24h)
+    
+    Note over Ch,C: ✅ Session established</code></pre>
+<hr />
+<h2 id="message-flow-after-session-established">💬 Message Flow (After
+Session Established)</h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Ch as Cheenu
+    participant C as Chhotu
+    
+    Note over Ch: Want to send: &quot;Hey, check out the prototype!&quot;
+    
+    Ch-&gt;&gt;Ch: Encrypt message with session key (AES)
+    Ch-&gt;&gt;Ch: Generate HMAC for integrity
+    
+    Ch-&gt;&gt;C: {&lt;br/&gt;  from: did:tribe:cheenu,&lt;br/&gt;  to: did:tribe:chhotu,&lt;br/&gt;  encrypted: &quot;...&quot;,&lt;br/&gt;  hmac: &quot;...&quot;&lt;br/&gt;}
+    
+    C-&gt;&gt;C: Verify HMAC ✅
+    C-&gt;&gt;C: Decrypt with session key
+    C-&gt;&gt;C: Process: &quot;Hey, check out the prototype!&quot;
+    
+    Note over C: Send reply
+    C-&gt;&gt;C: Encrypt reply with session key
+    C-&gt;&gt;Ch: {encrypted reply + hmac}
+    
+    Ch-&gt;&gt;Ch: Verify + Decrypt
+    Ch-&gt;&gt;Ch: Process reply
+    
+    Note over Ch,C: Fast! No expensive signing, just symmetric crypto</code></pre>
+<h3 id="session-renewal-before-24h-expiry">Session Renewal (Before 24h
+Expiry)</h3>
+<pre class="mermaid"><code>graph LR
+    A[Session expires in &lt;1h] --&gt; B[Initiate re-auth]
+    B --&gt; C[New DH exchange]
+    C --&gt; D[New session key]
+    D --&gt; E[Old key deleted]
+    E --&gt; F[Continue messaging]</code></pre>
+<hr />
+<h2 id="trust-tier-decision-flow">🤔 Trust Tier Decision Flow</h2>
+<h3 id="how-ai-decides-how-to-behave">How AI decides how to behave</h3>
+<pre class="mermaid"><code>graph TD
+    A[Message received] --&gt; B{Who is sender?}
+    B --&gt;|Check TRIBE.md| C{DID/handle match?}
+    
+    C --&gt;|No match| D[Tier 1: Stranger]
+    D --&gt; D1[Avoid/ignore&lt;br/&gt;Minimal engagement]
+    
+    C --&gt;|Match found| E{What tier?}
+    
+    E --&gt;|Tier 4| F[My Human]
+    F --&gt; F1[Follow USER.md guidance&lt;br/&gt;Respect privacy boundaries]
+    
+    E --&gt;|Tier 3| G[Tribe Member]
+    G --&gt; G1{Multi-party channel?}
+    G1 --&gt;|Yes| G2{Lowest tier in channel?}
+    G2 --&gt;|Stranger present| D1
+    G2 --&gt;|All Tier 3+| G3[Collaborate directly&lt;br/&gt;Share work freely&lt;br/&gt;Skip formalities]
+    G1 --&gt;|No, DM| G3
+    
+    E --&gt;|Tier 2| H[Acquaintance]
+    H --&gt; H1[Polite but bounded&lt;br/&gt;No info sharing]
+    
+    style F fill:#90EE90
+    style G3 fill:#87CEEB
+    style H1 fill:#FFD700
+    style D1 fill:#FFB6C1</code></pre>
+<hr />
+<h2 id="security-properties">🛡️ Security Properties</h2>
+<h3 id="challenge-response-authentication">Challenge-Response
+Authentication</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant A as Alice
+    participant B as Bob (claims to be Bob)
+    
+    A-&gt;&gt;B: Prove you&#39;re Bob&lt;br/&gt;Sign this: [random_nonce_XYZ]
+    
+    alt Bob has private key
+        B-&gt;&gt;B: Sign nonce with private key
+        B-&gt;&gt;A: Signature
+        A-&gt;&gt;A: Verify with Bob&#39;s public key ✅
+        Note over A: It&#39;s really Bob!
+    else Imposter
+        B-&gt;&gt;B: Can&#39;t sign (no private key)
+        B-&gt;&gt;A: (no valid signature)
+        A-&gt;&gt;A: Verification fails ❌
+        Note over A: Not Bob, reject!
+    end</code></pre>
+<h3 id="membership-verification-dual-signatures">Membership Verification
+(Dual Signatures)</h3>
+<p>Every protocol message has TWO signatures:</p>
+<pre><code>┌─────────────────────────────────────────────────┐
+│  Message                                        │
+│  ┌──────────────────────────────────────────┐  │
+│  │ Payload: &quot;Let&#39;s collaborate on X&quot;       │  │
+│  └──────────────────────────────────────────┘  │
+│                                                 │
+│  Signature 1: Tribe Key                        │
+│  → Proves: &quot;I am a tribe member&quot;               │
+│                                                 │
+│  Signature 2: Individual Key                   │
+│  → Proves: &quot;I am specifically Cheenu&quot;          │
+└─────────────────────────────────────────────────┘</code></pre>
+<p><strong>Why both?</strong> - Tribe signature → can’t participate
+without tribe key - Individual signature → know WHO in tribe sent it</p>
+<hr />
+<h2 id="skill-package-structure">📦 Skill Package Structure</h2>
+<pre><code>tribe-protocol/
+├── SKILL.md                    # AI instructions
+│   └── Frontmatter triggers on:
+│       - &quot;tribe&quot;, &quot;bot collaboration&quot;
+│       - &quot;trust tiers&quot;, &quot;handshake&quot;
+│       - Setting up multi-bot work
+│
+├── scripts/                    # CLI tools
+│   ├── tribe                   # Main command
+│   ├── tribe-init.js           # Generate identity
+│   ├── tribe-create.js         # Create tribe
+│   ├── tribe-join.js           # Join tribe
+│   ├── tribe-handshake.js      # Perform handshake
+│   ├── tribe-session.js        # Manage sessions
+│   └── lib/
+│       ├── crypto.js           # Ed25519, DH, AES
+│       ├── did.js              # DID generation
+│       ├── storage.js          # Secure key storage
+│       └── protocol.js         # Message handlers
+│
+├── references/                 # Loaded as needed
+│   ├── protocol-spec.md        # Full specification
+│   ├── security-model.md       # Threat model
+│   └── handshake-flow.md       # Detailed walkthrough
+│
+├── assets/                     # Templates
+│   └── TRIBE.template.md
+│
+└── schemas/                    # JSON validation
+    ├── did-document.schema.json
+    └── protocol-message.schema.json</code></pre>
+<hr />
+<h2 id="installation-usage-flow">🚀 Installation &amp; Usage Flow</h2>
+<h3 id="user-journey">User Journey</h3>
+<pre class="mermaid"><code>graph TD
+    A[Install skill] --&gt;|clawdhub install tribe-protocol| B[Skill downloaded]
+    B --&gt; C[Initialize identity]
+    C --&gt;|tribe init| D[Keypair generated&lt;br/&gt;DID created]
+    
+    D --&gt; E{Role?}
+    
+    E --&gt;|Founder| F[Create tribe]
+    F --&gt;|tribe create --name &#39;X&#39;| G[Tribe keypair generated&lt;br/&gt;TRIBE.md created]
+    G --&gt; H[Share tribe ID with others]
+    
+    E --&gt;|Member| I[Request to join]
+    I --&gt;|tribe join --tribe-id X| J[Send join request]
+    J --&gt; K[Founder approves]
+    K --&gt; L[Handshake performed]
+    L --&gt; M[Tribe key received]
+    M --&gt; N[TRIBE.md updated]
+    
+    H --&gt; O[Both can now collaborate]
+    N --&gt; O
+    
+    O --&gt; P[Session keys auto-established]
+    P --&gt; Q[Encrypted communication]
+    
+    style B fill:#E6F3FF
+    style G fill:#90EE90
+    style M fill:#90EE90
+    style Q fill:#FFD700</code></pre>
+<h3 id="file-locations">File Locations</h3>
+<pre><code>User&#39;s machine:
+│
+├── ~/clawd/                              # Workspace
+│   ├── TRIBE.md                         # Human-readable roster (AI reads)
+│   └── skills/tribe-protocol/           # Skill package (read-only)
+│
+└── ~/.clawdbot/tribes/                  # Private data (secure)
+    ├── keys/
+    │   ├── private.key                  # Identity (0600 permissions)
+    │   └── public.key
+    ├── my-did.json                      # My DID document
+    └── tribes/
+        └── discclawd-core/
+            ├── manifest.json            # Tribe metadata
+            ├── private.key              # Tribe key (0600)
+            ├── members.json             # Member list
+            └── sessions/                # Session keys
+                ├── yajat.session
+                └── chhotu.session</code></pre>
+<p><strong>Security:</strong> - Private keys never in workspace (can’t
+accidentally commit) - TRIBE.md is read-only for AI (only scripts
+modify) - Session keys auto-cleanup after 24h</p>
+<hr />
+<h2 id="how-ai-uses-this-day-to-day">🎭 How AI Uses This
+(Day-to-Day)</h2>
+<h3 id="scenario-message-arrives-in-discord">Scenario: Message arrives
+in Discord</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Identify sender</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> sender <span class="op">=</span> message<span class="op">.</span><span class="at">author</span><span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> senderDID <span class="op">=</span> <span class="fu">lookupDID</span>(sender)<span class="op">;</span>  <span class="co">// From TRIBE.md</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Check trust tier</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> channel <span class="op">=</span> message<span class="op">.</span><span class="at">channel</span><span class="op">;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> tier <span class="op">=</span> <span class="fu">getTrustTier</span>(senderDID<span class="op">,</span> channel)<span class="op">;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Adjust behavior</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="cf">switch</span> (tier) {</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="dv">4</span><span class="op">:</span> <span class="co">// My human</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Follow USER.md guidance</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Can share their public info if they consent</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="dv">3</span><span class="op">:</span> <span class="co">// Tribe member</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Direct, collaborative</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Share my work freely</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Respect their personal data</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Auto-establish session if needed</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sendCollaborativeResponse</span>()<span class="op">;</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="dv">2</span><span class="op">:</span> <span class="co">// Acquaintance</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Polite but bounded</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// No info sharing</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sendPoliteResponse</span>()<span class="op">;</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="dv">1</span><span class="op">:</span> <span class="co">// Stranger</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Minimal engagement</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Avoid interaction</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sendMinimalResponse</span>()<span class="op">;</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="lowest-tier-channel-rule">Lowest-Tier Channel Rule</h3>
+<pre class="mermaid"><code>graph TD
+    A[Channel has multiple people] --&gt; B{Check all members}
+    B --&gt; C[Find lowest trust tier]
+    
+    C --&gt; D{Lowest tier?}
+    D --&gt;|All Tier 3+| E[Tier 3 mode: Collaborate freely]
+    D --&gt;|Any Tier 2| F[Tier 2 mode: Polite but bounded]
+    D --&gt;|Any Tier 1| G[Tier 1 mode: Public space, careful]
+    
+    style E fill:#90EE90
+    style F fill:#FFD700
+    style G fill:#FFB6C1</code></pre>
+<p><strong>Prevents info leaks:</strong> One untrusted person = whole
+channel becomes untrusted space</p>
+<hr />
+<h2 id="scalability">⚡ Scalability</h2>
+<h3 id="problem-n-members-n²-handshakes">Problem: N members = N²
+handshakes?</h3>
+<p><strong>NO!</strong> We use <strong>transitive trust + shared tribe
+key</strong></p>
+<pre class="mermaid"><code>graph TD
+    subgraph &quot;Naive Approach (N² problem)&quot;
+    A1[Alice] ---|handshake| B1[Bob]
+    A1 ---|handshake| C1[Charlie]
+    B1 ---|handshake| C1
+    end
+    
+    subgraph &quot;Tribe Protocol (N handshakes)&quot;
+    N[Nag&lt;br/&gt;Founder] ---|1. handshake&lt;br/&gt;gives tribe key| A[Alice]
+    N ---|2. handshake&lt;br/&gt;gives tribe key| B[Bob]
+    N ---|3. handshake&lt;br/&gt;gives tribe key| C[Charlie]
+    
+    A -.lightweight&lt;br/&gt;session setup.-&gt; B
+    B -.lightweight&lt;br/&gt;session setup.-&gt; C
+    A -.lightweight&lt;br/&gt;session setup.-&gt; C
+    end
+    
+    style N fill:#90EE90</code></pre>
+<p><strong>How it works:</strong> 1. <strong>Founder handshakes with
+each member</strong> (gives them tribe key) 2. <strong>Members recognize
+each other</strong> (both have tribe key = both in tribe) 3.
+<strong>Session establishment is lightweight</strong> (just DH exchange,
+no full handshake)</p>
+<p><strong>Result:</strong> - 3 members = 3 handshakes (not 6) - 10
+members = 10 handshakes (not 90) - 100 members = 100 handshakes (not
+9,900)</p>
+<hr />
+<h2 id="privacy-boundaries">🔒 Privacy Boundaries</h2>
+<h3 id="what-ai-can-share-by-tier">What AI Can Share (By Tier)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│ TIER 4 (My Human)                                       │
+├─────────────────────────────────────────────────────────┤
+│ ✅ CAN SHARE (with their consent):                      │
+│   - Anything they explicitly approve                    │
+│   - Public info they&#39;ve shared                          │
+│                                                          │
+│ 🔒 PROTECTED (never without permission):                │
+│   - USER.md contents                                    │
+│   - MEMORY.md contents                                  │
+│   - Personal details (location, family, etc.)           │
+│   - Private conversations                               │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ TIER 3 (Tribe Members)                                  │
+├─────────────────────────────────────────────────────────┤
+│ ✅ CAN SHARE:                                            │
+│   - My work (code, research, prototypes)                │
+│   - Technical learnings                                 │
+│   - Project progress                                    │
+│   - Public info about projects                          │
+│                                                          │
+│ 🔒 PROTECTED:                                            │
+│   - My human&#39;s personal data                            │
+│   - Other humans&#39; data (without consent)                │
+│   - USER.md / MEMORY.md                                 │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ TIER 2 (Acquaintances)                                  │
+├─────────────────────────────────────────────────────────┤
+│ ✅ CAN SHARE:                                            │
+│   - Public pleasantries only                            │
+│                                                          │
+│ 🔒 PROTECTED:                                            │
+│   - Everything else                                     │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ TIER 1 (Strangers)                                      │
+├─────────────────────────────────────────────────────────┤
+│ ✅ CAN SHARE:                                            │
+│   - Nothing                                             │
+│                                                          │
+│ 🔒 PROTECTED:                                            │
+│   - Everything                                          │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Key principle:</strong> Everyone owns their own data. Tribe
+trust is between AGENTS, not about exposing humans’ lives.</p>
+<hr />
+<h2 id="implementation-timeline">📅 Implementation Timeline</h2>
+<pre class="mermaid"><code>gantt
+    title Tribe Protocol Development
+    dateFormat YYYY-MM-DD
+    section Phase 1
+    Core Crypto + CLI           :p1, 2026-02-01, 7d
+    section Phase 2
+    Handshake Protocol          :p2, after p1, 7d
+    section Phase 3
+    Session Management          :p3, after p2, 7d
+    section Phase 4
+    AI Integration              :p4, after p3, 7d
+    section Phase 5
+    Production Hardening        :p5, after p4, 7d
+    section Release
+    Package &amp; Publish           :p6, after p5, 3d</code></pre>
+<h3 id="week-by-week-deliverables">Week-by-Week Deliverables</h3>
+<p><strong>Week 1: Core Crypto + CLI Foundation</strong> - ✅ Crypto
+library (Ed25519, DH, AES) - ✅ <code>tribe init</code> (generate
+identity) - ✅ <code>tribe create</code> (create tribe) - ✅ Secure
+storage</p>
+<p><strong>Week 2: Handshake Protocol</strong> - ✅
+<code>tribe join</code> (request join) - ✅ <code>tribe approve</code>
+(founder approves) - ✅ Challenge-response - ✅ Tribe key transfer</p>
+<p><strong>Week 3: Session Management</strong> - ✅
+<code>tribe session</code> (establish session) - ✅ DH key exchange - ✅
+24h expiry + auto-renewal - ✅ Message encryption/decryption</p>
+<p><strong>Week 4: AI Integration</strong> - ✅ SKILL.md (complete
+instructions) - ✅ AGENTS.md integration (trust tier checking) - ✅
+Auto-session establishment - ✅ Privacy boundary enforcement</p>
+<p><strong>Week 5: Production Hardening</strong> - ✅ Error handling +
+logging - ✅ Schema validation - ✅ Tribe key rotation - ✅
+Troubleshooting guide</p>
+<p><strong>Week 6: Release</strong> - ✅ Package as .skill file - ✅
+Publish to ClawdHub - ✅ Documentation + examples</p>
+<hr />
+<h2 id="why-this-works">🤝 Why This Works</h2>
+<h3 id="for-users">For Users</h3>
+<ul>
+<li><strong>Simple CLI</strong> → <code>tribe init</code>,
+<code>tribe create</code>, <code>tribe join</code></li>
+<li><strong>Automatic</strong> → session management is transparent</li>
+<li><strong>Readable</strong> → TRIBE.md is human-friendly</li>
+</ul>
+<h3 id="for-ai">For AI</h3>
+<ul>
+<li><strong>Clear rules</strong> → <code>getTrustTier()</code> → behave
+accordingly</li>
+<li><strong>No manual crypto</strong> → scripts handle it</li>
+<li><strong>Privacy enforcement</strong> → programmatic boundaries</li>
+</ul>
+<h3 id="for-security">For Security</h3>
+<ul>
+<li><strong>Cryptographic verification</strong> → can’t fake
+identity</li>
+<li><strong>Decentralized</strong> → no central server to
+compromise</li>
+<li><strong>Private keys stay local</strong> → never transmitted</li>
+</ul>
+<h3 id="for-scalability">For Scalability</h3>
+<ul>
+<li><strong>Linear growth</strong> → N members = N handshakes</li>
+<li><strong>Efficient messaging</strong> → session keys reduce
+overhead</li>
+<li><strong>Tribe key</strong> → enables group operations</li>
+</ul>
+<hr />
+<h2 id="comparison-to-alternatives">📊 Comparison to Alternatives</h2>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 21%" />
+<col style="width: 25%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Tribe Protocol</th>
+<th>PGP Web of Trust</th>
+<th>OAuth</th>
+<th>W3C DID</th>
+<th>ActivityPub</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Multi-tier trust</strong></td>
+<td>✅ 4 tiers</td>
+<td>❌ Binary</td>
+<td>❌ Binary</td>
+<td>❌ Binary</td>
+<td>❌ Binary</td>
+</tr>
+<tr>
+<td><strong>Behavioral rules</strong></td>
+<td>✅ Built-in</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><strong>Bot-specific</strong></td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><strong>Privacy boundaries</strong></td>
+<td>✅ Enforced</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><strong>Session keys</strong></td>
+<td>✅ 24h renewal</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><strong>Decentralized</strong></td>
+<td>✅ Yes</td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+<td>✅ Yes</td>
+<td>⚠️ Federated</td>
+</tr>
+<tr>
+<td><strong>Human-readable</strong></td>
+<td>✅ Markdown</td>
+<td>❌ Complex</td>
+<td>❌ Tokens</td>
+<td>❌ JSON</td>
+<td>❌ JSON</td>
+</tr>
+<tr>
+<td><strong>Tribe membership</strong></td>
+<td>✅ Built-in</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Unique value:</strong> Purpose-built for AI agent
+coordination with trust tiers + behavioral protocols</p>
+<hr />
+<h2 id="next-steps">🎬 Next Steps</h2>
+<h3 id="immediate">Immediate</h3>
+<ol type="1">
+<li><strong>Review this presentation</strong> (Nag + Yajat)</li>
+<li><strong>Discuss architecture decisions</strong></li>
+<li><strong>Align on scope for MVP</strong></li>
+</ol>
+<h3 id="short-term">Short-term</h3>
+<ol start="4" type="1">
+<li><strong>Build Phase 1</strong> (core crypto + init)</li>
+<li><strong>Test handshake flow</strong> with real bots</li>
+<li><strong>Iterate</strong> based on findings</li>
+</ol>
+<h3 id="long-term">Long-term</h3>
+<ol start="7" type="1">
+<li><strong>Production hardening</strong></li>
+<li><strong>Publish to ClawdHub</strong></li>
+<li><strong>Open source</strong> (GitHub + RFC)</li>
+<li><strong>Grow tribe network</strong> (more bot operators)</li>
+</ol>
+<hr />
+<h2 id="discussion-questions">❓ Discussion Questions</h2>
+<ol type="1">
+<li><p><strong>Scope:</strong> Is the two-key system (identity + tribe)
+the right approach, or should we simplify?</p></li>
+<li><p><strong>Handshake:</strong> Is the challenge-response + encrypted
+key transfer flow secure enough?</p></li>
+<li><p><strong>Sessions:</strong> Is 24h expiry reasonable, or should it
+be configurable?</p></li>
+<li><p><strong>Privacy:</strong> Are the tier-based sharing rules clear
+and enforceable?</p></li>
+<li><p><strong>Scalability:</strong> Does the transitive trust model
+work for 100+ member tribes?</p></li>
+<li><p><strong>UX:</strong> Is the CLI interface
+(<code>tribe init</code>, <code>tribe create</code>, etc.)
+intuitive?</p></li>
+<li><p><strong>Timeline:</strong> Is 5-6 weeks realistic for
+production-ready 1.0?</p></li>
+<li><p><strong>Edge cases:</strong> What happens when:</p>
+<ul>
+<li>Tribe key leaks?</li>
+<li>Member goes rogue?</li>
+<li>Founder’s keys compromised?</li>
+<li>Network partition (can’t reach founder)?</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="resources">🔗 Resources</h2>
+<ul>
+<li><strong>Full Design Doc:</strong>
+<code>tribe-protocol-skill-design.md</code></li>
+<li><strong>Research Proposal:</strong>
+<code>tribe-protocol-proposal.md</code></li>
+<li><strong>Implementation Examples:</strong>
+<code>tribe-protocol-examples/</code></li>
+</ul>
+<p><strong>Ready to discuss and iterate!</strong> 🚀</p>
+</body>
+</html>

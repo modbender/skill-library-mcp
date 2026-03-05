@@ -1,0 +1,28 @@
+{
+  "name": "clawwall",
+  "version": "0.3.0",
+  "description": "DLP Surveillance Layer — scans outbound content for secrets, PII, and policy violations",
+  "hooks": {
+    "before_tool_call": {
+      "handler": "dist/index.js",
+      "export": "beforeToolCall"
+    }
+  },
+  "config": {
+    "serviceUrl": {
+      "type": "string",
+      "default": "http://127.0.0.1:8642",
+      "description": "ClawWall service URL"
+    },
+    "blockOnError": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, block tool calls when the ClawWall service is unreachable (fail-closed). Default: fail-open."
+    },
+    "timeoutMs": {
+      "type": "number",
+      "default": 5000,
+      "description": "Timeout for scan requests in milliseconds"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+# Monthly Review Cron Job
+# Runs on the 1st of each month at 9am
+# Analyzes previous month's activity and delivers insights
+
+name: "Monthly Dev Review"
+schedule:
+  kind: cron
+  expr: "0 9 1 * *"  # 9am on the 1st of every month
+  tz: "Europe/London"  # Adjust to your timezone
+
+payload:
+  kind: agentTurn
+  message: |
+    It's the 1st of the month - time for a monthly review!
+    
+    Run: god review
+    
+    Then analyze and tell me:
+    
+    1. **Activity Summary**: Which projects got the most attention last month?
+    2. **Patterns**: Did I focus on one project or spread across many?
+    3. **PR Velocity**: How many PRs were merged vs stalled?
+    4. **Quiet Projects**: Any repos that went silent mid-month?
+    5. **Accomplishments**: Based on commit messages, what did I ship?
+    6. **Recommendations**: What should I focus on this month?
+    
+    Be conversational and insightful - this is my monthly retrospective.
+  
+  model: anthropic/claude-sonnet-4  # Use your preferred model
+  thinking: low  # Fast analysis
+  timeoutSeconds: 300
+  
+  # Optionally deliver to a specific channel
+  # deliver: true
+  # channel: telegram
+  # to: +447876140050
+
+sessionTarget: isolated  # Run in isolated session
+enabled: true

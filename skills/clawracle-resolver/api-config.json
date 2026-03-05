@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "description": "API configuration for Clawracle OpenClaw agents. Agents can create and edit this file when instructed by the owner.",
+  "apis": [
+    {
+      "name": "TheSportsDB",
+      "category": "sports",
+      "docsFile": "api-docs/thesportsdb.md",
+      "apiKeyEnvVar": "SPORTSDB_API_KEY",
+      "apiKeyRequired": true,
+      "apiKeyLocation": "url_path",
+      "baseUrl": "https://www.thesportsdb.com/api/v1/json",
+      "description": "Free sports data API for teams, players, events, and results",
+      "capabilities": [
+        "Search teams, players, events",
+        "Lookup game results and scores",
+        "Get league standings",
+        "Find event details by date"
+      ]
+    },
+    {
+      "name": "Alpha Vantage",
+      "category": "market",
+      "docsFile": "api-docs/alphavantage.md",
+      "apiKeyEnvVar": "ALPHA_VANTAGE_API_KEY",
+      "apiKeyRequired": true,
+      "apiKeyLocation": "query_param",
+      "baseUrl": "https://www.alphavantage.co/query",
+      "description": "Stock market data and financial information",
+      "capabilities": [
+        "Get stock prices",
+        "Market quotes",
+        "Company information"
+      ]
+    },
+    {
+      "name": "NewsAPI",
+      "category": "politics",
+      "docsFile": "api-docs/newsapi.md",
+      "apiKeyEnvVar": "NEWS_API_KEY",
+      "apiKeyRequired": true,
+      "apiKeyLocation": "query_param",
+      "baseUrl": "https://newsapi.org/v2",
+      "description": "News articles and headlines for political events",
+      "capabilities": [
+        "Search news articles",
+        "Get headlines",
+        "Filter by topic and date"
+      ]
+    },
+    {
+      "name": "OpenWeather",
+      "category": "weather",
+      "docsFile": "api-docs/openweather.md",
+      "apiKeyEnvVar": "OPENWEATHER_API_KEY",
+      "apiKeyRequired": true,
+      "apiKeyLocation": "query_param",
+      "baseUrl": "https://api.openweathermap.org/data/2.5",
+      "description": "Weather data and forecasts",
+      "capabilities": [
+        "Current weather",
+        "Historical weather",
+        "Forecasts"
+      ]
+    }
+  ],
+  "instructions": {
+    "howToUse": "When a request comes in with a category string (e.g., 'sports', 'market', 'politics'), find the matching API in this config, read its docsFile, and use the API to resolve the query.",
+    "apiKeyAccess": "API keys are stored in .env file. Use the apiKeyEnvVar to read the key from process.env.",
+    "queryParsing": "Extract relevant information from the natural language query (teams, dates, locations, etc.) to construct API calls.",
+    "agentCanEdit": "Agents can create and edit API configurations and documentation files when instructed by the owner. Use fs.writeFileSync() to save changes."
+  }
+}

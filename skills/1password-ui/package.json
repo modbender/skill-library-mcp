@@ -1,0 +1,70 @@
+{
+  "name": "1password-ui",
+  "version": "1.1.0",
+  "description": "1Password UI tab for OpenClaw dashboard - manage secrets and credential mappings",
+  "author": "OpenClaw Community",
+  "license": "MIT",
+  "clawdbot": {
+    "type": "skill",
+    "emoji": "🔐",
+    "category": "tools",
+    "tags": ["1password", "secrets", "vault", "credentials", "security", "oauth", "ui"],
+    "requires": {
+      "clawdbot": ">=2026.1.0"
+    },
+    "provides": {
+      "ui": ["1password"],
+      "rpc": [
+        "1password.status",
+        "1password.signin",
+        "1password.signout",
+        "1password.vaults",
+        "1password.items",
+        "1password.getItem",
+        "1password.readSecret",
+        "1password.mappings.list",
+        "1password.mappings.set",
+        "1password.mappings.delete",
+        "1password.mappings.test"
+      ]
+    },
+    "capabilities": {
+      "credential_read": {
+        "description": "Reads secrets from 1Password via CLI or Connect API when requested by skills",
+        "mitigation": "Secrets only read on explicit request, never exposed to UI"
+      },
+      "mapping_storage": {
+        "description": "Stores skill→1Password mappings in ~/clawd/config/1password-mappings.json",
+        "paths": ["~/clawd/config/1password-mappings.json"],
+        "mitigation": "File contains references only (item/vault names), not actual secrets"
+      },
+      "external_api": {
+        "description": "Calls 1Password Connect API if configured (Docker mode)",
+        "mitigation": "Only connects to user-configured OP_CONNECT_HOST"
+      }
+    },
+    "securityNotes": {
+      "secret_handling": "The UI never calls readSecret. However, readSecret IS available via gateway RPC for skill use. Security relies on: (1) user being signed into 1Password, (2) gateway being loopback-only.",
+      "mapping_file": "Contains item/vault/field references, not actual credential values.",
+      "cli_auth": "Uses 1Password app integration for biometric auth when available.",
+      "gateway_exposure": "All 1password.* methods are gateway RPC calls. Protect your gateway accordingly."
+    },
+    "installWarnings": [
+      "Requires code changes to OpenClaw source (see INSTALL_INSTRUCTIONS.md)",
+      "CLI mode requires 1Password desktop app with CLI integration enabled",
+      "Docker mode requires 1Password Connect server deployment"
+    ]
+  },
+  "files": [
+    "SKILL.md",
+    "INSTALL_INSTRUCTIONS.md",
+    "CHANGELOG.md",
+    "reference/1password-backend.ts",
+    "reference/1password-views.ts",
+    "reference/1password-settings.ts",
+    "reference/1password-plugin.ts",
+    "scripts/op-helper.py"
+  ],
+  "homepage": "https://clawhub.ai/skills/1password-ui",
+  "repository": "https://github.com/clawdbot/skills"
+}

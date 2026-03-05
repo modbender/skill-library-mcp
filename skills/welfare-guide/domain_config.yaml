@@ -1,0 +1,111 @@
+domain:
+  name: "육아/복지"
+  emoji: "🍀"
+  disclaimer: |
+    ⚠️ 본 내용은 정보 제공 목적이며, 실제 수급 여부는 해당 기관에서 결정합니다.
+    최신 정책 및 신청은 복지로(www.bokjiro.go.kr) 또는 주민센터에서 확인하세요.
+  beginner_alias:
+    - "처음인데"
+    - "모르겠어"
+    - "쉽게"
+    - "기초"
+    - "초보"
+    - "어떻게 해?"
+
+intents:
+  - id: benefit_search
+    label: "Benefit Search"
+    triggers: ["받을 수 있는 혜택", "지원금 뭐 있어?", "나 해당 돼?", "맞춤 복지"]
+    output: "조건(나이/지역/가구/소득) 기반 맞춤 혜택 목록"
+    min_data: ["나이 또는 상황 (선택)"]
+    depth: both
+
+  - id: childcare
+    label: "Childcare"
+    triggers: ["아이 키우면", "보육료", "아동수당", "어린이집", "유아 지원", "양육수당"]
+    output: "연령별 육아·보육 지원 패키지 Flash"
+    min_data: ["자녀 나이"]
+    depth: both
+
+  - id: birth_support
+    label: "Birth Support"
+    triggers: ["출산하면", "임신 지원금", "첫만남이용권", "출산지원금", "출생축하금"]
+    output: "출산 전후 지원 총정리 Flash"
+    min_data: ["지역(선택)"]
+    depth: both
+
+  - id: basic_living
+    label: "Basic Living"
+    triggers: ["기초생활수급자", "의료급여", "생계급여", "주거급여", "교육급여", "차상위"]
+    output: "수급 조건 + 급여 종류 + 신청 방법"
+    min_data: ["가구 구성, 소득/재산(선택)"]
+    depth: both
+
+  - id: youth_support
+    label: "Youth Support"
+    triggers: ["청년 지원", "청년수당", "청년도약계좌", "청년 혜택", "취업 지원"]
+    output: "청년 전용 지원 프로그램 목록"
+    min_data: ["나이(선택)"]
+    depth: both
+
+  - id: senior_support
+    label: "Senior Support"
+    triggers: ["노인 복지", "기초연금", "노인장기요양", "경로우대", "노인 지원금"]
+    output: "노인 복지 서비스 목록 + 신청 조건"
+    min_data: ["나이(선택)"]
+    depth: both
+
+  - id: disability_support
+    label: "Disability Support"
+    triggers: ["장애인 지원", "장애수당", "장애연금", "활동지원", "장애 복지"]
+    output: "장애 유형·등급별 복지 서비스 목록"
+    min_data: ["장애 유형/등급(선택)"]
+    depth: both
+
+  - id: how_to_apply
+    label: "How to Apply"
+    triggers: ["어떻게 신청해?", "신청 방법", "서류 뭐 필요해?", "온라인 신청"]
+    output: "신청 경로(복지로/정부24/주민센터) + 필요 서류"
+    min_data: ["지원 종류"]
+    depth: flash
+
+  - id: beginner_guide
+    label: "Beginner Guide"
+    triggers: ["복지 처음인데", "지원금이 뭐야?", "복지 종류", "어디서 신청해?"]
+    output: "복지 시스템 입문 Flash (초보자 모드 강제)"
+    min_data: []
+    depth: flash
+
+data_sources:
+  primary:
+    - "보조금24 API (data.go.kr/15113968) — 전체 수혜서비스 [키: ~/.config/data-go-kr/api_key 활용신청 필요]"
+    - "복지로 중앙부처 API (data.go.kr/15090532) — 중앙부처 복지사업 + 수급조건 [활용신청 필요]"
+    - "복지로 지자체 API (data.go.kr/15108347) — 지역별 복지서비스 [활용신청 필요]"
+  secondary:
+    - "web_search: 복지로 [혜택명] 신청 방법"
+    - "web_search: [지역] 출산지원금 2026"
+
+flash:
+  max_lines: 40
+  always: true
+
+deep_dive:
+  trigger: request
+  trigger_intents:
+    - benefit_search
+    - basic_living
+    - childcare
+    - birth_support
+
+beginner_mode:
+  max_table_rows: 5
+  conclusion_first: true
+  glossary:
+    기초생활수급자: "소득과 재산이 일정 기준 이하인 가구. 생계·의료·주거·교육 급여를 받을 수 있음"
+    중위소득: "전체 가구를 소득 순으로 나열했을 때 정확히 가운데 가구의 소득. 복지 기준선으로 사용"
+    차상위계층: "기초수급자는 아니지만 소득이 중위소득 50% 이하인 가구"
+    아동수당: "만 8세 미만 아동에게 매월 10만원 지급하는 국가 지원금 (소득 무관)"
+    첫만남이용권: "출생 아동 1인당 200만원(첫째) 지급하는 바우처 (2024년 기준)"
+    보육료지원: "어린이집 이용 시 보육료를 국가가 지원하는 제도"
+    양육수당: "어린이집·유치원을 이용하지 않는 아동 가정에 현금 지급"
+    장기요양등급: "노인 또는 장애인의 일상생활 지원 필요도를 1~5등급으로 평가한 것"

@@ -1,0 +1,53 @@
+{
+  "id": "context-compactor",
+  "name": "Context Compactor",
+  "version": "0.1.0",
+  "description": "Token-based context compaction for local models (MLX, llama.cpp) that don't report context limits",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "maxTokens": {
+        "type": "number",
+        "default": 8000,
+        "description": "Maximum context tokens before compaction triggers"
+      },
+      "keepRecentTokens": {
+        "type": "number",
+        "default": 2000,
+        "description": "Tokens to keep from recent messages (not summarized)"
+      },
+      "summaryMaxTokens": {
+        "type": "number",
+        "default": 1000,
+        "description": "Maximum tokens for the compaction summary"
+      },
+      "charsPerToken": {
+        "type": "number",
+        "default": 4,
+        "description": "Estimated characters per token (for simple counting)"
+      },
+      "summaryModel": {
+        "type": "string",
+        "description": "Model to use for summarization (defaults to session model)"
+      },
+      "logLevel": {
+        "type": "string",
+        "enum": ["debug", "info", "warn", "error"],
+        "default": "info"
+      }
+    }
+  },
+  "uiHints": {
+    "enabled": { "label": "Enable Context Compactor" },
+    "maxTokens": { "label": "Max Context Tokens", "placeholder": "8000" },
+    "keepRecentTokens": { "label": "Keep Recent Tokens", "placeholder": "2000" },
+    "summaryMaxTokens": { "label": "Summary Max Tokens", "placeholder": "1000" },
+    "charsPerToken": { "label": "Chars per Token (estimate)", "placeholder": "4" },
+    "summaryModel": { "label": "Summary Model (optional)", "placeholder": "Leave blank for session model" }
+  }
+}

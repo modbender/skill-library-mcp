@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 团队协作</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fff;
+            height: 100vh;
+            color: #000;
+            overflow: hidden;
+        }
+        .container { 
+            max-width: 100%;
+            height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .screen { display: none; }
+        .screen.active { display: flex; }
+        
+        /* 登录/注册页面 - 白色极简 */
+        .login-screen, .auth-screen { 
+            max-width: 380px;
+            width: 100%;
+            padding: 48px 40px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+        }
+        .login-screen h1, .auth-screen h1 { 
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #000;
+            letter-spacing: 0.5px;
+        }
+        .login-screen h2, .auth-screen h2 { 
+            margin-bottom: 32px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #000;
+        }
+        .login-screen p, .auth-screen p { 
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .login-screen input, .auth-screen input { 
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            background: #fff;
+            color: #000;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .login-screen input::placeholder, .auth-screen input::placeholder { 
+            color: #999;
+        }
+        .login-screen input:focus, .auth-screen input:focus { 
+            background: #fafafa;
+            border-color: #000;
+            outline: none;
+        }
+        .login-screen button, .auth-screen button { 
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #000;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .login-screen button:hover, .auth-screen button:hover { 
+            background: #333;
+            transform: translateY(-1px);
+        }
+        .login-screen button:active, .auth-screen button:active { 
+            transform: translateY(0);
+        }
+        .login-screen button.secondary, .auth-screen button.secondary { 
+            background: transparent;
+            color: #666;
+            border: 1px solid #e5e5e5;
+        }
+        .login-screen button.secondary:hover, .auth-screen button.secondary:hover { 
+            background: #fafafa;
+            color: #000;
+            border-color: #d5d5d5;
+        }
+        .error { 
+            color: #ff3b30;
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .success { 
+            color: #34c759;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        .tips { 
+            color: #999;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+        
+        /* 聊天界面 - 白色极简 */
+        .chat-screen { 
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+        .chat-header {
+            padding: 16px 20px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .brand-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            letter-spacing: 0.5px;
+        }
+        .chat-messages { 
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { 
+            background: #e5e5e5;
+            border-radius: 2px;
+        }
+        .message { 
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 15px;
+            animation: slideIn 0.2s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.system { 
+            align-self: center;
+            background: #f5f5f5;
+            color: #999;
+            font-size: 12px;
+            max-width: 90%;
+            padding: 8px 14px;
+            border-radius: 12px;
+        }
+        .message.user { 
+            align-self: flex-end;
+            background: #000;
+            color: #fff;
+            border-radius: 16px 16px 4px 16px;
+        }
+        .message.assistant { 
+            align-self: flex-start;
+            background: #f5f5f5;
+            color: #000;
+            border-radius: 16px 16px 16px 4px;
+        }
+        
+        /* 输入区域 - 白色悬浮 */
+        .chat-input { 
+            padding: 20px;
+            background: transparent;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .chat-input input[type="text"] { 
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 24px;
+            background: #fff;
+            color: #000;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .chat-input input[type="text"]::placeholder { 
+            color: #999;
+        }
+        .chat-input input[type="text"]:focus { 
+            background: #fafafa;
+            border-color: #000;
+        }
+        .chat-input button { 
+            padding: 14px 28px;
+            border: none;
+            border-radius: 24px;
+            background: #000;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .chat-input button:hover { 
+            background: #333;
+            transform: scale(1.02);
+        }
+        .chat-input button:active { 
+            transform: scale(0.98);
+        }
+        .file-btn { 
+            background: #f5f5f5;
+            border: 1px solid #e5e5e5;
+            color: #666;
+            font-size: 18px;
+            padding: 14px;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .file-btn:hover { 
+            background: #e5e5e5;
+            border-color: #d5d5d5;
+            color: #000;
+        }
+        .file-btn.has-file { 
+            background: #34c759;
+            border-color: #34c759;
+            color: #fff;
+        }
+        
+        .loading { 
+            text-align: center;
+            padding: 12px;
+            color: #999;
+            font-size: 13px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .loading.hidden { display: none; }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .chat-messages { padding: 20px 12px; }
+            .chat-input { padding: 15px; margin-bottom: 10px; }
+            .message { max-width: 85%; font-size: 15px; }
+            .login-screen, .auth-screen { 
+                max-width: 90%;
+                padding: 32px 24px;
+                border: none;
+                box-shadow: none;
+            }
+            .chat-input button { padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主界面 -->
+        <div id="authScreen" class="screen auth-screen active">
+            <h1 class="brand-title">OPENCLAW-TEAM</h1>
+            <p>团队协作平台</p>
+            <button onclick="showLogin()">登录</button>
+            <button onclick="showInvite()">注册</button>
+        </div>
+        
+        <!-- 邀请码页面 -->
+        <div id="inviteScreen" class="screen auth-screen">
+            <h2>注册新账号</h2>
+            <input type="text" id="inviteCode" placeholder="请输入邀请码">
+            <button onclick="checkInvite()">验证</button>
+            <button class="secondary" onclick="showAuth()">返回</button>
+            <p class="tips">需要邀请码才能注册</p>
+            <p id="inviteError" class="error"></p>
+        </div>
+        
+        <!-- 登录页面 -->
+        <div id="loginScreen" class="screen login-screen">
+            <h2>👋 欢迎回来</h2>
+            <input type="text" id="loginUsername" placeholder="用户名">
+            <input type="password" id="loginPassword" placeholder="密码">
+            <button onclick="login()">登录</button>
+            <button class="secondary" onclick="showAuth()">返回</button>
+            <p id="loginError" class="error"></p>
+        </div>
+        
+        <!-- 注册页面 -->
+        <div id="registerScreen" class="screen login-screen">
+            <h2>🚀 创建账号</h2>
+            <input type="text" id="regUsername" placeholder="用户名 (最长15字符)">
+            <input type="password" id="regPassword" placeholder="设置密码">
+            <input type="password" id="regPassword2" placeholder="确认密码">
+            <button onclick="register()">注册</button>
+            <button class="secondary" onclick="showAuth()">返回</button>
+            <p id="regError" class="error"></p>
+        </div>
+        
+        <!-- 聊天页面 -->
+        <div id="chatScreen" class="screen chat-screen">
+            <div class="chat-header">
+                <span class="brand-name brand-title">OPENCLAW-TEAM</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+            </div>
+            <div class="chat-input">
+                <input type="file" id="fileInput" style="display: none;">
+                <button class="file-btn" onclick="document.getElementById('fileInput').click()" title="上传文件">📎</button>
+                <input type="text" id="chatInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()">发送</button>
+            </div>
+            <div id="chatLoading" class="loading hidden">正在思考...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let brandName = 'OPENCLAW-TEAM'; // 默认品牌名称
+        
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                brandName = config.brand_name || 'OPENCLAW-TEAM';
+                // 更新页面上的品牌名称
+                document.querySelectorAll('.brand-title').forEach(el => {
+                    el.textContent = brandName;
+                });
+            } catch (e) {
+                console.error('加载配置失败', e);
+            }
+        }
+        
+        async function checkStoredLogin() {
+            if (localStorage.getItem('openclaw_user')) {
+                const user = JSON.parse(localStorage.getItem('openclaw_user'));
+                try {
+                    const r = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({username: user.username, password: user.password})
+                    });
+                    const data = await r.json();
+                    if (data.success) {
+                        currentUser = user;
+                        showChat(data.username);
+                        return;
+                    }
+                } catch {}
+                localStorage.removeItem('openclaw_user');
+            }
+            showAuth();
+        }
+        
+        function showAuth() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('authScreen').classList.add('active');
+        }
+        
+        function showInvite() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('inviteScreen').classList.add('active');
+        }
+        
+        function showLogin() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('loginScreen').classList.add('active');
+        }
+        
+        function showRegister() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('registerScreen').classList.add('active');
+        }
+        
+        function showChat(username) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('chatScreen').classList.add('active');
+            document.getElementById('chatMessages').innerHTML = '';
+        }
+        
+        function checkInvite() {
+            const code = document.getElementById('inviteCode').value;
+            if (!code) {
+                document.getElementById('inviteError').textContent = '请输入邀请码';
+                return;
+            }
+            
+            fetch('/api/check_invite', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({code})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.valid) {
+                    showRegister();
+                } else {
+                    document.getElementById('inviteError').textContent = '邀请码错误';
+                }
+            });
+        }
+        
+        function register() {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+            const errorEl = document.getElementById('regError');
+            const inviteCode = document.getElementById('inviteCode').value;
+            
+            errorEl.textContent = '';
+            
+            if (!username || username.length > 15) {
+                errorEl.textContent = '用户名需要1-15个字符';
+                return;
+            }
+            if (username.includes('<') || username.includes('>')) {
+                errorEl.textContent = '用户名不能包含 < 或 >';
+                return;
+            }
+            if (password.length < 4) {
+                errorEl.textContent = '密码至少4个字符';
+                return;
+            }
+            if (password !== password2) {
+                errorEl.textContent = '两次密码不一致';
+                return;
+            }
+            
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password, invite_code: inviteCode})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = {username: data.username, password: password};
+                    localStorage.setItem('openclaw_user', JSON.stringify(currentUser));
+                    showChat(data.username);
+                } else {
+                    errorEl.textContent = data.error || '注册失败';
+                }
+            });
+        }
+        
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            errorEl.textContent = '';
+            
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = {username: data.username, password: password};
+                    localStorage.setItem('openclaw_user', JSON.stringify(currentUser));
+                    showChat(data.username);
+                } else {
+                    errorEl.textContent = data.error || '登录失败';
+                }
+            });
+        }
+        
+        function logout() {
+            localStorage.removeItem('openclaw_user');
+            currentUser = null;
+            showAuth();
+        }
+        
+        function addMessage(type, content) {
+            const div = document.createElement('div');
+            div.className = 'message ' + type;
+            div.textContent = content;
+            document.getElementById('chatMessages').appendChild(div);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+        
+        // 文件上传处理
+        let selectedFile = null;
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                document.querySelector('.file-btn').classList.add('has-file');
+                addMessage('system', '📎 已选择文件: ' + selectedFile.name);
+            }
+        });
+        
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('username', currentUser.username);
+            formData.append('password', currentUser.password);
+            formData.append('file', file);
+            
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            return response.json();
+        }
+        
+        async function sendMessage() {
+            if (!currentUser) return;
+            
+            const input = document.getElementById('chatInput');
+            let content = input.value.trim();
+            
+            // 如果有文件，先上传
+            if (selectedFile) {
+                addMessage('user', content || '[发送文件]');
+                document.getElementById('chatLoading').classList.remove('hidden');
+                
+                const uploadResult = await uploadFile(selectedFile);
+                
+                if (uploadResult.success) {
+                    content = content + '\n\n[文件: ' + selectedFile.name + ']\n' + uploadResult.url;
+                } else {
+                    document.getElementById('chatLoading').classList.add('hidden');
+                    addMessage('system', '❌ 文件上传失败: ' + uploadResult.error);
+                    selectedFile = null;
+                    document.querySelector('.file-btn').classList.remove('has-file');
+                    document.getElementById('fileInput').value = '';
+                    return;
+                }
+                
+                selectedFile = null;
+                document.querySelector('.file-btn').classList.remove('has-file');
+                document.getElementById('fileInput').value = '';
+            } else if (!content) {
+                return;
+            } else {
+                input.value = '';
+                addMessage('user', content);
+                document.getElementById('chatLoading').classList.remove('hidden');
+            }
+            
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: content,
+                    username: currentUser.username,
+                    password: currentUser.password
+                })
+            })
+            .then(r => {
+                if (r.status === 401 || r.status === 403) {
+                    showLogin();
+                    addMessage('system', '登录已过期，请重新登录');
+                    throw new Error('登录过期');
+                }
+                return r.json();
+            })
+            .then(data => {
+                document.getElementById('chatLoading').classList.add('hidden');
+                if (data.error) {
+                    addMessage('assistant', '❌ ' + data.error);
+                } else {
+                    addMessage('assistant', data.response);
+                }
+            })
+            .catch(e => {
+                document.getElementById('chatLoading').classList.add('hidden');
+                if (e.message !== '登录过期') {
+                    addMessage('assistant', '❌ 网络错误: ' + e.message);
+                }
+            });
+        }
+        
+        loadConfig();
+        checkStoredLogin();
+    </script>
+</body>
+</html>

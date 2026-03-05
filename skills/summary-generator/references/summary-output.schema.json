@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SummaryOutput",
+  "type": "object",
+  "properties": {
+    "summary": {
+      "type": "object",
+      "properties": {
+        "new_leads_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dataset_mode": {
+          "type": "string",
+          "enum": [
+            "broker_group",
+            "buyer_inquiry",
+            "mixed"
+          ]
+        },
+        "trends": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "record_type_breakdown": {
+          "type": "object",
+          "properties": {
+            "inventory_listing": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "buyer_requirement": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "inventory_listing",
+            "buyer_requirement"
+          ],
+          "additionalProperties": false
+        },
+        "priority_breakdown": {
+          "type": "object",
+          "properties": {
+            "P1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "P2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "P3": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "P1",
+            "P2",
+            "P3"
+          ],
+          "additionalProperties": false
+        },
+        "urgency_breakdown": {
+          "type": "object",
+          "properties": {
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "additionalProperties": false
+        },
+        "top_localities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "locality": {
+                "type": "string",
+                "minLength": 1
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "locality",
+              "count"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "new_leads_count",
+        "record_type_breakdown",
+        "priority_breakdown"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "summary"
+  ],
+  "additionalProperties": false
+}

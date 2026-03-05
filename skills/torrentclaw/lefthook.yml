@@ -1,0 +1,29 @@
+rc: ./.lefthookrc
+
+commit-msg:
+  commands:
+    validate:
+      run: |
+        msg=$(head -1 {1})
+        if ! echo "$msg" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?(!)?: .{1,}$'; then
+          echo ""
+          echo "ERROR: Invalid commit message format."
+          echo ""
+          echo "  Got: $msg"
+          echo ""
+          echo "  Expected: <type>[optional scope][!]: <description>"
+          echo ""
+          echo "  Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+          echo "  Examples:"
+          echo "    feat: add qBittorrent client detection"
+          echo "    fix(detect): correct aria2 daemon check"
+          echo "    docs: update API reference"
+          echo ""
+          exit 1
+        fi
+
+pre-commit:
+  commands:
+    shellcheck:
+      glob: "*.sh"
+      run: shellcheck {staged_files}

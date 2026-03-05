@@ -1,0 +1,414 @@
+{
+  "name": "tutu-smart-control",
+  "version": "1.3.0",
+  "description": "图图智控（TUTU）— USB 即插即用 AI 硬件，远程控制 Android 手机。提供 GUI 自动化、截图分析、通讯管理、沙箱化文件操作（仅 /sdcard/）、应用管理、录屏等操作。无 shell 执行/APK 安装/屏幕解锁/系统写入权限，不在对话中收集敏感凭据，隐私数据读取和敏感操作均需平台级 confirmation 拦截确认，Token 通过环境变量安全注入。",
+  "author": "zivzhao",
+  "homepage": "https://www.szs.chat",
+  "license": "MIT",
+  "main": "SKILL.md",
+  "tags": [
+    "android",
+    "phone",
+    "remote-control",
+    "gui-automation",
+    "mobile",
+    "iot",
+    "smart-device",
+    "tutu",
+    "tutu-smart-control",
+    "sms",
+    "screenshot",
+    "file-management",
+    "tts",
+    "location",
+    "notification",
+    "app-management",
+    "lock-screen",
+    "wifi",
+    "bluetooth",
+    "contacts",
+    "call-log",
+    "gps-mock",
+    "screen-recording",
+    "wallpaper",
+    "logcat",
+    "battery"
+  ],
+  "category": "integrations",
+  "permissions": [
+    "network:www.szs.chat"
+  ],
+  "config": {
+    "TUTU_API_TOKEN": {
+      "type": "string",
+      "required": true,
+      "description": "图图智控加密 Token。由 TUTU 硬件自动生成，可在设备管理页面或扫描设备二维码获取。Token 已加密包含设备身份信息，无需额外提供设备序列号。Get from https://www.szs.chat after purchasing TUTU hardware."
+    }
+  },
+  "tools": [
+    {
+      "name": "screenshot",
+      "description": "Capture current phone screen"
+    },
+    {
+      "name": "click",
+      "description": "Click at specified screen coordinates",
+      "parameters": {
+        "x": { "type": "integer", "description": "X coordinate (0-1080)", "required": true },
+        "y": { "type": "integer", "description": "Y coordinate (0-2400)", "required": true }
+      }
+    },
+    {
+      "name": "long_press",
+      "description": "Long press at specified coordinates",
+      "parameters": {
+        "x": { "type": "integer", "required": true },
+        "y": { "type": "integer", "required": true }
+      }
+    },
+    {
+      "name": "type",
+      "description": "Input text (auto clipboard paste for CJK)",
+      "parameters": {
+        "text": { "type": "string", "required": true },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" }
+      }
+    },
+    {
+      "name": "scroll",
+      "description": "Scroll screen in a direction",
+      "parameters": {
+        "direction": { "type": "string", "enum": ["up", "down", "left", "right"], "required": true },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" }
+      }
+    },
+    {
+      "name": "drag",
+      "description": "Drag from point A to point B"
+    },
+    {
+      "name": "open_app",
+      "description": "Open an app by Chinese name or package name",
+      "parameters": {
+        "app_name": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "press_home",
+      "description": "Press the Home button"
+    },
+    {
+      "name": "press_back",
+      "description": "Press the Back button"
+    },
+    {
+      "name": "press_enter",
+      "description": "Press the Enter key"
+    },
+    {
+      "name": "get_ui_nodes",
+      "description": "Get UI element tree of current screen"
+    },
+    {
+      "name": "click_by_text",
+      "description": "Find and click a UI element by text (fuzzy match)",
+      "parameters": {
+        "text": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "click_by_id",
+      "description": "Find and click a UI element by Android resource ID"
+    },
+    {
+      "name": "find_element",
+      "description": "Search for UI elements by text, id, or className"
+    },
+    {
+      "name": "get_device_info",
+      "description": "Get battery, network, memory, display, and foreground app info"
+    },
+    {
+      "name": "status",
+      "description": "Check if device is online"
+    },
+    {
+      "name": "get_server_info",
+      "description": "Get server version and supported extensions"
+    },
+    {
+      "name": "send_sms",
+      "description": "Send an SMS message (requires user confirmation before sending)",
+      "confirmation": true,
+      "parameters": {
+        "destination": { "type": "string", "required": true },
+        "text": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "read_sms",
+      "description": "Read SMS messages from inbox or sent box (requires user confirmation, contains personal data)",
+      "confirmation": true
+    },
+    {
+      "name": "make_call",
+      "description": "Make a phone call (requires user confirmation before dialing)",
+      "confirmation": true,
+      "parameters": {
+        "number": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "get_location",
+      "description": "Get GPS location (requires user confirmation, contains personal data)",
+      "confirmation": true
+    },
+    {
+      "name": "read_notifications",
+      "description": "Read system notification bar"
+    },
+    {
+      "name": "vibrate",
+      "description": "Vibrate the phone"
+    },
+    {
+      "name": "speak_tts",
+      "description": "Text-to-speech: read text aloud on phone",
+      "parameters": {
+        "text": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "list_files",
+      "description": "List files in a directory (restricted to /sdcard/ user storage only)"
+    },
+    {
+      "name": "read_file",
+      "description": "Read file content from phone (restricted to /sdcard/ user storage only)"
+    },
+    {
+      "name": "write_file",
+      "description": "Write content to a file on phone (restricted to /sdcard/ user storage only)"
+    },
+    {
+      "name": "delete_file",
+      "description": "Delete a file on phone (restricted to /sdcard/ user storage only, requires user confirmation)",
+      "confirmation": true
+    },
+    {
+      "name": "analyze_storage",
+      "description": "Analyze phone storage usage"
+    },
+    {
+      "name": "find_large_files",
+      "description": "Find large files consuming storage"
+    },
+    {
+      "name": "search_media",
+      "description": "Search images, videos, or audio on phone"
+    },
+    {
+      "name": "list_packages",
+      "description": "List installed apps (optionally third-party only, with versions)"
+    },
+    {
+      "name": "get_app_info",
+      "description": "Get detailed app info (version, install time, data size)",
+      "parameters": {
+        "package": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "force_stop_app",
+      "description": "Force stop a running app",
+      "parameters": {
+        "package": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "uninstall_app",
+      "description": "Uninstall an app from device (requires user confirmation)",
+      "confirmation": true,
+      "parameters": {
+        "package": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "clear_app_data",
+      "description": "Clear all data for an app (requires user confirmation)",
+      "confirmation": true,
+      "parameters": {
+        "package": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "set_brightness",
+      "description": "Set screen brightness (0-255) or auto mode",
+      "parameters": {
+        "value": { "type": "integer", "required": true },
+        "mode": { "type": "string", "enum": ["manual", "auto"] }
+      }
+    },
+    {
+      "name": "set_volume",
+      "description": "Set volume for audio stream (music/ring/alarm/etc)",
+      "parameters": {
+        "value": { "type": "integer", "required": true },
+        "streamType": { "type": "integer" }
+      }
+    },
+    {
+      "name": "get_volume",
+      "description": "Get current volume levels for all audio streams"
+    },
+    {
+      "name": "set_rotation",
+      "description": "Set screen rotation (0/90/180/270) and lock/unlock auto-rotate"
+    },
+    {
+      "name": "open_url",
+      "description": "Open URL in device default browser",
+      "parameters": {
+        "url": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "set_wifi",
+      "description": "Enable or disable WiFi",
+      "parameters": {
+        "enabled": { "type": "boolean", "required": true }
+      }
+    },
+    {
+      "name": "set_bluetooth",
+      "description": "Enable or disable Bluetooth",
+      "parameters": {
+        "enabled": { "type": "boolean", "required": true }
+      }
+    },
+    {
+      "name": "read_contacts",
+      "description": "Read contacts from address book (requires user confirmation, contains personal data)",
+      "confirmation": true
+    },
+    {
+      "name": "read_call_log",
+      "description": "Read recent call log (requires user confirmation, contains personal data)",
+      "confirmation": true
+    },
+    {
+      "name": "set_location_mock",
+      "description": "Inject mock GPS location (requires user confirmation)",
+      "confirmation": true,
+      "parameters": {
+        "latitude": { "type": "number", "required": true },
+        "longitude": { "type": "number", "required": true }
+      }
+    },
+    {
+      "name": "get_setting",
+      "description": "Read-only: query Android system setting value (e.g. brightness, timeout). Cannot modify settings.",
+      "parameters": {
+        "key": { "type": "string", "required": true },
+        "table": { "type": "string", "enum": ["system", "secure", "global"] }
+      }
+    },
+    {
+      "name": "get_lock_status",
+      "description": "Get lock screen status (on/off, locked, credential type)"
+    },
+    {
+      "name": "end_call",
+      "description": "Hang up current phone call"
+    },
+    {
+      "name": "get_running_processes",
+      "description": "Read-only: list running apps for diagnostics (no process control capability)"
+    },
+    {
+      "name": "get_battery_stats",
+      "description": "Get detailed battery statistics"
+    },
+    {
+      "name": "logcat",
+      "description": "Read-only: retrieve filtered system log entries for troubleshooting (read-only, no system modification)"
+    },
+    {
+      "name": "download_file",
+      "description": "Download file from URL to device (120s timeout, requires user confirmation)",
+      "confirmation": true,
+      "parameters": {
+        "url": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "long_click",
+      "description": "Long click at coordinates (server-side)",
+      "parameters": {
+        "x": { "type": "integer", "required": true },
+        "y": { "type": "integer", "required": true }
+      }
+    },
+    {
+      "name": "swipe",
+      "description": "Swipe gesture from point A to B (server-side)",
+      "parameters": {
+        "x1": { "type": "integer", "required": true },
+        "y1": { "type": "integer", "required": true },
+        "x2": { "type": "integer", "required": true },
+        "y2": { "type": "integer", "required": true }
+      }
+    },
+    {
+      "name": "input_keyevent",
+      "description": "Send key event by name or number",
+      "parameters": {
+        "keycode": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "get_wifi_list",
+      "description": "Scan nearby WiFi networks"
+    },
+    {
+      "name": "set_airplane_mode",
+      "description": "Enable or disable airplane mode (requires user confirmation)",
+      "confirmation": true,
+      "parameters": {
+        "enabled": { "type": "boolean", "required": true }
+      }
+    },
+    {
+      "name": "set_screen_timeout",
+      "description": "Set screen timeout duration (ms)",
+      "parameters": {
+        "timeoutMs": { "type": "integer", "required": true }
+      }
+    },
+    {
+      "name": "push_notification",
+      "description": "Push local notification to device",
+      "parameters": {
+        "title": { "type": "string", "required": true },
+        "text": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "set_wallpaper",
+      "description": "Set wallpaper from device image file",
+      "parameters": {
+        "path": { "type": "string", "required": true }
+      }
+    },
+    {
+      "name": "take_screenshot_to_file",
+      "description": "Screenshot saved as PNG on device"
+    },
+    {
+      "name": "record_screen",
+      "description": "Record screen to MP4 on device (max 180s)"
+    }
+  ]
+}

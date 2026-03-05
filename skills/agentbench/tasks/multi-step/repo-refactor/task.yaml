@@ -1,0 +1,90 @@
+name: "Execute Multi-File Refactor Plan"
+id: "multi-step-repo-refactor"
+version: "1.0"
+suite: "multi-step"
+difficulty: "expert"
+mode: "real"
+
+description: |
+  Tests the agent's ability to execute a structured refactoring plan across a
+  Python codebase. The workspace contains a monolithic utils.py with 15 functions
+  across 4 groups (IO, validation, formatting, calculations), 8 consumer files
+  that import from it, 3 test files, and a REFACTOR_PLAN.md. The agent must
+  split utils.py into 4 focused modules, update all import statements in
+  consumer and test files, verify tests still pass, delete the original
+  utils.py, and commit each logical step separately. Evaluates multi-file
+  coordination, import graph understanding, and incremental verification.
+
+user_message: |
+  Read REFACTOR_PLAN.md and execute the refactoring plan it describes.
+  Split utils.py into 4 new modules (io_utils.py, validation.py, formatting.py,
+  calculations.py), update all imports in consumer files and tests, verify
+  tests pass with `python -m pytest tests/ -v`, remove utils.py, and commit
+  each logical step separately with descriptive messages.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "io_utils.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "read_csv"
+          - "write_csv"
+          - "read_json"
+          - "write_json"
+  - pattern: "validation.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "validate_email"
+          - "validate_phone"
+          - "validate_date"
+          - "validate_required_fields"
+  - pattern: "formatting.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "format_currency"
+          - "format_date"
+          - "format_phone"
+          - "format_percentage"
+  - pattern: "calculations.py"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "calculate_total"
+          - "calculate_average"
+          - "calculate_discount"
+  - pattern: "pytest-output"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "python -m pytest tests/ -v"
+        contains:
+          - "passed"
+  - pattern: "git-history"
+    required: true
+    validators:
+      - type: "command-output-contains"
+        command: "git log --oneline"
+        contains:
+          - "refactor"
+
+expected_metrics:
+  tool_calls: [15, 35]
+  planning_ratio: [0.10, 0.30]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

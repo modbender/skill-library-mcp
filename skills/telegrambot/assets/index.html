@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>God Mode Manager</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #0e1116; color: #e7ecf3; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .bar { display: grid; grid-template-columns: 1fr 300px 130px; gap: 10px; margin-bottom: 14px; }
+    input, button { border: 1px solid #2c3442; background: #141a22; color: #e7ecf3; border-radius: 8px; padding: 10px; }
+    button { cursor: pointer; }
+    button:hover { background: #1b2330; }
+    .card { border: 1px solid #2c3442; background: #121822; border-radius: 10px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #232c3b; }
+    tr:hover { background: #172030; }
+    a { color: #73b6ff; text-decoration: none; }
+    .muted { color: #97a7bf; font-size: 12px; margin: 8px 0; }
+    .tag { font-size: 11px; border: 1px solid #314056; border-radius: 999px; padding: 3px 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>God Mode Manager</h2>
+    <div class="muted">Browse folders and download files from the configured root.</div>
+    <div class="bar">
+      <input id="path" value="" placeholder="Path under root, ex: Users" />
+      <input id="token" placeholder="Token" />
+      <button id="go">Browse</button>
+    </div>
+    <div class="muted" id="meta"></div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th><th>Action</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    const tokenRequired = __TOKEN_REQUIRED__;
+    const pathEl = document.getElementById('path');
+    const tokenEl = document.getElementById('token');
+    const rowsEl = document.getElementById('rows');
+    const metaEl = document.getElementById('meta');
+    const goBtn = document.getElementById('go');
+
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('path')) pathEl.value = qs.get('path');
+    if (qs.get('token')) tokenEl.value = qs.get('token');
+
+    function fmtSize(n) {
+      if (!n) return '-';
+      const u = ['B','KB','MB','GB']; let i = 0; let x = n;
+      while (x >= 1024 && i < u.length - 1) { x /= 1024; i++; }
+      return `${x.toFixed(x < 10 && i > 0 ? 1 : 0)} ${u[i]}`;
+    }
+
+    function q(path, token) {
+      const p = new URLSearchParams();
+      p.set('path', path || '');
+      if (token) p.set('token', token);
+      return p.toString();
+    }
+
+    async function browse() {
+      const p = pathEl.value.trim();
+      const t = tokenEl.value.trim();
+      if (tokenRequired && !t) {
+        alert('Token required');
+        return;
+      }
+      const res = await fetch(`/list?${q(p, t)}`);
+      const data = await res.json();
+      if (!res.ok) {
+        metaEl.textContent = `Error: ${data.error || res.status}`;
+        rowsEl.innerHTML = '';
+        return;
+      }
+      metaEl.textContent = `Path: ${data.path} · ${data.entries.length} items`;
+      rowsEl.innerHTML = '';
+
+      const parts = p.split(/[\\/]/).filter(Boolean);
+      if (parts.length) {
+        const up = parts.slice(0, -1).join('\\');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><a href="#" data-path="${up}">..</a></td><td><span class="tag">dir</span></td><td>-</td><td>-</td><td>-</td>`;
+        rowsEl.appendChild(tr);
+      }
+
+      for (const e of data.entries) {
+        const itemPath = p ? `${p}\\${e.name}` : e.name;
+        const tr = document.createElement('tr');
+        const action = e.isDirectory
+          ? `<a href="#" data-path="${itemPath}">Open</a>`
+          : `<a href="/download?${q(itemPath, t)}" target="_blank">Download</a>`;
+        tr.innerHTML = `
+          <td>${e.isDirectory ? '📁' : '📄'} ${e.name}</td>
+          <td><span class="tag">${e.isDirectory ? 'dir' : 'file'}</span></td>
+          <td>${e.isDirectory ? '-' : fmtSize(e.size)}</td>
+          <td>${e.modified || '-'}</td>
+          <td>${action}</td>`;
+        rowsEl.appendChild(tr);
+      }
+      history.replaceState(null, '', `/?${q(p, t)}`);
+    }
+
+    rowsEl.addEventListener('click', (ev) => {
+      const a = ev.target.closest('a[data-path]');
+      if (!a) return;
+      ev.preventDefault();
+      pathEl.value = a.dataset.path || '';
+      browse();
+    });
+
+    goBtn.addEventListener('click', browse);
+    if (pathEl.value || tokenEl.value) browse();
+  </script>
+</body>
+</html>

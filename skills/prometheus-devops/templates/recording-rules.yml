@@ -1,0 +1,301 @@
+# =============================================================================
+# Prometheus Recording Rules Template
+# =============================================================================
+#
+# Pre-computed metrics for frequently queried expressions. Recording rules
+# reduce query latency and cost for dashboards and alerts.
+#
+# Usage:
+#   1. Copy to /etc/prometheus/rules/recording_rules.yml
+#   2. Adjust job names and labels for your environment
+#   3. Validate: promtool check rules recording_rules.yml
+#   4. Reload Prometheus: curl -X POST http://localhost:9090/-/reload
+#
+# Naming Convention:
+#   level:metric:operations
+#   - level: aggregation level (job, instance, namespace, cluster)
+#   - metric: base metric name
+#   - operations: applied functions (rate5m, ratio, p95, total)
+#
+#   Examples:
+#     job:http_requests:rate5m
+#     instance:node_cpu:utilization
+#     namespace:container_memory:usage_bytes
+#
+# =============================================================================
+
+# ---------- HTTP Request Metrics ----------
+# Pre-compute common HTTP metrics used by dashboards and alerts.
+
+groups:
+  - name: http_request_rules
+    interval: 15s
+    rules:
+      # ---- Request Rate ----
+
+      # Total request rate per job (all status codes)
+      - record: job:http_requests:rate5m
+        expr: sum by (job) (rate(http_requests_total[5m]))
+
+      # Request rate per job and status code
+      - record: job:http_requests_by_status:rate5m
+        expr: sum by (job, status) (rate(http_requests_total[5m]))
+
+      # Request rate per job and method
+      - record: job:http_requests_by_method:rate5m
+        expr: sum by (job, method) (rate(http_requests_total[5m]))
+
+      # ---- Error Rates ----
+
+      # 5xx error rate per job
+      - record: job:http_requests_errors:rate5m
+        expr: sum by (job) (rate(http_requests_total{status=~"5.."}[5m]))
+
+      # Error rate as a percentage (used by alerts and SLO dashboards)
+      - record: job:http_requests_error_rate:ratio5m
+        expr: |
+          (
+            job:http_requests_errors:rate5m
+            /
+            job:http_requests:rate5m
+          )
+
+      # 4xx client error rate per job
+      - record: job:http_requests_client_errors:rate5m
+        expr: sum by (job) (rate(http_requests_total{status=~"4.."}[5m]))
+
+      # ---- Latency ----
+
+      # P50 latency per job
+      - record: job:http_request_duration:p50
+        expr: |
+          histogram_quantile(0.50,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      # P90 latency per job
+      - record: job:http_request_duration:p90
+        expr: |
+          histogram_quantile(0.90,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      # P95 latency per job
+      - record: job:http_request_duration:p95
+        expr: |
+          histogram_quantile(0.95,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      # P99 latency per job
+      - record: job:http_request_duration:p99
+        expr: |
+          histogram_quantile(0.99,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      # Average request duration per job
+      - record: job:http_request_duration:avg5m
+        expr: |
+          (
+            sum by (job) (rate(http_request_duration_seconds_sum[5m]))
+            /
+            sum by (job) (rate(http_request_duration_seconds_count[5m]))
+          )
+
+# ---------- Node / Infrastructure Metrics ----------
+# Pre-compute resource utilization metrics for node-exporter data.
+
+  - name: node_resource_rules
+    interval: 30s
+    rules:
+      # ---- CPU ----
+
+      # CPU utilization percentage per instance
+      - record: instance:node_cpu:utilization
+        expr: |
+          100 - (
+            avg by (instance) (
+              rate(node_cpu_seconds_total{mode="idle"}[5m])
+            ) * 100
+          )
+
+      # CPU utilization by mode (for breakdown charts)
+      - record: instance:node_cpu_by_mode:rate5m
+        expr: |
+          avg by (instance, mode) (
+            rate(node_cpu_seconds_total[5m])
+          ) * 100
+
+      # ---- Memory ----
+
+      # Memory utilization percentage per instance
+      - record: instance:node_memory:utilization
+        expr: |
+          (1 - (
+            node_memory_MemAvailable_bytes
+            /
+            node_memory_MemTotal_bytes
+          )) * 100
+
+      # Memory used bytes (for absolute dashboards)
+      - record: instance:node_memory:used_bytes
+        expr: |
+          node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
+
+      # ---- Disk ----
+
+      # Disk utilization percentage per instance and mountpoint
+      - record: instance:node_disk:utilization
+        expr: |
+          (1 - (
+            node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+            /
+            node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}
+          )) * 100
+
+      # Disk I/O utilization (busy percentage)
+      - record: instance:node_disk_io:utilization
+        expr: |
+          rate(node_disk_io_time_seconds_total[5m]) * 100
+
+      # Disk read/write throughput
+      - record: instance:node_disk:read_bytes_rate5m
+        expr: rate(node_disk_read_bytes_total[5m])
+
+      - record: instance:node_disk:write_bytes_rate5m
+        expr: rate(node_disk_written_bytes_total[5m])
+
+      # ---- Network ----
+
+      # Network receive throughput per instance
+      - record: instance:node_network:receive_bytes_rate5m
+        expr: |
+          sum by (instance) (
+            rate(node_network_receive_bytes_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+          )
+
+      # Network transmit throughput per instance
+      - record: instance:node_network:transmit_bytes_rate5m
+        expr: |
+          sum by (instance) (
+            rate(node_network_transmit_bytes_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+          )
+
+# ---------- Kubernetes Container Metrics ----------
+# Pre-compute container-level metrics from cAdvisor / kubelet.
+
+  - name: kubernetes_container_rules
+    interval: 30s
+    rules:
+      # ---- Container CPU ----
+
+      # CPU usage rate per pod and container
+      - record: namespace:container_cpu:usage_rate5m
+        expr: |
+          sum by (namespace, pod, container) (
+            rate(container_cpu_usage_seconds_total[5m])
+          )
+
+      # CPU usage as percentage of limit
+      - record: namespace:container_cpu:limit_utilization
+        expr: |
+          (
+            sum by (namespace, pod, container) (
+              rate(container_cpu_usage_seconds_total[5m])
+            )
+            /
+            sum by (namespace, pod, container) (
+              container_spec_cpu_quota / container_spec_cpu_period
+            )
+          ) * 100
+
+      # CPU throttling percentage
+      - record: namespace:container_cpu:throttle_rate
+        expr: |
+          (
+            sum by (namespace, pod, container) (
+              rate(container_cpu_cfs_throttled_periods_total[5m])
+            )
+            /
+            sum by (namespace, pod, container) (
+              rate(container_cpu_cfs_periods_total[5m])
+            )
+          )
+
+      # ---- Container Memory ----
+
+      # Memory working set per pod and container
+      - record: namespace:container_memory:working_set_bytes
+        expr: |
+          sum by (namespace, pod, container) (
+            container_memory_working_set_bytes
+          )
+
+      # Memory usage as percentage of limit
+      - record: namespace:container_memory:limit_utilization
+        expr: |
+          (
+            sum by (namespace, pod, container) (
+              container_memory_working_set_bytes
+            )
+            /
+            sum by (namespace, pod, container) (
+              container_spec_memory_limit_bytes
+            )
+          ) * 100
+
+      # ---- Namespace Aggregates ----
+
+      # Total CPU usage per namespace
+      - record: namespace:cpu:usage_rate5m
+        expr: |
+          sum by (namespace) (
+            rate(container_cpu_usage_seconds_total[5m])
+          )
+
+      # Total memory usage per namespace
+      - record: namespace:memory:working_set_bytes
+        expr: |
+          sum by (namespace) (
+            container_memory_working_set_bytes
+          )
+
+# ---------- SLO / Availability Metrics ----------
+# Pre-compute availability and SLO-related metrics.
+
+  - name: slo_rules
+    interval: 30s
+    rules:
+      # Availability over 5-minute window
+      - record: job:availability:ratio5m
+        expr: |
+          1 - job:http_requests_error_rate:ratio5m
+
+      # Availability over 1-hour window (for SLO dashboards)
+      - record: job:availability:ratio1h
+        expr: |
+          1 - (
+            sum by (job) (increase(http_requests_total{status=~"5.."}[1h]))
+            /
+            sum by (job) (increase(http_requests_total[1h]))
+          )
+
+      # Availability over 24-hour window
+      - record: job:availability:ratio24h
+        expr: |
+          1 - (
+            sum by (job) (increase(http_requests_total{status=~"5.."}[24h]))
+            /
+            sum by (job) (increase(http_requests_total[24h]))
+          )
+
+      # Error budget remaining (for 99.9% SLO target)
+      # Positive = budget remaining, negative = budget exhausted
+      - record: job:error_budget:remaining_ratio
+        expr: |
+          1 - (
+            (1 - job:availability:ratio24h)
+            /
+            (1 - 0.999)
+          )

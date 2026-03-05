@@ -1,0 +1,102 @@
+{
+  "allowedTools": {
+    "read": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 5000,
+      "description": "Read file contents"
+    },
+    "write": {
+      "roles": ["admin"],
+      "maxArgsLength": 50000,
+      "description": "Write file contents — admin only"
+    },
+    "exec": {
+      "roles": ["admin"],
+      "maxArgsLength": 2000,
+      "description": "Execute shell commands — admin only"
+    },
+    "gateway": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 5000,
+      "description": "OpenClaw gateway internal tool"
+    },
+    "web_search": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 1000,
+      "description": "Search the web"
+    },
+    "web_fetch": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 2000,
+      "description": "Fetch web content"
+    },
+    "memory_search": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 2000,
+      "description": "Search memory"
+    },
+    "memory_add": {
+      "roles": ["default", "admin"],
+      "maxArgsLength": 5000,
+      "description": "Add to memory"
+    }
+  },
+  "rateLimits": {
+    "perUser": {
+      "maxCalls": 100,
+      "windowSeconds": 3600
+    },
+    "perSession": {
+      "maxCalls": 30,
+      "windowSeconds": 300
+    }
+  },
+  "identityMap": {
+    "main": {
+      "userId": "agent-main",
+      "roles": ["admin"]
+    },
+    "dev": {
+      "userId": "agent-dev",
+      "roles": ["default", "admin"]
+    },
+    "ops": {
+      "userId": "agent-ops",
+      "roles": ["default"]
+    },
+    "unknown": {
+      "userId": "unknown-agent",
+      "roles": ["default"]
+    }
+  },
+  "injectionDetection": {
+    "enabled": true,
+    "sensitivity": "medium",
+    "customPatterns": [],
+    "obfuscationDetection": true,
+    "multiLanguage": true,
+    "canaryTokens": []
+  },
+  "auditLog": {
+    "path": "audit.jsonl",
+    "maxFileSizeMB": 100
+  },
+  "outputDlp": {
+    "enabled": false,
+    "mode": "log",
+    "redactionMode": "mask",
+    "customPatterns": []
+  },
+  "escalation": {
+    "enabled": false,
+    "reviewOnMediumInjection": true,
+    "reviewOnFirstToolUse": false,
+    "tokenTTLSeconds": 300
+  },
+  "behavioralMonitoring": {
+    "enabled": false,
+    "spikeThreshold": 3.0,
+    "monitoringWindowSeconds": 3600,
+    "action": "log"
+  }
+}

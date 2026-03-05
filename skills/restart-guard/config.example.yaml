@@ -1,0 +1,116 @@
+# Restart Guard Configuration
+# Copy this file to your preferred location and fill in your values.
+# Pass the path to scripts via --config flag.
+#
+# Example:
+#   cp config.example.yaml ~/.openclaw/custom/config/restart-guard.yaml
+#   python3 scripts/restart.py --config ~/.openclaw/custom/config/restart-guard.yaml
+
+# --- Paths ---
+paths:
+  # Where to write the restart context file
+  context_file: "~/.openclaw/custom/restart-guard-work/restart-context.md"
+  # Lock file to prevent restart storms
+  lock_file: "/tmp/restart-guard.lock"
+  # Restart log (append-only history)
+  restart_log: "~/.openclaw/custom/restart-guard-work/restart.log"
+  # Config backup directory (before restart)
+  backup_dir: "~/.openclaw/custom/restart-guard-work/restart-backup"
+  # OpenClaw config file (for backup)
+  openclaw_config: "~/.openclaw/openclaw.json"
+  # OpenClaw binary (auto-detected via `which` if empty)
+  openclaw_bin: ""
+
+# --- Gateway ---
+gateway:
+  host: "127.0.0.1"
+  port: 18789
+  # Delay before SIGUSR1 restart (ms)
+  restart_delay_ms: 3000
+  # Environment variable name containing the auth token
+  auth_token_env: "GATEWAY_AUTH_TOKEN"
+
+# --- Guardian ---
+guardian:
+  # How often to poll gateway health (seconds)
+  poll_interval: 2
+  # Timeout waiting for gateway to become unreachable/down (ms)
+  wait_down_timeout_ms: 60000
+  # Timeout waiting for gateway to become healthy again (ms)
+  wait_up_timeout_ms: 120000
+  # Require N consecutive healthy checks to pass
+  health_success_streak: 2
+  # Legacy compatibility timeout (seconds)
+  timeout: 120
+  # Commands to run on timeout for diagnostics
+  diagnostics:
+    - "openclaw doctor --non-interactive"
+    - "openclaw logs --tail 80"
+  # Total retry budget for result delivery (ms)
+  delivery_retry_budget_ms: 90000
+  # Retry interval between delivery rounds (ms)
+  delivery_retry_interval_ms: 2000
+  # Default log tail size for diagnostics
+  diagnostics_log_tail: 80
+
+# --- Safety ---
+safety:
+  # Minimum seconds between restarts
+  cooldown_seconds: 600
+  # Stop auto-restart after N consecutive failures
+  max_consecutive_failures: 3
+  # Backup openclaw.json before restart
+  backup_config: true
+
+# --- Notification ---
+# Guardian tries "primary" first; falls back to "channels" if gateway is down.
+# All enabled channels in the list are notified (multi-channel broadcast).
+notification:
+  # Primary: use OpenClaw message tool (requires working gateway)
+  primary: "openclaw"
+
+  # Notification mode:
+  # - origin: guardian ACK goes to the originating session (recommended)
+  # - selected: notify only selected channel/target
+  # - all: notify all configured channels
+  mode: "origin"
+
+  # Disaster delivery policy (origin ACK -> main fallback -> external broadcast)
+  emergency_policy: "origin_then_all"
+
+  # Fallback channels: ALL listed channels are notified when primary fails.
+  # Supported built-ins: "telegram", "discord", "slack", "webhook"
+  # Other channels (e.g. feishu) are sent via openclaw message passthrough.
+  # (Legacy: "fallback: telegram" still works for single channel)
+  channels:
+    # - telegram
+    # - discord
+    # - slack
+    # - webhook
+
+  # Settings for OpenClaw message tool (primary)
+  openclaw:
+    channel: ""        # e.g. "telegram", "discord", "slack", "feishu"
+    target: ""         # preferred on newer OpenClaw; e.g. Telegram chat id
+    to: ""             # legacy compatibility key (same value as target)
+
+  # Telegram direct API
+  telegram:
+    bot_token_env: "TELEGRAM_BOT_TOKEN"  # Env var name containing the bot token
+    chat_id: ""                          # Telegram chat ID to notify
+
+  # Discord webhook
+  discord:
+    webhook_url_env: "DISCORD_WEBHOOK_URL"  # Env var name containing the webhook URL
+
+  # Slack incoming webhook
+  slack:
+    webhook_url_env: "SLACK_WEBHOOK_URL"  # Env var name containing the webhook URL
+
+  # Generic webhook (any HTTP endpoint)
+  webhook:
+    url_env: "RESTART_GUARD_WEBHOOK_URL"  # Env var name containing the URL
+    method: "POST"                        # HTTP method
+    headers:                              # Custom headers
+      Content-Type: "application/json"
+    body_template: '{"text": "{{message}}"}'  # {{message}} is replaced with notification text

@@ -1,0 +1,40 @@
+{
+  "prefixMap": {
+    "@mini": {
+      "model": "minimax/MiniMax-M2.5",
+      "fallbackModel": "openai-codex/gpt-5.3-codex"
+    },
+    "@codex": {
+      "model": "openai-codex/gpt-5.3-codex",
+      "fallbackModel": "minimax/MiniMax-M2.5"
+    }
+  },
+  "aliasMap": {
+    "@m": "@mini",
+    "@c": "@codex"
+  },
+  "retry": {
+    "maxRetries": 2,
+    "baseDelayMs": 80,
+    "verifyRetries": 2,
+    "verifyDelayMs": 80
+  },
+  "defaultModel": "openai-codex/gpt-5.3-codex",
+  "auth": {
+    "requiredEnv": []
+  },
+  "safety": {
+    "rollbackOnFailure": true,
+    "lockPath": "./.router-switch.lock",
+    "lockStaleMs": 300000
+  },
+  "logging": {
+    "path": "./router.log.jsonl"
+  },
+  "sessionController": {
+    "binary": "openclaw",
+    "setArgsPrefix": ["models", "set"],
+    "statusArgs": ["models", "status", "--json"],
+    "timeoutMs": 15000
+  }
+}

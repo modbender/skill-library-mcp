@@ -1,0 +1,331 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cart API",
+    "description": "The Cart API allows you to add an item to an authenticated customer's cart. <br><br>\n\n### Rate Limit\n\nThe Public Cart API has a **5,000 call per day** rate limit. \n",
+    "termsOfService": "https://developer.kroger.com/terms",
+    "contact": {
+      "name": "API Support",
+      "email": "APISupport@kroger.com",
+      "url": "https://developer.kroger.com"
+    },
+    "version": "1.2.3"
+  },
+  "servers": [
+    {
+      "url": "https://api.kroger.com",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://api-ce.kroger.com",
+      "description": "Certification Environment"
+    }
+  ],
+  "security": [
+    {
+      "CustomerContext": [
+        "cart.basic:write"
+      ]
+    }
+  ],
+  "paths": {
+    "/v1/cart/add": {
+      "put": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Add to cart",
+        "description": "Provides access to add items to an authenticated customer's cart. \n<br><br> **Note**: the customer must be authenticated using the\nOAuth2 Authorization Code grant type.\n",
+        "operationId": "putCarts",
+        "requestBody": {
+          "description": "A list of items that you are adding to the cart.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cart.cartItemRequestModel"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid.UPC"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid.modality"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid.parameters"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.forbidden"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.cart.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CustomerContext": [
+              "cart.basic:write"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X PUT \\\n  'https://api.kroger.com/v1/cart/add' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}' \\\n  -d '\n{\n  \"items\": [\n    {\n      \"upc\": \"0001200016268\",\n      \"quantity\": 2,\n      \"modality\": \"PICKUP\"\n    }\n  ]\n}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"strings\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/cart/add\"\n\n  payload := strings.NewReader(\"{\\n  \\\"items\\\": [\\n     {\\n       \\\"upc\\\": \\\"0001200016268\\\",\\n       \\\"quantity\\\": \\2,\\n       \\\"modality\\\": \\\"PICKUP\\\"\\\\n      }\\n    ]\\n }\")\n\n  req, _ := http.NewRequest(\"PUT\", url, payload)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/cart/add\",\n  \"method\": \"PUT\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\",\n  },\n  \"processData\": false,\n  \"data\": \"{\\n  \\\"items\\\": [\\n     {\\n       \\\"upc\\\": \\\"0001200016268\\\",\\n       \\\"quantity\\\": \\2,\\n       \\\"modality\\\": \\\"PICKUP\\\"\\\\n      }\\n    ]\\n }\"\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nMediaType mediaType = MediaType.parse(\"application/json\");\nRequestBody body = RequestBody.create(mediaType, \"{\\n  \\\"items\\\": [\\n     {\\n       \\\"upc\\\": \\\"0001200016268\\\",\\n       \\\"quantity\\\": \\2,\\n       \\\"modality\\\": \\\"PICKUP\\\"\\\\n      }\\n    ]\\n }\");\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/cart/add\")\n  .put(body)\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "APIError": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "APIError.cart.serverError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "Internal server error"
+              },
+              "code": {
+                "type": "string",
+                "example": "CART-4xxx-xxx"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564159296910
+              }
+            }
+          }
+        }
+      },
+      "APIError.forbidden": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "missing required scopes"
+              },
+              "code": {
+                "type": "string",
+                "example": "Forbidden"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564143270221
+              }
+            }
+          }
+        }
+      },
+      "APIError.unauthorized": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "error_description": {
+                "type": "string",
+                "example": "The access token is invalid or has expired"
+              },
+              "error": {
+                "type": "string",
+                "example": "invalid_token"
+              }
+            }
+          }
+        }
+      },
+      "cart.cartItemModel": {
+        "required": [
+          "quantity",
+          "upc"
+        ],
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "description": "The quantity of the item.",
+            "example": 1
+          },
+          "upc": {
+            "type": "string",
+            "description": "The `UPC` of the item.",
+            "example": "0001111060903"
+          },
+          "modality": {
+            "type": "string",
+            "description": "An optional value representing a modality including: DELIVERY, PICKUP.",
+            "enum": [
+              "DELIVERY",
+              "PICKUP"
+            ],
+            "default": "PICKUP"
+          }
+        }
+      },
+      "cart.cartItemRequestModel": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "An array of items in the cart.",
+            "items": {
+              "$ref": "#/components/schemas/cart.cartItemModel"
+            }
+          }
+        }
+      },
+      "Invalid.modality": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Modality must be omitted or equal one of the following codes: DELIVERY, PICKUP"
+          }
+        }
+      },
+      "Invalid.parameters": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Cannot parse parameters"
+          }
+        }
+      },
+      "Invalid.UPC": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "UPC must have a length of 13 characters"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "CustomerContext": {
+        "type": "oauth2",
+        "description": "To make an API request that returns either personalized customer data or acts on behalf of a customer, the customer's consent is required using the [Authorization Code Grant Type](https://developer.kroger.com/reference/api/authorization-endpoints-public#tag/OAuth2/operation/authorizationCode).\n",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://api.kroger.com/v1/connect/oauth2/authorize",
+            "tokenUrl": "https://api.kroger.com/v1/connect/oauth2/token",
+            "scopes": {
+              "cart.basic:write": "Grants write access to a customer's cart."
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "API Reference",
+      "tags": [
+        "Carts"
+      ]
+    }
+  ]
+}

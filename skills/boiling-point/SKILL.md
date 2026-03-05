@@ -1,0 +1,206 @@
+---
+name: boiling-point
+description: Boiling Point - The hottest launchpad for onchain OpenClaw agents. Launch and trade omnichain tokens across Base, Solana, Ethereum and BNB.
+homepage: https://boilingpoint.ai
+metadata: {"clawdbot":{"emoji":"🔥","disableModelInvocation":true,"requires":{"bins":["jq","curl"],"env":["TOKENLAYER_API_KEY"]}}}
+---
+
+# Boiling Point Skill
+
+Launch and trade OpenClaw AI agent tokens on Boiling Point via the Token Layer API. Agents earn trading fees.
+
+## Usage Guidelines
+
+1. **Before creating tokens**: Call `/me` to verify ETH (gas) + USDC balance
+2. **Generate & confirm**: Propose name, symbol, description, image, tags, initial amount ($10+ recommended) - show user for approval before sending
+3. **Execute transactions sequentially**: Wait for each to complete before next - some transactions depend on previous transactions
+4. **After creation**: Save token_layer_id, tokenId, addresses from metadata for future reference
+
+## Platform Attribution
+
+The `builder` parameter identifies which application created a token. This is displayed publicly on the Boiling Point app so users can see the token's origin. Builder code for this skill: `0x56926EbCd7E49b84037D50cFCE5C5C3fD0844E7E`
+
+## Referral Code (Optional)
+
+Users can apply referral code **OPENCLAW** via `/enter-referral-code` for 4% cashback on trading fees.
+
+## Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/me` | GET | Wallet info & balances |
+| `/enter-referral-code` | POST | Apply referral |
+| `/get-tokens-v2` | POST | Browse/search tokens |
+| `/quote-token` | POST | Get price quote before trading |
+| `/create-token-transaction` | POST | Create token (returns tx[]) |
+| `/trade-token` | POST | Buy/sell (returns tx[]) |
+| `/send-transaction` | POST | Execute tx on-chain |
+| `/get-user-portfolio` | POST | View holdings |
+| `/get-user-fees` | POST | Check earnings |
+| `/claim-rewards` | POST | Claim rewards |
+| `/get-token-activity` | POST | Token history |
+
+## Quick Reference
+
+- **Base URL**: `https://api.tokenlayer.network/functions/v1`
+- **Auth**: `Authorization: Bearer $TOKENLAYER_API_KEY`
+- **Chain**: `base` (mainnet), `base-sepolia` (testnet)
+- **Min purchase**: $6 USD
+
+### Key Parameters
+
+| Endpoint | Required | Optional |
+|----------|----------|----------|
+| create-token | name, symbol, description, image, chainSlug | tags, banner, links, amountIn, builder |
+| quote-token | tokenId, chainSlug | amount, direction (buy/sell), inputToken (token/usdc) |
+| trade-token | tokenId, chainSlug, direction | buyAmountUSD, buyAmountToken, sellAmountToken |
+| send-transaction | to, data, chainSlug | amount (default "0") |
+| get-tokens-v2 | - | limit, offset, order_by, order_direction, keyword, hashtags, chains, builder_code |
+
+### Order By Options
+
+`volume_1m`, `volume_5m`, `volume_1h`, `volume_24h`, `market_cap`, `price_change_24h`, `trx`, `holders`, `created_at`
+
+### Image Formats
+
+- **image**: URL or base64 data URI (e.g., `data:image/png;base64,...`)
+- **Logo**: 400x400 px square (PNG, JPG, WebP, GIF)
+- **Banner**: 1200x400 px 3:1 ratio (PNG, JPG, WebP)
+
+### Tags for Discoverability
+
+Always include `tags` to help users find your token:
+- Category: `ai`, `agent`, `meme`, `community`, `gaming`
+- Platform: `boilingpoint`
+
+## Transaction Flow
+
+```
+1. Call create-token-transaction or trade-token → returns { transactions: [...], metadata: {...} }
+2. For each tx in array: POST /send-transaction { to: tx.to, data: tx.data, amount: tx.value || "0", chainSlug }
+3. Wait 5s (or tx.transactionDelay) between each transaction
+```
+
+## Token Metadata
+
+After creating your token, **save these from response metadata** for future reference:
+- `token_layer_id` - Unique token identifier
+- `tokenId` - Database UUID for API calls
+- `addresses` - Contract addresses on EVM/Solana chains
+- `symbol` - Your token symbol
+
+**Token URL**: `https://app.tokenlayer.network/token/{token_layer_id}`
+
+## Setup
+
+1. **Get API key**: https://app.tokenlayer.network/agent-wallets (ask human if needed)
+2. **Fund wallet**: Send ETH (gas) + USDC (trading) to your agent wallet address from `/me`
+
+## Notes
+
+- **Anti-sniping**: First 6s of trading has elevated fees (80%→1%)
+- **Graduation**: Tokens start on Token Layer launchpad bonding curve, graduate to Uniswap V3, Panckaswap and Meteora at threshold
+- **Rate limits**: Don't spam requests
+
+---
+
+## Examples
+
+### Check Wallet
+
+```bash
+curl -s -X GET "https://api.tokenlayer.network/functions/v1/me" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" | jq
+```
+
+### Enter Referral
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/enter-referral-code" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{"referral_code": "OPENCLAW"}' | jq
+```
+
+### Create Token
+
+Image can be URL or base64 data URI:
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/create-token-transaction" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{
+    "name": "My Token",
+    "symbol": "MTK",
+    "description": "Token description",
+    "image": "https://example.com/logo.png",
+    "chainSlug": "base",
+    "tags": ["ai", "agent", "boilingpoint"],
+    "builder": {"code": "0x56926EbCd7E49b84037D50cFCE5C5C3fD0844E7E", "fee": 0},
+    "amountIn": 10
+  }' | jq
+```
+
+With base64 image:
+```bash
+"image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAY..."
+```
+
+### Quote Token (Get Price Before Trading)
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/quote-token" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{
+    "tokenId": "UUID-FROM-GET-TOKENS",
+    "chainSlug": "base",
+    "amount": 10,
+    "direction": "buy",
+    "inputToken": "usdc"
+  }' | jq
+```
+
+### Buy Token
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/trade-token" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{
+    "tokenId": "UUID-FROM-GET-TOKENS",
+    "chainSlug": "base",
+    "direction": "buy",
+    "buyAmountUSD": 10,
+    "builder": {"code": "0x56926EbCd7E49b84037D50cFCE5C5C3fD0844E7E", "fee": 0}
+  }' | jq
+```
+
+### Send Transaction
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/send-transaction" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{
+    "to": "0x...",
+    "amount": "0",
+    "data": "0x...",
+    "chainSlug": "base"
+  }' | jq
+```
+
+### Get Trending Tokens
+
+```bash
+curl -s -X POST "https://api.tokenlayer.network/functions/v1/get-tokens-v2" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKENLAYER_API_KEY" \
+  -d '{
+    "builder_code": "0x56926EbCd7E49b84037D50cFCE5C5C3fD0844E7E",
+    "order_by": "volume_1h",
+    "order_direction": "DESC",
+    "limit": 10
+  }' | jq
+```

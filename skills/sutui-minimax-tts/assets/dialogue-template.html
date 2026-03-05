@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - 对话音频</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .scene {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        /* 完整音频区域 */
+        .full-audio-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .full-audio-section h2 {
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .full-audio-section h2::before {
+            content: "🎵";
+        }
+        
+        .full-audio-player {
+            width: 100%;
+        }
+        
+        .play-all-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .play-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .play-all-btn.playing {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        /* 角色列表 */
+        .characters-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .characters-section h2 {
+            color: #333;
+            margin-bottom: 16px;
+        }
+        
+        .characters-section h2::before {
+            content: "👥 ";
+        }
+        
+        .character-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .character-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .character-tag.male {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .character-tag.female {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+        
+        /* 对话列表 */
+        .dialogues-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .dialogues-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .dialogues-section h2::before {
+            content: "💬 ";
+        }
+        
+        .dialogue-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+        
+        .dialogue-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .dialogue-item.playing {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+        }
+        
+        .dialogue-index {
+            width: 32px;
+            height: 32px;
+            background: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+            flex-shrink: 0;
+        }
+        
+        .dialogue-content {
+            flex: 1;
+        }
+        
+        .dialogue-speaker {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .dialogue-speaker.male {
+            color: #1565c0;
+        }
+        
+        .dialogue-speaker.female {
+            color: #c2185b;
+        }
+        
+        .dialogue-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .dialogue-audio {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .dialogue-audio audio {
+            height: 36px;
+            flex: 1;
+        }
+        
+        .play-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .emotion-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #666;
+            margin-left: 8px;
+        }
+        
+        /* 进度指示 */
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .dialogue-item {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .dialogue-index {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题区域 -->
+        <div class="header">
+            <h1>{{title}}</h1>
+            <p class="scene">{{scene}}</p>
+        </div>
+        
+        <!-- 完整音频播放 -->
+        <div class="full-audio-section">
+            <h2>完整对话音频</h2>
+            <button class="play-all-btn" onclick="playAll()">
+                <span class="icon">▶️</span>
+                <span class="text">播放完整对话</span>
+            </button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <!-- 角色介绍 -->
+        <div class="characters-section">
+            <h2>登场角色</h2>
+            <div class="character-list">
+                {{#each characters}}
+                <div class="character-tag {{gender}}">
+                    <span>{{#if (eq gender 'male')}}👨{{else}}👩{{/if}}</span>
+                    <span>{{name}}</span>
+                    <span style="opacity: 0.7; font-size: 0.8rem;">({{voice_name}})</span>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        
+        <!-- 对话列表 -->
+        <div class="dialogues-section">
+            <h2>对话详情</h2>
+            <div class="dialogue-list">
+                {{#each dialogues}}
+                <div class="dialogue-item" data-index="{{@index}}" id="dialogue-{{@index}}">
+                    <div class="dialogue-index">{{add @index 1}}</div>
+                    <div class="dialogue-content">
+                        <div class="dialogue-speaker {{gender}}">
+                            {{speaker_name}}
+                            <span class="emotion-tag">{{emotion}}</span>
+                        </div>
+                        <div class="dialogue-text">{{text}}</div>
+                        <div class="dialogue-audio">
+                            <button class="play-btn" onclick="playSingle({{@index}})">▶</button>
+                            <audio id="audio-{{@index}}" src="{{audio_url}}" preload="metadata"></audio>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 对话数据
+        const dialogues = [
+            {{#each dialogues}}
+            {
+                index: {{@index}},
+                speaker: "{{speaker_name}}",
+                text: "{{text}}",
+                audioUrl: "{{audio_url}}"
+            }{{#unless @last}},{{/unless}}
+            {{/each}}
+        ];
+        
+        let currentIndex = 0;
+        let isPlayingAll = false;
+        
+        // 播放单段
+        function playSingle(index) {
+            stopAll();
+            const audio = document.getElementById(`audio-${index}`);
+            highlightDialogue(index);
+            audio.play();
+        }
+        
+        // 播放全部（顺序播放）
+        function playAll() {
+            if (isPlayingAll) {
+                stopAll();
+                return;
+            }
+            
+            isPlayingAll = true;
+            currentIndex = 0;
+            updatePlayAllBtn(true);
+            playNext();
+        }
+        
+        function playNext() {
+            if (currentIndex >= dialogues.length) {
+                stopAll();
+                return;
+            }
+            
+            const audio = document.getElementById(`audio-${currentIndex}`);
+            highlightDialogue(currentIndex);
+            updateProgress();
+            
+            audio.onended = () => {
+                currentIndex++;
+                playNext();
+            };
+            
+            audio.play();
+        }
+        
+        function stopAll() {
+            isPlayingAll = false;
+            dialogues.forEach((_, i) => {
+                const audio = document.getElementById(`audio-${i}`);
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            clearHighlight();
+            updatePlayAllBtn(false);
+            document.getElementById('progressFill').style.width = '0%';
+        }
+        
+        function highlightDialogue(index) {
+            clearHighlight();
+            const item = document.getElementById(`dialogue-${index}`);
+            if (item) {
+                item.classList.add('playing');
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        function clearHighlight() {
+            document.querySelectorAll('.dialogue-item').forEach(item => {
+                item.classList.remove('playing');
+            });
+        }
+        
+        function updatePlayAllBtn(playing) {
+            const btn = document.querySelector('.play-all-btn');
+            if (playing) {
+                btn.classList.add('playing');
+                btn.innerHTML = '<span class="icon">⏹️</span><span class="text">停止播放</span>';
+            } else {
+                btn.classList.remove('playing');
+                btn.innerHTML = '<span class="icon">▶️</span><span class="text">播放完整对话</span>';
+            }
+        }
+        
+        function updateProgress() {
+            const progress = ((currentIndex + 1) / dialogues.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+    </script>
+</body>
+</html>

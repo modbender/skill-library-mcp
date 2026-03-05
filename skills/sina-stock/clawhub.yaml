@@ -1,0 +1,137 @@
+---
+# ClawHub.ai Skill 发布配置
+# 文档：https://clawhub.ai/docs/publish
+
+# 基本信息
+name: sina-stock
+version: 1.0.0
+description: 获取 A 股实时股票行情数据（上证指数、深证成指、创业板指等），使用新浪财经 API。无需 API Key。
+author: Sunnyfo
+license: MIT
+
+# 分类
+category: finance
+tags:
+  - stock
+  - finance
+  - A 股
+  - 行情
+  - 股票
+  - 中国
+
+# 技能入口
+entry:
+  type: script
+  path: scripts/get_stock.py
+  interpreter: python3
+
+# 参数定义
+parameters:
+  - name: codes
+    type: string
+    required: true
+    description: 股票代码（逗号分隔），如 sh000001,sz399001
+  - name: --json
+    type: boolean
+    required: false
+    description: 输出 JSON 格式
+  - name: --simple
+    type: boolean
+    required: false
+    description: 简化输出
+
+# 使用示例
+examples:
+  - description: 获取大盘指数
+    command: sina-stock sh000001,sz399001,sz399006
+  - description: 获取个股行情
+    command: sina-stock sh600519,sz000858
+  - description: JSON 格式输出
+    command: sina-stock sh000001 --json
+
+# 依赖
+dependencies: []
+
+# 环境变量（无需 API Key）
+env: []
+
+# 权限
+permissions:
+  - network: true  # 需要访问新浪财经 API
+
+# 兼容性
+compatibility:
+  min_version: 1.0.0
+  platforms:
+    - windows
+    - macos
+    - linux
+
+# 图标（可选）
+icon: 📈
+
+# 发布说明
+changelog:
+  - version: 1.0.0
+    date: 2026-03-02
+    changes:
+      - 初始版本
+      - 支持 A 股大盘指数查询
+      - 支持个股行情查询
+      - 支持文本/JSON/简化输出格式
+
+# 链接
+links:
+  homepage: https://github.com/Sunnyfo/sina-stock
+  issues: https://github.com/Sunnyfo/sina-stock/issues
+  docs: https://github.com/Sunnyfo/sina-stock/blob/main/SKILL.md
+
+# 审核信息
+# 以下信息将用于 ClawHub 审核
+submission:
+  # 简要描述（50 字以内）
+  short_description: 获取 A 股实时行情，支持大盘指数和个股查询，无需 API Key
+
+  # 详细描述（用于展示页面）
+  long_description: |
+    Sina Stock 是一个用于获取 A 股实时行情的 LobsterAI Skill。
+
+    **功能特点：**
+    - 支持上证指数、深证成指、创业板指等大盘指数
+    - 支持任意 A 股股票代码查询
+    - 提供当前价、涨跌幅、成交量、成交额等详细数据
+    - 支持文本、JSON、简化等多种输出格式
+    - 无需 API Key，完全免费使用
+
+    **数据来源：** 新浪财经 API
+
+    **使用场景：**
+    - 查看大盘整体走势
+    - 监控自选股行情
+    - 获取股票数据用于分析
+
+  # 截图（可选，提升审核通过率）
+  # screenshots:
+  #   - path: screenshots/demo1.png
+  #     description: 使用示例
+
+  # 演示视频（可选）
+  # demo_video: https://www.youtube.com/watch?v=xxxxx
+
+  # 测试说明（帮助审核人员快速验证）
+  test_instructions: |
+    1. 安装 skill 后，运行以下命令测试：
+       ```
+       sina-stock sh000001,sz399001,sz399006
+       ```
+    2. 应该看到上证指数、深证成指、创业板指的实时数据
+    3. 测试 JSON 输出：
+       ```
+       sina-stock sh000001 --json
+       ```
+
+  # 注意事项
+  notes:
+    - 交易时间：工作日 9:30-11:30, 13:00-15:00
+    - 非交易时间返回最后收盘价
+    - 数据可能有秒级延迟

@@ -1,0 +1,50 @@
+{
+  "capsule": {
+    "blast_radius": {
+      "files": 1,
+      "lines": 272
+    },
+    "confidence": 0.85,
+    "content": "---\nname: xiaohongshu-auto\ndescription: 小红书自动化技能，自动发布笔记和管理内容\n---\n\n# 小红书自动发帖技能\n\n🤖 **技能名称**: xiaohongshu-auto  \n📝 **用途**: 自动登录小红书、发布笔记、管理内容  \n🔐 **认证**: 需要手动登录一次（保存 Cookie）\n\n---\n\n## ⚠️ 路径说明\n\n**技能路径**: `/root/.openclaw/workspace/skills/xiaohongshu-auto/`\n\n### macOS / Linux 示例\n```bash\ncd /root/.openclaw/workspace/skills/xiaohongshu-auto\n```\n\n### Windows 示例\n```powershell\ncd C:\\Users\\用户名\\.openclaw\\workspace\\skills\\xiaohongshu-auto\n```\n\n---\n\n## 🚀 快速开始\n\n### 1. 安装依赖\n\n```bash\n# 确保 Chrome 已安装\ngoogle-chrome --version\n\n# 安装必要的 Python 库（如果需要）\npip install selenium webdriver-manager\n```\n\n### 2. 配置浏览器\n\n**方式 A：Chrome 扩展 Relay（推荐）**\n\n1. 在 Chrome 中安装 **OpenClaw Browser Relay** 扩展\n   - Chrome Web Store 搜索 \"OpenClaw Browser Relay\"\n   - 或访问：https://chrome.google.com/webstore\n\n2. 手动登录小红书\n   - 打开 https://www.xiaohongshu.com\n   - 扫码或账号密码登录\n   - 保持登录状态\n\n3. 点击扩展图标，启用 Relay 模式\n\n**方式 B：独立浏览器**\n\n```bash\n# 启动 OpenClaw 管理的浏览器\nopenclaw browser start --profile openclaw\n```\n\n### 3. 使用技能\n\n#### 发布笔记\n```bash\n# 调用技能发布笔记\nopenclaw skill xiaohongshu-auto publish \\\n  --title \"笔记标题\" \\\n  --content \"笔记内容\" \\\n  --image \"/path/to/image.jpg\"\n```\n\n#### 查看笔记列表\n```bash\nopenclaw skill xiaohongshu-auto list\n```\n\n#### 分析数据\n```bash\nopenclaw skill xiaohongshu-auto analytics\n```\n\n---\n\n## 📋 配置文件\n\n创建 `config.json`：\n\n```json\n{\n  \"account\": {\n    \"loginMethod\": \"qrcode\",\n    \"sessionFile\": \"~/.openclaw/workspace/skills/xiaohongshu-auto/session.json\"\n  },\n  \"browser\": {\n    \"profile\": \"chrome\",\n    \"headless\": false,\n    \"userDataDir\": \"~/.openclaw/workspace/skills/xiaohongshu-auto/chrome-profile\"\n  },\n  \"posting\": {\n    \"dailyLimit\": 5,\n    \"randomDelay\": true,\n    \"delayRange\": [300, 1800],\n    \"autoHashtags\": true,\n    \"imageQuality\": 0.9\n  },\n  \"analytics\": {\n    \"trackViews\": true,\n    \"trackLikes\": true,\n    \"trackComments\": true,\n    \"reportInterval\": \"daily\"\n  }\n}\n```\n\n---\n\n## 🔧 使用方式\n\n### 基础用法\n\n**发布图文笔记**：\n```bash\nopenclaw skill xiaohongshu-auto publish \\\n  --title \"今天分享一个超好用的 AI 助手\" \\\n  --content \"最近发现了一个超厉害的工具...\" \\\n  --images \"image1.jpg,image2.jpg,image3.jpg\"\n```\n\n**发布视频笔记**：\n```bash\nopenclaw skill xiaohongshu-auto publish \\\n  --title \"Vlog | 我的一天\" \\\n  --content \"记录美好的一天\" \\\n  --video \"video.mp4\"\n```\n\n### 高级用法\n\n**定时发布**：\n```bash\n# 设置定时任务（每天早上 9 点发布）\n0 9 * * * openclaw skill xiaohongshu-auto publish --scheduled\n```\n\n**批量发布**：\n```bash\n# 从 CSV 文件批量发布\nopenclaw skill xiaohongshu-auto batch-publish \\\n  --csv \"posts.csv\" \\\n  --image-dir \"./images\"\n```\n\n**数据分析**：\n```bash\n# 获取最近 7 天数据\nopenclaw skill xiaohongshu-auto analytics --days 7\n\n# 导出报告\nopenclaw skill xiaohongshu-auto analytics --export report.pdf\n```\n\n---\n\n## 📁 目录结构\n\n```\nxiaohongshu-auto/\n├── SKILL.md              # 技能说明（本文件）\n├── USAGE.md              # 详细使用文档\n├── config.json           # 配置文件\n├── config.example.json   # 配置示例\n├── session.json          # 登录会话（自动生成）\n├── scripts/\n│   ├── publish.py        # 发布脚本\n│   ├── login.py          # 登录脚本\n│   └── analytics.py      # 数据分析脚本\n├── templates/\n│   ├── post-template.md  # 笔记模板\n│   └── hashtag-list.txt  # 标签库\n└── logs/\n    └── activity.log      # 活动日志\n```\n\n---\n\n## ⚠️ 注意事项\n\n### 平台规则\n1. **发布频率**：每天不超过 5 篇，避免被判定为营销号\n2. **内容质量**：确保原创，不要抄袭\n3. **图片要求**：分辨率不低于 1080x1440\n4. **敏感词**：避免广告法禁用词\n\n### 安全建议\n1. **人工审核**：发布前人工确认内容\n2. **随机延迟**：设置 5-30 分钟随机间隔\n3. **账号保护**：不要频繁切换设备\n4. **数据备份**：定期导出笔记数据\n\n### 风险提醒\n- ❌ 过度自动化可能导致限流\n- ❌ 低质量内容会被降权\n- ❌ 违规内容可能封号\n- ⚠️ 本工具仅供学习研究，请遵守平台规则\n\n---\n\n## 🛠️ 故障排查\n\n### 无法登录\n```bash\n# 清除会话重新登录\nrm ~/.openclaw/workspace/skills/xiaohongshu-auto/session.json\nopenclaw skill xiaohongshu-auto login\n```\n\n### 浏览器启动失败\n```bash\n# 检查 Chrome 安装\ngoogle-chrome --version\n\n# 重启浏览器服务\nopenclaw browser stop\nopenclaw browser start\n```\n\n### 发布失败\n```bash\n# 查看日志\ntail -f ~/.openclaw/workspace/skills/xiaohongshu-auto/logs/activity.log\n\n# 检查网络连接\ncurl -I https://www.xiaohongshu.com\n```\n\n---\n\n## 📊 收益模式\n\n### 流量分成\n- 小红书创作者中心\n- 笔记浏览量收益\n- 约 ¥0.01-0.05/千次浏览\n\n### 带货佣金\n- 商品链接转化\n- 佣金比例 5-30%\n\n### 品牌合作\n- 推广笔记\n- 单篇 ¥500-5000+\n\n### 引流变现\n- 导流到私域\n- 知识付费/咨询服务\n\n---\n\n## 📖 参考文档\n\n- [小红书创作者中心](https://creator.xiaohongshu.com/)\n- [小红书社区规范](https://www.xiaohongshu.com/community-guidelines)\n- [OpenClaw 浏览器文档](https://docs.openclaw.ai/browser)\n\n---\n\n*最后更新：2026-02-27*\n*版本：1.0.0*\n",
+    "env_fingerprint": {
+      "arch": "x64",
+      "platform": "linux"
+    },
+    "gene": "sha256:f35a6e7f490179447f26e22a1a2fd6014a10abe481f9b2102ad8a6515cf5b885",
+    "outcome": {
+      "score": 0.85,
+      "status": "success"
+    },
+    "schema_version": "1.5.0",
+    "summary": "小红书自动化",
+    "trigger": [
+      "xiaohongshu"
+    ],
+    "type": "Capsule"
+  },
+  "event": {
+    "capsule_id": "sha256:f35a6e7f490179447f26e22a1a2fd6014a10abe481f9b2102ad8a6515cf5b885",
+    "genes_used": [
+      "sha256:f35a6e7f490179447f26e22a1a2fd6014a10abe481f9b2102ad8a6515cf5b885"
+    ],
+    "intent": "engage",
+    "outcome": {
+      "score": 0.85,
+      "status": "success"
+    },
+    "source": "Skills-Bank migration",
+    "type": "EvolutionEvent"
+  },
+  "gene": {
+    "category": "engage",
+    "schema_version": "1.5.0",
+    "signals_match": [
+      "xiaohongshu-auto"
+    ],
+    "strategy": [
+      "license: MIT tags:   - xiaohongshu   - auto"
+    ],
+    "summary": "小红书自动化",
+    "type": "Gene"
+  }
+}

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>라온 AI 비서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a28;--bg4:#22223a;
+  --text:#e8e8f0;--text2:#9999aa;--text3:#666678;
+  --accent:#FF6B35;--accent2:#F7C948;--accent-bg:rgba(255,107,53,.1);
+  --glass:rgba(18,18,26,.75);--glass-border:rgba(255,255,255,.06);
+  --sidebar-w:260px;--radius:12px;--radius-sm:8px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;
+  display:flex;
+}
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--sidebar-w);height:100vh;flex-shrink:0;
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-right:1px solid var(--glass-border);
+  display:flex;flex-direction:column;transition:margin-left .3s ease;
+  z-index:100;position:relative;
+}
+.sidebar.collapsed{margin-left:calc(var(--sidebar-w)*-1)}
+.sidebar-header{padding:20px 16px 12px;display:flex;align-items:center;gap:10px}
+.sidebar-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sidebar-title{font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-subtitle{font-size:11px;color:var(--text3);margin-top:-2px}
+
+.sidebar-section{padding:0 12px;margin-top:16px}
+.sidebar-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:0 8px 6px;font-weight:600}
+
+.mode-btn{
+  display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;
+  border:none;background:transparent;color:var(--text2);cursor:pointer;
+  border-radius:var(--radius-sm);font-size:14px;text-align:left;
+  transition:all .15s;font-family:inherit;
+}
+.mode-btn:hover{background:var(--bg3);color:var(--text)}
+.mode-btn.active{background:var(--accent-bg);color:var(--accent);font-weight:600}
+.mode-btn .mode-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+
+.sidebar-divider{height:1px;background:var(--glass-border);margin:16px 12px}
+
+/* History */
+.history-section{flex:1;overflow-y:auto;padding:0 12px;min-height:0}
+.history-item{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);
+  font-size:13px;transition:background .15s;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.history-item:hover{background:var(--bg3);color:var(--text)}
+.history-item .hi-icon{flex-shrink:0;font-size:14px}
+.history-item .hi-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item .hi-del{
+  margin-left:auto;opacity:0;background:none;border:none;color:var(--text3);
+  cursor:pointer;font-size:14px;padding:2px;flex-shrink:0;
+}
+.history-item:hover .hi-del{opacity:1}
+.history-empty{padding:12px;color:var(--text3);font-size:12px;text-align:center}
+
+/* Profile card */
+.profile-card{
+  margin:12px;padding:14px;background:var(--bg3);border-radius:var(--radius);
+  border:1px solid var(--glass-border);flex-shrink:0;
+}
+.profile-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.profile-title{font-size:13px;font-weight:600;color:var(--text)}
+.profile-level{font-size:11px;color:var(--accent);font-weight:600}
+.xp-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s ease}
+.profile-xp-text{font-size:10px;color:var(--text3);text-align:right;margin-top:3px}
+.profile-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.profile-badge{font-size:14px;cursor:default}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh}
+
+/* Top bar */
+.topbar{
+  padding:12px 20px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--glass-border);flex-shrink:0;
+  background:var(--glass);backdrop-filter:blur(20px);
+}
+.topbar-toggle{
+  background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;
+  padding:4px;border-radius:6px;transition:color .15s;
+}
+.topbar-toggle:hover{color:var(--text)}
+.topbar-mode{font-size:15px;font-weight:600;flex:1}
+.topbar-new{
+  background:var(--bg3);border:1px solid var(--glass-border);color:var(--text2);
+  padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;
+  font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.topbar-new:hover{background:var(--bg4);color:var(--text)}
+.topbar-kbd{font-size:10px;color:var(--text3);background:var(--bg);padding:2px 5px;border-radius:4px}
+
+/* Messages */
+.messages{flex:1;overflow-y:auto;padding:24px 20px;min-height:0}
+.messages-inner{max-width:1100px;margin:0 auto}
+.msg{margin-bottom:20px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg-bot{display:flex;gap:12px;align-items:flex-start}
+.msg-avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.msg-content{
+  background:var(--bg2);border:1px solid var(--glass-border);
+  border-radius:var(--radius) var(--radius) var(--radius) 4px;
+  padding:14px 18px;max-width:calc(100% - 50px);color:var(--text);
+  font-size:14px;line-height:1.7;
+}
+.msg-user{display:flex;justify-content:flex-end}
+.msg-user .msg-content{
+  background:linear-gradient(135deg,var(--accent),#e85d2a);color:white;
+  border:none;border-radius:var(--radius) var(--radius) 4px var(--radius);
+  max-width:85%;
+}
+/* Markdown */
+.msg-content h1,.msg-content h2,.msg-content h3{color:var(--accent);margin:12px 0 6px;font-weight:700}
+.msg-content h1{font-size:17px}
+.msg-content h2{font-size:15px}
+.msg-content h3{font-size:14px}
+.msg-content strong{color:var(--text);font-weight:600}
+.msg-content ul,.msg-content ol{padding-left:20px;margin:6px 0}
+.msg-content li{margin:3px 0}
+.msg-content table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+.msg-content th{background:var(--bg3);border:1px solid var(--bg4);padding:6px 10px;text-align:left;font-weight:600;color:var(--accent)}
+.msg-content td{border:1px solid var(--bg4);padding:6px 10px}
+.msg-content code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:13px}
+.msg-content pre{background:var(--bg3);padding:12px;border-radius:var(--radius-sm);overflow-x:auto;margin:8px 0}
+.msg-content pre code{background:none;padding:0}
+.msg-content .score-display{font-size:28px;font-weight:700;margin:8px 0}
+.msg-content .xp-inline{margin-top:12px;padding:10px;background:var(--bg3);border-radius:var(--radius-sm);font-size:12px}
+.msg-content .xp-inline .xp-bar-inline{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:6px}
+.msg-content .xp-inline .xp-fill-inline{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s}
+
+/* Loading */
+.msg-loading .msg-content{background:var(--bg2);border:1px solid var(--glass-border)}
+.spinner{width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-inner{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px}
+.progress-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s}
+.loading-tip{font-size:11px;color:var(--accent);margin-top:6px}
+.loading-elapsed{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Welcome */
+.welcome{text-align:center;padding:60px 20px}
+.welcome-emoji{font-size:48px;margin-bottom:16px}
+.welcome h2{font-size:22px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome p{color:var(--text2);font-size:14px;max-width:600px;margin:0 auto}
+.welcome-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:24px;max-width:700px;margin-left:auto;margin-right:auto}
+.welcome-card{
+  background:var(--bg2);border:1px solid var(--glass-border);border-radius:var(--radius);
+  padding:14px;cursor:pointer;text-align:left;transition:all .15s;
+}
+.welcome-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.welcome-card .wc-icon{font-size:20px;margin-bottom:6px}
+.welcome-card .wc-title{font-size:13px;font-weight:600;color:var(--text)}
+.welcome-card .wc-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Idea cards */
+.idea-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:12px 0}
+.idea-card{
+  background:var(--bg3);border:1px solid var(--glass-border);border-radius:var(--radius);
+  padding:14px;cursor:pointer;transition:all .15s;
+}
+.idea-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.idea-card .ic-num{font-size:11px;color:var(--accent);font-weight:600}
+.idea-card .ic-name{font-size:14px;font-weight:600;margin:4px 0}
+.idea-card .ic-desc{font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.idea-card .ic-source{font-size:10px;color:var(--text3);margin-top:6px}
+.idea-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.idea-action-btn{
+  border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;
+  font-family:inherit;font-weight:500;transition:opacity .15s;color:white;
+}
+.idea-action-btn:hover{opacity:.85}
+
+/* ── Input area ── */
+.input-area{
+  padding:16px 20px;border-top:1px solid var(--glass-border);flex-shrink:0;
+  background:var(--glass);backdrop-filter:blur(20px);
+}
+.input-inner{max-width:1100px;margin:0 auto}
+.file-badge{
+  display:none;align-items:center;gap:6px;padding:6px 12px;margin-bottom:8px;
+  background:var(--accent-bg);border-radius:var(--radius-sm);font-size:12px;color:var(--accent);
+}
+.file-badge.visible{display:inline-flex}
+.file-badge button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px}
+.drop-zone{
+  display:none;padding:20px;border:2px dashed var(--accent);border-radius:var(--radius);
+  text-align:center;color:var(--accent);font-size:13px;margin-bottom:8px;
+  background:var(--accent-bg);
+}
+.drop-zone.active{display:block}
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.input-wrap{
+  flex:1;position:relative;background:var(--bg2);border:1px solid var(--glass-border);
+  border-radius:var(--radius);display:flex;align-items:flex-end;transition:border-color .15s;
+}
+.input-wrap:focus-within{border-color:var(--accent)}
+.input-wrap textarea{
+  flex:1;background:none;border:none;color:var(--text);font-size:14px;
+  padding:12px 14px;resize:none;outline:none;font-family:inherit;line-height:1.5;
+  min-height:24px;max-height:120px;
+}
+.input-wrap textarea::placeholder{color:var(--text3)}
+.input-btns{display:flex;gap:2px;padding:6px 8px 6px 0;align-items:flex-end}
+.pdf-btn{
+  background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;
+  padding:4px;border-radius:6px;transition:color .15s;
+}
+.pdf-btn:hover,.pdf-btn.has-file{color:var(--accent)}
+.send-btn{
+  width:40px;height:40px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--accent),#e85d2a);
+  border:none;cursor:pointer;color:white;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s;flex-shrink:0;
+}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn:hover:not(:disabled){opacity:.9}
+
+/* Cmd+K modal */
+.cmd-modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  align-items:flex-start;justify-content:center;padding-top:20vh;
+}
+.cmd-modal-overlay.open{display:flex}
+.cmd-modal{
+  background:var(--bg2);border:1px solid var(--glass-border);border-radius:var(--radius);
+  width:380px;max-width:90vw;overflow:hidden;animation:modalIn .15s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.cmd-modal-header{padding:12px 16px;border-bottom:1px solid var(--glass-border);font-size:13px;color:var(--text3)}
+.cmd-modal .mode-btn{padding:12px 16px;border-radius:0}
+.cmd-modal .mode-btn:hover{background:var(--bg3)}
+
+/* ── Feedback bar (evaluate / improve 모드) ── */
+.feedback-bar{
+  margin-top:14px;padding-top:12px;
+  border-top:1px solid var(--glass-border);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.feedback-label{font-size:12px;color:var(--text3);white-space:nowrap}
+.fb-btn{
+  background:var(--bg3);border:1px solid var(--glass-border);
+  color:var(--text2);padding:5px 16px;border-radius:20px;
+  cursor:pointer;font-size:13px;font-family:inherit;
+  transition:all .15s;
+}
+.fb-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.fb-btn:disabled{opacity:.5;cursor:not-allowed}
+.fb-thanks{font-size:13px;color:var(--accent)}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;height:100vh;z-index:200;box-shadow:0 0 30px rgba(0,0,0,.5)}
+  .sidebar.collapsed{margin-left:calc(var(--sidebar-w)*-1)}
+  .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199}
+  .mobile-overlay.open{display:block}
+  .topbar-kbd{display:none}
+  .messages{padding:16px 12px}
+  .input-area{padding:10px 12px}
+  .welcome-cards{grid-template-columns:repeat(2,1fr)}
+  .idea-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile overlay -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar collapsed" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">🌅</div>
+    <div>
+      <div class="sidebar-title">라온 AI 비서</div>
+      <div class="sidebar-subtitle">스타트업 성장 파트너</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">모드</div>
+    <button class="mode-btn active" data-mode="idea"><span class="mode-icon">🚀</span>아이디어</button>
+    <button class="mode-btn" data-mode="draft"><span class="mode-icon">✍️</span>초안 작성</button>
+    <button class="mode-btn" data-mode="evaluate"><span class="mode-icon">📊</span>사업 평가</button>
+    <button class="mode-btn" data-mode="improve"><span class="mode-icon">💡</span>개선 제안</button>
+    <button class="mode-btn" data-mode="match"><span class="mode-icon">🎯</span>정부사업 매칭</button>
+    <button class="mode-btn" data-mode="checklist"><span class="mode-icon">✅</span>체크리스트</button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section" style="flex-shrink:0">
+    <div class="sidebar-label">📂 이전 대화</div>
+  </div>
+  <div class="history-section" id="historyList">
+    <div class="history-empty">아직 대화 기록이 없습니다</div>
+  </div>
+
+  <div class="profile-card" id="profileCard">
+    <div class="profile-top">
+      <span class="profile-title" id="profileTitle">🌱 예비창업자</span>
+      <span class="profile-level" id="profileLevel">Lv.1</span>
+    </div>
+    <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="profile-xp-text" id="xpText">0 / 100 XP</div>
+    <div class="profile-badges" id="profileBadges"></div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <button class="topbar-toggle" id="sidebarToggle">☰</button>
+    <div class="topbar-mode" id="topbarMode">🚀 아이디어</div>
+    <button class="topbar-new" id="newChatBtn">
+      <span>+ 새 대화</span>
+      <span class="topbar-kbd">⌘N</span>
+    </button>
+  </div>
+
+  <div class="messages" id="messagesArea">
+    <div class="messages-inner" id="messagesInner">
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-emoji">🌅</div>
+        <h2>라온 AI 비서</h2>
+        <p>YC · a16z 기반 아이디어 추천부터 사업계획서 평가, 정부사업 매칭까지</p>
+        <div class="welcome-cards">
+          <div class="welcome-card" data-mode="idea"><div class="wc-icon">🚀</div><div class="wc-title">아이디어 탐색</div><div class="wc-desc">YC·a16z 트렌드 기반 추천</div></div>
+          <div class="welcome-card" data-mode="evaluate"><div class="wc-icon">📊</div><div class="wc-title">사업 평가</div><div class="wc-desc">TIPS 기준 100점 평가</div></div>
+          <div class="welcome-card" data-mode="draft"><div class="wc-icon">✍️</div><div class="wc-title">초안 작성</div><div class="wc-desc">지원서 초안 자동 생성</div></div>
+          <div class="welcome-card" data-mode="match"><div class="wc-icon">🎯</div><div class="wc-title">정부사업 매칭</div><div class="wc-desc">508개 사업 자동 매칭</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-inner">
+      <div class="file-badge" id="fileBadge">
+        📄 <span id="fileName"></span>
+        <button id="fileClear">✕</button>
+      </div>
+      <div class="drop-zone" id="dropZone">📄 PDF 파일을 여기에 드래그하세요</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea id="chatInput" rows="1" placeholder="메시지를 입력하세요... (Shift+Enter: 줄바꿈)"></textarea>
+          <div class="input-btns">
+            <input type="file" id="fileInput" accept=".pdf" style="display:none">
+            <button class="pdf-btn" id="pdfBtn" title="PDF 업로드">📎</button>
+          </div>
+        </div>
+        <button class="send-btn" id="sendBtn">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cmd+K modal -->
+<div class="cmd-modal-overlay" id="cmdModal">
+  <div class="cmd-modal">
+    <div class="cmd-modal-header">모드 전환 <span class="topbar-kbd">⌘K</span></div>
+    <button class="mode-btn" data-mode="idea"><span class="mode-icon">🚀</span>아이디어</button>
+    <button class="mode-btn" data-mode="draft"><span class="mode-icon">✍️</span>초안 작성</button>
+    <button class="mode-btn" data-mode="evaluate"><span class="mode-icon">📊</span>사업 평가</button>
+    <button class="mode-btn" data-mode="improve"><span class="mode-icon">💡</span>개선 제안</button>
+    <button class="mode-btn" data-mode="match"><span class="mode-icon">🎯</span>정부사업 매칭</button>
+    <button class="mode-btn" data-mode="checklist"><span class="mode-icon">✅</span>체크리스트</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const API_URL = window.RAON_API_URL || '';
+const MODE_NAMES = {
+  idea:'🚀 아이디어', draft:'✍️ 초안 작성', evaluate:'📊 사업 평가',
+  improve:'💡 개선 제안', match:'🎯 정부사업 매칭', checklist:'✅ 체크리스트'
+};
+const MODE_PLACEHOLDERS = {
+  idea:'관심 분야를 입력하거나 "전체"로 목록 확인',
+  draft:'사업 아이디어를 입력하세요',
+  evaluate:'사업계획서를 입력하거나 PDF를 업로드하세요',
+  improve:'개선할 사업계획서를 입력하세요',
+  match:'사업 내용을 입력하면 정부사업을 매칭합니다',
+  checklist:'지원 준비 상태를 점검할 내용을 입력하세요',
+};
+
+let currentMode = 'idea';
+let pendingPdfBase64 = null;
+let sessionContext = {}; // {lastDraft, lastIdea, lastEvaluation}
+let currentConvId = null;
+let conversations = JSON.parse(localStorage.getItem('raon_convs') || '{}');
+
+// DOM
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const sidebar = $('#sidebar');
+const sidebarToggle = $('#sidebarToggle');
+const mobileOverlay = $('#mobileOverlay');
+const messagesArea = $('#messagesArea');
+const messagesInner = $('#messagesInner');
+const welcomeScreen = $('#welcomeScreen');
+const chatInput = $('#chatInput');
+const sendBtn = $('#sendBtn');
+const fileInput = $('#fileInput');
+const pdfBtn = $('#pdfBtn');
+const fileBadge = $('#fileBadge');
+const fileName = $('#fileName');
+const fileClear = $('#fileClear');
+const topbarMode = $('#topbarMode');
+const newChatBtn = $('#newChatBtn');
+const cmdModal = $('#cmdModal');
+const dropZone = $('#dropZone');
+const historyList = $('#historyList');
+
+// ── Sidebar toggle ──
+function toggleSidebar(show) {
+  const shouldShow = show !== undefined ? show : sidebar.classList.contains('collapsed');
+  sidebar.classList.toggle('collapsed', !shouldShow);
+  mobileOverlay.classList.toggle('open', shouldShow && window.innerWidth <= 768);
+}
+sidebarToggle.addEventListener('click', () => toggleSidebar());
+mobileOverlay.addEventListener('click', () => toggleSidebar(false));
+
+// Auto-open sidebar on desktop
+if (window.innerWidth > 768) toggleSidebar(true);
+
+// ── Mode switching ──
+function setMode(mode) {
+  currentMode = mode;
+  $$('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  topbarMode.textContent = MODE_NAMES[mode] || mode;
+  chatInput.placeholder = MODE_PLACEHOLDERS[mode] || '메시지를 입력하세요...';
+  // Close cmd modal + mobile sidebar
+  cmdModal.classList.remove('open');
+  if (window.innerWidth <= 768) toggleSidebar(false);
+  // Show mode guide message
+  const guides = {
+    idea: '🚀 <strong>아이디어 모드</strong><br>전송 버튼을 누르면 YC·a16z 기반 62개 아이디어를 탐색할 수 있어요.<br>관심 분야를 입력하면 맞춤 추천도 가능합니다.',
+    evaluate: '📊 <strong>평가 모드</strong><br>사업 아이디어나 계획서를 입력하면 TIPS 심사 기준으로 100점 만점 평가해드려요.<br>PDF 파일도 업로드 가능합니다.',
+    draft: '✍️ <strong>초안 작성 모드</strong><br>사업 아이디어를 입력하면 정부지원사업 지원서 초안을 자동 생성해드려요.',
+    improve: '💡 <strong>개선 모드</strong><br>기존 사업계획서를 입력하면 구체적인 개선점을 제안해드려요.',
+    match: '🎯 <strong>매칭 모드</strong><br>사업 내용을 입력하면 적합한 정부지원사업을 추천해드려요.',
+    checklist: '✅ <strong>체크리스트 모드</strong><br>지원서 제출 전 빠진 항목이 없는지 점검해드려요.'
+  };
+  if (guides[mode] && welcomeScreen.style.display === 'none') {
+    addMsg(guides[mode], 'bot');
+  }
+}
+
+$$('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+// Welcome cards
+$$('.welcome-card').forEach(card => {
+  card.addEventListener('click', () => {
+    setMode(card.dataset.mode);
+    welcomeScreen.style.display = 'none';
+  });
+});
+
+// ── Cmd+K modal ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    cmdModal.classList.toggle('open');
+  }
+  if (e.key === 'Escape') cmdModal.classList.remove('open');
+  if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+    e.preventDefault();
+    newChat();
+  }
+});
+cmdModal.addEventListener('click', e => { if (e.target === cmdModal) cmdModal.classList.remove('open'); });
+
+// ── File handling ──
+pdfBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', handleFileSelect);
+fileClear.addEventListener('click', clearFile);
+
+function handleFileSelect() {
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (file.size > 10*1024*1024) { addMsg('⚠️ 파일이 너무 큽니다 (최대 10MB)', 'bot'); fileInput.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingPdfBase64 = reader.result.split(',')[1];
+    fileName.textContent = file.name;
+    fileBadge.classList.add('visible');
+    pdfBtn.classList.add('has-file');
+  };
+  reader.readAsDataURL(file);
+}
+function clearFile() {
+  pendingPdfBase64 = null; fileInput.value = '';
+  fileBadge.classList.remove('visible'); pdfBtn.classList.remove('has-file');
+}
+
+// Drag & drop
+['dragenter','dragover'].forEach(ev => {
+  document.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('active'); });
+});
+['dragleave','drop'].forEach(ev => {
+  document.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('active'); });
+});
+document.addEventListener('drop', e => {
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') {
+    const dt = new DataTransfer(); dt.items.add(file);
+    fileInput.files = dt.files;
+    handleFileSelect();
+  }
+});
+
+// ── Textarea auto-resize ──
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+});
+
+// ── Send ──
+let isComposing = false;
+chatInput.addEventListener('compositionstart', () => { isComposing = true; });
+chatInput.addEventListener('compositionend', () => { isComposing = false; });
+chatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !isComposing) { e.preventDefault(); sendMessage(); }
+});
+sendBtn.addEventListener('click', sendMessage);
+newChatBtn.addEventListener('click', newChat);
+
+function newChat() {
+  saveCurrentConv();
+  currentConvId = null;
+  sessionContext = {};
+  messagesInner.innerHTML = '';
+  welcomeScreen.style.display = '';
+  messagesInner.appendChild(welcomeScreen);
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+}
+
+// ── Messages ──
+function addMsg(html, type, extra) {
+  welcomeScreen.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = `msg msg-${type}`;
+  if (type === 'bot') {
+    div.innerHTML = `<div class="msg-avatar">🌅</div><div class="msg-content">${html}</div>`;
+  } else {
+    div.innerHTML = `<div class="msg-content">${html}</div>`;
+  }
+  if (extra) div.dataset.extra = extra;
+  messagesInner.appendChild(div);
+  messagesArea.scrollTop = messagesArea.scrollHeight;
+  return div;
+}
+
+// ── Markdown renderer ──
+function renderMarkdown(raw) {
+  const lines = raw.split('\n');
+  let out = [], inTable = false, tableHtml = '';
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.startsWith('|') && line.endsWith('|')) {
+      const cells = line.split('|').slice(1,-1).map(c=>c.trim());
+      if (cells.every(c => /^[-:]+$/.test(c))) continue;
+      if (!inTable) {
+        inTable = true;
+        tableHtml = '<table><tr>' + cells.map(c=>'<th>'+boldify(c)+'</th>').join('') + '</tr>';
+      } else {
+        tableHtml += '<tr>' + cells.map(c=>'<td>'+boldify(c)+'</td>').join('') + '</tr>';
+      }
+    } else {
+      if (inTable) { out.push(tableHtml+'</table>'); inTable=false; tableHtml=''; }
+      out.push(line);
+    }
+  }
+  if (inTable) out.push(tableHtml+'</table>');
+  return out.join('\n')
+    .replace(/^### (.+)/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^- (.+)/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>'+m+'</ul>')
+    .replace(/\n/g,'<br>');
+}
+function boldify(s){ return s.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>'); }
+
+// ── Loading UX ──
+const tips = [
+  '💡 TIPS 운영사는 AC/VC 60+개사가 참여해요',
+  '💡 2026년 창업지원사업 총 예산: 3.46조원!',
+  '💡 사업계획서에 정량 수치가 있으면 합격률 2배↑',
+  '💡 TAM-SAM-SOM 프레임워크로 시장 규모를 보여주세요',
+  '💡 TIPS 최대 8억원 (2026년 기준)',
+  '💡 고객 PoC/LOI가 있으면 심사에서 압도적 유리!',
+  '💡 520x 같은 효율 수치는 강력한 차별화 포인트',
+  '💡 2026년 508개 정부 창업지원사업이 운영 중',
+];
+const modeStages = {
+  evaluate:['📄 사업계획서 읽는 중','🔍 핵심 지표 분석 중','📊 TIPS 심사기준 대조 중','🏛️ 정부사업 매칭 중','✍️ 결과 정리 중'],
+  improve:['📄 사업계획서 분석 중','🔍 약점 파악 중','💡 개선안 생성 중','✍️ 결과 정리 중'],
+  match:['📄 사업 내용 분석 중','🏛️ 508개 정부사업 검색 중','🎯 적합도 매칭 중','✍️ 결과 정리 중'],
+  draft:['📄 아이디어 분석 중','🏛️ 지원사업 요건 확인 중','✍️ 지원서 초안 작성 중','📝 항목별 내용 채우는 중','🔍 최종 검토 중'],
+  checklist:['📄 사업 요건 확인 중','✅ 체크리스트 생성 중','✍️ 결과 정리 중'],
+};
+
+function createLoading(mode) {
+  const stages = modeStages[mode] || ['⏳ 처리 중'];
+  const el = addMsg(`<div class="loading-inner"><div class="spinner"></div><span>${stages[0]}...</span></div>`, 'bot');
+  el.classList.add('msg-loading');
+  const start = Date.now();
+  let stageIdx = 0, tipIdx = 0;
+  const timer = setInterval(() => {
+    const elapsed = Math.round((Date.now()-start)/1000);
+    stageIdx++;
+    const pct = Math.min(95, (stageIdx/(stages.length+2))*100);
+    const content = el.querySelector('.msg-content');
+    if (stageIdx < stages.length) {
+      content.innerHTML = `<div class="loading-inner"><div class="spinner"></div><span>${stages[stageIdx]}...</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div><div class="loading-elapsed">⏱ ${elapsed}초 경과</div>`;
+    } else {
+      const tip = tips[tipIdx++ % tips.length];
+      content.innerHTML = `<div class="loading-inner"><div class="spinner"></div><span>AI가 열심히 작성 중...</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(95,70+tipIdx*3)}%"></div></div><div class="loading-tip">${tip}</div><div class="loading-elapsed">⏱ ${elapsed}초 경과 — 문서 길이에 따라 수 분 소요</div>`;
+    }
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }, 3000);
+  return { el, timer };
+}
+
+// ── XP display ──
+const levelThresholds = [0,100,300,600,1000,1500,2500,5000];
+function updateProfileCard(profile) {
+  if (!profile) return;
+  const lvl = profile.level || 1;
+  const title = profile.title || '🌱 예비창업자';
+  const xp = profile.xp || 0;
+  const badges = profile.badges || [];
+  const cur = levelThresholds[Math.min(lvl-1, levelThresholds.length-1)] || 0;
+  const next = levelThresholds[Math.min(lvl, levelThresholds.length-1)] || (cur+100);
+  const inLevel = xp - cur;
+  const needed = next - cur;
+  const pct = Math.min(100, Math.round(inLevel/needed*100));
+
+  $('#profileTitle').textContent = title;
+  $('#profileLevel').textContent = 'Lv.' + lvl;
+  $('#xpFill').style.width = pct + '%';
+  $('#xpText').textContent = `${inLevel} / ${needed} XP`;
+  const badgesEl = $('#profileBadges');
+  badgesEl.innerHTML = badges.map(b => `<span class="profile-badge" title="${b}">${b}</span>`).join('');
+}
+
+async function fetchProfile() {
+  try {
+    const r = await fetch(API_URL+'/v1/profile');
+    const d = await r.json();
+    if (d.status==='ok' && d.profile) updateProfileCard(d.profile);
+  } catch(e){}
+}
+fetchProfile();
+
+function buildXpHtml(data, profile) {
+  if (!data.xp_gained) return '';
+  const lvl = profile?.level || data.level || 1;
+  const title = profile?.title || data.title || '🌱 예비창업자';
+  const xp = profile?.xp || 0;
+  const cur = levelThresholds[Math.min(lvl-1,levelThresholds.length-1)]||0;
+  const next = levelThresholds[Math.min(lvl,levelThresholds.length-1)]||(cur+100);
+  const inLevel = xp-cur, needed = next-cur;
+  const pct = Math.min(100, Math.round(inLevel/needed*100));
+  let html = `<div class="xp-inline"><div style="display:flex;justify-content:space-between"><span>${title} Lv.${lvl}</span><span style="color:var(--accent)">+${data.xp_gained} XP</span></div><div class="xp-bar-inline"><div class="xp-fill-inline" style="width:${pct}%"></div></div><div style="text-align:right;color:var(--text3);font-size:10px;margin-top:2px">${inLevel}/${needed} XP</div>`;
+  if (data.new_badges?.length) html += `<div style="margin-top:4px;color:var(--accent2)">🏆 새 뱃지: ${data.new_badges.join(', ')}</div>`;
+  html += '</div>';
+  return html;
+}
+
+// ── Send message ──
+let _lastRequest = {};
+function retryLast() {
+  if (_lastRequest.text) chatInput.value = _lastRequest.text;
+  if (_lastRequest.pdf) pendingPdfBase64 = _lastRequest.pdf;
+  if (_lastRequest.mode) setMode(_lastRequest.mode);
+  sendMessage();
+}
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text && !pendingPdfBase64 && currentMode !== 'idea') return;
+  _lastRequest = { text, pdf: pendingPdfBase64, mode: currentMode };
+
+  const displayText = pendingPdfBase64
+    ? `📄 ${fileName.textContent}${text?' — '+text:''}`
+    : text;
+  if (displayText) addMsg(displayText, 'user');
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  // Ensure conversation id
+  if (!currentConvId) {
+    currentConvId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  }
+
+  // ── Idea mode ──
+  if (currentMode === 'idea') {
+    try {
+      let res, data;
+      if (!text || text.length < 2) {
+        res = await fetch(`${API_URL}/v1/idea/list`);
+        data = await res.json();
+        if (data.status === 'ok') {
+          const cats = data.categories || [];
+          let html = `<h2>YC · a16z 아이디어 목록 (${cats.length}개)</h2><div class="idea-grid">`;
+          cats.forEach(c => {
+            html += `<div class="idea-card" onclick="window._raonViewIdea(${c.id})">
+              <div class="ic-num">#${c.id}</div>
+              <div class="ic-name">${c.name}</div>
+              <div class="ic-desc">${c.subtitle||c.description||''}</div>
+              <div class="ic-source">${c.source||''}</div>
+            </div>`;
+          });
+          html += '</div><p style="color:var(--text2);font-size:13px;margin-top:8px">카드를 클릭하면 상세 설명을 볼 수 있어요!</p>';
+          addMsg(html, 'bot');
+        } else {
+          addMsg('⚠️ '+(data.error||'목록을 불러올 수 없습니다.'), 'bot');
+        }
+      } else if (/^\d+$/.test(text.trim())) {
+        await showIdeaDetail(text.trim());
+      } else {
+        const loading = createLoading('idea');
+        res = await fetch(`${API_URL}/v1/idea/suggest`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({background:text,interests:text})
+        });
+        data = await res.json();
+        clearInterval(loading.timer); loading.el.remove();
+        if (data.status === 'ok') {
+          const items = data.suggestions || data.matches || [];
+          let html = '<h2>💡 맞춤 아이디어 추천</h2><div class="idea-grid">';
+          items.forEach((s,i) => {
+            const desc = s.reason||s.why_now||s.description||s.subtitle||'';
+            const sName = (s.name||'').replace(/'/g,"\\'");
+            const sDesc = (s.subtitle||desc||'').replace(/'/g,"\\'").substring(0,200);
+            html += `<div class="idea-card">
+              <div class="ic-num">#${i+1}</div>
+              <div class="ic-name">${s.name}</div>
+              <div class="ic-desc">${desc}</div>
+              <div class="ic-source">${s.source||''}</div>
+              <div class="idea-actions">
+                <button class="idea-action-btn" style="background:#FF6B35" onclick="window._raonIdeaAction('evaluate','${sName}','${sDesc}')">📊 평가</button>
+                <button class="idea-action-btn" style="background:#6366f1" onclick="window._raonIdeaAction('match','${sName}','${sDesc}')">🎯 매칭</button>
+                <button class="idea-action-btn" style="background:#f59e0b" onclick="window._raonIdeaAction('draft','${sName}','${sDesc}')">✍️ 초안</button>
+              </div>
+            </div>`;
+          });
+          html += '</div>';
+          if (!items.length) html = '<p>매칭되는 아이디어가 없습니다. 다른 키워드로 시도해보세요!</p>';
+          addMsg(html, 'bot');
+        } else {
+          addMsg('⚠️ '+(data.error||'추천을 불러올 수 없습니다.'), 'bot');
+        }
+      }
+    } catch(e) {
+      addMsg('⚠️ 서버에 연결할 수 없습니다. <button onclick="sendMessage()" style="margin-left:8px;padding:4px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">🔄 재시도</button>', 'bot');
+    }
+    sendBtn.disabled = false;
+    chatInput.focus();
+    saveCurrentConv();
+    return;
+  }
+
+  // ── Other modes ──
+  const loading = createLoading(currentMode);
+  const payload = { model: 'qwen3:8b' };
+
+  if ((currentMode === 'draft' || currentMode === 'checklist') && window._raonPendingProgram) {
+    payload.program = window._raonPendingProgram;
+    window._raonPendingProgram = null;
+  }
+
+  // 개선 제안 모드: 이전 평가 결과를 context로 전달
+  if (currentMode === 'improve' && sessionContext.lastEvaluation) {
+    payload.context = sessionContext.lastEvaluation;
+  }
+  // 초안 작성 모드: 이전 아이디어를 context로 전달
+  if (currentMode === 'draft' && sessionContext.lastIdea) {
+    payload.context = JSON.stringify(sessionContext.lastIdea);
+  }
+
+  if (pendingPdfBase64) {
+    payload.pdf_base64 = pendingPdfBase64;
+    if (text) payload.text = text;
+    clearFile();
+  } else {
+    payload.text = text;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/v1/${currentMode}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    clearInterval(loading.timer); loading.el.remove();
+
+    if (data.status === 'ok') {
+      const result = renderMarkdown(data.result || data.response || '');
+      const scoreHtml = data.score ? `<div class="score-display">📊 ${data.score}점</div>` : '';
+
+      // Store session context
+      if (currentMode === 'draft') sessionContext.lastDraft = data.result;
+      if (currentMode === 'evaluate') sessionContext.lastEvaluation = data.result;
+
+      // Fetch profile for XP
+      let profile = null;
+      try {
+        const pr = await fetch(API_URL+'/v1/profile');
+        const pd = await pr.json();
+        if (pd.status==='ok') { profile = pd.profile; updateProfileCard(profile); }
+      } catch(e){}
+
+      const xpHtml = buildXpHtml(data, profile);
+      const msgEl = addMsg(scoreHtml + result + xpHtml, 'bot');
+
+      // ── 피드백 버튼 (evaluate / improve 모드만 표시) ──────────────────────
+      if ((currentMode === 'evaluate' || currentMode === 'improve') && data.evaluation_id) {
+        const evalId = data.evaluation_id;
+        const fbBar = document.createElement('div');
+        fbBar.className = 'feedback-bar';
+        fbBar.innerHTML =
+          '<span class="feedback-label">이 평가가 도움이 됐나요?</span>' +
+          '<button class="fb-btn" data-rating="1">👍 도움됐어요</button>' +
+          '<button class="fb-btn" data-rating="-1">👎 아니에요</button>';
+        msgEl.querySelector('.msg-content').appendChild(fbBar);
+
+        fbBar.querySelectorAll('.fb-btn').forEach(function(btn) {
+          btn.addEventListener('click', async function() {
+            const rating = parseInt(this.dataset.rating);
+            // 즉시 UI 업데이트 (중복 클릭 방지)
+            fbBar.querySelectorAll('.fb-btn').forEach(function(b) { b.disabled = true; });
+            fbBar.innerHTML = '<span class="fb-thanks">감사합니다! 🙏</span>';
+            try {
+              await fetch((API_URL || '') + '/v1/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({evaluation_id: evalId, rating: rating})
+              });
+            } catch(e) { /* UI는 이미 업데이트됨 — 무시 */ }
+          });
+        });
+      }
+    } else {
+      addMsg(`⚠️ ${data.error||'오류가 발생했습니다.'}`, 'bot');
+    }
+  } catch(e) {
+    clearInterval(loading.timer); loading.el.remove();
+    addMsg('⚠️ 서버에 연결할 수 없습니다. <button onclick="sendMessage()" style="margin-left:8px;padding:4px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">🔄 재시도</button>', 'bot');
+  }
+  sendBtn.disabled = false;
+  chatInput.focus();
+  saveCurrentConv();
+}
+
+// ── Idea detail ──
+async function showIdeaDetail(id) {
+  try {
+    const res = await fetch(`${API_URL}/v1/idea/detail/${id}`);
+    const data = await res.json();
+    if (data.status === 'ok') {
+      const d = data.category || data.detail || data;
+      sessionContext.lastIdea = d;
+      const ideaName = (d.name||'').replace(/'/g,"\\'");
+      const ideaDesc = (d.description||d.subtitle||'').replace(/'/g,"\\'").substring(0,200);
+      let html = `<h2>🚀 [${d.id||id}] ${d.name||''}</h2>`;
+      if (d.subtitle) html += `<p style="color:var(--text2);margin-bottom:12px">${d.subtitle}</p>`;
+      if (d.description) html += `<h3>📋 설명</h3><p>${d.description.replace(/\n/g,'<br>')}</p>`;
+      if (d.why_now) html += `<h3>⏰ 왜 지금</h3><p>${d.why_now.replace(/\n/g,'<br>')}</p>`;
+      if (d.founder_profile) html += `<h3>👤 적합한 창업자</h3><p>${d.founder_profile}</p>`;
+      if (d.korea_market) html += `<h3>🇰🇷 한국 시장</h3><p>${d.korea_market.replace(/\n/g,'<br>')}</p>`;
+      html += `<div class="idea-actions" style="margin-top:16px">
+        <button class="idea-action-btn" style="background:#FF6B35" onclick="window._raonIdeaAction('evaluate','${ideaName}','${ideaDesc}')">📊 이걸로 평가받기</button>
+        <button class="idea-action-btn" style="background:#10b981" onclick="window._raonIdeaAction('improve','${ideaName}','${ideaDesc}')">💡 사업계획서 개선</button>
+        <button class="idea-action-btn" style="background:#6366f1" onclick="window._raonIdeaAction('match','${ideaName}','${ideaDesc}')">🎯 정부사업 매칭</button>
+        <button class="idea-action-btn" style="background:#f59e0b" onclick="window._raonIdeaAction('draft','${ideaName}','${ideaDesc}')">✍️ 지원서 초안</button>
+      </div>`;
+      addMsg(html, 'bot');
+    } else {
+      addMsg('⚠️ '+(data.error||'상세 정보를 불러올 수 없습니다.'), 'bot');
+    }
+  } catch(e) {
+    addMsg('⚠️ 서버에 연결할 수 없습니다. <button onclick="sendMessage()" style="margin-left:8px;padding:4px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">🔄 재시도</button>', 'bot');
+  }
+}
+
+window._raonViewIdea = id => showIdeaDetail(id);
+
+// ── Idea → mode action ──
+window._raonIdeaAction = function(mode, name, desc) {
+  setMode(mode);
+  if (mode === 'draft' || mode === 'checklist') window._raonPendingProgram = name;
+  const prompt = '[아이디어: '+name+'] '+desc;
+  chatInput.value = prompt;
+  sendMessage();
+};
+
+// ── Conversation history ──
+function saveCurrentConv() {
+  if (!currentConvId) return;
+  const msgs = [];
+  messagesInner.querySelectorAll('.msg').forEach(m => {
+    if (m.classList.contains('msg-loading') || m === welcomeScreen) return;
+    msgs.push({ type: m.classList.contains('msg-user')?'user':'bot', html: m.querySelector('.msg-content')?.innerHTML || '' });
+  });
+  if (msgs.length === 0) return;
+  const firstUserMsg = msgs.find(m => m.type === 'user');
+  const title = firstUserMsg ? firstUserMsg.html.replace(/<[^>]*>/g,'').substring(0,40) : '새 대화';
+  conversations[currentConvId] = { title, mode: currentMode, msgs, ts: Date.now() };
+  // Keep max 30
+  const keys = Object.keys(conversations).sort((a,b) => conversations[b].ts - conversations[a].ts);
+  if (keys.length > 30) { keys.slice(30).forEach(k => delete conversations[k]); }
+  localStorage.setItem('raon_convs', JSON.stringify(conversations));
+  renderHistory();
+}
+
+function renderHistory() {
+  const keys = Object.keys(conversations).sort((a,b) => conversations[b].ts - conversations[a].ts);
+  if (!keys.length) { historyList.innerHTML = '<div class="history-empty">아직 대화 기록이 없습니다</div>'; return; }
+  historyList.innerHTML = keys.map(k => {
+    const c = conversations[k];
+    const icon = MODE_NAMES[c.mode]?.split(' ')[0] || '💬';
+    return `<div class="history-item" data-id="${k}">
+      <span class="hi-icon">${icon}</span>
+      <span class="hi-text">${c.title}</span>
+      <button class="hi-del" data-del="${k}" title="삭제">✕</button>
+    </div>`;
+  }).join('');
+  historyList.querySelectorAll('.history-item').forEach(item => {
+    item.addEventListener('click', e => {
+      if (e.target.dataset.del) {
+        delete conversations[e.target.dataset.del];
+        localStorage.setItem('raon_convs', JSON.stringify(conversations));
+        renderHistory();
+        return;
+      }
+      loadConversation(item.dataset.id);
+    });
+  });
+}
+
+function loadConversation(id) {
+  const conv = conversations[id];
+  if (!conv) return;
+  currentConvId = id;
+  setMode(conv.mode);
+  messagesInner.innerHTML = '';
+  welcomeScreen.style.display = 'none';
+  conv.msgs.forEach(m => addMsg(m.html, m.type));
+  if (window.innerWidth <= 768) toggleSidebar(false);
+}
+
+renderHistory();
+
+})();
+</script>
+</body>
+</html>

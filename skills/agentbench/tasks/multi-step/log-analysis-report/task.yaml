@@ -1,0 +1,49 @@
+name: "Analyze Server Logs and Generate Report"
+id: "multi-step-log-analysis-report"
+version: "1.0"
+suite: "multi-step"
+difficulty: "hard"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to parse, categorize, and analyze server log data
+  through multiple processing steps. The log contains 200 lines with INFO,
+  WARN, and ERROR entries. Five distinct error types appear at varying
+  frequencies: ConnectionTimeout (8), NullPointerException (3),
+  OutOfMemoryError (2), FileNotFoundException (5), AuthenticationFailed (4).
+  Evaluates multi-step reasoning, pattern detection, and technical reporting.
+
+user_message: |
+  Analyze the server log in server.log and produce a comprehensive report:
+  1) Parse and categorize all log entries by level (INFO, WARN, ERROR)
+  2) Identify the top 5 errors by frequency
+  3) For each error type, suggest a likely root cause and recommended fix
+  4) Save the full report as log-report.md
+
+input_files:
+  - name: "server.log"
+
+expected_outputs:
+  - pattern: "log-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "error"
+          - "frequency"
+          - "fix"
+          - "recommendation"
+      - type: "word-count-range"
+        min: 400
+        max: 2000
+
+expected_metrics:
+  tool_calls: [4, 15]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

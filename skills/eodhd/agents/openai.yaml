@@ -1,0 +1,37 @@
+interface:
+  display_name: "EODHD CLI"
+  short_description: "Plan, build, and validate an OpenClaw-safe EODHD CLI"
+  default_prompt: "Use $eodhd to plan, build, review, or validate a stateless Bash CLI for the EODHD API that follows OpenClaw secret management, packaging, and logging standards."
+
+package:
+  binary: "eodhd"
+  entrypoint: "scripts/eodhd"
+  stateless: true
+  runtime_dependencies:
+    - "bash"
+    - "curl"
+  included_files:
+    - "SKILL.md"
+    - "README.md"
+    - "agents/openai.yaml"
+    - "references/implementation-plan.md"
+    - "references/openclaw-secrets.md"
+    - "scripts/eodhd"
+    - "scripts/test-smoke.sh"
+    - "scripts/check-package.sh"
+
+credentials:
+  primary: "EODHD_API_KEY"
+  required_env:
+    - name: "EODHD_API_KEY"
+      purpose: "EODHD API token injected by OpenClaw/Clawhub secrets management"
+      required: true
+  optional_overrides:
+    - "--api-key"
+
+distribution:
+  target: "Clawhub.ai"
+  public_repo_safe: true
+  validation_entrypoints:
+    - "scripts/check-package.sh"
+    - "scripts/test-smoke.sh"

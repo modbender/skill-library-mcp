@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Maylo</title>
+    <style>
+      :root{
+        --bg0:#050510;
+        --bg1:#0b0f23;
+        --card:rgba(255,255,255,.06);
+        --card2:rgba(255,255,255,.03);
+        --stroke:rgba(255,255,255,.10);
+        --text:#e9ecff;
+        --muted:rgba(233,236,255,.65);
+        --cyan:#22f6ff;
+        --magenta:#ff2bd6;
+        --purple:#7a5cff;
+        --green:#2bff9a;
+        --yellow:#ffe06b;
+        --red:#ff4d6d;
+        --shadow: 0 22px 70px rgba(0,0,0,.55);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Roboto, Arial;
+        color:var(--text);
+        background:
+          radial-gradient(900px 450px at 30% 20%, rgba(122,92,255,.24), transparent 60%),
+          radial-gradient(900px 450px at 70% 30%, rgba(34,246,255,.16), transparent 55%),
+          radial-gradient(700px 380px at 50% 80%, rgba(255,43,214,.12), transparent 60%),
+          linear-gradient(180deg, var(--bg0), var(--bg1));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:22px;
+      }
+
+      .wrap{width:min(980px,100%);}
+
+      .header{
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom:18px;
+      }
+      .brand{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+      }
+      .brand h1{
+        margin:0;
+        font-size:28px;
+        letter-spacing:.4px;
+      }
+      .brand .tag{
+        color:var(--muted);
+        font-size:13px;
+      }
+
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        border:1px solid var(--stroke);
+        background:rgba(255,255,255,.04);
+        border-radius:999px;
+        padding:10px 12px;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.2);
+      }
+      .dot{
+        width:10px;height:10px;border-radius:50%;
+        background:rgba(255,255,255,.4);
+        box-shadow:0 0 0 4px rgba(255,255,255,.08);
+      }
+      .statusText{font-weight:700;font-size:13px;letter-spacing:.4px;text-transform:uppercase;}
+      .wsText{color:var(--muted);font-size:12px;}
+
+      .grid{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap:14px;
+      }
+      @media (min-width: 860px){
+        .grid{grid-template-columns: 380px 1fr;}
+      }
+
+      .card{
+        background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+        border:1px solid var(--stroke);
+        border-radius:18px;
+        padding:16px;
+        box-shadow: var(--shadow);
+        position:relative;
+        overflow:hidden;
+      }
+      .card::before{
+        content:"";
+        position:absolute;inset:-2px;
+        background: radial-gradient(500px 180px at 20% 0%, rgba(34,246,255,.18), transparent 60%),
+                    radial-gradient(500px 200px at 80% 10%, rgba(255,43,214,.14), transparent 58%),
+                    radial-gradient(650px 300px at 50% 120%, rgba(122,92,255,.16), transparent 55%);
+        pointer-events:none;
+        opacity:.9;
+      }
+      .card > *{position:relative;}
+
+      .assistantCard{
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+        align-items:center;
+      }
+
+      .mayloBadge{
+        width:100%;
+        border:1px solid rgba(255,255,255,.10);
+        background:rgba(0,0,0,.18);
+        border-radius:14px;
+        padding:12px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+      }
+      .mayloBadge .name{font-weight:800;letter-spacing:.6px}
+      .mayloBadge .hint{color:var(--muted);font-size:12px}
+
+      .ptt{
+        width:170px;
+        height:170px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,.12);
+        background: radial-gradient(60% 60% at 50% 40%, rgba(34,246,255,.18), rgba(0,0,0,.2) 55%, rgba(0,0,0,.35));
+        box-shadow:
+          0 25px 80px rgba(0,0,0,.6),
+          inset 0 0 0 1px rgba(0,0,0,.35);
+        position:relative;
+        cursor:pointer;
+        user-select:none;
+        -webkit-tap-highlight-color: transparent;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      }
+      .ptt:active{transform: scale(.98)}
+
+      .pttGlow{
+        position:absolute;inset:-10px;
+        border-radius:999px;
+        background: conic-gradient(from 180deg, var(--cyan), var(--magenta), var(--purple), var(--cyan));
+        filter: blur(14px);
+        opacity:.22;
+        transition: opacity .14s ease;
+        pointer-events:none;
+      }
+
+      .pttInner{
+        width:148px;height:148px;border-radius:999px;
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(0,0,0,.30);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+      }
+      .mic{
+        width:36px;height:36px;
+        filter: drop-shadow(0 0 18px rgba(34,246,255,.25));
+        opacity:.95;
+      }
+      .pttLabel{font-weight:800;font-size:12px;letter-spacing:.7px;color:var(--muted);text-transform:uppercase}
+
+      .ptt.isHeld .pttGlow{opacity:.55}
+      .ptt.isHeld{filter:saturate(1.25)}
+      .ptt.isHeld .pttInner{
+        box-shadow:
+          inset 0 0 0 1px rgba(34,246,255,.20),
+          0 0 0 1px rgba(255,43,214,.12);
+      }
+
+      .waveBox{
+        width:100%;
+        border:1px solid rgba(255,255,255,.10);
+        background:rgba(0,0,0,.22);
+        border-radius:14px;
+        padding:10px;
+      }
+      canvas{width:100%;height:64px;display:block}
+
+      .right{
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+      }
+      .panelTitle{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:10px;
+      }
+      .panelTitle b{font-size:13px;letter-spacing:.6px;text-transform:uppercase}
+      .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+      .box{
+        border:1px solid rgba(255,255,255,.10);
+        background:rgba(0,0,0,.20);
+        border-radius:14px;
+        padding:12px;
+        min-height:92px;
+        white-space:pre-wrap;
+        word-break:break-word;
+        line-height:1.4;
+      }
+      .muted{color:var(--muted);font-size:12px}
+
+      /* status colors */
+      .s-idle .dot{background:rgba(255,255,255,.35); box-shadow:0 0 0 4px rgba(255,255,255,.08)}
+      .s-listening .dot{background:var(--cyan); box-shadow:0 0 0 4px rgba(34,246,255,.12), 0 0 22px rgba(34,246,255,.22)}
+      .s-processing .dot{background:var(--yellow); box-shadow:0 0 0 4px rgba(255,224,107,.12), 0 0 22px rgba(255,224,107,.18)}
+      .s-speaking .dot{background:var(--magenta); box-shadow:0 0 0 4px rgba(255,43,214,.12), 0 0 24px rgba(255,43,214,.22)}
+
+      .toast{
+        position:fixed;
+        left:50%;
+        bottom:18px;
+        transform:translateX(-50%);
+        padding:10px 12px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(0,0,0,.55);
+        color:var(--text);
+        font-size:13px;
+        box-shadow: 0 12px 50px rgba(0,0,0,.5);
+        opacity:0;
+        pointer-events:none;
+        transition: opacity .2s ease, transform .2s ease;
+      }
+      .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px)}
+
+      .obiziz{
+        position:fixed;
+        left:14px;
+        bottom:12px;
+        font-size:12px;
+        color:rgba(233,236,255,.55);
+        text-decoration:none;
+        letter-spacing:.4px;
+        opacity:.75;
+      }
+      .obiziz:hover{opacity:1;color:rgba(34,246,255,.85)}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="header">
+        <div class="brand">
+          <h1>Maylo</h1>
+          <div class="tag" style="display:none"></div>
+        </div>
+
+        <div id="pill" class="pill s-idle" role="status" aria-live="polite">
+          <span class="dot"></span>
+          <span id="status" class="statusText">idle</span>
+          <span class="wsText" id="ws" style="display:none">WS</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card assistantCard">
+          <div class="mayloBadge">
+            <div>
+              <div class="name">Maylo Assistant</div>
+              <div class="hint">Basılı tut ve konuş</div>
+            </div>
+            <div class="muted mono" id="wake">wake: -</div>
+          </div>
+
+          <div class="ptt" id="ptt" aria-label="Push to talk">
+            <div class="pttGlow"></div>
+            <div class="pttInner">
+              <svg class="mic" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" stroke="rgba(233,236,255,.92)" stroke-width="1.6"/>
+                <path d="M7 11a5 5 0 0 0 10 0" stroke="rgba(233,236,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M12 16v4" stroke="rgba(233,236,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M9 20h6" stroke="rgba(233,236,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <div class="pttLabel" id="pttLabel">hold to talk</div>
+            </div>
+          </div>
+
+          <div class="waveBox">
+            <canvas id="wave" width="860" height="140"></canvas>
+            <div class="muted" id="micHint" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card">
+            <div class="panelTitle">
+              <b>Transcript</b>
+              <span class="muted mono" id="meta" style="display:none">-</span>
+            </div>
+            <div id="transcript" class="box">-</div>
+          </div>
+
+          <div class="card">
+            <div class="panelTitle">
+              <b>Reply</b>
+              <span class="muted" style="display:none"></span>
+            </div>
+            <div id="reply" class="box">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <a class="obiziz" href="https://obiziz.com" target="_blank" rel="noopener noreferrer">obiziz.com</a>
+
+    <script>
+      const elPill = document.getElementById('pill');
+      const elStatus = document.getElementById('status');
+      const elWs = document.getElementById('ws');
+      const elWake = document.getElementById('wake');
+      const elTranscript = document.getElementById('transcript');
+      const elReply = document.getElementById('reply');
+      const elMeta = document.getElementById('meta');
+      const elToast = document.getElementById('toast');
+
+      const btn = document.getElementById('ptt');
+      const btnLabel = document.getElementById('pttLabel');
+
+      const canvas = document.getElementById('wave');
+      const ctx = canvas.getContext('2d');
+
+      const STATE_CLASSES = ['s-idle','s-listening','s-processing','s-speaking'];
+
+      function toast(msg){
+        elToast.textContent = msg;
+        elToast.classList.add('show');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => elToast.classList.remove('show'), 2200);
+      }
+
+      function setStatus(s){
+        elStatus.textContent = s;
+        elPill.classList.remove(...STATE_CLASSES);
+        elPill.classList.add('s-' + (s || 'idle'));
+      }
+
+      function render(state){
+        if (!state) return;
+        setStatus(state.status || 'idle');
+
+        if (state.last_wake_ts){
+          const d = new Date(state.last_wake_ts * 1000);
+          const sc = (state.last_wake_score ?? 0);
+          elWake.textContent = `wake: ${d.toLocaleTimeString()}  score=${sc.toFixed ? sc.toFixed(2) : sc}`;
+        }
+        if (typeof state.last_transcript === 'string' && state.last_transcript.trim()) elTranscript.textContent = state.last_transcript;
+        if (typeof state.last_reply === 'string' && state.last_reply.trim()) elReply.textContent = state.last_reply;
+      }
+
+      // state websocket
+      const wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+      const ws = new WebSocket(wsUrl);
+      ws.onopen = () => { elWs.textContent = 'WS: bağlı'; };
+      ws.onclose = () => { elWs.textContent = 'WS: kapandı'; };
+      ws.onerror = () => { elWs.textContent = 'WS: hata'; };
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === 'state'){
+            render(msg.data);
+          }
+        } catch (e) {}
+      };
+
+      // audio streaming
+      let mediaStream = null;
+      let audioCtx = null;
+      let sourceNode = null;
+      let processorNode = null;
+      let analyser = null;
+      let wsAudio = null;
+
+      let holding = false;
+      let startedAt = 0;
+      let level = 0;
+
+      function downsampleBuffer(buffer, inSampleRate, outSampleRate){
+        if (outSampleRate === inSampleRate) return buffer;
+        const ratio = inSampleRate / outSampleRate;
+        const newLength = Math.round(buffer.length / ratio);
+        const result = new Float32Array(newLength);
+        let offsetResult = 0;
+        let offsetBuffer = 0;
+        while (offsetResult < result.length) {
+          const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+          let accum = 0, count = 0;
+          for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+            accum += buffer[i];
+            count++;
+          }
+          result[offsetResult] = accum / Math.max(1, count);
+          offsetResult++;
+          offsetBuffer = nextOffsetBuffer;
+        }
+        return result;
+      }
+
+      function floatTo16BitPCM(float32Array){
+        const out = new Int16Array(float32Array.length);
+        for (let i=0;i<float32Array.length;i++){
+          let s = Math.max(-1, Math.min(1, float32Array[i]));
+          out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return out;
+      }
+
+      async function ensureMic(){
+        if (mediaStream) return mediaStream;
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        return mediaStream;
+      }
+
+      async function startHold(){
+        if (holding) return;
+        holding = true;
+        btn.classList.add('isHeld');
+        btnLabel.textContent = 'listening…';
+        elMeta.textContent = 'stream: opening';
+
+        startedAt = Date.now();
+
+        try{
+          await ensureMic();
+        }catch(err){
+          holding = false;
+          btn.classList.remove('isHeld');
+          btnLabel.textContent = 'hold to talk';
+          toast('Mikrofon izni gerekli');
+          return;
+        }
+
+        // Create audio graph fresh each utterance (simpler + reliable on mobile)
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        sourceNode = audioCtx.createMediaStreamSource(mediaStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+
+        // ScriptProcessor is deprecated but still widely supported and build-free.
+        processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+
+        const wsUrlAudio = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/audio';
+        wsAudio = new WebSocket(wsUrlAudio);
+        wsAudio.binaryType = 'arraybuffer';
+
+        wsAudio.onopen = () => {
+          elMeta.textContent = 'stream: live';
+          wsAudio.send(JSON.stringify({type:'start', sample_rate:16000, format:'pcm_s16le'}));
+        };
+        wsAudio.onerror = () => {
+          elMeta.textContent = 'stream: error';
+        };
+        wsAudio.onclose = () => {
+          // ok
+        };
+
+        processorNode.onaudioprocess = (e) => {
+          if (!holding || !wsAudio || wsAudio.readyState !== 1) return;
+          const input = e.inputBuffer.getChannelData(0);
+
+          // compute rms for viz
+          let sum = 0;
+          for (let i=0;i<input.length;i++) sum += input[i]*input[i];
+          level = Math.sqrt(sum / input.length);
+
+          // downsample to 16k
+          const ds = downsampleBuffer(input, audioCtx.sampleRate, 16000);
+          const pcm16 = floatTo16BitPCM(ds);
+          wsAudio.send(pcm16.buffer);
+
+          // auto cutoff at ~15s
+          if ((Date.now() - startedAt) > 15000){
+            stopHold();
+          }
+        };
+
+        // Connect: source -> analyser -> processor -> (destination muted)
+        sourceNode.connect(analyser);
+        analyser.connect(processorNode);
+        processorNode.connect(audioCtx.destination);
+
+        toast('Konuş');
+      }
+
+      async function stopHold(){
+        if (!holding) return;
+        holding = false;
+        btn.classList.remove('isHeld');
+        btnLabel.textContent = 'hold to talk';
+        elMeta.textContent = 'stream: closing';
+
+        try{
+          if (wsAudio && wsAudio.readyState === 1){
+            wsAudio.send(JSON.stringify({type:'stop'}));
+          }
+        }catch(e){}
+
+        try{ wsAudio && wsAudio.close(); } catch(e) {}
+        wsAudio = null;
+
+        try{ processorNode && processorNode.disconnect(); } catch(e) {}
+        try{ analyser && analyser.disconnect(); } catch(e) {}
+        try{ sourceNode && sourceNode.disconnect(); } catch(e) {}
+
+        processorNode = null;
+        analyser = null;
+        sourceNode = null;
+
+        try{
+          if (audioCtx){
+            await audioCtx.close();
+          }
+        }catch(e){}
+        audioCtx = null;
+
+        level = 0;
+        elMeta.textContent = 'stream: sent';
+      }
+
+      // Pointer events: work on desktop + mobile
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        btn.setPointerCapture(e.pointerId);
+        startHold();
+      });
+      btn.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        stopHold();
+      });
+      btn.addEventListener('pointercancel', (e) => {
+        e.preventDefault();
+        stopHold();
+      });
+      btn.addEventListener('lostpointercapture', (e) => {
+        stopHold();
+      });
+
+      // waveform / audiogram
+      function draw(){
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0,0,w,h);
+
+        // background grid
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = 'rgba(0,0,0,.12)';
+        ctx.fillRect(0,0,w,h);
+
+        ctx.strokeStyle = 'rgba(255,255,255,.06)';
+        ctx.lineWidth = 1;
+        for (let x=0;x<w;x+=48){
+          ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+        }
+
+        const bars = 48;
+        const gap = 6;
+        const bw = (w - gap*(bars-1)) / bars;
+
+        const s = (elStatus.textContent || 'idle').toLowerCase();
+        let speed = s === 'listening' ? 1.0 : s === 'processing' ? .6 : s === 'speaking' ? .8 : .25;
+
+        // Real level if available else animated jitter
+        const base = holding ? (0.10 + Math.min(0.9, level*2.4)) : (0.08 + 0.04*Math.sin(Date.now()/160*speed));
+        for (let i=0;i<bars;i++){
+          const t = (Date.now()/180 * speed) + i*0.35;
+          const jitter = 0.06*Math.sin(t) + 0.05*Math.sin(t*1.9);
+          const amp = Math.max(0.04, Math.min(1.0, base + (holding? jitter : Math.abs(jitter)*0.8)));
+          const bh = amp * (h*0.82);
+          const x = i*(bw+gap);
+          const y = (h-bh)/2;
+
+          const grad = ctx.createLinearGradient(0,y,0,y+bh);
+          grad.addColorStop(0, 'rgba(34,246,255,.75)');
+          grad.addColorStop(.5,'rgba(122,92,255,.72)');
+          grad.addColorStop(1, 'rgba(255,43,214,.62)');
+
+          ctx.fillStyle = grad;
+          roundRect(ctx, x, y, bw, bh, 10);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      function roundRect(ctx, x, y, w, h, r){
+        const rr = Math.min(r, w/2, h/2);
+        ctx.beginPath();
+        ctx.moveTo(x+rr, y);
+        ctx.arcTo(x+w, y, x+w, y+h, rr);
+        ctx.arcTo(x+w, y+h, x, y+h, rr);
+        ctx.arcTo(x, y+h, x, y, rr);
+        ctx.arcTo(x, y, x+w, y, rr);
+        ctx.closePath();
+      }
+
+      draw();
+
+      // initial hint
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        toast('Tarayıcı mikrofon desteklemiyor');
+      }
+    </script>
+  </body>
+</html>

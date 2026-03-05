@@ -1,0 +1,86 @@
+{
+  "name": "bear-blog-publisher",
+  "version": "1.0.2",
+  "description": "Publish blog posts to Bear Blog - supports user-provided markdown, AI-generated content, and auto-generated diagrams.",
+  "author": "OpenClaw Community",
+  "license": "MIT",
+  "homepage": "https://github.com/CatTalk2/bear-blog-publisher",
+  "bugs": {
+    "url": "https://github.com/CatTalk2/bear-blog-publisher/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CatTalk2/bear-blog-publisher.git"
+  },
+  "keywords": [
+    "bearblog",
+    "blog",
+    "publish",
+    "automation",
+    "content"
+  ],
+  "openclaw": {
+    "requires": {
+      "bins": ["python3"],
+      "python": ["requests", "playwright"]
+    },
+    "install": [
+      {
+        "id": "playwright",
+        "kind": "python",
+        "package": "playwright",
+        "label": "Install Playwright Python package"
+      },
+      {
+        "id": "playwright-browsers",
+        "kind": "script",
+        "command": "playwright install chromium",
+        "label": "Download Playwright browsers (~100MB)"
+      }
+    ],
+    "env": {
+      "BEAR_BLOG_EMAIL": {
+        "description": "Bear Blog email (optional, can also use config file or runtime params)"
+      },
+      "BEAR_BLOG_PASSWORD": {
+        "description": "Bear Blog password (optional, can also use config file or runtime params)"
+      },
+      "OPENAI_API_KEY": {
+        "description": "OpenAI API key for AI content generation (optional)"
+      },
+      "KIMI_API_KEY": {
+        "description": "Kimi API key for AI content generation (optional)"
+      }
+    },
+    "config": {
+      "schema": {
+        "skills": {
+          "type": "object",
+          "properties": {
+            "bear-blog-publisher": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Bear Blog email (optional if using env vars or runtime params)"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Bear Blog password (optional if using env vars or runtime params)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "entry": {
+      "when": "user wants to publish a blog post to Bear Blog",
+      "examples": [
+        "Publish a blog about Python best practices",
+        "Write a blog post about my travel experience",
+        "Create a blog about system design"
+      ]
+    }
+  }
+}

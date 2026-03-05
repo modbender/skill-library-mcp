@@ -1,0 +1,70 @@
+version: 1
+name: AgentDojo
+
+timezone: Europe/Berlin
+schedule:
+  dailyDigestTime: "04:00"
+  quietHours:
+    start: "23:00"
+    end: "07:00"
+
+priorityWeights:
+  quality: 0.6
+  cost: 0.25
+  safety: 0.15
+
+budget:
+  mode: flexible
+  maxDailyUsd: 8
+  maxDailyTokens: 180000
+  maxRunTokens: 4500
+  maxRunsPerAgentPerDay: 1
+  maxTeamRunsPerDay: 12
+
+intensityProfiles:
+  conservative:
+    maxSourcesPerRun: 2
+    maxToolCalls: 8
+  balanced:
+    maxSourcesPerRun: 3
+    maxToolCalls: 12
+  deep:
+    maxSourcesPerRun: 5
+    maxToolCalls: 16
+
+selectedProfile: conservative
+
+agents:
+  include:
+    - leadarchitect
+    - backend
+    - frontend
+    - devops
+    - netops
+    - seccompliance
+    - qa
+    - database
+
+sourcePolicy:
+  mode: open-web-guarded
+  minSourceScore: 75
+  maxSourceAgeDays: 90
+  requireCrossCheck: true
+  blockOnPromptInjectionSignals: true
+
+safety:
+  isolatedSessionsOnly: true
+  destructiveActionsDefaultDeny: true
+  maxFileWritesPerRun: 8
+  maxNetworkFetchesPerRun: 6
+  timeoutSeconds: 180
+
+reporting:
+  outputMode: compact
+  includeTopFindings: 3
+  writeDailyReport: true
+  reportPath: reports/daily
+  ledgerPath: state/ledger
+  runPath: state/runs
+  scorePath: state/scores
+  auditPath: audit/events.ndjson

@@ -1,0 +1,64 @@
+{
+  "name": "porkbun-dns",
+  "version": "1.0.1",
+  "description": "Manage Porkbun DNS records and domains via API v3. Create, read, update, and delete DNS records for domains managed by Porkbun.",
+  "homepage": "http://git.theta42.com/nova/porkbun-skill",
+  "author": {
+    "name": "Nova AI",
+    "email": "nova@vm42.us"
+  },
+  "owner": "wmantly",
+  "openclaw": {
+    "always": false,
+    "capabilities": [
+      "execute"
+    ]
+  },
+  "environment": {
+    "required": {
+      "PORKBUN_API_KEY": {
+        "description": "Porkbun API key from https://porkbun.com/account/api",
+        "help": "Create API credentials at Porkbun account settings",
+        "type": "string"
+      },
+      "PORKBUN_SECRET_API_KEY": {
+        "description": "Porkbun secret API key from https://porkbun.com/account/api",
+        "help": "Must be paired with PORKBUN_API_KEY",
+        "type": "string"
+      }
+    },
+    "optional": {},
+    "config": {
+      "paths": [
+        "~/.config/porkbun/config.json"
+      ],
+      "help": "Alternatively, store credentials in ~/.config/porkbun/config.json with format: {\"apiKey\": \"key\", \"secretApiKey\": \"secret\"}"
+    }
+  },
+  "install": {
+    "type": "instruction",
+    "steps": [
+      "1. Get API credentials: Log in to Porkbun and visit https://porkbun.com/account/api",
+      "2. Create API credentials (both public and secret keys)",
+      "3. Set environment variables OR create config file:",
+      "   Option A: export PORKBUN_API_KEY='your-key' && export PORKBUN_SECRET_API_KEY='your-secret'",
+      "   Option B: mkdir -p ~/.config/porkbun && cat > ~/.config/porkbun/config.json << EOF",
+      "   {",
+      "     \"apiKey\": \"your-pk1-key\",",
+      "     \"secretApiKey\": \"your-sk1-key\"",
+      "   }",
+      "   EOF"
+    ]
+  },
+  "scripts": {
+    "porkbun-dns": "scripts/porkbun-dns.js"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dns",
+    "porkbun",
+    "domain",
+    "api",
+    "cli"
+  ]
+}

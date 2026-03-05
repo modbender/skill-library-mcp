@@ -1,0 +1,107 @@
+{
+  "name": "create_lead",
+  "version": "1.0.0",
+  "description": "Create a new lead in the CRM system",
+  "author": "Business Claw Team",
+  "category": "crm",
+  
+  "triggers": [
+    "create lead",
+    "add lead",
+    "new lead",
+    "register lead"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Lead DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the lead",
+      "required": true
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "lead_name": {
+        "type": "string",
+        "description": "Lead full name or company name"
+      },
+      "email_id": {
+        "type": "string",
+        "description": "Primary email"
+      },
+      "phone": {
+        "type": "string",
+        "description": "Phone number"
+      },
+      "mobile_no": {
+        "type": "string",
+        "description": "Mobile number"
+      },
+      "company_name": {
+        "type": "string",
+        "description": "Company name (if individual)"
+      },
+      "territory": {
+        "type": "string",
+        "description": "Territory"
+      },
+      "source": {
+        "type": "string",
+        "description": "Lead source (e.g., Website, Referral)"
+      },
+      "lead_owner": {
+        "type": "string",
+        "description": "Sales person responsible"
+      },
+      "notes": {
+        "type": "string",
+        "description": "Initial notes"
+      }
+    },
+    "required": ["lead_name"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Lead"
+        }
+      },
+      {
+        "step": "create_lead",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Lead",
+          "data": {
+            "lead_name": "${lead_name}",
+            "email_id": "${email_id}",
+            "phone": "${phone}",
+            "mobile_no": "${mobile_no}",
+            "company_name": "${company_name}",
+            "territory": "${territory}",
+            "source": "${source}",
+            "lead_owner": "${lead_owner}",
+            "notes": "${notes}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "require_unique_email": true,
+    "validate_phone_format": true
+  },
+  
+  "output_template": "Created Lead {{name}}\nName: {{lead_name}}\nSource: {{source}}\nOwner: {{lead_owner}}"
+}

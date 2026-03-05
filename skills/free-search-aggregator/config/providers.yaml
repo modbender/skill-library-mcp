@@ -1,0 +1,143 @@
+providers:
+  # ── 高质量 API 搜索（需密钥，免费额度充足）─────────────────────────────
+  brave:
+    api_key: ${BRAVE_API_KEY}
+    daily_quota: 2000
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+
+  exa:
+    # Exa.ai 神经/语义搜索 — 免费 1000次/月 (≈33次/天)
+    # 申请: https://exa.ai/  env: EXA_API_KEY
+    api_key: ${EXA_API_KEY}
+    daily_quota: 33
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+    search_type: auto      # auto | neural | keyword
+    include_text: true
+
+  tavily:
+    api_key: ${TAVILY_API_KEY}
+    daily_quota: 1000
+    enabled: true
+    min_interval_seconds: 1.0
+    search_depth: basic
+    timeout_seconds: 12
+
+  # ── 完全免费（无需密钥）──────────────────────────────────────────────────
+  duckduckgo:
+    daily_quota: 500
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+
+  bing_html:
+    # Bing RSS 搜索 — 无需密钥，使用 Bing 内置 RSS 接口（稳定无反爬）
+    daily_quota: 300
+    enabled: true
+    min_interval_seconds: 2.0
+    timeout_seconds: 15
+
+  mojeek:
+    # Mojeek — 独立索引，非 Google/Bing 镜像，无需密钥即可 HTML 抓取
+    # 可选: 配置 MOJEEK_API_KEY 使用官方 JSON API 提升稳定性
+    # 申请 API key: https://www.mojeek.com/services/search/api/
+    api_key: ${MOJEEK_API_KEY}
+    daily_quota: 200
+    enabled: true
+    min_interval_seconds: 2.0
+    timeout_seconds: 15
+
+  wikipedia:
+    # Wikipedia Search API — 完全免费，适合事实性/百科查询
+    lang: en               # en | zh | ja | de | fr | it ...
+    daily_quota: 1000
+    enabled: true
+    min_interval_seconds: 0.5
+    timeout_seconds: 10
+
+  duckduckgo_instant:
+    daily_quota: 1000
+    enabled: true
+    min_interval_seconds: 0.5
+    timeout_seconds: 12
+
+  searxng:
+    # SearXNG 元搜索 — 需自托管实例（公共实例服务端限速严格）
+    # 自托管教程: https://searxng.github.io/searxng/
+    # 配置好后修改 endpoint 并将 enabled 改为 true
+    endpoint: ""           # 填入自托管实例地址，如: http://localhost:8080
+    categories: general    # general | news | science
+    daily_quota: 500
+    enabled: false         # 默认禁用：需要自托管实例
+    min_interval_seconds: 1.0
+    timeout_seconds: 15
+
+  # ── API 搜索（需密钥）────────────────────────────────────────────────────
+  serper:
+    api_key: ${SERPER_API_KEY}
+    daily_quota: 2500
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+
+  searchapi:
+    api_key: ${SEARCHAPI_API_KEY}
+    daily_quota: 100
+    enabled: true
+    engine: google
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+
+  google_cse:
+    # Google Custom Search JSON API — 免费 100次/天
+    # 1. 申请 API key: https://developers.google.com/custom-search/v1/introduction
+    # 2. 创建搜索引擎获取 cx: https://programmablesearchengine.google.com/
+    # env: GOOGLE_API_KEY, GOOGLE_CX
+    api_key: ${GOOGLE_API_KEY}
+    cx: ${GOOGLE_CX}
+    daily_quota: 100
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 12
+
+  baidu:
+    # 百度千帆 AI Search — 中文内容效果优异
+    # 申请: https://cloud.baidu.com/  env: BAIDU_API_KEY
+    api_key: ${BAIDU_API_KEY}
+    daily_quota: 200
+    enabled: true
+    min_interval_seconds: 1.0
+    timeout_seconds: 15
+    edition: standard           # standard | enhanced
+    search_recency_filter: year # year | month | week | day
+
+  yacy:
+    # YaCy 本地/P2P 搜索引擎（自托管）— 默认禁用
+    endpoint: http://localhost:8090/yacysearch.json
+    daily_quota: 1000
+    enabled: false
+    min_interval_seconds: 0.5
+    timeout_seconds: 15
+    resource: global
+
+router:
+  # 优先顺序: 高质量 API → 无密钥免费（Bing/Mojeek） → 其他 API → 百科保底
+  # 密钥未设置的提供商会快速跳过（不消耗额度，不增加延迟）
+  # SearXNG/YaCy 需自托管，默认禁用（在 providers 中 enabled: false）
+  provider_order:
+    - brave          # Brave 独立索引，高质量
+    - exa            # Exa.ai 神经语义搜索
+    - tavily         # 专为 AI agent 设计
+    - duckduckgo     # 无密钥，隐私友好
+    - bing_html      # 无密钥，Bing RSS，微软索引
+    - mojeek         # 无密钥，独立索引（非 Google/Bing）
+    - serper         # Google 索引，2500次/天
+    - searchapi      # Google/Bing 多引擎
+    - google_cse     # Google 官方 API，100次/天
+    - baidu          # 百度，中文内容
+    - wikipedia      # 百科事实查询保底
+    - searxng        # 自托管 SearXNG（禁用中）
+  quota_state_file: .quota_state.json

@@ -1,0 +1,184 @@
+{
+  "__inputs": [
+    { "name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "pluginId": "prometheus" },
+    { "name": "DS_LOKI",       "label": "Loki",       "type": "datasource", "pluginId": "loki" },
+    { "name": "DS_TEMPO",      "label": "Tempo",      "type": "datasource", "pluginId": "tempo" }
+  ],
+  "__requires": [],
+  "title": "FastAPI — App Overview",
+  "uid": "fastapi-overview",
+  "description": "Request rate, error rate, latency, logs. Select service from the dropdown.",
+  "tags": ["fastapi", "openclaw"],
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(http_requests_total, service)",
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2
+      },
+      {
+        "name": "interval",
+        "label": "Interval",
+        "type": "interval",
+        "query": "30s,1m,5m,10m",
+        "current": { "value": "1m" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2 },
+          "unit": "reqps"
+        }
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=~\"$service\"}[$interval])) by (service)",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Error Rate (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0, "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "custom": { "lineWidth": 2 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * sum(rate(http_requests_total{service=~\"$service\", status=~\"5..\"}[$interval])) by (service) / sum(rate(http_requests_total{service=~\"$service\"}[$interval])) by (service)",
+          "legendFormat": "{{service}} 5xx%",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Latency (p50 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$interval])) by (le, service))",
+          "legendFormat": "{{service}} p50", "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$interval])) by (le, service))",
+          "legendFormat": "{{service}} p95", "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$interval])) by (le, service))",
+          "legendFormat": "{{service}} p99", "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Requests by Endpoint",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "lineWidth": 1 } }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=~\"$service\"}[$interval])) by (handler, method)",
+          "legendFormat": "{{method}} {{handler}}", "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "HTTP Status Codes",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "4xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=~\"$service\", status=~\"2..\"}[$interval]))",
+          "legendFormat": "2xx", "refId": "A"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{service=~\"$service\", status=~\"4..\"}[$interval]))",
+          "legendFormat": "4xx", "refId": "B"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{service=~\"$service\", status=~\"5..\"}[$interval]))",
+          "legendFormat": "5xx", "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Logs",
+      "type": "logs",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 16 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{service=~\"$service\"}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

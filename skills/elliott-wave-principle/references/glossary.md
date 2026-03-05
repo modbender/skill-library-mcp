@@ -1,0 +1,25 @@
+# Glossary of Elliott Wave Terms
+
+- **Alternation (guideline)** – If wave 2 is a sharp correction, wave 4 will usually be sideways, and vice versa.
+- **Apex** – Intersection of the two boundary lines of a contracting triangle.
+- **Corrective wave** – A three‑wave pattern (or combination) that moves opposite the larger trend.
+- **Diagonal triangle (ending)** – Wedge‑shaped pattern with overlap, occurring in wave 5 or C; subdivides 3‑3‑3‑3‑3.
+- **Diagonal triangle (leading)** – Wedge‑shaped pattern with overlap, occurring in wave 1 or A; subdivides 5‑3‑5‑3‑5.
+- **Double three** – Combination of two simple sideways corrections (W‑X‑Y).
+- **Double zigzag** – Two zigzags separated by an X wave.
+- **Equality (guideline)** – In a five‑wave sequence, when wave 3 is longest, waves 1 and 5 tend to be equal.
+- **Expanded flat** – Flat correction where wave B exceeds the start of wave A.
+- **Failure (truncated fifth)** – Fifth wave fails to exceed the extreme of wave 3.
+- **Flat** – Sideways correction labelled A‑B‑C, subdividing 3‑3‑5.
+- **Impulse wave** – A five‑wave pattern subdividing 5‑3‑5‑3‑5, with no overlap of waves 1 and 4.
+- **Motive wave** – Any five‑wave pattern that makes progress (impulse or diagonal triangle).
+- **Orthodox top/bottom** – The end of a pattern, which may differ from the nominal price extreme.
+- **Overlap** – Wave 4 entering the price territory of wave 1 (forbidden in impulses, allowed in diagonals).
+- **Previous fourth wave** – The area where corrective patterns often terminate.
+- **Running flat** – B wave well beyond A’s start, but C fails to reach A’s end (rare).
+- **Sharp correction** – A corrective pattern that does not contain a price extreme beyond the prior impulse wave.
+- **Sideways correction** – A corrective pattern that contains a price extreme beyond the prior impulse wave.
+- **Throw‑over** – Brief penetration of a trendline on heavy volume at the end of a wave.
+- **Triangle** – Corrective pattern subdividing 3‑3‑3‑3‑3, labelled a‑b‑c‑d‑e; trendlines converge (or diverge).
+- **Truncated fifth** – See Failure.
+- **Zigzag** – Sharp correction labelled A‑B‑C, subdividing 5‑3‑5.

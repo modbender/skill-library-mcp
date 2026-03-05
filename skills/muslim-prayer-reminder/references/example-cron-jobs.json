@@ -1,0 +1,95 @@
+{
+  "description": "Example cron jobs for automated prayer reminders",
+  "note": "Replace placeholders with your actual values before using",
+  
+  "jobs": [
+    {
+      "name": "prayer-times:daily-fetch",
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 0 * * *",
+        "tz": "Africa/Casablanca"
+      },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Fetch today's prayer times:\n\n1. Run: cd /root/.openclaw/workspace && python3 skills/prayer-times/scripts/get_prayer_times.py --city YOUR_CITY --country YOUR_COUNTRY --json > prayer_times.json\n2. Verify prayer_times.json was created with today's times\n3. Silent operation - only alert if fetch fails after retry\n\nReplace YOUR_CITY and YOUR_COUNTRY with the user's location.\n\nThis ensures fresh prayer times are available for reminder checks.",
+        "timeoutSeconds": 60
+      },
+      "delivery": {
+        "mode": "none"
+      },
+      "enabled": true
+    },
+    {
+      "name": "prayer-times:reminder-check",
+      "schedule": {
+        "kind": "every",
+        "everyMs": 300000
+      },
+      "sessionTarget": "isolated",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check if it's time for Salat reminder:\n\n1. Run: cd /root/.openclaw/workspace && python3 skills/prayer-times/scripts/check_prayer_reminder.py --prayer-times prayer_times.json --timezone 1\n2. If exit code is 1, the script outputs the reminder message - send it to the user\n3. If exit code is 0, no reminder needed (return HEARTBEAT_OK)\n4. If exit code is 2, prayer times file is missing or invalid - log error\n\nThis checks every 5 minutes for three reminder windows: 10 min before, at prayer time, and 5 min after.",
+        "timeoutSeconds": 30
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      },
+      "enabled": true
+    }
+  ],
+  
+  "placeholders": {
+    "YOUR_CITY": "Your city name (e.g., Mecca, Istanbul, Cairo)",
+    "YOUR_COUNTRY": "Your country name (e.g., Saudi Arabia, Turkey, Egypt)",
+    "YOUR_TIMEZONE": "Your timezone (e.g., Asia/Riyadh, Europe/Istanbul, Africa/Cairo)",
+    "YOUR_OFFSET": "Your UTC offset (e.g., 3 for GMT+3, 2 for GMT+2)",
+    "check_interval_ms": 300000,
+    "note": "Replace placeholders with your actual location and timezone"
+  },
+  
+  "common_timezones": {
+    "Morocco": {
+      "tz": "Africa/Casablanca",
+      "offset": 1
+    },
+    "Saudi Arabia": {
+      "tz": "Asia/Riyadh",
+      "offset": 3
+    },
+    "Egypt": {
+      "tz": "Africa/Cairo",
+      "offset": 2
+    },
+    "Turkey": {
+      "tz": "Europe/Istanbul",
+      "offset": 3
+    },
+    "UAE": {
+      "tz": "Asia/Dubai",
+      "offset": 4
+    },
+    "Kuwait": {
+      "tz": "Asia/Kuwait",
+      "offset": 3
+    },
+    "Qatar": {
+      "tz": "Asia/Qatar",
+      "offset": 3
+    },
+    "Jordan": {
+      "tz": "Asia/Amman",
+      "offset": 2
+    },
+    "Algeria": {
+      "tz": "Africa/Algiers",
+      "offset": 1
+    },
+    "Tunisia": {
+      "tz": "Africa/Tunis",
+      "offset": 1
+    }
+  }
+}

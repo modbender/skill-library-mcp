@@ -1,0 +1,137 @@
+{
+  "workflows": {
+    "character_creation": {
+      "name": "角色创建工作流",
+      "description": "完整的角色创建和验证流程",
+      "tasks": [
+        {
+          "id": "init_workspace",
+          "name": "初始化工作空间",
+          "description": "验证和创建目录结构",
+          "agent_type": "lore_bible_manager",
+          "inputs": ["workspace"],
+          "outputs": ["directory_status", "missing_dirs"],
+          "timeout": 30,
+          "retry_count": 2
+        },
+        {
+          "id": "scan_existing",
+          "name": "扫描现有角色",
+          "description": "扫描现有角色档案，构建索引",
+          "agent_type": "lore_bible_manager",
+          "inputs": ["workspace"],
+          "outputs": ["character_index", "character_count"],
+          "depends_on": ["init_workspace"],
+          "timeout": 60
+        },
+        {
+          "id": "generate_profile",
+          "name": "生成角色档案",
+          "description": "根据模板生成角色档案内容",
+          "agent_type": "profile_generator",
+          "inputs": ["character_data", "template_type"],
+          "outputs": ["profile_content"],
+          "timeout": 30
+        },
+        {
+          "id": "save_temp",
+          "name": "保存临时档案",
+          "description": "将档案保存到临时目录",
+          "agent_type": "profile_session",
+          "inputs": ["profile_content", "character_name", "workspace"],
+          "outputs": ["temp_file_path"],
+          "depends_on": ["init_workspace", "generate_profile"],
+          "timeout": 30
+        },
+        {
+          "id": "detect_conflicts",
+          "name": "检测冲突",
+          "description": "检测与现有角色的冲突和常识错误",
+          "agent_type": "conflict_detector",
+          "inputs": ["character_data", "character_index"],
+          "outputs": ["conflicts", "is_valid"],
+          "depends_on": ["scan_existing"],
+          "timeout": 45
+        },
+        {
+          "id": "user_review",
+          "name": "用户审核",
+          "description": "向用户展示冲突并获取确认",
+          "agent_type": "profile_session",
+          "inputs": ["conflicts", "temp_file_path"],
+          "outputs": ["user_confirmed", "user_notes"],
+          "depends_on": ["detect_conflicts", "save_temp"],
+          "timeout": 300,
+          "interactive": true
+        },
+        {
+          "id": "move_final",
+          "name": "移动到最终目录",
+          "description": "用户确认后移动档案到Characters目录",
+          "agent_type": "profile_session",
+          "inputs": ["temp_file_path", "character_name", "user_confirmed"],
+          "outputs": ["final_file_path"],
+          "depends_on": ["user_review"],
+          "condition": "user_confirmed == true",
+          "timeout": 30
+        },
+        {
+          "id": "cleanup",
+          "name": "清理临时文件",
+          "description": "清理会话和临时文件",
+          "agent_type": "profile_session",
+          "inputs": ["session_id", "workspace"],
+          "outputs": ["cleaned_count"],
+          "depends_on": ["move_final"],
+          "timeout": 30
+        }
+      ]
+    },
+    "quick_creation": {
+      "name": "快速创建模式",
+      "description": "简化版本，跳过部分检查",
+      "tasks": [
+        {
+          "id": "init_workspace",
+          "name": "初始化工作空间",
+          "description": "验证和创建目录结构",
+          "agent_type": "lore_bible_manager",
+          "inputs": ["workspace"],
+          "outputs": ["directory_status"]
+        },
+        {
+          "id": "generate_and_save",
+          "name": "生成并保存",
+          "description": "生成档案并直接保存到Characters目录",
+          "agent_type": "profile_generator",
+          "inputs": ["character_data", "template_type", "workspace"],
+          "outputs": ["final_file_path"],
+          "depends_on": ["init_workspace"]
+        }
+      ]
+    }
+  },
+  "agents": {
+    "lore_bible_manager": {
+      "module": "scripts.lore_bible_manager",
+      "class": "LoreBibleManager"
+    },
+    "conflict_detector": {
+      "module": "scripts.conflict_detector",
+      "class": "ConflictDetector"
+    },
+    "profile_session": {
+      "module": "scripts.profile_session",
+      "class": "ProfileSession"
+    },
+    "profile_generator": {
+      "module": "scripts.generate_profile",
+      "class": "CharacterProfileGenerator"
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-01-26",
+    "description": "子代理任务工作流定义"
+  }
+}

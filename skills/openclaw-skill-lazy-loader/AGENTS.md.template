@@ -1,0 +1,72 @@
+## Skills (Lazy Loading)
+
+<!--
+Paste this section into your agent's AGENTS.md to enable lazy skill loading.
+Part of: OpenClaw Skill Lazy Loader (clawhub install openclaw-skill-lazy-loader)
+-->
+
+### Skill Loading Strategy
+
+**At session start:** Read `SKILLS.md` only (the catalog index — lightweight, ~300 tokens).
+
+**Do NOT read all skill files at startup.** Load individual skills on demand.
+
+**When to load a skill file:**
+- You're about to perform a task that requires it
+- You're unsure how to do something and the skill file would help
+- You haven't loaded it yet this session
+
+**When NOT to load a skill file:**
+- The current task doesn't need it
+- You already loaded it earlier this session
+- You're doing a simple conversational task
+
+### Loading Decision Process
+
+Before starting any task:
+1. Check: Does this task need specialized knowledge from a skill?
+2. If yes: Look up the skill in `SKILLS.md` → load just that file
+3. If no: Proceed without loading anything extra
+
+**Example internal reasoning:**
+```
+Task: "Write a Python function to parse JSON"
+→ Check SKILLS.md → Python skill available at skills/python/SKILL.md
+→ Load skills/python/SKILL.md
+→ Proceed with task
+```
+
+```
+Task: "What time is it in Tokyo?"
+→ Check: Need a skill? No — general knowledge task
+→ Load nothing
+→ Proceed with answer
+```
+
+### Memory Files
+
+**At session start:** Read `MEMORY.md` only (summary — load always).
+
+**Load daily memory files (`memory/YYYY-MM-DD.md`) only when:**
+- User asks about work from a specific date
+- Task involves a project that may have historical context
+- Debugging requires understanding what changed recently
+
+**Do NOT load all daily memory files at startup** — they add up fast.
+
+### Session-Level Tracking (Optional)
+
+If your agent supports tool use, track what's been loaded this session to avoid double-loading:
+
+```
+Loaded this session:
+- skills/python/SKILL.md ✓
+- memory/2026-02-27.md ✓
+```
+
+Only load each file once per session.
+
+---
+
+<!-- Token savings with this pattern: 40–93% reduction on context loading -->
+<!-- For more: clawhub install openclaw-skill-lazy-loader -->

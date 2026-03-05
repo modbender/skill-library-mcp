@@ -1,0 +1,269 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Unified Knowledge Base Schema",
+  "version": "1.0.0",
+  "description": "统一知识库 schema 定义，用于存储和查询各类编程知识",
+  
+  "definitions": {
+    "KnowledgeEntry": {
+      "type": "object",
+      "required": ["id", "category", "name", "triggers", "content", "created_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识符，格式: <category>-<hash>"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["experience", "tech-stack", "scenario", "problem", "testing", "pattern", "skill"],
+          "description": "知识分类"
+        },
+        "name": {
+          "type": "string",
+          "description": "知识条目名称"
+        },
+        "triggers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "触发加载的关键字列表"
+        },
+        "content": {
+          "type": "object",
+          "description": "具体知识内容，结构因 category 而异"
+        },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "知识来源（GitHub URL、会话 ID 等）"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "额外标签，用于精细化检索"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "创建时间"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "最后更新时间"
+        },
+        "usage_count": {
+          "type": "integer",
+          "default": 0,
+          "description": "被使用次数"
+        },
+        "effectiveness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5,
+          "description": "有效性评分 (0-1)，通过反馈更新"
+        }
+      }
+    },
+    
+    "ExperienceContent": {
+      "type": "object",
+      "description": "经验类知识内容",
+      "properties": {
+        "description": { "type": "string" },
+        "context": { "type": "string", "description": "适用场景描述" },
+        "solution": { "type": "string", "description": "解决方案" },
+        "pitfalls": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "需要避免的坑"
+        },
+        "related_tech": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    
+    "TechStackContent": {
+      "type": "object",
+      "description": "技术栈知识内容",
+      "properties": {
+        "tech_name": { "type": "string" },
+        "version": { "type": "string" },
+        "best_practices": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "conventions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "common_patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "gotchas": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "常见陷阱"
+        }
+      }
+    },
+    
+    "ScenarioContent": {
+      "type": "object",
+      "description": "场景类知识内容",
+      "properties": {
+        "scenario_name": { "type": "string" },
+        "description": { "type": "string" },
+        "typical_approach": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "considerations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_tech": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    
+    "ProblemContent": {
+      "type": "object",
+      "description": "问题类知识内容",
+      "properties": {
+        "problem_name": { "type": "string" },
+        "symptoms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "问题症状"
+        },
+        "root_causes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "根本原因"
+        },
+        "solutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "code_example": { "type": "string" },
+              "applicable_when": { "type": "string" }
+            }
+          }
+        },
+        "prevention": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "预防措施"
+        }
+      }
+    },
+    
+    "TestingContent": {
+      "type": "object",
+      "description": "测试类知识内容",
+      "properties": {
+        "testing_type": { 
+          "type": "string",
+          "enum": ["unit", "integration", "e2e", "performance", "security"]
+        },
+        "framework": { "type": "string" },
+        "best_practices": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "anti_patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "example_structure": { "type": "string" }
+      }
+    },
+    
+    "PatternContent": {
+      "type": "object",
+      "description": "编程范式内容",
+      "properties": {
+        "pattern_name": { "type": "string" },
+        "category": { 
+          "type": "string",
+          "enum": ["architecture", "design", "behavioral", "creational", "structural"]
+        },
+        "description": { "type": "string" },
+        "when_to_use": { "type": "string" },
+        "structure": { "type": "string" },
+        "example": { "type": "string" },
+        "pros": { "type": "array", "items": { "type": "string" } },
+        "cons": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    
+    "SkillContent": {
+      "type": "object",
+      "description": "编程技能内容",
+      "properties": {
+        "skill_name": { "type": "string" },
+        "level": {
+          "type": "string",
+          "enum": ["basic", "intermediate", "advanced"]
+        },
+        "description": { "type": "string" },
+        "key_concepts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "practical_tips": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "common_mistakes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  
+  "categories": {
+    "experience": {
+      "description": "经验积累：从实际编程会话中提取的经验教训",
+      "content_schema": { "$ref": "#/definitions/ExperienceContent" }
+    },
+    "tech-stack": {
+      "description": "技术栈积累：特定技术/框架的最佳实践和惯例",
+      "content_schema": { "$ref": "#/definitions/TechStackContent" }
+    },
+    "scenario": {
+      "description": "场景积累：特定编程场景的处理方法",
+      "content_schema": { "$ref": "#/definitions/ScenarioContent" }
+    },
+    "problem": {
+      "description": "问题积累：常见问题的诊断和解决方案",
+      "content_schema": { "$ref": "#/definitions/ProblemContent" }
+    },
+    "testing": {
+      "description": "测试积累：测试相关的最佳实践和模式",
+      "content_schema": { "$ref": "#/definitions/TestingContent" }
+    },
+    "pattern": {
+      "description": "编程范式：架构和设计模式",
+      "content_schema": { "$ref": "#/definitions/PatternContent" }
+    },
+    "skill": {
+      "description": "编程技能：通用编程技能和技巧",
+      "content_schema": { "$ref": "#/definitions/SkillContent" }
+    }
+  }
+}

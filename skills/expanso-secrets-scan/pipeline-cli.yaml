@@ -1,0 +1,68 @@
+# Expanso Pipeline: secrets-scan (CLI mode)
+# ==========================================
+#
+# Detect hardcoded secrets in text or code.
+#
+# Usage:
+#   cat config.yaml | expanso-edge run pipeline-cli.yaml
+#   cat .env.example | expanso-edge run pipeline-cli.yaml
+
+name: secrets-scan-cli
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: all
+      max_buffer: 1048576
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          meta trace_id = uuid_v4()
+
+          let secret_types = env("SECRET_TYPES").or("api_key,token,password,private_key,secret,credential,aws_key,github_token,slack_token,openai_key")
+
+          root.messages = [
+            {
+              "role": "system",
+              "content": "You are a security scanner specialized in detecting hardcoded secrets. Scan code and configuration for exposed credentials. Be thorough but avoid false positives. Do NOT flag placeholder values like 'your-api-key-here' or 'xxx'."
+            },
+            {
+              "role": "user",
+              "content": "Scan this text for hardcoded secrets. Look for: " + $secret_types + "\n\nReturn JSON:\n{\n  \"findings\": [\n    {\n      \"type\": \"api_key|token|password|private_key|aws_key|...\",\n      \"value\": \"partial value (first 4 chars + ... + last 4 chars)\",\n      \"full_match\": \"the full matched string\",\n      \"line\": 1,\n      \"severity\": \"high|medium|low\",\n      \"context\": \"brief context\"\n    }\n  ],\n  \"summary\": \"brief summary\"\n}\n\nDo NOT include:\n- Placeholder values (xxx, your-key-here, <token>)\n- Environment variable references (${VAR})\n- Example values from documentation\n\nReturn valid JSON only.\n\nText to scan:\n```\n" + content() + "\n```"
+            }
+          ]
+
+      - openai_chat_completion:
+          api_key: "${OPENAI_API_KEY}"
+          model: gpt-4o-mini
+
+      - mapping: |
+          let raw = this.choices.0.message.content
+          let parsed = $raw.parse_json().catch({"findings": [], "summary": "Parse error"})
+
+          root.findings = $parsed.findings.or([])
+          root.has_secrets = $parsed.findings.or([]).length() > 0
+          root.summary = $parsed.summary.or("")
+          root.metadata = {
+            "skill": "secrets-scan",
+            "mode": "cli",
+            "model": "gpt-4o-mini",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "findings_count": $parsed.findings.or([]).length(),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [secrets-scan] Found ${! root.findings.length() } secrets in ${! meta("input_length") } chars
+
+  output:
+    stdout:
+      codec: json_object

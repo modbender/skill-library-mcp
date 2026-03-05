@@ -1,0 +1,59 @@
+# Aperture L402 Reverse Proxy — Docker container on regtest.
+#
+# Requires a running litd + bitcoind regtest stack (docker-compose-regtest.yml).
+# Aperture connects to litd's lnd gRPC for invoice creation and L402 auth.
+#
+# Usage:
+#   docker compose -f docker-compose-aperture.yml up -d
+#   docker compose -f docker-compose-aperture.yml down -v
+#
+# The aperture container runs under Rosetta on Apple Silicon since no
+# arm64 image is published.
+#
+# Ports:
+#   8082 — Aperture HTTP proxy (insecure mode for regtest)
+#
+# A simple backend HTTP server is included as a second container (busybox
+# httpd serving static files from /www).
+
+services:
+  aperture:
+    image: ${APERTURE_IMAGE:-lightninglabs/aperture}:${APERTURE_VERSION:-v0.4.2}
+    platform: linux/amd64
+    container_name: litd-aperture
+    restart: unless-stopped
+    depends_on:
+      - backend
+    entrypoint: ["/bin/sh", "-c", "cp /tmp/aperture.yaml /root/.aperture/aperture.yaml && exec aperture --configfile=/root/.aperture/aperture.yaml"]
+    ports:
+      - "${APERTURE_PORT:-8082}:8082"
+    volumes:
+      - aperture-data:/root/.aperture
+      - ${APERTURE_CONF_PATH:-./aperture-regtest.yaml}:/tmp/aperture.yaml:ro
+      # Mount litd's TLS cert and macaroon from the litd container volume.
+      # These are copied in by the test setup after wallet creation.
+      - litd-aperture-creds:/root/.lnd-creds:ro
+    networks:
+      - litd-regtest
+      - aperture-net
+
+  backend:
+    image: busybox:latest
+    container_name: litd-backend
+    restart: unless-stopped
+    # Serve a simple HTTP response on port 9999.
+    command: ["sh", "-c", "mkdir -p /www/api && echo '{\"status\":\"ok\",\"message\":\"Hello from L402 backend\"}' > /www/api/data.json && echo '{\"status\":\"ok\"}' > /www/health && httpd -f -p 9999 -h /www"]
+    networks:
+      - aperture-net
+
+volumes:
+  aperture-data:
+  litd-aperture-creds:
+    external: true
+
+networks:
+  aperture-net:
+    driver: bridge
+  litd-regtest:
+    external: true
+    name: templates_litd-regtest

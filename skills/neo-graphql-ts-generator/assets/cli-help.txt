@@ -1,0 +1,77 @@
+GraphQL TypeScript Generator - CLI Usage Guide
+==============================================
+
+COMMAND SYNTAX
+--------------
+graphql-ts-generator [OPTIONS] <SCHEMA_FILE>
+
+BASIC EXAMPLES
+--------------
+1. Generate types from a single schema file:
+   graphql-ts-generator ./schemas/api.graphql
+
+2. Generate with custom output directory:
+   graphql-ts-generator ./schemas/api.graphql --output ./src/types/
+
+3. Generate multiple schemas:
+   graphql-ts-generator ./schemas/*.graphql
+
+ADVANCED OPTIONS
+----------------
+--output, -o       Output directory (default: ./generated)
+--namespace, -n    Wrap types in a namespace/module
+--no-unions        Disable union type generation
+--enums-as-const   Generate enums as 'const enum' (faster)
+--help             Show this help message
+
+SCHEMA REQUIREMENTS
+-------------------
+- Valid GraphQL SDL syntax
+- Must include at least one type definition
+- Supports: Object types, Interfaces, Unions, Enums, Scalars
+- Custom scalars map to 'any' by default
+
+OUTPUT FILES
+------------
+For each input schema, generates:
+- types.ts      : All TypeScript interfaces and types
+- enums.ts      : Enum definitions
+- unions.ts     : Union type definitions (if present)
+- index.ts      : Barrel export file
+
+EXIT CODES
+----------
+0 = Success
+1 = Invalid schema or parsing error
+2 = Missing dependencies
+3 = Write permission error
+
+ERROR HANDLING
+--------------
+- Parser errors include line/column numbers
+- Invalid type references are flagged
+- Circular dependencies are detected
+
+INTEGRATION EXAMPLES
+--------------------
+# In a build script:
+graphql-ts-generator src/graphql/schema.graphql --output src/types/
+
+# In package.json:
+"scripts": {
+  "generate:types": "graphql-ts-generator schemas/*.graphql"
+}
+
+# With namespace:
+graphql-ts-generator schema.graphql --namespace ApiTypes
+
+TROUBLESHOOTING
+---------------
+Problem: "Parser error: Unexpected token"
+Solution: Validate schema with GraphQL linter first
+
+Problem: Types not generating for custom scalars
+Solution: Add scalar definitions to schema or use --no-unions
+
+Problem: Output directory not writable
+Solution: Check permissions or use a different path

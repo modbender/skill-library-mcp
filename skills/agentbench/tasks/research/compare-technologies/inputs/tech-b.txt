@@ -1,0 +1,34 @@
+MongoDB — Technology Overview
+
+MongoDB is a general-purpose, document-oriented NoSQL database that stores data in flexible, JSON-like documents (BSON format). First released in 2009 by MongoDB Inc. (formerly 10gen), it has become the most widely adopted NoSQL database, with an estimated 100 million+ downloads and deployments across organizations ranging from startups to Fortune 500 companies.
+
+CORE ARCHITECTURE
+MongoDB uses a distributed architecture built around the concept of replica sets and sharding. A replica set is a group of MongoDB instances that maintain the same data set, providing redundancy and automatic failover. Sharding distributes data across multiple servers (shards) to support horizontal scaling, with a config server tracking the distribution and mongos routers directing queries to the appropriate shard.
+
+Data is stored in collections (analogous to tables) as BSON documents. Unlike relational databases, documents within a single collection can have different structures — a property known as schema flexibility. This means fields can vary from document to document, and data structures can evolve without requiring schema migrations.
+
+KEY FEATURES
+- Flexible document model with dynamic schemas — no need for upfront schema design or migrations
+- Native horizontal scaling through built-in sharding with automatic balancing
+- Rich query language supporting field queries, range queries, regular expression searches, and aggregation pipelines
+- Aggregation framework providing powerful data processing and transformation capabilities (similar to SQL GROUP BY but more flexible)
+- Built-in replication with automatic failover for high availability
+- GridFS for storing and retrieving files exceeding the 16MB BSON document size limit
+- Change streams for real-time data change notifications
+- Atlas Search powered by Apache Lucene for full-text search within the database
+- Time-series collections optimized for IoT and event data
+- Multi-document ACID transactions (added in version 4.0, improved through 7.0)
+- Queryable encryption allowing queries on encrypted data without server-side decryption
+
+STRENGTHS
+MongoDB's primary strength is developer productivity. The document model maps naturally to objects in application code, eliminating the "impedance mismatch" between application objects and database rows that characterizes ORM usage with relational databases. Schema flexibility means development teams can iterate rapidly, modifying data structures as application requirements evolve without costly migration processes.
+
+Horizontal scalability is a built-in, first-class feature. Organizations can start with a single server and scale to hundreds of nodes without application-level changes. The sharding architecture handles data distribution, query routing, and rebalancing automatically. This makes MongoDB particularly strong for applications expecting rapid growth or unpredictable workload patterns.
+
+MongoDB Atlas, the fully managed cloud database service, provides additional capabilities including automated backups, point-in-time recovery, performance advisors, global clusters with data locality controls, and serverless instances. Atlas simplifies operations significantly, handling infrastructure management, security patching, and scaling decisions.
+
+USE CASES
+MongoDB is widely deployed for content management systems, product catalogs (where product attributes vary widely), real-time analytics, mobile application backends, IoT data platforms, and gaming leaderboards and player profiles. Its flexibility makes it popular for projects in early stages where the data model is still evolving. Major users include Toyota, Forbes, Cisco, eBay, and the City of Chicago's open data platform.
+
+LIMITATIONS
+MongoDB's flexibility can become a liability without discipline. Without enforced schemas, data inconsistency can creep into production systems over time. While multi-document ACID transactions are supported, they carry performance overhead and are not as mature as transaction support in established relational databases. Complex joins across collections are less efficient than in relational systems — MongoDB encourages denormalization instead, which can lead to data duplication. Storage efficiency can be lower than relational alternatives due to field name repetition across documents. The aggregation pipeline, while powerful, has a steeper learning curve than SQL for developers accustomed to relational databases.

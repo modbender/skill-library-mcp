@@ -1,0 +1,95 @@
+{
+  "rules": [
+    {
+      "id": "age_realistic",
+      "name": "年龄合理性",
+      "description": "检查年龄是否在合理范围内（0-150岁）",
+      "condition": "age.isdigit() and not (0 <= int(age) <= 150)",
+      "severity": "warning",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "age_format",
+      "name": "年龄格式",
+      "description": "年龄应为数字或数字范围",
+      "pattern": "^\\d+(\\s*-\\s*\\d+)?$",
+      "severity": "info",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "name_length",
+      "name": "姓名长度",
+      "description": "角色姓名应在2-20个字符之间",
+      "condition": "len(name) < 2 or len(name) > 20",
+      "severity": "warning",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "gender_valid",
+      "name": "性别有效性",
+      "description": "性别应为常见值",
+      "pattern": "^(男|女|其他|未指定|非二元|未知)$",
+      "severity": "info",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "occupation_length",
+      "name": "职业描述长度",
+      "description": "职业/身份描述不应过长",
+      "condition": "len(occupation) > 100",
+      "severity": "warning",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "role_required",
+      "name": "角色定位",
+      "description": "故事中的角色不应为空",
+      "condition": "not role or role.strip() == ''",
+      "severity": "warning",
+      "enabled": true,
+      "category": "common_sense"
+    },
+    {
+      "id": "duplicate_name_strict",
+      "name": "严格重复姓名检测",
+      "description": "检测完全相同的姓名（忽略大小写和空格）",
+      "severity": "error",
+      "enabled": true,
+      "category": "duplicate"
+    },
+    {
+      "id": "similar_name",
+      "name": "相似姓名检测",
+      "description": "检测高度相似的姓名",
+      "severity": "warning",
+      "enabled": true,
+      "category": "duplicate"
+    },
+    {
+      "id": "timeline_consistency",
+      "name": "时间线一致性",
+      "description": "检查关键事件时间线是否合理",
+      "severity": "warning",
+      "enabled": true,
+      "category": "timeline"
+    },
+    {
+      "id": "relationship_symmetry",
+      "name": "关系对称性",
+      "description": "检查角色关系是否相互一致",
+      "severity": "warning",
+      "enabled": true,
+      "category": "relationships"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-01-26",
+    "description": "角色档案常识校验规则"
+  }
+}

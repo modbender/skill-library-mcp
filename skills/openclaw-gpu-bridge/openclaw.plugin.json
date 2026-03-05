@@ -1,0 +1,101 @@
+{
+  "id": "openclaw-gpu-bridge",
+  "name": "GPU Bridge",
+  "description": "Offload GPU-intensive ML tasks (BERTScore, embeddings) to one or multiple remote GPU machines",
+  "version": "0.2.1",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "hosts": {
+        "type": "array",
+        "description": "v0.2 multi-host config",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "URL of one GPU FastAPI service"
+            },
+            "name": {
+              "type": "string",
+              "description": "Optional host name"
+            },
+            "apiKey": {
+              "type": "string",
+              "description": "Optional API key for this host"
+            }
+          },
+          "required": [
+            "url"
+          ]
+        }
+      },
+      "serviceUrl": {
+        "type": "string",
+        "description": "v0.1 compatibility: URL of the FastAPI GPU service"
+      },
+      "url": {
+        "type": "string",
+        "description": "v0.1 compatibility alias for serviceUrl"
+      },
+      "timeout": {
+        "type": "number",
+        "default": 45,
+        "description": "HTTP request timeout in seconds"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "Optional API key (used as fallback for all hosts)"
+      },
+      "healthCheckIntervalSeconds": {
+        "type": "number",
+        "default": 30,
+        "description": "Host health-check interval in seconds"
+      },
+      "loadBalancing": {
+        "type": "string",
+        "enum": [
+          "round-robin",
+          "least-busy"
+        ],
+        "default": "round-robin",
+        "description": "Host selection strategy"
+      },
+      "models": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "embed": {
+            "type": "string",
+            "default": "all-MiniLM-L6-v2",
+            "description": "Default sentence-transformers model for embeddings"
+          },
+          "bertscore": {
+            "type": "string",
+            "default": "microsoft/deberta-xlarge-mnli",
+            "description": "Default model for BERTScore"
+          }
+        }
+      }
+    },
+    "description": "Configuration is optional. If no hosts/serviceUrl/url is set, tools will fail with a clear 'not configured' error instead of blocking plugin install."
+  },
+  "uiHints": {
+    "serviceUrl": {
+      "label": "GPU Service URL (legacy)",
+      "placeholder": "http://192.168.1.100:8765"
+    },
+    "apiKey": {
+      "label": "API Key",
+      "sensitive": true
+    },
+    "timeout": {
+      "label": "Timeout (seconds)"
+    },
+    "loadBalancing": {
+      "label": "Load balancing"
+    }
+  }
+}

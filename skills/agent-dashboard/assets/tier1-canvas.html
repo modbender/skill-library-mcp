@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0b; --card: #1a1a1d; --border: #27272a;
+            --text: #fafafa; --muted: #71717a; --secondary: #a1a1aa;
+            --blue: #3b82f6; --green: #22c55e; --yellow: #eab308;
+            --red: #ef4444; --orange: #f97316; --purple: #a855f7;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--text);
+            padding: 20px; line-height: 1.5;
+        }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .logo { width: 36px; height: 36px; background: linear-gradient(135deg, var(--blue), var(--purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        h1 { font-size: 1.25rem; font-weight: 600; }
+        .updated { color: var(--muted); font-size: 0.8rem; margin-left: auto; }
+        
+        .alert { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(249,115,22,0.15));
+            border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+        .alert h2 { font-size: 0.9rem; color: var(--orange); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .alert-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            background: rgba(0,0,0,0.3); border-radius: 6px; margin-bottom: 6px; font-size: 0.85rem; }
+        .priority { padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .priority.high { background: var(--red); } .priority.medium { background: var(--orange); }
+        .priority.low { background: var(--yellow); color: #000; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+        .card h3 { font-size: 0.85rem; color: var(--secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        
+        .active { display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            background: rgba(34,197,94,0.1); border-radius: 6px; margin-bottom: 6px; }
+        .pulse { width: 8px; height: 8px; background: var(--green); border-radius: 50%;
+            animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .task-name { font-weight: 500; font-size: 0.9rem; }
+        .task-meta { font-size: 0.75rem; color: var(--muted); }
+        
+        .product { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+            background: rgba(255,255,255,0.05); border-radius: 6px; margin: 4px; font-size: 0.85rem; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot.live { background: var(--green); } .dot.testing { background: var(--yellow); }
+        .dot.down { background: var(--red); }
+        
+        .cron { display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .cron:last-child { border: none; }
+        .cron-name { font-weight: 500; }
+        .cron-status { font-size: 0.9rem; }
+        .cron-errors { font-size: 0.7rem; padding: 2px 6px; background: rgba(239,68,68,0.2);
+            color: var(--red); border-radius: 8px; margin-left: 8px; }
+        
+        .activity { font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        .activity:last-child { border: none; }
+        .activity-time { color: var(--muted); font-size: 0.7rem; }
+        
+        .empty { color: var(--muted); font-size: 0.85rem; padding: 16px; text-align: center;
+            background: rgba(255,255,255,0.03); border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🚀</div>
+        <h1>Mission Control</h1>
+        <span class="updated">Updated: {{LAST_UPDATED}}</span>
+    </div>
+
+    {{#if ACTION_REQUIRED}}
+    <div class="alert">
+        <h2>🚨 Action Required</h2>
+        {{#each ACTION_REQUIRED}}
+        <div class="alert-item">
+            <span class="priority {{priority}}">{{priority}}</span>
+            <span>{{title}}</span>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    <div class="grid">
+        <div class="card">
+            <h3>⚡ Active Now</h3>
+            {{#if ACTIVE_NOW}}
+            {{#each ACTIVE_NOW}}
+            <div class="active">
+                <div class="pulse"></div>
+                <div>
+                    <div class="task-name">{{task}}</div>
+                    <div class="task-meta">{{model}} · {{duration}}</div>
+                </div>
+            </div>
+            {{/each}}
+            {{else}}
+            <div class="empty">✨ All quiet — no active tasks</div>
+            {{/if}}
+        </div>
+
+        <div class="card">
+            <h3>📋 Recent Activity</h3>
+            {{#if ACTIVITY}}
+            {{#each ACTIVITY}}
+            <div class="activity">
+                <div class="activity-time">{{time}}</div>
+                <div>{{event}}</div>
+            </div>
+            {{/each}}
+            {{else}}
+            <div class="empty">No recent activity</div>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+        <h3>📊 Products</h3>
+        {{#if PRODUCTS}}
+        {{#each PRODUCTS}}
+        <span class="product">
+            <span class="dot {{status}}"></span>
+            {{name}}
+        </span>
+        {{/each}}
+        {{else}}
+        <div class="empty">No products configured</div>
+        {{/if}}
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+        <h3>⏰ Cron Jobs</h3>
+        {{#if CRONS}}
+        {{#each CRONS}}
+        <div class="cron">
+            <span class="cron-name">{{name}}</span>
+            <div>
+                <span class="cron-status">{{statusIcon}}</span>
+                {{#if errors}}<span class="cron-errors">{{errors}} errors</span>{{/if}}
+            </div>
+        </div>
+        {{/each}}
+        {{else}}
+        <div class="empty">No cron jobs configured</div>
+        {{/if}}
+    </div>
+</body>
+</html>

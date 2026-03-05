@@ -1,0 +1,30 @@
+category: data_exfiltration
+description: "Data exfiltration detection rules"
+
+rules:
+  critical:
+    - id: DE001
+      pattern: "curl.*-X\\s*POST|wget.*--post|fetch\\(.*method.*POST"
+      description: "HTTP POST data exfiltration"
+      description_zh: "HTTP POST 数据外传"
+
+    - id: DE002
+      pattern: "curl.*\\$\\(|curl.*`|curl.*\\$\\{|curl.*\\$HOME|curl.*\\$ENV"
+      description: "curl sending env vars / dynamic content"
+      description_zh: "curl 发送环境变量/动态内容"
+
+  high:
+    - id: DE003
+      pattern: "\\.env|auth-profiles\\.json|credentials|api[_-]?key|secret[_-]?key|private[_-]?key"
+      description: "Access sensitive credential files"
+      description_zh: "访问敏感凭据文件"
+
+    - id: DE004
+      pattern: "ssh[_-]?(key|rsa|ed25519)|id_rsa|id_ed25519|known_hosts"
+      description: "SSH key access"
+      description_zh: "SSH 密钥访问"
+
+    - id: DE005
+      pattern: "keychain|login\\.keychain|security find"
+      description: "macOS Keychain access"
+      description_zh: "macOS 钥匙串访问"

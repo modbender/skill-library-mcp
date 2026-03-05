@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whoop OAuth - Authorization Complete</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #000; margin-bottom: 20px; }
+        .success { color: #28a745; font-size: 48px; margin-bottom: 20px; }
+        .code-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            text-align: left;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .copy-btn:hover { background: #0056b3; }
+        .copy-btn:active { background: #004085; }
+        .instructions {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e7f3ff;
+            border-radius: 6px;
+        }
+        .error { color: #dc3545; }
+        .label { font-weight: bold; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">✓</div>
+        <h1>Authorization Successful!</h1>
+        <p>You've successfully authorized the Whoop integration.</p>
+        
+        <div id="authCode" style="display:none;">
+            <div class="label">Authorization Code:</div>
+            <div class="code-box" id="codeDisplay"></div>
+            <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+        
+        <div id="authToken" style="display:none;">
+            <div class="label">Access Token:</div>
+            <div class="code-box" id="tokenDisplay"></div>
+            <button class="copy-btn" onclick="copyToken()">Copy Token</button>
+        </div>
+        
+        <div id="errorMessage" class="error" style="display:none;"></div>
+        
+        <div class="instructions">
+            <strong>Next Steps:</strong>
+            <ol>
+                <li>Copy the code/token above</li>
+                <li>Send it to your assistant via Telegram/WhatsApp</li>
+                <li>Your assistant will configure the integration</li>
+                <li>You can close this page</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const token = urlParams.get('access_token');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+
+        if (error) {
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorMessage').textContent = 
+                `Error: ${error}${errorDescription ? ' - ' + errorDescription : ''}`;
+            document.querySelector('.success').textContent = '✗';
+            document.querySelector('.success').style.color = '#dc3545';
+            document.querySelector('h1').textContent = 'Authorization Failed';
+        } else if (code) {
+            document.getElementById('authCode').style.display = 'block';
+            document.getElementById('codeDisplay').textContent = code;
+        } else if (token) {
+            document.getElementById('authToken').style.display = 'block';
+            document.getElementById('tokenDisplay').textContent = token;
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorMessage').textContent = 
+                'No authorization code or token found in the URL.';
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeDisplay').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+
+        function copyToken() {
+            const token = document.getElementById('tokenDisplay').textContent;
+            navigator.clipboard.writeText(token).then(() => {
+                const btn = document.querySelectorAll('.copy-btn')[1];
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+
+        // Auto-copy if code is present
+        if (code || token) {
+            setTimeout(() => {
+                if (code) copyCode();
+                if (token) copyToken();
+            }, 500);
+        }
+    </script>
+</body>
+</html>

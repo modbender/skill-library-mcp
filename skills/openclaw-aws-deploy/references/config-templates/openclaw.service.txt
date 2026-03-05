@@ -1,0 +1,27 @@
+[Unit]
+Description=OpenClaw Gateway
+Documentation=https://docs.openclaw.ai
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+
+WorkingDirectory=/home/openclaw/.openclaw
+ExecStart=/usr/local/bin/openclaw-startup.sh
+
+Restart=on-failure
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw
+
+# Note: Security hardening (ProtectSystem, ProtectHome, ReadWritePaths, PrivateTmp)
+# removed due to namespace issues on AL2023. The simpler config is more reliable.
+
+[Install]
+WantedBy=multi-user.target

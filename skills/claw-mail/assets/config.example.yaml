@@ -1,0 +1,118 @@
+# clawMail Skill Configuration
+# Copy to config.yaml and customize.
+#
+# Supports multiple accounts. Each account has its own IMAP/SMTP
+# credentials, mailboxes, and processing rules. One account is
+# designated as the default — any script invoked without --account
+# will use it automatically.
+#
+# ── Secure credential storage ──────────────────────────────────────
+# Passwords support several secure backends instead of plain text:
+#
+#   1Password CLI:    "op://vault/item/field"
+#   macOS Keychain:   "keychain://service-name/account-name"
+#   Environment var:  "env://VAR_NAME"
+#   Plain text:       "my-password"  (NOT recommended)
+#
+# Examples:
+#   password: "op://Work/IMAP/password"
+#   password: "keychain://imap.company.com/alice@company.com"
+#   password: "env://WORK_EMAIL_PASSWORD"
+
+# Which account to use when --account is not specified.
+default_account: work
+
+# Fallback SMTP relay — used when an account's own SMTP server is
+# unreachable (e.g. throttled, down for maintenance). Set this to a
+# relay service or a secondary mail server.
+smtp_fallback:
+  host: ""
+  port: 587
+  username: ""
+  password: ""
+  tls: true
+
+# ── Account profiles ────────────────────────────────────────────────
+
+accounts:
+  work:
+    label: "Work"
+    sender_address: "alice@company.com"
+    sender_name: "Alice Smith"
+
+    imap:
+      host: imap.company.com
+      port: 993
+      username: "alice@company.com"
+      password: "op://Work/IMAP/password"          # 1Password
+      ssl: true
+      timeout: 30        # connection timeout in seconds
+
+    smtp:
+      host: smtp.company.com
+      port: 587
+      username: "alice@company.com"
+      password: "op://Work/SMTP/password"          # 1Password
+      tls: true
+
+    mailboxes:
+      - INBOX
+      - Projects
+
+    fetch_limit: 50
+
+    # Per-account rules (run before global rules)
+    rules:
+      - name: flag_urgent
+        sender_pattern: "boss@company\\.com"
+        subject_pattern: "urgent|asap|critical"
+        actions: [flag, tag]
+        tag: urgent
+        priority: 10
+
+      - name: sort_invoices
+        subject_pattern: "invoice|receipt"
+        actions: [move, tag]
+        move_to: Finances
+        tag: invoice
+        priority: 8
+
+  personal:
+    label: "Personal"
+    sender_address: "alice@gmail.com"
+
+    imap:
+      host: imap.gmail.com
+      port: 993
+      username: "alice@gmail.com"
+      password: "keychain://imap.gmail.com/alice@gmail.com"  # macOS Keychain
+      ssl: true
+
+    smtp:
+      host: smtp.gmail.com
+      port: 587
+      username: "alice@gmail.com"
+      password: "keychain://smtp.gmail.com/alice@gmail.com"  # macOS Keychain
+      tls: true
+
+    mailboxes:
+      - INBOX
+
+    fetch_limit: 25
+    rules: []
+
+# ── Global rules ────────────────────────────────────────────────────
+# Applied to ALL accounts, after per-account rules.
+
+rules:
+  - name: spam_filter
+    subject_pattern: "(?i)buy now|act fast|limited time"
+    actions: [move]
+    move_to: Junk
+    priority: 100
+
+# ── Defaults ────────────────────────────────────────────────────────
+# Defaults used when a per-account value is missing.
+
+defaults:
+  fetch_limit: 50

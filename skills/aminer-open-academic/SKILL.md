@@ -1,0 +1,394 @@
+---
+name: aminer-data-search
+version: 1.0.4
+author: AMiner
+contact: report@aminer.cn
+description: >
+  使用 AMiner 开放平台 API 进行学术数据查询与分析。当用户需要查询学者信息、论文详情、机构数据、期刊内容或专利信息时使用此 skill。
+  触发场景：提到 AMiner、学术数据查询、查论文/学者/机构/期刊/专利、学术问答搜索、引用分析、科研机构分析、学者画像、论文引用链、期刊投稿分析等。
+  支持 6 大组合工作流（学者全景分析、论文深度挖掘、机构研究力分析、期刊论文监控、学术智能问答、专利链分析）以及 28 个独立 API 的直接调用。
+  即使用户只说"帮我查一下 XXX 学者"或"找找关于 XXX 的论文"，也应主动使用此 skill。
+---
+
+# AMiner 开放平台学术数据查询
+
+AMiner 是全球领先的学术数据平台，提供学者、论文、机构、期刊、专利等全维度学术数据。
+本 skill 涵盖全部 28 个开放 API，并将它们组合成 6 大实用工作流。
+使用前请先在控制台生成 token，并建议写入环境变量 `AMINER_API_KEY` 供脚本自动读取。
+
+- **API 文档**：https://open.aminer.cn/open/docs
+- **控制台（生成 Token）**：https://open.aminer.cn/open/board?tab=control
+
+---
+
+## 高优先级强制规则（重点）
+
+以下四条为**最高优先级**，在任何查询任务中都必须优先遵守：
+
+1. **Token 安全**：只允许检查 `AMINER_API_KEY` 是否存在，严禁在任何位置泄露 token 明文（包括终端输出、日志、示例结果、调试信息）。
+2. **费用控制**：必须优先采用最优组合查询，禁止无差别全量详情拉取；当命中结果很多且用户未指定数量时，默认仅查询前 10 条详情。
+3. **免费优先**：在用户未明确要求更深字段/更高精度前，优先使用免费接口；仅在免费接口无法满足需求时再升级到收费接口。
+4. **结果链接**：只要使用本 skill 且返回结果中出现实体（论文/学者/专利/期刊），无论任何场景与输出格式，都必须在每个实体后附上可访问 URL。
+
+实体 URL 模板（强制使用）：
+- 论文：`https://www.aminer.cn/pub/{论文id}`
+- 学者：`https://www.aminer.cn/profile/{学者id}`
+- 专利：`https://www.aminer.cn/patent/{专利id}`
+- 期刊：`https://www.aminer.cn/open/journal/detail/{期刊id}`
+
+> 强制执行说明：本规则适用于所有返回结果（含摘要、列表、详情、对比分析、工作流输出、raw 输出转述）。只要出现实体且有可用 ID，就必须附链接。
+
+> 违反以上任一条，视为流程不合规，必须立即中止并修正后再继续。
+
+---
+
+## 第一步：先检查环境变量 Token（必须）
+
+在执行任何 API 调用前，必须先检查环境变量 `AMINER_API_KEY` 是否存在（请求头格式：`Authorization: <your_token>`）。
+检查时仅判断“存在/不存在”，禁止输出、回显或记录 token 明文（包括日志、终端输出、示例结果）。
+
+**标准检查写法（推荐直接使用）：**
+```bash
+if [ -z "${AMINER_API_KEY+x}" ]; then
+    echo "AMINER_API_KEY 不存在"
+else
+    echo "AMINER_API_KEY 存在"
+fi
+```
+
+- **若环境变量中已有 token**：继续执行后续查询流程。
+- **若环境变量中无 token**：再检查用户是否显式提供了 `--token`。
+- **若环境变量与 `--token` 都没有**：立即停止，不要继续调用任何 API，也不要进入后续工作流；先引导用户获取 token。
+
+**token 建议配置方式（推荐）：**
+1. 前往 [AMiner 控制台](https://open.aminer.cn/open/board?tab=control) 登录并生成 API Token
+2. 将 token 写入环境变量：`export AMINER_API_KEY="<TOKEN>"`
+3. 脚本默认优先读取环境变量 `AMINER_API_KEY`（若显式传入 `--token`，则以 `--token` 为准）
+
+**无 token 时的引导话术要求：**
+1. 明确告知“当前缺少 token，无法继续调用 AMiner API”
+2. 引导前往 [AMiner 控制台](https://open.aminer.cn/open/board?tab=control) 登录并生成 API Token
+3. 如需帮助，可参考 [开放平台文档](https://open.aminer.cn/open/docs)
+4. 提示用户拿到 token 后再继续，并可直接回复：`这是我的 token: <TOKEN>`
+
+> token 可在控制台生成并在有效期内复用。未拿到 token 前，不执行任何数据查询步骤。
+
+---
+
+## 快速使用（Python 脚本）
+
+所有工作流均可通过 `scripts/aminer_client.py` 驱动：
+
+```bash
+# 推荐：先设置环境变量（后续命令可不再重复传 --token）
+export AMINER_API_KEY="<TOKEN>"
+
+# 学者全景分析
+python scripts/aminer_client.py --action scholar_profile --name "Andrew Ng"
+
+# 论文深度挖掘（含引用链）
+python scripts/aminer_client.py --action paper_deep_dive --title "Attention is all you need"
+
+# 机构研究力分析
+python scripts/aminer_client.py --action org_analysis --org "清华大学"
+
+# 期刊论文监控（指定年份）
+python scripts/aminer_client.py --action venue_papers --venue "Nature" --year 2024
+
+# 学术智能问答（自然语言提问）
+python scripts/aminer_client.py --action paper_qa --query "transformer架构最新进展"
+
+# 专利搜索与详情
+python scripts/aminer_client.py --action patent_search --query "量子计算"
+```
+
+也可以直接调用单个 API：
+```bash
+python scripts/aminer_client.py --action raw \
+  --api paper_search --params '{"title": "BERT", "page": 0, "size": 5}'
+
+# 或临时覆盖环境变量，显式传 --token
+python scripts/aminer_client.py --token <TOKEN> --action raw \
+  --api paper_search --params '{"title": "BERT", "page": 0, "size": 5}'
+```
+
+**raw 模式防错规则（强制）：**
+1. 调用前必须先核对函数签名（参数名与类型必须完全匹配），禁止“按语义猜参数”。
+2. raw 参数约束以 `references/api-catalog.md` 为最终准则；若与经验判断冲突，一律以 catalog 为准。
+3. `paper_info` 只用于批量基础信息，参数必须为 `{"ids": [...]}`。
+4. `paper_detail` 只支持单篇详情，参数必须为 `{"paper_id": "..."}`，**严禁**传 `ids`。
+5. 若需要多篇详情：先用低成本接口筛选（如 `paper_info` / `paper_search_pro`），再仅对目标子集调用 `paper_detail`（用户未指定数量时默认前 10 条）。
+6. 执行前先输出“即将调用的函数名 + 参数 JSON”进行自检，再发起请求。
+
+---
+
+## 稳定性与失败处理策略（必读）
+
+客户端 `scripts/aminer_client.py` 内置了请求重试与降级策略，用于减少网络抖动和短暂服务异常对结果的影响。
+
+- **超时与重试**
+  - 默认请求超时：`30s`
+  - 最大重试次数：`3`
+  - 退避策略：指数退避（`1s -> 2s -> 4s`）+ 随机抖动
+- **可重试状态码**
+  - `408 / 429 / 500 / 502 / 503 / 504`
+- **不可重试场景**
+  - 常见 `4xx`（如参数错误、鉴权问题）默认不重试，直接返回错误结构
+- **工作流降级**
+  - `paper_deep_dive`：`paper_search` 无结果时自动降级到 `paper_search_pro`
+  - `paper_qa`：`query` 模式无结果时，自动降级到 `paper_search_pro`
+- **可追踪调用链**
+  - 组合工作流输出中包含 `source_api_chain`，用于标记结果由哪些 API 组合得到
+
+---
+
+## 论文搜索接口选型指南
+
+当用户说“查论文”时，先判断目标是“找 ID”、“做筛选”、“做问答”还是“做分析报表”，再选 API：
+
+| API | 侧重点 | 适用场景 | 成本 |
+|---|---|---|---|
+| `paper_search` | 标题检索、快速拿 `paper_id` | 已知论文标题，先定位目标论文 | 免费 |
+| `paper_search_pro` | 多条件检索与排序（作者/机构/期刊/关键词） | 主题检索、按引用量或年份排序 | ¥0.01/次 |
+| `paper_qa_search` | 自然语言问答/主题词检索 | 用户用自然语言描述需求，先走语义检索 | ¥0.05/次 |
+| `paper_list_by_search_venue` | 返回更完整论文信息（适合分析） | 需要更丰富字段做分析/报告 | ¥0.30/次 |
+| `paper_list_by_keywords` | 多关键词批量检索 | 批量专题拉取（如 AlphaFold + protein folding） | ¥0.10/次 |
+| `paper_detail_by_condition` | 年份+期刊维度拉详情 | 期刊年度监控、选刊分析 | ¥0.20/次 |
+
+推荐路由（默认）：
+
+1. **已知标题**：`paper_search -> paper_detail -> paper_relation`
+2. **条件筛选**：`paper_search_pro -> paper_detail`
+3. **自然语言问答**：`paper_qa_search`（若无结果降级 `paper_search_pro`）
+4. **期刊年度分析**：`venue_search -> venue_paper_relation -> paper_detail_by_condition`
+
+---
+
+## 工作流外需求处理（必须）
+
+当用户提出的需求**不在上述 6 大工作流内**，或现有工作流无法直接覆盖时，必须执行以下步骤：
+
+1. 先阅读 `references/api-catalog.md`，确认可用接口、参数约束与返回字段。
+2. 根据用户目标选择最合适的 API，并设计最短可行调用链（先定位 ID，再补详情，再做关系扩展）。
+3. 必要时组合多个 API 完成查询，并在结果中标注 `source_api_chain`，清楚说明数据来源路径。
+4. 若存在多种组合方案，优先选择成本更低、稳定性更高、字段满足需求的方案。
+5. 尽可能使用“最优查询组合”，避免无差别全量拉取；先做低成本检索与筛选，再对少量目标做详情补全。
+6. 当结果量很大且用户未指定数量时，默认仅查询前 10 条详情并先返回摘要结果；例如命中 1000 篇论文时，不应对 1000 条全部调用详情接口，以减少用户费用。
+7. 涉及 `raw` 调用时，必须先做参数级校验：例如 `paper_info` 使用 `ids`，`paper_detail` 使用 `paper_id`，不得混用。
+8. 用户未明确要求深度信息时，优先走免费链路（如 `paper_search` / `paper_info` / `venue_search`），确认不足后再补充必要的收费接口。
+9. 最终返回实体列表时，必须附带对应 URL；若缺少实体 ID，应先补齐 ID 再输出结果。
+
+> 禁止因“没有现成工作流”而直接放弃查询；应基于 `api-catalog` 主动完成 API 组合。
+
+---
+
+## 6 大组合工作流
+
+### 工作流 1：学者全景分析（Scholar Profile）
+
+**适用场景**：了解某位学者的完整学术画像，包括简介、研究方向、发表论文、专利、科研项目。
+
+**调用链：**
+```
+学者搜索（name → person_id）
+    ↓
+并行调用：
+  ├── 学者详情（bio/教育背景/荣誉）
+  ├── 学者画像（研究方向/兴趣/工作经历）
+  ├── 学者论文（论文列表）
+  ├── 学者专利（专利列表）
+  └── 学者项目（科研项目/资助信息）
+```
+
+**命令：**
+```bash
+python scripts/aminer_client.py --token <TOKEN> --action scholar_profile --name "Yann LeCun"
+```
+
+**输出示例字段：**
+- 基本信息：姓名、机构、职称、性别
+- 个人简介（中英文）
+- 研究兴趣与领域
+- 教育背景（结构化）
+- 工作经历（结构化）
+- 论文列表（ID + 标题）
+- 专利列表（ID + 标题）
+- 科研项目（标题/资助金额/时间）
+
+---
+
+### 工作流 2：论文深度挖掘（Paper Deep Dive）
+
+**适用场景**：根据论文标题或关键词，获取论文完整信息及引用关系。
+
+**调用链：**
+```
+论文搜索 / 论文搜索pro（title/keyword → paper_id）
+    ↓
+论文详情（摘要/作者/DOI/期刊/年份/关键词）
+    ↓
+论文引用（该论文引用了哪些论文 → cited_ids）
+    ↓
+（可选）对被引论文批量获取论文信息
+```
+
+**命令：**
+```bash
+# 按标题搜索
+python scripts/aminer_client.py --token <TOKEN> --action paper_deep_dive --title "BERT"
+
+# 按关键词搜索（使用 pro 接口）
+python scripts/aminer_client.py --token <TOKEN> --action paper_deep_dive \
+  --keyword "large language model" --author "Hinton" --order n_citation
+```
+
+---
+
+### 工作流 3：机构研究力分析（Org Analysis）
+
+**适用场景**：分析某机构的学者规模、论文产出、专利数量，适合竞品研究或合作评估。
+
+**调用链：**
+```
+机构消歧pro（原始字符串 → org_id，处理别名/全称差异）
+    ↓
+并行调用：
+  ├── 机构详情（简介/类型/成立时间）
+  ├── 机构学者（学者列表）
+  ├── 机构论文（论文列表）
+  └── 机构专利（专利ID列表，支持分页，最多10000条）
+```
+
+> 若有多个同名机构，机构搜索会返回候选列表，可结合机构消歧 pro 精确匹配。
+
+**命令：**
+```bash
+python scripts/aminer_client.py --token <TOKEN> --action org_analysis --org "MIT"
+# 指定原始字符串（含缩写/别名）
+python scripts/aminer_client.py --token <TOKEN> --action org_analysis --org "Massachusetts Institute of Technology, CSAIL"
+```
+
+---
+
+### 工作流 4：期刊论文监控（Venue Papers）
+
+**适用场景**：追踪某期刊特定年份的论文，用于投稿调研或研究热点分析。
+
+**调用链：**
+```
+期刊搜索（name → venue_id）
+    ↓
+期刊详情（ISSN/类型/简称）
+    ↓
+期刊论文（venue_id + year → paper_id 列表）
+    ↓
+（可选）论文详情批量查询
+```
+
+**命令：**
+```bash
+python scripts/aminer_client.py --token <TOKEN> --action venue_papers --venue "NeurIPS" --year 2023
+```
+
+---
+
+### 工作流 5：学术智能问答（Paper QA Search）
+
+**适用场景**：用自然语言或结构化关键词智能搜索论文，支持 SCI 过滤、引用量排序、作者/机构限定。
+
+**核心 API**：`论文问答搜索`（¥0.05/次），支持：
+- `query`：自然语言提问，系统自动拆解为关键词
+- `topic_high/middle/low`：精细控制关键词权重（嵌套数组 OR/AND 逻辑）
+- `sci_flag`：只看 SCI 论文
+- `force_citation_sort`：按引用量排序
+- `force_year_sort`：按年份排序
+- `author_terms / org_terms`：按作者名或机构名过滤
+- `author_id / org_id`：按作者 ID 或机构 ID 过滤（推荐用于同名消歧）
+- `venue_ids`：按会议/期刊 ID 过滤
+
+**命令：**
+```bash
+# 自然语言问答
+python scripts/aminer_client.py --token <TOKEN> --action paper_qa \
+  --query "用于蛋白质结构预测的深度学习方法"
+
+# 精细关键词搜索（必须同时含 A 和 B，加分含 C）
+python scripts/aminer_client.py --token <TOKEN> --action paper_qa \
+  --topic_high '[["transformer","self-attention"],["protein folding"]]' \
+  --topic_middle '[["AlphaFold"]]' \
+  --sci_flag --sort_citation
+```
+
+---
+
+### 工作流 6：专利链分析（Patent Analysis）
+
+**适用场景**：搜索特定技术领域的专利，或获取某学者/机构的专利组合。
+
+**调用链（独立搜索）：**
+```
+专利搜索（query → patent_id）
+    ↓
+专利详情（摘要/申请日/申请号/受让人/发明人）
+```
+
+**调用链（经由学者/机构）：**
+```
+学者搜索 → 学者专利（patent_id 列表）
+机构消歧 → 机构专利（patent_id 列表）
+    ↓
+专利信息 / 专利详情
+```
+
+**命令：**
+```bash
+python scripts/aminer_client.py --token <TOKEN> --action patent_search --query "量子计算芯片"
+python scripts/aminer_client.py --token <TOKEN> --action scholar_patents --name "张首晟"
+```
+
+---
+
+## 单独 API 速查表
+
+> 完整参数说明请阅读 `references/api-catalog.md`
+
+| # | 标题 | 方法 | 价格 | 接口路径（基础域名：datacenter.aminer.cn/gateway/open_platform） |
+|---|------|------|------|------|
+| 1 | 论文问答搜索 | POST | ¥0.05 | `/api/paper/qa/search` |
+| 2 | 学者搜索 | POST | 免费 | `/api/person/search` |
+| 3 | 论文搜索 | GET | 免费 | `/api/paper/search` |
+| 4 | 论文搜索pro | GET | ¥0.01 | `/api/paper/search/pro` |
+| 5 | 专利搜索 | POST | 免费 | `/api/patent/search` |
+| 6 | 机构搜索 | POST | 免费 | `/api/organization/search` |
+| 7 | 期刊搜索 | POST | 免费 | `/api/venue/search` |
+| 8 | 学者详情 | GET | ¥1.00 | `/api/person/detail` |
+| 9 | 学者项目 | GET | ¥3.00 | `/api/project/person/v3/open` |
+| 10 | 学者论文 | GET | ¥1.50 | `/api/person/paper/relation` |
+| 11 | 学者专利 | GET | ¥1.50 | `/api/person/patent/relation` |
+| 12 | 学者画像 | GET | ¥0.50 | `/api/person/figure` |
+| 13 | 论文信息 | POST | 免费 | `/api/paper/info` |
+| 14 | 论文详情 | GET | ¥0.01 | `/api/paper/detail` |
+| 15 | 论文引用 | GET | ¥0.10 | `/api/paper/relation` |
+| 16 | 专利信息 | GET | 免费 | `/api/patent/info` |
+| 17 | 专利详情 | GET | ¥0.01 | `/api/patent/detail` |
+| 18 | 机构详情 | POST | ¥0.01 | `/api/organization/detail` |
+| 19 | 机构专利 | GET | ¥0.10 | `/api/organization/patent/relation` |
+| 20 | 机构学者 | GET | ¥0.50 | `/api/organization/person/relation` |
+| 21 | 机构论文 | GET | ¥0.10 | `/api/organization/paper/relation` |
+| 22 | 期刊详情 | POST | ¥0.20 | `/api/venue/detail` |
+| 23 | 期刊论文 | POST | ¥0.10 | `/api/venue/paper/relation` |
+| 24 | 机构消歧 | POST | ¥0.01 | `/api/organization/na` |
+| 25 | 机构消歧pro | POST | ¥0.05 | `/api/organization/na/pro` |
+| 26 | 论文搜索接口 | GET | ¥0.30 | `/api/paper/list/by/search/venue` |
+| 27 | 论文批量查询 | GET | ¥0.10 | `/api/paper/list/citation/by/keywords` |
+| 28 | 按年份与期刊获取论文详情 | GET | ¥0.20 | `/api/paper/platform/allpubs/more/detail/by/ts/org/venue` |
+
+---
+
+## 参考资料
+
+- 完整 API 参数文档：读取 `references/api-catalog.md`
+- Python 客户端源码：`scripts/aminer_client.py`
+- 测试用例：`evals/evals.json`
+- 官方文档：https://open.aminer.cn/open/docs
+- 控制台：https://open.aminer.cn/open/board?tab=control

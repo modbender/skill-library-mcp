@@ -1,0 +1,1183 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Products API",
+    "description": "The Products API allows you to search the Kroger product catalog. <br><br>\n\n### Rate Limit\n\nThe Public Products API has a **10,000 call per day** rate limit. \n\nFor all Public APIs, we enforce the rate limit by the number of calls the client makes to the endpoint, not individual API operations. This means you can distribute the 10,000 calls across all API operations using the `/products` endpoint as you see fit. <br><br>\n\n### Pagination\n\nThe Product Search operation supports pagination with a default value of 10 results per page. Using the following parameters, you can extend and skip results in the response:\n\n`filter.limit` - Sets a limit on the number of products returned.<br>\n`filter.start` - Sets a number of results to skip in the response. \n\n**Note**: Since searching by a term acts as a fuzzy search, the order of the results can change with each new request.  <br><br>\n\n### API Operations\n\nThe Products API supports the following operations: <br>\n<table>\n<tr>\n    <th>Name</th>\n    <th>Method</th>\n    <th>Description</th>\n</tr>\n<tr>\n    <td>Product search</td>\n    <td>GET</td>\n    <td>Allows you to find products by passing in either a search term or product Id.</td>\n</tr>\n<tr>\n    <td>Product details</td>\n    <td>GET</td>\n    <td>Returns product details for a specific product.</td>\n</tr>\n</table><br><br>\n\n### Additional Response Data \n\nTo return the following data from the `/products` endpoint, you must include a <code>locationId</code> in the request. All operations for the products endpoint accept the <code>filter.locationId</code> query parameter.<br><br>\n<ul>\n<li>Price<br><br>Returns the following price objects:<br><br><code>price</code> - Includes both the <code>regular</code> price of the item and the <code>promo</code> price of the item.<br><code>nationalPrice</code> - Includes both the <code>regular</code> national price of the item and the national <code>promo</code> price of the item.<br><br><b>Note</b>: Seasonal products only return a price when available. Some items may not have a national prices available.</li><br>\n\n<li>Fulfillment Type<br><br>Returns the following boolean objects to indicate an item's fulfillment availability:<br><br><code>instore</code> - The item is sold in store at the given location.<br><code>shiptohome</code> - The item is available to be shipped to home.<br><code>delivery</code> - The item is available for delivery from the given location.<br><code>curbside</code> - The item is available for curbside pickup from the given location.<br><br> <b>Note</b>: The <code>instore</code> fulfillment type only indicated that the item is sold by the given location, not that it is in stock.</li><br>\n\n<li>Aisle Locations<br><br>Returns the aisle locations of the item for the given location.</li><br>\n\n<li>Inventory<br><br>Returns the <code>stockLevel</code> of the item. This property is omitted when unavailable:<br><br><code>HIGH</code> - The stock level is high.<br><code>LOW</code> - The stock level is low.<br><code>TEMPORARILY_OUT_OF_STOCK</code> - The item is temporarily out of stock.</li>\n</ul>\n",
+    "termsOfService": "https://developer.kroger.com/terms",
+    "contact": {
+      "name": "API Support",
+      "email": "APISupport@kroger.com",
+      "url": "https://developer.kroger.com"
+    },
+    "version": "1.3.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.kroger.com",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://api-ce.kroger.com",
+      "description": "Certification Environment"
+    }
+  ],
+  "security": [
+    {
+      "ClientContext": [
+        "product.compact"
+      ]
+    }
+  ],
+  "paths": {
+    "/v1/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product search",
+        "description": "Allows you to find products by passing in either a search term or product Id.\n\n### Initial Search Value Required\n\nAn initial search value is requred for all requests. You can use either of the following parameters as an initial search value: \n\n`filter.term` - When using the term parameter, the API performs a fuzzy search based on the term provided in the string. Search results are based on how relevant the term is to the product description.\n\n`filter.brand` - When using the brand parameter, the API performs a search based on the brand provided in the string. Search results only contain products that match the brand queried for.\n\n`filter.productId` - When using the productId parameter, the API performs a query to find an exact match. The format for the productId is a 13 digit number. \n\n NOTE: If converting from a barcode omit the check digit.\n",
+        "operationId": "productGet",
+        "parameters": [
+          {
+            "name": "filter.term",
+            "in": "query",
+            "description": "A search term to filter product results. As an example, you could input _milk_, _bread_, or _salt_. <br><br><b>Note</b> - Search terms are limited to a maximum of 8 words. Each new space in the search term denotes a new word.",
+            "example": "milk",
+            "schema": {
+              "minLength": 3,
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.locationId",
+            "in": "query",
+            "description": "The locationId of the location. When using this filter, only products available at that location are returned.",
+            "example": "01400943",
+            "schema": {
+              "maxLength": 8,
+              "minLength": 8,
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.productId",
+            "in": "query",
+            "description": "The productId of the products(s) to return. For more than one item, the list must be comma-separated. When used, all other query parameters are ignored.",
+            "example": "0001111060903",
+            "schema": {
+              "maxLength": 13,
+              "minLength": 13,
+              "type": "string",
+              "maximum": 50
+            }
+          },
+          {
+            "name": "filter.brand",
+            "in": "query",
+            "description": "The brand name of the products to return. When using this filter, only products by that brand are returned. Brand names are case-sensitive, and lists must be pipe-separated.",
+            "example": "Kroger",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.fulfillment",
+            "in": "query",
+            "description": "'The available fulfillment types of the product(s) to return.\nFulfillment types are case-sensitive, and lists must be comma-separated.\nMust be one or more of the follow types: <ul> <li> `ais` - Available In\nStore</li> <li> `csp` - Curbside Pickup</li> <li> `dth` - Delivery To Home</li>\n<li> `sth` - Ship To Home</li> </ui>'\n",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ais",
+                "csp",
+                "dth",
+                "sth"
+              ]
+            }
+          },
+          {
+            "name": "filter.start",
+            "in": "query",
+            "description": "The number of products to skip.",
+            "schema": {
+              "maximum": 250,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "filter.limit",
+            "in": "query",
+            "description": "The number of products to return.",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/products.productsPayloadModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_locationId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_parameter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_limit"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.forbidden"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.products.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "product.compact"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/products?filter.brand={{BRAND}}&filter.term={{TERM}}&filter.locationId={{LOCATION_ID}}' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/products?filter.brand={{BRAND}}&filter.term={{TERM}}&filter.locationId={{LOCATION_ID}}\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/products?filter.brand={{BRAND}}&filter.term={{TERM}}&filter.locationId={{LOCATION_ID}}\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/products?filter.brand={{BRAND}}&filter.term={{TERM}}&filter.locationId={{LOCATION_ID}}\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/products/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product details",
+        "description": "Provides access to the details of a specific product by using the 13 digit `productId`. If converting from a barcode omit the check digit. \n\n To return the product price, availability, and aisle location, you must include the `filter.locationId` query parameter.",
+        "operationId": "productGetID",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The id of the product",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/productId"
+                },
+                {
+                  "$ref": "#/components/schemas/UPC"
+                }
+              ]
+            }
+          },
+          {
+            "name": "filter.locationId",
+            "in": "query",
+            "description": "The locationId of the location. When using this filter, only products available at that location are returned.",
+            "example": "01400943",
+            "schema": {
+              "maxLength": 8,
+              "minLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/products.productPayloadModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_locationId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_UPC"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.forbidden"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.products.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "product.compact"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/products/{{ID}}?filter.locationId={{LOCATION_ID}}' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/products/{{ID}}?filter.locationId={{LOCATION_ID}}\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/products/{{ID}}?filter.locationId={{LOCATION_ID}}\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/products/{{ID}}?filter.locationId={{LOCATION_ID}}\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Invalid_locationId": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'locationId' must have a length of 8 characters"
+          }
+        }
+      },
+      "Invalid_limit": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'limit' must be a number between 1 and 200 (inclusive)"
+          }
+        }
+      },
+      "Invalid_parameter": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Invalid parameters"
+          }
+        }
+      },
+      "Invalid_UPC": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "UPC must have a length of 13 characters"
+          }
+        }
+      },
+      "APIError": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "APIError.unauthorized": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "error_description": {
+                "type": "string",
+                "example": "The access token is invalid or has expired"
+              },
+              "error": {
+                "type": "string",
+                "example": "invalid_token"
+              }
+            }
+          }
+        }
+      },
+      "APIError.forbidden": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "missing required scopes"
+              },
+              "code": {
+                "type": "string",
+                "example": "Forbidden"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564143270221
+              }
+            }
+          }
+        }
+      },
+      "APIError.products.serverError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "Internal server error"
+              },
+              "code": {
+                "type": "string",
+                "example": "PRODUCT-4xxx-xxx"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564159296910
+              }
+            }
+          }
+        }
+      },
+      "productId": {
+        "type": "string",
+        "description": "The productId of the product to return.",
+        "example": "0001111060903",
+        "maxLength": 13,
+        "minLength": 13,
+        "maximum": 200
+      },
+      "products.productModel": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "The UPC of the product.",
+            "example": "0001111041700"
+          },
+          "productPageURI": {
+            "type": "string",
+            "description": "The URI of the product page.",
+            "example": "/p/kroger-2-reduced-fat-milk/0001111041700?cid=dis.api.tpi_products-api_20240521_b:all_c:p_t:"
+          },
+          "aliasProductIds": {
+            "type": "array",
+            "description": "The alias ProductId of the product to return.",
+            "items": {
+              "type": "string",
+              "example": "0001111060903"
+            }
+          },
+          "aisleLocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.productAisleLocationModel"
+            }
+          },
+          "brand": {
+            "type": "string",
+            "description": "The brand name of the product.",
+            "example": "Kroger"
+          },
+          "categories": {
+            "type": "array",
+            "description": "The category the product belongs to.",
+            "items": {
+              "type": "string",
+              "example": "Dairy"
+            }
+          },
+          "countryOrigin": {
+            "type": "string",
+            "description": "The country of origin of the product.",
+            "example": "United States"
+          },
+          "description": {
+            "type": "string",
+            "description": "The name of the product.",
+            "example": "Kroger 2% Reduced Fat Milk"
+          },
+          "alcohol": {
+            "type": "boolean",
+            "description": "Indicates if the product contains alcohol.",
+            "example": false
+          },
+          "alcoholProof": {
+            "type": "integer",
+            "description": "The proof of the alcohol in the product.",
+            "example": 0
+          },
+          "ageRestriction": {
+            "type": "boolean",
+            "description": "Indicates if the product has an age restriction.",
+            "example": false
+          },
+          "snapEligible": {
+            "type": "boolean",
+            "description": "Indicates if the product is eligible for SNAP benefits.",
+            "example": true
+          },
+          "manufacturerDeclarations": {
+            "type": "array",
+            "description": "Any manufacturer declarations for the product.",
+            "example": [
+              "Live Naturally",
+              "Kosher",
+              "Tree Nuts Free"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "sweeteningMethods": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "UNSPECIFIED"
+              },
+              "name": {
+                "type": "string",
+                "example": "Unspecified"
+              }
+            }
+          },
+          "allergens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.allergenModel"
+            }
+          },
+          "allergensDescription": {
+            "type": "string",
+            "description": "The description of the allergens for the product.",
+            "example": "Free from Cereals and Their Derivatives."
+          },
+          "certifiedForPassover": {
+            "type": "boolean",
+            "description": "Indicates if the product is certified for Passover.",
+            "example": false
+          },
+          "hypoallergenic": {
+            "type": "boolean",
+            "description": "Indicates if the product is hypoallergenic.",
+            "example": false
+          },
+          "nonGmo": {
+            "type": "boolean",
+            "description": "Indicates if the product is non-GMO.",
+            "example": false
+          },
+          "nonGmoClaimName": {
+            "type": "string",
+            "description": "The name of the non-GMO claim.",
+            "example": "PRODUCT LABELED WITH NON-GMO CLAIM"
+          },
+          "organicClaimName": {
+            "type": "string",
+            "description": "The name of the organic claim.",
+            "example": "ORGANIC CLAIM AND PRINTED ON PACKAGE"
+          },
+          "receiptDescription": {
+            "type": "string",
+            "description": "The description of the product to appear on the receipt.",
+            "example": "KROGER 2% RF MILK"
+          },
+          "warnings": {
+            "type": "string",
+            "description": "Any warnings for the product.",
+            "example": "KEEP REFRIGERATED"
+          },
+          "retstrictions": {
+            "$ref": "#/components/schemas/products.restrictionsModel"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.productItemModel"
+            }
+          },
+          "itemInformation": {
+            "$ref": "#/components/schemas/products.productBoxedDimensionsModel"
+          },
+          "temperature": {
+            "$ref": "#/components/schemas/products.productTemperatureModel"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.productImageModel"
+            }
+          },
+          "upc": {
+            "type": "string",
+            "description": "The UPC of the product.",
+            "example": "0001111041700"
+          },
+          "ratingsAndReviews": {
+            "type": "object",
+            "properties": {
+              "averageOverallRating": {
+                "type": "number",
+                "description": "The average overall rating of the product.",
+                "example": 4.5
+              },
+              "totalReviewCount": {
+                "type": "integer",
+                "description": "The total number of reviews for the product.",
+                "example": 12
+              }
+            }
+          },
+          "nutritionInformation": {
+            "type": "object",
+            "$ref": "#/components/schemas/products.nutritionInformationModel"
+          }
+        }
+      },
+      "products.restrictionsModel": {
+        "type": "object",
+        "properties": {
+          "maximumOrderQuantity": {
+            "type": "integer",
+            "example": 10
+          },
+          "minimumOrderQuantity": {
+            "type": "integer",
+            "example": 1
+          },
+          "postalCode": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "12345",
+              "67890"
+            ]
+          },
+          "shippable": {
+            "type": "boolean",
+            "example": false
+          },
+          "stateCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "CA",
+              "NY"
+            ]
+          }
+        }
+      },
+      "products.nutritionInformationModel": {
+        "type": "object",
+        "properties": {
+          "ingredientStatement": {
+            "type": "string",
+            "example": "\"Milk, skim milk, vitamin A palmitate, and vitamin D3.CONTAINS: MILK."
+          },
+          "dailyValueIntakeReference": {
+            "type": "string",
+            "example": "Percent Daily Values are based on a 2,000 calorie diet."
+          },
+          "servingSize": {
+            "$ref": "#/components/schemas/products.servingSizeModel"
+          },
+          "nutrients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.nutrientModel"
+            }
+          },
+          "preparationState": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "UNPREPARED"
+              },
+              "name": {
+                "type": "string",
+                "example": "Unprepared"
+              }
+            }
+          },
+          "servingsPerPackage": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "example": "8.0 Exact"
+              },
+              "value": {
+                "type": "number",
+                "example": 8
+              }
+            }
+          },
+          "nutritionalRating": {
+            "type": "string",
+            "example": "73"
+          }
+        }
+      },
+      "products.allergenModel": {
+        "type": "object",
+        "properties": {
+          "levelOfContainmentName": {
+            "type": "string",
+            "example": "Free from"
+          },
+          "name": {
+            "type": "string",
+            "example": "Tree Nuts and Their Derivatives"
+          }
+        }
+      },
+      "products.servingSizeModel": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "8 fl oz (240mL)"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 240
+          },
+          "unitOfMeasure": {
+            "type": "object",
+            "properties": {
+              "abbreviation": {
+                "type": "string",
+                "example": "ml"
+              },
+              "code": {
+                "type": "string",
+                "example": "MLT"
+              },
+              "name": {
+                "type": "string",
+                "example": "Millilitre"
+              }
+            }
+          }
+        }
+      },
+      "products.nutrientModel": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "CA"
+          },
+          "description": {
+            "type": "string",
+            "example": "calcium"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Calcium"
+          },
+          "percentDailyIntake": {
+            "type": "number",
+            "example": 25
+          },
+          "quantity": {
+            "type": "number",
+            "example": 290
+          },
+          "precision": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "APPROXIMATELY"
+              },
+              "name": {
+                "type": "string",
+                "example": "Approximately"
+              }
+            }
+          },
+          "unitOfMeasure": {
+            "type": "object",
+            "properties": {
+              "abbreviation": {
+                "type": "string",
+                "example": "mg"
+              },
+              "code": {
+                "type": "string",
+                "example": "MGM"
+              },
+              "name": {
+                "type": "string",
+                "example": "Milligram"
+              }
+            }
+          }
+        }
+      },
+      "products.productPayloadModel": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/products.productModel"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "products.productsPayloadModel": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/products.productModel"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "products.productAisleLocationModel": {
+        "type": "object",
+        "properties": {
+          "bayNumber": {
+            "type": "string",
+            "description": "The bay number of the aisle.",
+            "example": "13"
+          },
+          "description": {
+            "type": "string",
+            "description": "The location in the store.",
+            "example": "Aisle 35"
+          },
+          "number": {
+            "type": "string",
+            "description": "The aisle number in the store.",
+            "example": "35"
+          },
+          "numberOfFacings": {
+            "type": "string",
+            "description": "The number of facings.",
+            "example": "5"
+          },
+          "sequenceNumber": {
+            "type": "string",
+            "description": "The sequence of the aisle in the store.",
+            "example": "3"
+          },
+          "side": {
+            "type": "string",
+            "description": "The side of the aisle where the product is located.",
+            "example": "L"
+          },
+          "shelfNumber": {
+            "type": "string",
+            "description": "The shelf number in the aisle.",
+            "example": "2"
+          },
+          "shelfPositionInBay": {
+            "type": "string",
+            "description": "The position of the shelf in the bay.",
+            "example": "1"
+          }
+        }
+      },
+      "products.productBoxedDimensionsModel": {
+        "type": "object",
+        "description": "Information about the product's size.",
+        "properties": {
+          "depth": {
+            "type": "string",
+            "description": "The depth of the product.",
+            "example": "6"
+          },
+          "height": {
+            "type": "string",
+            "description": "The height of the product.",
+            "example": "10"
+          },
+          "width": {
+            "type": "string",
+            "description": "The length of the product.",
+            "example": "6"
+          },
+          "grossWeight": {
+            "type": "string",
+            "description": "The gross weight of the product.",
+            "example": "8.82 [lb_av]"
+          },
+          "netWeight": {
+            "type": "string",
+            "description": "The net weight of the product.",
+            "example": "8.62 [lb_av]"
+          },
+          "averageWeightPerUnit": {
+            "type": "string",
+            "description": "The average weight per unit of the product.",
+            "example": "8.62 [lb_av]"
+          }
+        }
+      },
+      "products.productItemModel": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "description": "The UPC of the item.",
+            "example": "0001111041700"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/products.productItemInventoryModel"
+          },
+          "favorite": {
+            "type": "boolean"
+          },
+          "fulfillment": {
+            "$ref": "#/components/schemas/products.productItemFulfillmentModel"
+          },
+          "price": {
+            "$ref": "#/components/schemas/products.productItemPriceModel"
+          },
+          "nationalPrice": {
+            "$ref": "#/components/schemas/products.productItemPriceModel"
+          },
+          "size": {
+            "type": "string",
+            "description": "A description of the item size.",
+            "example": "1 gal"
+          },
+          "soldBy": {
+            "type": "string",
+            "description": "Indicates how this item is sold. Values returned are typically either \"weight\" or \"unit\"",
+            "example": "unit"
+          }
+        }
+      },
+      "products.productItemInventoryModel": {
+        "type": "object",
+        "properties": {
+          "stockLevel": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "LOW",
+              "TEMPORARILY_OUT_OF_STOCK"
+            ],
+            "description": "Indicates the level of stock.",
+            "example": "HIGH"
+          }
+        }
+      },
+      "products.productItemFulfillmentModel": {
+        "type": "object",
+        "properties": {
+          "curbside": {
+            "type": "boolean",
+            "description": "Indicates if the product is available for curbside pickup."
+          },
+          "delivery": {
+            "type": "boolean",
+            "description": "Indicates if the product is available for home delivery."
+          },
+          "instore": {
+            "type": "boolean",
+            "description": "Indicates if the product is available in store. This does not indicate that the item is in stock."
+          },
+          "shiptohome": {
+            "type": "boolean",
+            "description": "Indicates if the product is available to be shipped from a fulfillment center."
+          }
+        }
+      },
+      "products.productItemPriceModel": {
+        "type": "object",
+        "properties": {
+          "regular": {
+            "type": "number",
+            "description": "The regular price of the item.",
+            "example": 1.99
+          },
+          "promo": {
+            "type": "number",
+            "description": "The sale price of the item.",
+            "example": 1.59
+          },
+          "regularPerUnitEstimate": {
+            "type": "number",
+            "description": "The estimated price of 1 unit of the item.",
+            "example": 1.99
+          },
+          "promoPerUnitEstimate": {
+            "type": "number",
+            "description": "The estimated sale price of 1 unit of the item.",
+            "example": 1.59
+          },
+          "expirationDate": {
+            "$ref": "#/components/schemas/products.dateValueModel"
+          },
+          "effectiveDate": {
+            "$ref": "#/components/schemas/products.dateValueModel"
+          }
+        }
+      },
+      "products.dateValueModel": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "date",
+            "example": "9999-12-31T00:00:00Z"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "UTC"
+          }
+        }
+      },
+      "products.productImageModel": {
+        "type": "object",
+        "description": "Information about the product's image.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "An optional identifier of the image size."
+          },
+          "perspective": {
+            "type": "string",
+            "description": "A description of the product image view.",
+            "example": "front"
+          },
+          "default": {
+            "type": "boolean"
+          },
+          "sizes": {
+            "type": "array",
+            "description": "An array of image sizes.",
+            "items": {
+              "$ref": "#/components/schemas/products.productImageSizeModel"
+            }
+          }
+        }
+      },
+      "products.productImageSizeModel": {
+        "type": "object",
+        "description": "Information about the product's image.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "An optional identifier of the image size.",
+            "example": "7df2d0a3-8349-44d4-9512-1dab89e675a9"
+          },
+          "size": {
+            "type": "string",
+            "description": "A description of the image size.",
+            "example": "medium"
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL location of the image.",
+            "example": "https://www.kroger.com/product/images/medium/front/0001111041700"
+          }
+        }
+      },
+      "products.productTemperatureModel": {
+        "type": "object",
+        "description": "Information about the item's temperature requirements.",
+        "properties": {
+          "indicator": {
+            "type": "string",
+            "description": "Information about the product's storage temperature.",
+            "example": "Refrigerated"
+          },
+          "heatSensitive": {
+            "type": "boolean",
+            "description": "Indicates if the item is heat sensitive."
+          }
+        }
+      },
+      "UPC": {
+        "type": "string",
+        "description": "The UPC of the product to return.",
+        "example": "0001111060903",
+        "maxLength": 13,
+        "minLength": 13,
+        "maximum": 200
+      }
+    },
+    "securitySchemes": {
+      "ClientContext": {
+        "type": "oauth2",
+        "description": "To make an API request that interacts with generalized information and does not require customer consent, use the [Client Credentials Grant Type](https://developer.kroger.com/reference/api/authorization-endpoints-public#tag/OAuth2/operation/accessToken) to authenticate your OAuth2 application.\n",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.kroger.com/v1/connect/oauth2/token",
+            "scopes": {
+              "product.compact": "Grants read access to general product information."
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "API Reference",
+      "tags": [
+        "Products"
+      ]
+    }
+  ]
+}

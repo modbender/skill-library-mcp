@@ -1,0 +1,83 @@
+# OpenClaw Configuration Example
+# Copy to ~/.openclaw/openclaw.yaml and customize
+
+# Gateway settings
+gateway:
+  port: 18789
+  host: "127.0.0.1"
+
+# Model configuration
+model:
+  provider: anthropic
+  model: claude-3-opus-20240229
+  
+# Plugin configuration
+plugins:
+  evidence-vault:
+    # Storage driver: filesystem or s3
+    driver: filesystem
+    
+    # Base path for vault storage
+    basePath: /var/evidence-vault
+    
+    # Maximum file size (500MB default)
+    maxFileSizeBytes: 524288000
+    
+    # Default retention in days (7 years)
+    defaultRetentionDays: 2555
+    
+    # Allowed MIME types
+    allowedMimeTypes:
+      - image/jpeg
+      - image/png
+      - image/gif
+      - image/webp
+      - video/mp4
+      - video/webm
+      - audio/mpeg
+      - audio/wav
+      - audio/ogg
+      - application/pdf
+      - application/zip
+      - text/plain
+      - application/json
+    
+    # Channel security
+    channelAllowlist:
+      - whatsapp
+      - telegram
+      - slack
+    channelDenylist:
+      - discord:public_server
+    requirePairing: true
+    
+    # S3 configuration (if driver: s3)
+    # s3:
+    #   endpoint: https://s3.amazonaws.com
+    #   bucket: evidence-vault-prod
+    #   region: us-east-1
+    #   objectLock: true
+    #   forcePathStyle: false
+    #   # Credentials from environment or IAM:
+    #   # AWS_ACCESS_KEY_ID
+    #   # AWS_SECRET_ACCESS_KEY
+
+# Skills configuration
+skills:
+  entries:
+    evidenceops:
+      enabled: true
+      config:
+        autoVerifyAfterIngest: true
+        defaultSensitivityTag: confidential
+
+# Logging
+logging:
+  level: info
+  format: json
+
+# Security settings
+security:
+  execApproval:
+    enabled: true
+    mode: ask  # ask, auto-approve, auto-deny

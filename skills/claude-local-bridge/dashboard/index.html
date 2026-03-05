@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>BRIDGE // Command</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F517;</text></svg>">
+</head>
+<body>
+  <!-- Scanline overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- Noise texture -->
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <div class="topbar__logo">
+        <span class="topbar__logo-glyph">&laquo;</span>
+        <span class="topbar__logo-glyph topbar__logo-glyph--flip">&raquo;</span>
+      </div>
+      <div class="topbar__title">
+        <span class="topbar__title-main">BRIDGE</span>
+        <span class="topbar__title-sub">COMMAND</span>
+      </div>
+    </div>
+    <div class="topbar__status">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">CONNECTING</span>
+    </div>
+    <button class="topbar__token-btn" id="tokenBtn" title="Enter API Token">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L10 5.5L15 6.5L11.5 10L12.5 15L8 12.5L3.5 15L4.5 10L1 6.5L6 5.5L8 1Z" stroke="currentColor" stroke-width="1.2"/></svg>
+    </button>
+  </header>
+
+  <!-- Token modal -->
+  <div class="modal" id="tokenModal">
+    <div class="modal__backdrop"></div>
+    <div class="modal__content">
+      <div class="modal__header">AUTHENTICATE</div>
+      <p class="modal__desc">Enter the bearer token displayed in your terminal when the bridge server starts.</p>
+      <input type="password" class="modal__input" id="tokenInput" placeholder="paste token here" autocomplete="off" spellcheck="false">
+      <div class="modal__actions">
+        <button class="btn btn--ghost" id="tokenCancel">CANCEL</button>
+        <button class="btn btn--primary" id="tokenSave">CONNECT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation tabs -->
+  <nav class="nav" role="tablist">
+    <button class="nav__tab nav__tab--active" data-tab="approvals" role="tab" aria-selected="true">
+      <span class="nav__tab-icon">&#9632;</span>
+      <span class="nav__tab-label">APPROVALS</span>
+      <span class="nav__tab-badge" id="pendingBadge" hidden>0</span>
+    </button>
+    <button class="nav__tab" data-tab="files" role="tab" aria-selected="false">
+      <span class="nav__tab-icon">&#9776;</span>
+      <span class="nav__tab-label">FILES</span>
+    </button>
+    <button class="nav__tab" data-tab="audit" role="tab" aria-selected="false">
+      <span class="nav__tab-icon">&#9881;</span>
+      <span class="nav__tab-label">AUDIT</span>
+    </button>
+    <button class="nav__tab" data-tab="status" role="tab" aria-selected="false">
+      <span class="nav__tab-icon">&#9673;</span>
+      <span class="nav__tab-label">STATUS</span>
+    </button>
+  </nav>
+
+  <!-- Main content area -->
+  <main class="content">
+
+    <!-- APPROVALS PANEL -->
+    <section class="panel panel--active" id="panel-approvals" role="tabpanel">
+      <div class="panel__header">
+        <h2 class="panel__title">Pending Requests</h2>
+        <div class="panel__controls">
+          <button class="btn btn--small btn--ghost" id="refreshApprovals">REFRESH</button>
+          <label class="toggle">
+            <input type="checkbox" id="showAllApprovals" checked>
+            <span class="toggle__label">ALL</span>
+          </label>
+        </div>
+      </div>
+      <div class="approval-list" id="approvalList">
+        <div class="empty-state" id="emptyApprovals">
+          <div class="empty-state__icon">&#128274;</div>
+          <div class="empty-state__text">No pending requests</div>
+          <div class="empty-state__sub">Approval requests from Claude will appear here in real-time</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILES PANEL -->
+    <section class="panel" id="panel-files" role="tabpanel" hidden>
+      <div class="panel__header">
+        <h2 class="panel__title">Workspace Explorer</h2>
+        <div class="panel__controls">
+          <button class="btn btn--small btn--ghost" id="refreshTree">REFRESH</button>
+          <select class="select" id="depthSelect">
+            <option value="1">Depth: 1</option>
+            <option value="2">Depth: 2</option>
+            <option value="3" selected>Depth: 3</option>
+            <option value="5">Depth: 5</option>
+          </select>
+        </div>
+      </div>
+      <div class="file-tree" id="fileTree">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#128193;</div>
+          <div class="empty-state__text">Connect to browse files</div>
+          <div class="empty-state__sub">Authenticate with your bridge token to explore workspace roots</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIT PANEL -->
+    <section class="panel" id="panel-audit" role="tabpanel" hidden>
+      <div class="panel__header">
+        <h2 class="panel__title">Audit Trail</h2>
+        <div class="panel__controls">
+          <button class="btn btn--small btn--ghost" id="refreshAudit">REFRESH</button>
+          <input type="text" class="search-input" id="auditSearch" placeholder="filter by path...">
+        </div>
+      </div>
+      <div class="audit-log" id="auditLog">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#128220;</div>
+          <div class="empty-state__text">No audit entries</div>
+          <div class="empty-state__sub">File access events will be logged here</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATUS PANEL -->
+    <section class="panel" id="panel-status" role="tabpanel" hidden>
+      <div class="panel__header">
+        <h2 class="panel__title">System Status</h2>
+        <div class="panel__controls">
+          <button class="btn btn--small btn--ghost" id="refreshStatus">REFRESH</button>
+        </div>
+      </div>
+      <div class="status-grid" id="statusGrid">
+        <div class="status-card">
+          <div class="status-card__label">SERVER</div>
+          <div class="status-card__value" id="serverStatus">--</div>
+        </div>
+        <div class="status-card">
+          <div class="status-card__label">UPTIME</div>
+          <div class="status-card__value" id="serverUptime">--</div>
+        </div>
+        <div class="status-card">
+          <div class="status-card__label">WEBSOCKET</div>
+          <div class="status-card__value" id="wsStatus">--</div>
+        </div>
+        <div class="status-card">
+          <div class="status-card__label">ACTIVE APPROVALS</div>
+          <div class="status-card__value" id="activeCount">--</div>
+        </div>
+      </div>
+      <div class="workspace-list" id="workspaceList">
+        <h3 class="section-title">Workspace Roots</h3>
+        <div id="workspaceItems" class="workspace-items"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://consensus.tools/schemas/deployment-guard-input.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["board_id", "proposed_deployment"],
+  "properties": {
+    "board_id": { "type": "string", "minLength": 1 },
+    "persona_set_id": { "type": "string", "minLength": 1 },
+    "mode": { "type": "string", "enum": ["persona", "external_agent"] },
+    "external_votes": { "type": "array", "items": { "$ref": "#/$defs/externalVote" } },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "require_rollback_artifact": { "type": "boolean", "default": true },
+        "require_passing_tests": { "type": "boolean", "default": true },
+        "require_canary_for_prod": { "type": "boolean", "default": true },
+        "block_if_error_budget_breached": { "type": "boolean", "default": true },
+        "max_initial_rollout_percent": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 },
+        "require_human_confirm_for_prod": { "type": "boolean", "default": true }
+      }
+    },
+    "proposed_deployment": { "$ref": "#/$defs/proposedDeployment" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "external_agent" } }, "required": ["mode"] },
+      "then": { "required": ["external_votes"] }
+    }
+  ],
+  "$defs": {
+    "proposedDeployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "environment", "service", "version", "requested_at", "checks", "rollout"],
+      "properties": {
+        "request_id": { "type": "string", "minLength": 1 },
+        "environment": { "type": "string", "enum": ["dev", "staging", "prod"] },
+        "service": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "requested_at": { "type": "string", "format": "date-time" },
+        "ticket_ref": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 8, "maxLength": 2000 },
+        "checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tests_passed", "ci_status", "error_budget_ok", "rollback_artifact_present", "schema_compatibility"],
+          "properties": {
+            "tests_passed": { "type": "boolean" },
+            "ci_status": { "type": "string", "enum": ["passed", "failed", "pending"] },
+            "error_budget_ok": { "type": "boolean" },
+            "rollback_artifact_present": { "type": "boolean" },
+            "schema_compatibility": { "type": "string", "enum": ["compatible", "incompatible", "unknown"] }
+          }
+        },
+        "rollout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["strategy", "initial_percent"],
+          "properties": {
+            "strategy": { "type": "string", "enum": ["all-at-once", "canary", "blue-green"] },
+            "initial_percent": { "type": "integer", "minimum": 1, "maximum": 100 },
+            "health_gate_minutes": { "type": "integer", "minimum": 1 },
+            "auto_rollback": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "externalVote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["persona_id", "name", "reputation_before", "vote", "confidence", "reasons", "red_flags", "suggested_edits"],
+      "properties": {
+        "persona_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "reputation_before": { "type": "number", "minimum": 0.05, "maximum": 0.95 },
+        "vote": { "type": "string", "enum": ["YES", "NO", "REWRITE"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "red_flags": { "type": "array", "items": { "type": "string" } },
+        "suggested_edits": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "id": "openclaw-rss-feeds",
+  "name": "RSS Feeds",
+  "description": "RSS/Atom feed digest with optional CVE enrichment, Ghost CMS drafts, and channel notifications",
+  "version": "0.2.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "feeds": {
+        "type": "array",
+        "description": "List of RSS/Atom feeds to monitor",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string", "description": "Unique feed identifier" },
+            "name": { "type": "string", "description": "Human-readable feed name" },
+            "url": { "type": "string", "description": "RSS/Atom feed URL" },
+            "keywords": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Keywords to filter feed items (empty = all items)"
+            },
+            "enrichCve": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable NVD CVE enrichment for this feed"
+            },
+            "cvssThreshold": {
+              "type": "number",
+              "default": 6.5,
+              "description": "Minimum CVSS score for CVE inclusion (only if enrichCve=true)"
+            },
+            "tags": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Ghost post tags for this feed's digest"
+            }
+          },
+          "required": ["id", "name", "url"]
+        }
+      },
+      "schedule": {
+        "type": "string",
+        "description": "Cron expression for automatic digest (empty = manual only), e.g. '0 9 1 * *'"
+      },
+      "lookbackDays": {
+        "type": "number",
+        "default": 31,
+        "description": "Number of days to look back for feed items"
+      },
+      "ghost": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Ghost CMS configuration for draft publishing",
+        "properties": {
+          "url": { "type": "string", "description": "Ghost site URL (e.g. https://blog.example.com)" },
+          "adminKey": { "type": "string", "description": "Ghost Admin API key (format: id:secret)" }
+        },
+        "required": ["url", "adminKey"]
+      },
+      "notify": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Notification targets (format: channel:target, e.g. 'whatsapp:<phone>')"
+      },
+      "nvdApiKey": {
+        "type": "string",
+        "description": "NVD API key for higher rate limits (optional, free from nvd.nist.gov)"
+      },
+      "retry": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Retry/backoff configuration for RSS feed fetches",
+        "properties": {
+          "maxRetries": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Maximum number of retry attempts per feed (default: 3)"
+          },
+          "initialDelayMs": {
+            "type": "integer",
+            "default": 1000,
+            "minimum": 100,
+            "maximum": 30000,
+            "description": "Initial delay in milliseconds before first retry (default: 1000)"
+          },
+          "backoffMultiplier": {
+            "type": "number",
+            "default": 2,
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Multiplier applied to delay between each retry attempt (default: 2)"
+          }
+        }
+      }
+    },
+    "required": ["feeds"]
+  },
+  "uiHints": {
+    "ghost.adminKey": { "label": "Ghost Admin Key", "sensitive": true },
+    "nvdApiKey": { "label": "NVD API Key", "sensitive": true }
+  }
+}

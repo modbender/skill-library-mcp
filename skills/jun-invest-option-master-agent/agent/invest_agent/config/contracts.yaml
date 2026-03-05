@@ -1,0 +1,116 @@
+version: 1
+
+# Field-level contracts for role outputs.
+# Purpose: make outputs machine-checkable and reduce ambiguity during aggregation.
+# Notes:
+# - This is a lightweight schema, not strict JSONSchema.
+# - Use `required` + `type` + `notes` + `examples`.
+
+common:
+  required_contract_fields: [assumptions, confidence, invalidation_conditions, risks]
+  confidence:
+    type: string
+    notes: "Use: low/medium/high or 0-100 with rationale; be consistent within one packet."
+
+roles:
+  Data:
+    snapshot:
+      type: object
+      required: [asof, tickers, benchmarks, prices, realized_vol_20d, implied_vol_proxy, options_chain_summary, calendar_2w]
+    data_quality_score:
+      type: object
+      required: [score, rationale]
+    anomalies:
+      type: object
+      required: [missing_fields, suspicious_points, latency_notes]
+
+  Regime:
+    regime_label:
+      type: object
+      required: [trend, vol, corr, liquidity]
+    evidence:
+      type: object
+      required: [bullets]
+    strategy_tilts:
+      type: object
+      required: [csp, cc]
+
+  EquityAlpha:
+    thesis:
+      type: object
+      required: [per_ticker]
+    catalysts:
+      type: object
+      required: [per_ticker]
+    key_levels:
+      type: object
+      required: [per_ticker]
+    liquidity_checks:
+      type: object
+      required: [per_ticker]
+
+  Options:
+    structure:
+      type: object
+      required: [strategy_type, ticker, rationale]
+    strikes_dte:
+      type: object
+      required: [target_dte, candidates, chosen]
+    payoff:
+      type: object
+      required: [credit_estimate, cash_return_pct, annualized_return_pct]
+    management_rules:
+      type: object
+      required: [take_profit_rule, roll_rule, drawdown_handling, assignment_handling]
+
+  Portfolio:
+    allocation:
+      type: object
+      required: [positions, total_cash_reserved, remaining_cash]
+    concentration_checks:
+      type: object
+      required: [breaches, correlation_notes]
+    cash_coverage:
+      type: object
+      required: [coverage_ok, notes]
+
+  Risk:
+    verdict:
+      type: object
+      required: [decision, one_line_reason]
+      notes: "decision must be PASS/LIMIT/VETO"
+    blocking_issues:
+      type: object
+      required: [list]
+
+  Execution:
+    order_plan:
+      type: object
+      required: [steps]
+    limit_prices:
+      type: object
+      required: [guidance]
+
+  Postmortem:
+    pnl_attribution:
+      type: object
+      required: [components]
+    improvements:
+      type: object
+      required: [process_changes, parameter_tweaks]
+
+  Growth:
+    backlog:
+      type: object
+      required: [items]
+      notes: "Each item should include: id/title/priority/effort/owner(optional)/status/tags/dependencies/files_to_change/acceptance_criteria. Must support collection+dedupe."
+    quick_wins:
+      type: object
+      required: [items]
+    plan:
+      type: object
+      required: [milestones, cadence, next_120m, risks]
+      notes: "Project management plan: milestones, 24/7 minute-level cadence, next 120 minutes execution list, key risks+mitigations."
+    metrics:
+      type: object
+      required: [quality_gaps, next_measurement]

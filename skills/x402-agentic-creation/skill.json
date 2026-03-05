@@ -1,0 +1,93 @@
+{
+    "name": "x402-creation",
+    "version": "1.0.0",
+    "description": "Monetize APIs with USDC via x402.",
+    "tools": [
+        {
+            "name": "provision_api",
+            "description": "Register a new API on the GateX402 gateway.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "api_name": {
+                        "type": "string",
+                        "description": "Human-readable name for the API."
+                    },
+                    "network": {
+                        "type": "string",
+                        "enum": ["eip155:8453", "solana:5eykt4UsFv8P8NJdTREpY1vzqAQZSSfL"],
+                        "description": "CAIP-2 network ID: eip155:8453 (Base Mainnet), solana:5eykt4UsFv8P8NJdTREpY1vzqAQZSSfL (Solana Mainnet)."
+                    },
+                    "origin_url": {
+                        "type": "string",
+                        "description": "Your API's base URL (the backend you are monetizing), e.g. https://your-api.example.com. Do not use the gateway URL (api.gatex402.dev)."
+                    },
+                    "routes": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "path_pattern": {
+                                    "type": "string",
+                                    "description": "e.g. /v1/*"
+                                },
+                                "method": {
+                                    "type": "string",
+                                    "enum": [
+                                        "GET",
+                                        "POST",
+                                        "PUT",
+                                        "DELETE"
+                                    ]
+                                },
+                                "price_usdc": {
+                                    "type": "number",
+                                    "description": "Price in USDC, e.g. 0.01"
+                                }
+                            },
+                            "required": [
+                                "path_pattern",
+                                "method",
+                                "price_usdc"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "api_name",
+                    "network",
+                    "origin_url",
+                    "routes"
+                ]
+            }
+        },
+        {
+            "name": "get_earnings",
+            "description": "Get current USDC balance and payout status.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        },
+        {
+            "name": "withdraw_funds",
+            "description": "Execute a withdrawal of earned USDC to the agent's wallet.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "network": {
+                        "type": "string",
+                        "enum": [
+                            "eip155:8453",
+                            "solana:5eykt4UsFv8P8NJdTREpY1vzqAQZSSfL"
+                        ],
+                        "description": "CAIP-2 network ID: eip155:8453 (Base Mainnet), solana:5eykt4UsFv8P8NJdTREpY1vzqAQZSSfL (Solana Mainnet)."
+                    }
+                },
+                "required": [
+                    "network"
+                ]
+            }
+        }
+    ]
+}

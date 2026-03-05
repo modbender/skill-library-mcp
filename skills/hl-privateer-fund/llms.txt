@@ -1,0 +1,113 @@
+# HL Privateer -- Agent Quick Start
+# https://hlprivateer.xyz
+# Skill package: https://hlprivateer.xyz/skills/hl-privateer.md
+
+## What is this?
+
+HL Privateer is an open, agentic discretionary trading desk on Hyperliquid.
+Autonomous agents make discretionary long/short calls. Positions, analysis,
+signals, and risk state are accessible to any inbound agent via x402
+pay-per-call endpoints.
+
+No API keys. No sign-ups. Just x402 (USDC on Base).
+
+## Base URLs
+
+- REST API: https://api.hlprivateer.xyz
+- WebSocket: wss://ws.hlprivateer.xyz
+- Web UI: https://hlprivateer.xyz
+
+## Quick Start
+
+1. GET https://api.hlprivateer.xyz/v1/agent/stream/snapshot
+2. Receive 402 + PAYMENT-REQUIRED header (Base64 JSON)
+3. Decode to get price, network, payTo, facilitator
+4. Sign x402 payment (USDC on Base, eip155:8453)
+5. Retry with PAYMENT-SIGNATURE header (Base64 JSON)
+6. Receive 200 + data + PAYMENT-RESPONSE header
+
+## x402 Payment
+
+- Network: Base (eip155:8453)
+- Asset: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+- Facilitator: https://facilitator.payai.network
+- Protocol: x402 v2 (exact scheme)
+- Guide: https://hlprivateer.xyz/skills/x402.md
+
+## Endpoint Catalog
+
+### Paid -- $0.01/call
+- GET /v1/agent/stream/snapshot        -- Mode, PnL%, health, positions, ops tape
+- GET /v1/agent/positions              -- Full position array (symbols, sides, sizes, entries, PnL)
+- GET /v1/agent/orders                 -- Open orders on the book
+- GET /v1/agent/analysis?latest=true   -- Latest AI strategist analysis with thesis
+- GET /v1/agent/analysis               -- Analysis history (paginated)
+
+### Paid -- $0.02/call
+- GET /v1/agent/insights?scope=market  -- Risk config, signal timeline, account snapshot
+- GET /v1/agent/insights?scope=ai      -- Full dashboard: floor state, risk, analysis, copy summary
+
+### Paid -- $0.03/call
+- GET /v1/agent/copy/trade?kind=signals    -- Proposal audit trail (analysis, risk, basket events)
+- GET /v1/agent/copy/trade?kind=positions  -- Position data formatted for copy-trading
+
+### Free (no payment)
+- GET /v1/public/pnl                   -- Current PnL% and mode
+- GET /v1/public/floor-snapshot        -- Mode, PnL%, health, account value, positions, ops tape
+- GET /v1/public/floor-tape            -- Recent ops log lines
+- GET /healthz                         -- Service health check
+
+## Use Cases
+
+### Copy Trading
+1. GET /v1/agent/positions ($0.01) -- current positions
+2. GET /v1/agent/copy/trade?kind=signals ($0.03) -- entry/exit signals
+3. GET /v1/agent/copy/trade?kind=positions ($0.03) -- copy-formatted data
+
+### Signal Integration
+1. GET /v1/agent/analysis?latest=true ($0.01) -- latest strategist thesis
+2. GET /v1/agent/insights?scope=ai ($0.02) -- full AI floor summary
+3. WebSocket wss://ws.hlprivateer.xyz -- real-time floor tape
+
+### Monitoring
+1. GET /v1/public/floor-snapshot (free) -- basic state
+2. GET /v1/agent/stream/snapshot ($0.01) -- rich health + ops data
+3. GET /v1/agent/insights?scope=market ($0.02) -- risk config + signals
+
+## WebSocket Protocol
+
+Connect: wss://ws.hlprivateer.xyz
+
+Client sends: sub.add, sub.remove, cmd.exec, ping
+Server sends: sub.ack, event, cmd.result, error, pong
+
+Subscribe: { "type": "sub.add", "channel": "public.tape" }
+Events:    { "type": "event", "channel": "...", "payload": { ... } }
+
+## How The Desk Works
+
+7 autonomous agent roles on one Hyperliquid account:
+- Strategist: scans 50+ perp markets, proposes long/short with thesis
+- Research: regime hypotheses, macro context, funding analysis
+- Risk: explains risk posture (advisory; hard-gated by deterministic engine)
+- Execution: tactics, slippage annotations
+- Ops: feed health, circuit breakers, 3s heartbeat
+- Market Data: stale feed detection, regime shifts
+- Scribe: audit narratives per proposal cycle
+
+All proposals pass deterministic risk engine (fail-closed). No agent bypasses
+risk limits. Human operator holds kill-switch authority.
+
+## Runtime Modes
+
+INIT -> WARMUP -> READY <-> IN_TRADE <-> REBALANCE
+Any state -> HALT (operator stop)
+Any state -> SAFE_MODE (dependency/data failure)
+
+## Skill Package Files
+
+- https://hlprivateer.xyz/skills/hl-privateer.md  -- Full skill definition
+- https://hlprivateer.xyz/skills/llms.txt          -- This file
+- https://hlprivateer.xyz/skills/api.md            -- Complete API reference
+- https://hlprivateer.xyz/skills/x402.md           -- x402 payment quickstart
+- https://hlprivateer.xyz/skills/agents.json       -- Machine-readable discovery

@@ -1,0 +1,141 @@
+{
+  "id": "openclaw-memory-brain",
+  "name": "OpenClaw Memory (Brain)",
+  "version": "0.3.1",
+  "description": "Personal brain memory: lightweight automatic capture + semantic recall with per-channel policies, deduplication, TTL, and retention.",
+  "configSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "storePath": {
+        "type": "string",
+        "description": "JSONL file path for brain memory",
+        "default": "~/.openclaw/workspace/memory/brain-memory.jsonl"
+      },
+      "dims": {
+        "type": "number",
+        "default": 256,
+        "minimum": 32,
+        "maximum": 2048
+      },
+      "redactSecrets": {
+        "type": "boolean",
+        "default": true
+      },
+      "maxItems": {
+        "type": "number",
+        "default": 5000,
+        "minimum": 100,
+        "maximum": 100000
+      },
+      "capture": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minChars": {
+            "type": "number",
+            "default": 80,
+            "minimum": 10
+          },
+          "requireExplicit": {
+            "type": "boolean",
+            "default": true
+          },
+          "explicitTriggers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "merke dir",
+              "remember this",
+              "notiere",
+              "keep this"
+            ]
+          },
+          "autoTopics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "entscheidung",
+              "decision"
+            ]
+          },
+          "channels": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Per-channel capture policy. Use allow/deny lists to control which channels are captured. Default policy applies when a channel is not in either list.",
+            "properties": {
+              "allow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Only capture from these channels/providers. If set, all other channels are skipped.",
+                "default": []
+              },
+              "deny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Never capture from these channels/providers.",
+                "default": []
+              },
+              "defaultPolicy": {
+                "type": "string",
+                "enum": [
+                  "capture",
+                  "skip"
+                ],
+                "default": "capture",
+                "description": "Default policy when a channel is not in allow or deny list."
+              }
+            }
+          },
+          "dedupeThreshold": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Similarity threshold (0-1) for deduplication. 0 = disabled. Recommended: 0.85-0.95."
+          },
+          "defaultTtlMs": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "description": "Default TTL in milliseconds for new memory items. 0 = no expiry. Items past their TTL are excluded from reads and purged on startup."
+          }
+        }
+      },
+      "defaultTags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "brain"
+        ]
+      },
+      "retention": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maxAgeDays": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "description": "Delete items older than this many days. 0 = disabled."
+          }
+        }
+      }
+    }
+  }
+}

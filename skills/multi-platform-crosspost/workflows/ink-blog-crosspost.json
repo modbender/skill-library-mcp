@@ -1,0 +1,668 @@
+{
+  "updatedAt": "2026-03-02T18:04:09.348Z",
+  "createdAt": "2026-02-19T11:00:50.900Z",
+  "id": "oYeX3n4KzLzUqwEJ",
+  "name": "Blog Cross-Post Pipeline",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog-crosspost",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1408,
+        304
+      ],
+      "webhookId": "blog-crosspost-webhook"
+    },
+    {
+      "parameters": {
+        "url": "=http://YOUR_BLOG_ADMIN_HOST:3000/api/posts/{{ $json.body.slug }}?lang={{ $json.body.lang || 'en' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "YOUR_BLOG_ADMIN_API_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2",
+      "name": "Fetch Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1168,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhook = $('Webhook').first().json;\nconst post = $input.first().json;\n\nif (!post || !post.slug) {\n  throw new Error('Post not found: ' + (webhook.body?.slug || 'unknown'));\n}\nif (post.frontmatter?.draft === true) {\n  throw new Error('Skipping draft post: ' + post.slug);\n}\n\nconst canonical = 'https://YOUR_BLOG_DOMAIN/posts/' + post.slug + '/';\nlet imageUrl = '';\nif (post.frontmatter?.image) {\n  imageUrl = post.frontmatter.image.startsWith('http') ? post.frontmatter.image : 'https://YOUR_BLOG_DOMAIN' + post.frontmatter.image;\n}\n\nconst platformsRaw = webhook.body?.platforms || 'all';\nconst allPlatforms = ['medium', 'linkedin', 'pinterest', 'substack'];\nlet platforms = platformsRaw === 'all' ? allPlatforms : platformsRaw.split(',').map(p => p.trim().toLowerCase());\nconst tags = (post.frontmatter?.tags || []).slice(0, 5);\n\nreturn [{\n  json: {\n    slug: post.slug,\n    lang: post.lang || 'en',\n    title: post.frontmatter?.title || post.slug,\n    description: post.frontmatter?.description || '',\n    date: post.frontmatter?.date || '',\n    categories: post.frontmatter?.categories || [],\n    tags: tags,\n    body: post.body,\n    canonical_url: canonical,\n    image_url: imageUrl,\n    platforms: platforms,\n    platforms_str: platforms.join(',')\n  }\n}];"
+      },
+      "id": "a3",
+      "name": "Validate Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_TRACKER_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "options": {}
+      },
+      "id": "a4",
+      "name": "Read Tracker Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -688,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Validate Post').first().json;\nconst webhook = $('Webhook').first().json;\nconst sheetRows = $('Read Tracker Sheet').all().map(i => i.json);\nconst existing = sheetRows.find(r => r.slug === post.slug);\nconst forceRepost = webhook.body?.force === true;\n\nlet platformsToPost = [...post.platforms];\nlet skipped = [];\n\nif (existing && !forceRepost) {\n  ['medium', 'linkedin', 'pinterest', 'substack'].forEach(p => {\n    if (existing[p + '_status'] === 'published' && platformsToPost.includes(p)) {\n      platformsToPost = platformsToPost.filter(x => x !== p);\n      skipped.push(p + ' (already published)');\n    }\n  });\n}\n\nreturn [{\n  json: {\n    ...post,\n    platforms_to_post: platformsToPost,\n    skipped_platforms: skipped,\n    is_retry: !!existing,\n    existing_row: existing || null,\n    do_medium: platformsToPost.includes('medium'),\n    do_linkedin: platformsToPost.includes('linkedin'),\n    do_pinterest: platformsToPost.includes('pinterest'),\n    do_substack: platformsToPost.includes('substack'),\n    results: {\n      linkedin_status: existing?.linkedin_status || 'skipped',\n      linkedin_url: existing?.linkedin_url || '',\n      medium_status: existing?.medium_status || 'skipped',\n      medium_url: existing?.medium_url || '',\n      pinterest_status: existing?.pinterest_status || 'skipped',\n      pinterest_url: existing?.pinterest_url || '',\n      substack_status: existing?.substack_status || 'skipped',\n      notes: []\n    }\n  }\n}];"
+      },
+      "id": "a5",
+      "name": "Determine Platforms",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'accepted', slug: $json.slug, platforms: $json.platforms_to_post, skipped: $json.skipped_platforms }) }}",
+        "options": {}
+      },
+      "id": "a6",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "li-check",
+              "leftValue": "={{ $json.do_linkedin }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a7",
+      "name": "IF LinkedIn",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Determine Platforms').first().json;\nconst title = post.title;\nconst desc = post.description;\nconst body = post.body || '';\nconst tags = post.tags || [];\n\nconst lines = body.split('\\n').filter(l => l.trim().length > 50 && !l.startsWith('#'));\nconst excerpt = lines.slice(0, 2).join(' ').substring(0, 300);\nconst hashtags = tags.slice(0, 5).map(t => '#' + t.replace(/[^a-zA-Z0-9]/g, '')).join(' ');\n\nconst linkedinText = title + '\\n\\n' + (desc || excerpt) + '\\n\\nRead the full article on my blog:\\n\\n' + hashtags;\n\nreturn [{ json: { ...post, linkedin_text: linkedinText } }];"
+      },
+      "id": "a8",
+      "name": "Build LinkedIn Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "person": "YOUR_LINKEDIN_PERSON_ID",
+        "text": "={{ $json.linkedin_text }}\n\n{{ $('Determine Platforms').first().json.canonical_url }}",
+        "additionalFields": {}
+      },
+      "id": "a9",
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        528,
+        208
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKEDIN_CREDENTIAL_ID",
+          "name": "LinkedIn account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Determine Platforms').first().json;\nconst results = { ...post.results };\n\ntry {\n  const liResult = $('Post to LinkedIn').first().json;\n  if (liResult?.error || liResult?.statusCode >= 400 || liResult?.serviceErrorCode) {\n    results.linkedin_status = 'failed';\n    results.notes.push('LinkedIn: ' + (liResult.message || liResult.error || 'API error'));\n  } else {\n    results.linkedin_status = 'published';\n    results.linkedin_url = liResult?.postUrl || liResult?.activity || '';\n  }\n} catch(e) {\n  results.linkedin_status = 'failed';\n  results.notes.push('LinkedIn: ' + String(e));\n}\n\nreturn [{ json: { ...post, results } }];"
+      },
+      "id": "a10",
+      "name": "Record LinkedIn Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Determine Platforms').first().json;\nreturn [{ json: { ...post } }];"
+      },
+      "id": "a11",
+      "name": "Skip LinkedIn",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "sub-check",
+              "leftValue": "={{ $('Determine Platforms').first().json.do_substack }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a12",
+      "name": "IF Substack",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "YOUR_NOTIFICATION_EMAIL",
+        "subject": "=[Substack Ready] {{ $('Determine Platforms').first().json.title }}",
+        "html": "=<h2>Ready to paste into Substack</h2>\n<p><strong>Title:</strong> {{ $('Determine Platforms').first().json.title }}</p>\n<p><strong>Canonical URL:</strong> <a href=\"{{ $('Determine Platforms').first().json.canonical_url }}\">{{ $('Determine Platforms').first().json.canonical_url }}</a></p>\n<hr>\n<div style=\"font-family: Georgia, serif; max-width: 680px; line-height: 1.8;\">{{ $('Determine Platforms').first().json.body.replace(/\\n/g, '<br>') }}</div>\n<hr>\n<p><em>Copy the content above and paste it into your Substack editor. Set the canonical URL to: {{ $('Determine Platforms').first().json.canonical_url }}</em></p>",
+        "options": {}
+      },
+      "id": "a13",
+      "name": "Email for Substack",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        96
+      ],
+      "webhookId": "0b157d0e-2df7-4216-972c-530d51660e28",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $('Determine Platforms').first().json;\nlet results;\n\n// Get results from LinkedIn branch if it ran\ntry {\n  results = { ...$('Record LinkedIn Result').first().json.results };\n} catch(e) {\n  results = { ...post.results };\n}\n\n// Record Substack result\ntry {\n  const emailResult = $('Email for Substack').first().json;\n  results.substack_status = 'published';\n} catch(e) {\n  // Substack was skipped or failed\n  if (post.do_substack) {\n    results.substack_status = 'failed';\n    results.notes = results.notes || [];\n    results.notes.push('Substack: email send failed');\n  }\n}\n\nconst notes = results.notes || [];\nconst has_failures = notes.length > 0;\n\nreturn [{\n  json: {\n    slug: post.slug,\n    title: post.title,\n    date: post.date,\n    canonical_url: post.canonical_url,\n    crossposted_at: new Date().toISOString().split('T')[0],\n    medium_status: results.medium_status || 'skipped',\n    medium_url: results.medium_url || '',\n    linkedin_status: results.linkedin_status || 'skipped',\n    linkedin_url: results.linkedin_url || '',\n    pinterest_status: results.pinterest_status || 'skipped',\n    pinterest_url: results.pinterest_url || '',\n    substack_status: results.substack_status || 'skipped',\n    notes: notes.join('; '),\n    has_failures: has_failures\n  }\n}];"
+      },
+      "id": "a14",
+      "name": "Collect Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_TRACKER_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "id": "slug",
+              "displayName": "slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "canonical_url",
+              "displayName": "canonical_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "crossposted_at",
+              "displayName": "crossposted_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "medium_status",
+              "displayName": "medium_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "medium_url",
+              "displayName": "medium_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_status",
+              "displayName": "linkedin_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pinterest_status",
+              "displayName": "pinterest_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pinterest_url",
+              "displayName": "pinterest_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "substack_status",
+              "displayName": "substack_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a15",
+      "name": "Update Tracker Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        464
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_FROM_EMAIL",
+        "toEmail": "YOUR_NOTIFICATION_EMAIL",
+        "subject": "={{ $json.has_failures ? '⚠️' : '✅' }} Cross-Post: {{ $json.title }}",
+        "html": "=<h2>Cross-Post Summary: {{ $json.title }}</h2>\n<p><strong>Slug:</strong> {{ $json.slug }}</p>\n<p><strong>Canonical:</strong> <a href=\"{{ $json.canonical_url }}\">{{ $json.canonical_url }}</a></p>\n<table style=\"border-collapse:collapse; width:100%; margin-top:16px;\"><tr style=\"background:#f0f0f0;\"><th style=\"padding:8px; text-align:left; border:1px solid #ddd;\">Platform</th><th style=\"padding:8px; text-align:left; border:1px solid #ddd;\">Status</th><th style=\"padding:8px; text-align:left; border:1px solid #ddd;\">URL</th></tr><tr><td style=\"padding:8px; border:1px solid #ddd;\">LinkedIn</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.linkedin_status }}</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.linkedin_url || '-' }}</td></tr><tr><td style=\"padding:8px; border:1px solid #ddd;\">Medium</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.medium_status }}</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.medium_url || '-' }}</td></tr><tr><td style=\"padding:8px; border:1px solid #ddd;\">Pinterest</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.pinterest_status }}</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.pinterest_url || '-' }}</td></tr><tr><td style=\"padding:8px; border:1px solid #ddd;\">Substack</td><td style=\"padding:8px; border:1px solid #ddd;\">{{ $json.substack_status }}</td><td style=\"padding:8px; border:1px solid #ddd;\">-</td></tr></table>{{ $json.notes ? '<p style=\"margin-top:16px; color:#c00;\"><strong>Issues:</strong> ' + $json.notes + '</p>' : '' }}<p style=\"margin-top:16px; color:#666;\"><em>To retry failed platforms: ./publish.sh crosspost {{ $json.slug }}</em></p>",
+        "options": {}
+      },
+      "id": "a16",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1968,
+        464
+      ],
+      "webhookId": "8ee88a5c-0486-4e5d-8c02-d30c4695a555",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Post": {
+      "main": [
+        [
+          {
+            "node": "Validate Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Post": {
+      "main": [
+        [
+          {
+            "node": "Read Tracker Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Tracker Sheet": {
+      "main": [
+        [
+          {
+            "node": "Determine Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Platforms": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Build LinkedIn Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build LinkedIn Text": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Record LinkedIn Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record LinkedIn Result": {
+      "main": [
+        [
+          {
+            "node": "IF Substack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "IF Substack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Substack": {
+      "main": [
+        [
+          {
+            "node": "Email for Substack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email for Substack": {
+      "main": [
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Results": {
+      "main": [
+        [
+          {
+            "node": "Update Tracker Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Tracker Sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "072dd40f-525d-4694-a8f9-80d5f1af35ef",
+  "activeVersionId": "a420da83-b15b-4d7a-adce-4bf6a92836c5",
+  "versionCounter": 26,
+  "triggerCount": 1,
+  "tags": []
+}

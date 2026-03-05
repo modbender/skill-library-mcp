@@ -1,0 +1,21 @@
+# DocSync — lefthook configuration
+# Installed by: docsync hooks install
+# Documentation: https://docsync.pages.dev/docs/hooks
+
+pre-commit:
+  parallel: true
+  commands:
+    docsync-drift-check:
+      glob: "*.{ts,tsx,js,jsx,mjs,py,rs,go,java,c,h,cpp,cc,cxx,hpp,rb,php,cs,swift,kt,kts}"
+      run: |
+        DOCSYNC_SKILL_DIR="${DOCSYNC_SKILL_DIR:-$HOME/.openclaw/skills/docsync}"
+        if [[ -f "$DOCSYNC_SKILL_DIR/scripts/drift.sh" ]]; then
+          source "$DOCSYNC_SKILL_DIR/scripts/drift.sh"
+          hook_drift_check
+        else
+          echo "[DocSync] Skill not found at $DOCSYNC_SKILL_DIR — skipping drift check"
+        fi
+      fail_text: |
+        Documentation drift detected!
+        Run 'docsync auto-fix' to regenerate stale docs,
+        or use 'git commit --no-verify' to skip this check.

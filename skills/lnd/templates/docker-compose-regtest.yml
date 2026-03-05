@@ -1,0 +1,122 @@
+# litd + Bitcoin Core Regtest Stack — local development and testing.
+#
+# Two containers:
+#   litd      — Lightning Terminal with bitcoind backend
+#   bitcoind  — Bitcoin Core in regtest mode with ZMQ notifications
+#
+# All litd runtime configuration lives in the mounted config file
+# (litd-regtest.conf.template by default). Use docker-start.sh --regtest
+# to generate a config with custom profile or debug level.
+#
+# Usage:
+#   skills/lnd/scripts/docker-start.sh --regtest     # Recommended
+#   docker compose -f docker-compose-regtest.yml up -d
+#   docker compose -f docker-compose-regtest.yml down
+#   docker compose -f docker-compose-regtest.yml down -v  # Remove volumes
+#
+# After starting, create a wallet:
+#   skills/lnd/scripts/create-wallet.sh --container litd
+#
+# Mine blocks:
+#   docker exec litd-bitcoind bitcoin-cli -regtest \
+#     -rpcuser=devuser -rpcpassword=devpass \
+#     generatetoaddress 101 $(docker exec litd lncli --network=regtest newaddress p2tr | jq -r '.address')
+#
+# Ports:
+#   8443  — litd HTTPS
+#   10009 — lnd gRPC
+#   9735  — Lightning P2P
+#   8080  — lnd REST API
+#   18443 — Bitcoin Core RPC
+#   28332 — ZMQ block notifications
+#   28333 — ZMQ tx notifications
+
+services:
+  bitcoind:
+    image: ${BITCOIN_CORE_IMAGE:-lightninglabs/bitcoin-core}:${BITCOIN_CORE_VERSION:-30}
+    container_name: litd-bitcoind
+    restart: unless-stopped
+    command:
+      - -regtest
+      - -server=1
+      - -rpcuser=devuser
+      - -rpcpassword=devpass
+      - -rpcallowip=0.0.0.0/0
+      - -rpcbind=0.0.0.0
+      - -txindex=1
+      - -fallbackfee=0.00001
+      - -addresstype=bech32m
+      - -changetype=bech32m
+      - -zmqpubrawblock=tcp://0.0.0.0:28332
+      - -zmqpubrawtx=tcp://0.0.0.0:28333
+      - -zmqpubhashblock=tcp://0.0.0.0:28332
+      - -zmqpubhashtx=tcp://0.0.0.0:28333
+    ports:
+      - "18443:18443"
+      - "28332:28332"
+      - "28333:28333"
+    volumes:
+      - litd-bitcoind-data:/root/.bitcoin
+    networks:
+      - litd-regtest
+    healthcheck:
+      test: ["CMD", "bitcoin-cli", "-regtest", "-rpcuser=devuser",
+             "-rpcpassword=devpass", "getblockchaininfo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  litd:
+    image: ${LITD_IMAGE:-lightninglabs/lightning-terminal}:${LITD_VERSION:-v0.16.0-alpha}
+    container_name: litd
+    restart: unless-stopped
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "touch /root/.lnd/wallet-password.txt && cp /tmp/lit.conf /root/.lit/lit.conf && exec litd"]
+    ports:
+      - "${LITD_HTTPS_PORT:-8443}:8443"
+      - "${LND_GRPC_PORT:-10009}:10009"
+      - "${LND_P2P_PORT:-9735}:9735"
+      - "${LND_REST_PORT:-8080}:8080"
+    volumes:
+      - litd-data:/root/.lnd
+      - litd-lit-data:/root/.lit
+      - ${LITD_CONF_PATH:-./litd-regtest.conf.template}:/tmp/lit.conf:ro
+    networks:
+      - litd-regtest
+
+  # Second litd node (bob) for two-node regtest setups such as L402
+  # payment testing where a channel is needed between payer and payee.
+  litd-bob:
+    image: ${LITD_IMAGE:-lightninglabs/lightning-terminal}:${LITD_VERSION:-v0.16.0-alpha}
+    container_name: litd-bob
+    restart: unless-stopped
+    profiles:
+      - two-node
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "touch /root/.lnd/wallet-password.txt && cp /tmp/lit.conf /root/.lit/lit.conf && exec litd"]
+    ports:
+      - "${BOB_LITD_HTTPS_PORT:-8444}:8443"
+      - "${BOB_LND_GRPC_PORT:-10010}:10009"
+      - "${BOB_LND_P2P_PORT:-9736}:9735"
+      - "${BOB_LND_REST_PORT:-8081}:8080"
+    volumes:
+      - litd-bob-data:/root/.lnd
+      - litd-bob-lit-data:/root/.lit
+      - ${BOB_LITD_CONF_PATH:-./litd-regtest.conf.template}:/tmp/lit.conf:ro
+    networks:
+      - litd-regtest
+
+volumes:
+  litd-bitcoind-data:
+  litd-data:
+  litd-lit-data:
+  litd-bob-data:
+  litd-bob-lit-data:
+
+networks:
+  litd-regtest:
+    driver: bridge

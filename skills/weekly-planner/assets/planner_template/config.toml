@@ -1,0 +1,62 @@
+# Weekly Planner configuration
+#
+# This file contains stable defaults and planning hints.
+# Edit freely.
+
+timezone = "UTC"  # IANA timezone name, e.g. "Europe/Berlin"
+
+[day_bounds]
+start = "06:00"
+end = "22:00"  # "too late" cutoff
+
+# Modes are user-defined. Use the mode key in week files (e.g. mode = "deep-work").
+[modes.deep-work]
+label = "Deep Work"
+default_block_minutes = 90
+min_block_minutes = 60
+
+[modes.ops]
+label = "Life Ops"
+default_block_minutes = 45
+
+[modes.shutdown]
+label = "Shutdown"
+default_block_minutes = 20
+
+[modes.reset]
+label = "Reset"
+default_block_minutes = 10
+
+[modes.relationships]
+label = "Relationships"
+default_block_minutes = 60
+
+# Weekly non-negotiables are planning hints. You can schedule them as time_blocks.
+[[weekly_nonnegotiables]]
+name = "Exercise"
+count = 3
+duration_minutes = 60
+preferred_windows = [["06:00", "09:00"]]
+
+[[weekly_nonnegotiables]]
+name = "Admin & errands"
+count = 1
+duration_minutes = 60
+preferred_days = ["Sat", "Sun"]
+
+[calendar]
+# Dedicated calendar for *destructive* sync (create/update/delete managed events).
+# Never point this at your primary calendar.
+planner_calendar_name = "Planner"
+planner_calendar_id = ""   # only needed for Google Calendar sync via gog
+write_enabled = false      # safety latch; must be true to allow --apply
+
+[sync]
+# Prefix used to mark managed events (private extended props + description markers).
+# Do not change after you start syncing, unless you intentionally want a clean slate.
+marker_prefix = "planner"
+
+[export]
+# Optional settings for .ics export (export_ics.py). If omitted, defaults are used.
+ics_calendar_name = "Planner"
+ics_output_dir = "weeks"

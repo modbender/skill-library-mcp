@@ -1,0 +1,251 @@
+{
+  "name": "Booking — No-Show Followup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "n1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "n2",
+      "name": "Read Appointments",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst appointments = $input.all().map(i => i.json);\nconst noShows = [];\n\nfor (const apt of appointments) {\n  // Only check confirmed appointments\n  if (apt.status !== 'confirmed') continue;\n  // Skip if already marked\n  if (apt.showed_up === 'true' || apt.showed_up === true) continue;\n  if (apt.showed_up === 'false' || apt.status === 'no-show') continue;\n\n  // Parse appointment datetime\n  const aptDate = new Date(`${apt.date}T${apt.time}`);\n  if (isNaN(aptDate.getTime())) continue;\n\n  // If appointment was 1-48 hours ago and no show_up status set\n  const hoursAgo = (now - aptDate) / (1000 * 60 * 60);\n  if (hoursAgo >= 1 && hoursAgo <= 48 && !apt.showed_up) {\n    noShows.push({\n      booking_id: apt.booking_id,\n      name: apt.name,\n      email: apt.email,\n      phone: apt.phone,\n      service: apt.service,\n      date: apt.date,\n      time: apt.time\n    });\n  }\n}\n\nif (noShows.length === 0) {\n  return [{ json: { skip: true, message: 'No potential no-shows' } }];\n}\n\nreturn noShows.map(n => ({ json: n }));"
+      },
+      "id": "n3",
+      "name": "Find No-Shows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "not-skip",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Has No-Shows?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=We missed you! Reschedule your {{ $json.service }} appointment",
+        "message": "=<h2>We Missed You</h2><p>Hi {{ $json.name }},</p><p>We noticed you weren't able to make your appointment:</p><table border='1' cellpadding='8' cellspacing='0'><tr><td><strong>Service</strong></td><td>{{ $json.service }}</td></tr><tr><td><strong>Date</strong></td><td>{{ $json.date }}</td></tr><tr><td><strong>Time</strong></td><td>{{ $json.time }}</td></tr></table><p>We understand things come up! Would you like to reschedule?</p><p>Contact us at {{ $env.BUSINESS_PHONE || 'YOUR_BUSINESS_PHONE' }} or reply to this email to book a new time.</p><p>{{ $env.BUSINESS_NAME || 'YOUR_BUSINESS_NAME' }}</p>",
+        "options": {}
+      },
+      "id": "n5",
+      "name": "Send Followup",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        200
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_BOOKING_SHEET_ID",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $json.booking_id }}",
+            "status": "no-show",
+            "showed_up": false,
+            "followup_sent_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "booking_id"
+          ],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "showed_up",
+              "displayName": "showed_up",
+              "required": false,
+              "defaultMatch": false
+            },
+            {
+              "id": "followup_sent_at",
+              "displayName": "followup_sent_at",
+              "required": false,
+              "defaultMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Mark No-Show",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1320,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Read Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Appointments": {
+      "main": [
+        [
+          {
+            "node": "Find No-Shows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find No-Shows": {
+      "main": [
+        [
+          {
+            "node": "Has No-Shows?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has No-Shows?": {
+      "main": [
+        [
+          {
+            "node": "Send Followup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send Followup": {
+      "main": [
+        [
+          {
+            "node": "Mark No-Show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

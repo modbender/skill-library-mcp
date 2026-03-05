@@ -1,0 +1,45 @@
+# Agent Lightning Configuration Example
+# Save as: agent-lightning.yaml
+
+# Agent Configuration
+agent:
+  name: "my-agent"
+  type: "openai"  # openai, langchain, autogen, crewai, python
+  model: "gpt-4o"
+  system_prompt: |
+    You are a helpful assistant.
+    Think step by step before answering.
+
+# Training Configuration
+training:
+  algorithm: "grpo"  # grpo, apo, sft, rloo
+  episodes: 100
+  batch_size: 8
+  learning_rate: 1e-4
+  max_steps: 10000
+  
+  # Checkpoint settings
+  checkpoint_interval: 20
+  save_path: "./checkpoints"
+
+# Evaluation Tasks
+environment:
+  eval_tasks:
+    - name: "math"
+      dataset: "gsm8k"
+    - name: "coding"
+      dataset: "humaneval"
+    - name: "reasoning"
+      dataset: "bbh"
+
+# Reward Configuration
+reward:
+  format_reward: true   # Reward for following output format
+  accuracy_reward: true  # Reward for correct answers
+  length_penalty: 0.01   # Penalize overly long responses
+
+# Logging
+logging:
+  level: "info"
+  wandb_project: "my-agent-training"
+  log_interval: 10

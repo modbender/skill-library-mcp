@@ -1,0 +1,227 @@
+# PromQL Queries for Cryptocurrency Trading System Metrics
+# These queries are used by MetricsCollector to fetch metrics from Prometheus/Mimir
+
+# ============================================================
+# Trading Engine Metrics
+# ============================================================
+trading:
+  # Order processing latency
+  order_latency_p99:
+    query: 'histogram_quantile(0.99, sum(rate(trading_order_latency_seconds_bucket[5m])) by (le, service))'
+    unit: seconds
+    description: P99 order processing latency
+
+  order_latency_p95:
+    query: 'histogram_quantile(0.95, sum(rate(trading_order_latency_seconds_bucket[5m])) by (le, service))'
+    unit: seconds
+    description: P95 order processing latency
+
+  # Order throughput
+  order_qps:
+    query: 'sum(rate(trading_orders_total[5m])) by (service, type)'
+    unit: qps
+    description: Order processing rate per second
+
+  # Order success/failure rates
+  order_success_rate:
+    query: 'sum(rate(trading_orders_total{status="success"}[5m])) / sum(rate(trading_orders_total[5m]))'
+    unit: ratio
+    description: Order success rate
+
+  order_error_rate:
+    query: 'sum(rate(trading_orders_total{status="error"}[5m])) / sum(rate(trading_orders_total[5m]))'
+    unit: ratio
+    description: Order error rate
+
+# ============================================================
+# Matching Engine Metrics
+# ============================================================
+matching:
+  # Matching latency
+  matching_latency_p99:
+    query: 'histogram_quantile(0.99, sum(rate(matching_engine_latency_seconds_bucket[5m])) by (le, pair))'
+    unit: seconds
+    description: P99 matching engine latency
+
+  # Order book depth
+  orderbook_depth:
+    query: 'matching_orderbook_depth{side="bid"} + matching_orderbook_depth{side="ask"}'
+    unit: count
+    description: Order book depth (bid + ask)
+
+  # Matching throughput
+  matches_per_second:
+    query: 'sum(rate(matching_trades_total[5m])) by (pair)'
+    unit: tps
+    description: Trades matched per second
+
+# ============================================================
+# Risk Management Metrics
+# ============================================================
+risk:
+  # Position value
+  total_position_value:
+    query: 'sum(risk_position_value_usd) by (account_type)'
+    unit: usd
+    description: Total position value in USD
+
+  # Margin utilization
+  margin_utilization:
+    query: 'risk_margin_used / risk_margin_available'
+    unit: ratio
+    description: Margin utilization ratio
+
+  # Risk limit breaches
+  risk_limit_breaches:
+    query: 'sum(increase(risk_limit_breach_total[5m])) by (limit_type)'
+    unit: count
+    description: Risk limit breach count
+
+# ============================================================
+# Wallet/Settlement Metrics
+# ============================================================
+wallet:
+  # Balance sync latency
+  balance_sync_latency:
+    query: 'histogram_quantile(0.99, sum(rate(wallet_sync_latency_seconds_bucket[5m])) by (le, currency))'
+    unit: seconds
+    description: Wallet balance sync latency
+
+  # Pending transactions
+  pending_transactions:
+    query: 'sum(wallet_pending_transactions) by (type, currency)'
+    unit: count
+    description: Pending wallet transactions
+
+  # Settlement queue depth
+  settlement_queue_depth:
+    query: 'settlement_queue_depth'
+    unit: count
+    description: Settlement queue depth
+
+# ============================================================
+# API Gateway Metrics
+# ============================================================
+api:
+  # API latency
+  api_latency_p99:
+    query: 'histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job="api-gateway"}[5m])) by (le, path))'
+    unit: seconds
+    description: API P99 latency
+
+  # API request rate
+  api_request_rate:
+    query: 'sum(rate(http_requests_total{job="api-gateway"}[5m])) by (method, path, status)'
+    unit: rps
+    description: API request rate
+
+  # API error rate
+  api_error_rate:
+    query: 'sum(rate(http_requests_total{job="api-gateway",status=~"5.."}[5m])) / sum(rate(http_requests_total{job="api-gateway"}[5m]))'
+    unit: ratio
+    description: API 5xx error rate
+
+  # WebSocket connections
+  websocket_connections:
+    query: 'sum(websocket_connections_active) by (service)'
+    unit: count
+    description: Active WebSocket connections
+
+# ============================================================
+# Infrastructure Metrics
+# ============================================================
+infrastructure:
+  # CPU usage
+  cpu_usage:
+    query: 'sum(rate(container_cpu_usage_seconds_total{namespace!="kube-system"}[5m])) by (pod, namespace) / sum(container_spec_cpu_quota{namespace!="kube-system"}/container_spec_cpu_period{namespace!="kube-system"}) by (pod, namespace)'
+    unit: ratio
+    description: Container CPU utilization
+
+  # Memory usage
+  memory_usage:
+    query: 'sum(container_memory_working_set_bytes{namespace!="kube-system"}) by (pod, namespace) / sum(container_spec_memory_limit_bytes{namespace!="kube-system"}) by (pod, namespace)'
+    unit: ratio
+    description: Container memory utilization
+
+  # Pod restarts
+  pod_restarts:
+    query: 'sum(increase(kube_pod_container_status_restarts_total[1h])) by (pod, namespace)'
+    unit: count
+    description: Pod restart count in last hour
+
+  # Network I/O
+  network_receive_bytes:
+    query: 'sum(rate(container_network_receive_bytes_total[5m])) by (pod, namespace)'
+    unit: bytes/s
+    description: Network receive rate
+
+  network_transmit_bytes:
+    query: 'sum(rate(container_network_transmit_bytes_total[5m])) by (pod, namespace)'
+    unit: bytes/s
+    description: Network transmit rate
+
+# ============================================================
+# Database Metrics
+# ============================================================
+database:
+  # Query latency
+  db_query_latency_p99:
+    query: 'histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, database))'
+    unit: seconds
+    description: Database query P99 latency
+
+  # Connection pool usage
+  db_connection_pool_usage:
+    query: 'db_connections_active / db_connections_max'
+    unit: ratio
+    description: Database connection pool utilization
+
+  # Replication lag
+  db_replication_lag:
+    query: 'db_replication_lag_seconds'
+    unit: seconds
+    description: Database replication lag
+
+# ============================================================
+# Message Queue Metrics
+# ============================================================
+queue:
+  # Queue depth
+  queue_depth:
+    query: 'sum(kafka_consumer_group_lag) by (topic, group)'
+    unit: count
+    description: Message queue consumer lag
+
+  # Message processing rate
+  message_rate:
+    query: 'sum(rate(kafka_topic_partition_current_offset[5m])) by (topic)'
+    unit: msg/s
+    description: Message production rate
+
+  # Consumer lag
+  consumer_lag:
+    query: 'sum(kafka_consumer_group_lag) by (group, topic)'
+    unit: count
+    description: Consumer group lag
+
+# ============================================================
+# Business Metrics
+# ============================================================
+business:
+  # Trading volume
+  trading_volume_24h:
+    query: 'sum(increase(trading_volume_usd_total[24h])) by (pair)'
+    unit: usd
+    description: 24h trading volume in USD
+
+  # Active users
+  active_users:
+    query: 'count(count by (user_id) (trading_orders_total offset 1h))'
+    unit: count
+    description: Active users in last hour
+
+  # Fee revenue
+  fee_revenue:
+    query: 'sum(increase(trading_fees_usd_total[1h]))'
+    unit: usd
+    description: Fee revenue in last hour

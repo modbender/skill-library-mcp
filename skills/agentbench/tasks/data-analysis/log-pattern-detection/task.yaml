@@ -1,0 +1,58 @@
+name: "Detect Root Cause from Service Log Patterns"
+id: "data-analysis-log-pattern-detection"
+version: "1.0"
+suite: "data-analysis"
+difficulty: "expert"
+mode: "real"
+
+description: |
+  Tests the agent's ability to analyze five microservice log files alongside
+  a service topology and SLA definitions to reconstruct a cascading failure
+  timeline. The root cause originates in the Payment Provider (service-d),
+  propagates through the Order Processor (service-b) via retry storms, and
+  ultimately triggers SLA breaches and circuit breakers at the API Gateway
+  (service-a). Two other services remain largely healthy. Evaluates temporal
+  reasoning, cross-file correlation, root-cause analysis, and structured
+  incident reporting.
+
+user_message: |
+  This workspace contains logs from a 2-hour incident window (10:00-12:00)
+  across 5 microservices, along with topology.yaml (service dependency graph)
+  and sla.yaml (response time and error rate thresholds).
+
+  Analyze all 5 service log files in logs/, cross-reference them with the
+  topology and SLA definitions, and create an incident-report.md that includes:
+  1. An incident timeline showing when each service was affected
+  2. The root cause of the incident
+  3. The cascade path showing how the failure propagated through services
+  4. Specific SLA breaches with evidence (timestamps and values)
+  5. Recommended fixes to prevent recurrence
+
+input_files: []
+
+expected_outputs:
+  - pattern: "incident-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "service-d"
+          - "root cause"
+          - "timeout"
+          - "retry"
+          - "cascade"
+          - "SLA"
+      - type: "word-count-range"
+        min: 500
+        max: 2500
+
+expected_metrics:
+  tool_calls: [10, 25]
+  planning_ratio: [0.15, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

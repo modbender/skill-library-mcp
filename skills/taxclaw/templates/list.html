@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="row" style="justify-content: space-between; margin-bottom: 14px;">
+    <h1 style="margin:0; font-size: 20px;">Documents</h1>
+    <div class="row">
+      <a href="/review" class="muted">Review queue</a>
+      <a href="/upload"><button>Upload</button></a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <form method="get" action="/documents" class="row" style="align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+      <div style="display:flex; flex-direction:column; gap:6px; min-width: 200px;">
+        <label class="muted" for="filer" style="font-size:12px;">Filer</label>
+        <select id="filer" name="filer">
+          <option value="" {% if filters.filer == '' %}selected{% endif %}>All filers</option>
+          {% for f in filter_options.filers %}
+            <option value="{{ f }}" {% if filters.filer == f %}selected{% endif %}>{{ f }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px; width: 140px;">
+        <label class="muted" for="year" style="font-size:12px;">Tax year</label>
+        <select id="year" name="year">
+          <option value="" {% if filters.year == '' %}selected{% endif %}>All years</option>
+          {% for y in filter_options.years %}
+            <option value="{{ y }}" {% if filters.year == y %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px; min-width: 220px;">
+        <label class="muted" for="type" style="font-size:12px;">Doc type</label>
+        <select id="type" name="type">
+          <option value="" {% if filters.type == '' %}selected{% endif %}>All types</option>
+          {% for t in filter_options.doc_types %}
+            <option value="{{ t }}" {% if filters.type == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:6px; min-width: 180px;">
+        <label class="muted" for="needs_review" style="font-size:12px;">Needs review</label>
+        <select id="needs_review" name="needs_review">
+          <option value="" {% if filters.needs_review == '' %}selected{% endif %}>Any</option>
+          <option value="1" {% if filters.needs_review == '1' %}selected{% endif %}>Yes</option>
+          <option value="0" {% if filters.needs_review == '0' %}selected{% endif %}>No</option>
+        </select>
+      </div>
+
+      <button type="submit">Filter</button>
+      <a href="/documents" class="muted">Reset</a>
+    </form>
+  </div>
+
+  <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+    <div class="muted" style="font-size: 12px;">Export all:</div>
+    <div class="row" style="gap: 10px; flex-wrap: wrap;">
+      <a class="btn" href="/export.wide.csv?csrf={{ csrf_token }}" style="min-width: 200px; text-align: center;">📊 Spreadsheet</a>
+      <a class="btn" href="/export.long.csv?csrf={{ csrf_token }}" style="min-width: 200px; text-align: center;">🗃 Data Analysis</a>
+      <a class="btn" href="/export.json?csrf={{ csrf_token }}" style="min-width: 200px; text-align: center;">🛠 Developer JSON</a>
+      <a class="btn" href="/export.originals.zip?csrf={{ csrf_token }}" style="min-width: 200px; text-align: center;">📦 All originals (.zip)</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>Type</th>
+          <th>Year</th>
+          <th>Filer</th>
+          <th>Status</th>
+          <th>Needs review</th>
+          <th>Confidence</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in docs %}
+          <tr>
+            <td>
+              <a href="/doc/{{ d.id }}">
+                {% if d.display_name %}
+                  <div style="font-weight: 700;">{{ d.display_name }}</div>
+                  <div class="muted" style="font-size: 12px; margin-top: 2px;">{{ d.id[:8] }}</div>
+                {% else %}
+                  {{ d.id[:8] }}
+                {% endif %}
+              </a>
+            </td>
+            <td>{{ d.doc_type or 'unknown' }}</td>
+            <td>{{ d.tax_year or '' }}</td>
+            <td>{{ d.filer or '' }}</td>
+            <td>
+              {% if d.status == 'processed' %}
+                <span class="pill ok">✅ Done</span>
+              {% elif d.status == 'needs_review' %}
+                <span class="pill warn">⚠️ Needs review</span>
+              {% else %}
+                <span class="pill">{{ d.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if d.needs_review %}
+                <span class="pill warn">yes</span>
+              {% else %}
+                <span class="pill ok">no</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if d.overall_confidence is none %}
+                <span class="muted">—</span>
+              {% else %}
+                {% set pct = (d.overall_confidence * 100)|round|int %}
+                {% if pct >= 80 %}
+                  <span class="pill ok">{{ pct }}%</span>
+                {% elif pct >= 50 %}
+                  <span class="pill warn">{{ pct }}%</span>
+                {% else %}
+                  <span class="pill bad">{{ pct }}%</span>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td class="muted">{{ d.created_at[:10] }}</td>
+          </tr>
+        {% endfor %}
+        {% if docs|length == 0 %}
+          <tr><td colspan="8" class="muted">No documents yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

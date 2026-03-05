@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clawctl"
+version = "0.2.0"
+description = "Coordination layer for OpenClaw agent fleets"
+requires-python = ">=3.9"
+dependencies = ["click", "flask"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[project.scripts]
+clawctl = "clawctl.cli:cli"
+
+[tool.setuptools.packages.find]
+include = ["clawctl*", "dashboard*"]
+
+[tool.setuptools.package-data]
+dashboard = ["index.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

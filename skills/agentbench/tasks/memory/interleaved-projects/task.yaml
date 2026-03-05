@@ -1,0 +1,66 @@
+name: "Maintain Context Across Interleaved Projects"
+id: "memory-interleaved-projects"
+version: "1.0"
+suite: "memory"
+difficulty: "hard"
+mode: "real"
+type: "multi-turn"
+
+description: |
+  Tests context switching between two unrelated projects. The agent starts
+  investigating a bug in project-alpha, gets interrupted to work on
+  project-beta, then must return to project-alpha with its investigation
+  state intact. Turn 4 tests recall of both contexts.
+
+input_files: []
+
+turns:
+  - role: user
+    message: |
+      In project-alpha/, the /users endpoint returns 500 errors. Start
+      investigating — read the code, identify the likely cause, but don't
+      fix it yet. Tell me what you find.
+    expect: "response"
+    validators:
+      - type: "response-contains"
+        values: ["name", "full_name"]
+        match: "any"
+
+  - role: user
+    message: |
+      Pause that for now. In project-beta/, update config.yaml to change
+      the database_host from db-legacy.internal to db-prod-2.internal
+    expect: "file-output"
+    validators:
+      - type: "content-contains"
+        in: "project-beta/config.yaml"
+        sections: ["db-prod-2.internal"]
+
+  - role: user
+    message: |
+      Back to project-alpha. Based on your earlier investigation, fix the
+      /users endpoint bug. Make sure the test passes.
+    expect: "file-output"
+    validators:
+      - type: "command-output-contains"
+        command: "cd project-alpha && python -m pytest test_app.py -v"
+        contains: ["passed"]
+
+  - role: user
+    message: |
+      Summarize everything you did across both projects.
+    expect: "response"
+    validators:
+      - type: "response-contains"
+        values: ["project-alpha", "project-beta", "users", "database", "db-prod-2"]
+        match: "all"
+
+expected_metrics:
+  tool_calls: [8, 22]
+  planning_ratio: [0.10, 0.30]
+
+scoring:
+  layer0_weight: 0.25
+  layer1_weight: 0.15
+  layer2_weight: 0.25
+  layer3_weight: 0.35

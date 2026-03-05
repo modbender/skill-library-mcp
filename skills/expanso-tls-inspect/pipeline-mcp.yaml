@@ -1,0 +1,47 @@
+# Expanso Pipeline: tls-inspect (MCP mode)
+
+name: tls-inspect-mcp
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /inspect
+      allowed_verbs: [POST]
+      timeout: 30s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let host = this.host.or("")
+          meta trace_id = uuid_v4()
+
+          root = if $host.length() == 0 { throw("host field is required") } else { "" }
+
+          root.certificate = {
+            "subject": "CN=" + $host,
+            "issuer": "Demo CA",
+            "valid_from": now(),
+            "valid_to": now(),
+            "sans": [$host]
+          }
+          root.valid = true
+          root.days_until_expiry = 365
+          root.metadata = {
+            "skill": "tls-inspect",
+            "mode": "mcp",
+            "host": $host,
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: "[tls-inspect] MCP inspected (trace: ${! meta(\"trace_id\").slice(0, 8) })"
+
+  output:
+    sync_response: {}

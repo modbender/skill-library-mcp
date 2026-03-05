@@ -1,0 +1,113 @@
+domain:
+  name: "연금/노후"
+  emoji: "🏦"
+  disclaimer: |
+    ⚠️ 본 내용은 정보 제공 목적이며, 투자·재무 조언이 아닙니다.
+    국민연금 정확한 예상액은 내연금(csa.nps.or.kr)에서 확인하세요.
+  beginner_alias:
+    - "처음인데"
+    - "모르겠어"
+    - "쉽게"
+    - "기초"
+    - "초보"
+    - "어려워"
+
+intents:
+  - id: pension_estimate
+    label: "Pension Estimate"
+    triggers: ["국민연금 얼마 받아?", "예상 수령액", "연금 얼마?", "국민연금 계산"]
+    output: "가입 기간/소득 기반 예상 수령액 계산 Flash"
+    min_data: ["현재 나이 또는 가입 기간", "평균 소득(선택)"]
+    depth: flash
+
+  - id: pension_guide
+    label: "Pension Guide"
+    triggers: ["국민연금 납부", "국민연금 가입", "추납", "반납", "크레딧", "임의가입"]
+    output: "가입·납부·크레딧·예외 제도 안내"
+    min_data: []
+    depth: both
+
+  - id: irp_vs_savings
+    label: "IRP vs Savings"
+    triggers: ["IRP", "연금저축", "퇴직연금", "세액공제 연금", "DC형 DB형", "절세 연금"]
+    output: "IRP vs 연금저축 절세 효과 비교 + 추천 전략"
+    min_data: ["소득 수준(선택)"]
+    depth: both
+
+  - id: retirement_sim
+    label: "Retirement Sim"
+    triggers: ["노후 자금", "은퇴하려면 얼마?", "노후 준비", "은퇴 자금 계산", "몇 살에 은퇴?"]
+    output: "목표 생활비 기반 필요 자산 역산 + 현재 준비 현황 비교"
+    min_data: ["희망 은퇴 나이 또는 월 생활비"]
+    depth: both
+
+  - id: severance_pay
+    label: "Severance Pay"
+    triggers: ["퇴직금", "퇴직급여", "퇴직금 계산", "중간정산", "DC형 퇴직금"]
+    output: "퇴직금 계산 + 수령 방법 + 세금 Flash"
+    min_data: ["근속 연수", "평균 임금(선택)"]
+    depth: both
+
+  - id: basic_pension
+    label: "Basic Pension"
+    triggers: ["기초연금", "노인연금", "기초연금 얼마?", "기초연금 대상"]
+    output: "수급 조건 + 금액 + 신청 방법 Flash"
+    min_data: ["나이(선택)"]
+    depth: flash
+
+  - id: fire
+    label: "FIRE"
+    triggers: ["조기 은퇴", "FIRE", "파이어족", "은퇴 일찍 하고 싶어", "몇억 있으면 은퇴해?"]
+    output: "FIRE 계산 (4% 룰 기반) + 필요 자산 + 전략"
+    min_data: ["월 생활비 또는 목표 나이"]
+    depth: both
+
+  - id: retirement_portfolio
+    label: "Retirement Portfolio"
+    triggers: ["은퇴 포트폴리오", "노후 투자", "연금 자산배분", "TDF"]
+    output: "finance-portfolio-counseling 스킬 연계 (은퇴 계획 인텐트)"
+    min_data: ["나이", "은퇴까지 남은 기간"]
+    depth: both
+
+  - id: beginner_guide
+    label: "Beginner Guide"
+    triggers: ["연금 처음인데", "연금이 뭐야?", "국민연금 vs 사적연금", "연금 종류"]
+    output: "한국 연금 3층 체계 입문 Flash (초보자 모드 강제)"
+    min_data: []
+    depth: flash
+
+data_sources:
+  primary:
+    - "국민연금공단 API (data.go.kr/15083533) [활용신청 필요]"
+    - "yahoo-finance-cli 스킬 — 연금펀드/ETF 수익률"
+    - "내장 계산식 — 국민연금 예상액, 퇴직금, FIRE 계산"
+  secondary:
+    - "web_search: 국민연금 예상 수령액 계산기"
+    - "web_search: IRP 연금저축 세액공제 2025"
+    - "web_search: TDF 수익률 비교"
+
+flash:
+  max_lines: 40
+  always: true
+
+deep_dive:
+  trigger: request
+  trigger_intents:
+    - retirement_sim
+    - irp_vs_savings
+    - fire
+    - severance_pay
+    - pension_guide
+
+beginner_mode:
+  max_table_rows: 5
+  conclusion_first: true
+  glossary:
+    국민연금: "국가가 운영하는 공적 연금. 소득의 9%를 납부하고 나중에 평생 받는 제도"
+    IRP: "개인형 퇴직연금계좌. 퇴직금을 이전하거나 추가 납입해 세액공제 받고 노후에 연금으로 받는 계좌"
+    연금저축: "세액공제 받으면서 노후 자금을 쌓는 장기 저축 상품 (펀드·보험·신탁)"
+    소득대체율: "은퇴 전 소득 대비 연금 수령액 비율. 국민연금 목표는 40~50%"
+    퇴직급여: "회사에서 1년 이상 근무 후 퇴직 시 받는 돈. 퇴직금 또는 퇴직연금 형태"
+    TDF: "Target Date Fund. 목표 은퇴 연도에 맞춰 자동으로 자산배분을 바꿔주는 펀드"
+    4퍼센트룰: "은퇴 자산의 4%를 매년 인출해도 30년 이상 버틸 수 있다는 경험칙"
+    추납: "과거에 납부하지 못한 국민연금 보험료를 나중에 추가로 납부하는 제도"

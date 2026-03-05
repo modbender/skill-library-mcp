@@ -1,0 +1,35 @@
+# Golden Cross Signal
+# Detects stocks where 50-day MA crosses above 200-day MA (bullish momentum)
+
+name: golden-cross
+description: "SMA50 crosses above SMA200 - bullish momentum with strong volume"
+asset_class: stock
+timeframe: "1D"
+
+# Pre-filter: large-cap stocks with decent volume
+filters:
+  - field: MARKET_CAPITALIZATION
+    op: ">"
+    value: 1000000000
+  - field: VOLUME
+    op: ">"
+    value: 500000
+
+columns:
+  - NAME
+  - PRICE
+  - CHANGE_PERCENT
+  - SIMPLE_MOVING_AVERAGE_50
+  - SIMPLE_MOVING_AVERAGE_200
+  - VOLUME
+
+# Signal: detect upward MA crossover
+computed:
+  - type: crossover
+    fast: SIMPLE_MOVING_AVERAGE_50
+    slow: SIMPLE_MOVING_AVERAGE_200
+    direction: up
+
+sort_by: VOLUME
+sort_order: desc
+limit: 20

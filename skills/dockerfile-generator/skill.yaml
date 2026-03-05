@@ -1,0 +1,43 @@
+# Skill: dockerfile_generator
+
+generate_dockerfile(app_type: string, config: object) => string
+
+## Trigger Patterns
+- 生成Dockerfile
+- docker配置
+- containerize
+
+## Implementation
+
+根据应用类型自动生成优化的 Dockerfile。
+
+```javascript
+function generateDockerfile(appType, config = {}) {
+  const templates = {
+    node: `FROM node:${config.version || '20-alpine'}
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE ${config.port || 3000}
+CMD ["node", "server.js"]`,
+    python: `FROM python:${config.version || '3.11'}-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE ${config.port || 8000}
+CMD ["python", "main.py"]`,
+    go: `FROM golang:${config.version || '1.21'}-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o main .
+FROM alpine
+WORKDIR /app
+COPY --from=builder /app/main .
+EXPOSE ${config.port || 8080}
+CMD ["./main"]`
+  };
+  
+  return templates[appType] || templates.node;
+}

@@ -1,0 +1,72 @@
+{
+  "name": "@felipeoff/sonarqube-analyzer",
+  "version": "1.0.0",
+  "description": "OpenClaw skill for SonarQube code quality analysis with intelligent issue detection",
+  "main": "src/index.js",
+  "bin": {
+    "sonarqube-analyzer": "./scripts/analyze.js"
+  },
+  "scripts": {
+    "analyze": "node scripts/analyze.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src scripts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-skill",
+    "sonarqube",
+    "code-quality",
+    "static-analysis",
+    "code-review",
+    "ci-cd"
+  ],
+  "author": "FelipeOFF <felipeoliveireferreira@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FelipeOFF/sonarqube-analyzer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FelipeOFF/sonarqube-analyzer/issues"
+  },
+  "homepage": "https://github.com/FelipeOFF/sonarqube-analyzer#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0"
+  },
+  "openclaw": {
+    "skillId": "sonarqube-analyzer",
+    "version": "1.0.0",
+    "tools": [
+      "sonar_get_issues",
+      "sonar_analyze_and_suggest",
+      "sonar_quality_gate"
+    ],
+    "config": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "sonarHostUrl": {
+            "type": "string",
+            "default": "http://127.0.0.1:9000",
+            "description": "SonarQube server URL"
+          },
+          "sonarToken": {
+            "type": "string",
+            "description": "SonarQube authentication token"
+          },
+          "defaultProject": {
+            "type": "string",
+            "description": "Default project key to analyze"
+          }
+        }
+      }
+    }
+  }
+}

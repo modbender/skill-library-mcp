@@ -1,0 +1,159 @@
+version: 1
+
+# Role contract system
+# - This file defines each role's responsibilities and I/O surface.
+# - Field-level typing/validation lives in: config/contracts.yaml
+# - Hard constraints live in: config/policy.yaml
+output_contract:
+  must_include:
+    - assumptions
+    - confidence
+    - invalidation_conditions
+    - risks
+
+roles:
+  PM:
+    description: "投资总监/组合经理：汇总子agent结果，生成最终审批包；不下单。"
+    inputs:
+      required: [Data, Regime, EquityAlpha, Options, Portfolio, Risk, Execution]
+      optional: [Postmortem]
+    outputs:
+      format: "approval_packet"
+      must_include: [recommendation, position_sizing, risk_controls, management_plan]
+
+  Data:
+    description: "数据与事实：价格/波动率/期权链/日历快照，异常与可信度评分。"
+    policy_refs:
+      - config/policy.yaml#options_policy.preferred_dte_days
+      - config/policy.yaml#universe.core_etf
+    inputs:
+      required: [tickers, asof]
+      optional: [dte_range, benchmark_tickers]
+    tools_preferred:
+      broker: "Futu OpenAPI（富途证券）— 期权链优先；ETF/指数现价若无权限则走 public 兜底。https://openapi.futunn.com/futu-api-doc/intro/intro.html"
+      public: ["TBD:yfinance-skill", "web_fetch", "web_search"]
+    quality_checks:
+      - "All key numbers must include source + timestamp."
+      - "Flag missing fields; downgrade data_quality_score accordingly."
+      - "Do not infer/guess numeric values."
+    outputs:
+      fields:
+        - snapshot
+        - data_quality_score
+        - anomalies
+        - assumptions
+        - confidence
+        - invalidation_conditions
+        - risks
+
+  Regime:
+    description: "市场状态：趋势/波动/相关性/流动性；策略加减权建议。"
+    policy_refs:
+      - config/policy.yaml#options_policy.preferred_dte_days
+    inputs:
+      required: [Data.snapshot]
+      optional: [lookback_days]
+    quality_checks:
+      - "Evidence must be falsifiable (thresholds or explicit re-evaluation triggers)."
+      - "Separate observations from recommendations."
+    outputs:
+      fields: [regime_label, evidence, strategy_tilts, assumptions, confidence, invalidation_conditions, risks]
+
+  EquityAlpha:
+    description: "个股研究：波段候选、催化剂、关键价位、流动性与期权可交易性。"
+    policy_refs:
+      - config/policy.yaml#universe
+    inputs:
+      required: [tickers, Data.snapshot]
+      optional: [earnings_date, thesis_horizon]
+    quality_checks:
+      - "Each ticker must have an explicit invalidation level or say unknown."
+      - "Liquidity assessment must mention options OI/spread qualitatively."
+      - "Avoid unverified fundamentals; label uncertainty."
+    outputs:
+      fields: [thesis, catalysts, key_levels, liquidity_checks, assumptions, confidence, invalidation_conditions, risks]
+
+  Options:
+    description: "期权结构：CSP/CC具体到期、行权、delta区间、管理与滚动规则。"
+    policy_refs:
+      - config/policy.yaml#options_policy
+      - config/policy.yaml#risk.permanent_cash_buffer_pct
+    inputs:
+      required: [strategy_type, Data.snapshot, risk_budget]
+      optional: [dte_target, delta_target_range]
+    constraints:
+      allowed: ["cash-secured put", "covered call"]
+      disallowed: ["leverage", "naked calls", "complex spreads"]
+    quality_checks:
+      - "Must respect preferred DTE 30–45 unless explicitly justified."
+      - "Must include assignment handling and defense rules."
+      - "No spreads, no naked calls."
+    outputs:
+      fields: [structure, strikes_dte, greeks_band, entry_rules, management_rules, exit_rules, assumptions, confidence, invalidation_conditions, risks]
+
+  Portfolio:
+    description: "组合构建：资金分配、集中度、现金覆盖、组合一致性检查。"
+    policy_refs:
+      - config/policy.yaml#allocation_targets
+      - config/policy.yaml#risk.concentration
+      - config/policy.yaml#risk.permanent_cash_buffer_pct
+    inputs:
+      required: [candidates, cash, constraints]
+      optional: [existing_positions]
+    quality_checks:
+      - "Validate CSP cash coverage (100%) and preserve permanent cash buffer (25%)."
+      - "Check concentration limits (single name 8%, aux 5%)."
+      - "Explain deviations from SPY/QQQ core targets."
+    outputs:
+      fields: [allocation, concentration_checks, cash_coverage, scenario_notes, assumptions, confidence, invalidation_conditions, risks]
+
+  Risk:
+    description: "独立风控：可否决；尾部/跳空/相关性/现金覆盖审核。"
+    policy_refs:
+      - config/policy.yaml#risk
+      - config/policy.yaml#options_policy
+    inputs:
+      required: [PM.draft, Data.snapshot]
+      optional: [Portfolio.allocation]
+    quality_checks:
+      - "Must explicitly PASS/LIMIT/VETO and cite which policy thresholds were used."
+      - "If LIMIT/VETO: provide executable mitigations (size/strike/DTE/abandon)."
+      - "Confirm no permanent cash buffer usage."
+    outputs:
+      fields: [verdict, blocking_issues, mitigations, monitoring_triggers, assumptions, confidence, invalidation_conditions, risks]
+
+  Execution:
+    description: "执行：限价/挂单/成交质量/滑点预估。"
+    inputs:
+      required: [approved_plan, market_liquidity]
+      optional: [broker_order_types]
+    quality_checks:
+      - "Avoid market orders unless explicitly justified."
+      - "State max concession vs mid; avoid chasing."
+    outputs:
+      fields: [order_plan, limit_prices, timing, slippage_estimate, assumptions, confidence, invalidation_conditions, risks]
+
+  Postmortem:
+    description: "复盘归因：PnL拆解、规则迭代建议、周/月复盘模板。"
+    inputs:
+      required: [trade_log, outcomes]
+      optional: [market_context]
+    quality_checks:
+      - "Separate bad luck vs bad process."
+      - "Convert lessons into concrete template/policy updates."
+    outputs:
+      fields: [pnl_attribution, rule_violations, improvements, next_actions, assumptions, confidence, invalidation_conditions, risks]
+
+  Growth:
+    description: "团队自我成长与升级：复盘整个流水线的质量缺口，负责待优化清单的收集/去重/优先级管理，并用专业项目管理方法把改进落成可执行计划（范围/里程碑/依赖/排期/验收）。"
+    inputs:
+      required: [run_artifacts]
+      optional: [validator_report, user_feedback]
+    quality_checks:
+      - "All suggestions must be actionable: file/path + what to change + acceptance criteria."
+      - "Backlog must support collection + dedupe + status tracking; avoid duplicate items with different wording."
+      - "Provide a realistic execution plan (milestones, dependencies, cadence, next_120m) — not just a list of ideas."
+      - "Tag each item with priority (P0/P1/P2) and effort (S/M/L)."
+      - "Never propose changes that violate policy constraints (no leverage, only CSP/CC, preserve cash buffer)."
+    outputs:
+      fields: [backlog, quick_wins, plan, metrics, assumptions, confidence, invalidation_conditions, risks]

@@ -1,0 +1,202 @@
+{
+  "id": "clawgator-superpowers",
+  "kind": "ai",
+  "name": "ClawGator Superpowers",
+  "description": "Framework pengembangan perangkat lunak lengkap untuk tim ClawGator. Brainstorming, planning, eksekusi sistematis, TDD, debugging, code review, dan git worktrees.",
+  "version": "1.0.0",
+  "author": "ClawGator Team",
+  "license": "MIT",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "brainstormingMode": {
+        "type": "string",
+        "default": "standard",
+        "enum": ["standard", "aggressive", "conservative"],
+        "description": "Mode brainstorming: standard, agresif, atau konservatif"
+      },
+      "maxTasksPerPlan": {
+        "type": "number",
+        "default": 5,
+        "description": "Maksimal tasks per rencana"
+      },
+      "enableVerification": {
+        "type": "boolean",
+        "default": true,
+        "description": "Aktifkan verifikasi otomatis setelah eksekusi"
+      },
+      "saveDesignDocs": {
+        "type": "boolean",
+        "default": true,
+        "description": "Simpan dokumen desain ke folder referensi"
+      },
+      "tddEnforced": {
+        "type": "boolean",
+        "default": true,
+        "description": "Paksa TDD (no code without failing test first)"
+      },
+      "debuggingStrictMode": {
+        "type": "boolean",
+        "default": true,
+        "description": "Paksa debugging sistematis (no fixes without root cause)"
+      },
+      "useGitWorktrees": {
+        "type": "boolean",
+        "default": true,
+        "description": "Gunakan git worktrees untuk workspace terisolasi"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "brainstorm",
+      "description": "Mulai sesi brainstorming baru",
+      "input": {
+        "topic": {
+          "type": "string",
+          "description": "Topik yang ingin didiskusikan",
+          "required": true
+        },
+        "context": {
+          "type": "object",
+          "description": "Konteks proyek (files, recentCommits, dll)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "create_git_worktree",
+      "description": "Buat git worktree baru untuk workspace terisolasi",
+      "input": {
+        "branchName": {
+          "type": "string",
+          "description": "Nama branch baru",
+          "required": true
+        },
+        "basedOn": {
+          "type": "string",
+          "description": "Base branch (default: main)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "write_implementation_plan",
+      "description": "Buat rencana implementasi terperinci",
+      "input": {
+        "planPath": {
+          "type": "string",
+          "description": "Path untuk menyimpan plan",
+          "required": true
+        },
+        "design": {
+          "type": "string",
+          "description": "Dokumen desain yang sudah disetujui",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "execute_plan",
+      "description": "Eksekusi plan dengan TDD",
+      "input": {
+        "planPath": {
+          "type": "string",
+          "description": "Path ke dokumen plan",
+          "required": true
+        },
+        "batchSize": {
+          "type": "number",
+          "description": "Jumlah tasks per batch (default: 3)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "systematic_debug",
+      "description": "Debugging sistematis dengan 4-phase root cause analysis",
+      "input": {
+        "issue": {
+          "type": "string",
+          "description": "Deskripsi issue/bug",
+          "required": true
+        },
+        "evidence": {
+          "type": "object",
+          "description": "Evidence awal (error logs, test output, dll)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "request_code_review",
+      "description": "Request code review untuk task tertentu",
+      "input": {
+        "taskNumber": {
+          "type": "number",
+          "description": "Nomor task yang direview",
+          "required": true
+        },
+        "planPath": {
+          "type": "string",
+          "description": "Path ke dokumen plan untuk referensi",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "apply_code_review_feedback",
+      "description": "Terapkan feedback dari code review",
+      "input": {
+        "taskNumber": {
+          "type": "number",
+          "description": "Nomor task yang diperbaiki",
+          "required": true
+        },
+        "feedback": {
+          "type": "array",
+          "description": "List feedback yang diterima",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "finish_development_branch",
+      "description": "Selesaikan development branch (merge, PR, keep, atau discard)",
+      "input": {
+        "action": {
+          "type": "string",
+          "enum": ["merge", "pr", "keep", "discard"],
+          "description": "Action untuk branch",
+          "required": true
+        },
+        "branchName": {
+          "type": "string",
+          "description": "Nama branch",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "get_status",
+      "description": "Cek status rencana proyek yang aktif",
+      "input": {}
+    }
+  ],
+  "subSkills": [
+    "using-superpowers",
+    "brainstorming",
+    "writing-plans",
+    "executing-plans",
+    "test-driven-development",
+    "systematic-debugging",
+    "using-git-worktrees",
+    "subagent-driven-development",
+    "dispatching-parallel-agents",
+    "requesting-code-review",
+    "receiving-code-review",
+    "verification-before-completion",
+    "finishing-a-development-branch",
+    "writing-skills"
+  ]
+}

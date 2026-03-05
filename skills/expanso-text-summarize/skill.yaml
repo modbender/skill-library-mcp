@@ -1,0 +1,64 @@
+# Skill: text-summarize
+# Version: 1.0.0
+#
+# Summarize any text into concise bullet points while keeping your API keys local.
+# This is the "Hello World" of Expanso + OpenClaw skills.
+
+name: text-summarize
+version: 1.0.0
+description: Summarize text into 3-5 bullet points using AI
+
+# Credentials (stored locally on Expanso Edge, never transmitted)
+credentials:
+  - name: OPENAI_API_KEY
+    required: false  # Not required if using Ollama
+    description: OpenAI API key for remote inference
+
+# Skill inputs
+inputs:
+  - name: text
+    type: string
+    required: true
+    description: Text to summarize (up to 1MB)
+  - name: bullet_count
+    type: integer
+    default: 5
+    description: Maximum number of bullet points (3-10)
+  - name: style
+    type: string
+    default: concise
+    enum: [concise, detailed, executive]
+    description: Summary style
+
+# Skill outputs
+outputs:
+  - name: summary
+    type: string
+    description: Bulleted summary of the input text
+  - name: metadata
+    type: object
+    description: Audit metadata (model, timestamp, input_hash)
+
+# Backend options (Expanso Edge flexibility)
+backends:
+  - name: openai
+    type: remote
+    requires: [OPENAI_API_KEY]
+    description: OpenAI GPT-4o-mini (fast, ~$0.001 per summary)
+  - name: ollama
+    type: local
+    models: [llama3.2, mistral, phi3]
+    description: Local Ollama (private, free, slower)
+
+# Expanso components used
+components:
+  inputs:
+    - stdin          # CLI mode
+    - http_server    # MCP mode
+  processors:
+    - mapping
+    - openai_chat_completion
+    - log
+  outputs:
+    - stdout         # CLI mode
+    - sync_response  # MCP mode

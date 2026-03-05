@@ -1,0 +1,113 @@
+{
+  "options": [
+    {
+      "name": "Metro + Walk",
+      "metadata": {
+        "mode_family": "public_transit"
+      },
+      "values": [
+        {
+          "criterion_name": "travel_time_min",
+          "value": 42
+        },
+        {
+          "criterion_name": "cost",
+          "value": 3.2
+        },
+        {
+          "criterion_name": "walking_min",
+          "value": 14
+        },
+        {
+          "criterion_name": "transfers",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "Direct Bus",
+      "metadata": {
+        "mode_family": "public_transit"
+      },
+      "values": [
+        {
+          "criterion_name": "travel_time_min",
+          "value": 55
+        },
+        {
+          "criterion_name": "cost",
+          "value": 1.6
+        },
+        {
+          "criterion_name": "walking_min",
+          "value": 6
+        },
+        {
+          "criterion_name": "transfers",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "Ride Hail",
+      "metadata": {
+        "mode_family": "on_demand"
+      },
+      "values": [
+        {
+          "criterion_name": "travel_time_min",
+          "value": 28,
+          "confidence": 0.72
+        },
+        {
+          "criterion_name": "cost",
+          "value": 18.5
+        },
+        {
+          "criterion_name": "walking_min",
+          "value": 2
+        },
+        {
+          "criterion_name": "transfers",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "criteria": [
+    {
+      "name": "travel_time_min",
+      "weight": 0.4,
+      "direction": "cost",
+      "description": "Estimated door-to-door travel time in minutes."
+    },
+    {
+      "name": "cost",
+      "weight": 0.2,
+      "direction": "cost",
+      "description": "Total monetary trip cost."
+    },
+    {
+      "name": "walking_min",
+      "weight": 0.25,
+      "direction": "cost",
+      "description": "Total walking time required by the route."
+    },
+    {
+      "name": "transfers",
+      "weight": 0.15,
+      "direction": "cost",
+      "description": "Number of route changes during the trip."
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_type": "max_value",
+      "criterion_name": "walking_min",
+      "threshold": 15,
+      "hard": true
+    }
+  ],
+  "policy_name": "balanced",
+  "context": "Choose a route to the airport while keeping walking manageable."
+}

@@ -1,0 +1,42 @@
+# Store-Specific Notes
+
+## inet.se (Swedish electronics)
+
+- **Protection:** Cloudflare Turnstile — requires stealth browser
+- **Search URL:** `https://www.inet.se/hitta?q=<query>`
+- **Cart URL:** `https://www.inet.se/kundvagn`
+- **Checkout URL:** `https://www.inet.se/kassa`
+- **Cookie banner:** Button with text "Jag förstår"
+- **Search input:** `input[name="q"]`
+- **Checkout form field IDs:**
+  - `#email` — email address
+  - `#cellPhone` — phone (name attr is obfuscated: `chrome-please-stop-autofilling-this-wrong`)
+  - `#organizationNo` — personnummer
+  - `#firstName`, `#lastName`
+  - `#streetAddress` — address
+  - `#zipCode` — postal code (auto-fills `#postalCity`)
+  - `#postalCity` — city (read-only, auto-filled from zip)
+- **Delivery radio buttons** (name: `delivery-method`):
+  - `#Instabox` — Instabox locker
+  - `#BudbeeBox` — Budbee locker
+  - `#PostNordBox` — PostNord locker
+  - `#PostNordMyPackCollect` — PostNord pickup point
+  - `#DhlServicePoint` — DHL pickup point
+  - `#Budbee` — Budbee home delivery (evening)
+  - `#PostNordMyPackHome` — PostNord home delivery
+  - `#ClickAndCollect` — Pick up in store
+- **Payment radio buttons** (name: `payment-method`):
+  - `#Swish` — Swish (auto-fills phone number)
+  - `#QliroInvoice` — Invoice (needs personnummer)
+  - `#QliroBuyNowPayLater` — Buy now pay later (needs personnummer)
+  - `#QliroPartialPayment` — Partial payment (needs personnummer)
+  - `#Finshark` — Bank transfer
+  - `#SwedbankPayCard` — Credit/debit card
+  - `#PayPal` — PayPal
+  - `#Quickbit` — Crypto
+  - `#Store` — Pay in store (only with ClickAndCollect)
+- **Notes:**
+  - Orders over 2,500 kr via Instabox/Budbee lockers require personnummer
+  - Budbee home delivery over 2,000 kr requires personnummer
+  - Free shipping available on PostNord Ombud and ClickAndCollect
+  - Language: Swedish

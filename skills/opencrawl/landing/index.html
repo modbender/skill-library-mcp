@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvoYield — Turn Every Bot Conversation Into Revenue</title>
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --bg2: #111827;
+            --card: #1a2332;
+            --green: #10b981;
+            --cyan: #06b6d4;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+            --text: #f1f5f9;
+            --text2: #94a3b8;
+            --dim: #64748b;
+            --border: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* ── NAV ───────────────────────────────────────────────── */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+
+        .nav-links a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            color: var(--bg);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover { border-color: var(--green); }
+
+        /* ── HERO ──────────────────────────────────────────────── */
+        .hero {
+            padding: 100px 0 80px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            font-size: 12px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--green);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--green), var(--cyan), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text2);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-cta { display: flex; gap: 16px; justify-content: center; }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .hero-stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--dim);
+            margin-top: 4px;
+        }
+
+        /* ── PROBLEM ───────────────────────────────────────────── */
+        .problem {
+            padding: 80px 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .problem h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .problem .subtitle {
+            text-align: center;
+            color: var(--text2);
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .problem-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .problem-card .icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .problem-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .problem-card p {
+            color: var(--text2);
+            font-size: 14px;
+        }
+
+        .problem-card .stat {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--red);
+            margin-top: 12px;
+        }
+
+        /* ── HOW IT WORKS ──────────────────────────────────────── */
+        .how {
+            padding: 80px 0;
+        }
+
+        .how h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .how-step {
+            text-align: center;
+            padding: 20px 12px;
+        }
+
+        .how-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            color: var(--bg);
+            font-weight: 800;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .how-step h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .how-step p {
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        /* ── FEATURES ──────────────────────────────────────────── */
+        .features {
+            padding: 80px 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--green);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-tag {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .tag-green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .tag-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .tag-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
+        .tag-yellow { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+        .tag-cyan { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--text2);
+            font-size: 14px;
+        }
+
+        /* ── PRICING ───────────────────────────────────────────── */
+        .pricing {
+            padding: 80px 0;
+        }
+
+        .pricing h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .pricing .subtitle {
+            text-align: center;
+            color: var(--text2);
+            margin-bottom: 48px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .price-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+        }
+
+        .price-card.featured {
+            border-color: var(--green);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+        }
+
+        .price-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            color: var(--bg);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        .price-card h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .price-card .price {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 16px 0;
+        }
+
+        .price-card .price span {
+            font-size: 16px;
+            color: var(--dim);
+            font-weight: 400;
+        }
+
+        .price-card .price-desc {
+            color: var(--text2);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .price-card ul {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .price-card li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check { color: var(--green); font-weight: bold; }
+
+        .price-card .btn { width: 100%; justify-content: center; }
+
+        /* ── PLAYBOOKS ─────────────────────────────────────────── */
+        .playbooks {
+            padding: 80px 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .playbooks h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+        }
+
+        .playbook-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .playbook-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .playbook-card:hover {
+            border-color: var(--yellow);
+            transform: translateY(-4px);
+        }
+
+        .playbook-card h3 { font-size: 16px; margin-bottom: 8px; }
+
+        .playbook-card p { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+
+        .playbook-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .playbook-plays { font-size: 12px; color: var(--dim); }
+
+        .playbook-price { font-size: 18px; font-weight: 700; color: var(--yellow); }
+
+        /* ── CODE BLOCK ────────────────────────────────────────── */
+        .code-section {
+            padding: 80px 0;
+        }
+
+        .code-section h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+        }
+
+        .code-block {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-x: auto;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .code-block .comment { color: var(--dim); }
+        .code-block .keyword { color: var(--purple); }
+        .code-block .string { color: var(--green); }
+        .code-block .method { color: var(--cyan); }
+        .code-block .number { color: var(--yellow); }
+
+        /* ── CTA ───────────────────────────────────────────────── */
+        .cta {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            color: var(--text2);
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+
+        /* ── FOOTER ────────────────────────────────────────────── */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--dim);
+            font-size: 13px;
+        }
+
+        /* ── RESPONSIVE ────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 36px; }
+            .problem-grid, .feature-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .how-grid { grid-template-columns: repeat(3, 1fr); }
+            .playbook-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-stats { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────────────────── -->
+<nav>
+    <div class="container">
+        <div class="logo">ConvoYield</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#playbooks">Playbooks</a>
+            <a href="/dashboard" class="btn btn-outline">Dashboard</a>
+            <a href="#cta" class="btn btn-primary">Get Started Free</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">Zero cost to run. Pure Python. No dependencies.</div>
+        <h1>Turn Every Bot Conversation Into <span class="gradient">Revenue</span></h1>
+        <p>ConvoYield treats conversations as yield-bearing financial instruments. Detect sentiment arbitrage, capture micro-conversions, and call strategic plays — all in real-time.</p>
+        <div class="hero-cta">
+            <a href="#cta" class="btn btn-primary">Start Free &rarr;</a>
+            <a href="#features" class="btn btn-outline">See How It Works</a>
+        </div>
+        <div class="hero-stats">
+            <div>
+                <div class="hero-stat-value">5x</div>
+                <div class="hero-stat-label">More value captured per conversation</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">$0</div>
+                <div class="hero-stat-label">Cost to run the core engine</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">85</div>
+                <div class="hero-stat-label">Strategic plays in the playbook</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">&lt;1ms</div>
+                <div class="hero-stat-label">Processing latency per message</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PROBLEM ───────────────────────────────────────────────────── -->
+<section class="problem">
+    <div class="container">
+        <h2>Your Bot Is Leaving Money on the Table</h2>
+        <p class="subtitle">Every conversation has untapped value. Most bots capture less than 20%.</p>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="icon">$</div>
+                <h3>Missed Micro-Conversions</h3>
+                <p>Between "hello" and "purchase," there are dozens of moments worth $0.50-$15 each. Email captures, budget reveals, competitor mentions, pain points. Your bot ignores them all.</p>
+                <div class="stat">80% value lost</div>
+            </div>
+            <div class="problem-card">
+                <div class="icon">#</div>
+                <h3>No Strategic Plays</h3>
+                <p>Your bot responds the same way whether the user is excited, frustrated, uncertain, or ready to buy. It has no playbook, no strategy, no game plan.</p>
+                <div class="stat">0 plays called</div>
+            </div>
+            <div class="problem-card">
+                <div class="icon">!</div>
+                <h3>Blind to Sentiment</h3>
+                <p>A frustrated user mentioning a competitor is a $45+ displacement opportunity. An excited user is primed for upsell. Your bot can't see any of it.</p>
+                <div class="stat">$0 from arbitrage</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────────────────────────── -->
+<section class="how" id="how">
+    <div class="container">
+        <h2>How ConvoYield Works</h2>
+        <div class="how-grid">
+            <div class="how-step">
+                <div class="how-number">1</div>
+                <h3>User Speaks</h3>
+                <p>Your bot receives a message like normal</p>
+            </div>
+            <div class="how-step">
+                <div class="how-number">2</div>
+                <h3>Yield Analysis</h3>
+                <p>ConvoYield scans for sentiment, arbitrage, and micro-conversions</p>
+            </div>
+            <div class="how-step">
+                <div class="how-number">3</div>
+                <h3>Play Called</h3>
+                <p>The optimal strategic play is recommended with execution hints</p>
+            </div>
+            <div class="how-step">
+                <div class="how-number">4</div>
+                <h3>Bot Responds</h3>
+                <p>Your bot uses the guidance to craft a yield-optimized response</p>
+            </div>
+            <div class="how-step">
+                <div class="how-number">5</div>
+                <h3>Value Captured</h3>
+                <p>Micro-conversions are tracked and yield compounds</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURES ──────────────────────────────────────────────────── -->
+<section class="features" id="features">
+    <div class="container">
+        <h2>Five Engines. One Mission. Maximum Yield.</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-tag tag-yellow">Revenue</div>
+                <h3>Sentiment Arbitrage</h3>
+                <p>Detect emotional gaps that create revenue opportunities. Frustration with competitors, excitement peaks, uncertainty windows — each is a monetizable moment.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-tag tag-green">Capture</div>
+                <h3>Micro-Conversion Tracker</h3>
+                <p>12+ types of hidden value per message. Email captures ($2-5), budget reveals ($5-10), pain points ($3-5), competitor intel ($3-5). Every message is a goldmine.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-tag tag-blue">Signal</div>
+                <h3>Momentum Scorer</h3>
+                <p>Is the user engaging or disengaging? Message length trends, question density, vocabulary richness — know the exact direction of every conversation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-tag tag-cyan">Predict</div>
+                <h3>Yield Forecaster</h3>
+                <p>Real-time dollar value prediction for every conversation. Imagine seeing "$127.50 estimated | $35 captured | $92.50 at risk" for each active chat.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-tag tag-purple">Strategy</div>
+                <h3>Play Caller</h3>
+                <p>20-play core playbook based on behavioral economics. Anchoring, loss framing, empathy bridges, urgency closes. The right play, called at the right time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-tag tag-green">Analytics</div>
+                <h3>Cloud Dashboard</h3>
+                <p>Real-time analytics across all your conversations. Yield timelines, play performance, arbitrage maps, conversion funnels, and session leaderboards.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CODE ──────────────────────────────────────────────────────── -->
+<section class="code-section">
+    <div class="container">
+        <h2>Three Lines to Revenue</h2>
+        <div class="code-block">
+<span class="keyword">from</span> convoyield <span class="keyword">import</span> ConvoYield
+
+engine = ConvoYield(base_conversation_value=<span class="number">50.0</span>)
+
+<span class="comment"># Process each user message</span>
+result = engine.<span class="method">process_user_message</span>(<span class="string">"I'm frustrated with Salesforce"</span>)
+
+<span class="comment"># Get strategic guidance instantly</span>
+result.recommended_play      <span class="comment"># "competitor_displacement"</span>
+result.estimated_yield        <span class="comment"># $89.50</span>
+result.top_arbitrage.type     <span class="comment"># "frustration_capture"</span>
+result.recommended_tone       <span class="comment"># "empathetic"</span>
+result.micro_conversions      <span class="comment"># [budget_reveal, need_statement, ...]</span>
+        </div>
+    </div>
+</section>
+
+<!-- ── PRICING ──────────────────────────────────────────────────── -->
+<section class="pricing" id="pricing">
+    <div class="container">
+        <h2>Simple Pricing. Massive ROI.</h2>
+        <p class="subtitle">Start free. Upgrade when your yield proves the value.</p>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>Starter</h3>
+                <div class="price">$0 <span>/month</span></div>
+                <div class="price-desc">For testing and small bots</div>
+                <ul>
+                    <li><span class="check">+</span> Core ConvoYield engine</li>
+                    <li><span class="check">+</span> 20-play community playbook</li>
+                    <li><span class="check">+</span> 5 conversations/day analytics</li>
+                    <li><span class="check">+</span> Basic dashboard</li>
+                    <li><span class="check">+</span> 7-day data retention</li>
+                </ul>
+                <a href="#cta" class="btn btn-outline">Start Free</a>
+            </div>
+            <div class="price-card featured">
+                <h3>Professional</h3>
+                <div class="price" style="color: var(--green);">$49 <span>/month</span></div>
+                <div class="price-desc">For growing businesses</div>
+                <ul>
+                    <li><span class="check">+</span> Everything in Starter</li>
+                    <li><span class="check">+</span> Unlimited conversations</li>
+                    <li><span class="check">+</span> Full analytics dashboard</li>
+                    <li><span class="check">+</span> 1 premium playbook included</li>
+                    <li><span class="check">+</span> 90-day data retention</li>
+                    <li><span class="check">+</span> Email reports</li>
+                    <li><span class="check">+</span> Priority support</li>
+                </ul>
+                <button class="btn btn-primary" onclick="subscribeToPlan('pro')">Get Pro</button>
+            </div>
+            <div class="price-card">
+                <h3>Enterprise</h3>
+                <div class="price" style="color: var(--purple);">$299 <span>/month</span></div>
+                <div class="price-desc">For teams at scale</div>
+                <ul>
+                    <li><span class="check">+</span> Everything in Professional</li>
+                    <li><span class="check">+</span> All premium playbooks included</li>
+                    <li><span class="check">+</span> Custom playbook creation</li>
+                    <li><span class="check">+</span> Team leaderboard</li>
+                    <li><span class="check">+</span> Webhook integrations</li>
+                    <li><span class="check">+</span> White-label option</li>
+                    <li><span class="check">+</span> Dedicated support</li>
+                </ul>
+                <button class="btn btn-outline" onclick="subscribeToPlan('enterprise')">Get Enterprise</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PLAYBOOKS ──────────────────────────────────────────────────── -->
+<section class="playbooks" id="playbooks">
+    <div class="container">
+        <h2>Premium Industry Playbooks</h2>
+        <div class="playbook-grid">
+            <div class="playbook-card">
+                <h3>SaaS Sales Mastery</h3>
+                <p>Trial conversion, expansion revenue, churn prevention, and competitive positioning for B2B SaaS.</p>
+                <div class="playbook-meta">
+                    <span class="playbook-plays">25 plays</span>
+                    <span class="playbook-price">$49/mo</span>
+                </div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:12px;font-size:12px;" onclick="subscribeToPlan('saas_sales')">Subscribe</button>
+            </div>
+            <div class="playbook-card">
+                <h3>E-Commerce Revenue Max</h3>
+                <p>Cart recovery, upsell cascades, review harvesting, and repeat purchase triggers for online retail.</p>
+                <div class="playbook-meta">
+                    <span class="playbook-plays">22 plays</span>
+                    <span class="playbook-price">$39/mo</span>
+                </div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:12px;font-size:12px;" onclick="subscribeToPlan('ecommerce')">Subscribe</button>
+            </div>
+            <div class="playbook-card">
+                <h3>Real Estate Closer</h3>
+                <p>Lead qualification, showing scheduling, offer negotiation, and referral generation for agents.</p>
+                <div class="playbook-meta">
+                    <span class="playbook-plays">20 plays</span>
+                    <span class="playbook-price">$79/mo</span>
+                </div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:12px;font-size:12px;" onclick="subscribeToPlan('real_estate')">Subscribe</button>
+            </div>
+            <div class="playbook-card">
+                <h3>Healthcare Engagement</h3>
+                <p>Appointment booking, treatment adherence, patient satisfaction, and insurance navigation.</p>
+                <div class="playbook-meta">
+                    <span class="playbook-plays">18 plays</span>
+                    <span class="playbook-price">$99/mo</span>
+                </div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:12px;font-size:12px;" onclick="subscribeToPlan('healthcare')">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────── -->
+<section class="cta" id="cta">
+    <div class="container">
+        <h2>Stop Leaving Money on the Table</h2>
+        <p>Every conversation your bot has is a financial instrument.<br>ConvoYield helps you maximize its yield.</p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="#" class="btn btn-primary">pip install convoyield &rarr;</a>
+            <a href="/dashboard" class="btn btn-outline">Open Dashboard</a>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer>
+    <div class="container">
+        ConvoYield &mdash; Conversational Yield Optimization Engine &mdash; MIT License
+    </div>
+</footer>
+
+<script>
+    const API_BASE = window.location.origin;
+
+    async function subscribeToPlan(productId) {
+        // Get or create API key
+        let apiKey = localStorage.getItem('cy_api_key');
+        if (!apiKey) {
+            const email = prompt('Enter your email to get started:');
+            if (!email) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/v1/keys`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, tier: 'free' }),
+                });
+                const data = await res.json();
+                apiKey = data.api_key;
+                localStorage.setItem('cy_api_key', apiKey);
+                localStorage.setItem('cy_server', API_BASE);
+            } catch (e) {
+                alert('Could not create account. Please try again.');
+                return;
+            }
+        }
+
+        // Create checkout session
+        try {
+            const res = await fetch(`${API_BASE}/api/v1/billing/checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': apiKey,
+                },
+                body: JSON.stringify({ product_id: productId }),
+            });
+            const data = await res.json();
+            if (data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                alert(data.detail || 'Could not create checkout session.');
+            }
+        } catch (e) {
+            alert('Could not connect to billing. Please try again.');
+        }
+    }
+</script>
+</body>
+</html>

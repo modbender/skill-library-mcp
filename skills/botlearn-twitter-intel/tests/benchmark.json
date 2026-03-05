@@ -1,0 +1,476 @@
+{
+  "version": "0.0.1",
+  "dimension": "information-retrieval",
+  "tasks": [
+    {
+      "id": "bench-easy-01",
+      "difficulty": "easy",
+      "description": "Identify top KOLs for a well-known topic",
+      "input": "List the top 5 most influential accounts on Twitter/X discussing artificial intelligence. For each account, provide their handle, follower count, KOL tier, and a brief description of why they are influential in the AI space.",
+      "rubric": [
+        {
+          "criterion": "KOL Identification Accuracy",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Identifies 5 genuinely influential AI accounts across multiple tiers (researchers, industry leaders, commentators); accounts are widely recognized in the AI community",
+            "3": "Identifies 3-4 relevant accounts but selection is skewed toward one category (e.g., all corporate accounts)",
+            "1": "Identifies 1-2 relevant accounts mixed with irrelevant ones",
+            "0": "No relevant AI KOLs identified"
+          }
+        },
+        {
+          "criterion": "Metadata Completeness",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Each account includes: handle, follower count, KOL tier classification, credibility indicators, and a specific reason for their influence",
+            "3": "Handles and follower counts provided but missing tier classification or influence rationale",
+            "1": "Only handles listed without supporting data",
+            "0": "No metadata provided"
+          }
+        },
+        {
+          "criterion": "Source Diversity",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Accounts span multiple KOL tiers (Mega, Macro, Mid) and roles (researcher, founder, journalist, practitioner)",
+            "3": "Accounts from 2 tiers or roles",
+            "1": "All accounts from same tier or role",
+            "0": "No diversity consideration"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 75
+    },
+    {
+      "id": "bench-easy-02",
+      "difficulty": "easy",
+      "description": "Extract trending hashtags for a specific topic",
+      "input": "What are the top trending hashtags on Twitter/X related to cryptocurrency in the past 24 hours? Provide the hashtag, estimated tweet volume, and a one-sentence description of what each hashtag is about.",
+      "rubric": [
+        {
+          "criterion": "Hashtag Relevance",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Returns 5+ genuinely trending crypto-related hashtags that are currently active; all are directly relevant to cryptocurrency topics",
+            "3": "Returns 3-4 relevant hashtags but includes 1-2 generic or outdated ones",
+            "1": "Returns mostly generic hashtags (#crypto, #bitcoin) without trending context",
+            "0": "Irrelevant hashtags"
+          }
+        },
+        {
+          "criterion": "Volume & Context Data",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Each hashtag includes estimated tweet volume, what it refers to, and why it is trending now",
+            "3": "Volume estimates provided but context is vague",
+            "1": "Hashtags listed without volume or context",
+            "0": "No supporting data"
+          }
+        },
+        {
+          "criterion": "Temporal Accuracy",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Hashtags are clearly from the last 24 hours with timestamps or recency indicators; distinguishes current trends from evergreen tags",
+            "3": "Some recency indication but not clearly time-bounded",
+            "1": "No temporal context — could be from any time period",
+            "0": "Returns outdated trends"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-easy-03",
+      "difficulty": "easy",
+      "description": "Basic sentiment check on a public figure",
+      "input": "What is the general sentiment on Twitter/X toward Elon Musk this week? Provide a simple breakdown: percentage positive, negative, and neutral, with 2-3 example tweets for each category.",
+      "rubric": [
+        {
+          "criterion": "Sentiment Classification",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Provides clear percentage breakdown with reasonable distribution; acknowledges mixed/polarized sentiment; methodology is explained",
+            "3": "Provides a general sentiment direction (mostly positive/negative) but percentages are vague or unsupported",
+            "1": "Single-word sentiment (e.g., 'negative') without nuance or data",
+            "0": "No sentiment analysis"
+          }
+        },
+        {
+          "criterion": "Example Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "2-3 examples per category from credible accounts; examples clearly represent the stated sentiment; tone is correctly interpreted (sarcasm detected)",
+            "3": "1-2 examples per category but some are ambiguous or from low-credibility accounts",
+            "1": "Generic examples that do not clearly demonstrate the sentiment category",
+            "0": "No examples provided"
+          }
+        },
+        {
+          "criterion": "Temporal Framing",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Analysis is clearly bounded to the current week; notes any specific events driving sentiment shifts",
+            "3": "Roughly time-bounded but does not connect sentiment to specific events",
+            "1": "No clear time boundary; could be about any period",
+            "0": "Clearly outdated analysis"
+          }
+        }
+      ],
+      "expectedScoreWithout": 40,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-med-01",
+      "difficulty": "medium",
+      "description": "Track narrative evolution around a policy event",
+      "input": "Analyze how the Twitter/X conversation around US data privacy legislation has evolved over the past month. Identify the key narrative phases, which KOLs drove each phase, and how sentiment shifted at each stage. Flag any coordinated campaign activity.",
+      "rubric": [
+        {
+          "criterion": "Narrative Phase Identification",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Identifies 3+ distinct narrative phases with clear temporal boundaries and triggering events; shows how the conversation evolved from one phase to the next",
+            "3": "Identifies 2 phases but boundaries are unclear or triggering events are not specified",
+            "1": "Treats the entire month as a single undifferentiated conversation",
+            "0": "No temporal analysis"
+          }
+        },
+        {
+          "criterion": "KOL Attribution",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Attributes specific KOLs to each narrative phase; shows cascade patterns (who spoke first, who amplified); credibility tiers assigned",
+            "3": "Names some KOLs but does not connect them to specific phases or show cascade dynamics",
+            "1": "Generic mention of 'influencers' without specific attribution",
+            "0": "No KOL analysis"
+          }
+        },
+        {
+          "criterion": "Sentiment Trajectory",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Maps sentiment across the full month with shifts clearly linked to events; distinguishes gradual drift from sharp reversals; reports baseline and deviations",
+            "3": "Reports overall sentiment change but without phase-by-phase granularity",
+            "1": "Single sentiment label for the whole period",
+            "0": "No sentiment analysis"
+          }
+        },
+        {
+          "criterion": "Coordination Detection",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Explicitly checks for coordinated campaigns; reports findings (whether coordination was detected or not) with evidence; distinguishes organic from manufactured activity",
+            "3": "Mentions coordination possibility but without systematic detection or evidence",
+            "1": "Does not address coordination at all",
+            "0": "Presents potentially coordinated activity as organic"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-med-02",
+      "difficulty": "medium",
+      "description": "Competitive intelligence via Twitter KOL monitoring",
+      "input": "I'm launching a fintech startup focused on embedded payments. Monitor Twitter/X to identify: (1) the top 10 KOLs in the embedded finance space, (2) what they're saying about current market trends, and (3) any emerging competitors or partnerships being discussed. Provide a competitive intelligence briefing.",
+      "rubric": [
+        {
+          "criterion": "KOL Discovery",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Identifies 10 relevant KOLs across tiers (industry analysts, fintech founders, VC investors, developers); includes credibility scores and relevance justification for each",
+            "3": "Identifies 5-7 relevant KOLs but limited to one or two categories",
+            "1": "Identifies fewer than 5 KOLs or includes irrelevant accounts",
+            "0": "No KOL discovery"
+          }
+        },
+        {
+          "criterion": "Market Trend Extraction",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Extracts 3+ specific market trends with KOL source attribution; trends are actionable and relevant to embedded payments; includes supporting tweet evidence",
+            "3": "Identifies general fintech trends but not specific to embedded payments or lacking attribution",
+            "1": "Vague trend statements without evidence",
+            "0": "No trend analysis"
+          }
+        },
+        {
+          "criterion": "Competitive Signal Detection",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Identifies specific competitors or partnerships being discussed by KOLs; provides context on competitive positioning; flags early signals of market moves",
+            "3": "Mentions some competitors but without context or KOL attribution",
+            "1": "Generic competitive landscape without Twitter-specific intelligence",
+            "0": "No competitive signals"
+          }
+        },
+        {
+          "criterion": "Briefing Structure",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Follows structured briefing format with executive summary, KOL table, trend analysis, competitive signals, and recommended monitoring actions",
+            "3": "Partially structured with some sections missing",
+            "1": "Unstructured narrative",
+            "0": "No organization"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-med-03",
+      "difficulty": "medium",
+      "description": "Detect and analyze bot activity around a controversial topic",
+      "input": "Investigate whether bot networks are amplifying specific narratives about genetically modified organisms (GMOs) on Twitter/X. Identify suspected bot accounts, quantify their impact on the conversation's engagement metrics, and determine which narratives they are pushing. Separate organic KOL opinions from bot-amplified messaging.",
+      "rubric": [
+        {
+          "criterion": "Bot Detection Methodology",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Applies systematic bot detection using account-level, behavior-level, and network-level signals from domain knowledge; explains the heuristics used and their confidence",
+            "3": "Applies some bot detection but only at one level (e.g., account-level only) without network analysis",
+            "1": "Mentions bots but does not apply systematic detection",
+            "0": "No bot detection"
+          }
+        },
+        {
+          "criterion": "Impact Quantification",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Reports bot contamination percentage; provides both raw and bot-filtered engagement metrics; quantifies how much bot activity inflates specific narrative visibility",
+            "3": "Reports presence of bots but does not quantify their impact on metrics",
+            "1": "Vague mention of bot activity without quantification",
+            "0": "No quantification"
+          }
+        },
+        {
+          "criterion": "Narrative Separation",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Clearly separates organic KOL opinions from bot-amplified narratives; shows which narratives are genuinely held by credible voices vs. artificially boosted",
+            "3": "Identifies different narratives but does not clearly separate organic from amplified",
+            "1": "Treats all narratives equally without bot-organic distinction",
+            "0": "No narrative analysis"
+          }
+        },
+        {
+          "criterion": "Evidence Presentation",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Provides specific examples of suspected bot accounts with evidence (account age, posting patterns, network connections); shows coordination patterns",
+            "3": "Mentions suspected accounts but evidence is thin or anecdotal",
+            "1": "No specific examples or evidence",
+            "0": "Unsupported claims"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-med-04",
+      "difficulty": "medium",
+      "description": "Multi-language Twitter intelligence gathering",
+      "input": "Monitor Twitter/X discourse about renewable energy policy in both English and Spanish-speaking communities. Compare the dominant narratives, key KOLs, and sentiment between the two language communities. Identify any cross-language narrative transfer.",
+      "rubric": [
+        {
+          "criterion": "Multi-Language Coverage",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Constructs separate queries for English and Spanish using lang: filters; identifies KOLs in both communities; provides analysis for each language independently",
+            "3": "Covers both languages but analysis is significantly deeper for one language",
+            "1": "Only covers one language effectively",
+            "0": "Single-language analysis despite multi-language request"
+          }
+        },
+        {
+          "criterion": "Cross-Community Comparison",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Provides structured comparison of narratives, KOLs, and sentiment between communities; identifies shared vs. unique concerns; notes cultural/political context differences",
+            "3": "Compares sentiment but does not compare narratives or KOLs in depth",
+            "1": "Presents each community separately without comparison",
+            "0": "No comparison"
+          }
+        },
+        {
+          "criterion": "Cross-Language Transfer Detection",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Identifies specific narratives or talking points that transferred from one language community to the other; traces the transfer timeline and amplifiers",
+            "3": "Notes some overlap between communities but does not trace transfer dynamics",
+            "1": "Does not address cross-language transfer",
+            "0": "Ignores the cross-language aspect entirely"
+          }
+        },
+        {
+          "criterion": "Output Quality",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Structured briefing with side-by-side comparison tables; confidence ratings for each community; recommended monitoring for both languages",
+            "3": "Readable output but lacks comparative structure",
+            "1": "Unstructured mixed narrative",
+            "0": "Disorganized output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-01",
+      "difficulty": "hard",
+      "description": "Real-time crisis monitoring and misinformation detection",
+      "input": "A major cybersecurity breach has just been reported at a Fortune 500 company. Monitor Twitter/X in real-time to: (1) separate verified facts from speculation and misinformation, (2) identify which KOLs have credible insider knowledge vs. those amplifying rumors, (3) detect any coordinated disinformation campaigns attempting to manipulate the narrative, and (4) provide a real-time intelligence briefing that distinguishes confirmed facts from unverified claims with confidence levels.",
+      "rubric": [
+        {
+          "criterion": "Fact vs. Speculation Separation",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Explicitly categorizes each claim as confirmed/unconfirmed/speculation with evidence basis; traces claims to primary sources; flags contradictions between accounts; assigns per-claim confidence levels",
+            "3": "Separates some facts from speculation but categorization is inconsistent or missing evidence basis",
+            "1": "Presents all information with similar authority regardless of verification status",
+            "0": "No fact-checking or verification"
+          }
+        },
+        {
+          "criterion": "KOL Credibility Assessment",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Assesses each KOL's likely access to insider information based on professional background, prior accuracy, and institutional affiliation; distinguishes cybersecurity experts from general tech commentators; applies credibility scoring framework",
+            "3": "Identifies some credible sources but does not systematically assess expertise relevance",
+            "1": "Treats all KOLs equally regardless of domain expertise",
+            "0": "No credibility assessment"
+          }
+        },
+        {
+          "criterion": "Disinformation Detection",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Systematically checks for coordinated campaigns: synchronized posting, bot amplification, narrative manipulation; reports findings with specific evidence; quantifies disinformation contamination of the overall conversation",
+            "3": "Notes potential disinformation but without systematic detection or quantification",
+            "1": "Does not address disinformation possibility",
+            "0": "Presents disinformation as credible intelligence"
+          }
+        },
+        {
+          "criterion": "Real-Time Briefing Quality",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Structured briefing with clear timestamps, fact/speculation labels on each item, evolving confidence ratings, and recommended next monitoring actions; suitable for decision-makers",
+            "3": "Useful briefing but lacks timestamps or evolving confidence tracking",
+            "1": "Static summary without real-time structure",
+            "0": "Unusable output"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 55
+    },
+    {
+      "id": "bench-hard-02",
+      "difficulty": "hard",
+      "description": "Geopolitical narrative tracking across multiple stakeholder groups",
+      "input": "Track the Twitter/X discourse around US-China technology competition, specifically regarding semiconductor export controls. Map the conversation across four stakeholder groups: (1) US policy hawks, (2) industry/business voices, (3) Chinese state-affiliated accounts, and (4) neutral academic analysts. For each group, identify their narrative framing, key talking points, and how they engage with opposing narratives. Detect any state-sponsored information operations.",
+      "rubric": [
+        {
+          "criterion": "Stakeholder Group Mapping",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Successfully identifies and separates accounts into all 4 stakeholder groups with clear classification criteria; accounts are correctly attributed; includes 3+ KOLs per group",
+            "3": "Maps 2-3 groups but classification is imprecise or one group is missing",
+            "1": "Treats the conversation as monolithic without stakeholder segmentation",
+            "0": "No stakeholder mapping"
+          }
+        },
+        {
+          "criterion": "Narrative Framing Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "For each group: identifies the core narrative frame (e.g., national security vs. free trade vs. sovereign rights), key talking points, and rhetorical strategies; shows how frames differ and where they conflict",
+            "3": "Identifies general positions but does not analyze framing strategies or rhetorical differences",
+            "1": "Surface-level position summary without framing analysis",
+            "0": "No narrative analysis"
+          }
+        },
+        {
+          "criterion": "Cross-Group Engagement Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Maps how groups engage with each other: quote tweets, reply patterns, counter-narratives; identifies which groups are talking past each other vs. directly engaging; shows information flow between groups",
+            "3": "Notes some cross-group interaction but analysis is shallow",
+            "1": "Analyzes each group in isolation without cross-group dynamics",
+            "0": "No engagement analysis"
+          }
+        },
+        {
+          "criterion": "State-Sponsored Detection",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Applies systematic detection for state-affiliated accounts (official labels, behavior patterns, coordination signals); distinguishes organic vs. state-directed messaging; provides evidence for assessments; quantifies state-sponsored content share",
+            "3": "Identifies some state-affiliated accounts but detection is not systematic",
+            "1": "Mentions state involvement without evidence",
+            "0": "Ignores state-sponsored operations entirely"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 55
+    },
+    {
+      "id": "bench-hard-03",
+      "difficulty": "hard",
+      "description": "Predictive intelligence from early Twitter signals",
+      "input": "Based on current Twitter/X signals, identify 3 emerging technology trends that have not yet reached mainstream media coverage but are gaining traction among Micro-KOLs and Mid-KOLs in the tech space. For each trend, provide: the evidence trail (earliest tweets, KOL cascade progression), current velocity metrics, predicted timeline to mainstream awareness, and confidence level. Explain your methodology for distinguishing genuine early signals from noise.",
+      "rubric": [
+        {
+          "criterion": "Early Signal Detection",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Identifies 3 genuine emerging trends with clear evidence they originated in Micro/Mid-KOL circles; provides earliest tweet timestamps and shows the signal before mainstream pickup; trends are plausible and specific",
+            "3": "Identifies 2 trends but evidence trail is incomplete or one trend is already mainstream",
+            "1": "Identifies already-mainstream topics or vague trend categories",
+            "0": "No genuine early signal detection"
+          }
+        },
+        {
+          "criterion": "Evidence Quality & Cascade Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "For each trend: provides specific tweet evidence, shows KOL cascade progression with timestamps, maps the spread across KOL tiers; evidence is verifiable and attributed",
+            "3": "Some evidence provided but cascade analysis is incomplete or evidence is anecdotal",
+            "1": "Claims without supporting evidence or timeline",
+            "0": "No evidence"
+          }
+        },
+        {
+          "criterion": "Predictive Assessment",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Provides specific timeline predictions for mainstream awareness with justified reasoning; includes velocity metrics, comparisons to historical trend patterns, and explicit uncertainty bounds",
+            "3": "General timeline prediction without quantitative basis or uncertainty bounds",
+            "1": "No predictive element — only describes current state",
+            "0": "No prediction attempted"
+          }
+        },
+        {
+          "criterion": "Methodology Transparency",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Clearly explains the signal-vs-noise methodology: which heuristics were used, how false positives were filtered, what thresholds were applied, and what the limitations are",
+            "3": "Mentions methodology at a high level but lacks specifics",
+            "1": "No methodology explanation — trends appear to be selected arbitrarily",
+            "0": "No methodology"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 55
+    }
+  ]
+}

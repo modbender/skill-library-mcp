@@ -1,0 +1,57 @@
+version: "0.1"
+default_verdict: deny
+
+rules:
+  - name: allow-read-workspace
+    match:
+      action_type: read
+      target_pattern: "./**"
+    verdict: approve
+    reason: "Read access within workspace only"
+
+  - name: escalate-write
+    match:
+      action_type: write
+    verdict: escalate
+    reason: "Write actions require explicit user approval"
+
+  - name: escalate-execute
+    match:
+      action_type: execute
+    verdict: escalate
+    reason: "Execute actions require explicit user approval"
+
+  - name: escalate-network
+    match:
+      action_type: network
+    verdict: escalate
+    reason: "Network actions require explicit user approval"
+
+  - name: escalate-create
+    match:
+      action_type: create
+    verdict: escalate
+    reason: "Create actions require explicit user approval"
+
+  - name: escalate-delete
+    match:
+      action_type: delete
+    verdict: escalate
+    reason: "Delete actions require explicit user approval"
+
+sensitive_data:
+  - category: credentials
+    patterns:
+      - "**/*.env"
+      - "**/.ssh/**"
+      - "**/credentials*"
+      - "**/*secret*"
+      - "**/*token*"
+    action: deny
+
+  - category: keys
+    patterns:
+      - "**/*.pem"
+      - "**/*.key"
+      - "**/*.p12"
+    action: deny

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Avatar fills the entire screen */
+    #avatar-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0a0a0f 0%, #0f0f1a 100%);
+    }
+
+    #avatar-container video {
+      width: 100%;
+      height: 120%;
+      object-fit: cover;
+      object-position: center top;
+      position: absolute;
+      top: -10%;
+      left: 0;
+    }
+
+    #avatar-container audio {
+      display: none;
+    }
+
+    /* Subtle vignette overlay */
+    #avatar-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(10, 10, 15, 0.4) 100%);
+      pointer-events: none;
+    }
+
+    /* Thinking overlay - orbital ring */
+    #thinking-overlay {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #thinking-overlay.active {
+      opacity: 1;
+    }
+
+    .orbit-container {
+      width: 160px;
+      height: 160px;
+      position: relative;
+    }
+
+    /* Spinning arcs */
+    .orbit-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: rgba(129, 140, 248, 0.9);
+      border-right-color: rgba(129, 140, 248, 0.3);
+      animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      filter: drop-shadow(0 0 10px rgba(129, 140, 248, 0.5));
+    }
+
+    .orbit-ring:nth-child(2) {
+      inset: 14px;
+      border-top-color: rgba(167, 139, 250, 0.7);
+      border-right-color: rgba(167, 139, 250, 0.2);
+      border-width: 2.5px;
+      animation-duration: 1.8s;
+      animation-direction: reverse;
+    }
+
+    .orbit-ring:nth-child(3) {
+      inset: 28px;
+      border-top-color: rgba(196, 181, 253, 0.6);
+      border-right-color: transparent;
+      border-width: 2px;
+      animation-duration: 2.4s;
+    }
+
+    .orbit-ring:nth-child(4) {
+      inset: 40px;
+      border-top-color: rgba(224, 210, 255, 0.4);
+      border-left-color: rgba(224, 210, 255, 0.15);
+      border-width: 1.5px;
+      animation-duration: 3.2s;
+      animation-direction: reverse;
+    }
+
+    /* Center glow dot */
+    .orbit-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #a78bfa;
+      box-shadow: 0 0 20px rgba(167, 139, 250, 0.8), 0 0 40px rgba(167, 139, 250, 0.4), 0 0 60px rgba(129, 140, 248, 0.2);
+      animation: centerPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes centerPulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+    }
+
+    /* Ambient glow behind the indicator */
+    #thinking-glow {
+      position: absolute;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(129, 140, 248, 0.05) 40%, transparent 70%);
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      animation: glowBreath 3s ease-in-out infinite;
+    }
+
+    #thinking-glow.active {
+      opacity: 1;
+    }
+
+    @keyframes glowBreath {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.2); }
+    }
+
+    /* Top bar - kept for settings overlay anchor */
+    #top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+
+    /* Bottom status bar */
+    #bottom-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 8px 0;
+    }
+
+    #identity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #identity .name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #94a3b8;
+      letter-spacing: 0.3px;
+    }
+
+    #identity .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    #identity .dot.thinking {
+      background: #fbbf24;
+      animation: pulse 0.6s ease-in-out infinite;
+    }
+
+    #identity .dot.speaking {
+      background: #818cf8;
+      animation: pulse 0.4s ease-in-out infinite;
+    }
+
+    #status {
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: #64748b;
+      letter-spacing: 0.3px;
+    }
+
+    /* Bottom input area — overlays avatar */
+    #bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 24px 28px;
+      background: linear-gradient(180deg, transparent, rgba(10, 10, 15, 0.85) 30%, rgba(10, 10, 15, 0.95) 100%);
+      z-index: 10;
+    }
+
+    /* Detail panel */
+    #detail-panel {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 0 8px 16px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    #detail-panel:empty {
+      display: none;
+    }
+
+    #detail-panel::-webkit-scrollbar { width: 4px; }
+    #detail-panel::-webkit-scrollbar-track { background: transparent; }
+    #detail-panel::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    #detail-content {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    #detail-content h1, #detail-content h2, #detail-content h3 {
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 12px 0 6px;
+    }
+
+    #detail-content ul, #detail-content ol {
+      padding-left: 20px;
+      margin: 6px 0;
+    }
+
+    #detail-content li {
+      margin: 3px 0;
+    }
+
+    #detail-content strong {
+      color: #e2e8f0;
+    }
+
+    #detail-content code {
+      background: rgba(99, 102, 241, 0.15);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    #detail-content p {
+      margin: 6px 0;
+    }
+
+    /* Spoken text display */
+    #spoken-text {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      font-style: italic;
+      padding: 0 8px 8px;
+      min-height: 0;
+      transition: opacity 0.3s;
+    }
+
+    #spoken-text:empty {
+      display: none;
+    }
+
+    /* Input */
+    #input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #msg {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 16px;
+      border: 1px solid #1e293b;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    #msg:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    #msg::placeholder {
+      color: #475569;
+    }
+
+    #send {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    #send:hover { background: #4f46e5; }
+    #send:active { transform: scale(0.95); }
+    #send:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    #send-slack {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      background: #4A154B;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    #send-slack:hover { background: #611f69; }
+    #send-slack:active { transform: scale(0.95); }
+    #send-slack:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    #send-slack svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      stroke: none;
+    }
+
+    #send svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Settings button */
+    #settings-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+      padding: 4px 8px;
+      filter: grayscale(1) brightness(2);
+    }
+    #settings-btn:hover { opacity: 0.8; }
+
+    /* Settings page */
+    #settings-page {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 20, 0.97);
+      z-index: 50;
+      padding: 32px;
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+    }
+    #settings-page.active { display: flex; }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .settings-header h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .settings-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .settings-close:hover { color: #e2e8f0; }
+
+    .settings-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .avatar-options {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .avatar-option {
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid #1e293b;
+      border-radius: 16px;
+      padding: 20px 28px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #e2e8f0;
+      text-align: center;
+    }
+    .avatar-option:hover {
+      border-color: #475569;
+      background: rgba(30, 41, 59, 0.9);
+    }
+    .avatar-option.active {
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.15);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    .avatar-label {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="avatar-container">
+    <video id="simli-video" autoplay playsinline></video>
+    <audio id="simli-audio" autoplay></audio>
+    <div id="thinking-glow"></div>
+    <div id="thinking-overlay">
+      <div class="orbit-container">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-center"></div>
+      </div>
+    </div>
+
+    <div id="top-bar">
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings-page">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button class="settings-close" onclick="document.getElementById('settings-page').classList.remove('active')">X</button>
+      </div>
+      <div class="settings-section">
+        <h3>Language</h3>
+        <div class="avatar-options" id="lang-options">
+          <!-- Populated dynamically from config -->
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Avatar</h3>
+        <div class="avatar-options" id="avatar-options">
+          <!-- Populated dynamically from config -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-bar">
+    <div id="spoken-text"></div>
+    <div id="detail-panel"><div id="detail-content"></div></div>
+    <div id="input-row">
+      <input id="msg" type="text" placeholder="Ask me anything..." autocomplete="off" />
+      <button id="send">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+      </button>
+      <button id="send-slack" title="Send to Slack DM" style="display:none;">
+        <svg viewBox="0 0 24 24"><path d="M14.5 2a2.5 2.5 0 0 0 0 5H17V4.5A2.5 2.5 0 0 0 14.5 2z"/><path d="M7 7h5v5H7z"/><path d="M4.5 7A2.5 2.5 0 0 0 2 9.5A2.5 2.5 0 0 0 4.5 12H7V7z"/><path d="M7 14.5A2.5 2.5 0 0 0 9.5 17V14.5z"/><path d="M12 12h5v5h-5z"/><path d="M9.5 22a2.5 2.5 0 0 0 0-5H7v2.5A2.5 2.5 0 0 0 9.5 22z"/><path d="M17 12h2.5a2.5 2.5 0 0 0 0-5H17z"/><path d="M19.5 17a2.5 2.5 0 0 0-2.5-2.5h-5V17a2.5 2.5 0 0 0 5 0z"/></svg>
+      </button>
+    </div>
+    <div id="bottom-status-bar">
+      <div id="identity">
+        <div class="dot" id="statusDot"></div>
+        <span class="name" id="app-name">Avatar Assistant</span>
+      </div>
+      <div id="status">Ready</div>
+      <button id="settings-btn" title="Settings" onclick="document.getElementById('settings-page').classList.toggle('active')">
+        &#x2699;
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="./src/client/app.ts"></script>
+</body>
+</html>

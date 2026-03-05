@@ -1,0 +1,43 @@
+{
+  "name": "invoice",
+  "version": "1.1.0",
+  "description": "Creates and manages invoices as JSON files on GitHub. Supports sequential numbering, calculated preview via script, and PDF generation via GitHub Actions.",
+  "author": "netsnek",
+  "license": "MIT",
+  "tags": ["productivity", "invoicing", "german", "invoice", "billing", "github"],
+  "permissions": ["network", "exec"],
+  "entry": "SKILL.md",
+  "minOpenClawVersion": "0.8.0",
+  "scripts": [
+    "scripts/push-invoice.sh",
+    "scripts/get-invoices.sh",
+    "scripts/get-next-number.sh",
+    "scripts/calc-preview.sh"
+  ],
+  "env": [
+    {
+      "name": "GITHUB_TOKEN",
+      "description": "GitHub Personal Access Token with contents:write permissions",
+      "required": true
+    },
+    {
+      "name": "INVOICE_REPO",
+      "description": "GitHub repository in 'owner/repo' format (e.g. 'myorg/my-invoices')",
+      "required": true
+    }
+  ],
+  "config": {
+    "invoicePrefix": {
+      "description": "Prefix for invoice numbers (e.g. 'RE' for Rechnung)",
+      "default": "RE"
+    },
+    "currency": {
+      "description": "Currency code (e.g. 'EUR', 'USD')",
+      "default": "EUR"
+    },
+    "taxRate": {
+      "description": "Default tax rate as decimal (e.g. 0.20 for 20%)",
+      "default": 0.20
+    }
+  }
+}

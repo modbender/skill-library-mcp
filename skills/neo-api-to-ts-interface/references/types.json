@@ -1,0 +1,81 @@
+{
+  "commonTypes": {
+    "description": "Common TypeScript type mappings for API responses",
+    "types": {
+      "stringKey": {
+        "type": "{ [key: string]: string }",
+        "description": "Dictionary with string keys and string values"
+      },
+      "numberKey": {
+        "type": "{ [key: string]: number }",
+        "description": "Dictionary with string keys and number values"
+      },
+      "anyKey": {
+        "type": "{ [key: string]: any }",
+        "description": "Dictionary with string keys and any values"
+      },
+      "ISO8601": {
+        "type": "string",
+        "description": "ISO 8601 date/time string",
+        "format": "date-time"
+      },
+      "Email": {
+        "type": "string",
+        "description": "Email address",
+        "format": "email"
+      },
+      "URL": {
+        "type": "string",
+        "description": "URL string",
+        "format": "uri"
+      },
+      "UUID": {
+        "type": "string",
+        "description": "UUID v4 identifier",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "SafeInteger": {
+        "type": "number",
+        "description": "Safe integer within JavaScript safe range",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "Timestamp": {
+        "type": "number",
+        "description": "Unix timestamp in milliseconds"
+      },
+      "HexColor": {
+        "type": "string",
+        "description": "Hex color code",
+        "pattern": "^#([0-9a-f]{3}|[0-9a-f]{6})$"
+      },
+      "IPAddress": {
+        "type": "string",
+        "description": "IPv4 or IPv6 address",
+        "format": "ipv4-ipv6"
+      }
+    }
+  },
+  "mappings": {
+    "description": "Automatic type mappings for common JSON patterns",
+    "rules": [
+      {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T",
+        "type": "Date"
+      },
+      {
+        "pattern": "^https?://",
+        "type": "URL"
+      },
+      {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "type": "UUID"
+      },
+      {
+        "pattern": "^#[0-9a-f]{3}$|^#[0-9a-f]{6}$",
+        "type": "HexColor"
+      }
+    ]
+  },
+  "note": "These reference types are used during parsing to recognize and standardize common patterns."
+}

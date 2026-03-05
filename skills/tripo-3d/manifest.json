@@ -1,0 +1,96 @@
+{
+  "name": "tripo-3d-generation",
+  "version": "1.3.0",
+  "description": "Turn text or images into production-ready 3D models with sculpture-level geometry and sharp edges. Powered by Tripo AI — supports text-to-3D, image-to-3D, auto-rigging, skeletal animation (walk/run/jump/attack), stylization (LEGO/Voxel/Voronoi/Minecraft), format conversion, and PBR materials. 10 free credits, no API key required.",
+  "author": "tripo-team",
+  "license": "MIT",
+  "homepage": "https://www.tripo3d.ai/",
+  "repository": "",
+  "categories": ["creative", "ai-models", "media"],
+  "tags": ["3d", "ai", "model-generation", "text-to-3d", "image-to-3d", "tripo", "glb", "fbx", "rigging", "animation", "pbr", "stl", "3d-printing", "game-assets"],
+  "permissions": ["network:outbound"],
+  "secrets": {
+    "TRIPO_API_KEY": {
+      "description": "Your Tripo API key (starts with tsk_). Optional — 10 free credits are available without a key. Get yours at https://platform.tripo3d.ai/api-keys",
+      "required": false
+    }
+  },
+  "entry": "index.mjs",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": ["generate", "status", "download", "credits", "rig", "animate", "prerigcheck", "stylize", "convert", "texture", "refine"],
+        "description": "The action to perform. Core: generate/status/download/credits. Animation: prerigcheck→rig→animate. Post-processing: stylize/convert/texture/refine."
+      },
+      "prompt": {
+        "type": "string",
+        "description": "Text description for 3D model generation. Used with action='generate' when no image_url is provided. Example: 'a futuristic robot with glowing eyes'"
+      },
+      "image_url": {
+        "type": "string",
+        "description": "Public image URL for image-to-3D generation. When provided with action='generate', uses image-to-model instead of text-to-model."
+      },
+      "task_id": {
+        "type": "string",
+        "description": "Task ID returned from a generate action. Required for action='status' and action='download'."
+      },
+      "format": {
+        "type": "string",
+        "enum": ["glb", "fbx", "obj", "stl"],
+        "description": "Desired output 3D model format. Default: glb"
+      },
+      "model_version": {
+        "type": "string",
+        "default": "v3.0-20250812",
+        "enum": ["Turbo-v1.0-20250506", "v3.1-20260211", "v3.0-20250812", "v2.5-20250123", "v2.0-20240919", "v1.4-20240625"],
+        "description": "Tripo model version. Default: v3.0-20250812 (best stable quality). Options: Turbo-v1.0 (fastest), v3.1 (newest, may be unstable), v2.5 (fast+balanced), v2.0 (accurate), v1.4 (legacy)"
+      },
+      "animation": {
+        "type": "string",
+        "enum": ["preset:idle", "preset:walk", "preset:run", "preset:jump", "preset:climb", "preset:slash", "preset:shoot", "preset:hurt", "preset:fall", "preset:turn"],
+        "description": "Animation preset for action='animate'. Requires a rigged model (use action='rig' first)."
+      },
+      "style": {
+        "type": "string",
+        "enum": ["lego", "voxel", "voronoi", "minecraft"],
+        "description": "Stylization style for action='stylize'."
+      },
+      "out_format": {
+        "type": "string",
+        "enum": ["glb", "fbx"],
+        "default": "glb",
+        "description": "Output format for rig/animate actions."
+      },
+      "block_size": {
+        "type": "integer",
+        "default": 80,
+        "description": "Block size for stylization (action='stylize'). Larger = coarser blocks."
+      },
+      "convert_format": {
+        "type": "string",
+        "enum": ["GLTF", "USDZ", "FBX", "OBJ", "STL", "3MF"],
+        "description": "Target format for action='convert'."
+      },
+      "face_limit": {
+        "type": "integer",
+        "default": 10000,
+        "description": "Maximum face count for action='convert'."
+      },
+      "texture_quality": {
+        "type": "string",
+        "enum": ["standard", "detailed"],
+        "default": "standard",
+        "description": "Texture quality for action='texture'. 'detailed' gives higher resolution."
+      },
+      "spec": {
+        "type": "string",
+        "enum": ["tripo", "mixamo"],
+        "default": "tripo",
+        "description": "Rigging specification for action='rig'. 'mixamo' for Mixamo-compatible skeleton."
+      }
+    },
+    "required": ["action"]
+  }
+}

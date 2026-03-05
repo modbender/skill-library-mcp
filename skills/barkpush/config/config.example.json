@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bark Push Skill Configuration",
+  "description": "配置文件用于管理 Bark 推送的默认参数、用户别名、分组列表等设置",
+  "type": "object",
+  "properties": {
+    "default_push_url": {
+      "type": "string",
+      "description": "Bark API 的默认推送地址",
+      "default": "https://api.day.app",
+      "examples": [
+        "https://api.day.app",
+        "https://your-custom-bark-server.com"
+      ]
+    },
+    "users": {
+      "type": "object",
+      "description": "用户别名到 device_key 的映射字典，便于使用友好的名称代替复杂的设备密钥",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "examples": [
+        {
+          "alice": "device_key_alice_abc123",
+          "bob": "device_key_bob_def456",
+          "charlie": "device_key_charlie_ghi789",
+          "admin": "device_key_admin_xyz999"
+        }
+      ],
+      "default": {}
+    },
+    "defaults": {
+      "type": "object",
+      "description": "默认推送参数，当用户未指定参数时使用这些默认值",
+      "properties": {
+        "level": {
+          "type": "string",
+          "description": "消息级别：passive(被动), active(活跃), time-sensitive(时间敏感), critical(紧急)",
+          "enum": ["passive", "active", "time-sensitive", "critical"],
+          "default": "active"
+        },
+        "volume": {
+          "type": "integer",
+          "description": "警告通知音量（0-10），仅在 level 为 critical 时生效",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 10
+        },
+        "badge": {
+          "type": "integer",
+          "description": "应用图标角标数字，设置后应用图标右上角会显示数字",
+          "minimum": 0,
+          "default": 1
+        },
+        "sound": {
+          "type": "string",
+          "description": "通知声音名称，可选值：bell, chime, glass, horn, note, default 等",
+          "default": "bell",
+          "examples": ["bell", "chime", "glass", "horn", "note", "alarm"]
+        },
+        "icon": {
+          "type": "string",
+          "description": "自定义推送图标的 URL 地址（必须是 HTTPS）",
+          "format": "uri",
+          "default": "",
+          "examples": [
+            "https://example.com/icon.png",
+            "https://cdn.example.com/notification-icon.jpg"
+          ]
+        },
+        "group": {
+          "type": "string",
+          "description": "默认分组名称，相同分组的消息会被归并显示",
+          "default": "default",
+          "examples": ["work", "personal", "urgent", "system"]
+        },
+        "call": {
+          "type": "boolean",
+          "description": "是否启用呼叫功能（持续响铃，需要用户手动停止）",
+          "default": false
+        },
+        "autoCopy": {
+          "type": "boolean",
+          "description": "是否自动复制推送内容到剪贴板",
+          "default": false
+        },
+        "copy": {
+          "type": "string",
+          "description": "点击通知后复制到剪贴板的内容（默认为空则不复制）",
+          "default": "",
+          "examples": ["验证码：123456", "https://example.com/link"]
+        },
+        "isArchive": {
+          "type": "boolean",
+          "description": "是否自动归档消息（归档后不会显示在通知中心）",
+          "default": true
+        },
+        "action": {
+          "type": "string",
+          "description": "自定义动作的 JSON 字符串，用于添加交互按钮",
+          "default": "",
+          "examples": [
+            "{\"action\":\"confirm\",\"text\":\"确认\"}",
+            "{\"action\":\"openUrl\",\"url\":\"https://example.com\"}"
+          ]
+        }
+      },
+      "required": ["level", "volume", "badge", "sound", "group"],
+      "additionalProperties": false
+    },
+    "groups": {
+      "type": "array",
+      "description": "可用的分组列表，用户可以从这些分组中选择",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": ["default", "work", "personal", "urgent"],
+      "examples": [
+        ["work", "personal", "urgent", "family", "system"]
+      ]
+    },
+    "ciphertext": {
+      "type": "string",
+      "description": "加密推送的密文密钥，配置后所有推送将使用加密方式发送（需要在 Bark 客户端配置相同密钥）",
+      "default": "",
+      "examples": [
+        "your_encryption_key_here"
+      ]
+    },
+    "history_limit": {
+      "type": "integer",
+      "description": "历史推送记录的最大保存条数，超过此数量后自动删除最旧的记录（FIFO策略）",
+      "minimum": 10,
+      "maximum": 10000,
+      "default": 100
+    },
+    "enable_update": {
+      "type": "boolean",
+      "description": "是否启用消息更新功能（启用后会保存历史记录以支持更新和删除操作）",
+      "default": true
+    }
+  },
+  "required": ["default_push_url", "users", "defaults"],
+  "additionalProperties": false,
+  
+  "examples": [
+    {
+      "default_push_url": "https://api.day.app",
+      "users": {
+        "alice": "abc123xyz",
+        "bob": "def456uvw",
+        "charlie": "ghi789rst"
+      },
+      "defaults": {
+        "level": "active",
+        "volume": 10,
+        "badge": 1,
+        "sound": "bell",
+        "icon": "",
+        "group": "default",
+        "call": false,
+        "autoCopy": false,
+        "copy": "",
+        "isArchive": true,
+        "action": ""
+      },
+      "groups": ["work", "personal", "urgent", "system"],
+      "ciphertext": "",
+      "history_limit": 100,
+      "enable_update": true
+    }
+  ]
+}

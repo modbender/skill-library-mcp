@@ -1,0 +1,46 @@
+name: mobayilo_voice
+description: Guarded Mobayilo voice calling adapter for OpenClaw workflows
+version: 0.2.0
+entrypoints:
+  check_status:
+    run: python integrations/mobayilo_voice/actions/check_status.py --json
+    output: json
+  start_call:
+    run: python integrations/mobayilo_voice/actions/start_call.py --destination "{{destination}}" --country "{{country}}" {{#if dry_run}}--dry-run{{/if}} {{#if approved}}--approved{{/if}} {{#if callback}}--callback{{/if}} {{#if fallback_callback}}--fallback-callback{{/if}} {{#if require_agent_ready}}--require-agent-ready{{/if}} {{#if execute}}--execute{{/if}}
+    output: json
+inputs:
+  destination:
+    type: string
+    required: true
+  country:
+    type: string
+    required: false
+  dry_run:
+    type: boolean
+    required: false
+    default: true
+  execute:
+    type: boolean
+    required: false
+    default: false
+  approved:
+    type: boolean
+    required: false
+    default: false
+  callback:
+    type: boolean
+    required: false
+    default: false
+  fallback_callback:
+    type: boolean
+    required: false
+    default: false
+  require_agent_ready:
+    type: boolean
+    required: false
+    default: false
+guardrails:
+  production_host_default: true
+  allow_non_prod_host_env: MOBY_ALLOW_NON_PROD_HOST
+  approval_required_env: MOBY_REQUIRE_APPROVAL
+  phone_masking: last4

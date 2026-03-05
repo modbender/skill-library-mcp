@@ -1,0 +1,63 @@
+{
+  "name": "weekly-report",
+  "version": "1.0.0",
+  "description": "Generate weekly progress report from activity data",
+  "author": "MCP Workflow",
+  "steps": [
+    {
+      "name": "collect-commits",
+      "type": "fetch",
+      "source": "git",
+      "action": "get-weekly-commits",
+      "description": "Collect commits from the week"
+    },
+    {
+      "name": "collect-tasks",
+      "type": "fetch",
+      "source": "linear|jira|github",
+      "action": "get-completed-tasks",
+      "description": "Collect completed tasks"
+    },
+    {
+      "name": "analyze-progress",
+      "type": "analysis",
+      "action": "calculate-metrics",
+      "description": "Analyze progress metrics"
+    },
+    {
+      "name": "generate-summary",
+      "type": "generate",
+      "action": "create-summary",
+      "description": "Generate narrative summary"
+    },
+    {
+      "name": "identify-blockers",
+      "type": "analysis",
+      "action": "find-blockers",
+      "description": "Identify blockers and challenges"
+    },
+    {
+      "name": "plan-next-week",
+      "type": "generate",
+      "action": "create-next-week-plan",
+      "description": "Plan for next week"
+    },
+    {
+      "name": "format-report",
+      "type": "output",
+      "action": "generate-report",
+      "format": "markdown",
+      "template": "weekly-report",
+      "description": "Format final report"
+    }
+  ],
+  "resources": [
+    "git://repo/{branch}/commits",
+    "linear://team/{team}/issues",
+    "github://repo/{owner}/{repo}/pulls"
+  ],
+  "triggers": {
+    "schedule": "0 17 * * 5",
+    "description": "Every Friday at 5pm"
+  }
+}

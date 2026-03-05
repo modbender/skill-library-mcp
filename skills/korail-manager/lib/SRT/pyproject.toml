@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "SRTrain"
+authors = [
+    { name = "Gyeongjae Choi", email = "def6488@gmail.com" },
+]
+description = "SRT(Super Rapid Train) wrapper for python"
+readme = "README.md"
+requires-python = ">= 3.10"
+dependencies = [
+    "requests",
+]
+dynamic = [
+    "version",
+]
+license.file = "LICENSE"
+
+[project.urls]
+Homepage = "https://github.com/ryanking13/SRT"
+"Bug Tracker" = "https://github.com/ryanking13/SRT/issues"
+Changelog = "https://github.com/ryanking13/SRT/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-httpserver",
+  "black==23.12.1",
+  "pre-commit",
+]
+
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["SRT"]
+
+[tool.ruff]
+select = [
+  "E",     # pycodestyles
+  "W",     # pycodestyles
+  "F",     # pyflakes
+  "B0",    # bugbear (all B0* checks enabled by default)
+  "B904",  # bugbear (Within an except clause, raise exceptions with raise ... from err)
+  "UP",    # pyupgrade
+  "I",     # isort
+  "PGH",   # pygrep-hooks
+]
+# Remove E999 once pattern matching is supported
+# https://github.com/charliermarsh/ruff/issues/282
+ignore = ["E402", "E501", "E731", "E741", "E999"]
+target-version = "py311"

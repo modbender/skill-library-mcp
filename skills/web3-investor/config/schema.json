@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Web3 Investor Configuration",
+  "type": "object",
+  "properties": {
+    "discovery": {
+      "type": "object",
+      "description": "Investment opportunity discovery settings",
+      "properties": {
+        "data_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["mcp", "defillama"]
+          },
+          "default": ["defillama"],
+          "description": "Priority order of data sources"
+        },
+        "default_chain": {
+          "type": "string",
+          "default": "ethereum",
+          "description": "Default blockchain for searches"
+        },
+        "min_apy": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Minimum APY to include in results (percentage)"
+        },
+        "max_results": {
+          "type": "integer",
+          "default": 20,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum number of results to return"
+        }
+      }
+    },
+    "trading": {
+      "type": "object",
+      "description": "Safe Vault trading settings",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["simulation", "limited_auto", "full_auto"],
+          "default": "simulation",
+          "description": "Execution mode: simulation (manual), limited_auto (under limit), full_auto (autonomous)"
+        },
+        "wallet_type": {
+          "type": "string",
+          "enum": ["metamask", "safe"],
+          "default": "metamask",
+          "description": "Wallet type for transaction signing"
+        },
+        "default_limit_usd": {
+          "type": "number",
+          "default": 100,
+          "minimum": 0,
+          "description": "Auto-execution limit in USD (for limited_auto mode)"
+        },
+        "whitelist_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether whitelist is required for transactions"
+        },
+        "safe_address": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$",
+          "description": "Safe{Wallet} address (required if wallet_type is 'safe')"
+        }
+      }
+    },
+    "portfolio": {
+      "type": "object",
+      "description": "Portfolio management settings",
+      "properties": {
+        "chain": {
+          "type": "string",
+          "default": "ethereum",
+          "description": "Blockchain to track"
+        },
+        "debank_api_key": {
+          "type": "string",
+          "description": "Debank API key (optional, enables enhanced data)"
+        },
+        "rpc_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Custom Ethereum RPC endpoint"
+        },
+        "track_expiry": {
+          "type": "boolean",
+          "default": true,
+          "description": "Track position expiry dates"
+        },
+        "expiry_warning_days": {
+          "type": "integer",
+          "default": 7,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "Days before expiry to trigger warning"
+        }
+      }
+    },
+    "risk_preferences": {
+      "type": "object",
+      "description": "Risk assessment preferences",
+      "properties": {
+        "max_risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "default": "medium",
+          "description": "Maximum acceptable risk level"
+        },
+        "min_tvl_usd": {
+          "type": "number",
+          "default": 1000000,
+          "minimum": 0,
+          "description": "Minimum TVL in USD for opportunities"
+        },
+        "require_audit": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require protocol to be audited"
+        },
+        "min_protocol_age_days": {
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "description": "Minimum days since protocol launch"
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Notification preferences (agent uses these to ask owner)",
+      "properties": {
+        "expiry_channel": {
+          "type": "string",
+          "enum": ["telegram", "email", "none"],
+          "default": "none",
+          "description": "Channel for expiry notifications"
+        },
+        "trade_channel": {
+          "type": "string",
+          "enum": ["telegram", "email", "none"],
+          "default": "none",
+          "description": "Channel for trade confirmations"
+        }
+      }
+    }
+  },
+  "required": []
+}

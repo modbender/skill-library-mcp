@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparse Rotating White Grid</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --grid-color: rgba(255, 255, 255, 0.5);
+            /* Reduced opacity for better look */
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Large Sparse Grid */
+        .grid {
+            position: absolute;
+            width: 200vmax;
+            /* Massive size to cover rotation edges */
+            height: 200vmax;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 120px 120px;
+            /* Sparse grid sizing */
+            animation: rotate-grid 60s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes rotate-grid {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Subtle vignette to soften edges */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="grid"></div>
+        <div class="vignette"></div>
+    </div>
+</body>
+
+</html>

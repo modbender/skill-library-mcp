@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+
+  "notification_channels": {
+    "telegram": {
+      "bot_token": "$ENV:TELEGRAM_BOT_TOKEN",
+      "chat_id": "$ENV:TELEGRAM_CHAT_ID"
+    }
+  },
+
+  "characters": [
+    {
+      "id": 2114794365,
+      "name": "Main Character",
+      "token": "$ENV:EVE_TOKEN_MAIN",
+      "refresh_token": "$ENV:EVE_REFRESH_MAIN",
+      "client_id": "$ENV:EVE_CLIENT_ID",
+      "scopes": [
+        "esi-wallet.read_character_wallet.v1",
+        "esi-skills.read_skills.v1",
+        "esi-skills.read_skillqueue.v1",
+        "esi-assets.read_assets.v1",
+        "esi-clones.read_clones.v1",
+        "esi-clones.read_implants.v1",
+        "esi-location.read_location.v1",
+        "esi-location.read_ship_type.v1",
+        "esi-location.read_online.v1",
+        "esi-characters.read_notifications.v1",
+        "esi-industry.read_character_jobs.v1",
+        "esi-markets.read_character_orders.v1",
+        "esi-contracts.read_character_contracts.v1",
+        "esi-killmails.read_killmails.v1",
+        "esi-planets.manage_planets.v1",
+        "esi-characters.read_fatigue.v1",
+        "esi-mail.read_mail.v1"
+      ],
+      "corporation": {
+        "id": 98000001,
+        "name": "My Corp"
+      },
+      "enabled": true
+    }
+  ],
+
+  "alerts": {
+    "enabled": true,
+    "check_interval": "5m",
+    "channels": ["telegram"],
+    "rules": [
+      {
+        "type": "war_declared",
+        "severity": "critical"
+      },
+      {
+        "type": "structure_under_attack",
+        "severity": "critical"
+      },
+      {
+        "type": "structure_fuel_low",
+        "severity": "warning",
+        "threshold": 24
+      },
+      {
+        "type": "skill_complete",
+        "severity": "info",
+        "cooldown": "1h"
+      },
+      {
+        "type": "wallet_large_deposit",
+        "severity": "info",
+        "threshold": 1000000000
+      },
+      {
+        "type": "industry_job_complete",
+        "severity": "info",
+        "cooldown": "30m"
+      },
+      {
+        "type": "pi_extractor_expired",
+        "severity": "warning"
+      },
+      {
+        "type": "killmail",
+        "severity": "info"
+      },
+      {
+        "type": "contract_expired",
+        "severity": "warning",
+        "cooldown": "2h"
+      }
+    ]
+  },
+
+  "reports": {
+    "enabled": true,
+    "schedule": "0 9,21 * * *",
+    "timezone": "Europe/Berlin",
+    "channels": ["telegram"],
+    "templates": [
+      {
+        "name": "net_worth",
+        "format": "short"
+      },
+      {
+        "name": "skill_queue",
+        "format": "detailed"
+      },
+      {
+        "name": "wallet_summary",
+        "format": "short"
+      },
+      {
+        "name": "assets_summary",
+        "format": "short"
+      }
+    ]
+  },
+
+  "market": {
+    "enabled": true,
+    "check_interval": "30m",
+    "channels": ["telegram"],
+    "items": [
+      {
+        "type_id": 44992,
+        "name": "PLEX",
+        "region_id": 10000002,
+        "region_name": "The Forge",
+        "alert_above": 4500000,
+        "alert_below": 3500000,
+        "trend_alert": {
+          "change_percent": 10,
+          "time_window": "1h"
+        },
+        "cooldown": "1h"
+      },
+      {
+        "type_id": 34,
+        "name": "Tritanium",
+        "region_id": 10000002,
+        "region_name": "The Forge",
+        "trend_alert": {
+          "change_percent": 15,
+          "time_window": "6h"
+        }
+      },
+      {
+        "type_id": 16274,
+        "name": "Skill Injector",
+        "region_id": 10000002,
+        "region_name": "The Forge",
+        "alert_below": 800000000,
+        "cooldown": "2h"
+      }
+    ]
+  }
+}

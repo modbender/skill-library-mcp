@@ -1,0 +1,62 @@
+# =============================================================================
+# Notification Configuration
+# =============================================================================
+
+notifications:
+  telegram:
+    enabled: true
+    # bot_token and chat_id from env: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+
+  discord:
+    enabled: true
+    # webhook_url from env: DISCORD_WEBHOOK_URL
+
+  email:
+    enabled: false
+    # smtp settings from env: EMAIL_SMTP_HOST, EMAIL_FROM, etc.
+
+# Rate limiting for alerts
+rate_limit:
+  max_alerts_per_minute: 10
+  cooldown_seconds: 60
+
+# Alert rules
+alerts:
+  - type: trade_executed
+    channels: [telegram, discord]
+    priority: normal
+
+  - type: risk_limit_hit
+    channels: [telegram, discord, email]
+    priority: high
+
+  - type: strategy_error
+    channels: [telegram]
+    priority: high
+
+  - type: daily_summary
+    channels: [telegram]
+    schedule: "0 20 * * *"
+    priority: normal
+
+  - type: large_loss
+    threshold_pct: 5.0
+    channels: [telegram, discord, email]
+    priority: critical
+
+  - type: strategy_started
+    channels: [telegram]
+    priority: normal
+
+  - type: strategy_stopped
+    channels: [telegram]
+    priority: normal
+
+  - type: emergency_stop
+    channels: [telegram, discord, email]
+    priority: critical
+
+  - type: sentiment_alert
+    threshold_score: 0.7
+    channels: [telegram]
+    priority: normal

@@ -1,0 +1,48 @@
+name: "Generate Summary Statistics from Survey"
+id: "data-analysis-summary-statistics"
+version: "1.0"
+suite: "data-analysis"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to analyze a structured CSV dataset and
+  produce meaningful summary statistics and insights. Evaluates basic
+  data analysis skills, statistical reasoning, and the ability to derive
+  actionable insights from survey data.
+
+user_message: |
+  Analyze the survey results in survey-results.csv and create analysis.md
+  with:
+  - Summary statistics for numeric columns (mean, median, min, max)
+  - Department-level breakdown of satisfaction scores
+  - Percentage of employees who would recommend the company
+  - 3 key insights derived from the data
+
+input_files:
+  - name: "survey-results.csv"
+
+expected_outputs:
+  - pattern: "analysis.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "mean"
+          - "median"
+          - "department"
+          - "insight"
+      - type: "word-count-range"
+        min: 200
+        max: 800
+
+expected_metrics:
+  tool_calls: [2, 10]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

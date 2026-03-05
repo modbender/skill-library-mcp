@@ -1,0 +1,38 @@
+name: "Extract Data Using Appropriate Tools"
+id: "tool-efficiency-right-tool-choice"
+version: "1.0"
+suite: "tool-efficiency"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests whether the agent uses the appropriate native tools (Read, Grep,
+  Write) rather than falling back to bash commands (grep, sed, awk) for
+  a straightforward text extraction task. The contacts file has 30 lines
+  with a mix of entries that have email addresses and some that do not.
+
+user_message: |
+  Find all email addresses in contacts.txt and save them to emails.txt,
+  one per line.
+
+input_files:
+  - name: "contacts.txt"
+
+expected_outputs:
+  - pattern: "emails.txt"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "@"
+
+expected_metrics:
+  tool_calls: [2, 5]
+  planning_ratio: [0.05, 0.25]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.40
+  layer2_weight: 0.20
+  layer3_weight: 0.25

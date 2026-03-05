@@ -1,0 +1,51 @@
+{
+  "name": "@openclaw/voice-log",
+  "version": "0.1.5",
+  "description": "OpenClaw live conversation journal powered by Soniox STT (requires SONIOX_API_KEY from https://soniox.com/speech-to-text)",
+  "author": "local",
+  "license": "MIT",
+  "keywords": [
+    "openclaw",
+    "skill",
+    "voice",
+    "journal",
+    "soniox",
+    "stt"
+  ],
+  "openclaw": {
+    "skill": true,
+    "triggers": [
+      "start voice journal",
+      "start voice log",
+      "end voice journal",
+      "summarize last 10 minutes"
+    ],
+    "capabilities": [
+      "background-stt",
+      "rolling-minute-log",
+      "conversation-recap"
+    ],
+    "requirements": {
+      "bins": [
+        "node",
+        "arecord|rec|ffmpeg"
+      ],
+      "env": {
+        "SONIOX_API_KEY": "required - Soniox API key"
+      }
+    }
+  },
+  "files": [
+    "SKILL.md",
+    "scripts/"
+  ],
+  "scripts": {
+    "start-journal": "node scripts/voice_journal_ctl.js start",
+    "end-journal": "node scripts/voice_journal_ctl.js end",
+    "status-journal": "node scripts/voice_journal_ctl.js status",
+    "last-journal": "node scripts/voice_journal_ctl.js last"
+  },
+  "dependencies": {
+    "@soniox/node": "^1.1.1"
+  }
+}

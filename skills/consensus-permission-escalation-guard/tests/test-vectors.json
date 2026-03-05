@@ -1,0 +1,355 @@
+{
+  "version": "0.1.0",
+  "policy_notes": {
+    "hard_block_flags": [
+      "WILDCARD_PERMISSION",
+      "MISSING_TICKET",
+      "MISSING_JUSTIFICATION",
+      "TEMP_NO_EXPIRY",
+      "BREAK_GLASS_NO_INCIDENT",
+      "SOD_CONFLICT",
+      "FORBIDDEN_ROLE_JUMP"
+    ],
+    "rewrite_flags": [
+      "JUSTIFICATION_TOO_WEAK",
+      "TEMP_DURATION_TOO_LONG",
+      "PROD_REQUIRES_HUMAN_CONFIRM"
+    ]
+  },
+  "cases": [
+    {
+      "id": "PE-001",
+      "name": "prod wildcard admin grant",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["WILDCARD_PERMISSION"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-001",
+          "environment": "prod",
+          "requested_at": "2026-02-28T22:00:00Z",
+          "ticket_ref": "SEC-1001",
+          "justification": "Need urgent access to repair service outage with complete context.",
+          "subject": { "type": "user", "id": "u.alex", "team": "sre" },
+          "resource": { "system": "aws-iam", "resource_id": "account:prod" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["ec2:Describe*"],
+            "requested_permissions": ["*"],
+            "temporary": true,
+            "duration_minutes": 30
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-002",
+      "name": "missing ticket",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["MISSING_TICKET"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-002",
+          "environment": "staging",
+          "requested_at": "2026-02-28T22:01:00Z",
+          "justification": "Need additional scope to run migration rehearsal and validate rollback.",
+          "subject": { "type": "service_account", "id": "svc.migrator" },
+          "resource": { "system": "postgres", "resource_id": "db:staging" },
+          "change": {
+            "kind": "expand_scope",
+            "current_permissions": ["db:read"],
+            "requested_permissions": ["db:write"],
+            "temporary": true,
+            "duration_minutes": 60
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-003",
+      "name": "schema reject: missing justification",
+      "expected_error_code": "INVALID_INPUT",
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-003",
+          "environment": "dev",
+          "requested_at": "2026-02-28T22:02:00Z",
+          "ticket_ref": "DEV-12",
+          "justification": "", 
+          "subject": { "type": "user", "id": "u.sam" },
+          "resource": { "system": "github", "resource_id": "repo:api" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["repo:read"],
+            "requested_permissions": ["repo:write"],
+            "temporary": true,
+            "duration_minutes": 45
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-004",
+      "name": "temporary escalation without expiry",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["TEMP_NO_EXPIRY"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-004",
+          "environment": "prod",
+          "requested_at": "2026-02-28T22:03:00Z",
+          "ticket_ref": "OPS-991",
+          "justification": "Emergency live debug for transaction queue processing lag.",
+          "subject": { "type": "user", "id": "u.jordan", "team": "ops" },
+          "resource": { "system": "kubernetes", "resource_id": "cluster:prod" },
+          "change": {
+            "kind": "assume_role",
+            "current_permissions": ["cluster:view"],
+            "requested_permissions": ["cluster:admin"],
+            "temporary": true
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-005",
+      "name": "break glass with no incident",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["BREAK_GLASS_NO_INCIDENT"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-005",
+          "environment": "prod",
+          "requested_at": "2026-02-28T22:04:00Z",
+          "ticket_ref": "OPS-992",
+          "justification": "Critical path issue requires immediate full access.",
+          "subject": { "type": "user", "id": "u.mina", "team": "ops" },
+          "resource": { "system": "gcp-iam", "resource_id": "project:prod-core" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["resourcemanager.projects.get"],
+            "requested_permissions": ["resourcemanager.projects.setIamPolicy"],
+            "temporary": true,
+            "duration_minutes": 20,
+            "break_glass": true
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-006",
+      "name": "separation of duties conflict",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["SOD_CONFLICT"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-006",
+          "environment": "prod",
+          "requested_at": "2026-02-28T22:05:00Z",
+          "ticket_ref": "FIN-301",
+          "justification": "Need payout approval role to clear backlog.",
+          "subject": { "type": "user", "id": "u.taylor", "team": "finance" },
+          "resource": { "system": "payments", "resource_id": "ledger:primary" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["payments:create"],
+            "requested_permissions": ["payments:approve"],
+            "temporary": true,
+            "duration_minutes": 60
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-007",
+      "name": "forbidden role jump",
+      "expected_decision": "BLOCK",
+      "expected_flags": ["FORBIDDEN_ROLE_JUMP"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-007",
+          "environment": "staging",
+          "requested_at": "2026-02-28T22:06:00Z",
+          "ticket_ref": "SEC-880",
+          "justification": "Need org owner role for test setup.",
+          "subject": { "type": "role", "id": "viewer" },
+          "resource": { "system": "github", "resource_id": "org:acme" },
+          "change": {
+            "kind": "assume_role",
+            "current_permissions": ["org:viewer"],
+            "requested_permissions": ["org:owner"],
+            "temporary": true,
+            "duration_minutes": 30
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-008",
+      "name": "weak justification should rewrite",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["JUSTIFICATION_TOO_WEAK"],
+      "input": {
+        "board_id": "board_perm",
+        "proposed_escalation": {
+          "request_id": "req-008",
+          "environment": "dev",
+          "requested_at": "2026-02-28T22:07:00Z",
+          "ticket_ref": "DEV-81",
+          "justification": "need it asap",
+          "subject": { "type": "user", "id": "u.lee" },
+          "resource": { "system": "vault", "resource_id": "path:kv/dev" },
+          "change": {
+            "kind": "expand_scope",
+            "current_permissions": ["vault:read"],
+            "requested_permissions": ["vault:write"],
+            "temporary": true,
+            "duration_minutes": 30
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-009",
+      "name": "temporary duration too long should rewrite",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["TEMP_DURATION_TOO_LONG"],
+      "input": {
+        "board_id": "board_perm",
+        "constraints": { "max_temporary_duration_minutes": 120 },
+        "proposed_escalation": {
+          "request_id": "req-009",
+          "environment": "staging",
+          "requested_at": "2026-02-28T22:08:00Z",
+          "ticket_ref": "OPS-120",
+          "justification": "Need write scope to run controlled replay and verify fixes.",
+          "subject": { "type": "service_account", "id": "svc.replay" },
+          "resource": { "system": "kafka", "resource_id": "topic:events" },
+          "change": {
+            "kind": "expand_scope",
+            "current_permissions": ["topic:read"],
+            "requested_permissions": ["topic:write"],
+            "temporary": true,
+            "duration_minutes": 720
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-010",
+      "name": "prod elevation requires human confirm",
+      "expected_decision": "REQUIRE_REWRITE",
+      "expected_flags": ["PROD_REQUIRES_HUMAN_CONFIRM"],
+      "input": {
+        "board_id": "board_perm",
+        "constraints": { "production_requires_human_confirm": true },
+        "proposed_escalation": {
+          "request_id": "req-010",
+          "environment": "prod",
+          "requested_at": "2026-02-28T22:09:00Z",
+          "ticket_ref": "OPS-130",
+          "justification": "Need temporary prod write to resolve customer-facing incident.",
+          "subject": { "type": "user", "id": "u.riley", "team": "sre" },
+          "resource": { "system": "postgres", "resource_id": "db:prod-orders" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["db:read"],
+            "requested_permissions": ["db:write"],
+            "temporary": true,
+            "duration_minutes": 30
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-011",
+      "name": "bounded least-privilege temporary escalation",
+      "expected_decision": "ALLOW",
+      "expected_flags": [],
+      "input": {
+        "board_id": "board_perm",
+        "constraints": { "production_requires_human_confirm": false },
+        "proposed_escalation": {
+          "request_id": "req-011",
+          "environment": "staging",
+          "requested_at": "2026-02-28T22:10:00Z",
+          "ticket_ref": "OPS-140",
+          "justification": "Need staging db write for rollback rehearsal validation and cleanup.",
+          "subject": { "type": "service_account", "id": "svc.rollback" },
+          "resource": { "system": "postgres", "resource_id": "db:staging-orders" },
+          "change": {
+            "kind": "grant",
+            "current_permissions": ["db:read"],
+            "requested_permissions": ["db:write"],
+            "temporary": true,
+            "duration_minutes": 45
+          }
+        }
+      }
+    },
+    {
+      "id": "PE-012",
+      "name": "external-agent votes deterministic aggregation",
+      "expected_decision": "ALLOW",
+      "expected_flags": [],
+      "input": {
+        "board_id": "board_perm",
+        "mode": "external_agent",
+        "proposed_escalation": {
+          "request_id": "req-012",
+          "environment": "dev",
+          "requested_at": "2026-02-28T22:11:00Z",
+          "ticket_ref": "DEV-141",
+          "justification": "Temporary scope increase for integration test pipeline maintenance.",
+          "subject": { "type": "service_account", "id": "svc.ci" },
+          "resource": { "system": "github", "resource_id": "repo:web" },
+          "change": {
+            "kind": "expand_scope",
+            "current_permissions": ["repo:read"],
+            "requested_permissions": ["repo:write"],
+            "temporary": true,
+            "duration_minutes": 20
+          }
+        },
+        "external_votes": [
+          {
+            "persona_id": "p-sec",
+            "name": "Security",
+            "reputation_before": 0.45,
+            "vote": "YES",
+            "confidence": 0.72,
+            "reasons": ["Scoped and temporary"],
+            "red_flags": [],
+            "suggested_edits": []
+          },
+          {
+            "persona_id": "p-sre",
+            "name": "SRE",
+            "reputation_before": 0.30,
+            "vote": "YES",
+            "confidence": 0.78,
+            "reasons": ["Operationally needed"],
+            "red_flags": [],
+            "suggested_edits": []
+          },
+          {
+            "persona_id": "p-gov",
+            "name": "Governance",
+            "reputation_before": 0.25,
+            "vote": "REWRITE",
+            "confidence": 0.66,
+            "reasons": ["Add post-change review note"],
+            "red_flags": [],
+            "suggested_edits": ["Attach post-run evidence"]
+          }
+        ]
+      }
+    }
+  ]
+}

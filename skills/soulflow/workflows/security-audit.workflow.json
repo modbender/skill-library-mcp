@@ -1,0 +1,37 @@
+{
+  "id": "security-audit",
+  "name": "Security Audit",
+  "version": 3,
+  "description": "Scan codebase for vulnerabilities, prioritize, fix, and verify",
+  "steps": [
+    {
+      "id": "scan",
+      "name": "Security Scanner",
+      "input": "TASK: {{task}}\n\nYou must perform a thorough security audit. Do NOT just describe what you would do — actually do it.\n\nSTEPS:\n1. Use the `exec` tool to run: find the project root and list all source files\n2. Use the `read` tool to read each key source file (auth, routes, middleware, config, DB queries)\n3. Check each file for: SQL injection, XSS, path traversal, auth bypass, credential exposure, CORS misconfig, missing rate limiting, insecure defaults\n4. Document every finding with the exact file path, line reference, severity (critical/high/medium/low), and what the fix should be\n\nYou MUST actually read the files. Do not guess or assume.\n\nWhen done, end with:\nSTATUS: done",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "prioritize",
+      "name": "Prioritizer",
+      "input": "Review the security scan findings below. Create a numbered, prioritized fix plan.\n\n--- SCAN RESULTS ---\n{{scan_output}}\n--- END ---\n\nFor each finding:\n1. Rank by severity × exploitability\n2. Specify the exact file and what needs to change\n3. Group related fixes that can be done together\n\nOutput a clear numbered list. When done, end with:\nSTATUS: done",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "fix",
+      "name": "Fixer",
+      "input": "Apply the security fixes below to the codebase. Use the `read` tool to open each file, then `edit` to make changes.\n\n--- FIX PLAN ---\n{{prioritize_output}}\n--- END ---\n\nFor EACH fix:\n1. `read` the file\n2. `edit` the specific section that needs changing\n3. Confirm the edit was applied\n\nDo NOT skip fixes. Do NOT just describe fixes — apply them. Report every file you modified.\n\nWhen done, end with:\nSTATUS: done\nFILES_MODIFIED: comma-separated list of files changed",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "verify",
+      "name": "Verifier",
+      "input": "Verify the security fixes were correctly applied. Use `read` to check each modified file.\n\n--- ORIGINAL FINDINGS ---\n{{scan_output}}\n--- END FINDINGS ---\n\n--- CHANGES MADE ---\n{{fix_output}}\n--- END CHANGES ---\n\nFor each original finding, `read` the file and confirm the vulnerability is patched. Report:\n- FIXED: list of confirmed fixes\n- REMAINING: any issues still present\n- REGRESSIONS: any new issues introduced\n\nWhen done, end with:\nSTATUS: done",
+      "expects": "STATUS: done",
+      "maxRetries": 1,
+      "onFail": { "retryStep": "fix", "maxRetries": 1 }
+    }
+  ]
+}

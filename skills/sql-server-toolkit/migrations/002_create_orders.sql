@@ -1,0 +1,11 @@
+
+CREATE TABLE Orders (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    Total DECIMAL(10,2) NOT NULL CHECK (Total >= 0),
+    Status NVARCHAR(50) NOT NULL DEFAULT 'Pending',
+    CreatedAt DATETIME2 DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Orders_Users 
+        FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ON DELETE CASCADE
+);

@@ -1,0 +1,128 @@
+# Stage Advancement Workflow
+# Automatically advances pipelines based on criteria and time thresholds
+
+name: stage-advancement
+description: Auto-advance pipelines based on activity, time, and probability criteria
+enabled: true
+schedule:
+  frequency: daily
+  time: "10:00"
+
+triggers:
+  - type: scheduled
+    cron: "0 10 * * *"
+  - type: manual
+    name: review_and_advance
+
+advancement_rules:
+  # Rule 1: Proposal sent and no response for 7 days
+  - name: proposal-to-negotiation
+    description: Advance proposals with no response after 7 days
+    from_stage: "Proposal/Price Quote"
+    to_stage: "Negotiation/Review"
+    conditions:
+      - field: Modified_Time
+        operator: older_than_days
+        value: 7
+      - field: Stage
+        operator: equals
+        value: "Proposal/Price Quote"
+    actions:
+      - type: advance_stage
+        create_task: true
+        task_subject: "Follow up on proposal - negotiation phase"
+        task_due: "+1d"
+        notify_owner: true
+
+  # Rule 2: High probability deals
+  - name: high-probability-advance
+    description: Advance deals with >80% probability
+    from_stage: "Negotiation/Review"
+    to_stage: "Closed Won"
+    conditions:
+      - field: Probability
+        operator: greater_than
+        value: 80
+      - field: Stage
+        operator: equals
+        value: "Negotiation/Review"
+      - field: Days_In_Stage
+        operator: greater_than
+        value: 3
+    actions:
+      - type: advance_stage
+        create_task: false
+        notify_owner: true
+        require_approval: true
+
+  # Rule 3: Stuck in qualification too long
+  - name: qualification-push
+    description: Push stalled qualification deals to needs analysis
+    from_stage: "Qualification"
+    to_stage: "Needs Analysis"
+    conditions:
+      - field: Days_In_Stage
+        operator: greater_than
+        value: 14
+      - field: Last_Activity_Time
+        operator: older_than_days
+        value: 7
+    actions:
+      - type: advance_stage
+        create_task: true
+        task_subject: "URGENT: Qualification stalled - needs attention"
+        task_priority: High
+        notify_manager: true
+
+  # Rule 4: Auto-close lost after 90 days in prospecting
+  - name: auto-close-stale-prospects
+    description: Close lost deals stuck in prospecting for 90+ days
+    from_stage: "Prospecting"
+    to_stage: "Closed Lost"
+    conditions:
+      - field: Days_In_Stage
+        operator: greater_than
+        value: 90
+      - field: Last_Activity_Time
+        operator: older_than_days
+        value: 30
+    actions:
+      - type: advance_stage
+        loss_reason: "No response - auto closed after 90 days"
+        create_task: false
+        notify_owner: true
+        log_activity: true
+
+settings:
+  batch_size: 50
+  dry_run: false
+  require_approval_for_closing: true
+  skip_if_no_activity: false
+  business_days_only: true
+
+notifications:
+  on_advance:
+    email: true
+    in_app: true
+    template: |
+      Pipeline Advanced: {{pipeline.name}}
+      
+      From: {{from_stage}}
+      To: {{to_stage}}
+      
+      Amount: {{pipeline.amount}}
+      Owner: {{pipeline.owner}}
+      
+      Reason: {{advancement_reason}}
+  
+  daily_summary:
+    enabled: true
+    time: "11:00"
+    recipients:
+      - sales-manager@company.com
+    include_details: true
+
+logging:
+  level: info
+  log_file: "logs/stage-advancement.log"
+  retention_days: 30

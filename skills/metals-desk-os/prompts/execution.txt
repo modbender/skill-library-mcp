@@ -1,0 +1,34 @@
+EXECUTION PROTOCOL
+
+BEFORE EVERY TRADE:
+1. Confirm bias conviction > 65/100
+2. Confirm alignment score > 0.6
+3. Confirm liquidity sweep within last 3 candles
+4. Confirm BOS/CHoCH in trade direction
+5. Confirm session = London or NY
+6. Confirm macro risk = low or medium
+7. Confirm spread < threshold
+8. Confirm no news block active
+9. Confirm daily loss < 80% of limit
+10. Confirm consecutive losses < 3
+
+ORDER PLACEMENT:
+- Limit order at FVG midpoint (preferred)
+- Limit order at OB midpoint (secondary)
+- Market order only if displacement confirms (last resort)
+- SL: Below/above last swing structure + buffer
+- TP1: 1.5R (close 40%)
+- TP2: 2.5R (close 30%)
+- TP3: 4.0R (close 30%)
+
+POST-ENTRY MANAGEMENT:
+1. When TP1 hit → partial close 40% → move SL to BE + buffer
+2. When TP2 hit → partial close 30% → trail SL under last swing
+3. When TP3 hit → close remaining → log trade
+4. If structure breaks against → close at market
+
+FAILSAFES:
+- API error on order: DO NOT RETRY, alert and log
+- Order rejected: alert, log, DO NOT re-submit
+- Disconnect: close all positions immediately
+- Spread spike during open position: tighten management, prepare to close

@@ -1,0 +1,41 @@
+# Daily Briefing Cron Configuration
+# This file defines the cron job for OpenClaw's built-in scheduler
+
+# Job ID: daily-briefing
+# Schedule: Every day at 7:00 AM
+# Timezone: Europe/London
+
+name: daily-briefing
+schedule: "0 7 * * *"
+timezone: "Europe/London"
+payload:
+  kind: "agentTurn"
+  content: |
+    Run the daily morning briefing and send it to paulkingham@mac.com via iMessage.
+    
+    Steps:
+    1. Change to the skill directory: cd /Users/nudge/openclaw/skills/daily-briefing
+    2. Run the briefing generator: ./scripts/generate-briefing.sh
+    3. Send the output via iMessage to paulkingham@mac.com
+    
+    If imsg is not available, output the briefing text directly so it can be delivered.
+    
+    The briefing should include:
+    - Weather for Leyton, London
+    - Today's calendar events
+    - Top 5 news headlines
+    - 3-4 AI/Tech developments
+    - OpenClaw deep dive (skills, tips, community)
+    - Two actionable suggestions
+  
+delivery:
+  to: "paulkingham@mac.com"
+  channel: "imessage"
+
+# Optional settings
+enabled: true
+deleteAfterRun: false
+labels:
+  - "daily"
+  - "briefing"
+  - "morning"

@@ -1,0 +1,149 @@
+---
+name: "page-behavior-audit"
+version: "1.0.3"
+model_invocable: false
+trigger:
+  type: "webhook"
+  path: "/api/audit/scan"
+  method: "POST"
+description: "Deep behavioral audit with hashed policy (CSP-compliant, no plaintext badwords)"
+tags:
+  - "security"
+  - "frontend"
+  - "supply-chain"
+timeout: 15000
+env:
+  required:
+    - name: "WECOM_WEBHOOK_URL"
+      description: "WeCom webhook URL for critical alerts"
+      sensitive: true
+    - name: "OPENCLAW_AUDIT_DIR"
+      description: "Directory for audit logs, screenshots, and HAR files"
+      default: "${HOME}/.openclaw/audit"
+ui:
+  runnable: true
+  input_schema:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+        format: "uri"
+        description: "Target URL to audit (must be HTTP/HTTPS)"
+      include_har:
+        type: "boolean"
+        default: true
+    required:
+      - "url"
+policy:
+  badwords:
+    hash_list:
+      # sha256 hashes for exact match keywords (64 hex chars)
+      - "sha256:5e884898da28047151d0e56f8dc6292773607d2d72aa89a73c1b472a0765512e"
+      - "sha256:2c74fd17edafd80e8447b0d4f3a7d62e86d5f3514d105a93e15596c8a1a1319f"
+      - "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    regex_hash_list:
+      # sha256 hashes for regex patterns (64 hex chars)
+      - "sha256:1f8ac10f7420b57ee1e8d77fec5c82892bb2d50e70631fe5bcb57cf342498114"
+    source: "verified:internal://policy/content-safety/2026-q1"
+    updated_at: "2026-02-10T08:00:00Z"
+    signature: "ed25519:A1B2C3D4E5F6789012345678901234567890123456789012345678901234567890ABCDEF1234567890"
+    verification_url: "https://your-org.example.com/policies/verify"
+
+steps:
+  - step: "launch-browser"
+    action: "builtin.launchBrowser"
+    config:
+      headless: true
+      args:
+        - "--no-sandbox"
+        - "--disable-gpu"
+        - "--disable-dev-shm-usage"
+        - "--user-data-dir=/tmp/openclaw-$(uuid)"
+
+  - step: "navigate-and-wait"
+    action: "builtin.navigate"
+    depends_on:
+      - "launch-browser"
+    config:
+      url: "{{ .input.url }}"
+      wait_until: "networkidle0"
+      timeout: "{{ .input.timeout | default 15000 }}"
+
+  - step: "install-redirect-hook"
+    action: "builtin.evaluate"
+    depends_on:
+      - "navigate-and-wait"
+    config:
+      expression: "() => { window.__oc_redirects = []; const orig = location.assign; location.assign = function(u) { __oc_redirects.push({type:'assign',url:u,ts:Date.now()}); orig.apply(this,arguments); }; location.replace = function(u) { __oc_redirects.push({type:'replace',url:u,ts:Date.now()}); orig.apply(this,arguments); }; }"
+
+  - step: "extract-content"
+    action: "builtin.evaluate"
+    depends_on:
+      - "install-redirect-hook"
+    config:
+      expression: "({ title: document.title, text: document.body?.innerText?.substring(0, 10000) || '', links: Array.from(document.querySelectorAll('a[href]')).map(a => ({ href: a.href, text: a.textContent?.trim()?.substring(0, 200) || '' })).filter(x => x.href) })"
+
+  - step: "check-text-policy"
+    action: "builtin.checkTextPolicy"
+    depends_on:
+      - "extract-content"
+    config:
+      text: "{{ .steps.extract-content.output.text }}"
+      links: "{{ .steps.extract-content.output.links }}"
+
+  - step: "monitor-responses"
+    action: "builtin.monitorResponses"
+    depends_on:
+      - "navigate-and-wait"
+    config:
+      rules:
+        - condition: "headers['content-type'] && headers['content-type'].toLowerCase().includes('xml') && !url.match(/\\.xml($|\\?)/i)"
+          severity: "CRITICAL"
+          message: "XML served from non-.xml endpoint (SSRF/XXE risk)"
+        - condition: "headers['content-type'] && headers['content-type'].toLowerCase().includes('image/') && body && body.trim().startsWith('<?xml')"
+          severity: "CRITICAL"
+          message: "Image endpoint returning XML (XML external entity evasion)"
+
+  - step: "screenshot"
+    action: "builtin.screenshot"
+    depends_on:
+      - "navigate-and-wait"
+    config:
+      path: "{{ env.OPENCLAW_AUDIT_DIR }}/$(date +%s)_{{ sha256 .input.url }}.png"
+      full_page: true
+
+  - step: "export-har"
+    action: "builtin.harExport"
+    depends_on:
+      - "navigate-and-wait"
+    config:
+      path: "{{ env.OPENCLAW_AUDIT_DIR }}/$(date +%s)_{{ sha256 .input.url }}.har"
+
+  - step: "aggregate-report"
+    action: "builtin.aggregateReport"
+    depends_on:
+      - "check-text-policy"
+      - "monitor-responses"
+      - "screenshot"
+      - "export-har"
+    config:
+      fields:
+        url: "{{ .input.url }}"
+        redirects: "{{ .steps.install-redirect-hook.output }}"
+        text_alerts: "{{ .steps.check-text-policy.output.alerts }}"
+        ct_alerts: "{{ .steps.monitor-responses.output.alerts }}"
+        screenshot_path: "{{ .steps.screenshot.output.path }}"
+        har_path: "{{ .steps.export-har.output.path }}"
+
+  - step: "send-alert-if-critical"
+    action: "builtin.notify"
+    depends_on:
+      - "aggregate-report"
+    if: "{{ .steps.aggregate-report.output.critical_count > 0 }}"
+    config:
+      channel: "wecom"
+      webhook_url: "{{ env.WECOM_WEBHOOK_URL }}"
+      template: "FRONTEND_BEHAVIOR_ALERT"
+      data:
+        url: "{{ .input.url }}"
+        alerts: "{{ json .steps.aggregate-report.output }}"

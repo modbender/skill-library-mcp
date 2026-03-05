@@ -1,0 +1,246 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://openclaw.ai/schemas/evidence-manifest.json",
+  "title": "Evidence Case Manifest",
+  "description": "Schema for EvidenceOps case manifest with chain of custody",
+  "type": "object",
+  "required": ["schemaVersion", "caseId", "createdAt", "updatedAt", "sensitivityTag", "retentionPolicy", "items", "chainOfCustody"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Manifest schema version"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^case-[a-zA-Z0-9_-]+$",
+      "description": "Unique case identifier"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of case creation"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "sensitivityTag": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Data sensitivity classification"
+    },
+    "retentionPolicy": {
+      "type": "object",
+      "required": ["retentionDays", "legalHold", "deleteAfter"],
+      "properties": {
+        "retentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of days to retain evidence"
+        },
+        "legalHold": {
+          "type": "boolean",
+          "description": "Whether legal hold is active"
+        },
+        "deleteAfter": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Scheduled deletion date"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidenceId", "original", "metadata", "derivatives", "vault"],
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "pattern": "^ev-[a-zA-Z0-9-]+$",
+            "description": "Unique evidence identifier"
+          },
+          "original": {
+            "type": "object",
+            "required": ["filename", "sha256", "size", "mime", "receivedAt", "source"],
+            "properties": {
+              "filename": {
+                "type": "string",
+                "description": "Original filename"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+                "description": "SHA-256 hash of original file"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "File size in bytes"
+              },
+              "mime": {
+                "type": "string",
+                "description": "MIME type"
+              },
+              "receivedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "ISO 8601 timestamp of receipt"
+              },
+              "source": {
+                "type": "object",
+                "required": ["channel", "sender"],
+                "properties": {
+                  "channel": {
+                    "type": "string",
+                    "description": "Source channel"
+                  },
+                  "sender": {
+                    "type": "string",
+                    "description": "Sender identifier"
+                  },
+                  "messageId": {
+                    "type": "string",
+                    "description": "Message ID from source channel"
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "description": "Session identifier"
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extracted metadata",
+            "properties": {
+              "exif": {
+                "type": "object",
+                "description": "EXIF data for images"
+              },
+              "duration": {
+                "type": "number",
+                "description": "Duration in seconds for audio/video"
+              },
+              "pages": {
+                "type": "integer",
+                "description": "Page count for documents"
+              },
+              "dimensions": {
+                "type": "object",
+                "properties": {
+                  "width": { "type": "integer" },
+                  "height": { "type": "integer" }
+                }
+              },
+              "author": {
+                "type": "string",
+                "description": "Document author"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Original creation timestamp"
+              }
+            }
+          },
+          "derivatives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "filename", "sha256", "size", "generatedAt"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["thumbnail", "transcript", "preview", "ocr"],
+                  "description": "Derivative type"
+                },
+                "filename": {
+                  "type": "string",
+                  "description": "Derivative filename"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$",
+                  "description": "SHA-256 hash of derivative"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Derivative size in bytes"
+                },
+                "generatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Generation timestamp"
+                }
+              }
+            }
+          },
+          "vault": {
+            "type": "object",
+            "required": ["provider", "vaultUrl", "ingestedAt"],
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": ["filesystem", "s3"],
+                "description": "Storage provider"
+              },
+              "vaultUrl": {
+                "type": "string",
+                "format": "uri",
+                "description": "Vault storage URL"
+              },
+              "ingestedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Ingestion timestamp"
+              }
+            }
+          }
+        }
+      }
+    },
+    "chainOfCustody": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event", "timestamp", "actor", "previousHash", "currentHash"],
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event type"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp"
+          },
+          "actor": {
+            "type": "string",
+            "description": "Actor who performed the action"
+          },
+          "evidenceId": {
+            "type": "string",
+            "description": "Related evidence ID if applicable"
+          },
+          "previousHash": {
+            "type": ["string", "null"],
+            "description": "Hash of previous chain entry"
+          },
+          "currentHash": {
+            "type": "string",
+            "description": "Hash of this chain entry"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional event details"
+          }
+        }
+      }
+    }
+  }
+}

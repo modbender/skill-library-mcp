@@ -1,0 +1,96 @@
+# Kokoro TTS Reference
+
+## CLI Synopsis
+
+```
+kokoro-tts <input_file> [<output_file>] [options]
+```
+
+If `<output_file>` is omitted, use `--stream` for playback or `--split-output` for chapter files.
+
+## Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--voice <str>` | Voice name or blend (`"v1:60,v2:40"`) | interactive |
+| `--lang <str>` | Language code | `en-us` |
+| `--speed <float>` | Speech rate | `1.0` |
+| `--format <str>` | `wav` or `mp3` | `wav` |
+| `--stream` | Play audio directly, no file saved | — |
+| `--split-output <dir>` | Save each chunk/chapter separately | — |
+| `--merge-chunks` | Merge split chunks into chapter files | — |
+| `--model <path>` | Custom path to `kokoro-v1.0.onnx` | `./kokoro-v1.0.onnx` |
+| `--voices <path>` | Custom path to `voices-v1.0.bin` | `./voices-v1.0.bin` |
+| `--debug` | Verbose processing info | — |
+
+## Supported Input Formats
+
+- `.txt` — plain text
+- `.epub` — EPUB book (auto chapter extraction)
+- `.pdf` — PDF document (extracts chapters from TOC or content)
+- `-` or `/dev/stdin` — stdin / pipe (`echo "Hi" | kokoro-tts - --stream`)
+
+## Complete Voice List
+
+### 🇺🇸 American English (`en-us`)
+
+**Female:** af_alloy, af_aoede, af_bella, af_heart, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sarah, af_sky
+
+**Male:** am_adam, am_echo, am_eric, am_fenrir, am_liam, am_michael, am_onyx, am_puck
+
+### 🇬🇧 British English (`en-gb`)
+
+**Female:** bf_alice, bf_emma, bf_isabella, bf_lily
+
+**Male:** bm_daniel, bm_fable, bm_george, bm_lewis
+
+### 🇨🇳 Mandarin Chinese (`cmn`)
+
+**Female:** zf_xiaobei, zf_xiaoni, zf_xiaoxiao, zf_xiaoyi
+
+**Male:** zm_yunjian, zm_yunxi, zm_yunxia, zm_yunyang
+
+### 🇯🇵 Japanese (`ja`)
+
+**Female:** jf_alpha, jf_gongitsune, jf_nezumi, jf_tebukuro
+
+**Male:** jm_kumo
+
+### 🇫🇷 French (`fr-fr`)
+
+**Female:** ff_siwis
+
+### 🇮🇹 Italian (`it`)
+
+**Female:** if_sara
+
+**Male:** im_nicola
+
+## Voice Blending
+
+Mix multiple voices with weight syntax:
+
+```bash
+# 60% sarah, 40% adam
+kokoro-tts input.txt out.wav --voice "af_sarah:60,am_adam:40"
+
+# Equal blend (omit weights)
+kokoro-tts input.txt out.wav --voice "am_adam,af_sarah"
+```
+
+## EPUB / PDF Workflow
+
+```bash
+# Split into per-chapter files
+kokoro-tts book.epub --split-output ./chapters/ --format mp3 --voice af_heart
+
+# Later, merge chunks into full chapters
+kokoro-tts --merge-chunks --split-output ./chapters/ --format wav
+```
+
+## Tips
+
+- Python 3.9–3.12 required (3.13+ not supported).
+- Model files can live anywhere; use `--model` and `--voices` to point to them.
+- Use `--debug` to troubleshoot EPUB/PDF chapter detection.
+- `kokoro-tts --help-voices` and `--help-languages` list available options at runtime.

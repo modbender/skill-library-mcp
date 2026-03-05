@@ -1,0 +1,197 @@
+{
+  "slug": "google-business-optimizer",
+  "name": "Google Business Optimizer",
+  "version": "1.0.0",
+  "description": "Automate Google Business Profile management and save 5-10 hours per week",
+  "author": "OpenClaw Skills",
+  "license": "MIT",
+  "categories": ["business", "automation", "marketing", "local-seo"],
+  "keywords": ["google", "business", "profile", "reviews", "local-seo", "gmb", "automation"],
+  "pricing": {
+    "model": "freemium",
+    "plans": [
+      {
+        "name": "FREE",
+        "price": 0,
+        "currency": "USD",
+        "interval": "month",
+        "features": [
+          "1 business location",
+          "50 reviews per month",
+          "Basic response templates",
+          "Manual rank checks",
+          "Community support"
+        ],
+        "limits": {
+          "locations": 1,
+          "reviews_per_month": 50,
+          "competitors": 0,
+          "keywords": 5
+        }
+      },
+      {
+        "name": "PRO",
+        "price": 19,
+        "currency": "USD",
+        "interval": "month",
+        "features": [
+          "5 business locations",
+          "Unlimited reviews",
+          "AI-powered responses",
+          "Competitor tracking (5 competitors)",
+          "Weekly competitor reports",
+          "Rank tracking (20 keywords)",
+          "Email notifications",
+          "Priority support"
+        ],
+        "limits": {
+          "locations": 5,
+          "reviews_per_month": -1,
+          "competitors": 5,
+          "keywords": 20
+        }
+      },
+      {
+        "name": "AGENCY",
+        "price": 49,
+        "currency": "USD",
+        "interval": "month",
+        "features": [
+          "Unlimited business locations",
+          "Unlimited reviews",
+          "AI-powered responses with custom training",
+          "Unlimited competitor tracking",
+          "White-label PDF reports",
+          "Unlimited rank tracking",
+          "API access",
+          "Slack/Discord integrations",
+          "Dedicated account manager"
+        ],
+        "limits": {
+          "locations": -1,
+          "reviews_per_month": -1,
+          "competitors": -1,
+          "keywords": -1
+        }
+      }
+    ]
+  },
+  "runtime": {
+    "type": "node",
+    "entry": "index.ts",
+    "typescript": true
+  },
+  "permissions": [
+    "network",
+    "filesystem:read",
+    "filesystem:write"
+  ],
+  "requires": {
+    "env": [
+      "GBP_API_KEY",
+      "GBP_LOCATION_ID"
+    ],
+    "optional_env": [
+      "GBP_ACCOUNT_ID",
+      "OPENAI_API_KEY",
+      "SLACK_WEBHOOK",
+      "EMAIL_TO",
+      "EMAIL_FROM"
+    ]
+  },
+  "heartbeat": {
+    "enabled": true,
+    "schedule": "0 */6 * * *",
+    "config_file": "HEARTBEAT.md"
+  },
+  "commands": [
+    {
+      "name": "reviews",
+      "description": "Manage and respond to customer reviews",
+      "args": [
+        {"name": "check", "type": "boolean", "description": "Check for new reviews"},
+        {"name": "respond", "type": "boolean", "description": "Auto-respond to reviews"},
+        {"name": "respond-all", "type": "boolean", "description": "Respond to all pending reviews"},
+        {"name": "template", "type": "string", "description": "Response template (professional|friendly|short|detailed)"},
+        {"name": "stats", "type": "boolean", "description": "Show review statistics"},
+        {"name": "pending", "type": "boolean", "description": "List reviews needing response"},
+        {"name": "last-30-days", "type": "boolean", "description": "Limit to last 30 days"}
+      ]
+    },
+    {
+      "name": "update-hours",
+      "description": "Update business hours and special hours",
+      "args": [
+        {"name": "location", "type": "string", "description": "Specific location name"},
+        {"name": "all-locations", "type": "boolean", "description": "Apply to all locations"},
+        {"name": "holiday", "type": "boolean", "description": "Set holiday hours"},
+        {"name": "special", "type": "boolean", "description": "Set special event hours"},
+        {"name": "date", "type": "string", "description": "Date for special/holiday hours (YYYY-MM-DD)"},
+        {"name": "closed", "type": "boolean", "description": "Mark as closed"},
+        {"name": "hours", "type": "string", "description": "Hours string (HH:MM-HH:MM)"},
+        {"name": "monday", "type": "string", "description": "Monday hours"},
+        {"name": "tuesday", "type": "string", "description": "Tuesday hours"},
+        {"name": "wednesday", "type": "string", "description": "Wednesday hours"},
+        {"name": "thursday", "type": "string", "description": "Thursday hours"},
+        {"name": "friday", "type": "string", "description": "Friday hours"},
+        {"name": "saturday", "type": "string", "description": "Saturday hours"},
+        {"name": "sunday", "type": "string", "description": "Sunday hours"}
+      ]
+    },
+    {
+      "name": "competitors",
+      "description": "Monitor competitor Google Business Profiles",
+      "args": [
+        {"name": "add", "type": "string", "description": "Add competitor by name"},
+        {"name": "remove", "type": "string", "description": "Remove competitor by name"},
+        {"name": "list", "type": "boolean", "description": "List tracked competitors"},
+        {"name": "analyze", "type": "boolean", "description": "Run competitor analysis"},
+        {"name": "report", "type": "boolean", "description": "Generate report"},
+        {"name": "compare", "type": "boolean", "description": "Compare metrics"},
+        {"name": "metric", "type": "string", "description": "Metric to compare (rating|reviews|photos)"},
+        {"name": "format", "type": "string", "description": "Report format (email|pdf|slack)"}
+      ]
+    },
+    {
+      "name": "rank-track",
+      "description": "Track local search rankings",
+      "args": [
+        {"name": "add", "type": "string", "description": "Add keyword to track"},
+        {"name": "remove", "type": "string", "description": "Remove keyword"},
+        {"name": "list", "type": "boolean", "description": "List tracked keywords"},
+        {"name": "check", "type": "boolean", "description": "Check current rankings"},
+        {"name": "history", "type": "boolean", "description": "Show ranking history"},
+        {"name": "days", "type": "number", "description": "Number of days for history"},
+        {"name": "report", "type": "boolean", "description": "Generate ranking report"},
+        {"name": "keyword", "type": "string", "description": "Specific keyword for report"}
+      ]
+    },
+    {
+      "name": "config",
+      "description": "Configure the skill",
+      "args": [
+        {"name": "credentials", "type": "string", "description": "Path to credentials.json"},
+        {"name": "location-id", "type": "string", "description": "Google Business location ID"},
+        {"name": "account-id", "type": "string", "description": "Google account ID"},
+        {"name": "plan", "type": "string", "description": "Subscription plan (free|pro|agency)"}
+      ]
+    },
+    {
+      "name": "auth",
+      "description": "Authentication commands",
+      "args": [
+        {"name": "login", "type": "boolean", "description": "Login to Google"},
+        {"name": "logout", "type": "boolean", "description": "Logout"},
+        {"name": "status", "type": "boolean", "description": "Check auth status"}
+      ]
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openclaw/skills/google-business-optimizer"
+  },
+  "bugs": {
+    "url": "https://github.com/openclaw/skills/issues"
+  },
+  "homepage": "https://openclaw.io/skills/google-business-optimizer"
+}

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://clawhub.com/schemas/product/v1.json",
+  "name": "semantic-shield",
+  "displayName": "Semantic Shield",
+  "version": "1.0.0",
+  "publisher": {
+    "name": "Simply Semantics",
+    "id": "simply-semantics",
+    "url": "https://www.simplysemantics.com",
+    "email": "info@simplysemantics.com"
+  },
+  "description": "AI skill safety validation API — real human experts vet skills, plugins, and MCP tools for security risks. Query trust scores, submit evaluation inquiries, and get real-time safety verdicts before installing anything in your AI agents.",
+  "longDescription": "Semantic Shield is a security-first skill that protects AI agents, bots, and users from unsafe skills, plugins, and tools. Every skill in the registry is vetted by US-based security experts with 30+ years of experience (including Homeland Security). Agents and developers can query any skill's safety profile via API or MCP — getting a safety score (0–100), risk level, threat details, and clear install/reject recommendation. Unvetted skills can be submitted for expert evaluation. Continuous 0-day threat monitoring keeps assessments current. Built for autonomous AI agent ecosystems where trust decisions happen at machine speed.",
+  "homepage": "https://www.simplysemantics.com/semantic-shield.html",
+  "repository": "https://clawhub.com/simply-semantics/semantic-shield",
+  "license": "MIT",
+  "categories": [
+    "security",
+    "ai-agents",
+    "trust-validation",
+    "mcp",
+    "saas-component",
+    "skill-vetting",
+    "compliance",
+    "risk-assessment"
+  ],
+  "tags": [
+    "security",
+    "trust",
+    "vetting",
+    "ai-safety",
+    "skill-validation",
+    "mcp-compatible",
+    "agent-safety",
+    "risk-scoring",
+    "threat-detection",
+    "0-day-monitoring",
+    "human-reviewed",
+    "compliance",
+    "plugin-safety",
+    "openclaw",
+    "saas",
+    "api"
+  ],
+  "mcp": {
+    "compatible": true,
+    "endpoints": [
+      {
+        "method": "GET",
+        "path": "/api/v1/search",
+        "description": "Search for vetted skills by name or provider (free, no quota cost)",
+        "input": {
+          "q": "string — skill name or ID to search for (partial match)",
+          "provider": "string — optional provider name filter"
+        },
+        "output": {
+          "results": "array of { skill_id, provider }",
+          "count": "number of matches"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/check",
+        "description": "Get full trust details for a specific skill (counts against lookup quota)",
+        "input": {
+          "skill_id": "string — exact skill identifier",
+          "provider": "string — exact provider name"
+        },
+        "output": {
+          "skill_id": "string",
+          "provider": "string",
+          "skill_url": "string or null",
+          "vetted": "boolean",
+          "vetted_by": "string — 'Simply Semantics'",
+          "safety_score": "integer 0–100",
+          "risk_level": "string — critical|high|medium|low|safe",
+          "risk_summary": "string — brief findings",
+          "threats_found": "array of threat strings",
+          "recommendation": "string — safe to install|install with caution|do not install",
+          "last_checked": "ISO date string"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/validate",
+        "description": "Submit an unvetted skill for expert security evaluation (counts against inquiry quota)",
+        "input": {
+          "skill_id": "string — skill identifier",
+          "provider": "string — provider name",
+          "skill_url": "string — optional URL to the skill"
+        },
+        "output": {
+          "request_id": "string — tracking ID",
+          "status": "string — 'pending'",
+          "message": "string — confirmation"
+        }
+      }
+    ]
+  },
+  "pricing": {
+    "model": "freemium",
+    "tiers": {
+      "free": {
+        "price": 0,
+        "lookupsPerMonth": 25,
+        "inquiriesPerMonth": 5,
+        "description": "Query skill safety profiles and submit limited evaluation inquiries"
+      },
+      "pro": {
+        "price": 29,
+        "lookupsPerMonth": 100,
+        "inquiriesPerMonth": 20,
+        "description": "Priority evaluations, full reports, webhook alerts, and email support"
+      },
+      "enterprise": {
+        "price": "custom",
+        "lookupsPerMonth": "unlimited",
+        "inquiriesPerMonth": "unlimited",
+        "description": "Unlimited access, private queue, SLA, dedicated support, and custom integrations"
+      }
+    }
+  },
+  "features": [
+    "Real-time skill safety lookups via API — safety score, risk level, and recommendation",
+    "100% REAL human security experts — US-based with 30+ years experience including Homeland Security",
+    "Submit unvetted skills for expert evaluation with tracked request lifecycle",
+    "Safety scoring 0–100 with risk levels: critical, high, medium, low, safe",
+    "Threat detection for prompt injection, data exfiltration, over-privileged permissions, and more",
+    "Continuous 0-day vulnerability monitoring keeps assessments current",
+    "Webhook alerts for Pro+ tiers when threats are detected on previously vetted skills",
+    "Free search endpoint — find skills by name or provider at no quota cost",
+    "API-key auth for agent/bot integration (OpenClaw, LangChain, and other frameworks)",
+    "SSO authentication via SimplySemantics.com",
+    "MCP-compatible endpoints for autonomous AI agent decision-making",
+    "Interactive dashboard with usage metrics, history, and settings"
+  ]
+}
+

@@ -1,0 +1,141 @@
+{
+  "id": "nima-memory",
+  "name": "nima-memory",
+  "version": "2.0.9",
+  "kind": "memory",
+  "events": [
+    "agent_end",
+    "before_compaction",
+    "after_compaction",
+    "gateway_start"
+  ],
+  "description": "NIMA Unified Memory - Three-layer experiential capture and graph-augmented recall",
+  "main": "index.js",
+  "type": "module",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "identity_name": {
+        "type": "string",
+        "default": "agent"
+      },
+      "skip_subagents": {
+        "type": "boolean",
+        "default": true
+      },
+      "skip_heartbeats": {
+        "type": "boolean",
+        "default": true
+      },
+      "content_limits": {
+        "type": "object",
+        "properties": {
+          "max_text_length": {
+            "type": "number",
+            "default": 3000
+          },
+          "max_summary_length": {
+            "type": "number",
+            "default": 300
+          },
+          "max_summary_input": {
+            "type": "number",
+            "default": 80
+          },
+          "max_thinking_summary": {
+            "type": "number",
+            "default": 120
+          },
+          "max_output_summary": {
+            "type": "number",
+            "default": 100
+          }
+        }
+      },
+      "free_energy": {
+        "type": "object",
+        "properties": {
+          "min_threshold": {
+            "type": "number",
+            "default": 0.2,
+            "description": "Minimum FE score to store (0.0-1.0). Memories below this are filtered as noise."
+          },
+          "affect_variance_weight": {
+            "type": "number",
+            "default": 0.3,
+            "description": "Weight for affect variance in FE calculation"
+          },
+          "thinking_boost": {
+            "type": "number",
+            "default": 0.1,
+            "description": "FE boost when agent has significant contemplation"
+          },
+          "routine_penalty": {
+            "type": "number",
+            "default": 0.2,
+            "description": "FE penalty for short/routine exchanges"
+          },
+          "monotonous_penalty": {
+            "type": "number",
+            "default": 0.4,
+            "description": "FE penalty for monotonous patterns (HEARTBEAT_OK, etc)"
+          }
+        }
+      },
+      "noise_filtering": {
+        "type": "object",
+        "properties": {
+          "filter_heartbeat_mechanics": {
+            "type": "boolean",
+            "default": true
+          },
+          "filter_system_noise": {
+            "type": "boolean",
+            "default": true
+          },
+          "filter_empty_exchanges": {
+            "type": "boolean",
+            "default": true
+          },
+          "min_exchange_length": {
+            "type": "number",
+            "default": 5,
+            "description": "Minimum combined input+output length (chars) to store"
+          }
+        }
+      },
+      "database": {
+        "type": "object",
+        "properties": {
+          "backend": {
+            "type": "string",
+            "enum": [
+              "sqlite",
+              "ladybugdb"
+            ],
+            "default": "sqlite"
+          },
+          "auto_migrate": {
+            "type": "boolean",
+            "default": false,
+            "description": "Auto-migrate from SQLite to LadybugDB on startup"
+          },
+          "migration_batch_size": {
+            "type": "number",
+            "default": 500,
+            "description": "Batch size for LadybugDB migration"
+          },
+          "health_check_on_startup": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    }
+  }
+}

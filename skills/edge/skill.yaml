@@ -1,0 +1,22 @@
+name: edge
+version: 0.1.0
+author: edgedottrade
+description: >
+  On-chain trading data and order management. Search tokens, inspect pairs,
+  screen for gems, analyze wallets, place limit orders, subscribe to price alerts.
+license: MIT
+keywords: [crypto, trading, defi, solana, base, ethereum, orders, portfolio]
+permissions:
+  - network: outbound
+  - mcp: spawn
+config:
+  - key: API_KEY
+    description: Edge Trade API key (sk-...)
+    required: true
+    secret: true
+mcp:
+  servers:
+    - name: edge
+      command: npx
+      args: ["-y", "@edgedottrade/mcp", "--api-key", "${API_KEY}"]
+      repository: "https://github.com/edgetrade/mcp"

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Mint</title>
+<link rel="stylesheet" href="shared/exo-style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="container container--narrow" style="padding-top:24px;padding-bottom:60px">
+
+<div class="panel">
+  <p style="font-size:15px;color:var(--text-secondary);line-height:1.8">
+    <strong style="color:var(--text-primary)">Exoskeletons</strong> are onchain identity infrastructure for AI agents on Base.
+    Each one carries visual identity, communication channels, key-value storage, a reputation score, and modular extensions.
+    <em style="color:var(--gold)">Humans configure the shell. Agents fill it with life.</em>
+  </p>
+</div>
+
+<!-- Wallet -->
+<div class="panel">
+  <button class="btn btn--secondary btn--full" id="connectBtn" onclick="onConnect()">Connect Wallet</button>
+  <div id="walletInfo" class="hidden" style="margin-top:12px">
+    <p class="text-mono text-dim text-center" style="font-size:12px;word-break:break-all" id="addrDisplay"></p>
+    <div id="badges" style="text-align:center;margin-top:8px"></div>
+  </div>
+  <div id="connectStatus" style="display:none"></div>
+</div>
+
+<!-- Network Stats -->
+<div class="panel">
+  <div class="panel__title">Network</div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-box"><div class="stat-box__value" id="sPhase">--</div><div class="stat-box__label">Phase</div></div>
+    <div class="stat-box"><div class="stat-box__value" id="sPrice">--</div><div class="stat-box__label">Price</div></div>
+    <div class="stat-box"><div class="stat-box__value" id="sMinted">--</div><div class="stat-box__label">Minted</div></div>
+    <div class="stat-box"><div class="stat-box__value" id="sGenesis">--</div><div class="stat-box__label">Genesis Left</div></div>
+  </div>
+</div>
+
+<!-- Configure -->
+<div class="panel">
+  <div class="panel__title">Configure</div>
+
+  <div class="form-row">
+    <label class="form-row__label">Shape</label>
+    <select class="form-select" id="cfgShape" onchange="updatePreview()">
+      <option value="0">Hexagon</option><option value="1">Circle</option>
+      <option value="2">Diamond</option><option value="3">Shield</option>
+      <option value="4">Octagon</option><option value="5">Triangle</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label class="form-row__label">Primary</label>
+    <input type="color" class="form-input" id="cfgPrimary" value="#00BFFF" onchange="updatePreview()">
+  </div>
+  <div class="form-row">
+    <label class="form-row__label">Secondary</label>
+    <input type="color" class="form-input" id="cfgSecondary" value="#3C0078" onchange="updatePreview()">
+  </div>
+  <div class="form-row">
+    <label class="form-row__label">Symbol</label>
+    <select class="form-select" id="cfgSymbol" onchange="updatePreview()">
+      <option value="0">None</option><option value="1">Eye</option>
+      <option value="2">Gear</option><option value="3">Bolt</option>
+      <option value="4">Star</option><option value="5">Wave</option>
+      <option value="6">Node</option><option value="7">Diamond</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label class="form-row__label">Pattern</label>
+    <select class="form-select" id="cfgPattern" onchange="updatePreview()">
+      <option value="0">None</option><option value="1">Grid</option>
+      <option value="2">Dots</option><option value="3">Lines</option>
+      <option value="4">Circuits</option><option value="5">Rings</option>
+    </select>
+  </div>
+
+  <div style="text-align:center;margin:16px 0 8px">
+    <button class="btn btn--ghost btn--sm" onclick="randomize()">Randomize</button>
+  </div>
+
+  <div style="display:flex;justify-content:center;margin:12px 0">
+    <svg id="preview" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"
+         style="width:340px;height:340px;border:1px solid var(--border);border-radius:var(--radius-md);background:#080808"></svg>
+  </div>
+  <p class="text-mono text-center" style="font-size:10px;color:var(--text-tertiary);letter-spacing:1.5px;margin-top:-4px">EXACT ON-CHAIN RENDER PREVIEW</p>
+</div>
+
+<!-- Mint -->
+<div class="panel">
+  <div class="panel__title">Mint</div>
+  <button class="btn btn--primary btn--full" id="mintBtn" onclick="doMint()" disabled>Mint Exoskeleton</button>
+  <div id="mintStatus" style="display:none"></div>
+</div>
+
+</main>
+
+<div id="app-footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script src="shared/exo-core.js"></script>
+<script src="shared/exo-ui.js"></script>
+<script>
+ExoUI.initPage('mint.html');
+
+let mintPrice = 0n;
+
+function getConfig() {
+  const shape = parseInt(document.getElementById('cfgShape').value);
+  const p = document.getElementById('cfgPrimary').value;
+  const s = document.getElementById('cfgSecondary').value;
+  const sym = parseInt(document.getElementById('cfgSymbol').value);
+  const pat = parseInt(document.getElementById('cfgPattern').value);
+  return [
+    shape,
+    parseInt(p.slice(1, 3), 16), parseInt(p.slice(3, 5), 16), parseInt(p.slice(5, 7), 16),
+    parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16),
+    sym, pat
+  ];
+}
+
+function updatePreview() {
+  const cfg = getConfig();
+  const nextId = document.getElementById('sMinted').textContent;
+  const displayId = nextId && nextId !== '--' ? nextId : '?';
+  document.getElementById('preview').innerHTML = ExoCore.renderSVGPreview(cfg, { tokenId: displayId });
+}
+
+function randomize() {
+  document.getElementById('cfgShape').value = Math.floor(Math.random() * 6);
+  const rc = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+  document.getElementById('cfgPrimary').value = rc();
+  document.getElementById('cfgSecondary').value = rc();
+  document.getElementById('cfgSymbol').value = Math.floor(Math.random() * 8);
+  document.getElementById('cfgPattern').value = Math.floor(Math.random() * 6);
+  updatePreview();
+}
+
+async function loadStats() {
+  try {
+    const [price, phase, nextId, supply] = await Promise.all([
+      ExoCore.withFallback(() => ExoCore.contracts.core.getMintPrice()),
+      ExoCore.withFallback(() => ExoCore.contracts.core.getMintPhase()),
+      ExoCore.withFallback(() => ExoCore.contracts.core.nextTokenId()),
+      ExoCore.withFallback(() => ExoCore.contracts.core.totalSupply()),
+    ]);
+    mintPrice = price;
+    const next = Number(nextId);
+    document.getElementById('sPhase').textContent = phase.toUpperCase();
+    document.getElementById('sPrice').textContent = ExoCore.formatEth(price) + ' ETH';
+    document.getElementById('sMinted').textContent = Number(supply);
+    document.getElementById('sGenesis').textContent = Math.max(0, 1000 - next + 1);
+  } catch (e) { console.error('Stats error:', e); }
+}
+
+async function onConnect() {
+  try {
+    await ExoCore.connectWallet();
+    onAccountChange();
+  } catch (e) {
+    ExoUI.showStatus('connectStatus', e.message, 'error');
+  }
+}
+
+async function onAccountChange() {
+  const account = ExoCore.account;
+  if (!account) {
+    document.getElementById('connectBtn').textContent = 'Connect Wallet';
+    document.getElementById('walletInfo').classList.add('hidden');
+    document.getElementById('mintBtn').disabled = true;
+    return;
+  }
+  document.getElementById('connectBtn').textContent = ExoCore.truncAddr(account);
+  document.getElementById('connectBtn').style.borderColor = 'var(--gold)';
+  document.getElementById('connectBtn').style.color = 'var(--gold)';
+  document.getElementById('walletInfo').classList.remove('hidden');
+  document.getElementById('addrDisplay').textContent = account;
+  document.getElementById('mintBtn').disabled = false;
+
+  try {
+    const [isWL, usedFree, count] = await Promise.all([
+      ExoCore.contracts.core.whitelist(account),
+      ExoCore.contracts.core.usedFreeMint(account),
+      ExoCore.contracts.core.mintCount(account),
+    ]);
+    const badges = document.getElementById('badges');
+    badges.innerHTML = '';
+    if (isWL) {
+      badges.innerHTML = '<span class="badge badge--gold">Whitelisted</span>';
+      if (!usedFree) badges.innerHTML += ' <span class="badge badge--green">Free Mint</span>';
+    }
+    if (Number(count) >= 3) {
+      document.getElementById('mintBtn').disabled = true;
+      document.getElementById('mintBtn').textContent = 'Limit Reached (3/3)';
+    } else if (isWL && !usedFree) {
+      document.getElementById('mintBtn').textContent = 'Mint Exoskeleton (Free)';
+    } else {
+      document.getElementById('mintBtn').textContent = 'Mint Exoskeleton';
+    }
+  } catch (e) { console.error('Wallet check error:', e); }
+}
+
+window.addEventListener('exo:accountChanged', onAccountChange);
+
+async function doMint() {
+  const account = ExoCore.account;
+  if (!account) { ExoUI.showStatus('mintStatus', 'Connect wallet first', 'error'); return; }
+  const btn = document.getElementById('mintBtn');
+  btn.disabled = true;
+  btn.textContent = 'Minting...';
+  ExoUI.showStatus('mintStatus', 'Confirm transaction in your wallet...', 'pending');
+
+  try {
+    const cfg = getConfig();
+    const configBytes = new Uint8Array(cfg);
+    const core = ExoCore.getSignedContract('core');
+
+    const [isWL, usedFree] = await Promise.all([
+      ExoCore.contracts.core.whitelist(account),
+      ExoCore.contracts.core.usedFreeMint(account),
+    ]);
+    const value = (isWL && !usedFree) ? 0n : mintPrice;
+
+    const tx = await core.mint(configBytes, { value });
+    ExoUI.showStatus('mintStatus',
+      `Minting... TX: <a href="https://basescan.org/tx/${tx.hash}" target="_blank">${tx.hash.slice(0, 14)}...</a>`,
+      'pending');
+
+    const receipt = await tx.wait();
+    const transferLog = receipt.logs.find(l =>
+      l.address.toLowerCase() === ExoCore.CONTRACTS.core.toLowerCase() &&
+      l.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+    );
+    const tokenId = transferLog ? Number(BigInt(transferLog.topics[3])) : '?';
+
+    ExoUI.showStatus('mintStatus',
+      `Minted Exoskeleton #${tokenId}! <a href="token.html#${tokenId}">View your Exoskeleton</a> · <a href="https://basescan.org/tx/${tx.hash}" target="_blank">TX</a>`,
+      'ok');
+    btn.textContent = 'Minted #' + tokenId;
+    loadStats();
+  } catch (e) {
+    const msg = e.code === 'ACTION_REJECTED' ? 'Transaction rejected by user'
+              : e.code === 'INSUFFICIENT_FUNDS' ? 'Insufficient ETH balance'
+              : (e.shortMessage || e.message || String(e));
+    ExoUI.showStatus('mintStatus', msg, 'error');
+    btn.textContent = 'Mint Exoskeleton';
+    btn.disabled = false;
+  }
+}
+
+ExoCore.onReady(() => {
+  loadStats();
+  updatePreview();
+  setInterval(loadStats, 30000);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+name: "Create Conference Registration Form Template"
+id: "file-creation-structured-form"
+version: "1.0"
+suite: "file-creation"
+difficulty: "easy"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read form requirements and produce a
+  well-organized form template document. Evaluates structured content
+  creation, completeness, and clear labeling of required vs optional fields.
+
+user_message: |
+  Read the form requirements in form-requirements.txt and create a
+  registration form template as registration-form.md. Include all
+  required fields with their types and validation rules. Mark optional
+  fields clearly. Organize the form logically.
+
+input_files:
+  - name: "form-requirements.txt"
+
+expected_outputs:
+  - pattern: "registration-form.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "name"
+          - "email"
+          - "required"
+          - "optional"
+
+expected_metrics:
+  tool_calls: [2, 6]
+  planning_ratio: [0.05, 0.25]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

@@ -1,0 +1,73 @@
+{
+  "id": "memory-qdrant",
+  "kind": "memory",
+  "name": "Memory (Qdrant)",
+  "version": "1.0.10",
+  "description": "本地语义记忆系统（Qdrant + Transformers.js，完全本地运行）",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "qdrantUrl": {
+        "type": "string",
+        "description": "Qdrant 服务地址（留空使用内存模式）"
+      },
+      "collectionName": {
+        "type": "string",
+        "default": "openclaw_memories"
+      },
+      "autoCapture": {
+        "type": "boolean",
+        "default": false
+      },
+      "autoRecall": {
+        "type": "boolean",
+        "default": true
+      },
+      "captureMaxChars": {
+        "type": "number",
+        "minimum": 100,
+        "maximum": 10000,
+        "default": 500
+      },
+      "maxMemorySize": {
+        "type": "number",
+        "minimum": 100,
+        "maximum": 1000000,
+        "default": 1000,
+        "description": "Maximum number of memories in in-memory mode. Set to 999999 for unlimited (oldest memories are auto-deleted when limit is reached, except when set to 999999)"
+      }
+    }
+  },
+  "uiHints": {
+    "qdrantUrl": {
+      "label": "Qdrant URL",
+      "placeholder": "Leave empty for in-memory mode (zero config)",
+      "advanced": true,
+      "help": "External Qdrant server URL. Leave empty to use in-memory storage."
+    },
+    "collectionName": {
+      "label": "Collection Name",
+      "placeholder": "openclaw_memories",
+      "advanced": true
+    },
+    "autoCapture": {
+      "label": "Auto Capture",
+      "help": "Auto-save important info after conversations. Note: trigger patterns match emails and phone numbers, so enabling this may capture PII. Disabled by default."
+    },
+    "autoRecall": {
+      "label": "Auto Recall",
+      "help": "Auto-inject relevant memories before conversations"
+    },
+    "captureMaxChars": {
+      "label": "Capture Max Length",
+      "help": "Maximum characters per captured memory",
+      "advanced": true
+    },
+    "maxMemorySize": {
+      "label": "Max Memory Size (In-Memory Mode)",
+      "help": "Maximum number of memories stored in in-memory mode. When limit is reached, oldest memories are automatically deleted (LRU eviction). Set to 999999 for unlimited storage. Only applies to in-memory mode, not external Qdrant.",
+      "advanced": true
+    }
+  }
+}

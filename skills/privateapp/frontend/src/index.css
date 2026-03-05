@@ -1,0 +1,618 @@
+/* Private App — Global Styles
+ * Mobile-first, system dark/light via prefers-color-scheme
+ * No external fonts, no frameworks — system font stack only
+ */
+
+/* ── Light mode (default) ── */
+:root {
+  --accent: #5b4ed4;
+  --accent-bg: #ede9ff;
+  --bg: #f2f2f7;
+  --card-bg: #ffffff;
+  --text: #1c1c1e;
+  --text-secondary: #8e8e93;
+  --border: rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  color-scheme: light;
+}
+
+/* ── Dark mode ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #a78bfa;
+    --accent-bg: #2d1f6e;
+    --bg: #000000;
+    --card-bg: #1c1c1e;
+    --text: #f2f2f7;
+    --text-secondary: #8e8e93;
+    --border: rgba(255, 255, 255, 0.1);
+    color-scheme: dark;
+  }
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+               system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* ── Page layout ── */
+.page {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── Nav bar ── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  padding-top: calc(12px + var(--safe-top));
+  background: var(--card-bg);
+  border-bottom: 0.5px solid var(--border);
+  min-height: calc(56px + var(--safe-top));
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nav-bar .title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-bar .spacer {
+  min-width: 44px;
+}
+
+.nav-bar .nav-btn {
+  background: none;
+  border: none;
+  font-size: 17px;
+  cursor: pointer;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--accent);
+  font-weight: 400;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.nav-bar .nav-btn:active {
+  background: var(--border);
+}
+
+/* ── Scrollable content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(20px + var(--safe-bottom));
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  margin: 8px 16px;
+  overflow: hidden;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.card-row + .card-row {
+  border-top: 0.5px solid var(--border);
+}
+
+/* ── Section header ── */
+.section-header {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 20px 16px 6px;
+}
+
+/* ── Loading ── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error state ── */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* ── App grid (home screen) ── */
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 12px;
+  padding: 24px 20px;
+  justify-items: center;
+}
+
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.app-tile:active .app-icon-wrap {
+  transform: scale(0.9);
+}
+
+.app-tile .app-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 13.5px; /* iOS icon radius = 22.5% of size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(0,0,0,0.05));
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .app-tile .app-icon-wrap {
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(0,0,0,0.2));
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  }
+}
+
+.app-tile .app-name {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Drag & reorder ── */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
+}
+
+.app-tile.wiggle {
+  animation: wiggle 0.3s ease-in-out infinite;
+}
+
+.app-tile.dragging {
+  opacity: 0.4;
+}
+
+.app-tile.drop-target .app-icon-wrap {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px var(--accent), 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ── Stat cards (system monitor) ── */
+.stat-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 6px 16px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.stat-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.5s ease;
+}
+
+/* ── File browser ── */
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 2px;
+  font-size: 13px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+
+.breadcrumb-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 4px;
+  font-family: inherit;
+  border-radius: 4px;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.breadcrumb-sep {
+  color: var(--text-secondary);
+  opacity: 0.4;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 12px;
+  min-height: 52px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-top: 0.5px solid var(--border);
+}
+
+.file-row:first-child {
+  border-top: none;
+}
+
+.file-row:active {
+  background: var(--border);
+}
+
+.file-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 15px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.file-chevron {
+  color: var(--text-secondary);
+  opacity: 0.4;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ── Preview ── */
+.preview-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+.preview-video {
+  max-width: 100%;
+  max-height: 100%;
+  background: #000;
+}
+
+.preview-text {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  font-family: 'SF Mono', 'Menlo', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Service status dots ── */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.active { background: #34c759; }
+.status-dot.inactive { background: #ff3b30; }
+
+/* ── Toggle switch ── */
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: var(--border);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.toggle input:checked + .toggle-track {
+  background: #34c759;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  transition: left 0.2s;
+  pointer-events: none;
+}
+
+.toggle input:checked ~ .toggle-thumb {
+  left: 22px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  min-height: 44px;
+  transition: opacity 0.15s;
+}
+
+.btn:active { opacity: 0.7; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--card-bg);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+.btn-full { width: 100%; }
+
+/* ── Empty state ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.empty-icon { font-size: 48px; opacity: 0.5; }
+.empty-text { font-size: 15px; }
+
+/* ── Bottom navigation bar ── */
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border-top: 0.5px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+  flex-shrink: 0;
+}
+
+.bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  min-height: 56px;
+  transition: color 0.15s;
+}
+
+.bottom-nav-btn > span:first-child {
+  font-size: 20px;
+}
+
+.bottom-nav-btn.active {
+  color: var(--accent);
+}
+
+.bottom-nav-btn:active {
+  opacity: 0.7;
+}
+
+/* ── Section header ── */
+.section-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 16px 8px;
+}
+
+/* ── Settings selects ── */
+.settings-select {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  outline: none;
+  max-width: 60%;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6'%3E%3Cpath d='M0 0l6 6 6-6' fill='%238e8e93'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}

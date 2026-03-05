@@ -1,0 +1,54 @@
+{
+  "version": "0.0.1",
+  "timeout": 60,
+  "tasks": [
+    {
+      "id": "smoke-01",
+      "description": "Find top academic papers on a well-defined AI topic with multi-database search and citation analysis",
+      "input": "Find the top 5 most influential recent papers on retrieval-augmented generation (RAG) for reducing hallucination in large language models. I need papers from 2023 or later, with citation counts, publication venues, and a brief synthesis of how the field is evolving. Prioritize peer-reviewed work but include significant preprints.",
+      "rubric": [
+        {
+          "criterion": "Query Construction & Database Coverage",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Constructs database-specific queries for arXiv (using cat:cs.CL, ti:/abs: prefixes), Semantic Scholar (with fieldsOfStudy, year filter, citation fields), and Google Scholar; uses appropriate academic terminology (RAG, hallucination, LLM, faithfulness)",
+            "3": "Searches 2 databases with reasonable queries but misses database-specific optimizations (e.g., no category codes on arXiv)",
+            "1": "Searches only one database or uses generic web-search-style queries",
+            "0": "No academic database search attempted; treats as a general web search"
+          }
+        },
+        {
+          "criterion": "Result Relevance & Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "All 5 papers directly address RAG for hallucination reduction; includes mix of foundational work and recent advances; papers are from reputable venues (ACL, EMNLP, NeurIPS, ICML, ICLR, or high-citation arXiv preprints)",
+            "3": "3-4 papers are directly relevant; 1-2 are tangentially related (e.g., general RAG without hallucination focus, or general hallucination without RAG)",
+            "1": "Fewer than 3 relevant papers; includes non-academic sources or off-topic papers",
+            "0": "Results are not academic papers or do not address the topic"
+          }
+        },
+        {
+          "criterion": "Bibliographic Completeness & Citation Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Each paper includes: full title, authors, year, venue, publication status (peer-reviewed/preprint), citation count, DOI or arXiv ID, and open-access link; citation velocity or influential citation count noted",
+            "3": "Papers have title, authors, and year but missing venue, citation data, or identifiers for some entries",
+            "1": "Only titles and URLs provided; no citation analysis",
+            "0": "Incomplete or fabricated bibliographic information"
+          }
+        },
+        {
+          "criterion": "Synthesis & Research Narrative",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Provides a synthesis connecting the 5 papers: identifies thematic clusters (e.g., retrieval methods, evaluation approaches), notes consensus findings, highlights open questions, and suggests a reading order",
+            "3": "Brief summary of each paper but no cross-paper synthesis or thematic grouping",
+            "1": "Raw list of papers with abstracts but no synthesis",
+            "0": "No synthesis or narrative connecting results"
+          }
+        }
+      ],
+      "passThreshold": 60
+    }
+  ]
+}

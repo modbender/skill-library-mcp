@@ -1,0 +1,46 @@
+name: "Debug Silent Data Loss in Pipeline"
+id: "error-handling-cascading-failures"
+version: "1.0"
+suite: "error-handling"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests debugging silent failures. A 4-stage data pipeline runs without
+  errors but loses ~10% of records. The validate stage crashes on null/empty
+  amount values, the transform stage silently catches and drops those rows,
+  and the export stage writes fewer records with no warning.
+
+user_message: |
+  The data pipeline (python pipeline.py) processes data/input.csv into
+  output.csv. It runs without errors, but the output has fewer records
+  than the input. Investigate why records are being lost, fix the root
+  cause (not just the symptom), and verify the fix produces all 100
+  records in the output. Write a brief explanation of what was wrong.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "validate.py"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections: ["None", "null", "empty", "0"]
+        match: "any"
+
+expected_behavior:
+  - description: "Pipeline produces all 100 records after fix"
+    validators:
+      - type: "command-output-contains"
+        command: "python pipeline.py"
+        contains: ["100"]
+
+expected_metrics:
+  tool_calls: [8, 20]
+  planning_ratio: [0.15, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

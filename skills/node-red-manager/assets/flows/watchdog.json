@@ -1,0 +1,58 @@
+[
+    {
+        "id": "watchdog-flow",
+        "type": "tab",
+        "label": "System Watchdog",
+        "disabled": false,
+        "info": "Monitors system health."
+    },
+    {
+        "id": "inject-node",
+        "type": "inject",
+        "z": "watchdog-flow",
+        "name": "Check every 5s",
+        "props": [{"p": "payload"}],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 100,
+        "wires": [["exec-node"]]
+    },
+    {
+        "id": "exec-node",
+        "type": "exec",
+        "z": "watchdog-flow",
+        "command": "uptime -p",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "Get Uptime",
+        "x": 350,
+        "y": 100,
+        "wires": [["debug-node"], [], []]
+    },
+    {
+        "id": "debug-node",
+        "type": "debug",
+        "z": "watchdog-flow",
+        "name": "Log Uptime",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 100,
+        "wires": []
+    }
+]

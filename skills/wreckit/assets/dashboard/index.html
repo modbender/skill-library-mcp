@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wreckit — Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --surface: #141416;
+    --surface2: #1c1c1f;
+    --border: #2a2a2e;
+    --text: #e4e4e7;
+    --text2: #a1a1aa;
+    --green: #22c55e;
+    --green-bg: #22c55e18;
+    --yellow: #eab308;
+    --yellow-bg: #eab30818;
+    --red: #ef4444;
+    --red-bg: #ef444418;
+    --blue: #3b82f6;
+    --blue-bg: #3b82f618;
+    --purple: #a855f7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo .hammer { font-size: 28px; }
+
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .stats-bar .stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stats-bar .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #3a3a3e; }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-ship { background: var(--green-bg); color: var(--green); }
+  .badge-caution { background: var(--yellow-bg); color: var(--yellow); }
+  .badge-blocked { background: var(--red-bg); color: var(--red); }
+  .badge-running { background: var(--blue-bg); color: var(--blue); }
+  .badge-queued { background: var(--surface2); color: var(--text2); }
+
+  .mode-tag {
+    font-size: 11px;
+    color: var(--text2);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+
+  .gates {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .gate {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .gate-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .gate-pass { background: var(--green-bg); color: var(--green); }
+  .gate-fail { background: var(--red-bg); color: var(--red); }
+  .gate-warn { background: var(--yellow-bg); color: var(--yellow); }
+  .gate-running { background: var(--blue-bg); color: var(--blue); animation: pulse 1.5s infinite; }
+  .gate-pending { background: var(--surface); color: var(--text2); }
+  .gate-skip { background: var(--surface); color: #555; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .gate-name {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .gate-detail {
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .gate-time {
+    font-size: 11px;
+    color: var(--text2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-fill-green { background: var(--green); }
+  .progress-fill-yellow { background: var(--yellow); }
+  .progress-fill-red { background: var(--red); }
+  .progress-fill-blue { background: var(--blue); }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .iterations {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .iter-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .iter-dot.fail { background: var(--red); }
+  .iter-dot.current { background: var(--blue); animation: pulse 1.5s infinite; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text2);
+  }
+
+  .empty-state h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .empty-state p { font-size: 14px; }
+
+  .refresh-time {
+    font-size: 11px;
+    color: #555;
+  }
+
+  /* Findings panel */
+  .findings {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 12px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .card.expanded .findings {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .finding {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+
+  .finding:last-child { border-bottom: none; }
+
+  .finding-sev {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  .sev-blocker { background: var(--red-bg); color: var(--red); }
+  .sev-warning { background: var(--yellow-bg); color: var(--yellow); }
+  .sev-info { background: var(--blue-bg); color: var(--blue); }
+
+  .click-hint {
+    font-size: 10px;
+    color: #444;
+    cursor: pointer;
+  }
+
+  .card { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="hammer">🔨</span>
+    <div>
+      <h1>wreckit</h1>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="dot" style="background:var(--green)"></div><span id="stat-ship">0</span> Ship</div>
+    <div class="stat"><div class="dot" style="background:var(--yellow)"></div><span id="stat-caution">0</span> Caution</div>
+    <div class="stat"><div class="dot" style="background:var(--red)"></div><span id="stat-blocked">0</span> Blocked</div>
+    <div class="stat"><div class="dot" style="background:var(--blue)"></div><span id="stat-running">0</span> Running</div>
+    <div class="refresh-time">Updated <span id="last-refresh">—</span></div>
+  </div>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// wreckit dashboard — reads from .wreckit/dashboard.json in each project
+// Auto-refreshes every 5 seconds
+
+const DATA_PATH = '/api/status'; // served by dashboard server
+
+const GATE_ICONS = {
+  pass: '✓', fail: '✗', warn: '!', running: '◉', pending: '○', skip: '—'
+};
+
+function renderGate(gate) {
+  return `
+    <div class="gate">
+      <div class="gate-icon gate-${gate.status}">${GATE_ICONS[gate.status]}</div>
+      <span class="gate-name">${gate.name}</span>
+      <span class="gate-detail">${gate.detail || ''}</span>
+      <span class="gate-time">${gate.duration || ''}</span>
+    </div>
+  `;
+}
+
+function renderFindings(findings) {
+  if (!findings || !findings.length) return '';
+  return findings.map(f => `
+    <div class="finding">
+      <span class="finding-sev sev-${f.severity}">${f.severity}</span>
+      <span>${f.message}</span>
+    </div>
+  `).join('');
+}
+
+function renderCard(run) {
+  const gatesDone = run.gates.filter(g => g.status === 'pass' || g.status === 'warn').length;
+  const gatesTotal = run.gates.filter(g => g.status !== 'skip').length;
+  const pct = gatesTotal > 0 ? (gatesDone / gatesTotal * 100) : 0;
+
+  const progressClass = run.decision === 'ship' ? 'green' :
+    run.decision === 'caution' ? 'yellow' :
+    run.decision === 'blocked' ? 'red' : 'blue';
+
+  const badgeClass = run.decision || 'running';
+
+  const iterDots = (run.iterations || []).map(i =>
+    `<div class="iter-dot ${i.status === 'fail' ? 'fail' : i.status === 'current' ? 'current' : ''}"></div>`
+  ).join('');
+
+  return `
+    <div class="card" onclick="this.classList.toggle('expanded')">
+      <div class="card-header">
+        <div>
+          <span class="card-title">${run.repo}</span>
+          <span class="mode-tag">${run.mode}</span>
+          <div class="card-meta">${run.language} · ${run.framework || 'no framework'} · ${run.branch || 'main'}</div>
+        </div>
+        <span class="badge badge-${badgeClass}">${(run.decision || 'running').toUpperCase()}</span>
+      </div>
+      <div class="gates">
+        ${run.gates.map(renderGate).join('')}
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill progress-fill-${progressClass}" style="width:${pct}%"></div>
+      </div>
+      <div class="card-footer">
+        <div class="iterations">${iterDots} <span>${run.iteration || 0}/${run.maxIterations || 50} iterations</span></div>
+        <span class="click-hint">click for details</span>
+      </div>
+      <div class="findings">
+        ${renderFindings(run.findings)}
+      </div>
+    </div>
+  `;
+}
+
+function renderStats(runs) {
+  const counts = { ship: 0, caution: 0, blocked: 0, running: 0 };
+  runs.forEach(r => {
+    if (r.decision) counts[r.decision]++;
+    else counts.running++;
+  });
+  document.getElementById('stat-ship').textContent = counts.ship;
+  document.getElementById('stat-caution').textContent = counts.caution;
+  document.getElementById('stat-blocked').textContent = counts.blocked;
+  document.getElementById('stat-running').textContent = counts.running;
+}
+
+function render(runs) {
+  const grid = document.getElementById('grid');
+  if (!runs.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column: 1/-1">
+        <h2>🔨 No runs yet</h2>
+        <p>Start a wreckit audit to see results here</p>
+      </div>
+    `;
+    return;
+  }
+  // Sort: running first, then blocked, caution, ship
+  const order = { undefined: 0, running: 0, blocked: 1, caution: 2, ship: 3 };
+  runs.sort((a, b) => (order[a.decision] ?? 0) - (order[b.decision] ?? 0));
+  grid.innerHTML = runs.map(renderCard).join('');
+  renderStats(runs);
+  document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
+}
+
+// Fetch and render
+async function refresh() {
+  try {
+    const res = await fetch(DATA_PATH);
+    const data = await res.json();
+    render(data.runs || []);
+  } catch {
+    // If server not running, try loading from file
+    loadFromFile();
+  }
+}
+
+function loadFromFile() {
+  // Demo/fallback: render from inline data
+  const demoEl = document.getElementById('demo-data');
+  if (demoEl) {
+    try {
+      const data = JSON.parse(demoEl.textContent);
+      render(data.runs || []);
+    } catch {}
+  }
+}
+
+// Auto-refresh every 5s
+setInterval(refresh, 5000);
+
+// Initial load — try file-based data first
+document.addEventListener('DOMContentLoaded', () => {
+  const stored = localStorage.getItem('wreckit-runs');
+  if (stored) {
+    try { render(JSON.parse(stored)); } catch {}
+  }
+  refresh();
+});
+</script>
+
+<!-- Inline demo data for offline/preview -->
+<script type="application/json" id="demo-data">
+{
+  "runs": [
+    {
+      "repo": "pinata-security",
+      "mode": "audit",
+      "language": "TypeScript",
+      "framework": "none",
+      "branch": "main",
+      "decision": null,
+      "iteration": 0,
+      "maxIterations": 50,
+      "gates": [
+        { "name": "AI Slop Scan", "status": "pass", "detail": "0 hallucinated deps", "duration": "12s" },
+        { "name": "Type Check", "status": "pass", "detail": "tsc --noEmit", "duration": "8s" },
+        { "name": "Test Quality", "status": "running", "detail": "analyzing assertions..." },
+        { "name": "Mutation Kill", "status": "pending" },
+        { "name": "LLM-as-Judge", "status": "skip" },
+        { "name": "Proof Bundle", "status": "pending" }
+      ],
+      "iterations": [
+        { "status": "pass" }, { "status": "pass" }, { "status": "current" }
+      ],
+      "findings": [
+        { "severity": "info", "message": "47 detection categories found, all have test coverage" },
+        { "severity": "warning", "message": "3 tests have single assertions — consider strengthening" }
+      ]
+    },
+    {
+      "repo": "slopometer",
+      "mode": "audit",
+      "language": "TypeScript",
+      "framework": "Next.js",
+      "branch": "main",
+      "decision": "caution",
+      "iteration": 12,
+      "maxIterations": 50,
+      "gates": [
+        { "name": "AI Slop Scan", "status": "pass", "detail": "0 issues", "duration": "9s" },
+        { "name": "Type Check", "status": "pass", "detail": "tsc clean", "duration": "6s" },
+        { "name": "Test Quality", "status": "warn", "detail": "72% branch coverage", "duration": "34s" },
+        { "name": "Mutation Kill", "status": "warn", "detail": "91% kill rate", "duration": "2m 18s" },
+        { "name": "LLM-as-Judge", "status": "skip" },
+        { "name": "Proof Bundle", "status": "pass", "duration": "2s" }
+      ],
+      "findings": [
+        { "severity": "warning", "message": "Mutation kill rate 91% — 4 survivors in scoring module" },
+        { "severity": "warning", "message": "Branch coverage 72% — error paths in scanner untested" },
+        { "severity": "info", "message": "AI slop detection logic itself is well-tested" }
+      ]
+    },
+    {
+      "repo": "colette",
+      "mode": "audit",
+      "language": "Swift",
+      "framework": "SwiftUI",
+      "branch": "main",
+      "decision": "blocked",
+      "iteration": 3,
+      "maxIterations": 50,
+      "gates": [
+        { "name": "AI Slop Scan", "status": "fail", "detail": "2 phantom imports", "duration": "15s" },
+        { "name": "Type Check", "status": "fail", "detail": "swift build — 7 errors", "duration": "22s" },
+        { "name": "Test Quality", "status": "pending" },
+        { "name": "Mutation Kill", "status": "pending" },
+        { "name": "LLM-as-Judge", "status": "skip" },
+        { "name": "Proof Bundle", "status": "pending" }
+      ],
+      "findings": [
+        { "severity": "blocker", "message": "2 phantom imports: CloudKitSync (not in project), DesignTokens (removed)" },
+        { "severity": "blocker", "message": "7 type errors in ContentView.swift — missing protocol conformance" }
+      ]
+    }
+  ]
+}
+</script>
+
+</body>
+</html>

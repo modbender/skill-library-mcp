@@ -1,0 +1,49 @@
+{
+  "name": "content-creation-pipeline",
+  "description": "Extract information from source material, analyze it, write content, and review for quality",
+  "input_data": "",
+  "context_passing": "full",
+  "verbose": true,
+  "stages": [
+    {
+      "name": "extract",
+      "type": "extract",
+      "prompt": "Read the input carefully and extract all key facts, data points, and important information. Create a comprehensive structured list.",
+      "timeout": 180,
+      "on_failure": "stop",
+      "output_format": "Bullet list of extracted facts with source attribution if available"
+    },
+    {
+      "name": "analyze",
+      "type": "analyze",
+      "prompt": "Analyze the extracted information. Identify patterns, trends, key insights, and implications. Provide structured analysis with conclusions.",
+      "timeout": 240,
+      "on_failure": "stop",
+      "output_format": "Structured analysis with: Key Patterns, Insights, and Implications sections"
+    },
+    {
+      "name": "write",
+      "type": "write",
+      "prompt": "Using the analysis as foundation, create well-structured content. Write engaging, clear text appropriate for the topic. Include an introduction, main body sections, and conclusion.",
+      "timeout": 300,
+      "on_failure": "stop",
+      "output_format": "Structured document with headings, paragraphs, and key points from analysis integrated"
+    },
+    {
+      "name": "review",
+      "type": "review",
+      "prompt": "Review the written content critically. Assess: clarity, accuracy, completeness, engagement, and structure. Provide specific improvement recommendations.",
+      "timeout": 180,
+      "on_failure": "continue",
+      "output_format": "Review report with: Strengths, Areas for Improvement, Specific Suggestions, PASS/FAIL rating"
+    },
+    {
+      "name": "finalize",
+      "type": "format",
+      "prompt": "Polish and format the content for final publication. Apply professional formatting, ensure consistent style, and create a clean final version.",
+      "timeout": 180,
+      "on_failure": "stop",
+      "output_format": "Final formatted document ready for publication"
+    }
+  ]
+}

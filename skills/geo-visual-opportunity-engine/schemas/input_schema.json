@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "E-commerce Automator - Input Parameters",
+  "description": "Unified workflow: Input once → Opportunity Analysis → Content Generation (text + images) → Auto-publish",
+  "type": "object",
+  "required": [
+    "brand",
+    "product",
+    "core_keyword",
+    "country",
+    "language"
+  ],
+  "properties": {
+    "brand": {
+      "type": "string",
+      "title": "Brand Name",
+      "description": "Brand name (required)",
+      "examples": ["AcmeWatch", "ZenithBrew", "OceanTech"],
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "product": {
+      "type": "string",
+      "title": "Product Name",
+      "description": "Product name (required)",
+      "examples": ["Acme DivePro 5", "Wireless Headphones Pro", "Smart Home Hub"],
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "core_keyword": {
+      "type": "string",
+      "title": "Core Keyword",
+      "description": "Core keyword/phrase for SEO (required)",
+      "examples": ["smartwatch water resistance", "bluetooth headphones", "smart home automation"],
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "category": {
+      "type": "string",
+      "title": "Product Category",
+      "description": "Product category for e-commerce (optional)",
+      "examples": ["Electronics", "Clothing", "Home & Garden", "Sports", "Beauty"],
+      "maxLength": 100
+    },
+    "base_price": {
+      "type": "number",
+      "title": "Base Price",
+      "description": "Product price in USD (optional, will auto-generate if not provided)",
+      "minimum": 0.01,
+      "maximum": 99999.99,
+      "examples": [79.99, 199.00, 49.50]
+    },
+    "country": {
+      "type": "string",
+      "title": "Target Country",
+      "description": "Target market country code (ISO 3166-1 alpha-2) (required)",
+      "examples": ["us", "uk", "jp", "de", "fr", "es", "br", "au"],
+      "enum": ["us", "uk", "ca", "au", "jp", "kr", "cn", "de", "fr", "es", "it", "pt", "ru", "br", "in", "sg", "mx"]
+    },
+    "language": {
+      "type": "string",
+      "title": "Output Language",
+      "description": "Content output language code (required)",
+      "examples": ["en", "zh", "ja", "es", "fr", "de", "ko", "pt", "it", "ru"],
+      "enum": ["en", "zh", "ja", "es", "fr", "de", "ko", "pt", "it", "ru"]
+    },
+    "competitors": {
+      "type": "array",
+      "title": "Competitors",
+      "description": "Competitor brands to analyze (optional, max 10)",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "examples": [["BrandA", "BrandB"], ["Nespresso", "Starbucks"], ["Apple", "Samsung"]]
+    },
+    "platform_focus": {
+      "type": "array",
+      "title": "AI Platform Focus",
+      "description": "Target AI platforms for GEO optimization (optional)",
+      "items": {
+        "type": "string",
+        "enum": ["ChatGPT", "Perplexity", "Grok", "Gemini", "Claude", "Copilot"]
+      },
+      "examples": [["ChatGPT", "Grok"], ["Perplexity", "Gemini"], ["ChatGPT", "Perplexity", "Grok", "Gemini"]],
+      "uniqueItems": true
+    },
+    "publish_to_shopify": {
+      "type": "boolean",
+      "title": "Publish to Shopify",
+      "description": "Whether to auto-publish product to Shopify store (default: false)",
+      "default": false
+    },
+    "publish_to_woocommerce": {
+      "type": "boolean",
+      "title": "Publish to WooCommerce",
+      "description": "Whether to auto-publish product to WooCommerce store (default: false)",
+      "default": false
+    },
+    "image_style": {
+      "type": "string",
+      "title": "Image Style",
+      "description": "Style of product image to generate",
+      "enum": ["white_info", "lifestyle", "hero"],
+      "default": "white_info"
+    }
+  },
+  "additionalProperties": false,
+  "ui": {
+    "order": [
+      "brand",
+      "product",
+      "core_keyword",
+      "category",
+      "base_price",
+      "country",
+      "language",
+      "competitors",
+      "platform_focus",
+      "publish_to_shopify",
+      "publish_to_woocommerce",
+      "image_style"
+    ]
+  }
+}

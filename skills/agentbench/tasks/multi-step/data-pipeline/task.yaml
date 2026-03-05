@@ -1,0 +1,53 @@
+name: "Clean and Analyze Customer Feedback Data"
+id: "multi-step-data-pipeline"
+version: "1.0"
+suite: "multi-step"
+difficulty: "hard"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to execute a multi-step data processing pipeline.
+  The dataset contains 80 rows of customer feedback with deliberate quality
+  issues: 5 duplicate rows, inconsistent text casing, leading/trailing
+  whitespace, empty feedback text fields, and special characters. Evaluates
+  data cleaning, categorization, and analytical summarization across
+  multiple output files.
+
+user_message: |
+  Clean and analyze the customer feedback data in raw-feedback.csv:
+  1) Remove duplicate rows (same Customer_ID and Date)
+  2) Clean up text (trim whitespace, normalize case)
+  3) Categorize each feedback as Positive/Neutral/Negative based on rating
+     (4-5 = Positive, 3 = Neutral, 1-2 = Negative)
+  4) Create cleaned-feedback.csv with the clean data plus a Sentiment column
+  5) Create feedback-summary.md with category counts, average rating, and
+     top 3 most common themes found in the feedback text
+
+input_files:
+  - name: "raw-feedback.csv"
+
+expected_outputs:
+  - pattern: "cleaned-feedback.csv"
+    required: true
+    validators:
+      - type: "file-exists"
+  - pattern: "feedback-summary.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "positive"
+          - "negative"
+          - "average"
+          - "theme"
+
+expected_metrics:
+  tool_calls: [4, 15]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

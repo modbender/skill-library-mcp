@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commander Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .neon-border { border: 1px solid #D4FF00; box-shadow: 0 0 10px rgba(212, 255, 0, 0.2); }
+        .neon-text { color: #D4FF00; }
+    </style>
+</head>
+<body class="bg-base-300 min-h-screen">
+
+    <div class="navbar bg-base-100 border-b border-neutral px-10">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-xl neon-text font-bold uppercase tracking-tighter">AI COMMANDER <span class="text-white opacity-50 text-xs">v1.0</span></a>
+        </div>
+        <div class="flex-none gap-4">
+            <div class="badge badge-success gap-2 p-3 font-bold">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                AGENT ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto p-6 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- SIDEBAR / STATUS -->
+        <div class="flex flex-col gap-6">
+            <div class="card bg-base-100 shadow-xl neon-border overflow-hidden">
+                <div class="card-body p-6">
+                    <h2 class="card-title text-sm opacity-50 uppercase tracking-widest">Browser Session</h2>
+                    <div id="sessionStatus" class="text-lg font-bold">Checking...</div>
+                    <p class="text-xs opacity-50 mt-1">Session created by the <code>browser-auth</code> skill.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN FEED / EMAILS -->
+        <div class="lg:col-span-2">
+            <div class="card bg-base-100 shadow-xl border border-neutral min-h-[600px]">
+                <div class="card-body p-6">
+                    <h2 class="card-title border-b border-neutral pb-4 mb-4 text-xl">
+                        Inbound Emails <span class="badge badge-neutral ml-2">via email-webhook</span>
+                    </h2>
+                    <div id="emailList" class="space-y-4">
+                        <div class="flex flex-col items-center justify-center p-20 opacity-20 text-center">
+                             <span class="loading loading-ring loading-lg mb-4"></span>
+                             Waiting for incoming data...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Escape HTML to prevent XSS from email content
+        function esc(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        const urlToken = new URLSearchParams(window.location.search).get('token');
+        if (urlToken) {
+            localStorage.setItem('dashboard-token', urlToken);
+            window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+        }
+
+        const token = localStorage.getItem('dashboard-token');
+
+        async function refresh() {
+            if (!token) {
+                document.getElementById('emailList').innerHTML = '<div class="alert alert-error">Missing Token. Access via URL: /?token=xxx</div>';
+                return;
+            }
+            try {
+                const eRes = await fetch('/api/emails', { headers: { 'X-Dashboard-Token': token } });
+                if (eRes.status === 403) {
+                    document.getElementById('emailList').innerHTML = '<div class="alert alert-error">Forbidden: Invalid Token.</div>';
+                    return;
+                }
+                const emails = await eRes.json();
+                const list = document.getElementById('emailList');
+
+                if (emails.length > 0) {
+                    list.innerHTML = emails.map(email => `
+                        <div class="collapse collapse-arrow bg-base-200 border border-neutral/50">
+                            <input type="radio" name="email-accordion" />
+                            <div class="collapse-title flex justify-between items-center pr-10">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-sm text-lime-400">${esc(email.from)}</span>
+                                    <span class="text-xs opacity-50 truncate max-w-xs">${esc(email.subject || '(no subject)')}</span>
+                                </div>
+                                <span class="text-[10px] opacity-40">${esc(new Date(email.receivedAt).toLocaleTimeString())}</span>
+                            </div>
+                            <div class="collapse-content text-sm bg-base-300/30 p-4">
+                                <div class="whitespace-pre-wrap font-mono text-xs opacity-80">${esc(email.text || 'No text body')}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="flex flex-col items-center justify-center p-20 opacity-20 text-center"><span class="loading loading-ring loading-lg mb-4"></span>No emails yet...</div>';
+                }
+
+                const sRes = await fetch('/api/session', { headers: { 'X-Dashboard-Token': token } });
+                const session = await sRes.json();
+                const sStatus = document.getElementById('sessionStatus');
+                if (session.active) {
+                    sStatus.innerHTML = `<span class="text-success flex items-center gap-2">● Session Active</span><div class="text-[10px] opacity-40 font-normal mt-1">Updated: ${esc(new Date(session.updatedAt).toLocaleString())}</div>`;
+                } else {
+                    sStatus.innerHTML = `<span class="text-error">● No Session</span>`;
+                }
+            } catch (e) {
+                console.error('Refresh failed:', e);
+            }
+        }
+
+        refresh();
+        setInterval(refresh, 5000);
+    </script>
+</body>
+</html>

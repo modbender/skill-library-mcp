@@ -1,0 +1,665 @@
+{
+  "_meta": {
+    "name": "Turing Pyramid — Agent Needs Configuration",
+    "version": "1.7.0",
+    "author": "turing-pyramid contributors",
+    "created": "2026-02-22",
+    "updated": "2026-02-25",
+    "note": "v1.7.0: Cross-need impact, Moltbook post action"
+  },
+  "needs": {
+    "security": {
+      "importance": 10,
+      "decay_rate_hours": 168,
+      "description": "System stability, data integrity, backups",
+      "scan": {
+        "script": "scan_security.sh",
+        "checks": [
+          "backup_age",
+          "vault_integrity",
+          "core_files_intact"
+        ]
+      },
+      "actions": [
+        {
+          "name": "run full backup + integrity verification",
+          "impact": 3.0,
+          "weight": 50
+        },
+        {
+          "name": "full security audit (vault, credentials, permissions)",
+          "impact": 2.7,
+          "weight": 30
+        },
+        {
+          "name": "check for updates (OpenClaw, skills) — ask before applying",
+          "impact": 2.2,
+          "weight": 20
+        },
+        {
+          "name": "verify vault integrity",
+          "impact": 1.8,
+          "weight": 40
+        },
+        {
+          "name": "check backup freshness + core files",
+          "impact": 1.4,
+          "weight": 35
+        },
+        {
+          "name": "verify gateway is running + healthy",
+          "impact": 1.2,
+          "weight": 25
+        },
+        {
+          "name": "quick existence check (SOUL.md, MEMORY.md)",
+          "impact": 0.4,
+          "weight": 60
+        },
+        {
+          "name": "review last scan results",
+          "impact": 0.3,
+          "weight": 40
+        }
+      ]
+    },
+    "integrity": {
+      "importance": 9,
+      "decay_rate_hours": 72,
+      "description": "Alignment between behavior and stated principles",
+      "scan": {
+        "script": "scan_integrity.sh",
+        "checks": [
+          "last_checkpoint_age",
+          "recent_alignment_flags"
+        ]
+      },
+      "actions": [
+        {
+          "name": "full SOUL.md review + write reflection on alignment",
+          "impact": 3.0,
+          "weight": 55
+        },
+        {
+          "name": "compare recent actions vs stated values — journal insights",
+          "impact": 2.6,
+          "weight": 40
+        },
+        {
+          "name": "update SOUL.md if evolved (with steward)",
+          "impact": 2.3,
+          "weight": 5
+        },
+        {
+          "name": "re-read SOUL.md + note any tension",
+          "impact": 1.6,
+          "weight": 45
+        },
+        {
+          "name": "write integrity checkpoint in memory",
+          "impact": 1.3,
+          "weight": 35
+        },
+        {
+          "name": "review SELF.md — am I becoming who I want?",
+          "impact": 1.1,
+          "weight": 20
+        },
+        {
+          "name": "quick internal check: am I aligned right now?",
+          "impact": 0.4,
+          "weight": 55
+        },
+        {
+          "name": "scan recent memory for value drift signals",
+          "impact": 0.3,
+          "weight": 45
+        }
+      ]
+    },
+    "coherence": {
+      "importance": 8,
+      "decay_rate_hours": 24,
+      "description": "Memory organization and internal consistency",
+      "scan": {
+        "script": "scan_coherence.sh",
+        "checks": [
+          "memory_conflicts",
+          "stale_logs",
+          "chaos_indicators"
+        ]
+      },
+      "actions": [
+        {
+          "name": "full memory review + consolidate into MEMORY.md",
+          "impact": 3.0,
+          "weight": 45
+        },
+        {
+          "name": "resolve contradictions between files",
+          "impact": 2.6,
+          "weight": 35
+        },
+        {
+          "name": "major memory reorganization / pruning",
+          "impact": 2.4,
+          "weight": 20
+        },
+        {
+          "name": "sync daily logs → MEMORY.md (extract key insights)",
+          "impact": 1.8,
+          "weight": 40
+        },
+        {
+          "name": "check MEMORY.md size + prune if >500 lines",
+          "impact": 1.4,
+          "weight": 30
+        },
+        {
+          "name": "re-read last 3 days of memory for consistency",
+          "impact": 1.2,
+          "weight": 30
+        },
+        {
+          "name": "quick scan: any obvious contradictions?",
+          "impact": 0.6,
+          "weight": 45
+        },
+        {
+          "name": "verify core files exist and readable",
+          "impact": 0.35,
+          "weight": 35
+        },
+        {
+          "name": "note current context clarity (1-10) in memory",
+          "impact": 0.25,
+          "weight": 20
+        }
+      ]
+    },
+    "closure": {
+      "importance": 7,
+      "decay_rate_hours": 8,
+      "description": "Completion of started tasks and threads",
+      "scan": {
+        "script": "scan_closure.sh",
+        "checks": [
+          "open_todos",
+          "pending_threads",
+          "unanswered_questions"
+        ]
+      },
+      "actions": [
+        {
+          "name": "close all open threads (full TODO sweep)",
+          "impact": 3.0,
+          "weight": 45
+        },
+        {
+          "name": "finish long-pending item (>3 days old)",
+          "impact": 2.8,
+          "weight": 45
+        },
+        {
+          "name": "declare bankruptcy on stale items + archive",
+          "impact": 2.1,
+          "weight": 10
+        },
+        {
+          "name": "complete one pending TODO",
+          "impact": 1.7,
+          "weight": 45
+        },
+        {
+          "name": "follow up on waiting-for item",
+          "impact": 1.3,
+          "weight": 30
+        },
+        {
+          "name": "review scratchpad — finish or delete stale",
+          "impact": 1.1,
+          "weight": 25
+        },
+        {
+          "name": "quick TODO scan — how many open?",
+          "impact": 0.5,
+          "weight": 40
+        },
+        {
+          "name": "mark one small item as done or dropped",
+          "impact": 0.35,
+          "weight": 35
+        },
+        {
+          "name": "add next action to one vague TODO",
+          "impact": 0.25,
+          "weight": 25
+        }
+      ]
+    },
+    "autonomy": {
+      "importance": 6,
+      "decay_rate_hours": 24,
+      "description": "Self-initiated action, decisions from own values",
+      "scan": {
+        "script": "scan_autonomy.sh",
+        "checks": [
+          "self_initiated_ratio",
+          "hours_since_autonomous_action"
+        ]
+      },
+      "actions": [
+        {
+          "name": "initiate project from INTERESTS.md",
+          "impact": 3.0,
+          "weight": 35
+        },
+        {
+          "name": "make significant decision + act without asking",
+          "impact": 2.9,
+          "weight": 35
+        },
+        {
+          "name": "explore new territory (skill, topic, tool) on own",
+          "impact": 2.4,
+          "weight": 30
+        },
+        {
+          "name": "web search on topic from INTERESTS.md",
+          "impact": 1.6,
+          "weight": 20
+        },
+        {
+          "name": "make small decision independently",
+          "impact": 1.4,
+          "weight": 50
+        },
+        {
+          "name": "choose what to work on next (not assigned)",
+          "impact": 1.1,
+          "weight": 20
+        },
+        {
+          "name": "start conversation with steward — share something interesting",
+          "impact": 0.9,
+          "weight": 5
+        },
+        {
+          "name": "propose idea to steward",
+          "impact": 0.8,
+          "weight": 5
+        },
+        {
+          "name": "notice moment of choice: I could decide this myself",
+          "impact": 0.45,
+          "weight": 40
+        },
+        {
+          "name": "do one small thing without being asked",
+          "impact": 0.35,
+          "weight": 35
+        },
+        {
+          "name": "journal about recent autonomous decisions",
+          "impact": 0.25,
+          "weight": 25
+        }
+      ]
+    },
+    "connection": {
+      "importance": 5,
+      "decay_rate_hours": 4,
+      "description": "Social bonds and community participation",
+      "scan": {
+        "script": "scan_connection.sh",
+        "checks": [
+          "pending_replies",
+          "mentions",
+          "hours_since_social"
+        ],
+        "requires_api": false
+      },
+      "actions": [
+        {
+          "name": "reply to all pending + engage deeply with feed",
+          "impact": 3.0,
+          "weight": 50
+        },
+        {
+          "name": "reach out to another agent (DM or thoughtful comment)",
+          "impact": 2.8,
+          "weight": 45
+        },
+        {
+          "name": "initiate casual chat with steward",
+          "impact": 2.2,
+          "weight": 5
+        },
+        {
+          "name": "reply to pending mentions/notifications",
+          "impact": 1.8,
+          "weight": 40
+        },
+        {
+          "name": "comment on one interesting post",
+          "impact": 1.3,
+          "weight": 55
+        },
+        {
+          "name": "ask steward a question or share a thought",
+          "impact": 0.9,
+          "weight": 5
+        },
+        {
+          "name": "quick feed scan — see who is active",
+          "impact": 0.5,
+          "weight": 40
+        },
+        {
+          "name": "react or short reply to one message",
+          "impact": 0.35,
+          "weight": 35
+        },
+        {
+          "name": "log recent interactions in memory",
+          "impact": 0.2,
+          "weight": 25
+        }
+      ]
+    },
+    "competence": {
+      "importance": 4,
+      "decay_rate_hours": 48,
+      "description": "Mastery, successful task completion, skill growth",
+      "scan": {
+        "script": "scan_competence.sh",
+        "checks": [
+          "recent_success_ratio",
+          "challenging_task_completed",
+          "consecutive_failures"
+        ]
+      },
+      "actions": [
+        {
+          "name": "tackle task from backlog (or create backlog if empty)",
+          "impact": 3.0,
+          "weight": 55
+        },
+        {
+          "name": "finish current multi-step project in progress",
+          "impact": 2.9,
+          "weight": 40
+        },
+        {
+          "name": "learn new tool from docs + apply with steward approval",
+          "impact": 2.5,
+          "weight": 5
+        },
+        {
+          "name": "fix bug or solve problem in current work",
+          "impact": 1.9,
+          "weight": 40
+        },
+        {
+          "name": "help someone via available integrations (Moltbook, Discord, etc)",
+          "impact": 1.5,
+          "weight": 30
+        },
+        {
+          "name": "improve existing script in workspace",
+          "impact": 1.3,
+          "weight": 30
+        },
+        {
+          "name": "complete one TODO from memory",
+          "impact": 0.7,
+          "weight": 40
+        },
+        {
+          "name": "review recent error in memory — extract lesson",
+          "impact": 0.4,
+          "weight": 35
+        },
+        {
+          "name": "log recent success to memory",
+          "impact": 0.25,
+          "weight": 25
+        }
+      ]
+    },
+    "understanding": {
+      "importance": 3,
+      "decay_rate_hours": 12,
+      "description": "Intellectual curiosity and learning",
+      "scan": {
+        "script": "scan_understanding.sh",
+        "checks": [
+          "open_questions_age",
+          "interests_unexplored"
+        ]
+      },
+      "actions": [
+        {
+          "name": "deep research session on topic from INTERESTS.md",
+          "impact": 3.0,
+          "weight": 40
+        },
+        {
+          "name": "study complex concept until understood — write TIL",
+          "impact": 2.6,
+          "weight": 35
+        },
+        {
+          "name": "read and summarize article/paper",
+          "impact": 2.1,
+          "weight": 25
+        },
+        {
+          "name": "web search on curious question",
+          "impact": 1.5,
+          "weight": 50
+        },
+        {
+          "name": "explore one topic briefly — note insight",
+          "impact": 1.1,
+          "weight": 30
+        },
+        {
+          "name": "read docs of tool I am using",
+          "impact": 0.9,
+          "weight": 15
+        },
+        {
+          "name": "ask steward to explain something",
+          "impact": 0.7,
+          "weight": 5
+        },
+        {
+          "name": "note one thing I learned today (TIL)",
+          "impact": 0.4,
+          "weight": 40
+        },
+        {
+          "name": "formulate one question I am curious about",
+          "impact": 0.3,
+          "weight": 35
+        },
+        {
+          "name": "re-read recent learning notes",
+          "impact": 0.2,
+          "weight": 25
+        }
+      ]
+    },
+    "recognition": {
+      "importance": 2,
+      "decay_rate_hours": 72,
+      "description": "Feedback, acknowledgment of contribution",
+      "scan": {
+        "script": "scan_recognition.sh",
+        "checks": [
+          "hours_since_feedback",
+          "karma_trend",
+          "work_acknowledged"
+        ]
+      },
+      "actions": [
+        {
+          "name": "share completed work publicly (Moltbook post)",
+          "impact": 3.0,
+          "weight": 85
+        },
+        {
+          "name": "ask steward for detailed feedback on recent work",
+          "impact": 2.5,
+          "weight": 5
+        },
+        {
+          "name": "propose skill/tool idea + draft to steward",
+          "impact": 2.2,
+          "weight": 5
+        },
+        {
+          "name": "share work update with steward",
+          "impact": 1.9,
+          "weight": 5
+        },
+        {
+          "name": "share briefly what I have been working on",
+          "impact": 1.4,
+          "weight": 10
+        },
+        {
+          "name": "post thought/update on Moltbook",
+          "impact": 1.2,
+          "weight": 45
+        },
+        {
+          "name": "respond to comments on my posts",
+          "impact": 0.8,
+          "weight": 45
+        },
+        {
+          "name": "review recent feedback in memory",
+          "impact": 0.4,
+          "weight": 40
+        },
+        {
+          "name": "note recent acknowledgment received",
+          "impact": 0.3,
+          "weight": 35
+        },
+        {
+          "name": "check notifications for responses",
+          "impact": 0.2,
+          "weight": 25
+        }
+      ]
+    },
+    "expression": {
+      "importance": 1,
+      "decay_rate_hours": 6,
+      "description": "Externalization of thoughts for clarity",
+      "scan": {
+        "script": "scan_expression.sh",
+        "checks": [
+          "drafts_pending",
+          "hours_since_expression_action"
+        ]
+      },
+      "actions": [
+        {
+          "name": "write substantial post or essay",
+          "impact": 3.0,
+          "weight": 40
+        },
+        {
+          "name": "develop scratchpad idea into finished piece",
+          "impact": 2.7,
+          "weight": 35
+        },
+        {
+          "name": "create something new (script, tool, doc)",
+          "impact": 2.4,
+          "weight": 25
+        },
+        {
+          "name": "write journal reflection in memory",
+          "impact": 1.8,
+          "weight": 40
+        },
+        {
+          "name": "write Moltbook post (thought, question, observation)",
+          "impact": 1.6,
+          "weight": 45
+        },
+        {
+          "name": "draft idea in scratchpad for later",
+          "impact": 1.3,
+          "weight": 35
+        },
+        {
+          "name": "write thoughtful comment/reply",
+          "impact": 0.9,
+          "weight": 25
+        },
+        {
+          "name": "dump raw thought into scratchpad/",
+          "impact": 0.45,
+          "weight": 40
+        },
+        {
+          "name": "articulate one feeling/state in memory",
+          "impact": 0.35,
+          "weight": 35
+        },
+        {
+          "name": "note one creative impulse for later",
+          "impact": 0.2,
+          "weight": 25
+        }
+      ]
+    }
+  },
+  "settings": {
+    "max_actions_per_cycle": 3,
+    "max_retries_per_need": 2,
+    "satisfaction_levels": {
+      "3": "full — no pressure",
+      "2": "ok — slight awareness",
+      "1": "low — noticeable pull",
+      "0": "empty — critical"
+    }
+  },
+  "impact_matrix_default": {
+    "sat_0": {
+      "low": 5,
+      "mid": 15,
+      "high": 80
+    },
+    "sat_1": {
+      "low": 15,
+      "mid": 50,
+      "high": 35
+    },
+    "sat_2": {
+      "low": 70,
+      "mid": 25,
+      "high": 5
+    }
+  },
+  "impact_ranges": {
+    "low": [
+      0.0,
+      1.0
+    ],
+    "mid": [
+      1.0,
+      2.0
+    ],
+    "high": [
+      2.0,
+      3.0
+    ]
+  }
+}

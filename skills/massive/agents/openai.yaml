@@ -1,0 +1,35 @@
+interface:
+  display_name: "Massive CLI"
+  short_description: "OpenClaw Bash wrapper for Massive API"
+  default_prompt: "Use $massive-com to query Massive REST endpoints through a safe Bash CLI for OpenClaw agents."
+
+policy:
+  allow_implicit_invocation: true
+
+runtime:
+  required_tools:
+    - bash
+    - curl
+    - jq
+  environment_variables:
+    - name: MASSIVE_API_KEY_REF
+      required: false
+      preferred: true
+      description: "OpenClaw SecretRef JSON for the Massive API key."
+    - name: MASSIVE_API_KEY
+      required: false
+      preferred: false
+      description: "Plaintext Massive API key fallback for local development."
+    - name: MASSIVE_BASE_URL
+      required: false
+      preferred: false
+      description: "Optional HTTPS origin override. Defaults to https://api.massive.com."
+
+credentials:
+  primary:
+    any_of:
+      - MASSIVE_API_KEY_REF
+      - MASSIVE_API_KEY
+  notes:
+    - "MASSIVE_API_KEY_REF is preferred when the runtime supports OpenClaw SecretRef resolution."
+    - "If both are set, the secret ref takes precedence over the plaintext fallback."

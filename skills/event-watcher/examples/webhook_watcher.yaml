@@ -1,0 +1,15 @@
+watchers:
+  - name: webhook_events
+    source: webhook
+    webhook_log_path: /root/.openclaw/workspace/webhook_events.jsonl
+    batch_count: 50
+    filter:
+      field: "payload.type"
+      op: "!="
+      value: "sunny"
+    wake:
+      method: sessions_send
+      reply_channel: slack
+      reply_to: channel:YOUR_CHANNEL_ID
+      message_template: |
+        Webhook event: id={{event_id}} type={{payload.type}} city={{payload.city}}

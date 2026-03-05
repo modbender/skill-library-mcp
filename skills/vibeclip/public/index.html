@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video App Prototype</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: auto; padding: 20px; }
+    form { border: 1px solid #ccc; padding: 20px; }
+    input, textarea, button { display: block; margin: 10px 0; width: 100%; }
+    #result { margin-top: 20px; }
+    video { width: 100%; max-width: 640px; }
+    pre { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🎵 Video App Prototype</h1>
+  <p>Upload melody audio, photo, and prompt to generate scenes description and synced video clip (photo morph + waveform).</p>
+  
+  <form id="genForm" enctype="multipart/form-data">
+    <label>Audio (mp3/wav):</label>
+    <input type="file" name="audio" accept="audio/*" required>
+    
+    <label>Photo (jpg/png):</label>
+    <input type="file" name="photo" accept="image/*" required>
+    
+    <label>Prompt (theme/desc):</label>
+    <textarea name="prompt" placeholder="e.g. romantic sunset guitar melody" required rows="3"></textarea>
+    
+    <button type="submit">Generate Scenes & Video</button>
+  </form>
+  
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('genForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<p>Generating...</p>';
+
+      try {
+        const res = await fetch('/generate', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <h3>Scenes Description:</h3>
+            <pre>${data.scenes}</pre>
+            <h3>Video:</h3>
+            <video controls src="${data.videoUrl}"></video>
+            <a href="${data.downloadUrl}" download>Download MP4</a>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

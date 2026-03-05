@@ -1,0 +1,77 @@
+{
+  "provider": "idp",
+  "title": "Identity Provider Permissions",
+  "description": "Required permissions for AuditClaw identity provider compliance scanning",
+  "providers": {
+    "google_workspace": {
+      "title": "Google Workspace",
+      "authentication": {
+        "method": "Service Account with Domain-Wide Delegation",
+        "env_vars": {
+          "GOOGLE_WORKSPACE_SA_KEY": "Path to service account JSON key file",
+          "GOOGLE_WORKSPACE_ADMIN_EMAIL": "Super admin email for impersonation"
+        }
+      },
+      "setup_steps": [
+        "Enable Admin SDK API in Google Cloud Console (APIs & Services -> Library)",
+        "Create a service account in IAM & Admin -> Service Accounts",
+        "Enable domain-wide delegation on the service account",
+        "In Google Admin -> Security -> API controls -> Domain-wide delegation, add the service account client ID",
+        "Grant these OAuth scopes to the service account"
+      ],
+      "oauth_scopes": [
+        {
+          "scope": "https://www.googleapis.com/auth/admin.directory.user.readonly",
+          "reason": "Read user directory: MFA status, login times, password strength"
+        },
+        {
+          "scope": "https://www.googleapis.com/auth/admin.reports.audit.readonly",
+          "reason": "Read admin audit reports for security event monitoring"
+        }
+      ],
+      "checks_covered": {
+        "google_mfa": "All active users have 2-step verification enrolled and enforced",
+        "google_admins": "Super admin count is 2-4, all with 2SV enabled",
+        "google_inactive": "No active users with last login > 90 days",
+        "google_passwords": "All users have password strength rated STRONG"
+      }
+    },
+    "okta": {
+      "title": "Okta",
+      "authentication": {
+        "method": "API Token (SSWS)",
+        "env_vars": {
+          "OKTA_ORG_URL": "Okta organization URL (e.g., https://mycompany.okta.com)",
+          "OKTA_API_TOKEN": "Okta API token (SSWS format)"
+        }
+      },
+      "setup_steps": [
+        "Go to Okta Admin Console -> Security -> API -> Tokens",
+        "Click 'Create Token'",
+        "Name: auditclaw-scanner",
+        "Copy the token value (shown only once)"
+      ],
+      "required_permissions": [
+        {
+          "permission": "okta.users.read",
+          "reason": "Read user profiles, MFA enrollment status, login activity"
+        },
+        {
+          "permission": "okta.factors.read",
+          "reason": "Read MFA factor enrollment for each user"
+        },
+        {
+          "permission": "okta.policies.read",
+          "reason": "Read password and session policies"
+        }
+      ],
+      "checks_covered": {
+        "okta_mfa": "All active users have at least 1 MFA factor enrolled",
+        "okta_passwords": "Password policy: minLength>=12, history>=5, maxAttempts<=5, maxAge<=90",
+        "okta_inactive": "No active users with last login > 90 days",
+        "okta_sessions": "MFA required per session, session lifetime <= 12h, idle timeout <= 1h"
+      },
+      "note": "Okta API tokens inherit the permissions of the admin who creates them. Use a read-only admin or Super Admin with care."
+    }
+  }
+}

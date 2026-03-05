@@ -1,0 +1,42 @@
+{
+  "provider": "azure",
+  "title": "Azure Role Assignments",
+  "description": "Required Azure RBAC roles for AuditClaw compliance scanning",
+  "authentication": {
+    "recommended": "Service Principal",
+    "alternative": "Azure CLI (az login)",
+    "env_vars": {
+      "AZURE_CLIENT_ID": "Service principal application (client) ID",
+      "AZURE_CLIENT_SECRET": "Service principal client secret",
+      "AZURE_TENANT_ID": "Azure AD tenant ID",
+      "AZURE_SUBSCRIPTION_ID": "Target subscription ID"
+    }
+  },
+  "roles": [
+    {
+      "role": "Reader",
+      "scope": "Subscription",
+      "reason": "Read access to all resource configurations (storage, compute, network, SQL, App Service)",
+      "built_in_id": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+    },
+    {
+      "role": "Security Reader",
+      "scope": "Subscription",
+      "reason": "Read access to Microsoft Defender for Cloud status and security recommendations",
+      "built_in_id": "39bc4728-0917-49c7-9d2c-d95423bc2eb4"
+    }
+  ],
+  "setup_commands": {
+    "create_sp": "az ad sp create-for-rbac --name auditclaw-scanner --role Reader --scopes /subscriptions/<SUBSCRIPTION_ID>",
+    "add_security_reader": "az role assignment create --assignee <APP_ID> --role 'Security Reader' --scope /subscriptions/<SUBSCRIPTION_ID>"
+  },
+  "checks_covered": {
+    "storage": "Storage account encryption, HTTPS enforcement, TLS version, public access",
+    "network": "NSG rules for SSH (22) and RDP (3389) exposure",
+    "keyvault": "Soft delete and purge protection",
+    "sql": "Server auditing and TDE encryption",
+    "compute": "VM disk encryption at host",
+    "appservice": "HTTPS-only and TLS 1.2+",
+    "defender": "Defender for Cloud plan status"
+  }
+}

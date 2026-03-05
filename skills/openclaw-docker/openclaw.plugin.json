@@ -1,0 +1,92 @@
+{
+  "id": "openclaw-docker",
+  "name": "Docker",
+  "description": "Manage Docker containers and Compose projects via OpenClaw tools",
+  "version": "0.2.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "socketPath": {
+        "type": "string",
+        "default": "/var/run/docker.sock",
+        "description": "Unix socket path for local Docker daemon"
+      },
+      "host": {
+        "type": "string",
+        "description": "Remote Docker daemon host"
+      },
+      "port": {
+        "type": "number",
+        "default": 2376,
+        "description": "Remote Docker daemon port"
+      },
+      "tls": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "caPath": {
+            "type": "string"
+          },
+          "certPath": {
+            "type": "string"
+          },
+          "keyPath": {
+            "type": "string"
+          },
+          "rejectUnauthorized": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "readOnly": {
+        "type": "boolean",
+        "default": false,
+        "description": "If true, only read operations are allowed"
+      },
+      "allowedOperations": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "ps",
+            "logs",
+            "inspect",
+            "start",
+            "stop",
+            "restart",
+            "compose_up",
+            "compose_down",
+            "compose_ps"
+          ]
+        }
+      },
+      "composeProjects": {
+        "type": "array",
+        "default": [],
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "path"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "timeoutMs": {
+        "type": "number",
+        "default": 15000,
+        "minimum": 1000
+      }
+    }
+  }
+}

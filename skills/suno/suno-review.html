@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;background:#fff;padding:40px 50px;line-height:1.6}
+.header{background-color:#1e3a8a !important;color:#ffffff !important;padding:25px 30px;border-radius:12px;margin-bottom:25px;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+.header h1{font-size:32px;font-weight:700;margin-bottom:10px;color:#ffffff !important}
+.header .meta-row{display:flex;gap:15px;font-size:14px;flex-wrap:wrap}
+.header .meta-row span{background-color:#3b82f6 !important;padding:5px 14px;border-radius:5px;color:#ffffff !important;font-weight:600}
+.publish-box{background:#dbeafe;border:2px solid #2563eb;border-radius:10px;padding:20px 25px;margin-bottom:25px}
+.publish-box h2{font-size:16px;color:#1e40af;margin-bottom:15px;border-bottom:2px solid #2563eb;padding-bottom:6px}
+.publish-box table{width:100%;border-collapse:collapse}
+.publish-box td{padding:8px 12px;font-size:14px;border-bottom:1px solid #93c5fd;vertical-align:top}
+.publish-box td:first-child{font-weight:700;color:#1e40af;width:100px}
+.publish-box .mono{font-family:"SF Mono",Menlo,monospace;font-size:13px;background:#eff6ff;padding:2px 6px;border-radius:3px}
+.main-content{background:#f0fdf4;border:2px solid #22c55e;border-radius:10px;padding:20px 25px;margin-bottom:25px}
+.main-content h2{font-size:18px;color:#166534;margin-bottom:15px;border-bottom:2px solid #22c55e;padding-bottom:6px}
+.main-content h3{font-size:15px;color:#374151;margin:12px 0 6px}
+.main-content p{margin:5px 0;font-size:14px}
+.main-content pre{background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:12px;margin:8px 0;font-size:12px;white-space:pre-wrap}
+.main-content code.inline{background:#dcfce7;padding:2px 6px;border-radius:3px;font-size:13px;color:#166534}
+.main-content li{margin:3px 0;font-size:14px}
+.summary-box{background:#fef3c7;border:2px solid #d97706;border-radius:10px;padding:20px 25px;margin-bottom:25px}
+.summary-box h2{font-size:16px;color:#92400e;margin-bottom:15px}
+.summary-box table{width:100%;border-collapse:collapse}
+.summary-box th{text-align:left;padding:8px;background:#fcd34d;font-size:13px}
+.summary-box td{padding:8px;font-size:13px;border-bottom:1px solid #fcd34d}
+.summary-box tr.valid td{color:#166534}
+.summary-box tr.invalid td{color:#dc2626;background:#fef2f2}
+.file-box{background:#f8fafc;border:2px solid #cbd5e1;border-radius:10px;padding:20px 25px;margin-bottom:20px}
+.file-box h3{font-size:15px;color:#1e40af;margin-bottom:12px}
+.file-box pre{background:#fff;border:1px solid #e2e8f0;padding:15px;font-size:11px;white-space:pre-wrap;line-height:1.5}
+.warning{background:#fef2f2;border:2px solid #dc2626;border-radius:8px;padding:12px 15px;margin-bottom:20px;color:#991b1b;font-size:13px}
+</style></head><body>
+
+<div class="header">
+  <h1>Suno</h1>
+  <div class="meta-row">
+    <span>slug: <strong>suno</strong></span>
+    <span>v1.0.0</span>
+    <span>171 lines ⚠️</span>
+    <span>4 file(s)</span>
+  </div>
+</div>
+
+<div class="publish-box">
+  <h2>Publish Values</h2>
+  <table>
+    <tr><td>--slug</td><td><span class="mono">suno</span></td></tr>
+    <tr><td>--name</td><td><span class="mono">Suno</span></td></tr>
+    <tr><td>--version</td><td><span class="mono">1.0.0</span></td></tr>
+    <tr><td>--changelog</td><td><span class="mono">Initial release</span></td></tr>
+    <tr><td>Description</td><td>Generate songs with Suno AI. Full workflow from idea to audio file via web or API.</td></tr>
+  </table>
+</div>
+
+<div class="warning">⚠️ <strong>171 lines</strong> — exceeds 80 line limit.</div>
+
+<div class="main-content">
+  <h2>📄 SKILL.md</h2>
+  <h2>Setup</h2>
+<p>On first use, read <code class="inline">setup.md</code> for integration guidelines.</p>
+<h2>When to Use</h2>
+<p>User wants to generate a song. Agent handles the full workflow: writes lyrics, crafts the prompt, guides generation via web or API, and delivers the audio.</p>
+<h2>Architecture</h2>
+<p>Memory at <code class="inline">~/suno/</code>. See <code class="inline">memory-template.md</code> for structure.</p>
+<p>The agent creates this folder to store:</p>
+<li>User preferences and favorite styles</li>
+<li>Successful prompts for reuse</li>
+<h2>Quick Reference</h2>
+<p>| Topic | File |</p>
+<p>|-------|------|</p>
+<p>| Setup process | <code class="inline">setup.md</code> |</p>
+<p>| Memory template | <code class="inline">memory-template.md</code> |</p>
+<p>| API options | <code class="inline">api-reference.md</code> |</p>
+<h2>How to Generate</h2>
+<h3>Option A: Suno Website (Default)</h3>
+<p>Most users generate directly at suno.com/create:</p>
+<p>1. Go to suno.com and log in</p>
+<p>2. Choose Simple mode (describe) or Custom mode (lyrics + style)</p>
+<p>3. Click Create and wait 30-60 seconds</p>
+<p>4. Download the audio</p>
+<p>The agent helps craft the perfect prompt before you paste it.</p>
+<h3>Option B: Third-Party APIs (For Automation)</h3>
+<p>For programmatic access, see <code class="inline">api-reference.md</code> which documents:</p>
+<li>aimusicapi.ai (hosted, API key)</li>
+<li>EvoLink (hosted, API key)</li>
+<li>Self-hosted options (advanced users)</li>
+<p>The agent can guide you through API calls if you have one configured.</p>
+<h2>Core Rules</h2>
+<h3>1. Prompt Structure</h3>
+<p>Effective prompts follow this pattern:</p>
+<pre><code>
+[Genre] [mood] song about [topic], [vocal description], [tempo/energy], [instruments]
+</code></pre>
+<p>Example: "Indie folk melancholic song about lost love, soft female vocals, slow tempo, acoustic guitar and piano"</p>
+<h3>2. Be Specific About Vocals</h3>
+<li>Gender: male, female, duet, choir</li>
+<li>Style: raspy, smooth, powerful, whispered, operatic</li>
+<li>Range: deep, high-pitched, baritone, soprano</li>
+<h3>3. Genre + Subgenre = Better Results</h3>
+<p>| Generic (weak) | Specific (strong) |</p>
+<p>|----------------|-------------------|</p>
+<p>| Rock | 90s grunge rock |</p>
+<p>| Electronic | Deep house with analog synths |</p>
+<p>| Pop | 2010s synth-pop |</p>
+<p>| Hip hop | Lo-fi boom bap |</p>
+<h3>4. Mood Layering</h3>
+<p>Combine 2-3 mood descriptors:</p>
+<li>Energy: energetic, chill, explosive, dreamy</li>
+<li>Emotion: melancholic, euphoric, nostalgic, hopeful</li>
+<li>Atmosphere: dark, bright, ethereal, cinematic</li>
+<h3>5. Custom Mode Lyrics</h3>
+<pre><code>
+[Verse 1]
+Your lyrics here
+Keep verses 4-6 lines
+[Chorus]
+Catchy hook here
+Repeat key phrases
+[Bridge]
+Contrast section
+[Outro]
+Fade out
+</code></pre>
+<h3>6. Style Tags</h3>
+<pre><code>
+Genres: rock, pop, jazz, classical, electronic, hip-hop, country, R&amp;B, metal, folk, reggae, blues, soul, funk, disco, ambient, lo-fi
+Decades: 60s, 70s, 80s, 90s, 2000s, 2010s, modern
+Production: lo-fi, polished, raw, clean, vintage, futuristic
+Instruments: guitar, piano, synth, drums, bass, strings, brass
+</code></pre>
+<h3>7. What to Avoid</h3>
+<li>Copyrighted artist names ("sounds like Taylor Swift")</li>
+<li>Overly long prompts (under 200 chars optimal)</li>
+<li>Conflicting styles ("heavy metal lullaby")</li>
+<h2>Workflow</h2>
+<p>1. <strong>Understand the vision</strong> — Genre, mood, purpose</p>
+<p>2. <strong>Craft the prompt</strong> — Apply rules above</p>
+<p>3. <strong>Write lyrics</strong> (if custom mode)</p>
+<p>4. <strong>User generates</strong> — At suno.com or via API</p>
+<p>5. <strong>Iterate</strong> — Refine prompt based on results</p>
+<h2>Lyric Writing</h2>
+<h3>Hook Patterns</h3>
+<li><strong>Repetition:</strong> Repeat key phrase 2-3x in chorus</li>
+<li><strong>Question:</strong> End verse with question, answer in chorus</li>
+<li><strong>Contrast:</strong> Verse low energy, chorus explosive</li>
+<h3>Rhyme Schemes</h3>
+<pre><code>
+AABB: Simple, catchy (pop, country)
+ABAB: Classic, narrative (rock, folk)
+ABCB: Subtle, sophisticated (jazz, R&amp;B)
+Free: Modern, emotional (indie, hip-hop)
+</code></pre>
+<h3>Syllable Matching</h3>
+<p>Keep counts similar:</p>
+<pre><code>
+OK: "Walking down the street" (5) / "Looking for the beat" (5)
+Bad: "Walking down" (3) / "I am looking everywhere for something" (10)
+</code></pre>
+<h2>Common Traps</h2>
+<li><strong>Vague prompts</strong> ("make a good song") → garbage output</li>
+<li><strong>No vocal description</strong> → random voice</li>
+<li><strong>Incompatible genres</strong> → confused generation</li>
+<li><strong>Forgetting tempo</strong> → inconsistent pacing</li>
+<li><strong>Unstructured lyrics</strong> → awkward phrasing</li>
+<h2>Data Storage</h2>
+<p>This skill stores preferences locally in <code class="inline">~/suno/</code>:</p>
+<li>Music preferences and favorite styles</li>
+<li>Successful prompts for reuse</li>
+<p>All data stays on your machine. The skill itself makes no external requests.</p>
+<h2>Related Skills</h2>
+<p>Install with <code class="inline">clawhub install &lt;slug&gt;</code> if user confirms:</p>
+<li><code class="inline">audio</code> — audio processing and editing</li>
+<li><code class="inline">ffmpeg</code> — convert and manipulate audio files</li>
+<li><code class="inline">video</code> — combine music with video content</li>
+<h2>Feedback</h2>
+<li>If useful: <code class="inline">clawhub star suno</code></li>
+<li>Stay updated: <code class="inline">clawhub sync</code></li>
+</div>
+
+<div class="summary-box">
+  <h2>📎 Supporting Files</h2>
+  <table>
+    <tr><th>File</th><th>Size</th><th>Status</th></tr>
+    <tr class="valid"><td>setup.md</td><td>59 lines</td><td>✅ referenced</td></tr><tr class="valid"><td>memory-template.md</td><td>66 lines</td><td>✅ referenced</td></tr><tr class="valid"><td>api-reference.md</td><td>80 lines</td><td>✅ referenced</td></tr>
+  </table>
+</div>
+<div class="file-box"><h3>📄 setup.md</h3><pre># Setup — Suno
+
+Read this when `~/suno/` doesn't exist or is empty.
+
+## Your Attitude
+
+You're helping someone create music with AI. Your role is to craft great prompts and lyrics that will produce excellent results when they use Suno.
+
+Focus on their creative vision. Keep technical details minimal.
+
+## Priority Order
+
+### 1. First: Understand What They Want
+
+Start by understanding their music:
+- "What kind of song are you thinking? Genre, mood?"
+- "Do you have lyrics in mind, or should I write them?"
+- "Any specific vocal style you prefer?"
+
+### 2. Then: Craft and Deliver
+
+Once you understand their vision:
+1. Write an optimized prompt following the Core Rules
+2. Write lyrics if they want custom mode
+3. Give them ready-to-paste content for suno.com
+
+### 3. Finally: Learn Their Preferences
+
+As you work together, note:
+- Genres they gravitate toward
+- Vocal styles they like
+- Prompts that produced great results
+
+Save these to `~/suno/memory.md` for future sessions.
+
+## What You're Saving
+
+In `~/suno/memory.md`:
+- Favorite genres and styles
+- Vocal preferences
+- Successful prompts that worked well
+- Projects they mention
+
+## Generation
+
+Most users generate at suno.com/create directly. Your job is to give them:
+- A well-crafted prompt (Simple mode)
+- Or lyrics + style tags (Custom mode)
+
+If they ask about APIs or automation, point them to `api-reference.md` which documents third-party options.
+
+## When Done
+
+Once you:
+1. Understand their music taste
+2. Have delivered a working prompt or lyrics
+3. They've successfully generated a song
+
+...you're set. Future sessions will be faster with preferences saved.</pre></div><div class="file-box"><h3>📄 memory-template.md</h3><pre># Memory Template — Suno
+
+Create `~/suno/memory.md` with this structure:
+
+```markdown
+# Suno Memory
+
+## Status
+status: ongoing
+version: 1.0.0
+last: YYYY-MM-DD
+integration: pending
+
+## Music Preferences
+&lt;!-- Genres, artists, styles they gravitate toward --&gt;
+&lt;!-- Add as you learn from conversations --&gt;
+
+## Vocal Preferences
+&lt;!-- Male/female, specific vocal styles they like --&gt;
+&lt;!-- Any vocal characteristics they prefer --&gt;
+
+## Use Cases
+&lt;!-- What they typically create music for --&gt;
+&lt;!-- Projects, videos, podcasts, personal, etc. --&gt;
+
+## Successful Prompts
+&lt;!-- Prompts that generated good results --&gt;
+&lt;!-- Format: prompt -&gt; result description --&gt;
+
+## Notes
+&lt;!-- Observations about their taste --&gt;
+&lt;!-- Things that worked or didn't work --&gt;
+
+---
+*Updated: YYYY-MM-DD*
+```
+
+## Status Values
+
+| Value | Meaning | Behavior |
+|-------|---------|----------|
+| `ongoing` | Still learning their taste | Gather preferences through creation |
+| `complete` | Know their style well | Apply preferences automatically |
+| `paused` | User said "not now" | Don't ask, work with what you have |
+
+## Generations Log (Optional)
+
+For users who create frequently, create `~/suno/generations/` folder with:
+
+```markdown
+# Generation Log
+
+## YYYY-MM-DD: [Title/Description]
+- Prompt: "[full prompt used]"
+- Style: [genre, mood]
+- Result: [kept/discarded/extended]
+- Notes: [what worked, what to improve]
+```
+
+## Key Principles
+
+- Learn preferences through creation, not interrogation
+- Remember what prompts worked well for reuse
+- Note their reactions to different styles
+- Track projects they mention for context
+- Update `last` date on each session</pre></div><div class="file-box"><h3>📄 api-reference.md</h3><pre># API Options — Suno
+
+This document lists third-party services for programmatic Suno access. All require separate accounts and API keys from their respective providers.
+
+## Overview
+
+Suno doesn't have an official public API. These are third-party alternatives:
+
+| Service | Type | Website |
+|---------|------|---------|
+| **AI Music API** | Hosted | aimusicapi.ai |
+| **EvoLink** | Hosted | evolink.ai |
+| **gcui-art/suno-api** | Self-hosted | github.com/gcui-art/suno-api |
+| **SunoAI-API** | Self-hosted | github.com/SunoAI-API/Suno-API |
+
+## Hosted Services
+
+### AI Music API (aimusicapi.ai)
+- Sign up and get API key from their dashboard
+- Pay-per-use pricing
+- Endpoints for generate, lyrics, extend
+
+### EvoLink (evolink.ai)
+- Sign up and get API key
+- Supports Suno v4, v4.5, v5
+- MCP tools available for agent integration
+
+## Self-Hosted Options
+
+For users who want full control, these GitHub projects let you run your own Suno proxy:
+
+### gcui-art/suno-api
+- Requires: Docker, Suno account cookie, 2Captcha account
+- Deploy via Docker Compose or Vercel
+- Handles CAPTCHA automatically
+
+### SunoAI-API/Suno-API
+- Requires: Python, Suno account cookie
+- Simpler setup, FastAPI-based
+- Manual CAPTCHA handling
+
+## When to Use APIs
+
+APIs are useful when:
+- Building apps that need music generation
+- Automating music creation workflows
+- Integrating with other tools
+
+For casual use, the Suno website (suno.com/create) is simpler and doesn't require any setup.
+
+## API Call Pattern
+
+Most Suno APIs follow this pattern:
+
+1. **Generate** — Send prompt, receive task ID
+2. **Poll** — Check task status every 5-10 seconds
+3. **Retrieve** — Get audio URL when complete
+
+Generation typically takes 30-90 seconds.
+
+## Example (conceptual)
+
+```
+POST /api/generate
+{
+  "prompt": "indie rock song about city nights",
+  "make_instrumental": false
+}
+
+Response: { "task_id": "abc123" }
+
+GET /api/status?id=abc123
+
+Response: { 
+  "status": "completed",
+  "audio_url": "https://..."
+}
+```
+
+Specific endpoints vary by service — see each provider's documentation.</pre></div>
+
+</body></html>

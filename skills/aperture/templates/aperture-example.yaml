@@ -1,0 +1,64 @@
+# Aperture L402 Reverse Proxy Configuration Template
+#
+# Copy to ~/.aperture/aperture.yaml and modify as needed.
+# Or use: skills/aperture/scripts/setup.sh to generate automatically.
+#
+# Documentation: https://github.com/lightninglabs/aperture
+
+# Listen address for incoming requests.
+listenaddr: "localhost:8081"
+
+# Log level: trace, debug, info, warn, error, critical.
+debuglevel: "info"
+
+# Disable TLS (development only). Set to false for production.
+insecure: true
+
+# Database backend: sqlite, postgres, or etcd.
+dbbackend: "sqlite"
+sqlite:
+  dbfile: "~/.aperture/aperture.db"
+
+# LND authentication configuration.
+authenticator:
+  # Network: regtest, simnet, testnet, mainnet, signet.
+  network: "mainnet"
+
+  # Direct lnd connection.
+  lndhost: "localhost:10009"
+  tlspath: "~/.lnd/tls.cert"
+  macdir: "~/.lnd/data/chain/bitcoin/mainnet"
+
+  # Or disable auth entirely for testing.
+  # disable: true
+
+# Backend services protected by L402.
+services:
+  - name: "default-api"
+    # Match all hosts.
+    hostregexp: ".*"
+
+    # Protect /api/ paths.
+    pathregexp: '^/api/.*$'
+
+    # Backend server address.
+    address: "127.0.0.1:8080"
+    protocol: http
+
+    # Price per request in satoshis.
+    price: 100
+
+    # Token expires after 1 year (seconds).
+    timeout: 31557600
+
+    # Free paths (no payment required).
+    authwhitelistpaths:
+      - '^/health$'
+      - '^/public/.*$'
+
+    # Optional rate limits.
+    # ratelimits:
+    #   - pathregexp: '^/api/.*$'
+    #     requests: 100
+    #     per: 1m
+    #     burst: 150

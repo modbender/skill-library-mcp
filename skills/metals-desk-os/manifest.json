@@ -1,0 +1,53 @@
+{
+  "system": "metals-desk-os",
+  "version": "1.0.0",
+  "runtime": "node",
+  "minNodeVersion": "18.0.0",
+  "architecture": "event-driven",
+  "philosophy": "risk-first",
+  "config": {
+    "stateFile": "./data/state.json",
+    "tradeLogFile": "./data/trade-log.json",
+    "performanceFile": "./data/performance.json",
+    "biasMemoryFile": "./data/bias-memory.json",
+    "loopIntervalMs": 5000,
+    "pricePollingMs": 1000,
+    "dashboardPort": 3077,
+    "websocketPort": 3078
+  },
+  "environment": {
+    "MT5_SERVER": "",
+    "MT5_LOGIN": "",
+    "MT5_PASSWORD": "",
+    "MT5_ACCOUNT_ID": "",
+    "METAAPI_TOKEN": "",
+    "WHATSAPP_API_URL": "",
+    "WHATSAPP_TOKEN": "",
+    "WHATSAPP_PHONE": "",
+    "TELEGRAM_BOT_TOKEN": "",
+    "TELEGRAM_CHAT_ID": "",
+    "NEWS_API_KEY": "",
+    "OPENROUTER_API_KEY": "",
+    "ANTHROPIC_API_KEY": ""
+  },
+  "pipeline": [
+    "price-feed",
+    "session-engine",
+    "structure-engine",
+    "liquidity-engine",
+    "macro-engine",
+    "bias-engine",
+    "volatility-engine",
+    "risk-engine",
+    "execution-engine",
+    "performance-engine"
+  ],
+  "safetyHalts": [
+    "dailyLossExceeded",
+    "spreadAnomaly",
+    "volatilitySpikeExtreme",
+    "newsSpikeDetected",
+    "brokerDisconnection",
+    "consecutiveLossLimit"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "bloom-identity-skill",
+  "version": "2.0.0",
+  "description": "OpenClaw skill for generating Bloom Identity Cards",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./recommendation-pipeline": "./dist/recommendation-pipeline.js",
+    "./discovery-sync": "./dist/discovery-sync.js"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "build:pipeline": "esbuild src/recommendation-pipeline.ts --bundle --platform=node --outfile=dist/recommendation-pipeline.js --format=cjs",
+    "build:discovery": "esbuild src/discovery-sync.ts --bundle --platform=node --outfile=dist/discovery-sync.js --format=cjs",
+    "build:all": "npm run build:pipeline && npm run build:discovery",
+    "test": "echo \"No tests yet\"",
+    "test:conversation": "ts-node scripts/test-conversation-analysis.ts",
+    "test:cdp-wallet": "ts-node scripts/test-cdp-wallet.ts",
+    "generate-token": "ts-node generate-fresh-token.ts",
+    "x-agent": "tsx scripts/autonomous-x-agent.ts",
+    "test:x-agent": "tsx scripts/test-x-agent.ts",
+    "mint-sbt": "ts-node scripts/mint-sbt.ts",
+    "missions": "ts-node src/mission-cli.ts"
+  },
+  "keywords": [
+    "openclaw",
+    "bloom",
+    "identity",
+    "agent",
+    "web3"
+  ],
+  "author": "Bloom Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "@coinbase/agentkit": "^0.10.4",
+    "commander": "^11.1.0",
+    "dotenv": "^17.2.4",
+    "jsonwebtoken": "^9.0.2",
+    "twitter-api-v2": "^1.29.0",
+    "viem": "^2.40.3"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.0.0",
+    "ethers": "^6.16.0",
+    "puppeteer": "^24.37.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

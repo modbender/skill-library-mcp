@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>tradr Dashboard</title>
+<style>
+:root {
+  --bg: #050507; --card: #0e0e14; --card-hover: #131320; --border: #1a1a28; --border-accent: #2a1015;
+  --text: #e8e8ec; --muted: #5a5a6e; --green: #00e676; --red: #e53935; --yellow: #ffab00;
+  --blue: #42a5f5; --purple: #ab47bc; --accent: #e53935; --accent-glow: rgba(229,57,53,0.3); --accent-dim: #8b1a1a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,'SF Pro Text','Inter','Segoe UI',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+
+/* Cards */
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; transition:border-color .2s; }
+.card:hover { border-color:var(--border-accent); }
+.card h2 { font-size:.75rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+.card h2 .count { font-size:.7rem; color:var(--muted); font-weight:400; text-transform:none; letter-spacing:0; }
+
+/* Stat cards */
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:14px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; }
+.stat-card:hover { border-color:var(--border-accent); }
+.stat-value { font-size:1.6rem; font-weight:800; line-height:1.2; font-family:'SF Mono','Menlo','Fira Code',monospace; }
+.stat-label { font-size:.7rem; color:var(--muted); margin-top:2px; text-transform:uppercase; letter-spacing:.5px; }
+.stat-sub { font-size:.72rem; color:var(--muted); margin-top:2px; }
+
+/* Colors */
+.green { color:var(--green); } .red { color:var(--red); } .blue { color:var(--blue); }
+.yellow { color:var(--yellow); } .purple { color:var(--purple); } .muted { color:var(--muted); }
+
+/* Badges */
+.badge { display:inline-block; padding:2px 7px; border-radius:4px; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+.badge-chain { background:rgba(66,165,245,.12); color:var(--blue); border:1px solid rgba(66,165,245,.2); }
+.badge-swing { background:rgba(66,165,245,.12); color:var(--blue); border:1px solid rgba(66,165,245,.2); }
+.badge-snipe { background:rgba(255,171,0,.12); color:var(--yellow); border:1px solid rgba(255,171,0,.2); }
+.badge-gamble { background:rgba(171,71,188,.12); color:var(--purple); border:1px solid rgba(171,71,188,.2); }
+.badge-diamond { background:rgba(232,232,236,.12); color:var(--text); border:1px solid rgba(232,232,236,.2); }
+
+/* Position cards */
+.pos-card { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:10px; transition:all .2s; }
+.pos-card:hover { border-color:var(--accent-dim); background:var(--card-hover); }
+.pos-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.pos-token { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+.pos-mult { font-size:1.2rem; font-weight:800; font-family:'SF Mono','Menlo',monospace; }
+.pos-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+.pos-stat-label { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.pos-stat-val { font-family:'SF Mono','Menlo',monospace; font-size:.85rem; font-weight:600; }
+.pos-footer { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; font-size:.72rem; color:var(--muted); }
+.pos-status { display:inline-flex; align-items:center; gap:4px; }
+.dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
+.dot-on { background:var(--green); box-shadow:0 0 6px rgba(0,230,118,.4); }
+.dot-off { background:var(--muted); }
+
+/* Tables */
+.table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+th { text-align:left; color:var(--accent); font-weight:600; padding:8px; border-bottom:1px solid var(--border); white-space:nowrap; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; }
+td { padding:7px 8px; border-bottom:1px solid var(--border); white-space:nowrap; }
+tr:hover { background:var(--card-hover); }
+.mono { font-family:'SF Mono','Menlo','Fira Code',monospace; }
+
+/* Search */
+.search-input { width:100%; padding:8px 12px; border-radius:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); font-size:.8rem; outline:none; font-family:inherit; transition:border-color .2s; margin-bottom:10px; }
+.search-input:focus { border-color:var(--accent); }
+.search-input::placeholder { color:var(--muted); }
+
+/* Collapsible */
+.collapse-toggle { cursor:pointer; user-select:none; }
+.collapse-toggle::after { content:'▸'; margin-left:8px; font-size:.7rem; display:inline-block; transition:transform .2s; }
+.collapse-toggle.open::after { transform:rotate(90deg); }
+.collapse-body { max-height:0; overflow:hidden; transition:max-height .3s ease; }
+.collapse-body.open { max-height:2000px; }
+
+/* Config items */
+.cfg-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:8px; margin-bottom:12px; }
+.cfg-item { padding:8px 10px; background:var(--bg); border-radius:6px; border:1px solid var(--border); }
+.cfg-label { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.cfg-val { font-family:'SF Mono','Menlo',monospace; font-size:.82rem; font-weight:600; margin-top:2px; }
+
+/* Empty state */
+.empty { text-align:center; padding:30px 20px; color:var(--muted); font-size:.85rem; }
+
+/* Tx link */
+.tx-link { color:var(--blue); text-decoration:none; font-size:.75rem; }
+.tx-link:hover { text-decoration:underline; }
+
+/* Last update */
+.last-update { text-align:center; font-size:.68rem; color:var(--muted); padding:10px 0; }
+
+/* Exit manager bar */
+.em-bar { display:flex; align-items:center; gap:14px; padding:8px 14px; background:var(--card); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; font-size:.72rem; overflow-x:auto; }
+.em-item { display:flex; align-items:center; gap:5px; white-space:nowrap; color:var(--muted); }
+.em-val { color:var(--text); font-weight:600; }
+.em-sep { width:1px; height:16px; background:var(--border); flex-shrink:0; }
+
+/* Responsive */
+@media (max-width:520px) {
+  .stats-row { grid-template-columns:repeat(3,1fr); }
+  .stat-value { font-size:1.2rem; }
+  .stat-label { font-size:.6rem; }
+  .pos-grid { grid-template-columns:1fr 1fr; }
+  table { font-size:.7rem; }
+  th { padding:6px; font-size:.6rem; }
+  td { padding:5px 6px; }
+  .em-bar { flex-wrap:wrap; gap:6px 10px; }
+  .em-sep { display:none; }
+}
+
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+<div id="tradr-root" style="padding:0"></div>
+<script>
+const TRADR_API_BASE = '';
+const TZ = 'America/New_York';
+let _data = { positions: {}, trades: [], config: {}, health: {} };
+
+function fmtTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  if (isNaN(d)) return '—';
+  return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:TZ});
+}
+function fmtDateTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  if (isNaN(d)) return '—';
+  const opts = {timeZone:TZ};
+  const est = new Date(d.toLocaleString('en-US',opts));
+  return `${(est.getMonth()+1).toString().padStart(2,'0')}/${est.getDate().toString().padStart(2,'0')} ${d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:TZ})}`;
+}
+function fmtAgo(ts) {
+  if (!ts) return '—';
+  const diff = (Date.now() - new Date(ts).getTime()) / 1000;
+  if (diff < 0) return '0m';
+  if (diff < 60) return Math.floor(diff)+'s';
+  if (diff < 3600) return Math.floor(diff/60)+'m';
+  if (diff < 86400) { const h=Math.floor(diff/3600); const m=Math.floor((diff%3600)/60); return h+'h '+m+'m'; }
+  return Math.floor(diff/86400)+'d '+Math.floor((diff%86400)/3600)+'h';
+}
+function fmtMcap(v) {
+  if (!v) return '—';
+  if (v>=1e9) return '$'+(v/1e9).toFixed(2)+'B';
+  if (v>=1e6) return '$'+(v/1e6).toFixed(2)+'M';
+  if (v>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+v.toFixed(0);
+}
+function fmtUsd(v) { return v != null ? (v >= 0 ? '+$'+v.toFixed(2) : '-$'+Math.abs(v).toFixed(2)) : '—'; }
+function fmtUsdPlain(v) { return v != null ? '$'+Math.abs(v).toFixed(2) : '—'; }
+function fmtMult(v) { return v != null && v > 0 ? v.toFixed(2)+'x' : '—'; }
+function multClass(v) { return v >= 1 ? 'green' : 'red'; }
+function modeBadge(m) { return '<span class="badge badge-'+(m||'swing')+'">'+(m||'swing')+'</span>'; }
+function chainBadge(c) { return '<span class="badge badge-chain">'+(c||'?')+'</span>'; }
+function txLink(tx, chain) {
+  if (!tx || tx==='manual' || tx==='none') return tx || '—';
+  const base = chain === 'solana' ? 'https://solscan.io/tx/' : 'https://basescan.org/tx/';
+  return '<a href="'+base+tx+'" target="_blank" class="tx-link">'+tx.substring(0,10)+'...</a>';
+}
+function actionClass(a) {
+  if (!a) return '';
+  const lower = a.toLowerCase();
+  if (lower === 'buy') return 'green';
+  if (lower.includes('sell') || lower.includes('stop') || lower.includes('trail')) return 'red';
+  return 'muted';
+}
+
+async function fetchApi(path) {
+  try { const r = await fetch(TRADR_API_BASE + path); return await r.json(); } catch { return null; }
+}
+
+async function loadData() {
+  const [pos, trades, cfg, health] = await Promise.all([
+    fetchApi('/api/positions'),
+    fetchApi('/api/trades'),
+    fetchApi('/api/tradr-config'),
+    fetchApi('/api/health')
+  ]);
+  if (pos) _data.positions = pos.positions || pos || {};
+  if (trades) _data.trades = trades.trades || [];
+  if (cfg) _data.config = cfg;
+  if (health) _data.health = health;
+  render();
+}
+
+function render() {
+  const root = document.getElementById('tradr-root');
+  const positions = _data.positions;
+  const allPos = Object.entries(positions);
+  const open = allPos.filter(([_,p]) => !p.closed);
+  const closed = allPos.filter(([_,p]) => p.closed);
+  const config = _data.config;
+
+  root.innerHTML =
+    renderExitManagerBar() +
+    renderPositions(open) +
+    renderStats(closed, open) +
+    renderClosedPositions(closed) +
+    renderTradeHistory() +
+    renderConfig(config) +
+    '<div class="last-update">Last updated: '+fmtDateTime(new Date().toISOString())+' EST</div>';
+}
+
+function renderExitManagerBar() {
+  const cfg = _data.config;
+  const pollSec = cfg.poll_interval_seconds || 10;
+  const open = Object.values(_data.positions).filter(p => !p.closed).length;
+  const maxPos = cfg.max_concurrent_positions || 5;
+  return `<div class="em-bar">
+    <div class="em-item"><span class="dot dot-on"></span><span class="em-val">Exit Manager</span></div>
+    <div class="em-sep"></div>
+    <div class="em-item">Poll: <span class="em-val">${pollSec}s</span></div>
+    <div class="em-sep"></div>
+    <div class="em-item">Positions: <span class="em-val">${open}/${maxPos}</span></div>
+    <div class="em-sep"></div>
+    <div class="em-item">Mode: <span class="em-val">${cfg.default_mode || 'swing'}</span></div>
+    <div class="em-sep"></div>
+    <div class="em-item">Mcap Cap: <span class="em-val">${fmtMcap(cfg.mcap_ceiling_usd)}</span></div>
+  </div>`;
+}
+
+function renderPositions(open) {
+  if (open.length === 0) {
+    return `<div class="card"><h2>Open Positions</h2><div class="empty">No open positions — waiting for confluence</div></div>`;
+  }
+  const cards = open.map(([ca, p]) => {
+    const mult = (p.current_mcap && p.entry_mcap) ? p.current_mcap / p.entry_mcap : null;
+    const peakMult = (p.peak_mcap && p.entry_mcap) ? p.peak_mcap / p.entry_mcap : null;
+    const pnl = p.est_pnl_usd || (mult ? (mult - 1) * (p.remaining_usd || p.buy_amount_usd || 0) : null);
+    return `<div class="pos-card">
+      <div class="pos-header">
+        <div class="pos-token">$${p.token || '?'} ${chainBadge(p.chain)} ${modeBadge(p.mode)}</div>
+        <div class="pos-mult ${mult != null ? multClass(mult) : 'muted'}">${fmtMult(mult)}</div>
+      </div>
+      <div class="pos-grid">
+        <div><div class="pos-stat-label">Entry MC</div><div class="pos-stat-val">${fmtMcap(p.entry_mcap)}</div></div>
+        <div><div class="pos-stat-label">Current MC</div><div class="pos-stat-val">${fmtMcap(p.current_mcap)}</div></div>
+        <div><div class="pos-stat-label">Peak MC</div><div class="pos-stat-val">${fmtMcap(p.peak_mcap)} <span class="muted" style="font-size:.75rem">${fmtMult(peakMult)}</span></div></div>
+        <div><div class="pos-stat-label">Invested</div><div class="pos-stat-val">${fmtUsdPlain(p.buy_amount_usd)}</div></div>
+        <div><div class="pos-stat-label">Remaining</div><div class="pos-stat-val">${fmtUsdPlain(p.remaining_usd || p.buy_amount_usd)}</div></div>
+        <div><div class="pos-stat-label">Unrealized P&L</div><div class="pos-stat-val ${pnl != null ? (pnl >= 0 ? 'green' : 'red') : 'muted'}">${pnl != null ? fmtUsd(pnl) : '—'}</div></div>
+      </div>
+      <div class="pos-footer">
+        <span>Held: ${fmtAgo(p.buy_ts)}</span>
+        <span class="pos-status"><span class="dot ${p.first_exit_done ? 'dot-on' : 'dot-off'}"></span>TP1 ${p.first_exit_done ? 'Done' : 'Pending'}</span>
+        <span class="pos-status"><span class="dot ${p.trailing_active ? 'dot-on' : 'dot-off'}"></span>Trail ${p.trailing_active ? 'Active' : 'Off'}</span>
+        ${p.score != null ? '<span>Score: '+p.score+'</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card"><h2>Open Positions <span class="count">${open.length} active</span></h2>${cards}</div>`;
+}
+
+function getPnl(p) {
+  if (p.pnl != null) return p.pnl;
+  if (p.pnl_pct != null && p.buy_amount_usd) return p.buy_amount_usd * p.pnl_pct / 100;
+  return 0;
+}
+function getCloseMult(p) {
+  if (p.close_multiple) return p.close_multiple;
+  if (p.final_sell_multiple) return p.final_sell_multiple;
+  if (p.pnl_pct != null) return 1 + p.pnl_pct / 100;
+  return null;
+}
+
+function renderStats(closed, open) {
+  const totalPnl = closed.reduce((s,[_,p]) => s + getPnl(p), 0);
+  const wins = closed.filter(([_,p]) => getPnl(p) > 0).length;
+  const winRate = closed.length > 0 ? (wins / closed.length * 100).toFixed(0) : '—';
+  const multiples = closed.filter(([_,p]) => getCloseMult(p)).map(([_,p]) => getCloseMult(p));
+  const avgMult = multiples.length > 0 ? (multiples.reduce((a,b)=>a+b,0)/multiples.length) : null;
+  const peakMults = closed.filter(([_,p]) => p.peak_mcap && p.entry_mcap).map(([_,p]) => p.peak_mcap / p.entry_mcap);
+  const avgPeak = peakMults.length > 0 ? (peakMults.reduce((a,b)=>a+b,0)/peakMults.length) : null;
+  const best = closed.reduce((b,[_,p]) => { const pnl=getPnl(p); return (!b || pnl > b.pnl) ? {token:p.token,pnl,mult:getCloseMult(p)} : b; }, null);
+
+  return `<div class="stats-row">
+    <div class="stat-card"><div class="stat-value ${totalPnl >= 0 ? 'green' : 'red'}">${totalPnl >= 0 ? '+' : ''}$${Math.abs(totalPnl).toFixed(2)}</div><div class="stat-label">Total P&L</div></div>
+    <div class="stat-card"><div class="stat-value ${winRate !== '—' && parseFloat(winRate) >= 50 ? 'green' : winRate !== '—' ? 'red' : ''}">${winRate}${winRate !== '—' ? '%' : ''}</div><div class="stat-label">Win Rate</div><div class="stat-sub">${wins}/${closed.length} trades</div></div>
+    <div class="stat-card"><div class="stat-value ${avgPeak && avgPeak >= 1 ? 'green' : avgPeak ? 'red' : ''}">${avgPeak ? avgPeak.toFixed(1)+'x' : '—'}</div><div class="stat-label">Avg Peak</div></div>
+    <div class="stat-card"><div class="stat-value">${closed.length}</div><div class="stat-label">Closed Trades</div></div>
+    <div class="stat-card"><div class="stat-value green">${best ? '$'+best.token+' '+(best.mult ? best.mult.toFixed(1)+'x' : '') : '—'}</div><div class="stat-label">Best Trade</div></div>
+    <div class="stat-card"><div class="stat-value blue">${open.length}</div><div class="stat-label">Active</div></div>
+  </div>`;
+}
+
+function fmtCloseReason(r) {
+  if (!r) return '—';
+  const map = {'BANKR_EXTERNAL_SELL':'External Sell','hard_stop':'Hard Stop','trailing_stop':'Trailing Stop','take_profit':'Take Profit','max_hold':'Max Hold','manual_sell_mcap_too_high':'Manual (MC too high)','reconciliation':'Reconciled'};
+  return map[r] || r.replace(/_/g,' ');
+}
+
+function renderClosedPositions(closed) {
+  if (closed.length === 0) return '';
+  const sorted = [...closed].sort((a,b) => new Date(b[1].close_ts||0) - new Date(a[1].close_ts||0));
+  const rows = sorted.map(([ca, p]) => {
+    const pnl = getPnl(p);
+    const mult = getCloseMult(p);
+    const peakMult = (p.peak_mcap && p.entry_mcap) ? p.peak_mcap / p.entry_mcap : null;
+    const held = p.buy_ts && p.close_ts ? Math.round((new Date(p.close_ts) - new Date(p.buy_ts)) / 60000) : null;
+    const heldStr = held != null ? (held < 60 ? held+'m' : Math.floor(held/60)+'h '+held%60+'m') : '—';
+    return `<div class="pos-card">
+      <div class="pos-header">
+        <div class="pos-token">$${p.token || '?'} ${chainBadge(p.chain)} ${modeBadge(p.mode)}</div>
+        <div class="pos-mult ${mult != null ? multClass(mult) : 'muted'}">${mult ? mult.toFixed(2)+'x' : '—'}</div>
+      </div>
+      <div class="pos-grid">
+        <div><div class="pos-stat-label">Entry MC</div><div class="pos-stat-val">${fmtMcap(p.entry_mcap)}</div></div>
+        <div><div class="pos-stat-label">Peak MC</div><div class="pos-stat-val">${fmtMcap(p.peak_mcap)} <span class="muted" style="font-size:.75rem">${fmtMult(peakMult)}</span></div></div>
+        <div><div class="pos-stat-label">Invested</div><div class="pos-stat-val">${fmtUsdPlain(p.buy_amount_usd)}</div></div>
+        <div><div class="pos-stat-label">P&L</div><div class="pos-stat-val ${pnl >= 0 ? 'green' : 'red'}">${fmtUsd(pnl)}</div></div>
+        <div><div class="pos-stat-label">Held</div><div class="pos-stat-val">${heldStr}</div></div>
+        <div><div class="pos-stat-label">Exit Reason</div><div class="pos-stat-val">${fmtCloseReason(p.close_reason)}</div></div>
+      </div>
+      ${p.note ? '<div class="pos-footer" style="font-size:.7rem;color:var(--muted)">'+p.note+'</div>' : ''}
+      <div class="pos-footer">
+        <span>Entry: ${fmtDateTime(p.buy_ts)}</span>
+        <span>Exit: ${fmtDateTime(p.close_ts)}</span>
+        ${p.close_tx ? '<span>'+txLink(p.close_tx, p.chain)+'</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card"><h2 class="collapse-toggle" onclick="this.classList.toggle('open');document.getElementById('closed-pos-body').classList.toggle('open')">Closed Positions <span class="count">${closed.length} trades</span></h2><div class="collapse-body" id="closed-pos-body">${rows}</div></div>`;
+}
+
+function renderTradeHistory() {
+  const trades = [..._data.trades].reverse();
+  if (trades.length === 0) {
+    return `<div class="card"><h2>Trade History</h2><div class="empty">No trades yet</div></div>`;
+  }
+  // Try to enrich trades with position data for chain/mode
+  const posMap = _data.positions;
+  const rows = trades.map(t => {
+    const pos = posMap[t.ca] || {};
+    const chain = pos.chain || t.chain || 'base';
+    const mode = pos.mode || t.mode || '';
+    const act = t.action || 'buy';
+    return `<tr class="trade-row">
+      <td>${fmtDateTime(t.ts||t.timestamp)}</td>
+      <td><strong>$${t.token||'?'}</strong></td>
+      <td class="${actionClass(act)}" style="font-weight:700">${act.toUpperCase()}</td>
+      <td class="mono">$${parseFloat(t.amount||t.amount_usd||0).toFixed(2)}</td>
+      <td>${t.score||'—'}</td>
+      <td>${mode ? modeBadge(mode) : '—'}</td>
+      <td class="${t.status==='completed'?'green':'red'}">${t.status||'—'}</td>
+      <td>${txLink(t.tx, chain)}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="card">
+    <h2>Trade History <span class="count">${trades.length} trades</span></h2>
+    <input type="text" class="search-input" id="tradr-trade-search" placeholder="Search trades..." oninput="filterTradrTrades()">
+    <div class="table-wrap"><table><thead><tr>
+      <th>Time</th><th>Token</th><th>Action</th><th>Amount</th><th>Score</th><th>Mode</th><th>Status</th><th>Tx</th>
+    </tr></thead><tbody id="tradr-trades-tbody">${rows}</tbody></table></div>
+  </div>`;
+}
+
+function renderConfig(cfg) {
+  const modes = cfg.modes || {};
+  const s2s = cfg.score_to_size || {};
+
+  const modeRows = Object.entries(modes).map(([name, m]) => `<tr>
+    <td>${modeBadge(name)}</td>
+    <td class="mono">${m.stop_at != null ? m.stop_at+'x' : '—'}</td>
+    <td class="mono">${m.take_profit_1 != null ? m.take_profit_1+'x ('+((m.take_profit_1_size||0)*100)+'%)' : '—'}</td>
+    <td class="mono">${m.trailing_stop != null ? (m.trailing_stop*100)+'%' : '—'}${m.trailing_stop_tight ? ' / '+(m.trailing_stop_tight*100)+'% tight' : ''}</td>
+    <td class="mono">${m.max_hold_hours != null ? m.max_hold_hours+'h' : '∞'}</td>
+  </tr>`).join('');
+
+  const sizeItems = Object.entries(s2s).sort((a,b) => parseInt(b[0]) - parseInt(a[0])).map(([score, size]) =>
+    `<div class="cfg-item"><div class="cfg-label">Score ≥${score}</div><div class="cfg-val green">$${size}</div></div>`
+  ).join('');
+
+  return `<div class="card">
+    <h2 class="collapse-toggle" onclick="toggleTradrConfig(this)">Configuration</h2>
+    <div class="collapse-body" id="tradr-config-body">
+      <div style="margin-top:12px">
+        <div style="font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px">Exit Modes</div>
+        <div class="table-wrap"><table><thead><tr><th>Mode</th><th>Stop</th><th>Take Profit</th><th>Trailing</th><th>Max Hold</th></tr></thead><tbody>${modeRows}</tbody></table></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px">Position Sizing</div>
+        <div class="cfg-grid">${sizeItems}</div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px">Limits</div>
+        <div class="cfg-grid">
+          <div class="cfg-item"><div class="cfg-label">Mcap Ceiling</div><div class="cfg-val">${fmtMcap(cfg.mcap_ceiling_usd)}</div></div>
+          <div class="cfg-item"><div class="cfg-label">Max Positions</div><div class="cfg-val">${cfg.max_concurrent_positions || '—'}</div></div>
+          <div class="cfg-item"><div class="cfg-label">Max Position Size</div><div class="cfg-val">${fmtUsdPlain(cfg.max_position_size_usd)}</div></div>
+          <div class="cfg-item"><div class="cfg-label">Cooldown</div><div class="cfg-val">${cfg.cooldown_minutes || 0}m</div></div>
+          <div class="cfg-item"><div class="cfg-label">Daily Limit</div><div class="cfg-val">${cfg.max_daily_trades || '∞'}</div></div>
+          <div class="cfg-item"><div class="cfg-label">Default Mode</div><div class="cfg-val">${cfg.default_mode || 'swing'}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.toggleTradrConfig = function(el) {
+  el.classList.toggle('open');
+  document.getElementById('tradr-config-body').classList.toggle('open');
+};
+window.filterTradrTrades = function() {
+  const q = document.getElementById('tradr-trade-search').value.toLowerCase();
+  document.querySelectorAll('#tradr-trades-tbody tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+};
+window.refreshTradr = function() { loadData(); };
+
+loadData();
+setInterval(loadData, 15000);
+</script>
+</body>
+</html>

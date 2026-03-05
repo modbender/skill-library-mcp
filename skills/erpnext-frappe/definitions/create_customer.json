@@ -1,0 +1,121 @@
+{
+  "name": "create_customer",
+  "version": "1.0.0",
+  "description": "Create a new customer with contact and address information",
+  "author": "Business Claw Team",
+  "category": "crm",
+  
+  "triggers": [
+    "create customer",
+    "add customer",
+    "new customer",
+    "register customer"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Customer DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the customer",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create contact (optional)",
+      "required": false
+    },
+    {
+      "name": "create_document",
+      "description": "Create address (optional)",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_name": {
+        "type": "string",
+        "description": "Customer full name or company name"
+      },
+      "customer_type": {
+        "type": "string",
+        "enum": ["Company", "Individual"],
+        "description": "Type of customer"
+      },
+      "customer_group": {
+        "type": "string",
+        "description": "Customer group (e.g., Commercial, Individual)"
+      },
+      "territory": {
+        "type": "string",
+        "description": "Territory"
+      },
+      "email": {
+        "type": "string",
+        "description": "Primary email address"
+      },
+      "phone": {
+        "type": "string",
+        "description": "Primary phone number"
+      },
+      "address_line1": {
+        "type": "string",
+        "description": "Address line 1"
+      },
+      "city": {
+        "type": "string",
+        "description": "City"
+      },
+      "state": {
+        "type": "string",
+        "description": "State/Province"
+      },
+      "pincode": {
+        "type": "string",
+        "description": "Postal code"
+      },
+      "country": {
+        "type": "string",
+        "description": "Country"
+      }
+    },
+    "required": ["customer_name", "customer_type"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Customer"
+        }
+      },
+      {
+        "step": "create_customer",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Customer",
+          "data": {
+            "customer_name": "${customer_name}",
+            "customer_type": "${customer_type}",
+            "customer_group": "${customer_group}",
+            "territory": "${territory}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "require_unique_email": true,
+    "validate_phone_format": true
+  },
+  
+  "output_template": "Created Customer {{name}}\nType: {{customer_type}}\nGroup: {{customer_group}}"
+}

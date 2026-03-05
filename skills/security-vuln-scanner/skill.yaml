@@ -1,0 +1,41 @@
+# Skill: security_vulnerability_scanner
+
+scan_vulnerabilities(code: string, language: string) => object
+
+## Trigger Patterns
+- 安全扫描
+- 漏洞检测
+- security scan
+- vulnerability
+
+## Implementation
+
+扫描代码中的安全漏洞：SQL注入、XSS、硬编码密码、敏感信息泄露等。
+
+```javascript
+function scanVulnerabilities(code, language) {
+  const patterns = {
+    sqlInjection: /query\s*\(\s*['"`].*\$\{|execute.*\$\{/gi,
+    xss: /innerHTML\s*=|document\.write/gi,
+    hardcodedSecret: /password\s*=\s*['"][^'"]+['"]/gi,
+    insecureRandom: /Math\.random\(\)/gi,
+    commandInjection: /exec\s*\(\s*\$\{|system\s*\(\s*\$\{/gi
+  };
+  
+  const vulnerabilities = [];
+  
+  for (const [type, pattern] of Object.entries(patterns)) {
+    let match;
+    while ((match = pattern.exec(code)) !== null) {
+      vulnerabilities.push({
+        type,
+        line: code.substring(0, match.index).split('\n').length,
+        severity: getSeverity(type),
+        message: getMessage(type)
+      });
+    }
+  }
+  
+  return { vulnerabilities, score: calculateScore(vulnerabilities) };
+}
+```

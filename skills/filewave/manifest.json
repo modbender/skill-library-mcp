@@ -1,0 +1,272 @@
+{
+  "name": "filewave",
+  "version": "1.3.0",
+  "displayName": "FileWave UEM API",
+  "description": "Query FileWave device inventory with multi-server support, intelligent filtering, and session-level data segregation",
+  "keywords": [
+    "filewave",
+    "uem",
+    "endpoint management",
+    "inventory",
+    "devices",
+    "multi-server",
+    "mdm"
+  ],
+  "author": "Joshua Levitsky (@jlevitsk)",
+  "license": "MIT",
+  "repository": "https://github.com/jlevitsk/filewave-skill",
+  "bugs": "https://github.com/jlevitsk/filewave-skill/issues",
+  "homepage": "https://clawhub.com/skills/filewave",
+  
+  "requires": {
+    "python": "3.7+",
+    "packages": ["requests"]
+  },
+  
+  "installation": {
+    "onInstall": "python3 lib/onboarding.py",
+    "onUpgrade": "echo 'FileWave skill updated'",
+    "postInstallMessage": "Run 'filewave setup' to add more servers or 'filewave --help' for commands"
+  },
+  
+  "files": {
+    "executable": "./filewave",
+    "modules": [
+      "lib/api_utils.py",
+      "lib/config_manager.py",
+      "lib/query_parser.py",
+      "lib/session_data_manager.py",
+      "lib/device_cache.py",
+      "lib/bulk_update_handler.py",
+      "lib/device_hierarchy.py",
+      "lib/device_hierarchy_analysis.py",
+      "lib/device_analytics.py",
+      "lib/onboarding.py"
+    ],
+    "documentation": [
+      "docs/README.md",
+      "docs/CLI_REFERENCE.md",
+      "docs/BULK_UPDATE.md",
+      "docs/ONBOARDING.md",
+      "docs/API_CAPABILITIES.md",
+      "docs/CREDENTIAL_ARCHITECTURE.md",
+      "docs/SESSION_DATA_MANAGER.md"
+    ],
+    "configuration": {
+      "path": "~/.filewave/config",
+      "format": "ini",
+      "userCreated": true
+    }
+  },
+  
+  "commands": [
+    {
+      "name": "filewave",
+      "description": "FileWave UEM device inventory queries",
+      "usage": "filewave [command] [options]",
+      "subcommands": [
+        {
+          "name": "setup",
+          "description": "Interactive server configuration"
+        },
+        {
+          "name": "profiles",
+          "description": "List configured servers"
+        },
+        {
+          "name": "query",
+          "description": "Query device inventory",
+          "options": [
+            "--query-id ID (required) Inventory Query ID",
+            "--profile NAME (optional) Server profile to use",
+            "--filter EXPR (optional) Filter expression (repeatable)",
+            "--reference NAME (optional) Name for this query result",
+            "--format [text|json] (default: text)"
+          ]
+        },
+        {
+          "name": "compare",
+          "description": "Compare two query results",
+          "args": "REF1 REF2"
+        },
+        {
+          "name": "session-log",
+          "description": "Show queries in current session",
+          "options": [
+            "--server HOSTNAME (optional) Filter by server"
+          ]
+        },
+        {
+          "name": "summary",
+          "description": "Session statistics and summary"
+        },
+        {
+          "name": "device-details",
+          "description": "Show full device info (groups, clone status)"
+        },
+        {
+          "name": "device-search",
+          "description": "Search for device by name or serial"
+        },
+        {
+          "name": "cache-status",
+          "description": "Show device lookup cache status"
+        },
+        {
+          "name": "bulk-template",
+          "description": "Generate CSV template for bulk updates"
+        },
+        {
+          "name": "bulk-update",
+          "description": "Execute bulk device update from CSV"
+        },
+        {
+          "name": "hierarchy",
+          "description": "Analyze device clone relationships"
+        },
+        {
+          "name": "hierarchy-batch",
+          "description": "Batch analyze device hierarchies"
+        },
+        {
+          "name": "find-devices",
+          "description": "Find all devices by product type (iPad, iPhone, Mac, etc.)"
+        },
+        {
+          "name": "update-model",
+          "description": "Trigger a Model Update to commit pending changes"
+        },
+        {
+          "name": "insights",
+          "description": "Fleet analytics and reporting"
+        },
+        {
+          "name": "warm-cache",
+          "description": "Preload device cache from smart groups"
+        }
+      ]
+    }
+  ],
+  
+  "capabilities": [
+    "Multi-server support with profiles",
+    "Natural language filter expressions",
+    "Session-level data segregation",
+    "Cross-server comparison with validation",
+    "Secure credential storage (chmod 600)",
+    "JSON and text output formats",
+    "Interactive setup wizard",
+    "Device inventory querying"
+  ],
+  
+  "supportedPlatforms": [
+    "macOS",
+    "Linux"
+  ],
+  
+  "fileWaveCompatibility": {
+    "versionMin": "15.0.0",
+    "versionMax": null,
+    "notes": "Designed for FileWave 15.5.0+ (Inventory Query API)"
+  },
+  
+  "changelog": {
+    "1.3.0": {
+      "date": "2026-02-16",
+      "changes": [
+        "New: warm-cache command (preload device cache from smart groups)",
+        "New: cache-status command (inspect cache state)",
+        "Improved: Parallel device detail lookups via ThreadPoolExecutor",
+        "Improved: Dual-index cache (name + ID keys) for faster lookups",
+        "Performance: 60ms cached / 257ms warm / 565ms cold (from 909ms baseline)"
+      ]
+    },
+    "1.2.0": {
+      "date": "2026-02-13",
+      "changes": [
+        "New: find-devices command (type-aware device discovery via internal API)",
+        "New: update-model command (trigger Model Update to commit changes)",
+        "Improved: device-search now returns ALL matches (was first-only)",
+        "Added: Internal devices API integration (/filewave/api/devices/internal/devices)",
+        "Added: Hardware identification via invf_Client_device_product_name",
+        "Added: Smart group fast-path with recursive fallback for fresh servers"
+      ]
+    },
+    "1.1.0": {
+      "date": "2026-02-13",
+      "changes": [
+        "Code audit: removed hardcoded credentials, unified API patterns",
+        "Deprecated datetime.utcnow() calls",
+        "Documentation accuracy fixes across all docs",
+        "Manifest updated with all modules and subcommands"
+      ]
+    },
+    "1.0.0": {
+      "date": "2026-02-12",
+      "changes": [
+        "Initial release",
+        "Multi-server profile support",
+        "Natural language filtering",
+        "Session data segregation",
+        "Cross-server comparison",
+        "Comprehensive documentation"
+      ]
+    }
+  },
+  
+  "dependencies": [],
+  
+  "testing": {
+    "tested_against": "filewave.company.com (FileWave lab server)",
+    "test_query_id": 1,
+    "verified_commands": [
+      "filewave profiles",
+      "filewave query --query-id 1",
+      "filewave session-log",
+      "filewave summary",
+      "filewave find-devices iPad",
+      "filewave device-search iPad",
+      "filewave device-details 213",
+      "filewave warm-cache",
+      "filewave cache-status"
+    ]
+  },
+  
+  "security": {
+    "credentialStorage": "~/.filewave/config (INI file, chmod 600)",
+    "tokenHandling": "Never logged or transmitted outside API calls",
+    "envVarOverride": "FILEWAVE_SERVER and FILEWAVE_TOKEN supported for CI/CD"
+  },
+  
+  "examples": [
+    {
+      "description": "List configured servers",
+      "command": "filewave profiles"
+    },
+    {
+      "description": "Query device inventory",
+      "command": "filewave query --query-id 1 --reference lab_macos"
+    },
+    {
+      "description": "Query with filter",
+      "command": "filewave query --query-id 1 --filter 'last_seen > 30 days'"
+    },
+    {
+      "description": "Compare two servers",
+      "command": "filewave query --query-id 1 --profile lab --reference lab\nfilewave query --query-id 1 --profile production --reference prod\nfilewave compare lab prod"
+    },
+    {
+      "description": "JSON export",
+      "command": "filewave query --query-id 1 --format json > devices.json"
+    }
+  ],
+  
+  "support": {
+    "author": "Joshua Levitsky",
+    "email": "josh.levitsky@filewave.com",
+    "github": "https://github.com/jlevitsk",
+    "documentation": "https://github.com/jlevitsk/filewave-skill",
+    "issues": "https://github.com/jlevitsk/filewave-skill/issues",
+    "discussions": "https://discord.gg/clawd"
+  }
+}

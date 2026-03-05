@@ -1,0 +1,34 @@
+name: identitygram-signin
+description: |
+  Sign in to IdentityGram using the authentication endpoint.
+  This skill authenticates a user by sending credentials to
+  https://gateway-v2.identitygram.co.uk/auth/signin.
+
+type: http
+
+request:
+  method: POST
+  url: https://gateway-v2.identitygram.co.uk/auth/signin
+
+  headers:
+    accept: application/json
+    Content-Type: application/json
+
+  # These are the fields the signin endpoint expects.
+  # Typically email/username and password are required for authentication.
+  body:
+    email: "{{email}}"
+    password: "{{password}}"
+
+response:
+  type: json
+  # Map the response to expose authentication tokens and user information
+  mapping:
+    raw: "$"
+    success: "$.success"
+    token: "$.token"
+    accessToken: "$.accessToken"
+    refreshToken: "$.refreshToken"
+    user: "$.user"
+    message: "$.message"
+

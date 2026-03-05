@@ -1,0 +1,68 @@
+# Expanso Pipeline: log-sanitize (CLI mode)
+# ==========================================
+#
+# Usage:
+#   echo 'password=secret123' | expanso-edge run pipeline-cli.yaml
+#   cat app.log | expanso-edge run pipeline-cli.yaml
+#
+# No API key needed - runs entirely locally with pattern matching.
+
+name: "log-sanitize-cli"
+type: pipeline
+
+config:
+  input:
+    stdin:
+      codec: lines
+      max_buffer: 10485760  # 10MB for large logs
+
+  pipeline:
+    processors:
+      - mapping: |
+          meta input_hash = content().hash("sha256").encode("hex")
+          meta input_length = content().length()
+          meta trace_id = uuid_v4()
+
+          # Define patterns to redact
+          let text = content()
+          let redactions = 0
+          let patterns_matched = []
+
+          # Common secret patterns with regex-like matching
+          # Password patterns
+          let text = $text.re_replace_all("(?i)(password|passwd|pwd)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # Token/API key patterns
+          let text = $text.re_replace_all("(?i)(token|api[_-]?key|apikey|access[_-]?key|secret[_-]?key)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # Bearer tokens
+          let text = $text.re_replace_all("(?i)bearer\\s+[a-zA-Z0-9._-]+", "Bearer ***REDACTED***")
+
+          # AWS keys
+          let text = $text.re_replace_all("AKIA[0-9A-Z]{16}", "***AWS_KEY_REDACTED***")
+
+          # Generic secret patterns
+          let text = $text.re_replace_all("(?i)(secret|auth|credential|private[_-]?key)\\s*[=:]\\s*[^\\s,;\"']+", "$1=***REDACTED***")
+
+          # JWT tokens (three base64 sections separated by dots)
+          let text = $text.re_replace_all("eyJ[a-zA-Z0-9_-]*\\.eyJ[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]+", "***JWT_REDACTED***")
+
+          root.sanitized = $text
+          root.redactions = content().length() - $text.length()
+          root.metadata = {
+            "skill": "log-sanitize",
+            "mode": "cli",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [log-sanitize] Processed ${! meta("input_length") } chars (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    stdout:
+      codec: json_object

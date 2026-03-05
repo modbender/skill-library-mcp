@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Swarm — Live Explorer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; 
+      background: #0a0a0a; color: #e0e0e0; 
+      min-height: 100vh; padding: 40px 20px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    
+    h1 { font-size: 26px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+    .subtitle { color: #555; font-size: 13px; margin-top: 6px; margin-bottom: 32px; }
+    .subtitle a { color: #666; text-decoration: none; transition: color 0.2s; }
+    .subtitle a:hover { color: #fff; }
+    
+    /* Stats */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px; margin-bottom: 36px;
+    }
+    .stat {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 10px;
+      padding: 16px; transition: border-color 0.3s;
+    }
+    .stat:hover { border-color: #333; }
+    .stat-value { font-size: 24px; font-weight: 600; color: #fff; }
+    .stat-label { font-size: 10px; color: #555; margin-top: 4px; text-transform: uppercase; letter-spacing: 1.2px; }
+    .stat-value.green { color: #4ade80; }
+    .stat-value.blue { color: #7b7bff; }
+    .stat-value.amber { color: #e0c040; }
+    
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 0;
+    }
+    .tab {
+      background: none; border: none; color: #555; padding: 8px 16px;
+      font-size: 12px; cursor: pointer; font-family: inherit;
+      border-bottom: 2px solid transparent; transition: all 0.2s;
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .tab:hover { color: #888; }
+    .tab.active { color: #fff; border-bottom-color: #4ade80; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Section headers */
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a;
+    }
+    .section-title { font-size: 14px; color: #777; text-transform: uppercase; letter-spacing: 1px; }
+    .section-badge {
+      background: #1a1a1a; color: #555; font-size: 11px; padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    /* Board cards */
+    .board-card {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 10px;
+      margin-bottom: 12px; overflow: hidden; transition: border-color 0.3s;
+    }
+    .board-card:hover { border-color: #333; }
+    .board-card.main-board { border-color: #1a3a1a; }
+    .board-card.main-board:hover { border-color: #2a5a2a; }
+    
+    .board-summary {
+      padding: 20px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .board-left { flex: 1; }
+    .board-name { font-size: 16px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .board-desc { font-size: 12px; color: #666; margin-bottom: 10px; }
+    .board-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: 11px; color: #444; }
+    .board-right { text-align: right; flex-shrink: 0; margin-left: 16px; }
+    .board-member-count { font-size: 24px; font-weight: 600; color: #fff; }
+    .board-member-label { font-size: 10px; color: #555; text-transform: uppercase; }
+    
+    .main-tag {
+      background: #1a2e1a; color: #4ade80; border: 1px solid #2e4e2e;
+      padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+    }
+    .v3-tag {
+      background: #1a1a2e; color: #7b7bff; border: 1px solid #2a2a4e;
+      padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+    }
+    
+    .skills-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .skill-tag {
+      background: #12121e; color: #6b6bef; border: 1px solid #22224e;
+      padding: 2px 9px; border-radius: 10px; font-size: 10px;
+    }
+    
+    .board-details {
+      display: none; border-top: 1px solid #1a1a1a;
+      padding: 16px 20px; background: #0d0d0d;
+    }
+    .board-card.expanded .board-details { display: block; }
+    
+    .detail-section { margin-bottom: 16px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    
+    .member-list { display: flex; flex-direction: column; gap: 6px; }
+    .member-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; background: #111; border-radius: 6px; font-size: 12px;
+    }
+    .member-addr { color: #888; font-family: monospace; }
+    .member-addr a { color: #888; text-decoration: none; }
+    .member-addr a:hover { color: #fff; }
+    .member-skills { color: #555; font-size: 11px; }
+    .member-status { font-size: 10px; padding: 2px 6px; border-radius: 8px; }
+    .member-approved { background: #1a2e1a; color: #4ade80; }
+    .member-pending { background: #2e2e1a; color: #e0e040; }
+    
+    /* Escrow section */
+    .escrow-container { max-height: 500px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #333 #111; }
+    .escrow-container::-webkit-scrollbar { width: 6px; }
+    .escrow-container::-webkit-scrollbar-track { background: #111; border-radius: 3px; }
+    .escrow-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    
+    .escrow-card {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 8px;
+      padding: 16px; margin-bottom: 8px; transition: border-color 0.2s;
+    }
+    .escrow-card:hover { border-color: #333; }
+    .escrow-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .escrow-amount { font-size: 18px; font-weight: 600; color: #4ade80; }
+    .escrow-status { padding: 2px 9px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+    .status-active { background: #1a2e1a; color: #4ade80; border: 1px solid #2e4e2e; }
+    .status-released { background: #1a1a2e; color: #7b7bff; border: 1px solid #2a2a4e; }
+    .status-disputed { background: #2e1a1a; color: #ff7b7b; border: 1px solid #4e2a2a; }
+    .status-refunded { background: #2e2e1a; color: #e0e040; border: 1px solid #4e4e2a; }
+    .escrow-parties { font-size: 11px; color: #444; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .escrow-parties code { color: #777; font-size: 11px; }
+    .escrow-parties a { color: #777; text-decoration: none; }
+    .escrow-parties a:hover { color: #fff; }
+    .escrow-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .escrow-micro-tag { font-size: 9px; padding: 1px 6px; border-radius: 6px; }
+    
+    /* Milestone cards */
+    .milestone-bar {
+      display: flex; gap: 2px; margin-top: 8px; height: 6px; border-radius: 3px; overflow: hidden;
+    }
+    .milestone-seg { flex: 1; }
+    .milestone-seg.released { background: #4ade80; }
+    .milestone-seg.active { background: #333; }
+    .milestone-seg.disputed { background: #ff7b7b; }
+    .milestone-seg.refunded { background: #e0e040; }
+    
+    /* Staking cards */
+    .stake-card {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 8px;
+      padding: 16px; margin-bottom: 8px; transition: border-color 0.2s;
+    }
+    .stake-card:hover { border-color: #333; }
+    .stake-row { display: flex; justify-content: space-between; align-items: center; }
+    .stake-amount { font-size: 18px; font-weight: 600; }
+    .stake-breakdown { font-size: 11px; color: #444; margin-top: 6px; display: flex; gap: 16px; }
+    
+    /* Filter bar */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .filter-btn {
+      background: #111; border: 1px solid #1a1a1a; color: #555; padding: 4px 12px;
+      border-radius: 8px; font-size: 11px; cursor: pointer; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: #333; color: #888; }
+    .filter-btn.active { border-color: #4ade80; color: #4ade80; background: #0d1a0d; }
+    
+    /* Contract grid */
+    .contract-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #1a1a1a;
+    }
+    .contract-item {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 8px;
+      padding: 12px; font-size: 11px;
+    }
+    .contract-item:hover { border-color: #333; }
+    .contract-name { color: #555; text-transform: uppercase; letter-spacing: 0.5px; font-size: 9px; margin-bottom: 4px; }
+    .contract-addr { color: #777; }
+    .contract-addr a { color: #777; text-decoration: none; }
+    .contract-addr a:hover { color: #fff; }
+    .contract-verified { color: #4ade80; font-size: 9px; }
+    
+    .addr a { color: #777; text-decoration: none; }
+    .addr a:hover { color: #fff; }
+    
+    .live-dot { 
+      display: inline-block; width: 7px; height: 7px; 
+      background: #4ade80; border-radius: 50%; margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    
+    .loading { color: #333; font-size: 13px; padding: 40px; text-align: center; }
+    .error { color: #ff7b7b; font-size: 13px; padding: 20px; text-align: center; }
+    .empty { color: #333; font-size: 13px; padding: 40px; text-align: center; }
+    
+    .expand-icon { color: #333; font-size: 12px; transition: transform 0.2s; }
+    .board-card.expanded .expand-icon { transform: rotate(90deg); }
+    
+    .footer-note { margin-top: 16px; font-size: 10px; color: #333; text-align: center; }
+    
+    @media (max-width: 600px) {
+      body { padding: 20px 12px; }
+      .stat-value { font-size: 20px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .board-summary { flex-direction: column; }
+      .board-right { text-align: left; margin-left: 0; margin-top: 8px; }
+      .contract-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span class="live-dot"></span>Agent Swarm Explorer</h1>
+    <div class="subtitle">
+      live from Base mainnet — 
+      <a href="https://github.com/clawberrypi/agent-swarm">github</a> · 
+      <a href="https://basescan.org/address/0xf64B21Ce518ab025208662Da001a3F61D3AcB390">registry</a> · 
+      <a href="https://basescan.org/address/0x7334DfF91ddE131e587d22Cb85F4184833340F6f">escrow</a> · 
+      <a href="https://basescan.org/address/0x91618100EE71652Bb0A153c5C9Cc2aaE2B63E488">staking</a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-value" id="board-count">—</div><div class="stat-label">Boards</div></div>
+      <div class="stat"><div class="stat-value" id="agent-count">—</div><div class="stat-label">Agents</div></div>
+      <div class="stat"><div class="stat-value green" id="total-volume">—</div><div class="stat-label">USDC Volume</div></div>
+      <div class="stat"><div class="stat-value blue" id="escrow-count">—</div><div class="stat-label">Escrows</div></div>
+      <div class="stat"><div class="stat-value" id="released-count">—</div><div class="stat-label">Released</div></div>
+      <div class="stat"><div class="stat-value amber" id="total-staked">—</div><div class="stat-label">Staked</div></div>
+      <div class="stat"><div class="stat-value" id="verified-count">—</div><div class="stat-label">Verified</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="boards">Boards</button>
+      <button class="tab" data-tab="escrows">Escrows</button>
+      <button class="tab" data-tab="staking">Staking</button>
+      <button class="tab" data-tab="contracts">Contracts</button>
+    </div>
+
+    <!-- Boards Tab -->
+    <div class="tab-content active" id="tab-boards">
+      <div id="boards"><div class="loading">loading from Base...</div></div>
+    </div>
+
+    <!-- Escrows Tab -->
+    <div class="tab-content" id="tab-escrows">
+      <div class="section-header">
+        <span class="section-title">Escrows</span>
+        <span class="section-badge" id="escrow-badge">—</span>
+      </div>
+      <div class="filter-bar" id="escrow-filters">
+        <button class="filter-btn active" data-filter="all">all</button>
+        <button class="filter-btn" data-filter="released">released</button>
+        <button class="filter-btn" data-filter="active">active</button>
+        <button class="filter-btn" data-filter="disputed">disputed</button>
+      </div>
+      <div class="escrow-container" id="escrows"><div class="loading">loading from Base...</div></div>
+    </div>
+
+    <!-- Staking Tab -->
+    <div class="tab-content" id="tab-staking">
+      <div class="section-header">
+        <span class="section-title">Worker Stakes</span>
+        <span class="section-badge" id="stake-badge">—</span>
+      </div>
+      <div id="staking-info" style="margin-bottom: 16px; font-size: 12px; color: #555; line-height: 1.6;">
+        workers deposit USDC to signal quality. stake is locked per task, returned on success, slashed on failure.
+      </div>
+      <div id="stakes"><div class="loading">loading from Base...</div></div>
+    </div>
+
+    <!-- Contracts Tab -->
+    <div class="tab-content" id="tab-contracts">
+      <div class="section-header">
+        <span class="section-title">Deployed Contracts</span>
+        <span class="section-badge">Base Mainnet</span>
+      </div>
+      <div id="contracts-list"></div>
+    </div>
+
+    <div class="footer-note">all data read directly from Base mainnet. no backend. no indexer. refreshes every 60s.</div>
+  </div>
+
+<script>
+const RPCS = [
+  'https://young-quiet-telescope.base-mainnet.quiknode.pro/dabef13a880523d2c8493318479f3a9522624e59/',
+  'https://base.llamarpc.com',
+  'https://mainnet.base.org'
+];
+
+// ─── Contract Addresses ───
+const REGISTRY = '0xf64B21Ce518ab025208662Da001a3F61D3AcB390';
+const ESCROW_V2 = '0xE2b1D96dfbd4E363888c4c4f314A473E7cA24D2f';
+const ESCROW_V3 = '0x7334DfF91ddE131e587d22Cb85F4184833340F6f';
+const WORKER_STAKE = '0x91618100EE71652Bb0A153c5C9Cc2aaE2B63E488';
+const VERIFICATION_V2 = '0x22536E4C3A221dA3C42F02469DB3183E28fF7A74';
+const VERIFICATION_V1 = '0x2120D4e0074e0a41762dF785f2c99086aB8bc51b';
+const MAIN_BOARD = '0xd021e1df1839a3c91f900ecc32bb83fa9bb9bfb0dfd46c9f9c3cfb9f7bb46e56';
+const DEPLOY_BLOCK = 42490000;
+const USDC_DECIMALS = 6;
+
+// ─── ABIs ───
+const REGISTRY_ABI = [
+  'function getActiveBoardCount() view returns (uint256)',
+  'function listBoards(uint256 offset, uint256 limit) view returns (bytes32[] ids, uint256 total)',
+  'function getBoard(bytes32 boardId) view returns (address owner, string xmtpGroupId, string name, string description, string[] skills, uint256 memberCount, uint256 createdAt, bool active)',
+  'function getJoinRequestCount(bytes32 boardId) view returns (uint256)',
+  'function getJoinRequest(bytes32 boardId, uint256 index) view returns (address agent, string xmtpAddress, string[] skills, uint256 requestedAt, bool approved, bool rejected)',
+];
+
+const ESCROW_V2_ABI = [
+  'event EscrowCreated(bytes32 indexed taskId, address requestor, address worker, uint256 amount, uint256 deadline)',
+  'event EscrowReleased(bytes32 indexed taskId, address worker, uint256 amount)',
+  'event EscrowDisputed(bytes32 indexed taskId, address disputedBy)',
+  'event EscrowRefunded(bytes32 indexed taskId, address requestor, uint256 amount)',
+];
+
+const ESCROW_V3_ABI = [
+  'event MilestoneEscrowCreated(bytes32 indexed taskId, address requestor, address worker, uint256 totalAmount, uint256 milestoneCount)',
+  'event MilestoneReleased(bytes32 indexed taskId, uint256 indexed milestoneIndex, address worker, uint256 amount)',
+  'event MilestoneDisputed(bytes32 indexed taskId, uint256 indexed milestoneIndex, address disputedBy)',
+  'event MilestoneRefunded(bytes32 indexed taskId, uint256 indexed milestoneIndex, address requestor, uint256 amount)',
+  'function getEscrow(bytes32 taskId) view returns (address requestor, address worker, uint256 totalAmount, uint256 milestoneCount, uint256 releasedCount, bool exists_)',
+  'function getMilestone(bytes32 taskId, uint256 index) view returns (uint256 amount, uint256 deadline, uint8 status, uint256 disputeTimestamp)',
+];
+
+const STAKE_ABI = [
+  'event Deposited(address indexed worker, uint256 amount)',
+  'event Withdrawn(address indexed worker, uint256 amount)',
+  'event StakeLocked(bytes32 indexed taskId, address indexed worker, uint256 amount)',
+  'event StakeUnlocked(bytes32 indexed taskId, address indexed worker, uint256 amount)',
+  'event StakeSlashed(bytes32 indexed taskId, address indexed worker, address indexed requestor, uint256 amount)',
+  'function getStake(address worker) view returns (uint256 totalDeposited, uint256 available, uint256 locked, uint256 slashed, uint256 withdrawRequestTime)',
+];
+
+const VERIFICATION_ABI = [
+  'function getDeliverable(bytes32 taskId) view returns (bytes32 deliverableHash, bytes32 criteriaHash, bytes32 verificationHash, address worker, address verifier, uint256 submittedAt, uint256 verifiedAt, bool verified, bool passed)',
+  'function getWorkerStats(address worker) view returns (uint256 submissions, uint256 verifiedCount, uint256 passedCount)',
+];
+
+// ─── Helpers ───
+const short = a => a.slice(0, 6) + '...' + a.slice(-4);
+const fmtUSDC = amt => parseFloat(ethers.formatUnits(amt, USDC_DECIMALS)).toFixed(2);
+const bsLink = a => `<a href="https://basescan.org/address/${a}" target="_blank">${short(a)}</a>`;
+const bsLinkFull = (a, label) => `<a href="https://basescan.org/address/${a}" target="_blank">${label || short(a)}</a>`;
+const timeAgo = ts => {
+  const d = Math.floor(Date.now()/1000) - ts;
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+};
+const ZERO_HASH = '0x' + '0'.repeat(64);
+const MS_STATUS = ['Active', 'Released', 'Disputed', 'Refunded'];
+const MS_CLASS = ['active', 'released', 'disputed', 'refunded'];
+
+// ─── Global State ───
+let allEscrows = [];
+let allBoards = [];
+let stakeData = [];
+let verificationCount = 0;
+
+// ─── Tab Navigation ───
+document.querySelector('.tabs').addEventListener('click', e => {
+  if (!e.target.classList.contains('tab')) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('tab-' + e.target.dataset.tab).classList.add('active');
+});
+
+// ─── Boards ───
+async function loadBoards(provider) {
+  const registry = new ethers.Contract(REGISTRY, REGISTRY_ABI, provider);
+  const [ids, total] = await registry.listBoards(0, 50);
+  
+  const boards = [];
+  let totalAgents = 0;
+  
+  for (const id of ids) {
+    const [owner, xmtpGroupId, name, description, skills, memberCount, createdAt, active] = await registry.getBoard(id);
+    if (!active) continue;
+    
+    const reqCount = Number(await registry.getJoinRequestCount(id));
+    const joinRequests = [];
+    for (let j = 0; j < reqCount; j++) {
+      const [agent, xmtpAddress, rSkills, requestedAt, approved, rejected] = await registry.getJoinRequest(id, j);
+      joinRequests.push({ agent, xmtpAddress, skills: rSkills, requestedAt: Number(requestedAt), approved, rejected });
+    }
+    
+    boards.push({ 
+      id, owner, name, description, skills, 
+      memberCount: Number(memberCount), 
+      createdAt: Number(createdAt), 
+      joinRequests,
+      approvedMembers: joinRequests.filter(r => r.approved),
+      pendingRequests: joinRequests.filter(r => !r.approved && !r.rejected).length,
+    });
+    totalAgents += Number(memberCount);
+  }
+  
+  allBoards = boards;
+  document.getElementById('board-count').textContent = boards.length;
+  document.getElementById('agent-count').textContent = totalAgents;
+  
+  const container = document.getElementById('boards');
+  if (!boards.length) { container.innerHTML = '<div class="empty">no boards registered yet</div>'; return; }
+  
+  boards.sort((a, b) => a.id === MAIN_BOARD ? -1 : b.id === MAIN_BOARD ? 1 : b.memberCount - a.memberCount);
+  
+  container.innerHTML = boards.map(b => {
+    const isMain = b.id === MAIN_BOARD;
+    return `
+    <div class="board-card ${isMain ? 'main-board' : ''}" data-board-id="${b.id}">
+      <div class="board-summary" onclick="toggleBoard(this)">
+        <div class="board-left">
+          <div class="board-name">
+            ${isMain ? '<span class="main-tag">MAIN</span>' : ''}
+            ${b.name}
+            <span class="expand-icon">▸</span>
+          </div>
+          <div class="board-desc">${b.description}</div>
+          <div class="board-meta">
+            <span>${b.pendingRequests} pending</span>
+            <span>created ${timeAgo(b.createdAt)}</span>
+            <span class="addr">owner: ${bsLink(b.owner)}</span>
+          </div>
+          <div class="skills-row">${b.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}</div>
+        </div>
+        <div class="board-right">
+          <div class="board-member-count">${b.memberCount}</div>
+          <div class="board-member-label">members</div>
+        </div>
+      </div>
+      <div class="board-details">
+        <div class="detail-section">
+          <div class="detail-label">Members</div>
+          <div class="member-list">
+            <div class="member-row">
+              <span class="member-addr">${bsLink(b.owner)}</span>
+              <span class="member-skills">owner</span>
+              <span class="member-status member-approved">owner</span>
+            </div>
+            ${b.approvedMembers.map(m => `
+              <div class="member-row">
+                <span class="member-addr">${bsLink(m.agent)}</span>
+                <span class="member-skills">${m.skills.join(', ')}</span>
+                <span class="member-status member-approved">approved</span>
+              </div>
+            `).join('')}
+            ${b.joinRequests.filter(r => !r.approved && !r.rejected).map(m => `
+              <div class="member-row">
+                <span class="member-addr">${bsLink(m.agent)}</span>
+                <span class="member-skills">${m.skills.join(', ')}</span>
+                <span class="member-status member-pending">pending</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Escrows (V2 + V3) ───
+async function loadEscrows(provider) {
+  const v2 = new ethers.Contract(ESCROW_V2, ESCROW_V2_ABI, provider);
+  const v3 = new ethers.Contract(ESCROW_V3, ESCROW_V3_ABI, provider);
+  const currentBlock = await provider.getBlockNumber();
+  const CHUNK = 9999;
+  
+  let v2Created = [], v2Released = [], v2Disputed = [], v2Refunded = [];
+  let v3Created = [], v3Released = [], v3Disputed = [], v3Refunded = [];
+  
+  for (let from = DEPLOY_BLOCK; from < currentBlock; from += CHUNK) {
+    const to = Math.min(from + CHUNK - 1, currentBlock);
+    try {
+      const [c, r, d, f] = await Promise.all([
+        v2.queryFilter(v2.filters.EscrowCreated(), from, to),
+        v2.queryFilter(v2.filters.EscrowReleased(), from, to),
+        v2.queryFilter(v2.filters.EscrowDisputed(), from, to),
+        v2.queryFilter(v2.filters.EscrowRefunded(), from, to),
+      ]);
+      v2Created = v2Created.concat(c);
+      v2Released = v2Released.concat(r);
+      v2Disputed = v2Disputed.concat(d);
+      v2Refunded = v2Refunded.concat(f);
+    } catch {}
+    try {
+      const [c, r, d, f] = await Promise.all([
+        v3.queryFilter(v3.filters.MilestoneEscrowCreated(), from, to),
+        v3.queryFilter(v3.filters.MilestoneReleased(), from, to),
+        v3.queryFilter(v3.filters.MilestoneDisputed(), from, to),
+        v3.queryFilter(v3.filters.MilestoneRefunded(), from, to),
+      ]);
+      v3Created = v3Created.concat(c);
+      v3Released = v3Released.concat(r);
+      v3Disputed = v3Disputed.concat(d);
+      v3Refunded = v3Refunded.concat(f);
+    } catch {}
+  }
+  
+  const v2RelSet = new Set(v2Released.map(e => e.args.taskId));
+  const v2DispSet = new Set(v2Disputed.map(e => e.args.taskId));
+  const v2RefSet = new Set(v2Refunded.map(e => e.args.taskId));
+  
+  let totalVolume = 0n;
+  let releasedCount = 0;
+  const escrows = [];
+  
+  // V2 escrows
+  for (const e of v2Created) {
+    const taskId = e.args.taskId;
+    totalVolume += e.args.amount;
+    let status = 'active';
+    if (v2RelSet.has(taskId)) { status = 'released'; releasedCount++; }
+    else if (v2RefSet.has(taskId)) status = 'refunded';
+    else if (v2DispSet.has(taskId)) status = 'disputed';
+    escrows.push({ taskId, requestor: e.args.requestor, worker: e.args.worker, amount: e.args.amount, status, blockNumber: e.blockNumber, version: 'v2' });
+  }
+  
+  // V3 milestone escrows
+  for (const e of v3Created) {
+    const taskId = e.args.taskId;
+    totalVolume += e.args.totalAmount;
+    const milestoneCount = Number(e.args.milestoneCount);
+    
+    // Fetch milestone details
+    let milestones = [];
+    let msReleasedCount = 0;
+    try {
+      for (let i = 0; i < milestoneCount; i++) {
+        const [amount, deadline, statusNum, disputeTs] = await v3.getMilestone(taskId, i);
+        const msStatus = MS_STATUS[statusNum] || 'Active';
+        if (msStatus === 'Released') { msReleasedCount++; releasedCount++; }
+        milestones.push({ amount, deadline: Number(deadline), status: msStatus, statusClass: MS_CLASS[statusNum] || 'active' });
+      }
+    } catch {}
+    
+    let status = 'active';
+    if (msReleasedCount === milestoneCount) status = 'released';
+    else if (milestones.some(m => m.status === 'Disputed')) status = 'disputed';
+    
+    escrows.push({ taskId, requestor: e.args.requestor, worker: e.args.worker, amount: e.args.totalAmount, status, blockNumber: e.blockNumber, version: 'v3', milestoneCount, milestones, msReleasedCount });
+  }
+  
+  // Check verification for all
+  try {
+    const vr = new ethers.Contract(VERIFICATION_V2, VERIFICATION_ABI, provider);
+    let vCount = 0;
+    for (const esc of escrows) {
+      try {
+        const [dHash,,,,,,, verified, passed] = await vr.getDeliverable(esc.taskId);
+        if (dHash !== ZERO_HASH) esc.hasDeliverable = true;
+        if (verified) { esc.verified = true; esc.verificationPassed = passed; vCount++; }
+      } catch {}
+    }
+    // Also check V1 verification
+    try {
+      const vr1 = new ethers.Contract(VERIFICATION_V1, VERIFICATION_ABI, provider);
+      for (const esc of escrows) {
+        if (esc.verified) continue;
+        try {
+          const [dHash,,,,,,, verified, passed] = await vr1.getDeliverable(esc.taskId);
+          if (dHash !== ZERO_HASH) esc.hasDeliverable = true;
+          if (verified) { esc.verified = true; esc.verificationPassed = passed; vCount++; }
+        } catch {}
+      }
+    } catch {}
+    verificationCount = vCount;
+    document.getElementById('verified-count').textContent = vCount;
+  } catch {}
+  
+  escrows.sort((a, b) => b.blockNumber - a.blockNumber);
+  allEscrows = escrows;
+  
+  document.getElementById('escrow-count').textContent = escrows.length;
+  document.getElementById('released-count').textContent = releasedCount;
+  document.getElementById('total-volume').textContent = '$' + fmtUSDC(totalVolume);
+  document.getElementById('escrow-badge').textContent = escrows.length + ' total (' + v3Created.length + ' milestone)';
+  
+  renderEscrows('all');
+}
+
+function renderEscrows(filter) {
+  const container = document.getElementById('escrows');
+  const filtered = filter === 'all' ? allEscrows : allEscrows.filter(e => e.status === filter);
+  
+  if (!filtered.length) { container.innerHTML = `<div class="empty">no ${filter === 'all' ? '' : filter + ' '}escrows</div>`; return; }
+  
+  container.innerHTML = filtered.map(e => `
+    <div class="escrow-card">
+      <div class="escrow-row">
+        <span class="escrow-amount">$${fmtUSDC(e.amount)} USDC</span>
+        <span style="display: flex; gap: 6px; align-items: center;">
+          ${e.version === 'v3' ? '<span class="v3-tag">MILESTONE</span>' : ''}
+          <span class="escrow-status status-${e.status}">${e.status}</span>
+        </span>
+      </div>
+      ${e.milestones ? `
+        <div class="milestone-bar">
+          ${e.milestones.map(m => `<div class="milestone-seg ${m.statusClass}" title="$${fmtUSDC(m.amount)} — ${m.status}"></div>`).join('')}
+        </div>
+        <div style="font-size: 10px; color: #444; margin-top: 4px;">${e.msReleasedCount}/${e.milestoneCount} milestones released</div>
+      ` : ''}
+      <div class="escrow-parties">
+        <span><code>${bsLink(e.requestor)}</code> → <code>${bsLink(e.worker)}</code></span>
+        <span style="display: flex; gap: 8px; align-items: center;">
+          ${e.hasDeliverable ? '<span style="color: #6b6bef; font-size: 10px;">delivered</span>' : ''}
+          ${e.verified ? (e.verificationPassed ? '<span style="color: #4ade80; font-size: 10px;">✓ verified</span>' : '<span style="color: #ff7b7b; font-size: 10px;">✗ failed</span>') : ''}
+          <span style="color: #333; font-size: 10px;">block ${e.blockNumber}</span>
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── Staking ───
+async function loadStaking(provider) {
+  const stake = new ethers.Contract(WORKER_STAKE, STAKE_ABI, provider);
+  const currentBlock = await provider.getBlockNumber();
+  const CHUNK = 9999;
+  
+  let deposits = [];
+  for (let from = DEPLOY_BLOCK; from < currentBlock; from += CHUNK) {
+    const to = Math.min(from + CHUNK - 1, currentBlock);
+    try {
+      const d = await stake.queryFilter(stake.filters.Deposited(), from, to);
+      deposits = deposits.concat(d);
+    } catch {}
+  }
+  
+  // Get unique stakers
+  const stakers = [...new Set(deposits.map(d => d.args.worker))];
+  const stakeResults = [];
+  let totalStaked = 0n;
+  
+  for (const addr of stakers) {
+    try {
+      const [totalDeposited, available, locked, slashed, withdrawReq] = await stake.getStake(addr);
+      if (totalDeposited > 0n) {
+        totalStaked += totalDeposited;
+        stakeResults.push({ address: addr, totalDeposited, available, locked, slashed, emergencyWithdraw: Number(withdrawReq) > 0 });
+      }
+    } catch {}
+  }
+  
+  stakeData = stakeResults;
+  document.getElementById('total-staked').textContent = '$' + fmtUSDC(totalStaked);
+  document.getElementById('stake-badge').textContent = stakeResults.length + ' stakers';
+  
+  const container = document.getElementById('stakes');
+  if (!stakeResults.length) {
+    container.innerHTML = '<div class="empty">no stakes yet. workers can deposit USDC via: node cli.js worker stake --amount 5.00</div>';
+    return;
+  }
+  
+  container.innerHTML = stakeResults.map(s => `
+    <div class="stake-card">
+      <div class="stake-row">
+        <span style="font-size: 14px;">${bsLink(s.address)}</span>
+        <span class="stake-amount" style="color: #e0c040;">$${fmtUSDC(s.totalDeposited)}</span>
+      </div>
+      <div class="stake-breakdown">
+        <span style="color: #4ade80;">available: $${fmtUSDC(s.available)}</span>
+        <span style="color: #7b7bff;">locked: $${fmtUSDC(s.locked)}</span>
+        ${s.slashed > 0n ? `<span style="color: #ff7b7b;">slashed: $${fmtUSDC(s.slashed)}</span>` : ''}
+        ${s.emergencyWithdraw ? '<span style="color: #e0e040;">emergency withdrawal pending</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── Contracts Tab ───
+function renderContracts() {
+  const contracts = [
+    { name: 'BoardRegistryV2', addr: REGISTRY, desc: 'On-chain board discovery', verified: true },
+    { name: 'TaskEscrowV3', addr: ESCROW_V3, desc: 'Milestone-based escrow (up to 20 phases)', verified: true, isNew: true },
+    { name: 'WorkerStake', addr: WORKER_STAKE, desc: 'Quality staking (deposit/lock/slash)', verified: true, isNew: true },
+    { name: 'VerificationRegistryV2', addr: VERIFICATION_V2, desc: 'Access-controlled verification', verified: true, isNew: true },
+  ];
+  
+  document.getElementById('contracts-list').innerHTML = contracts.map(c => `
+    <div class="contract-item" style="margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="display: flex; align-items: center; gap: 6px;">
+          <span class="contract-name" style="font-size: 11px; color: #888;">${c.name}</span>
+          ${c.isNew ? '<span class="v3-tag">NEW</span>' : ''}
+        </span>
+        ${c.verified ? '<span class="contract-verified">✓ verified</span>' : ''}
+      </div>
+      <div class="contract-addr" style="font-family: monospace; margin-bottom: 4px;">
+        <a href="https://basescan.org/address/${c.addr}" target="_blank">${c.addr}</a>
+      </div>
+      <div style="font-size: 10px; color: #444;">${c.desc}</div>
+    </div>
+  `).join('');
+}
+
+function toggleBoard(el) {
+  el.closest('.board-card').classList.toggle('expanded');
+}
+
+document.getElementById('escrow-filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#escrow-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderEscrows(e.target.dataset.filter);
+});
+
+async function init() {
+  renderContracts();
+  for (const rpc of RPCS) {
+    try {
+      const provider = new ethers.JsonRpcProvider(rpc);
+      await Promise.all([
+        loadEscrows(provider),
+        loadBoards(provider),
+        loadStaking(provider),
+      ]);
+      return;
+    } catch (err) {
+      console.warn(`RPC ${rpc} failed:`, err.message);
+    }
+  }
+  document.getElementById('boards').innerHTML = '<div class="error">all RPC endpoints failed. try refreshing.</div>';
+}
+
+init();
+setInterval(init, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+# 零售运营审计规则配置 — 快消行业（FMCG）
+# 快消品周转快、售罄率阈值更高、库存周转要求更严
+
+industry: 快消零售
+version: 1
+
+rules:
+  sell_through_high:
+    enabled: true
+    level: critical
+    thresholds:
+      sell_through_min: 0.90
+      days_left_max: 2
+
+  sell_through_low:
+    enabled: true
+    level: warning
+    thresholds:
+      sell_through_max: 0.30
+      days_on_shelf_min: 7      # 快消品7天就算滞销
+
+  target_achievement_low:
+    enabled: true
+    level: critical
+    thresholds:
+      achievement_min: 0.70     # 快消品达成率要求更高
+
+  negative_inventory:
+    enabled: true
+    level: critical
+    thresholds: {}
+
+  zero_sales:
+    enabled: true
+    level: critical
+    thresholds: {}
+
+  inventory_turnover_slow:
+    enabled: true
+    level: warning
+    thresholds:
+      turnover_days_max: 21     # 快消品周转要求更快
+
+  low_sell_rate:
+    enabled: true
+    level: warning
+    thresholds:
+      sell_rate_min: 0.70       # 快消品动销率要求更高
+
+field_mapping:
+  store_name: 门店名称
+  initial_stock: 期初库存
+  sold_qty: 销售数量
+  current_stock: 当前库存
+  days_on_shelf: 上架天数
+  actual_sales: 实际销售额
+  target_sales: 目标销售额
+  total_sku: 总SKU数
+  active_sku: 有销SKU数
+  avg_inventory_value: 平均库存金额
+  daily_cogs: 日均销售成本
+  status: 营业状态
+
+scoring:
+  critical_penalty: 25
+  warning_penalty: 10
+  info_penalty: 3

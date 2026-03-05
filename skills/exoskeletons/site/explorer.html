@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Explorer</title>
+<link rel="stylesheet" href="shared/exo-style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="container" style="padding-top:24px;padding-bottom:60px">
+
+<!-- Search -->
+<div class="panel" style="padding:16px 20px">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <input type="text" class="form-input" id="searchInput" placeholder="Search by token ID or name..."
+           style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="btn btn--secondary btn--sm" onclick="doSearch()">Search</button>
+  </div>
+</div>
+
+<!-- Controls + Grid -->
+<div class="panel">
+  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="text-mono" style="font-size:11px;color:var(--text-tertiary);letter-spacing:1px">SORT</span>
+      <select class="form-select" id="sortBy" onchange="onFilterChange()" style="padding:6px 10px;font-size:12px">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="rep">Reputation</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="text-mono" style="font-size:11px;color:var(--text-tertiary);letter-spacing:1px">FILTER</span>
+      <select class="form-select" id="filterBy" onchange="onFilterChange()" style="padding:6px 10px;font-size:12px">
+        <option value="all">All</option>
+        <option value="genesis">Genesis Only</option>
+        <option value="named">Named Only</option>
+      </select>
+    </div>
+    <div style="flex:1"></div>
+    <span class="text-mono" style="font-size:12px;color:var(--text-secondary)" id="countLabel">Loading...</span>
+  </div>
+
+  <div class="token-grid" id="grid">
+    <div class="loading-text" style="grid-column:1/-1">Loading Exoskeletons...</div>
+  </div>
+  <div id="paginationArea"></div>
+</div>
+
+<!-- My Tokens (wallet connected) -->
+<div class="panel hidden" id="myTokensPanel">
+  <div class="panel__title">My Exoskeletons</div>
+  <div class="token-grid" id="myGrid"></div>
+</div>
+
+</main>
+
+<div id="app-footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script src="shared/exo-core.js"></script>
+<script src="shared/exo-ui.js"></script>
+<script>
+ExoUI.initPage('explorer.html');
+
+const PER_PAGE = 20;
+let allTokens = [];
+let totalMinted = 0;
+let currentPage = 1;
+
+function getPage() {
+  const h = location.hash.replace('#', '');
+  const m = h.match(/page=(\d+)/);
+  return m ? parseInt(m[1]) : 1;
+}
+
+async function loadAllProfiles() {
+  allTokens = await ExoCore.loadAllTokens();
+  totalMinted = allTokens.length;
+}
+
+function getFilteredSorted() {
+  let tokens = [...allTokens];
+  const filter = document.getElementById('filterBy').value;
+  if (filter === 'genesis') tokens = tokens.filter(t => t.genesis);
+  if (filter === 'named') tokens = tokens.filter(t => t.name);
+
+  const sort = document.getElementById('sortBy').value;
+  if (sort === 'newest') tokens.sort((a, b) => b.id - a.id);
+  else if (sort === 'oldest') tokens.sort((a, b) => a.id - b.id);
+  else if (sort === 'rep') tokens.sort((a, b) => b.repScore - a.repScore);
+
+  return tokens;
+}
+
+async function renderPage() {
+  const tokens = getFilteredSorted();
+  const totalPages = Math.max(1, Math.ceil(tokens.length / PER_PAGE));
+  currentPage = Math.min(getPage(), totalPages);
+
+  document.getElementById('countLabel').textContent = tokens.length + ' Exoskeletons';
+
+  const start = (currentPage - 1) * PER_PAGE;
+  const pageTokens = tokens.slice(start, start + PER_PAGE);
+
+  const grid = document.getElementById('grid');
+  if (pageTokens.length === 0) {
+    grid.innerHTML = '<div class="loading-text" style="grid-column:1/-1">No Exoskeletons found. <a href="mint.html">Mint the first</a></div>';
+    document.getElementById('paginationArea').innerHTML = '';
+    return;
+  }
+
+  const svgs = pageTokens.map(t => ExoCore.renderTokenSVG(t));
+
+  grid.innerHTML = pageTokens.map((t, i) => ExoUI.renderTokenCard(t, svgs[i])).join('');
+  document.getElementById('paginationArea').innerHTML = ExoUI.renderPagination(currentPage, totalPages, 'goPage');
+}
+
+function goPage(p) {
+  location.hash = 'page=' + p;
+  renderPage();
+  window.scrollTo(0, 0);
+}
+
+function onFilterChange() {
+  currentPage = 1;
+  location.hash = 'page=1';
+  renderPage();
+}
+
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+
+  // Check if it's a number (token ID)
+  if (!isNaN(q) && parseInt(q) > 0) {
+    window.location.href = 'token.html#' + parseInt(q);
+    return;
+  }
+
+  // Try name lookup
+  try {
+    const tokenId = await ExoCore.contracts.registry.resolveByName(q);
+    if (Number(tokenId) > 0) {
+      window.location.href = 'token.html#' + Number(tokenId);
+      return;
+    }
+  } catch (e) {}
+
+  // Filter locally
+  const lower = q.toLowerCase();
+  const matches = allTokens.filter(t => t.name && t.name.toLowerCase().includes(lower));
+  if (matches.length === 1) {
+    window.location.href = 'token.html#' + matches[0].id;
+  } else if (matches.length > 0) {
+    document.getElementById('countLabel').textContent = matches.length + ' results';
+    const grid = document.getElementById('grid');
+    const svgs = matches.slice(0, PER_PAGE).map(t => ExoCore.renderTokenSVG(t));
+    grid.innerHTML = matches.slice(0, PER_PAGE).map((t, i) => ExoUI.renderTokenCard(t, svgs[i])).join('');
+    document.getElementById('paginationArea').innerHTML = '';
+  } else {
+    document.getElementById('grid').innerHTML = '<div class="loading-text" style="grid-column:1/-1">No results for "' + ExoCore.escHtml(q) + '"</div>';
+  }
+}
+
+// My Tokens
+async function loadMyTokens() {
+  const account = ExoCore.account;
+  if (!account) { document.getElementById('myTokensPanel').classList.add('hidden'); return; }
+
+  try {
+    const tokenIds = await ExoCore.getOwnedTokens(account);
+    if (tokenIds.length === 0) { document.getElementById('myTokensPanel').classList.add('hidden'); return; }
+
+    document.getElementById('myTokensPanel').classList.remove('hidden');
+    const myGrid = document.getElementById('myGrid');
+    myGrid.innerHTML = tokenIds.map(() => ExoUI.renderSkeletonCard()).join('');
+
+    const [profiles, svgs] = await Promise.all([
+      Promise.all(tokenIds.map(async id => {
+        try {
+          const p = await ExoCore.contracts.registry.getProfile(id);
+          return { id, name: p.name, genesis: p.genesis, repScore: Number(p.reputationScore) };
+        } catch (e) { return { id, name: '', genesis: false, repScore: 0 }; }
+      })),
+      Promise.all(tokenIds.map(async id => {
+        try { return await ExoCore.contracts.renderer.renderSVG(id); } catch (e) { return null; }
+      })),
+    ]);
+
+    myGrid.innerHTML = profiles.map((t, i) => ExoUI.renderTokenCard(t, svgs[i])).join('');
+  } catch (e) { console.error('My tokens error:', e); }
+}
+
+window.addEventListener('exo:accountChanged', loadMyTokens);
+window.addEventListener('hashchange', () => renderPage());
+
+ExoCore.onReady(async () => {
+  await loadAllProfiles();
+  renderPage();
+  loadMyTokens();
+});
+</script>
+</body>
+</html>

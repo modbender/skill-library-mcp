@@ -1,0 +1,148 @@
+{
+  "version": "2.3.0",
+  "source": "Artificial Analysis API v4",
+  "date": "2026-02-15",
+  "notes": "Codex scores marked 'estimated: true' are from OpenAI blog data, not independently verified.",
+  "models": {
+    "gemini-2.5-flash-lite": {
+      "provider": "google-gemini-cli",
+      "openclaw_id": "google-gemini-cli/gemini-2.5-flash-lite",
+      "tier": "SIMPLE",
+      "speed_tok_s": 495,
+      "ttft_s": 0.23,
+      "intelligence": 21.6,
+      "context_window": 1048576,
+      "best_at": ["low-latency pings", "trivial tasks", "format conversions"],
+      "benchmarks": {
+        "ifbench": null,
+        "gpqa": null,
+        "coding": null,
+        "math": null,
+        "tau2": null
+      },
+      "estimated": false
+    },
+    "gemini-3-flash-preview": {
+      "provider": "google-gemini-cli",
+      "openclaw_id": "google-gemini-cli/gemini-3-flash-preview",
+      "tier": "FAST",
+      "speed_tok_s": 206,
+      "ttft_s": 12.75,
+      "intelligence": 46.4,
+      "context_window": 1048576,
+      "best_at": ["instruction following", "structured output", "heartbeats", "cron jobs"],
+      "benchmarks": {
+        "ifbench": 0.780,
+        "gpqa": null,
+        "coding": null,
+        "math": 0.970,
+        "tau2": null
+      },
+      "estimated": false
+    },
+    "gemini-3-pro-preview": {
+      "provider": "google-gemini-cli",
+      "openclaw_id": "google-gemini-cli/gemini-3-pro-preview",
+      "tier": "RESEARCH",
+      "speed_tok_s": 131,
+      "ttft_s": 29.59,
+      "intelligence": 48.4,
+      "context_window": 1048576,
+      "best_at": ["scientific research", "long context analysis", "fact-checking"],
+      "benchmarks": {
+        "ifbench": null,
+        "gpqa": 0.908,
+        "coding": 35.1,
+        "math": 0.957,
+        "tau2": null
+      },
+      "estimated": false
+    },
+    "gpt-5.3-codex": {
+      "provider": "openai-codex",
+      "openclaw_id": "openai-codex/gpt-5.3-codex",
+      "tier": "CODE",
+      "speed_tok_s": 113,
+      "ttft_s": 20.00,
+      "intelligence": 51.5,
+      "context_window": 200000,
+      "best_at": ["code generation", "math", "debugging"],
+      "benchmarks": {
+        "ifbench": 0.590,
+        "gpqa": 0.738,
+        "coding": 49.3,
+        "math": 0.990,
+        "tau2": 0.811
+      },
+      "estimated": true
+    },
+    "claude-opus-4-6": {
+      "provider": "anthropic",
+      "openclaw_id": "anthropic/claude-opus-4-6",
+      "tier": "DEEP",
+      "speed_tok_s": 67,
+      "ttft_s": 1.76,
+      "intelligence": 53.0,
+      "context_window": 200000,
+      "best_at": ["reasoning", "planning", "judgment", "content"],
+      "benchmarks": {
+        "ifbench": 0.639,
+        "gpqa": 0.769,
+        "coding": 43.3,
+        "math": 0.540,
+        "tau2": 0.780
+      },
+      "estimated": false
+    },
+    "k2p5": {
+      "provider": "kimi-coding",
+      "openclaw_id": "kimi-coding/k2p5",
+      "tier": "ORCHESTRATE",
+      "speed_tok_s": 39,
+      "ttft_s": 1.65,
+      "intelligence": 46.7,
+      "context_window": 131072,
+      "best_at": ["multi-agent orchestration", "tool use pipelines"],
+      "benchmarks": {
+        "ifbench": null,
+        "gpqa": null,
+        "coding": null,
+        "math": null,
+        "tau2": 0.959
+      },
+      "estimated": false
+    }
+  },
+  "tiers": {
+    "SIMPLE": {
+      "description": "Lowest latency, trivial tasks only",
+      "primary": "gemini-2.5-flash-lite",
+      "requires_provider": "google-gemini-cli"
+    },
+    "FAST": {
+      "description": "Good speed with solid intelligence, instruction following",
+      "primary": "gemini-3-flash-preview",
+      "requires_provider": "google-gemini-cli"
+    },
+    "RESEARCH": {
+      "description": "Scientific research, long context, math",
+      "primary": "gemini-3-pro-preview",
+      "requires_provider": "google-gemini-cli"
+    },
+    "CODE": {
+      "description": "Code generation, debugging, math",
+      "primary": "gpt-5.3-codex",
+      "requires_provider": "openai-codex"
+    },
+    "DEEP": {
+      "description": "General reasoning, planning, judgment (default)",
+      "primary": "claude-opus-4-6",
+      "requires_provider": "anthropic"
+    },
+    "ORCHESTRATE": {
+      "description": "Multi-agent coordination, tool pipelines",
+      "primary": "k2p5",
+      "requires_provider": "kimi-coding"
+    }
+  }
+}

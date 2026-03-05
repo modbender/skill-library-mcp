@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - OpenClaw</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .dashboard-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .username {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: rgba(255, 92, 92, 0.15);
+            border: 1px solid rgba(255, 92, 92, 0.3);
+            border-radius: 8px;
+            color: #ff5c5c;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 92, 92, 0.25);
+            border-color: rgba(255, 92, 92, 0.4);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 48px 32px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .welcome {
+            margin-bottom: 40px;
+        }
+        
+        .welcome h2 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .welcome p {
+            margin: 0;
+            color: #888;
+            font-size: 15px;
+        }
+        
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        
+        .nav-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 28px 24px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 16px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-card:hover {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.20);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .nav-card .icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+        
+        .nav-card .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .nav-card .desc {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.5;
+        }
+        
+        .nav-card.device-pairings {
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+        .nav-card.device-pairings:hover {
+            border-color: rgba(46, 204, 113, 0.5);
+            box-shadow: 0 12px 32px rgba(46, 204, 113, 0.1);
+        }
+        
+        .nav-card.channel-approvals {
+            border-color: rgba(92, 158, 255, 0.3);
+        }
+        .nav-card.channel-approvals:hover {
+            border-color: rgba(92, 158, 255, 0.5);
+            box-shadow: 0 12px 32px rgba(92, 158, 255, 0.1);
+        }
+        
+        .nav-card.terminal {
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+        .nav-card.terminal:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.1);
+        }
+        
+        @media (max-width: 640px) {
+            .content {
+                padding: 24px 16px;
+            }
+            .nav-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>OpenClaw Dashboard</h1>
+            <div class="user-info">
+                <span class="username">Welcome, {{ session.username }}</span>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="welcome">
+                <h2>Overview</h2>
+                <p>Manage your OpenClaw gateway, devices, and channels.</p>
+            </div>
+            
+            <div class="nav-cards">
+                <a href="/device-pairings" class="nav-card device-pairings">
+                    <span class="icon">🔗</span>
+                    <span class="title">Device Pairings</span>
+                    <span class="desc">Approve or reject browser and device connections to the gateway.</span>
+                </a>
+                
+                <a href="/channel-approvals" class="nav-card channel-approvals">
+                    <span class="icon">💬</span>
+                    <span class="title">Channel Approvals</span>
+                    <span class="desc">Review and approve pending channel pairing requests (Telegram, Discord, etc).</span>
+                </a>
+                
+                <a href="/terminal" class="nav-card terminal">
+                    <span class="icon">🖥️</span>
+                    <span class="title">Terminal</span>
+                    <span class="desc">Open a live terminal session on the server.</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

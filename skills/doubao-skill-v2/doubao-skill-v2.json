@@ -1,0 +1,104 @@
+{
+  "name": "doubao-v2",
+  "displayName": "Doubao Image & Video Generation V2",
+  "version": "1.0.0",
+  "description": "Doubao API Shell 脚本实现 - 文本生图、图片编辑和文本生视频",
+  "author": "wenkangwei",
+  "category": "ai-generation",
+  "capabilities": [
+    "text-to-image",
+    "image-editing",
+    "text-to-video",
+    "task-status-check"
+  ],
+  "runtime": "bash",
+  "main": "scripts/doubao_skill.sh",
+  "parameters": {
+    "action": {
+      "type": "string",
+      "enum": ["img", "edit", "vid", "status"],
+      "required": true,
+      "description": "操作类型: img (文本生图), edit (图片编辑), vid (文本生视频), status (检查任务状态)"
+    },
+    "prompt": {
+      "type": "string",
+      "required": false,
+      "description": "生成/编辑提示词（img、edit、vid 时必需）"
+    },
+    "image_url": {
+      "type": "string",
+      "required": false,
+      "description": "图片 URL（edit 时必需，vid 时可选）"
+    },
+    "sync_mode": {
+      "type": "string",
+      "enum": ["sync", "async"],
+      "default": "async",
+      "description": "视频生成模式: sync (等待完成), async (快速返回任务 ID)"
+    },
+    "task_id": {
+      "type": "string",
+      "required": false,
+      "description": "任务 ID（status 时必需）"
+    }
+  },
+  "environment": {
+    "ARK_API_KEY": {
+      "required": true,
+      "description": "Volcengine ARK API 密钥"
+    },
+    "PATH": {
+      "required": false,
+      "description": "系统 PATH，需要包含 curl 和 jq"
+    }
+  },
+  "dependencies": {
+    "bash": ">= 4.0",
+    "curl": "*",
+    "jq": "*"
+  },
+  "examples": [
+    {
+      "description": "生成图片",
+      "input": {
+        "action": "img",
+        "prompt": "一只可爱的小猫"
+      }
+    },
+    {
+      "description": "编辑图片（去除水印）",
+      "input": {
+        "action": "edit",
+        "image_url": "https://example.com/image.png",
+        "prompt": "remove watermark, keep main content"
+      }
+    },
+    {
+      "description": "生成视频（异步）",
+      "input": {
+        "action": "vid",
+        "prompt": "一个人在跳舞",
+        "sync_mode": "async"
+      }
+    },
+    {
+      "description": "生成视频（同步）",
+      "input": {
+        "action": "vid",
+        "prompt": "一个人在跳舞",
+        "sync_mode": "sync"
+      }
+    },
+    {
+      "description": "检查任务状态",
+      "input": {
+        "action": "status",
+        "task_id": "task_xxxxx"
+      }
+    }
+  ],
+  "installation": {
+    "bash": "chmod +x scripts/doubao.sh && chmod +x scripts/doubao_skill.sh",
+    "setup": "./scripts/doubao.sh help"
+  }
+}

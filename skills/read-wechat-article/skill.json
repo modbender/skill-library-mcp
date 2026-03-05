@@ -1,0 +1,117 @@
+{
+  "name": "read_wechat_article",
+  "description": "微信公众号文章阅读Skill，支持抓取、解析、清洗和格式化输出",
+  "version": "1.0.0",
+  "author": "Claw Community",
+  "email": "community@claw.ai",
+  "tags": ["wechat", "article", "crawling", "parsing", "markdown"],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "微信公众号文章URL，格式如 https://mp.weixin.qq.com/s/xxxxxxx",
+        "pattern": "^https://mp\.weixin\.qq\.com/s/[A-Za-z0-9_-]+"
+      }
+    },
+    "required": ["url"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "description": "处理是否成功"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "文章标题"
+          },
+          "author": {
+            "type": "string",
+            "description": "文章作者"
+          },
+          "publish_time": {
+            "type": "string",
+            "description": "文章发布时间（格式：YYYY-MM-DD HH:MM）"
+          },
+          "content_markdown": {
+            "type": "string",
+            "description": "Markdown格式的文章正文"
+          },
+          "content_text": {
+            "type": "string",
+            "description": "纯文本格式的文章正文"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "文章中的图片URL列表"
+          },
+          "original_url": {
+            "type": "string",
+            "description": "原始文章URL"
+          },
+          "word_count": {
+            "type": "integer",
+            "description": "文章字数（不含空格和换行）"
+          },
+          "read_time_minutes": {
+            "type": "integer",
+            "description": "预计阅读时间（分钟，按每分钟500字计算）"
+          }
+        },
+        "description": "处理结果数据"
+      },
+      "error": {
+        "type": "string",
+        "description": "错误信息（处理失败时返回）"
+      }
+    }
+  },
+  "runtime": "python",
+  "handler": "read_wechat_article.handler",
+  "requirements": [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "markdownify>=0.11.6"
+  ],
+  "icon": "https://cdn.jsdelivr.net/gh/claw-community/skill-icons@main/wechat-article.svg",
+  "homepage": "https://github.com/claw-community/read_wechat_article",
+  "license": "MIT",
+  "keywords": ["微信公众号", "文章阅读", "网页抓取", "内容解析", "Markdown"],
+  "examples": [
+    {
+      "name": "基本使用示例",
+      "parameters": {
+        "url": "https://mp.weixin.qq.com/s/ijZyuHyubiX7Dp1tJrxZOw"
+      },
+      "expected": {
+        "success": true,
+        "data": {
+          "title": "未来1500天，影视行业的钱会被这1%的人赚走？",
+          "author": "郑林",
+          "content_markdown": "# 未来1500天，影视行业的钱会被这1%的人赚走？\n\n...",
+          "word_count": 25000
+        }
+      }
+    }
+  ],
+  "limits": {
+    "rate": "10/min",
+    "concurrent": 5,
+    "description": "调用频率限制"
+  },
+  "compliance": {
+    "crawling": "仅支持用户主动提供URL的抓取请求",
+    "commercial_use": "不得将抓取的内容用于商业目的",
+    "batch_crawling": "不允许大规模批量爬取",
+    "platform_rules": "必须遵守微信公众平台使用条款"
+  }
+}

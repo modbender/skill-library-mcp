@@ -1,0 +1,36 @@
+# Oversold Bounce Signal
+# Detects oversold stocks (RSI < 30) showing early price recovery
+
+name: oversold-bounce
+description: "RSI below 30 with positive price change - potential bounce"
+asset_class: stock
+timeframe: "1D"
+
+# Pre-filter: mid-cap+ stocks in oversold territory
+filters:
+  - field: MARKET_CAPITALIZATION
+    op: ">"
+    value: 500000000
+  - field: RELATIVE_STRENGTH_INDEX_14
+    op: "<"
+    value: 35
+
+columns:
+  - NAME
+  - PRICE
+  - CHANGE_PERCENT
+  - RELATIVE_STRENGTH_INDEX_14
+  - VOLUME
+
+# Signals: deeply oversold + positive price change
+computed:
+  - type: threshold
+    field: RELATIVE_STRENGTH_INDEX_14
+    op: "<"
+    value: 30
+  - type: expression
+    expr: "CHANGE_PERCENT > 0"
+
+sort_by: RELATIVE_STRENGTH_INDEX_14
+sort_order: asc
+limit: 20

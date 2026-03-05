@@ -1,0 +1,591 @@
+{
+  "$schema": "openclaw-framework-v1",
+  "id": "pci-dss",
+  "name": "PCI DSS v4.0",
+  "version": "1.0",
+  "description": "The Payment Card Industry Data Security Standard (PCI DSS) v4.0 provides a baseline of technical and operational requirements designed to protect payment account data. It applies to all entities that store, process, or transmit cardholder data.",
+  "domains": [
+    {
+      "id": "req-1",
+      "name": "Requirement 1: Install and Maintain Network Security Controls",
+      "controls": [
+        {
+          "id": "1.1.1",
+          "title": "Network Security Control Policies and Procedures",
+          "description": "All security policies and operational procedures related to network security controls are documented, kept up to date, and known to all affected parties.",
+          "category": "Network Security",
+          "priority": 4,
+          "typical_evidence": [
+            "Network security policy",
+            "Firewall management procedures",
+            "Policy review records",
+            "Staff acknowledgment records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.6"],
+            "iso27001": ["A.13.1.1"]
+          }
+        },
+        {
+          "id": "1.2.1",
+          "title": "Firewall and Router Configuration Standards",
+          "description": "Configuration standards for firewalls, routers, and network security controls are defined, implemented, and maintained. Standardized configurations reduce misconfigurations that expose cardholder data.",
+          "category": "Network Security",
+          "priority": 5,
+          "typical_evidence": [
+            "Firewall configuration standards",
+            "Network device hardening guides",
+            "Firewall rule review records",
+            "Network architecture diagrams"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.6"],
+            "iso27001": ["A.13.1.1", "A.13.1.3"]
+          }
+        },
+        {
+          "id": "1.3.1",
+          "title": "Inbound Traffic Restriction to CDE",
+          "description": "Inbound traffic to the cardholder data environment is restricted to only that which is necessary. Limiting inbound access reduces the attack surface for cardholder data systems.",
+          "category": "Network Security",
+          "priority": 5,
+          "typical_evidence": [
+            "Firewall rule sets",
+            "Network segmentation validation reports",
+            "CDE network diagrams",
+            "Traffic flow analysis records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.6"],
+            "iso27001": ["A.13.1.1", "A.13.1.3"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-2",
+      "name": "Requirement 2: Apply Secure Configurations to All System Components",
+      "controls": [
+        {
+          "id": "2.1.1",
+          "title": "Secure Configuration Policies",
+          "description": "All security policies and operational procedures for applying secure configurations are documented and known to all affected parties.",
+          "category": "System Configuration",
+          "priority": 4,
+          "typical_evidence": [
+            "System hardening standards",
+            "Configuration management policy",
+            "Baseline configuration documents",
+            "Policy distribution records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC8.1"],
+            "iso27001": ["A.12.1.2", "A.14.2.2"]
+          }
+        },
+        {
+          "id": "2.2.1",
+          "title": "Vendor Default Accounts and Settings",
+          "description": "Vendor-supplied defaults for system passwords and other security parameters are changed before installing on the network. Default credentials are commonly exploited by attackers.",
+          "category": "System Configuration",
+          "priority": 5,
+          "typical_evidence": [
+            "Default password removal checklist",
+            "System provisioning procedures",
+            "Configuration audit reports",
+            "Vendor default assessment records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1"],
+            "iso27001": ["A.9.4.3", "A.12.1.2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-3",
+      "name": "Requirement 3: Protect Stored Account Data",
+      "controls": [
+        {
+          "id": "3.1.1",
+          "title": "Data Retention and Disposal Policies",
+          "description": "All security policies and operational procedures for protecting stored account data are documented, in use, and known to all affected parties.",
+          "category": "Data Protection",
+          "priority": 4,
+          "typical_evidence": [
+            "Data retention policy",
+            "Data disposal procedures",
+            "Storage location inventory",
+            "Retention schedule documentation"
+          ],
+          "mappings": {
+            "soc2": ["CC6.5"],
+            "iso27001": ["A.8.2.3", "A.8.3.2"]
+          }
+        },
+        {
+          "id": "3.3.1",
+          "title": "SAD Not Retained After Authorization",
+          "description": "Sensitive authentication data is not retained after authorization, even if encrypted. Eliminating post-authorization SAD storage removes a high-value target for attackers.",
+          "category": "Data Protection",
+          "priority": 5,
+          "typical_evidence": [
+            "Data flow diagrams",
+            "SAD deletion verification records",
+            "Storage scan results",
+            "Application configuration reviews"
+          ],
+          "mappings": {
+            "soc2": ["CC6.5"],
+            "iso27001": ["A.8.2.3"]
+          }
+        },
+        {
+          "id": "3.5.1",
+          "title": "PAN Rendering Unreadable",
+          "description": "Primary account number is rendered unreadable anywhere it is stored using strong cryptography, truncation, masking, or hashing. Rendering PAN unreadable protects it even if storage is compromised.",
+          "category": "Data Protection",
+          "priority": 5,
+          "typical_evidence": [
+            "Encryption implementation records",
+            "Tokenization system documentation",
+            "PAN masking configuration",
+            "Cryptographic key management procedures"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.7"],
+            "iso27001": ["A.10.1.1", "A.10.1.2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-4",
+      "name": "Requirement 4: Protect Cardholder Data with Strong Cryptography During Transmission",
+      "controls": [
+        {
+          "id": "4.1.1",
+          "title": "Transmission Encryption Policies",
+          "description": "All security policies and operational procedures for protecting cardholder data during transmission are documented and known to all affected parties.",
+          "category": "Cryptography",
+          "priority": 4,
+          "typical_evidence": [
+            "Encryption policy for data in transit",
+            "Approved cryptographic protocols list",
+            "Policy communication records",
+            "Network encryption standards"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.7"],
+            "iso27001": ["A.10.1.1", "A.13.2.1"]
+          }
+        },
+        {
+          "id": "4.2.1",
+          "title": "Strong Cryptography for Transmission",
+          "description": "Strong cryptography and security protocols are used to safeguard cardholder data during transmission over open, public networks. Encryption prevents interception during transit.",
+          "category": "Cryptography",
+          "priority": 5,
+          "typical_evidence": [
+            "TLS configuration records",
+            "Certificate inventory",
+            "Network protocol scan results",
+            "Encryption strength validation reports"
+          ],
+          "mappings": {
+            "soc2": ["CC6.7"],
+            "iso27001": ["A.10.1.1", "A.14.1.2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-5",
+      "name": "Requirement 5: Protect All Systems and Networks from Malicious Software",
+      "controls": [
+        {
+          "id": "5.2.1",
+          "title": "Anti-Malware Deployment",
+          "description": "An anti-malware solution is deployed on all systems commonly affected by malicious software. Comprehensive anti-malware coverage detects and prevents malware infections.",
+          "category": "Malware Protection",
+          "priority": 5,
+          "typical_evidence": [
+            "Anti-malware deployment records",
+            "Endpoint protection inventory",
+            "Malware definition update logs",
+            "Coverage gap assessments"
+          ],
+          "mappings": {
+            "soc2": ["CC7.1"],
+            "iso27001": ["A.12.2.1"]
+          }
+        },
+        {
+          "id": "5.3.1",
+          "title": "Anti-Malware Active and Monitored",
+          "description": "The anti-malware solution is kept current, performs periodic scans, and generates audit logs. Active monitoring ensures malware is detected and addressed promptly.",
+          "category": "Malware Protection",
+          "priority": 4,
+          "typical_evidence": [
+            "Anti-malware scan schedules",
+            "Scan result reports",
+            "Auto-update configuration records",
+            "Malware alert and response logs"
+          ],
+          "mappings": {
+            "soc2": ["CC7.1", "CC7.2"],
+            "iso27001": ["A.12.2.1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-6",
+      "name": "Requirement 6: Develop and Maintain Secure Systems and Software",
+      "controls": [
+        {
+          "id": "6.1.1",
+          "title": "Secure Development Policies",
+          "description": "All security policies and operational procedures for developing and maintaining secure systems and software are documented and known to affected parties.",
+          "category": "Secure Development",
+          "priority": 4,
+          "typical_evidence": [
+            "Secure development lifecycle policy",
+            "Coding standards documentation",
+            "Developer security guidelines",
+            "SDLC process documentation"
+          ],
+          "mappings": {
+            "soc2": ["CC8.1"],
+            "iso27001": ["A.14.2.1", "A.14.2.5"]
+          }
+        },
+        {
+          "id": "6.2.1",
+          "title": "Security Patch Management",
+          "description": "Custom and third-party software components are inventoried and security patches are applied in a timely manner. Timely patching closes known vulnerabilities before they can be exploited.",
+          "category": "Secure Development",
+          "priority": 5,
+          "typical_evidence": [
+            "Patch management policy",
+            "Patch deployment records",
+            "Software component inventory",
+            "Critical patch timeline tracking"
+          ],
+          "mappings": {
+            "soc2": ["CC7.1", "CC8.1"],
+            "iso27001": ["A.12.6.1"]
+          }
+        },
+        {
+          "id": "6.3.1",
+          "title": "Secure Coding Practices",
+          "description": "Software development processes address common coding vulnerabilities such as those in the OWASP Top 10. Secure coding practices prevent the introduction of exploitable vulnerabilities.",
+          "category": "Secure Development",
+          "priority": 4,
+          "typical_evidence": [
+            "Secure code review records",
+            "Static analysis scan reports",
+            "Developer training completion records",
+            "Code review checklists"
+          ],
+          "mappings": {
+            "soc2": ["CC8.1"],
+            "iso27001": ["A.14.2.1", "A.14.2.6"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-7",
+      "name": "Requirement 7: Restrict Access to System Components and Cardholder Data by Business Need to Know",
+      "controls": [
+        {
+          "id": "7.1.1",
+          "title": "Access Control Policies",
+          "description": "All security policies and operational procedures for restricting access to system components and cardholder data are documented and known to affected parties.",
+          "category": "Access Control",
+          "priority": 4,
+          "typical_evidence": [
+            "Access control policy",
+            "Need-to-know determination procedures",
+            "Access request and approval forms",
+            "Policy acknowledgment records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.3"],
+            "iso27001": ["A.9.1.1", "A.9.1.2"]
+          }
+        },
+        {
+          "id": "7.2.1",
+          "title": "Role-Based Access Control System",
+          "description": "An access control system is established that restricts access based on a user's need to know and covers all system components. Role-based access ensures users only access what they need for their job function.",
+          "category": "Access Control",
+          "priority": 5,
+          "typical_evidence": [
+            "RBAC matrix",
+            "Access provisioning records",
+            "Periodic access reviews",
+            "Access control system configuration"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.3"],
+            "iso27001": ["A.9.2.2", "A.9.4.1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-8",
+      "name": "Requirement 8: Identify Users and Authenticate Access to System Components",
+      "controls": [
+        {
+          "id": "8.2.1",
+          "title": "Unique User Identification",
+          "description": "All users are assigned a unique ID before access to system components or cardholder data is allowed. Unique identification ensures accountability and traceability of all user actions.",
+          "category": "Authentication",
+          "priority": 5,
+          "typical_evidence": [
+            "User ID assignment records",
+            "Unique ID policy",
+            "Shared account prohibition evidence",
+            "Identity management system reports"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.2"],
+            "iso27001": ["A.9.2.1"]
+          }
+        },
+        {
+          "id": "8.3.1",
+          "title": "Strong Authentication for Users and Administrators",
+          "description": "Strong authentication mechanisms such as multi-factor authentication are implemented for all access into the cardholder data environment. MFA significantly reduces the risk of credential-based attacks.",
+          "category": "Authentication",
+          "priority": 5,
+          "typical_evidence": [
+            "MFA implementation records",
+            "Authentication policy",
+            "MFA enrollment reports",
+            "Authentication method inventory"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1", "CC6.2"],
+            "iso27001": ["A.9.4.2"]
+          }
+        },
+        {
+          "id": "8.6.1",
+          "title": "System and Service Account Management",
+          "description": "Use of application and system accounts and associated authentication factors is strictly managed. Unmanaged service accounts can become persistent backdoors for attackers.",
+          "category": "Authentication",
+          "priority": 4,
+          "typical_evidence": [
+            "Service account inventory",
+            "Service account ownership records",
+            "Password rotation schedules",
+            "Service account access reviews"
+          ],
+          "mappings": {
+            "soc2": ["CC6.1"],
+            "iso27001": ["A.9.2.1", "A.9.2.5"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-9",
+      "name": "Requirement 9: Restrict Physical Access to Cardholder Data",
+      "controls": [
+        {
+          "id": "9.1.1",
+          "title": "Physical Security Policies",
+          "description": "All security policies and operational procedures for restricting physical access to cardholder data are documented and known to all affected parties.",
+          "category": "Physical Security",
+          "priority": 3,
+          "typical_evidence": [
+            "Physical security policy",
+            "Facility access procedures",
+            "Physical security standards",
+            "Policy communication records"
+          ],
+          "mappings": {
+            "soc2": ["CC6.4"],
+            "iso27001": ["A.11.1.1", "A.11.1.2"]
+          }
+        },
+        {
+          "id": "9.4.1",
+          "title": "Physical Access Controls for Sensitive Areas",
+          "description": "Physical access to sensitive areas within the cardholder data environment is controlled and monitored. Physical access controls prevent unauthorized individuals from accessing systems storing cardholder data.",
+          "category": "Physical Security",
+          "priority": 4,
+          "typical_evidence": [
+            "Badge access system logs",
+            "Visitor management records",
+            "CCTV monitoring records",
+            "Physical access review reports"
+          ],
+          "mappings": {
+            "soc2": ["CC6.4"],
+            "iso27001": ["A.11.1.2", "A.11.1.3"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-10",
+      "name": "Requirement 10: Log and Monitor All Access to System Components and Cardholder Data",
+      "controls": [
+        {
+          "id": "10.1.1",
+          "title": "Audit Logging Policies",
+          "description": "All security policies and operational procedures for logging and monitoring are documented, in use, and known to all affected parties.",
+          "category": "Logging and Monitoring",
+          "priority": 4,
+          "typical_evidence": [
+            "Logging and monitoring policy",
+            "Audit log standards",
+            "Log management procedures",
+            "Policy distribution records"
+          ],
+          "mappings": {
+            "soc2": ["CC7.2"],
+            "iso27001": ["A.12.4.1"]
+          }
+        },
+        {
+          "id": "10.2.1",
+          "title": "Audit Logs Capture Required Events",
+          "description": "Audit logs are enabled and active for all system components to capture all required events including user access, administrative actions, and security events.",
+          "category": "Logging and Monitoring",
+          "priority": 5,
+          "typical_evidence": [
+            "Audit log configuration records",
+            "Event capture verification reports",
+            "Sample audit log reviews",
+            "Log completeness assessments"
+          ],
+          "mappings": {
+            "soc2": ["CC7.2", "CC7.3"],
+            "iso27001": ["A.12.4.1", "A.12.4.3"]
+          }
+        },
+        {
+          "id": "10.4.1",
+          "title": "Audit Log Review",
+          "description": "Audit logs are reviewed at least daily to identify anomalies or suspicious activity. Timely log review enables rapid detection and response to potential compromises.",
+          "category": "Logging and Monitoring",
+          "priority": 5,
+          "typical_evidence": [
+            "Log review records",
+            "Automated alert configurations",
+            "Anomaly investigation reports",
+            "SIEM dashboard screenshots"
+          ],
+          "mappings": {
+            "soc2": ["CC7.2", "CC7.3"],
+            "iso27001": ["A.12.4.1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-11",
+      "name": "Requirement 11: Test Security of Systems and Networks Regularly",
+      "controls": [
+        {
+          "id": "11.1.1",
+          "title": "Security Testing Policies",
+          "description": "All security policies and operational procedures for regular security testing are documented, in use, and known to all affected parties.",
+          "category": "Security Testing",
+          "priority": 3,
+          "typical_evidence": [
+            "Security testing policy",
+            "Testing schedule and plan",
+            "Testing methodology documentation",
+            "Policy acknowledgment records"
+          ],
+          "mappings": {
+            "soc2": ["CC4.1"],
+            "iso27001": ["A.14.2.8"]
+          }
+        },
+        {
+          "id": "11.3.1",
+          "title": "Vulnerability Scanning",
+          "description": "Internal and external vulnerability scans are performed at least quarterly and after any significant change. Regular scanning identifies vulnerabilities before they can be exploited.",
+          "category": "Security Testing",
+          "priority": 5,
+          "typical_evidence": [
+            "Quarterly scan reports",
+            "ASV scan attestations",
+            "Remediation tracking records",
+            "Scan coverage analysis"
+          ],
+          "mappings": {
+            "soc2": ["CC7.1"],
+            "iso27001": ["A.12.6.1"]
+          }
+        },
+        {
+          "id": "11.4.1",
+          "title": "Penetration Testing",
+          "description": "External and internal penetration testing is performed at least annually and after significant changes to the environment. Penetration testing validates the effectiveness of security controls from an attacker's perspective.",
+          "category": "Security Testing",
+          "priority": 5,
+          "typical_evidence": [
+            "Penetration test reports",
+            "Remediation evidence",
+            "Testing scope documentation",
+            "Retest validation records"
+          ],
+          "mappings": {
+            "soc2": ["CC4.1", "CC7.1"],
+            "iso27001": ["A.14.2.8", "A.18.2.3"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "req-12",
+      "name": "Requirement 12: Support Information Security with Organizational Policies and Programs",
+      "controls": [
+        {
+          "id": "12.1.1",
+          "title": "Information Security Policy",
+          "description": "An overall information security policy is established, published, maintained, and disseminated to all relevant personnel and vendors. The security policy sets the organizational tone for protecting cardholder data.",
+          "category": "Security Governance",
+          "priority": 4,
+          "typical_evidence": [
+            "Information security policy",
+            "Policy review and approval records",
+            "Policy distribution evidence",
+            "Annual policy review minutes"
+          ],
+          "mappings": {
+            "soc2": ["CC1.1", "CC5.2"],
+            "iso27001": ["A.5.1.1", "A.5.1.2"]
+          }
+        },
+        {
+          "id": "12.6.1",
+          "title": "Security Awareness Program",
+          "description": "A formal security awareness program is implemented to make all personnel aware of the cardholder data security policy and procedures. Security awareness reduces the risk of human-factor breaches.",
+          "category": "Security Governance",
+          "priority": 4,
+          "typical_evidence": [
+            "Security awareness program documentation",
+            "Training completion records",
+            "Awareness campaign materials",
+            "Training effectiveness assessments"
+          ],
+          "mappings": {
+            "soc2": ["CC1.4"],
+            "iso27001": ["A.7.2.2"]
+          }
+        }
+      ]
+    }
+  ]
+}

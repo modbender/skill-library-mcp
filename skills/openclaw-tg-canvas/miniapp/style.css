@@ -1,0 +1,332 @@
+:root {
+  /* Light defaults */
+  --tg-bg: #ffffff;
+  --tg-text: #111111;
+  --tg-hint: #7d7d7d;
+  --tg-link: #2481cc;
+  --tg-btn: #2481cc;
+  --tg-btn-text: #ffffff;
+  --tg-secondary-bg: #f2f2f2;
+}
+
+/* Prefer Telegram theme vars when available */
+:root[data-theme="light"] {
+  --tg-bg: var(--tg-theme-bg-color, #ffffff);
+  --tg-text: var(--tg-theme-text-color, #111111);
+  --tg-hint: var(--tg-theme-hint-color, #7d7d7d);
+  --tg-link: var(--tg-theme-link-color, #2481cc);
+  --tg-btn: var(--tg-theme-button-color, #2481cc);
+  --tg-btn-text: var(--tg-theme-button-text-color, #ffffff);
+  --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f2f2f2);
+}
+
+:root[data-theme="dark"] {
+  --tg-bg: var(--tg-theme-bg-color, #0f0f10);
+  --tg-text: var(--tg-theme-text-color, #f3f4f6);
+  --tg-hint: var(--tg-theme-hint-color, #9aa0a6);
+  --tg-link: var(--tg-theme-link-color, #8ab4f8);
+  --tg-btn: var(--tg-theme-button-color, #2f81f7);
+  --tg-btn-text: var(--tg-theme-button-text-color, #ffffff);
+  --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #1b1c1f);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* no outer scroll */
+  background: var(--tg-bg);
+  color: var(--tg-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  background: var(--tg-bg);
+  z-index: 5;
+  border-bottom: 1px solid var(--tg-secondary-bg);
+}
+
+.title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tg-hint);
+  letter-spacing: 0.2px;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--tg-hint);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--tg-secondary-bg);
+  color: var(--tg-hint);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.conn-text {
+  font-weight: 600;
+}
+
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa0a6; /* disconnected */
+  box-shadow: 0 0 0 2px var(--tg-secondary-bg);
+}
+
+.conn-dot.connected {
+  background: #27ae60; /* connected */
+}
+
+.conn-dot.connecting {
+  background: #f2c94c; /* connecting */
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px 20px;
+}
+
+.content-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.fade-in {
+  animation: fadeIn 220ms ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.center {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--tg-hint);
+  text-align: center;
+  padding: 24px;
+}
+
+.empty-card {
+  border: 1px dashed var(--tg-secondary-bg);
+  border-radius: 14px;
+  padding: 18px 16px;
+  background: #fff;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--tg-secondary-bg);
+  border-top-color: var(--tg-link);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 420px) {
+  .topbar {
+    padding: 10px 12px 6px;
+  }
+  .status {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .content {
+    padding: 10px 12px 18px;
+  }
+}
+
+/* Terminal overlay — covers everything, canvas preserved underneath */
+.terminal-pane {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.terminal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.terminal-topbar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b949e;
+  letter-spacing: 0.2px;
+}
+
+.terminal-close-btn {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 16px;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  line-height: 1;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+#terminal-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
+/* Mobile key toolbar */
+.term-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #161b22;
+  border-top: 1px solid #30363d;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 0;
+  /* hide scrollbar but keep scrollability */
+  scrollbar-width: none;
+}
+.term-toolbar::-webkit-scrollbar { display: none; }
+
+.tbkey {
+  flex-shrink: 0;
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 7px;
+  padding: 0 14px;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background 120ms, color 120ms;
+}
+
+.tbkey-arrow {
+  padding: 0 10px;
+  font-size: 16px;
+}
+
+.tbkey-mod {
+  min-width: 52px;
+}
+
+.tbkey.active {
+  background: #388bfd;
+  color: #fff;
+  border-color: #388bfd;
+}
+
+/* Make xterm fill its container */
+#terminal-container .xterm {
+  height: 100%;
+}
+
+#terminal-container .xterm-viewport {
+  overflow-y: auto !important;
+}
+
+/* Markdown styles */
+.content h1, .content h2, .content h3 {
+  margin: 14px 0 8px;
+}
+
+.content p {
+  margin: 8px 0;
+  line-height: 1.45;
+}
+
+.content ul, .content ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.content code {
+  background: var(--tg-secondary-bg);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+.content pre {
+  background: var(--tg-secondary-bg);
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+}

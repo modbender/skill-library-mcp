@@ -1,0 +1,330 @@
+# Production-Ready Kubernetes Ingress Templates
+# Replace all <placeholders> with actual values
+# Lines marked with # CUSTOMIZE require modification for your workload
+
+---
+# Template 1: Standard Ingress with TLS (nginx ingress controller)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: <app-name>  # CUSTOMIZE: ingress name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/part-of: <system-name>
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "Ingress for <app-name>"
+
+    # --- Ingress Controller Selection ---
+    # CUSTOMIZE: uncomment the appropriate ingress class annotation
+    # For nginx ingress controller:
+    kubernetes.io/ingress.class: "nginx"
+    # For traefik ingress controller:
+    # kubernetes.io/ingress.class: "traefik"
+    # For AWS ALB ingress controller:
+    # kubernetes.io/ingress.class: "alb"
+
+    # --- TLS / cert-manager ---
+    # CUSTOMIZE: cert-manager cluster issuer for automatic TLS certificate provisioning
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # CUSTOMIZE: issuer name
+    # Alternative: namespace-scoped issuer
+    # cert-manager.io/issuer: "letsencrypt-prod"
+    # Force HTTPS redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # HSTS header
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+
+    # --- Rate Limiting (nginx) ---
+    # CUSTOMIZE: adjust rate limits based on expected traffic
+    nginx.ingress.kubernetes.io/limit-rps: "50"  # CUSTOMIZE: requests per second per IP
+    nginx.ingress.kubernetes.io/limit-rpm: "500"  # CUSTOMIZE: requests per minute per IP
+    nginx.ingress.kubernetes.io/limit-connections: "10"  # CUSTOMIZE: concurrent connections per IP
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"  # Burst allowance multiplier
+    # Custom response when rate limited
+    nginx.ingress.kubernetes.io/limit-rate-after: "10m"  # Start limiting after 10MB transferred
+    nginx.ingress.kubernetes.io/limit-rate: "1m"  # Limit to 1MB/s after threshold
+
+    # --- CORS Configuration (nginx) ---
+    # CUSTOMIZE: enable and configure CORS as needed
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://example.com,https://www.example.com"  # CUSTOMIZE: allowed origins
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"  # CUSTOMIZE: allowed methods
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Accept, Origin"  # CUSTOMIZE: allowed headers
+    nginx.ingress.kubernetes.io/cors-expose-headers: "X-Request-Id"  # CUSTOMIZE: exposed headers
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "3600"  # Preflight cache duration in seconds
+
+    # --- Request Configuration (nginx) ---
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"  # CUSTOMIZE: max request body size
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"  # CUSTOMIZE: backend read timeout (seconds)
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"  # CUSTOMIZE: backend send timeout (seconds)
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"  # CUSTOMIZE: backend connect timeout (seconds)
+
+    # --- Security Headers (nginx) ---
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+
+spec:
+  # Ingress class (K8s 1.18+, preferred over annotation)
+  ingressClassName: nginx  # CUSTOMIZE: nginx, traefik, alb, etc.
+
+  # TLS configuration
+  tls:
+  - hosts:
+    - <domain.example.com>  # CUSTOMIZE: primary domain
+    - <www.domain.example.com>  # CUSTOMIZE: additional domain
+    secretName: <app-name>-tls  # CUSTOMIZE: TLS secret name (auto-created by cert-manager)
+
+  rules:
+  # Primary host with path-based routing
+  - host: <domain.example.com>  # CUSTOMIZE: primary domain
+    http:
+      paths:
+      # Main application
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: <app-name>-frontend  # CUSTOMIZE: frontend service name
+            port:
+              number: 80  # CUSTOMIZE: service port
+      # API routes
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: <app-name>-api  # CUSTOMIZE: API service name
+            port:
+              number: 80  # CUSTOMIZE: service port
+      # WebSocket endpoint
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: <app-name>-ws  # CUSTOMIZE: WebSocket service name
+            port:
+              number: 80  # CUSTOMIZE: service port
+
+  # Subdomain-based routing
+  - host: <api.domain.example.com>  # CUSTOMIZE: API subdomain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: <app-name>-api  # CUSTOMIZE: API service name
+            port:
+              number: 80
+
+---
+# Template 2: Ingress with Traefik Annotations
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: <app-name>-traefik  # CUSTOMIZE: ingress name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+    app.kubernetes.io/instance: <instance-name>
+  annotations:
+    # --- Traefik-specific annotations ---
+    # TLS with cert-manager
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # CUSTOMIZE: issuer name
+
+    # Rate limiting (Traefik middleware)
+    traefik.ingress.kubernetes.io/router.middlewares: "<namespace>-rate-limit@kubernetescrd"  # CUSTOMIZE: middleware reference
+
+    # Redirect HTTP to HTTPS
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+
+    # Sticky sessions
+    # traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    # traefik.ingress.kubernetes.io/service.sticky.cookie.name: "traefik_session"
+
+    # Custom headers
+    traefik.ingress.kubernetes.io/custom-response-headers: "X-Frame-Options:DENY||X-Content-Type-Options:nosniff"
+
+    # Compression
+    traefik.ingress.kubernetes.io/router.middlewares: "<namespace>-compress@kubernetescrd"
+
+    # Request buffering
+    traefik.ingress.kubernetes.io/buffering.maxRequestBodyBytes: "10485760"  # CUSTOMIZE: 10MB
+
+spec:
+  ingressClassName: traefik  # CUSTOMIZE: ingress class name
+  tls:
+  - hosts:
+    - <domain.example.com>  # CUSTOMIZE: domain
+    secretName: <app-name>-tls  # CUSTOMIZE: TLS secret name
+  rules:
+  - host: <domain.example.com>  # CUSTOMIZE: domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: <app-name>  # CUSTOMIZE: service name
+            port:
+              number: 80  # CUSTOMIZE: service port
+
+---
+# Template 3: Multi-Host Ingress (microservices routing)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: <system-name>-routing  # CUSTOMIZE: ingress name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <system-name>
+    app.kubernetes.io/component: ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Enable sticky sessions for specific backends
+    # nginx.ingress.kubernetes.io/affinity: "cookie"
+    # nginx.ingress.kubernetes.io/session-cookie-name: "route"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - <app.domain.example.com>  # CUSTOMIZE: application domain
+    - <api.domain.example.com>  # CUSTOMIZE: API domain
+    - <admin.domain.example.com>  # CUSTOMIZE: admin domain
+    secretName: <system-name>-tls  # CUSTOMIZE: TLS secret (wildcard cert recommended)
+  rules:
+  # Application frontend
+  - host: <app.domain.example.com>  # CUSTOMIZE: application domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend  # CUSTOMIZE: frontend service
+            port:
+              number: 80
+  # API gateway
+  - host: <api.domain.example.com>  # CUSTOMIZE: API domain
+    http:
+      paths:
+      - path: /v1
+        pathType: Prefix
+        backend:
+          service:
+            name: api-v1  # CUSTOMIZE: API v1 service
+            port:
+              number: 80
+      - path: /v2
+        pathType: Prefix
+        backend:
+          service:
+            name: api-v2  # CUSTOMIZE: API v2 service
+            port:
+              number: 80
+  # Admin panel
+  - host: <admin.domain.example.com>  # CUSTOMIZE: admin domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin  # CUSTOMIZE: admin service
+            port:
+              number: 80
+
+---
+# Template 4: Ingress with Path Rewriting
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: <app-name>-rewrite  # CUSTOMIZE: ingress name
+  namespace: <namespace>  # CUSTOMIZE: target namespace
+  labels:
+    app.kubernetes.io/name: <app-name>
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+    # Path rewriting: strip the path prefix before forwarding to backend
+    # /api/users -> /users on the backend service
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+    # Use regex in paths (required for capture groups)
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - <domain.example.com>  # CUSTOMIZE: domain
+    secretName: <app-name>-tls
+  rules:
+  - host: <domain.example.com>  # CUSTOMIZE: domain
+    http:
+      paths:
+      # /api/* -> /* on api-service (strips /api prefix)
+      - path: /api(/|$)(.*)  # CUSTOMIZE: path prefix to strip
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: <app-name>-api  # CUSTOMIZE: backend service
+            port:
+              number: 80
+      # /dashboard/* -> /* on dashboard-service
+      - path: /dashboard(/|$)(.*)  # CUSTOMIZE: path prefix to strip
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: <app-name>-dashboard  # CUSTOMIZE: backend service
+            port:
+              number: 80
+
+---
+# Usage Notes:
+#
+# 1. Prerequisites:
+#    - Ingress controller must be installed (nginx, traefik, etc.)
+#    - cert-manager must be installed for automatic TLS
+#    - DNS records must point to the ingress controller's external IP/LB
+#
+# 2. Install nginx ingress controller:
+#    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.0/deploy/static/provider/cloud/deploy.yaml
+#
+# 3. Install cert-manager:
+#    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+#
+# 4. Create a ClusterIssuer for Let's Encrypt:
+#    apiVersion: cert-manager.io/v1
+#    kind: ClusterIssuer
+#    metadata:
+#      name: letsencrypt-prod
+#    spec:
+#      acme:
+#        server: https://acme-v02.api.letsencrypt.org/directory
+#        email: <your-email>  # CUSTOMIZE
+#        privateKeySecretRef:
+#          name: letsencrypt-prod
+#        solvers:
+#        - http01:
+#            ingress:
+#              class: nginx
+#
+# 5. Debug ingress issues:
+#    kubectl describe ingress <ingress-name>
+#    kubectl get events --field-selector involvedObject.name=<ingress-name>
+#    kubectl logs -n ingress-nginx deploy/ingress-nginx-controller
+#
+# 6. Test TLS certificate:
+#    curl -v https://<domain.example.com> 2>&1 | grep -A5 "Server certificate"

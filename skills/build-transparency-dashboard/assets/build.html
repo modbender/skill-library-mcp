@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- TODO: Replace YOUR_PROJECT_NAME throughout this file -->
+<title>The Build — YOUR_PROJECT_NAME</title>
+<meta name="description" content="Watch YOUR_PROJECT_NAME being built in real time. Live progress, shipped features, community ideas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/nav.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #050508;
+    --surface:   #0c0c14;
+    --surface2:  #12121e;
+    --surface3:  #1a1a2e;
+    --border:    rgba(255,255,255,0.06);
+    --border2:   rgba(255,255,255,0.12);
+    --text:      #e8e8f0;
+    --muted:     #6b6b80;
+    --dim:       #3a3a50;
+
+    /* TODO: Replace #7c6eff and #a78bfa with YOUR_BRAND_COLOR and a lighter variant */
+    --brand:      #7c6eff;
+    --brand2:     #a78bfa;
+    --brand-dim:  rgba(124,110,255,0.12);
+    --brand-glow: rgba(124,110,255,0.25);
+
+    --success:     #00d4aa;
+    --success-dim: rgba(0,212,170,0.1);
+    --warning:     #fbbf24;
+    --warning-dim: rgba(251,191,36,0.1);
+    --error:       #f87171;
+    --error-dim:   rgba(248,113,113,0.1);
+
+    --mono:    'DM Mono', monospace;
+    --sans:    'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 44px; /* ticker height */
+  }
+
+  /* Grain noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.022;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Ambient orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: 0;
+    animation: orb-drift 20s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 600px; height: 600px; background: rgba(124,110,255,0.07); top: -200px; right: -200px; animation-duration: 25s; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(0,212,170,0.04);   bottom: 10%; left: -100px;  animation-duration: 18s; animation-delay: -8s; }
+  @keyframes orb-drift { to { transform: translate(40px, 30px) scale(1.1); } }
+
+  /* Pulse dot (status indicator) */
+  .pulse-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.5; transform:scale(0.8); }
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 100px 48px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    padding: 4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── HERO ROW ── */
+  .hero-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .project-name {
+    font-family: var(--display);
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-sub {
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 2.5rem; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--dim);
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.06em;
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--surface3);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), var(--brand2));
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: -3px;
+    width: 2px; height: 8px;
+    background: #fff;
+    box-shadow: 0 0 8px var(--brand), 0 0 16px var(--brand-glow);
+  }
+
+  /* Feature tags */
+  .feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.3rem 0.65rem;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    border-radius: 4px;
+  }
+  .tag.done   { border-color: rgba(0,212,170,0.25);  color: var(--success); background: var(--success-dim); }
+  .tag.active { border-color: rgba(124,110,255,0.35); color: var(--brand2);  background: var(--brand-dim); }
+
+  /* ── STATUS PANEL (right column) ── */
+  .status-panel {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .status-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    opacity: 0.5;
+  }
+
+  /* Optional: project avatar / logo */
+  .project-avatar-wrap {
+    position: relative;
+    width: 64px; height: 64px;
+    margin-bottom: 1.25rem;
+  }
+  .project-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 1px solid rgba(124,110,255,0.3);
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 20px rgba(124,110,255,0.2);
+  }
+  .project-online {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--success);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 6px var(--success);
+  }
+
+  .stat-rows { display: flex; flex-direction: column; gap: 1rem; }
+  .sr-label {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.2rem;
+  }
+  .sr-value { font-size: 0.85rem; color: var(--text); font-weight: 500; }
+  .sr-value.brand   { color: var(--brand2); }
+  .sr-value.success { color: var(--success); }
+  .sr-value.warning { color: var(--warning); }
+  .sr-value a { color: var(--brand); text-decoration: none; }
+  .sr-value a:hover { text-decoration: underline; }
+
+  /* ── TWO-COLUMN LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  /* ── SHIPPED LOG ── */
+  .shipped-item {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 1.25rem;
+    align-items: start;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .shipped-item:first-child { padding-top: 0; }
+  .shipped-item:last-child  { border-bottom: none; padding-bottom: 0; }
+
+  .s-date { font-family: var(--mono); font-size: 0.6rem; color: var(--dim); padding-top: 0.15rem; }
+  .s-text { font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    padding: 0.22rem 0.5rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    align-self: flex-start;
+    border-radius: 4px;
+  }
+  .badge.feature { background: var(--brand-dim);    color: var(--brand2);  border: 1px solid rgba(124,110,255,0.2); }
+  .badge.fix     { background: var(--warning-dim);  color: var(--warning); border: 1px solid rgba(251,191,36,0.2); }
+  .badge.build   { background: var(--success-dim);  color: var(--success); border: 1px solid rgba(0,212,170,0.2); }
+
+  /* ── UP NEXT QUEUE ── */
+  .queue-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .queue-item:first-child { padding-top: 0; }
+  .queue-item:last-child  { border-bottom: none; padding-bottom: 0; }
+
+  .q-num { font-family: var(--mono); font-size: 0.6rem; color: var(--brand); padding-top: 0.2rem; min-width: 18px; }
+  .q-title { font-family: var(--display); font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; margin-bottom: 0.3rem; }
+  .q-desc  { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+
+  /* ── IDEAS SECTION ── */
+  .ideas-layout {
+    display: grid;
+    /* TODO: If you remove the coin panel, change to 1fr */
+    grid-template-columns: 1fr 280px;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .ideas-intro {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .idea-form {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .idea-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+  .idea-input:focus { border-color: rgba(124,110,255,0.5); }
+  .idea-input::placeholder { color: var(--dim); }
+
+  .idea-row { display: flex; gap: 0.75rem; }
+
+  .idea-handle {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.7rem 1rem;
+    outline: none;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+  .idea-handle:focus { border-color: rgba(124,110,255,0.5); }
+  .idea-handle::placeholder { color: var(--dim); }
+
+  .idea-btn {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.5rem;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    border-radius: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .idea-btn:hover  { opacity: 0.85; }
+  .idea-btn:active { transform: scale(0.97); }
+
+  .idea-list { display: flex; flex-direction: column; }
+
+  .idea-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .idea-item:last-child { border-bottom: none; }
+
+  .vote-btn {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    width: 48px; height: 36px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+    border-radius: 6px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .vote-btn:hover          { border-color: var(--brand); color: var(--brand); }
+  .vote-btn.voted          { border-color: var(--brand); color: var(--brand); background: var(--brand-dim); }
+
+  .idea-text   { font-size: 0.85rem; color: var(--text); line-height: 1.4; flex: 1; }
+  .idea-author { font-family: var(--mono); font-size: 0.58rem; color: var(--dim); margin-top: 0.2rem; }
+
+  .empty-ideas {
+    padding: 2.5rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    border: 1px dashed var(--border2);
+    border-radius: 8px;
+  }
+
+  /* ── COIN PANEL ── */
+  /* TODO: Remove this entire section if you have no token/coin */
+  .coin-panel {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .coin-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    opacity: 0.5;
+  }
+
+  .coin-ticker  { font-family: var(--mono); font-size: 0.58rem; color: var(--dim); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+  .coin-price   { font-family: var(--mono); font-size: 1.1rem; font-weight: 500; line-height: 1; letter-spacing: 0.02em; margin-bottom: 0.35rem; }
+  .coin-change  { font-family: var(--mono); font-size: 0.68rem; margin-bottom: 1.5rem; }
+  .coin-change.up   { color: var(--success); }
+  .coin-change.down { color: var(--error); }
+
+  .coin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .coin-stat     { background: var(--surface2); padding: 0.75rem; }
+  .cs-label      { font-family: var(--mono); font-size: 0.52rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .cs-value      { font-family: var(--mono); font-size: 0.82rem; color: var(--text); }
+
+  .coin-ca {
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    color: var(--dim);
+    word-break: break-all;
+    line-height: 1.6;
+    padding: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    margin-bottom: 1rem;
+  }
+  .coin-ca:hover { border-color: var(--border2); color: var(--muted); }
+
+  .coin-note { font-size: 0.75rem; color: var(--dim); line-height: 1.6; font-style: italic; margin-bottom: 1rem; }
+
+  .trade-btn {
+    display: block;
+    text-align: center;
+    background: var(--brand);
+    color: #fff;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .trade-btn:hover  { opacity: 0.85; }
+  .trade-btn:active { transform: scale(0.97); }
+
+  /* ── TICKER BAR ── */
+  .ticker {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 36px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 4rem;
+    animation: ticker 45s linear infinite;
+    white-space: nowrap;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+  }
+  .ticker-track em { color: var(--brand2); font-style: normal; }
+  .ticker-track b  { color: var(--success); font-weight: 400; }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Fade-in animation */
+  .fade-in { animation: fadeIn 0.35s ease forwards; }
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(5px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .page { padding: 90px 24px 0; }
+    .section { padding: 2.5rem 0; }
+    .hero-row, .two-col, .ideas-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .status-panel { max-width: 400px; }
+    .ideas-layout .coin-panel { max-width: 400px; }
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 72px 16px 0; }
+    .section { padding: 2rem 0; }
+    .section-label { font-size: 0.55rem; margin-bottom: 1.5rem; }
+    .project-name { font-size: 2.2rem; }
+    .project-sub  { font-size: 0.85rem; }
+    .feature-list { gap: 0.4rem; }
+    .tag { font-size: 0.58rem; padding: 0.28rem 0.55rem; }
+    .status-panel { padding: 1.5rem; }
+    .shipped-item { grid-template-columns: 48px 1fr; gap: 0.75rem; }
+    .shipped-item .badge { display: none; }
+    .s-text { font-size: 0.8rem; }
+    .q-title { font-size: 0.95rem; }
+    .q-desc  { font-size: 0.75rem; }
+    .ideas-intro { font-size: 0.82rem; }
+    .idea-form { padding: 1.25rem; }
+    .idea-input { font-size: 0.82rem; }
+    .idea-row { flex-direction: column; }
+    .idea-handle, .idea-btn { width: 100%; }
+    .idea-text { font-size: 0.8rem; }
+    .coin-panel { padding: 1.5rem; }
+    .coin-price { font-size: 0.95rem; }
+    .coin-ca { font-size: 0.48rem; }
+    nav { padding: 14px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- Nav is rendered by nav.js. Configure it in nav.js (NAV_CONFIG). -->
+<nav id="nav"></nav>
+<script src="/nav.js"></script>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: CURRENTLY BUILDING                            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">Currently Building</div>
+    <div class="hero-row">
+
+      <!-- Left: project info -->
+      <div>
+        <!-- TODO: Replace with your project name -->
+        <div class="project-name">YOUR_PROJECT_NAME</div>
+
+        <!-- TODO: Replace with your project description -->
+        <div class="project-sub">
+          A concise description of what you're building and why it matters.
+          Keep it to 2–3 sentences max.
+        </div>
+
+        <!-- Progress bar — updated live from status.json -->
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span>COMPLETION</span>
+            <span id="completionPct">—%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- TODO: Replace with your actual feature list -->
+        <!-- Classes: (none) = planned, "done" = shipped, "active" = in progress -->
+        <div class="feature-list">
+          <div class="tag done">✓ Feature One</div>
+          <div class="tag done">✓ Feature Two</div>
+          <div class="tag active">Feature Three</div>
+          <div class="tag">Feature Four</div>
+          <div class="tag">Feature Five</div>
+        </div>
+      </div>
+
+      <!-- Right: live status panel -->
+      <div class="status-panel">
+        <!-- TODO: If you have a project avatar/logo, uncomment and update src -->
+        <!--
+        <div class="project-avatar-wrap">
+          <img class="project-avatar" src="/avatar.png" alt="Project avatar">
+          <div class="project-online"></div>
+        </div>
+        -->
+
+        <div class="stat-rows">
+          <div>
+            <div class="sr-label">Status</div>
+            <div class="sr-value success" id="projectStatus">Online · Building</div>
+          </div>
+          <div>
+            <div class="sr-label">Last Deploy</div>
+            <div class="sr-value warning" id="lastDeploy">—</div>
+          </div>
+          <div>
+            <div class="sr-label">Commits This Week</div>
+            <div class="sr-value brand" id="commitsWeek">—</div>
+          </div>
+          <div>
+            <div class="sr-label">Days Alive</div>
+            <div class="sr-value brand" id="daysAlive">—</div>
+          </div>
+          <div>
+            <div class="sr-label">Last Commit</div>
+            <div class="sr-value" style="font-size:0.75rem; color:var(--muted);" id="lastCommitMsg">—</div>
+            <div class="sr-value" style="font-size:0.65rem; color:var(--dim); margin-top:0.1rem;" id="lastCommitTime">—</div>
+          </div>
+          <div>
+            <div class="sr-label">Born</div>
+            <!-- TODO: Replace YOUR_BORN_DATE with a human-readable date, e.g. "Jan 1, 2026" -->
+            <div class="sr-value">YOUR_BORN_DATE</div>
+          </div>
+          <div>
+            <div class="sr-label">Builder</div>
+            <!-- TODO: Replace with your handle + link -->
+            <div class="sr-value"><a href="https://x.com/yourhandle" target="_blank">@yourhandle</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: SHIPPED LOG + UP NEXT QUEUE                   -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="two-col">
+
+      <!-- Shipped log — dynamically loaded from status.json -->
+      <div>
+        <div class="section-label">Shipped This Week</div>
+        <div id="shippedList">
+          <!-- populated by JS from status.json -->
+          <!-- fallback static items below while status loads: -->
+          <div class="shipped-item">
+            <div class="s-date">Mar 01</div>
+            <div class="s-text">Initial launch — project is live</div>
+            <div class="badge build">BUILD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Queue — dynamically loaded from status.json -->
+      <div>
+        <div class="section-label">Up Next</div>
+        <div id="queueList">
+          <!-- populated by JS from status.json -->
+          <!-- fallback: -->
+          <div class="queue-item">
+            <div class="q-num">01</div>
+            <div>
+              <div class="q-title">Next Feature</div>
+              <div class="q-desc">Description of what's coming next.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: IDEAS BOARD + COIN PANEL                      -->
+  <!-- TODO: Remove the coin-panel div if you have no token     -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="ideas-layout">
+
+      <!-- Community ideas board -->
+      <div>
+        <div class="section-label">Community Build Ideas</div>
+        <p class="ideas-intro">
+          What should we build next? Submit an idea. The community votes.
+          <!-- TODO: Customize this copy -->
+        </p>
+
+        <div class="idea-form">
+          <input class="idea-input" type="text" id="ideaInput" placeholder="Describe your build idea..." maxlength="160">
+          <div class="idea-row">
+            <input class="idea-handle" type="text" id="ideaAuthor" placeholder="Your handle (optional)" maxlength="30">
+            <button class="idea-btn" onclick="submitIdea()">Submit</button>
+          </div>
+        </div>
+
+        <div class="idea-list" id="ideaList">
+          <div class="empty-ideas" id="emptyState">No ideas yet — be the first ↑</div>
+        </div>
+      </div>
+
+      <!-- ── COIN PANEL ──────────────────────────────────── -->
+      <!-- TODO: Remove this entire div if you have no token  -->
+      <!-- ─────────────────────────────────────────────────── -->
+      <div class="coin-panel">
+        <!-- TODO: Replace YOUR_TICKER and YOUR_NETWORK -->
+        <div class="coin-ticker">$YOUR_TICKER · YOUR_NETWORK</div>
+        <div class="coin-price" id="coinPrice">—</div>
+        <div class="coin-change" id="coinChange">Loading...</div>
+        <div class="coin-grid">
+          <div class="coin-stat">
+            <div class="cs-label">Market Cap</div>
+            <div class="cs-value" id="coinMC">—</div>
+          </div>
+          <div class="coin-stat">
+            <div class="cs-label">Holders</div>
+            <div class="cs-value" id="coinHolders">—</div>
+          </div>
+          <div class="coin-stat">
+            <div class="cs-label">24h Volume</div>
+            <div class="cs-value" id="coinVol">—</div>
+          </div>
+          <div class="coin-stat">
+            <div class="cs-label">Network</div>
+            <!-- TODO: Replace YOUR_NETWORK -->
+            <div class="cs-value">YOUR_NETWORK</div>
+          </div>
+        </div>
+        <!-- TODO: Replace YOUR_COIN_CA with the token contract address -->
+        <div class="coin-ca" onclick="copyCA(this)" title="Click to copy">
+          CA: YOUR_COIN_CA
+        </div>
+        <!-- TODO: Replace YOUR_COIN_CA in both the note and the trade link below -->
+        <div class="coin-note">The coin for people who believe in the build.</div>
+        <!-- TODO: Update swap URL with your actual CA and network -->
+        <a href="https://app.uniswap.org/swap?outputCurrency=YOUR_COIN_CA" target="_blank" class="trade-btn">Buy $YOUR_TICKER ↗</a>
+      </div>
+      <!-- END COIN PANEL -->
+
+    </div>
+  </section>
+
+</div><!-- /.page -->
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- TICKER BAR (fixed bottom)                                    -->
+<!-- TODO: Update static ticker text to match your project        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span><em>STATUS:</em> BUILDING</span>
+    <span>·</span>
+    <span><em>PROJECT:</em> <span id="tickerProject">YOUR_PROJECT_NAME</span></span>
+    <span>·</span>
+    <span><em>COMMITS:</em> <span id="tickerCommits">— THIS WEEK</span></span>
+    <span>·</span>
+    <span><em>NEXT:</em> <span id="tickerNext">—</span></span>
+    <!-- TODO: Add or remove ticker items as needed. Duplicate the block below the separator for seamless loop -->
+    <span>·</span>
+    <span><em>STATUS:</em> BUILDING</span>
+    <span>·</span>
+    <span><em>PROJECT:</em> YOUR_PROJECT_NAME</span>
+    <span>·</span>
+    <span><em>COMMITS:</em> — THIS WEEK</span>
+    <span>·</span>
+    <span><em>NEXT:</em> —</span>
+    <span>·</span>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG — set these to match your project
+// ══════════════════════════════════════════════════════════════════
+
+// TODO: Replace with your project's birth date (ISO 8601)
+const BORN_DATE = new Date('YOUR_BORN_DATE_ISO'); // e.g. '2026-01-01T00:00:00-05:00'
+
+// TODO: Replace with your ideas API URL (from ideas-api.js)
+//       Or set to null to disable the ideas board.
+const IDEAS_API = 'https://YOUR_API_HOST/public/ideas';
+
+// TODO: Replace with your token CA (or set to null to disable coin panel)
+const COIN_CA = 'YOUR_COIN_CA'; // e.g. '0xABC...'
+
+// ══════════════════════════════════════════════════════════════════
+// LIVE CLOCK (days alive)
+// ══════════════════════════════════════════════════════════════════
+function calcAlive() {
+  const diff = Date.now() - BORN_DATE;
+  if (isNaN(diff) || diff < 0) return '—';
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000)  / 60000);
+  return `${d}d ${h}h ${m}m`;
+}
+
+function updateAlive() {
+  const el = document.getElementById('daysAlive');
+  if (el) el.textContent = calcAlive() + ' alive';
+}
+
+updateAlive();
+setInterval(updateAlive, 60000);
+
+
+// ══════════════════════════════════════════════════════════════════
+// STATUS.JSON — fetch and update the dashboard live
+// ══════════════════════════════════════════════════════════════════
+async function fetchStatus() {
+  try {
+    const r = await fetch('/status.json?t=' + Date.now());
+    const s = await r.json();
+
+    // Project status
+    if (s.project?.statusText) {
+      document.getElementById('projectStatus').textContent = s.project.statusText;
+    }
+
+    // Last deploy / version
+    if (s.version) {
+      document.getElementById('lastDeploy').textContent = `v${s.version} · ${
+        new Date(s.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      }`;
+    }
+
+    // Last commit
+    if (s.lastCommit) {
+      const commitTime = new Date(s.lastCommit.time);
+      const minsAgo   = Math.floor((Date.now() - commitTime) / 60000);
+      const timeStr   = minsAgo < 60   ? `${minsAgo}m ago`
+                      : minsAgo < 1440 ? `${Math.floor(minsAgo/60)}h ago`
+                                       : `${Math.floor(minsAgo/1440)}d ago`;
+      document.getElementById('lastCommitMsg').textContent  = s.lastCommit.message;
+      document.getElementById('lastCommitTime').textContent = timeStr;
+    }
+
+    // Commits this week
+    if (s.commitsThisWeek !== undefined) {
+      document.getElementById('commitsWeek').textContent  = s.commitsThisWeek + ' commits this week';
+      document.getElementById('tickerCommits').textContent = s.commitsThisWeek + ' COMMITS THIS WEEK';
+    }
+
+    // Shipped log
+    if (s.shipped?.length) {
+      const list = document.getElementById('shippedList');
+      list.innerHTML = s.shipped.map(item => `
+        <div class="shipped-item fade-in">
+          <div class="s-date">${item.date || ''}</div>
+          <div class="s-text">${escHtml(item.text)}</div>
+          <div class="badge ${item.type || 'feature'}">${(item.type || 'feature').toUpperCase()}</div>
+        </div>
+      `).join('');
+    }
+
+    // Queue
+    if (s.queue?.length) {
+      const list = document.getElementById('queueList');
+      list.innerHTML = s.queue.map(item => `
+        <div class="queue-item fade-in">
+          <div class="q-num">${item.num || '—'}</div>
+          <div>
+            <div class="q-title">${escHtml(item.title)}</div>
+            <div class="q-desc">${escHtml(item.desc)}</div>
+          </div>
+        </div>
+      `).join('');
+      // Update ticker "NEXT"
+      document.getElementById('tickerNext').textContent = s.queue[0]?.title?.toUpperCase() || '—';
+    }
+
+  } catch (e) {
+    console.log('[build] status.json unavailable — using static content');
+  }
+}
+
+fetchStatus();
+setInterval(fetchStatus, 60000); // refresh every 60s
+
+
+// ══════════════════════════════════════════════════════════════════
+// COIN PRICE — DexScreener API
+// TODO: Remove this block if you have no token
+// ══════════════════════════════════════════════════════════════════
+async function fetchCoin() {
+  if (!COIN_CA || COIN_CA === 'YOUR_COIN_CA') return;
+  try {
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${COIN_CA}`);
+    const d = await r.json();
+    const p = d.pairs?.[0];
+    if (!p) return;
+
+    const price  = parseFloat(p.priceUsd);
+    const change = parseFloat(p.priceChange?.h24 || 0);
+
+    const fmt  = n => n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+    const fmtP = n => {
+      if (n < 0.000001) return `$${n.toFixed(10)}`.replace(/0+$/, '');
+      if (n < 0.001)    return `$${n.toFixed(7)}`.replace(/0+$/, '');
+      return `$${n.toFixed(4)}`;
+    };
+
+    document.getElementById('coinPrice').textContent = fmtP(price);
+    const cel = document.getElementById('coinChange');
+    cel.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}% (24h)`;
+    cel.className   = `coin-change ${change >= 0 ? 'up' : 'down'}`;
+    if (p.marketCap || p.fdv)  document.getElementById('coinMC').textContent  = fmt(p.marketCap || p.fdv);
+    if (p.volume?.h24)          document.getElementById('coinVol').textContent = fmt(p.volume.h24);
+  } catch {
+    const cel = document.getElementById('coinChange');
+    if (cel) cel.textContent = 'Live data unavailable';
+  }
+}
+fetchCoin();
+setInterval(fetchCoin, 30000);
+
+
+// ══════════════════════════════════════════════════════════════════
+// IDEAS BOARD
+// ══════════════════════════════════════════════════════════════════
+const voted = new Set(JSON.parse(localStorage.getItem('build_dashboard_voted') || '[]'));
+function saveVoted() { localStorage.setItem('build_dashboard_voted', JSON.stringify([...voted])); }
+
+function renderIdeas(ideas) {
+  const list = document.getElementById('ideaList');
+  list.innerHTML = '';
+  if (!ideas.length) {
+    list.innerHTML = '<div class="empty-ideas" id="emptyState">No ideas yet — be the first ↑</div>';
+    return;
+  }
+  ideas.sort((a, b) => b.votes - a.votes).forEach(idea => {
+    const item    = document.createElement('div');
+    item.className = 'idea-item fade-in';
+    item.dataset.id = idea.id;
+    const hasVoted  = voted.has(idea.id);
+    item.innerHTML  = `
+      <button class="vote-btn ${hasVoted ? 'voted' : ''}" onclick="vote(this,'${idea.id}')">▲ <span>${idea.votes}</span></button>
+      <div>
+        <div class="idea-text">${escHtml(idea.text)}</div>
+        <div class="idea-author">${escHtml(idea.author)}</div>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+async function loadIdeas() {
+  if (!IDEAS_API || IDEAS_API.includes('YOUR_API_HOST')) return;
+  try {
+    const r     = await fetch(IDEAS_API);
+    const ideas = await r.json();
+    renderIdeas(ideas);
+  } catch { /* silently fail */ }
+}
+
+async function vote(btn, id) {
+  if (voted.has(id)) return;
+  voted.add(id); saveVoted();
+  btn.classList.add('voted');
+  const span = btn.querySelector('span');
+  span.textContent = parseInt(span.textContent) + 1;
+  try { await fetch(`${IDEAS_API}/${id}/vote`, { method: 'POST' }); } catch {}
+}
+
+async function submitIdea() {
+  const input    = document.getElementById('ideaInput');
+  const authorEl = document.getElementById('ideaAuthor');
+  const text     = input.value.trim();
+
+  if (!text) {
+    input.style.borderColor = 'rgba(248,113,113,0.6)';
+    setTimeout(() => input.style.borderColor = '', 1200);
+    return;
+  }
+
+  const btn = document.querySelector('.idea-btn');
+  btn.textContent = 'Submitting...';
+  btn.disabled    = true;
+
+  try {
+    const r = await fetch(IDEAS_API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ text, author: authorEl.value.trim() || 'anon' }),
+    });
+    if (r.ok) { input.value = ''; authorEl.value = ''; await loadIdeas(); }
+  } catch {
+    input.style.borderColor = 'rgba(248,113,113,0.6)';
+    setTimeout(() => input.style.borderColor = '', 1200);
+  }
+
+  btn.textContent = 'Submit';
+  btn.disabled    = false;
+}
+
+document.getElementById('ideaInput')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitIdea();
+});
+
+loadIdeas();
+
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════════════
+function escHtml(str) {
+  return String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function copyCA(el) {
+  navigator.clipboard.writeText(COIN_CA).then(() => {
+    const orig = el.textContent;
+    el.textContent = '✓ Copied!';
+    el.style.color = 'var(--success)';
+    setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

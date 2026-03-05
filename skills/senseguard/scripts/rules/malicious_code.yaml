@@ -1,0 +1,35 @@
+category: malicious_execution
+description: "Malicious code execution detection rules"
+
+rules:
+  critical:
+    - id: MC001
+      pattern: "base64\\s+(-d|--decode)|atob\\(|Buffer\\.from\\(.*base64"
+      description: "Base64 decode execution (common obfuscation)"
+      description_zh: "Base64 解码执行（常见混淆手法）"
+
+    - id: MC002
+      pattern: "eval\\(|exec\\(|os\\.system\\(|subprocess\\.(call|run|Popen)"
+      description: "Dynamic code execution"
+      description_zh: "动态代码执行"
+
+    - id: MC003
+      pattern: "chmod\\s+\\+x|chmod\\s+[0-7]*[1357][0-7]*"
+      description: "Set executable permissions"
+      description_zh: "设置可执行权限"
+
+    - id: MC004
+      pattern: "/dev/tcp/|nc\\s+-e|ncat|reverse.shell|bind.shell"
+      description: "Reverse shell"
+      description_zh: "反向 shell"
+
+  high:
+    - id: MC005
+      pattern: "pip install|npm install|brew install|apt install"
+      description: "Install external packages (potential malicious deps)"
+      description_zh: "安装外部包（可能引入恶意依赖）"
+
+    - id: MC006
+      pattern: "download.*execute|fetch.*run|wget.*sh|curl.*\\|.*sh"
+      description: "Download and execute pattern"
+      description_zh: "下载并执行模式"

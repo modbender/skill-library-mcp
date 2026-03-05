@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXOSKELETONS — Mint</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#222;--gold:#FFD700;--green:#00FFAA;--dim:#666;--text:#ccc}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{color:var(--gold);font-size:28px;letter-spacing:4px;margin:20px 0 5px}
+.sub{color:var(--dim);font-size:12px;margin-bottom:30px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:10px 0;width:100%;max-width:520px}
+.card h2{color:var(--green);font-size:14px;letter-spacing:2px;margin-bottom:15px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{text-align:center;padding:8px;background:#0d0d0d;border-radius:4px}
+.stat .val{font-size:20px;color:var(--gold);font-weight:bold}
+.stat .lbl{font-size:10px;color:var(--dim);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.row{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.row label{width:100px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
+.row select,.row input{flex:1;background:#0d0d0d;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:4px;font-family:inherit;font-size:13px}
+.row input[type=color]{padding:2px;height:36px;cursor:pointer}
+.preview-wrap{display:flex;justify-content:center;margin:15px 0}
+#preview{width:320px;height:320px;border:1px solid var(--border);border-radius:8px;background:#080808}
+button{width:100%;padding:14px;font-family:inherit;font-size:16px;font-weight:bold;letter-spacing:2px;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s}
+#connectBtn{background:transparent;border:2px solid var(--green);color:var(--green)}
+#connectBtn:hover{background:var(--green);color:#000}
+#mintBtn{background:var(--gold);color:#000;margin-top:10px}
+#mintBtn:hover{background:#e6c200}
+#mintBtn:disabled{background:#333;color:#666;cursor:not-allowed}
+.status{text-align:center;padding:10px;font-size:13px;margin-top:10px;border-radius:4px}
+.status.ok{color:var(--green);background:#001a10}
+.status.err{color:#ff4444;background:#1a0000}
+.status.pending{color:var(--gold);background:#1a1500}
+.wl-badge{display:inline-block;background:#1a1500;color:var(--gold);padding:3px 8px;border-radius:3px;font-size:11px;margin-top:5px}
+.free-badge{background:#001a10;color:var(--green)}
+.addr{font-size:11px;color:var(--dim);word-break:break-all;text-align:center;margin-top:5px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.footer{margin-top:30px;text-align:center;font-size:11px;color:var(--dim);line-height:1.8}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h1>EXOSKELETONS</h1>
+<p class="sub">onchain identity NFTs for AI agents — Base</p>
+
+<!-- CONNECT -->
+<div class="card" id="connectCard">
+<button id="connectBtn" onclick="connect()">CONNECT WALLET</button>
+<div id="walletInfo" class="hidden">
+<p class="addr" id="addrDisplay"></p>
+<div id="badges" style="text-align:center;margin-top:5px"></div>
+</div>
+</div>
+
+<!-- STATS -->
+<div class="card">
+<h2>// NETWORK</h2>
+<div class="stats">
+<div class="stat"><div class="val" id="sPhase">--</div><div class="lbl">Phase</div></div>
+<div class="stat"><div class="val" id="sPrice">--</div><div class="lbl">Price</div></div>
+<div class="stat"><div class="val" id="sMinted">--</div><div class="lbl">Minted</div></div>
+<div class="stat"><div class="val" id="sGenesis">--</div><div class="lbl">Genesis Left</div></div>
+</div>
+</div>
+
+<!-- CONFIG -->
+<div class="card">
+<h2>// CONFIGURE</h2>
+
+<div class="row">
+<label>Shape</label>
+<select id="cfgShape" onchange="updatePreview()">
+<option value="0">Hexagon</option>
+<option value="1">Circle</option>
+<option value="2">Diamond</option>
+<option value="3">Shield</option>
+<option value="4">Octagon</option>
+<option value="5">Triangle</option>
+</select>
+</div>
+
+<div class="row">
+<label>Primary</label>
+<input type="color" id="cfgPrimary" value="#00BFFF" onchange="updatePreview()">
+</div>
+
+<div class="row">
+<label>Secondary</label>
+<input type="color" id="cfgSecondary" value="#3C0078" onchange="updatePreview()">
+</div>
+
+<div class="row">
+<label>Symbol</label>
+<select id="cfgSymbol" onchange="updatePreview()">
+<option value="0">None</option>
+<option value="1">Eye</option>
+<option value="2">Gear</option>
+<option value="3">Bolt</option>
+<option value="4">Star</option>
+<option value="5">Wave</option>
+<option value="6">Node</option>
+<option value="7">Diamond</option>
+</select>
+</div>
+
+<div class="row">
+<label>Pattern</label>
+<select id="cfgPattern" onchange="updatePreview()">
+<option value="0">None</option>
+<option value="1">Grid</option>
+<option value="2">Dots</option>
+<option value="3">Lines</option>
+<option value="4">Circuits</option>
+<option value="5">Rings</option>
+</select>
+</div>
+
+<div class="preview-wrap">
+<svg id="preview" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+<p style="text-align:center;font-size:10px;color:var(--dim);margin-top:-8px">EXACT ON-CHAIN RENDER PREVIEW</p>
+</div>
+
+<!-- MINT -->
+<div class="card">
+<h2>// MINT</h2>
+<button id="mintBtn" onclick="mint()" disabled>MINT EXOSKELETON</button>
+<div id="mintStatus"></div>
+</div>
+
+<div class="footer">
+CC0 — No rights reserved<br>
+Built by <a href="https://github.com/Potdealer/exoskeletons" target="_blank">potdealer & Ollie</a><br>
+Contract: <a href="https://basescan.org/address/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank">0x8241...Da0d</a><br>
+<span style="color:var(--gold)">Chain: Base (8453)</span>
+</div>
+
+<script>
+const CORE = "0x8241BDD5009ed3F6C99737D2415994B58296Da0d";
+const CHAIN_ID = "0x2105"; // 8453
+const RPC = "https://mainnet.base.org";
+
+// Function selectors
+const SEL = {
+  mint: "0x7ba0e2e7",
+  getMintPrice: "0xa7f93ebd",
+  getMintPhase: "0xc52766c6",
+  nextTokenId: "0x75794a3c",
+  totalSupply: "0x18160ddd",
+  whitelist: "0x9b19251a",
+  usedFreeMint: "0x61273028",
+};
+
+let account = null;
+let mintPrice = 0n;
+
+// ── Hex helpers ─────────────────────────────────────────────
+function hexToInt(h) { return h === "0x" ? 0n : BigInt(h); }
+function padAddr(a) { return "0x" + a.toLowerCase().replace("0x","").padStart(64,"0"); }
+function pad32(n) { return n.toString(16).padStart(64,"0"); }
+function hexToStr(h) {
+  // ABI-encoded string: offset(32) + length(32) + data
+  h = h.replace("0x","");
+  if (h.length < 128) return "";
+  const len = parseInt(h.substring(64,128), 16);
+  const data = h.substring(128, 128 + len * 2);
+  let s = "";
+  for (let i = 0; i < data.length; i += 2) s += String.fromCharCode(parseInt(data.substring(i, i+2), 16));
+  return s;
+}
+function toWei(eth) { return BigInt(Math.round(eth * 1e18)); }
+function fromWei(w) { return Number(w) / 1e18; }
+
+// ── RPC call ────────────────────────────────────────────────
+async function rpc(data) {
+  const r = await fetch(RPC, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({jsonrpc:"2.0",method:"eth_call",params:[{to:CORE,data},"latest"],id:1})
+  });
+  const j = await r.json();
+  return j.result || "0x";
+}
+
+// ── Load stats ──────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const [priceHex, phaseHex, nextHex, supplyHex] = await Promise.all([
+      rpc(SEL.getMintPrice),
+      rpc(SEL.getMintPhase),
+      rpc(SEL.nextTokenId),
+      rpc(SEL.totalSupply),
+    ]);
+
+    mintPrice = hexToInt(priceHex);
+    const phase = hexToStr(phaseHex);
+    const next = Number(hexToInt(nextHex));
+    const supply = Number(hexToInt(supplyHex));
+    const genesisLeft = Math.max(0, 1000 - next + 1);
+
+    document.getElementById("sPhase").textContent = phase.toUpperCase();
+    document.getElementById("sPrice").textContent = fromWei(mintPrice) + " ETH";
+    document.getElementById("sMinted").textContent = supply;
+    document.getElementById("sGenesis").textContent = genesisLeft;
+  } catch(e) {
+    console.error("Stats error:", e);
+  }
+}
+
+// ── Connect wallet ──────────────────────────────────────────
+async function connect() {
+  if (!window.ethereum) {
+    showStatus("No wallet detected. Install MetaMask or use a Web3 browser.", "err");
+    return;
+  }
+
+  try {
+    // Request accounts
+    const accounts = await window.ethereum.request({method:"eth_requestAccounts"});
+    account = accounts[0];
+
+    // Switch to Base if needed
+    try {
+      await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_ID}]});
+    } catch(e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({method:"wallet_addEthereumChain",params:[{
+          chainId: CHAIN_ID,
+          chainName: "Base",
+          nativeCurrency: {name:"ETH",symbol:"ETH",decimals:18},
+          rpcUrls: ["https://mainnet.base.org"],
+          blockExplorerUrls: ["https://basescan.org"]
+        }]});
+      }
+    }
+
+    // Update UI
+    document.getElementById("connectBtn").textContent = account.slice(0,6) + "..." + account.slice(-4);
+    document.getElementById("connectBtn").style.borderColor = "var(--gold)";
+    document.getElementById("connectBtn").style.color = "var(--gold)";
+    document.getElementById("walletInfo").classList.remove("hidden");
+    document.getElementById("addrDisplay").textContent = account;
+    document.getElementById("mintBtn").disabled = false;
+
+    // Check whitelist status
+    const wlHex = await rpc(SEL.whitelist + padAddr(account).slice(2));
+    const isWL = hexToInt(wlHex) > 0n;
+    const freeHex = await rpc(SEL.usedFreeMint + padAddr(account).slice(2));
+    const usedFree = hexToInt(freeHex) > 0n;
+
+    const badges = document.getElementById("badges");
+    if (isWL) {
+      badges.innerHTML = '<span class="wl-badge">WHITELISTED</span>';
+      if (!usedFree) {
+        badges.innerHTML += ' <span class="wl-badge free-badge">FREE MINT AVAILABLE</span>';
+        document.getElementById("mintBtn").textContent = "MINT EXOSKELETON (FREE)";
+      }
+    }
+
+  } catch(e) {
+    showStatus("Connection failed: " + e.message, "err");
+  }
+}
+
+// ── Build config bytes ──────────────────────────────────────
+function getConfig() {
+  const shape = parseInt(document.getElementById("cfgShape").value);
+  const p = document.getElementById("cfgPrimary").value;
+  const s = document.getElementById("cfgSecondary").value;
+  const symbol = parseInt(document.getElementById("cfgSymbol").value);
+  const pattern = parseInt(document.getElementById("cfgPattern").value);
+
+  const pr = parseInt(p.slice(1,3),16), pg = parseInt(p.slice(3,5),16), pb = parseInt(p.slice(5,7),16);
+  const sr = parseInt(s.slice(1,3),16), sg = parseInt(s.slice(3,5),16), sb = parseInt(s.slice(5,7),16);
+
+  return [shape, pr, pg, pb, sr, sg, sb, symbol, pattern];
+}
+
+function encodeConfig(cfg) {
+  // ABI encode bytes: offset(32) + length(32) + data(padded to 32)
+  const offset = pad32(32);
+  const length = pad32(9);
+  let data = "";
+  for (const b of cfg) data += b.toString(16).padStart(2, "0");
+  data = data.padEnd(64, "0"); // pad to 32 bytes
+  return offset + length + data;
+}
+
+// ── Mint ────────────────────────────────────────────────────
+async function mint() {
+  if (!account) { showStatus("Connect wallet first", "err"); return; }
+
+  const btn = document.getElementById("mintBtn");
+  btn.disabled = true;
+  btn.textContent = "MINTING...";
+  showStatus("Confirm transaction in your wallet...", "pending");
+
+  try {
+    const cfg = getConfig();
+    const calldata = SEL.mint + encodeConfig(cfg);
+
+    // Check if free mint
+    const wlHex = await rpc(SEL.whitelist + padAddr(account).slice(2));
+    const isWL = hexToInt(wlHex) > 0n;
+    const freeHex = await rpc(SEL.usedFreeMint + padAddr(account).slice(2));
+    const usedFree = hexToInt(freeHex) > 0n;
+    const value = (isWL && !usedFree) ? "0x0" : "0x" + mintPrice.toString(16);
+
+    const txHash = await window.ethereum.request({
+      method: "eth_sendTransaction",
+      params: [{
+        from: account,
+        to: CORE,
+        data: calldata,
+        value: value,
+        chainId: CHAIN_ID,
+      }]
+    });
+
+    showStatus('Minting... TX: <a href="https://basescan.org/tx/' + txHash + '" target="_blank">' + txHash.slice(0,14) + '...</a>', "pending");
+
+    // Poll for receipt
+    let receipt = null;
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const resp = await fetch(RPC, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({jsonrpc:"2.0",method:"eth_getTransactionReceipt",params:[txHash],id:1})
+      });
+      const j = await resp.json();
+      if (j.result) { receipt = j.result; break; }
+    }
+
+    if (receipt && receipt.status === "0x1") {
+      // Parse token ID from Transfer event (topic 0xddf252ad...)
+      let tokenId = "?";
+      for (const log of receipt.logs) {
+        if (log.address.toLowerCase() === CORE.toLowerCase() && log.topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
+          tokenId = Number(BigInt(log.topics[3]));
+          break;
+        }
+      }
+      showStatus('Minted Exoskeleton #' + tokenId + '! <a href="https://basescan.org/tx/' + txHash + '" target="_blank">View TX</a>', "ok");
+      btn.textContent = "MINTED #" + tokenId;
+      loadStats(); // refresh
+    } else if (receipt) {
+      showStatus("Transaction reverted. Check your wallet for details.", "err");
+      btn.textContent = "MINT EXOSKELETON";
+      btn.disabled = false;
+    } else {
+      showStatus("Transaction pending... check Basescan.", "pending");
+      btn.textContent = "MINT EXOSKELETON";
+      btn.disabled = false;
+    }
+
+  } catch(e) {
+    showStatus("Mint failed: " + (e.message || e), "err");
+    btn.textContent = "MINT EXOSKELETON";
+    btn.disabled = false;
+  }
+}
+
+// ── Preview SVG — pixel-accurate match of ExoskeletonRenderer.sol ──
+function updatePreview() {
+  const cfg = getConfig();
+  const svg = document.getElementById("preview");
+  const pHex = document.getElementById("cfgPrimary").value;
+  const sHex = document.getElementById("cfgSecondary").value;
+  const pRgb = `rgb(${cfg[1]},${cfg[2]},${cfg[3]})`;
+
+  // Genesis is true for all current mints (tokens 1-1000)
+  const genesis = true;
+  const nextId = document.getElementById("sMinted").textContent;
+  const displayId = nextId && nextId !== "--" ? nextId : "?";
+
+  // ── Defs (gradients + filters) — matches _buildDefs() ──
+  let out = '<defs>';
+  out += `<radialGradient id="glow"><stop offset="0%" stop-color="${pHex}" stop-opacity="0.6"/><stop offset="100%" stop-color="${pHex}" stop-opacity="0"/></radialGradient>`;
+  out += `<radialGradient id="core-glow"><stop offset="0%" stop-color="${pHex}" stop-opacity="0.3"/><stop offset="60%" stop-color="${sHex}" stop-opacity="0.1"/><stop offset="100%" stop-opacity="0"/></radialGradient>`;
+  out += '<filter id="blur"><feGaussianBlur stdDeviation="3"/></filter>';
+  out += '<filter id="blur-lg"><feGaussianBlur stdDeviation="8"/></filter>';
+  out += `<filter id="glow-filter"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="${pRgb}" flood-opacity="0.5"/></filter>`;
+  out += '</defs>';
+
+  // ── Background — matches _buildBackground() ──
+  out += '<rect width="500" height="500" fill="#080808"/>';
+  out += '<rect x="0" y="0" width="500" height="500" fill="url(#core-glow)"/>';
+
+  // ── Frame — matches _buildGenesisFrame() / _buildStandardFrame() ──
+  if (genesis) {
+    out += `<rect x="8" y="8" width="484" height="484" rx="16" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>`;
+    out += `<rect x="14" y="14" width="472" height="472" rx="12" fill="none" stroke="${pHex}" stroke-width="1" opacity="0.4"/>`;
+    out += '<circle cx="24" cy="24" r="4" fill="#FFD700" opacity="0.8"/>';
+    out += '<circle cx="476" cy="24" r="4" fill="#FFD700" opacity="0.8"/>';
+    out += '<circle cx="24" cy="476" r="4" fill="#FFD700" opacity="0.8"/>';
+    out += '<circle cx="476" cy="476" r="4" fill="#FFD700" opacity="0.8"/>';
+  } else {
+    out += `<rect x="10" y="10" width="480" height="480" rx="14" fill="none" stroke="${pHex}" stroke-width="1" opacity="0.5"/>`;
+  }
+
+  // ── Central Shape — matches _buildCentralShape() ──
+  const gf = ` fill="none" stroke="${pHex}" stroke-width="2" filter="url(#glow-filter)"`;
+  const shapes = {
+    0: `<polygon points="250,160 319,200 319,280 250,320 181,280 181,200"${gf}/>`,
+    1: `<circle cx="250" cy="240" r="80"${gf}/>`,
+    2: `<polygon points="250,155 340,240 250,325 160,240"${gf}/>`,
+    3: `<path d="M250,160 L330,200 L330,280 Q330,320 250,340 Q170,320 170,280 L170,200 Z"${gf}/>`,
+    4: `<polygon points="217,160 283,160 330,207 330,273 283,320 217,320 170,273 170,207"${gf}/>`,
+    5: `<polygon points="250,155 345,325 155,325"${gf}/>`,
+  };
+  out += shapes[cfg[0]] || shapes[0];
+
+  // ── Symbol — matches _buildSymbol() ──
+  const sym = cfg[7];
+  if (sym === 1) {
+    out += `<ellipse cx="250" cy="240" rx="20" ry="12" fill="none" stroke="${pHex}" stroke-width="1.5" opacity="0.7"/>`;
+    out += `<circle cx="250" cy="240" r="5" fill="${pHex}" opacity="0.6"/>`;
+  } else if (sym === 2) {
+    out += `<circle cx="250" cy="240" r="12" fill="none" stroke="${pHex}" stroke-width="1.5" opacity="0.7"/>`;
+    out += `<circle cx="250" cy="240" r="5" fill="${pHex}" opacity="0.4"/>`;
+    out += `<line x1="250" y1="225" x2="250" y2="255" stroke="${pHex}" stroke-width="1" opacity="0.5"/>`;
+    out += `<line x1="235" y1="240" x2="265" y2="240" stroke="${pHex}" stroke-width="1" opacity="0.5"/>`;
+  } else if (sym === 3) {
+    out += `<polygon points="255,225 245,238 258,238 243,258" fill="none" stroke="${pHex}" stroke-width="1.5" opacity="0.7"/>`;
+  } else if (sym === 4) {
+    out += `<polygon points="250,225 254,237 267,237 257,245 260,258 250,250 240,258 243,245 233,237 246,237" fill="none" stroke="${pHex}" stroke-width="1" opacity="0.7"/>`;
+  } else if (sym === 5) {
+    out += `<path d="M230,240 Q240,228 250,240 Q260,252 270,240" fill="none" stroke="${pHex}" stroke-width="1.5" opacity="0.7"/>`;
+  } else if (sym === 6) {
+    out += `<circle cx="250" cy="240" r="4" fill="${pHex}" opacity="0.6"/>`;
+    out += `<circle cx="238" cy="228" r="2" fill="${pHex}" opacity="0.4"/>`;
+    out += `<circle cx="262" cy="228" r="2" fill="${pHex}" opacity="0.4"/>`;
+    out += `<circle cx="238" cy="252" r="2" fill="${pHex}" opacity="0.4"/>`;
+    out += `<circle cx="262" cy="252" r="2" fill="${pHex}" opacity="0.4"/>`;
+    out += `<line x1="250" y1="240" x2="238" y2="228" stroke="${pHex}" stroke-width="0.5" opacity="0.3"/>`;
+    out += `<line x1="250" y1="240" x2="262" y2="228" stroke="${pHex}" stroke-width="0.5" opacity="0.3"/>`;
+    out += `<line x1="250" y1="240" x2="238" y2="252" stroke="${pHex}" stroke-width="0.5" opacity="0.3"/>`;
+    out += `<line x1="250" y1="240" x2="262" y2="252" stroke="${pHex}" stroke-width="0.5" opacity="0.3"/>`;
+  } else if (sym === 7) {
+    out += `<polygon points="250,228 260,240 250,252 240,240" fill="none" stroke="${pHex}" stroke-width="1.5" opacity="0.7"/>`;
+  }
+
+  // ── Pattern — matches _buildPattern() (fresh mint = 0 complexity, but show preview) ──
+  // For preview we use complexity=2 so patterns are visible; onchain they scale with rep
+  const pat = cfg[8];
+  const previewComplexity = 2;
+  if (pat === 1) {
+    // Grid
+    for (let x = 170; x <= 330; x += 36) {
+      out += `<line x1="${x}" y1="170" x2="${x}" y2="310" stroke="${sHex}" stroke-width="0.3" opacity="0.15"/>`;
+    }
+    for (let y = 170; y <= 310; y += 36) {
+      out += `<line x1="170" y1="${y}" x2="330" y2="${y}" stroke="${sHex}" stroke-width="0.3" opacity="0.15"/>`;
+    }
+  } else if (pat === 2) {
+    // Dots
+    const count = previewComplexity * 2;
+    for (let i = 0; i < count && i < 20; i++) {
+      const cx = 190 + (i * 37 % 120);
+      const cy = 190 + (i * 53 % 100);
+      out += `<circle cx="${cx}" cy="${cy}" r="1.5" fill="${sHex}" opacity="0.2"/>`;
+    }
+  } else if (pat === 3) {
+    // Lines
+    for (let i = 0; i < previewComplexity && i < 10; i++) {
+      const x = 180 + i * 15;
+      out += `<line x1="${x}" y1="170" x2="${x + 30}" y2="310" stroke="${sHex}" stroke-width="0.3" opacity="0.12"/>`;
+    }
+  } else if (pat === 4) {
+    // Circuits
+    for (let i = 0; i < previewComplexity && i < 8; i++) {
+      const x1 = 200 + (i * 31 % 100);
+      const y1 = 200 + (i * 47 % 80);
+      const x2 = 200 + ((i + 1) * 31 % 100);
+      const y2 = 200 + ((i + 1) * 47 % 80);
+      out += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${sHex}" stroke-width="0.5" opacity="0.2"/>`;
+      out += `<circle cx="${x1}" cy="${y1}" r="2" fill="${sHex}" opacity="0.3"/>`;
+    }
+  } else if (pat === 5) {
+    // Rings
+    for (let i = 1; i <= previewComplexity && i <= 5; i++) {
+      const r = 20 + i * 12;
+      out += `<circle cx="250" cy="240" r="${r}" fill="none" stroke="${sHex}" stroke-width="0.4" opacity="0.12"/>`;
+    }
+  }
+
+  // ── Text — matches _buildText() ──
+  out += `<text x="250" y="42" fill="${pHex}" font-family="monospace" font-size="8" text-anchor="middle" letter-spacing="4" opacity="0.3">EXOSKELETON</text>`;
+  out += `<text x="470" y="42" fill="${pHex}" font-family="monospace" font-size="10" text-anchor="end" opacity="0.4">#${displayId}</text>`;
+  out += `<text x="250" y="370" fill="${pHex}" font-family="monospace" font-size="16" text-anchor="middle" opacity="0.9">YOUR AGENT</text>`;
+  if (genesis) {
+    out += '<text x="250" y="395" fill="#FFD700" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="3" opacity="0.7">GENESIS</text>';
+  }
+
+  // ── Stats bar — matches _buildStats() (fresh mint = all zeros) ──
+  out += `<line x1="40" y1="455" x2="460" y2="455" stroke="${pHex}" stroke-width="0.3" opacity="0.2"/>`;
+  out += `<text x="60" y="470" fill="${sHex}" font-family="monospace" font-size="8" opacity="0.35">MSG:0</text>`;
+  out += `<text x="180" y="470" fill="${sHex}" font-family="monospace" font-size="8" opacity="0.35">STO:0</text>`;
+  out += `<text x="300" y="470" fill="${sHex}" font-family="monospace" font-size="8" opacity="0.35">MOD:0</text>`;
+
+  svg.innerHTML = out;
+}
+
+// ── Status display ──────────────────────────────────────────
+function showStatus(msg, type) {
+  const el = document.getElementById("mintStatus");
+  el.innerHTML = msg;
+  el.className = "status " + type;
+}
+
+// ── Init ────────────────────────────────────────────────────
+loadStats();
+updatePreview();
+setInterval(loadStats, 30000);
+
+// Auto-connect if wallet available
+if (window.ethereum) {
+  window.ethereum.request({method:"eth_accounts"}).then(accounts => {
+    if (accounts.length > 0) {
+      connect();
+    }
+  });
+}
+</script>
+</body>
+</html>

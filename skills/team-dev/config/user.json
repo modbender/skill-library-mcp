@@ -1,0 +1,71 @@
+{
+  "maxAgents": 5,
+  "notifications": {
+    "enabled": true,
+    "onSuccess": true,
+    "onFailure": true,
+    "onCancelled": false
+  },
+  "retry": {
+    "maxAttempts": 3,
+    "delaySeconds": 60
+  },
+  "pr": {
+    "autoMerge": false
+  },
+  "workflow": {
+    "protectedBranches": ["main", "master"]
+  },
+  "agentPolicy": {
+    "enabledAgents": ["codex", "claude", "gemini", "cursor"],
+    "phaseAllowedAgents": {
+      "build": ["codex", "claude", "cursor", "gemini"],
+      "review": ["codex", "gemini", "claude"],
+      "fixup": ["codex", "claude", "cursor", "gemini"]
+    },
+    "phasePreferredOrder": {
+      "build": ["codex", "claude", "cursor", "gemini"],
+      "review": ["codex", "gemini", "claude"],
+      "fixup": ["codex", "claude", "cursor", "gemini"]
+    }
+  },
+  "review": {
+    "requiredReviewers": ["codex", "gemini", "claude"],
+    "minCompleted": 2,
+    "weights": {
+      "codex": 1.0,
+      "gemini": 0.8,
+      "claude": 0.3
+    },
+    "blockRules": {
+      "claudeCriticalOnly": true
+    }
+  },
+  "cleanup": {
+    "autoCleanup": true,
+    "cleanupAfterDays": 7,
+    "removeOrphanManagedWorktrees": true,
+    "maxSessionTerminalTtlSeconds": 3600,
+    "maxSessionFailedCancelledTtlSeconds": 900
+  },
+  "archive": {
+    "enabled": true,
+    "autoPruneOnCleanup": true,
+    "keepDays": 0,
+    "keepCount": 12,
+    "keepFailedCancelledDays": 0,
+    "keepFailedCancelledCount": 2
+  },
+  "queueArchive": {
+    "enabled": true,
+    "autoPruneOnCheck": true,
+    "keepDays": 0,
+    "keepCount": 20,
+    "keepFailedCancelledDays": 0,
+    "keepFailedCancelledCount": 3
+  },
+  "logging": {
+    "enabled": true,
+    "logDir": "logs"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "human-like-memory",
+  "displayName": "Human-Like Memory",
+  "description": "This skill provides long-term memory capabilities for conversations. Use this skill when the user wants to recall past conversations, save important information to memory, search memories, or when context from previous interactions would be helpful.",
+  "version": "0.4.1",
+  "author": {
+    "name": "hanlaomo",
+    "url": "https://human-like.me"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "memory",
+    "long-term-memory",
+    "conversation",
+    "recall",
+    "ai-memory"
+  ],
+  "main": "./SKILL.md",
+  "scripts": {
+    "memory": "./scripts/memory.mjs",
+    "setup": "./scripts/setup.sh"
+  },
+  "secrets": {
+    "HUMAN_LIKE_MEM_API_KEY": {
+      "type": "string",
+      "description": "API Key for Human-Like Memory service",
+      "required": true,
+      "placeholder": "mp_xxxxxxxxxxxxxx",
+      "helpUrl": "https://human-like.me",
+      "helpText": "Get your API Key from https://human-like.me"
+    },
+    "HUMAN_LIKE_MEM_BASE_URL": {
+      "type": "string",
+      "description": "Base URL for Memory API",
+      "required": false,
+      "default": "https://human-like.me",
+      "placeholder": "https://human-like.me"
+    },
+    "HUMAN_LIKE_MEM_USER_ID": {
+      "type": "string",
+      "description": "User identifier for memory isolation",
+      "required": false,
+      "default": "openclaw-user",
+      "placeholder": "my-user-id"
+    }
+  },
+  "config": {
+    "memoryLimitNumber": {
+      "type": "number",
+      "description": "Maximum number of memories to retrieve",
+      "default": 6
+    },
+    "minScore": {
+      "type": "number",
+      "description": "Minimum relevance score for memory retrieval (0-1)",
+      "default": 0.1
+    },
+    "asyncMode": {
+      "type": "boolean",
+      "description": "Save memories asynchronously",
+      "default": true
+    },
+    "saveTriggerTurns": {
+      "type": "number",
+      "description": "Number of conversation turns before auto-save (saveMaxTurns = saveTriggerTurns × 2)",
+      "default": 5
+    }
+  },
+  "triggers": [
+    "remember",
+    "recall",
+    "what did we discuss",
+    "save this",
+    "search memory",
+    "do you remember",
+    "as we discussed",
+    "previously mentioned"
+  ],
+  "capabilities": [
+    "memory-recall",
+    "memory-save",
+    "memory-search"
+  ],
+  "requirements": {
+    "node": ">=18.0.0"
+  }
+}

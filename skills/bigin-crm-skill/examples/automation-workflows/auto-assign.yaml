@@ -1,0 +1,43 @@
+# Auto-Assign Unassigned Pipelines
+# Automatically assigns unassigned pipeline entries to sales reps
+
+name: auto-assign-pipelines
+description: Auto-assign unassigned pipelines to sales reps using round-robin
+enabled: true
+schedule:
+  frequency: hourly
+  times:
+    - "09:00"
+    - "14:00"
+    - "17:00"
+
+triggers:
+  - type: manual
+    name: manual_run
+  - type: scheduled
+    cron: "0 9,14,17 * * *"
+
+conditions:
+  - field: Owner
+    operator: is_empty
+    value: null
+
+actions:
+  - type: assign_owner
+    method: round_robin
+    owners:
+      - sales1@company.com
+      - sales2@company.com
+      - sales3@company.com
+    notify: true
+
+notifications:
+  on_assignment:
+    email: true
+    subject: "New Pipeline Assigned"
+    message: "You have been assigned a new pipeline: {{pipeline.name}}"
+
+settings:
+  max_assignments_per_run: 50
+  skip_if_no_match: true
+  log_assignments: true

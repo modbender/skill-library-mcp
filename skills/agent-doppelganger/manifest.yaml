@@ -1,0 +1,135 @@
+skill:
+  id: agent-doppelganger
+  name: Agent Doppelgänger (ADG)
+  version: 0.1.0
+  visibility: public
+  maturity: experimental
+  description: >
+    Policy-bounded identity delegate that communicates on behalf of the user within formally defined authority, confidence, and risk constraints.
+  author:
+    name: OpenClaw Community
+    contact: security@openclaw.local
+  license: Apache-2.0
+  tags:
+    - identity
+    - delegation
+    - communication
+    - safety-critical
+    - autonomy
+  runtime:
+    type: long_running
+    requires_persistence: true
+    isolation: strict
+    entrypoint:
+      handler: adg.main
+      language: python
+      python_version: ">=3.10"
+  permissions:
+    filesystem:
+      read:
+        - ~/.openclaw/adg/profile/*
+        - ~/.openclaw/adg/policies/*
+        - ~/.openclaw/adg/memory/*
+      write:
+        - ~/.openclaw/adg/memory/*
+        - ~/.openclaw/adg/audit/*
+    network:
+      outbound: false
+    execution:
+      shell: false
+  channels:
+    supported:
+      - email
+      - discord
+      - slack
+      - whatsapp
+    mode: intercept
+    default_action: draft_only
+  interfaces:
+    inbound_events:
+      - message.received
+      - message.edited
+      - channel.connected
+      - channel.disconnected
+    outbound_actions:
+      - message.send
+      - message.draft
+      - message.block
+      - user.notify
+  configuration:
+    schema:
+      profile_path:
+        type: string
+        required: true
+        description: Path to identity profile directory
+      policy_path:
+        type: string
+        required: true
+        description: Path to authority & constraint policies
+      confidence:
+        min_global:
+          type: float
+          default: 0.82
+        draft_threshold:
+          type: float
+          default: 0.70
+      escalation:
+        on_policy_violation:
+          type: string
+          enum: [block, notify]
+          default: block
+        on_low_confidence:
+          type: string
+          enum: [draft_only, notify]
+          default: draft_only
+      watermark:
+        enabled:
+          type: boolean
+          default: true
+      kill_switch:
+        enabled:
+          type: boolean
+          default: true
+  safety:
+    guarantees:
+      - no_commitment_authority
+      - no_financial_actions
+      - no_legal_representation
+      - no_self_learning_without_review
+    enforcement: hard
+  memory:
+    strategy: distilled
+    retention_days: 30
+    redact_sensitive: true
+  audit:
+    enabled: true
+    path: ~/.openclaw/adg/audit/
+    log_level: decision
+    replayable: true
+  lifecycle:
+    startup:
+      - load_identity_profile
+      - load_policies
+      - calibrate_confidence
+    shutdown:
+      - flush_audit_logs
+      - lock_memory
+  hooks:
+    pre_intent:
+      - policy_gate
+    post_intent:
+      - confidence_estimator
+    pre_send:
+      - verifier
+      - watermarker
+    post_send:
+      - audit_logger
+  commands:
+    - name: adg.status
+      description: Show current authority, confidence, and channel state
+    - name: adg.pause
+      description: Disable all outbound actions
+    - name: adg.resume
+      description: Resume operation
+    - name: adg.review
+      description: Review pending drafts and violations

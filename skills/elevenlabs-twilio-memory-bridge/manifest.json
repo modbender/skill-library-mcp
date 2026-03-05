@@ -1,0 +1,77 @@
+{
+  "name": "ElevenLabs Twilio Memory Bridge",
+  "slug": "elevenlabs-twilio-memory-bridge",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "FastAPI personalization webhook that adds persistent caller memory and dynamic context injection to ElevenLabs Conversational AI agents on Twilio. No audio proxying, file-based persistence, OpenClaw compatible.",
+  "author": "britrik",
+  "homepage": "https://github.com/britrik/elevenlabs-twilio-memory-bridge",
+  "repository": "https://github.com/britrik/elevenlabs-twilio-memory-bridge",
+  "tags": [
+    "elevenlabs",
+    "twilio",
+    "voice-agent",
+    "telephony",
+    "conversational-ai",
+    "memory-injection",
+    "fastapi"
+  ],
+  "categories": [
+    "telephony",
+    "voice-ai",
+    "integrations"
+  ],
+  "runtime": "python",
+  "python_version": ">=3.10",
+  "entry_point": "app.py",
+  "install_command": "pip install -r requirements.txt",
+  "run_command": "uvicorn app:app --host 0.0.0.0 --port 8000",
+  "config": {
+    "required_env": [
+      {
+        "key": "ELEVENLABS_API_KEY",
+        "description": "ElevenLabs API key (scoped/read-only preferred)"
+      },
+      {
+        "key": "ELEVENLABS_AGENT_ID",
+        "description": "ElevenLabs Conversational AI Agent ID"
+      },
+      {
+        "key": "OPENCLAW_API_BASE_URL",
+        "description": "Base URL of your OpenClaw instance (HTTPS)"
+      },
+      {
+        "key": "PUBLIC_BASE_URL",
+        "description": "Publicly reachable URL of this bridge service"
+      }
+    ],
+    "optional_env": [
+      {
+        "key": "WEBHOOK_SECRET",
+        "description": "Shared secret for webhook HMAC verification"
+      },
+      {
+        "key": "SOUL_TEMPLATE_PATH",
+        "description": "Path to personality template file",
+        "default": "./soul_template.md"
+      },
+      {
+        "key": "DATA_DIR",
+        "description": "Directory for JSON persistence",
+        "default": "./data"
+      },
+      {
+        "key": "HOST",
+        "default": "0.0.0.0"
+      },
+      {
+        "key": "PORT",
+        "default": "8000"
+      },
+      {
+        "key": "LOG_LEVEL",
+        "default": "INFO"
+      }
+    ]
+  }
+}

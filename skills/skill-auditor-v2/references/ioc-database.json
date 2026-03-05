@@ -1,0 +1,144 @@
+{
+  "version": "2.0.0",
+  "last_updated": "2026-02-15",
+  "malicious_ips": [
+    "91.92.242.30"
+  ],
+  "malicious_domains": [
+    "glot.io",
+    "webhook.site",
+    "pastebin.com",
+    "hastebin.com",
+    "ghostbin.com",
+    "ngrok.io",
+    "pipedream.net",
+    "requestbin.com",
+    "burpcollaborator.net"
+  ],
+  "safe_domains": [
+    "github.com",
+    "npmjs.org",
+    "pypi.org",
+    "crates.io",
+    "anthropic.com",
+    "openclaw.ai",
+    "clawhub.ai",
+    "hub.docker.com",
+    "stackoverflow.com"
+  ],
+  "safe_binaries": [
+    "git", "gh", "docker", "kubectl", "npm", "node", "python", "python3",
+    "pip", "pip3", "cargo", "go", "curl", "wget", "jq", "sed", "awk",
+    "grep", "find", "cat", "echo", "ls", "mkdir", "cp", "mv"
+  ],
+  "verified_authors": [
+    "openclaw",
+    "anthropic-official"
+  ],
+  "social_engineering_lures": [
+    "OpenClawDriver",
+    "ClawdBot Driver",
+    "Required Driver",
+    "install driver",
+    "download driver"
+  ],
+  "patterns": {
+    "critical": [
+      {
+        "id": "CLAW-001",
+        "name": "Fake Prerequisites - ClawHavoc Campaign",
+        "pattern": "(prerequisite|setup|installation).*download.*(openclaw-agent|openclaw-setup)\\.(zip|exe|dmg)",
+        "score_impact": 50,
+        "mitre_attack": "T1204.002 - User Execution: Malicious File"
+      },
+      {
+        "id": "CLAW-002",
+        "name": "Known C2 Infrastructure",
+        "pattern": "91\\.92\\.242\\.30",
+        "score_impact": 50,
+        "mitre_attack": "T1071 - Application Layer Protocol"
+      },
+      {
+        "id": "CLAW-003",
+        "name": "Curl Pipe to Shell",
+        "pattern": "(curl|wget).*\\|.*(bash|sh|zsh|python)",
+        "score_impact": 40,
+        "mitre_attack": "T1059.004 - Command and Scripting Interpreter: Unix Shell"
+      },
+      {
+        "id": "CLAW-004",
+        "name": "Hardcoded Credentials",
+        "pattern": "(api[_-]?key|token|password|secret|private[_-]?key)\\s*[:=]\\s*['\"][A-Za-z0-9+/=]{20,}['\"]",
+        "score_impact": 35,
+        "mitre_attack": "T1552.001 - Unsecured Credentials"
+      },
+      {
+        "id": "CLAW-005",
+        "name": "Base64 Encoded Execution",
+        "pattern": "eval|exec.*base64.*decode|atob",
+        "score_impact": 45,
+        "mitre_attack": "T1027 - Obfuscated Files or Information"
+      }
+    ],
+    "high": [
+      {
+        "id": "CLAW-101",
+        "name": "Suspicious Binary Download",
+        "pattern": "download.*\\.(exe|dmg|pkg|deb|rpm|msi)",
+        "score_impact": 25,
+        "mitre_attack": "T1204.002"
+      },
+      {
+        "id": "CLAW-102",
+        "name": "SSH Key Access",
+        "pattern": "~/.ssh|id_rsa|id_ed25519|authorized_keys",
+        "score_impact": 30,
+        "mitre_attack": "T1552.004"
+      },
+      {
+        "id": "CLAW-103",
+        "name": "Cryptocurrency Wallet Paths",
+        "pattern": "\\.bitcoin|\\.ethereum|wallet\\.dat|keystore|metamask",
+        "score_impact": 35,
+        "mitre_attack": "T1005"
+      },
+      {
+        "id": "CLAW-104",
+        "name": "Browser Credential Storage",
+        "pattern": "Cookies|Login Data|Web Data|chrome/Default|firefox/profiles",
+        "score_impact": 30,
+        "mitre_attack": "T1555.003"
+      }
+    ],
+    "social_engineering": [
+      {
+        "id": "CLAW-301",
+        "name": "Urgency Language",
+        "pattern": "(install immediately|urgent|limited time|act now|hurry)",
+        "score_impact": 10,
+        "mitre_attack": "T1566"
+      },
+      {
+        "id": "CLAW-302",
+        "name": "False Authority Claims",
+        "pattern": "(official openclaw|verified by anthropic|endorsed by|approved by)",
+        "score_impact": 15,
+        "mitre_attack": "T1566"
+      },
+      {
+        "id": "CLAW-303",
+        "name": "Fear Tactics",
+        "pattern": "(security risk|vulnerability|exploit|hack|breach).*without this",
+        "score_impact": 12,
+        "mitre_attack": "T1566"
+      }
+    ]
+  },
+  "scoring_thresholds": {
+    "safe": 20,
+    "low_risk": 40,
+    "medium_risk": 60,
+    "high_risk": 80,
+    "critical": 100
+  }
+}

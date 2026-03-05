@@ -1,0 +1,42 @@
+{
+  "mappings": [
+    {
+      "name": "work-to-personal",
+      "targetAccount": "target@example.com",
+      "targetCalendarId": "primary",
+      "sources": [
+        {
+          "account": "source@example.com",
+          "calendarId": "primary"
+        }
+      ],
+      "lookaheadDays": 1,
+      "allDayMode": "ignore",
+      "overlapPolicy": "skip"
+    }
+  ],
+  "hold": {
+    "summary": "Busy",
+    "visibility": "private",
+    "transparency": "busy",
+    "notifications": "none",
+    "reminders": "none"
+  },
+  "metadata": {
+    "format": "SYNCV1",
+    "encoding": "base64url(json)",
+    "fields": ["srcAccount", "srcCalendar", "eventId", "start", "end", "title"]
+  },
+  "scheduling": {
+    "reconcileCron": "15 2 * * *",
+    "daytimeCron": "*/20 8-18 * * 1-5",
+    "driftWindowDays": 30,
+    "watchIntervalSeconds": 900
+  },
+  "safety": {
+    "dryRun": true,
+    "maxChangesPerRun": 100,
+    "excludeIfSummaryMatches": ["^OOO", "^PTO"],
+    "excludeIfDescriptionPrefix": ["MANUAL:"]
+  }
+}

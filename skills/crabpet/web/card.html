@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=480, initial-scale=1.0">
+<title>CrabPet Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 480px; height: 640px; overflow: hidden;
+    background: #0a0a1a;
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    color: #ccc;
+  }
+  .card {
+    width: 480px; height: 640px; position: relative;
+    background: linear-gradient(170deg, #0d0d2a 0%, #0a0a1a 40%, #111128 100%);
+    overflow: hidden;
+  }
+  /* 顶部装饰线 */
+  .top-bar {
+    height: 4px;
+    background: linear-gradient(90deg, #FF6B4A, #FFD700, #FF6B4A);
+  }
+  .header {
+    text-align: center; padding: 12px 0 8px;
+  }
+  .header h1 {
+    font-size: 18px; font-weight: 700; letter-spacing: 6px;
+    color: #FF6B4A;
+    text-shadow: 0 0 20px rgba(255,107,74,0.3);
+  }
+  /* 精灵画布区 */
+  .sprite-area {
+    width: 260px; height: 180px; margin: 0 auto;
+    position: relative;
+    background: radial-gradient(ellipse at center, rgba(255,107,74,0.06) 0%, transparent 70%);
+    border-radius: 12px;
+  }
+  #spriteCanvas {
+    display: block; margin: 0 auto;
+    image-rendering: pixelated;
+  }
+  /* 名称 */
+  .pet-name {
+    text-align: center; font-size: 22px; font-weight: 700;
+    color: #FF6B4A; margin: 8px 0 6px;
+    text-shadow: 0 0 15px rgba(255,107,74,0.2);
+  }
+  /* 标签组 */
+  .tags {
+    display: flex; justify-content: center; gap: 8px; margin: 6px 0 12px;
+  }
+  .tag {
+    padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 400;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(4px);
+  }
+  .tag.lv { color: #FF6B4A; border-color: rgba(255,107,74,0.4); }
+  .tag.pers { color: #87CEEB; border-color: rgba(135,206,235,0.3); }
+  .tag.mood { color: #AABBDD; border-color: rgba(170,187,221,0.3); }
+  /* EXP 条 */
+  .xp-section {
+    padding: 0 36px; margin-bottom: 12px;
+  }
+  .xp-header {
+    display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px;
+  }
+  .xp-track {
+    height: 10px; border-radius: 5px;
+    background: #1a1a2e;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .xp-fill {
+    height: 100%; border-radius: 5px;
+    background: linear-gradient(90deg, #FF6B4A, #FFD700);
+    box-shadow: 0 0 8px rgba(255,107,74,0.4);
+    transition: width 0.3s;
+  }
+  /* 数据面板 */
+  .stats-panel {
+    margin: 0 30px 10px; padding: 12px 0;
+    background: rgba(17,17,40,0.8);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    display: flex;
+    backdrop-filter: blur(4px);
+  }
+  .stat-col {
+    flex: 1; text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-col:last-child { border-right: none; }
+  .stat-val { font-size: 16px; font-weight: 700; color: #fff; }
+  .stat-label { font-size: 10px; color: #666; margin-top: 2px; }
+  /* 个性雷达 */
+  .radar-section {
+    padding: 0 36px; margin-bottom: 8px;
+  }
+  .radar-title { font-size: 11px; color: #555; margin-bottom: 6px; }
+  .radar-row {
+    display: flex; align-items: center; margin: 3px 0;
+  }
+  .radar-label { width: 36px; font-size: 11px; color: #777; }
+  .radar-track {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: #1a1a2e; margin: 0 8px;
+    overflow: hidden;
+  }
+  .radar-fill { height: 100%; border-radius: 3px; }
+  .radar-fill.coder { background: #4FC3F7; }
+  .radar-fill.writer { background: #CE93D8; }
+  .radar-fill.analyst { background: #FFD54F; }
+  .radar-fill.creative { background: #81C784; }
+  .radar-fill.hustle { background: #FF6B4A; }
+  .radar-val { width: 28px; font-size: 10px; color: #555; text-align: right; }
+  /* 成就 */
+  .achievements {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    padding: 0 30px; margin-bottom: 10px;
+  }
+  .ach {
+    padding: 2px 8px; font-size: 11px; border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #aaa;
+  }
+  /* 底部 */
+  .footer {
+    position: absolute; bottom: 0; width: 100%;
+    text-align: center; padding: 10px;
+    font-size: 11px; color: #333;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer span { color: #FF6B4A; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top-bar"></div>
+  <div class="header"><h1>CRABPET CARD</h1></div>
+
+  <div class="sprite-area">
+    <canvas id="spriteCanvas" width="260" height="180"></canvas>
+  </div>
+
+  <div class="pet-name" id="petName">CrabPet</div>
+  <div class="tags" id="tags"></div>
+
+  <div class="xp-section">
+    <div class="xp-header">
+      <span>EXP</span>
+      <span id="xpText">0/0</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+  </div>
+
+  <div class="stats-panel" id="statsPanel"></div>
+
+  <div class="radar-section">
+    <div class="radar-title">个性雷达</div>
+    <div id="radarBars"></div>
+  </div>
+
+  <div class="achievements" id="achList"></div>
+
+  <div class="footer">
+    <span>clawhub install crabpet</span>
+  </div>
+</div>
+
+<script>
+// ── Sprite Data ──
+const SPRITES = {
+  baby: {pixels:['........','..RR.RR.','..RRRR..','.ROWWOR.','.ROOOR..','..RRRR..','.R.RR.R.','........'],
+    colorMap:{R:'#D4432F',O:'#FF7B54',W:'#FFFFFF'}},
+  teen: {pixels:['............','..RR....RR..','..RR....RR..','.RRRR..RRRR.','.ROOOOOROOR.','.ROOOOOOOR..','.ROWOOOWOR..','.ROOOOOOOR..','..RRRRRRRR..','..RR.RR.RR..','..R..RR..R..','............'],
+    colorMap:{R:'#D4432F',O:'#FF7B54',W:'#FFFFFF'}},
+  adult: {pixels:['................','...RR......RR...','...RR......RR...','..RRRR...RRRR...','..RRRRR.RRRRR...','.RROOOOOOOOORR..','.RROOOOOOOORR...','.RROWOOOOWOORRR.','.RROOOOOOOOORR..','.RROOMMMMOORRR..','..RRRRRRRRRRRR..','..RRRRRRRRRRR...','...RR.RRRR.RR...','...R..RRRR..R...','......RRRR......','................'],
+    colorMap:{R:'#D4432F',O:'#FF7B54',W:'#FFFFFF',M:'#FF4757'}},
+  legend: {pixels:['....G......G....','...GRR.GG.RRG...','...GRR.GG.RRG...','..GRRRRGGRRRR...','..GRRRRRRRRRRG..','.GRROOOOOOOORRG.','.GRROOOOOOORRG..','.GRROWOOOOWOORG.','.GRROOOOOOOORGG.','.GRROOMMMMOORRG.','..GRRRRRRRRRRRG.','..GRRRRRRRRRRG..','...GR.GRRRG.RG..','...G..GRRG..G...','......GRRG......','......G..G......'],
+    colorMap:{R:'#D4432F',O:'#FF7B54',W:'#FFFFFF',M:'#FF4757',G:'#FFD700'}}
+};
+const FROZEN_MAP = {R:'#5B9BD5',O:'#A0C4E8',W:'#E8E8E8',M:'#7BB8DE',G:'#87CEEB'};
+const DUSTY_MAP = {R:'#6B5B4F',O:'#8B7B6F',W:'#CCCCCC',M:'#7B6B5F',G:'#A89880'};
+const FACE_DATA = {
+  happy: {pixels:['........','..W..W..','........','...MM...','........'],colorMap:{W:'#FFFFFF',M:'#FF4757'},offset:[3,3]},
+  bored: {pixels:['........','..WW.WW.','..W..W..','...MM...','........'],colorMap:{W:'#CCCCCC',M:'#999999'},offset:[3,3]},
+  sleepy: {pixels:['........','..WW.WW.','........','...M....','........'],colorMap:{W:'#AAAAAA',M:'#CC8888'},offset:[3,3]},
+  excited: {pixels:['........','..WW.WW.','..WW.WW.','..MMMM..','..MMMM..','........'],colorMap:{W:'#FFFFFF',M:'#FF4757'},offset:[3,3]}
+};
+const ACC_DATA = {
+  glasses: {pixels:['BGGGBGGG','BGGGBGGG'],colorMap:{B:'#333333',G:'#87CEEB'},offset:[2,3]},
+  hat: {pixels:['..BBBB..','.BBBBBB.','BBBBBBBB','..TTTT..','..TTTT..'],colorMap:{B:'#1a1a2e',T:'#FFD700'},offset:[3,-2]},
+  scarf: {pixels:['SSSSSSSS','.SSSSSS.','..SS....','..SS....','..SS....'],colorMap:{S:'#E74C3C'},offset:[2,8]},
+  coffee: {pixels:['.SS.','BBBB','BCWB','BCWB','BBBB'],colorMap:{B:'#8B4513',C:'#6F3E1F',W:'#D4A76A',S:'#DDD'},offset:[10,5]},
+  lightning: {pixels:['..LL','.LL.','LLLL','.LL.','LL..'],colorMap:{L:'#FFD700'},offset:[12,1]}
+};
+const MOOD_FACE = {energetic:'happy',bored:'bored',slacking:'sleepy',hibernating:'sleepy',dusty:'sleepy',frozen:'sleepy'};
+const PERS_ACC = {coder:'glasses',writer:'scarf',analyst:'hat',hustle:'coffee'};
+const ACHIEVEMENTS = {
+  first_chat:{n:'初次见面',e:'🥚'},day_3:{n:'三日之缘',e:'🌱'},day_7:{n:'七日之约',e:'🔥'},
+  day_30:{n:'铁人虾',e:'🏆'},day_100:{n:'百日传说',e:'👑'},night_owl:{n:'夜猫子',e:'🦉'},
+  code_master:{n:'代码大师',e:'💻'},wordsmith:{n:'妙笔生花',e:'✍️'},data_wizard:{n:'数据巫师',e:'📊'},
+  chatterbox:{n:'话痨虾',e:'💬'},comeback:{n:'浪子回头',e:'🔄'}
+};
+
+function drawSprite(ctx, pixels, cmap, ox, oy, ps) {
+  pixels.forEach((row, ri) => {
+    [...row].forEach((ch, ci) => {
+      if (ch !== '.' && cmap[ch]) {
+        ctx.fillStyle = cmap[ch];
+        ctx.fillRect(ox + ci * ps, oy + ri * ps, ps, ps);
+      }
+    });
+  });
+}
+
+function renderCard(data) {
+  // Name
+  document.getElementById('petName').textContent = data.name || 'CrabPet';
+
+  // Tags
+  const tagsEl = document.getElementById('tags');
+  tagsEl.innerHTML = `
+    <span class="tag lv">Lv.${data.level}</span>
+    <span class="tag pers">${data.pers_label_text || ''}</span>
+    <span class="tag mood">${data.mood_label_text || ''}</span>`;
+
+  // XP
+  const pct = data.xp_next > 0 ? Math.min(100, data.xp / data.xp_next * 100) : 0;
+  document.getElementById('xpText').textContent = `${data.xp}/${data.xp_next}`;
+  document.getElementById('xpFill').style.width = pct + '%';
+
+  // Stats
+  document.getElementById('statsPanel').innerHTML = `
+    <div class="stat-col"><div class="stat-val">${data.total_days}</div><div class="stat-label">活跃天数</div></div>
+    <div class="stat-col"><div class="stat-val">${data.streak}</div><div class="stat-label">连续打卡</div></div>
+    <div class="stat-col"><div class="stat-val">${data.born || '—'}</div><div class="stat-label">出生日期</div></div>`;
+
+  // Radar
+  const dims = {coder:'技术',writer:'文艺',analyst:'学术',creative:'创意',hustle:'勤奋'};
+  const pers = data.personality || {};
+  let radarHTML = '';
+  Object.entries(dims).forEach(([k, label]) => {
+    const v = pers[k] || 0;
+    radarHTML += `<div class="radar-row">
+      <span class="radar-label">${label}</span>
+      <div class="radar-track"><div class="radar-fill ${k}" style="width:${v*100}%"></div></div>
+      <span class="radar-val">${v.toFixed(1)}</span></div>`;
+  });
+  document.getElementById('radarBars').innerHTML = radarHTML;
+
+  // Achievements
+  const achs = data.achievements || [];
+  document.getElementById('achList').innerHTML = achs
+    .filter(a => ACHIEVEMENTS[a])
+    .map(a => `<span class="ach">${ACHIEVEMENTS[a].e} ${ACHIEVEMENTS[a].n}</span>`)
+    .join('');
+
+  // ── Sprite Canvas ──
+  const canvas = document.getElementById('spriteCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const stage = data.stage || 'baby';
+  const mood = data.mood || 'energetic';
+  const sprite = SPRITES[stage] || SPRITES.baby;
+  let cmap = Object.assign({}, sprite.colorMap);
+  if (mood === 'frozen') Object.assign(cmap, FROZEN_MAP);
+  else if (mood === 'dusty' || mood === 'hibernating') Object.assign(cmap, DUSTY_MAP);
+
+  const rows = sprite.pixels;
+  const cols = Math.max(...rows.map(r => r.length));
+  const ps = Math.min(Math.floor(160 / cols), Math.floor(140 / rows.length));
+  const bw = cols * ps, bh = rows.length * ps;
+  const ox = (canvas.width - bw) / 2;
+  const oy = (canvas.height - bh) / 2;
+
+  drawSprite(ctx, rows, cmap, ox, oy, ps);
+
+  // Face
+  const face = FACE_DATA[MOOD_FACE[mood] || 'happy'];
+  if (face) {
+    const fo = face.offset || [0,0];
+    drawSprite(ctx, face.pixels, face.colorMap, ox + fo[0]*ps, oy + fo[1]*ps, ps);
+  }
+
+  // Accessory
+  const accName = PERS_ACC[data.primary_pers || ''];
+  const acc = accName ? ACC_DATA[accName] : null;
+  if (acc) {
+    const ao = acc.offset || [0,0];
+    drawSprite(ctx, acc.pixels, acc.colorMap, ox + ao[0]*ps, oy + ao[1]*ps, ps);
+  }
+
+  // Sparkle effect for energetic
+  if (mood === 'energetic') {
+    ctx.fillStyle = '#FFD700';
+    [[ox-12,oy-8],[ox+bw+6,oy-4],[ox-8,oy+bh+2],[ox+bw+10,oy+bh-6]].forEach(([sx,sy]) => {
+      ctx.fillRect(sx, sy, 2, 6); ctx.fillRect(sx-2, sy+2, 6, 2);
+    });
+  }
+  // Zzz for hibernating
+  if (mood === 'hibernating') {
+    ctx.fillStyle = '#AABBDD'; ctx.font = '14px sans-serif';
+    ctx.fillText('z', ox+bw+4, oy+8);
+    ctx.fillText('Z', ox+bw+14, oy-2);
+    ctx.fillText('Z', ox+bw+26, oy-14);
+  }
+  // Ice for frozen
+  if (mood === 'frozen') {
+    ctx.fillStyle = 'rgba(173,216,230,0.3)';
+    ctx.fillRect(ox-4, oy-4, bw+8, bh+8);
+  }
+}
+
+// ── PET_DATA injected by pet_engine.py ──
+const PET_DATA = /*PET_DATA_JSON*/{"name":"CrabPet","level":1,"stage":"baby","mood":"energetic"}/*END_PET_DATA*/;
+renderCard(PET_DATA);
+</script>
+</body>
+</html>

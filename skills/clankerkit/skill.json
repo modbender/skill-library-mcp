@@ -1,0 +1,748 @@
+{
+  "$schema": "https://raw.githubusercontent.com/OpenClaw/skills/main/schema.json",
+  "name": "clankerkit",
+  "version": "0.2.0",
+  "description": "ClankerKit — Autonomous wallet operations for AI agents on Monad — swap, stake, deploy, trade memecoins, and manage spending policies",
+  "author": "ClankerKit Team",
+  "tools": [
+    {
+      "name": "get_wallet_info",
+      "description": "Get current wallet information including balance and policy state",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_token_balance",
+      "description": "Get the ERC20 token balance of the agent wallet",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token symbol (WMON, USDC, DAK, CHOG, YAKI) or contract address"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      }
+    },
+    {
+      "name": "send_tokens",
+      "description": "Send native MON tokens to an address",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Recipient address"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount in wei"
+          }
+        },
+        "required": [
+          "to",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "send_token",
+      "description": "Send ERC20 tokens to an address",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token contract address"
+          },
+          "to": {
+            "type": "string",
+            "description": "Recipient address"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount in smallest unit"
+          }
+        },
+        "required": [
+          "token",
+          "to",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "execute_transaction",
+      "description": "Execute an arbitrary transaction on a smart contract",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target contract address"
+          },
+          "value": {
+            "type": "string",
+            "description": "Native value to send (in wei)",
+            "default": "0"
+          },
+          "data": {
+            "type": "string",
+            "description": "Encoded calldata"
+          }
+        },
+        "required": [
+          "target",
+          "data"
+        ]
+      }
+    },
+    {
+      "name": "swap_tokens",
+      "description": "Swap tokens on Monad via Kuru DEX aggregator. Supports any token by symbol (MON, USDC, WMON, CHOG, DAK, AUSD, WETH, WBTC) or by contract address (0x...). When the user provides a contract address (CA), pass it directly as tokenIn or tokenOut. The amount should be a human-readable number (e.g. '0.01' for 0.01 MON) \u2014 it will be converted to wei automatically based on the input token's decimals.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tokenIn": {
+            "type": "string",
+            "description": "Source token: symbol (MON, USDC, WMON, etc.) or contract address (0x...)"
+          },
+          "tokenOut": {
+            "type": "string",
+            "description": "Target token: symbol (MON, USDC, WMON, etc.) or contract address (0x...)"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount to swap in human-readable form (e.g. '0.01' for 0.01 tokens). Converted to wei automatically."
+          },
+          "slippage": {
+            "type": "number",
+            "description": "Slippage tolerance in basis points (default: 50 = 0.5%)",
+            "default": 50
+          }
+        },
+        "required": [
+          "tokenIn",
+          "tokenOut",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "get_swap_quote",
+      "description": "Get a swap quote without executing. Supports any token by symbol or contract address (0x...).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tokenIn": {
+            "type": "string",
+            "description": "Source token: symbol or contract address (0x...)"
+          },
+          "tokenOut": {
+            "type": "string",
+            "description": "Target token: symbol or contract address (0x...)"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount in human-readable form (e.g. '0.01'). Converted to wei automatically."
+          }
+        },
+        "required": [
+          "tokenIn",
+          "tokenOut",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "stake_mon",
+      "description": "Stake MON tokens with a validator to earn rewards",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Amount of MON to stake in wei"
+          },
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional, uses default if not specified)"
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "unstake_mon",
+      "description": "Unstake MON tokens from a validator (starts withdrawal process)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Amount to unstake in wei"
+          },
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional)"
+          },
+          "withdrawId": {
+            "type": "number",
+            "description": "Withdrawal ID (default: 0)",
+            "default": 0
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "withdraw_stake",
+      "description": "Withdraw unstaked MON after withdrawal delay (1 epoch) has passed",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional)"
+          },
+          "withdrawId": {
+            "type": "number",
+            "description": "Withdrawal ID (default: 0)",
+            "default": 0
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "claim_staking_rewards",
+      "description": "Claim accumulated staking rewards",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional)"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "compound_rewards",
+      "description": "Compound (re-stake) accumulated staking rewards",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional)"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_staking_info",
+      "description": "Get staking delegation info for the agent's wallet",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "validatorId": {
+            "type": "number",
+            "description": "Validator ID (optional)"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_policy",
+      "description": "Get current spending policy limits and usage",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "update_daily_limit",
+      "description": "Update the daily spending limit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "newLimit": {
+            "type": "string",
+            "description": "New daily limit in wei"
+          }
+        },
+        "required": [
+          "newLimit"
+        ]
+      }
+    },
+    {
+      "name": "pay_for_service",
+      "description": "Pay for an x402-enabled API endpoint",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "The API endpoint URL"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Payment amount in USDC"
+          }
+        },
+        "required": [
+          "endpoint",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "register_agent",
+      "description": "Register this agent on ERC-8004 identity registry",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Agent name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Agent description"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ]
+      }
+    },
+    {
+      "name": "get_kuru_markets",
+      "description": "List known Kuru CLOB orderbook markets on Monad mainnet",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_order_book",
+      "description": "Fetch the live L2 order book (bids and asks) for a Kuru CLOB market",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "marketAddress": {
+            "type": "string",
+            "description": "Orderbook contract address (e.g. 0x065C9d28E428A0db40191a54d33d5b7c71a9C394)"
+          }
+        },
+        "required": [
+          "marketAddress"
+        ]
+      }
+    },
+    {
+      "name": "get_market_price",
+      "description": "Get best bid, ask, and mid price for a Kuru CLOB market",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "marketAddress": {
+            "type": "string",
+            "description": "Orderbook contract address"
+          }
+        },
+        "required": [
+          "marketAddress"
+        ]
+      }
+    },
+    {
+      "name": "kuru_market_order",
+      "description": "Place a market (IOC) order on a Kuru CLOB market. Agent EOA must hold the tokens.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "marketAddress": {
+            "type": "string",
+            "description": "Orderbook contract address"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in human-readable float (quote for buy, base for sell)"
+          },
+          "isBuy": {
+            "type": "boolean",
+            "description": "True for a buy order, false for a sell order"
+          },
+          "minAmountOut": {
+            "type": "number",
+            "description": "Minimum acceptable output (0 = no min)",
+            "default": 0
+          },
+          "slippageBps": {
+            "type": "number",
+            "description": "Slippage in basis points",
+            "default": 100
+          }
+        },
+        "required": [
+          "marketAddress",
+          "amount",
+          "isBuy"
+        ]
+      }
+    },
+    {
+      "name": "kuru_limit_order",
+      "description": "Place a limit (GTC) order on a Kuru CLOB market",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "marketAddress": {
+            "type": "string",
+            "description": "Orderbook contract address"
+          },
+          "price": {
+            "type": "number",
+            "description": "Order price in quote asset (human-readable float)"
+          },
+          "size": {
+            "type": "number",
+            "description": "Order size in base asset (human-readable float)"
+          },
+          "isBuy": {
+            "type": "boolean",
+            "description": "True for a bid, false for an ask"
+          },
+          "postOnly": {
+            "type": "boolean",
+            "description": "Reject if the order would immediately cross the spread",
+            "default": false
+          }
+        },
+        "required": [
+          "marketAddress",
+          "price",
+          "size",
+          "isBuy"
+        ]
+      }
+    },
+    {
+      "name": "cancel_kuru_orders",
+      "description": "Cancel one or more open orders on a Kuru CLOB market",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "marketAddress": {
+            "type": "string",
+            "description": "Orderbook contract address"
+          },
+          "orderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of order ID strings to cancel"
+          }
+        },
+        "required": [
+          "marketAddress",
+          "orderIds"
+        ]
+      }
+    },
+    {
+      "name": "kyber_swap",
+      "description": "Execute a cross-chain swap on Ethereum/Polygon/Arbitrum/Optimism/Base/BSC/Avalanche via KyberSwap aggregator. No API key needed.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "description": "Target chain: ethereum, polygon, arbitrum, optimism, base, bsc, avalanche"
+          },
+          "tokenIn": {
+            "type": "string",
+            "description": "Source token address on the target chain"
+          },
+          "tokenOut": {
+            "type": "string",
+            "description": "Destination token address on the target chain"
+          },
+          "amountIn": {
+            "type": "string",
+            "description": "Amount to sell in the token's smallest unit (wei)"
+          },
+          "slippageBps": {
+            "type": "number",
+            "description": "Slippage tolerance in bps (default 50 = 0.5%)",
+            "default": 50
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Recipient address (defaults to agent EOA)"
+          }
+        },
+        "required": [
+          "chain",
+          "tokenIn",
+          "tokenOut",
+          "amountIn"
+        ]
+      }
+    },
+    {
+      "name": "zerox_swap",
+      "description": "Execute a cross-chain swap via 0x Swap API v2. Requires ZEROX_API_KEY env var.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "description": "Target chain: ethereum, polygon, arbitrum, optimism, base, bsc, avalanche"
+          },
+          "tokenIn": {
+            "type": "string",
+            "description": "Source token address"
+          },
+          "tokenOut": {
+            "type": "string",
+            "description": "Destination token address"
+          },
+          "amountIn": {
+            "type": "string",
+            "description": "Amount to sell in smallest unit"
+          },
+          "slippageBps": {
+            "type": "number",
+            "description": "Slippage tolerance in bps (default 50)",
+            "default": 50
+          }
+        },
+        "required": [
+          "chain",
+          "tokenIn",
+          "tokenOut",
+          "amountIn"
+        ]
+      }
+    },
+    {
+      "name": "get_meme_tokens",
+      "description": "Get live price metrics for all known Monad memecoins (DAK, CHOG, YAKI) from Kuru CLOB orderbooks",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_token_price",
+      "description": "Get live price metrics for a specific Monad token by symbol or address",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token symbol (DAK, CHOG, YAKI) or contract address"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      }
+    },
+    {
+      "name": "smart_trade",
+      "description": "Evaluate or execute an autonomous trading strategy for a Monad memecoin. Strategies: dca, momentum, scalp, hodl.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token symbol (DAK, CHOG, YAKI)"
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "Strategy type: dca, momentum, scalp, hodl"
+          },
+          "budgetMon": {
+            "type": "number",
+            "description": "Total budget in MON (human-readable float)"
+          },
+          "stopLoss": {
+            "type": "number",
+            "description": "Stop-loss as a fraction (0.1 = -10% from entry)",
+            "default": 0.1
+          },
+          "takeProfit": {
+            "type": "number",
+            "description": "Take-profit as a fraction (0.3 = +30% from entry)",
+            "default": 0.3
+          },
+          "dcaIntervals": {
+            "type": "number",
+            "description": "For DCA strategy: number of equal-sized purchases",
+            "default": 5
+          },
+          "momentumThreshold": {
+            "type": "number",
+            "description": "For momentum strategy: minimum 24h price change fraction (0.05 = +5%)",
+            "default": 0.05
+          },
+          "autoExecute": {
+            "type": "boolean",
+            "description": "If true, actually place the order. If false (default), dry-run only.",
+            "default": false
+          }
+        },
+        "required": [
+          "token",
+          "strategyType",
+          "budgetMon"
+        ]
+      }
+    },
+    {
+      "name": "create_policy",
+      "description": "Create a spending policy for the agent wallet. Sets daily and weekly MON limits, optional token/contract allowlists, and optional approval threshold. Must be called once before the wallet can execute guarded transactions.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dailyLimit": {
+            "type": "string",
+            "description": "Maximum MON spend per day (human-readable, e.g. '1.0')"
+          },
+          "weeklyLimit": {
+            "type": "string",
+            "description": "Maximum MON spend per week (human-readable). Defaults to 7x dailyLimit if omitted."
+          },
+          "allowedTokens": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional list of ERC20 token addresses the agent is allowed to transfer. Empty = all tokens allowed."
+          },
+          "allowedContracts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional list of contract addresses the agent is allowed to call. Empty = all contracts allowed."
+          },
+          "requireApprovalAbove": {
+            "type": "string",
+            "description": "MON threshold above which owner approval is required (human-readable). 0 = no threshold."
+          }
+        },
+        "required": [
+          "dailyLimit"
+        ]
+      }
+    },
+    {
+      "name": "ensure_gas",
+      "description": "Ensure the agent EOA has enough MON for gas fees. If the EOA balance is below the minimum threshold, automatically sends MON from the AgentWallet contract to the EOA. Call this before executing transactions if unsure whether the agent has gas. Users only need to fund the wallet contract address — the agent tops up its own gas from there.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "minBalance": {
+            "type": "string",
+            "description": "Minimum acceptable EOA balance in MON (human-readable, default '0.01')"
+          },
+          "topUpAmount": {
+            "type": "string",
+            "description": "Amount of MON to send to EOA if below minimum (human-readable, default '0.05')"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "deploy_policy_engine",
+      "description": "Deploy a new PolicyEngine contract on Monad. The deployer (AGENT_PRIVATE_KEY) becomes the owner. Returns the deployed contract address.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "deploy_agent_wallet",
+      "description": "Deploy a new AgentWallet contract on Monad. Optionally deploys a PolicyEngine too if none is provided. Returns the wallet and policy engine addresses.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "Address that will own the wallet (can transfer ownership, withdraw all funds)"
+          },
+          "agent": {
+            "type": "string",
+            "description": "Address of the AI agent EOA allowed to call execute() on the wallet"
+          },
+          "policyEngine": {
+            "type": "string",
+            "description": "Optional: address of an existing PolicyEngine contract. If omitted, a new one is deployed first."
+          }
+        },
+        "required": [
+          "owner",
+          "agent"
+        ]
+      }
+    }
+  ],
+  "environment": {
+    "AGENT_WALLET_ADDRESS": {
+      "description": "Deployed AgentWallet contract address",
+      "required": true
+    },
+    "POLICY_ENGINE_ADDRESS": {
+      "description": "Deployed PolicyEngine contract address",
+      "required": true
+    },
+    "AGENT_PRIVATE_KEY": {
+      "description": "Private key for the agent (without 0x prefix)",
+      "required": true,
+      "secret": true
+    },
+    "OWNER_ADDRESS": {
+      "description": "Owner address (human controller)",
+      "required": true
+    },
+    "MONAD_RPC_URL": {
+      "description": "Monad RPC URL",
+      "default": "https://testnet-rpc.monad.xyz"
+    },
+    "MONAD_NETWORK": {
+      "description": "Network to use: 'testnet' (default) or 'mainnet'",
+      "default": "testnet"
+    },
+    "ZEROX_API_KEY": {
+      "description": "0x Swap API v2 key (required only for zerox_swap tool). Get free key at dashboard.0x.org",
+      "required": false,
+      "secret": true
+    }
+  }
+}

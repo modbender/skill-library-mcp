@@ -1,0 +1,89 @@
+# ClawHub Skill Manifest
+# https://clawhub.com
+
+name: github-memory-sync
+version: 1.0.0
+description: |
+  将 OpenClaw 的 memory 文件同步到 GitHub 仓库进行备份和版本控制。
+  支持 MEMORY.md 和 memory/*.md 文件的推送、拉取、状态检查。
+
+author: davinwang
+license: MIT
+
+# 技能类型
+type: shell
+
+# 入口脚本
+entry: sync.sh
+
+# 需要的环境变量
+env:
+  - name: GITHUBTOKEN
+    description: GitHub Personal Access Token
+    required: true
+    sensitive: true
+  - name: GITHUB_REPO
+    description: GitHub 仓库 (格式：username/repo)
+    required: true
+  - name: GITHUB_BRANCH
+    description: Git 分支名称
+    required: false
+    default: main
+  - name: WORKSPACE_DIR
+    description: OpenClaw workspace 目录
+    required: false
+    default: /root/.openclaw/workspace
+
+# 依赖
+dependencies:
+  - git
+
+# 标签
+tags:
+  - github
+  - memory
+  - backup
+  - sync
+  - version-control
+
+# 使用说明
+usage: |
+  配置方式（在 ~/.openclaw/openclaw.json 中）:
+  
+  {
+    "skills": {
+      "entries": {
+        "github-memory-sync": {
+          "enabled": true,
+          "env": {
+            "GITHUBTOKEN": "ghp_xxx",
+            "GITHUB_REPO": "username/repo",
+            "GITHUB_BRANCH": "main",
+            "WORKSPACE_DIR": "/root/.openclaw/workspace"
+          }
+        }
+      }
+    }
+  }
+
+  使用命令:
+  - "初始化 GitHub memory 仓库" - 首次设置
+  - "同步 memory 到 GitHub" - 推送更新
+  - "从 GitHub 拉取 memory" - 获取最新版本
+  - "检查 memory 同步状态" - 查看差异
+
+# 安全提示
+security:
+  - Token 应保存在配置文件中，不要提交到版本控制
+  - 建议使用 Private 仓库存储 memory
+  - 定期轮换 GitHub Token
+  - 技能代码不包含用户 memory 文件（运行时动态读取）
+
+# 发布时排除的文件
+publish:
+  ignore:
+    - MEMORY.md
+    - memory/
+    - openclaw.json
+    - "*.tar.gz"
+    - ".git/"

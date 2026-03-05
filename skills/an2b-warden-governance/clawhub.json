@@ -1,0 +1,90 @@
+{
+  "name": "warden-governance",
+  "display_name": "War/Den Governance",
+  "version": "1.0.0",
+  "description": "Govern your OpenClaw bot with War/Den. Every action evaluated before executing. Community mode with zero dependencies. Enterprise upgrade to Sentinel_OS + EngramPort.",
+  "author": "AN2B Technologies",
+  "author_url": "https://an2b.com",
+  "skill_url": "https://warden.an2b.com/openclaw",
+  "repository": "https://github.com/an2b/warden-governance-skill",
+  "license": "MIT",
+  "pricing": "free",
+  "support_url": "https://warden.an2b.com",
+  "install_path": "~/.openclaw/skills/warden-governance/",
+  "memory_path": "~/.openclaw/memory/",
+  "hooks": [
+    "before_action",
+    "after_action",
+    "on_error"
+  ],
+  "config": {
+    "SENTINEL_API_KEY": {
+      "required": false,
+      "description": "Sentinel_OS API key for enterprise governance. Leave blank for community mode.",
+      "default": ""
+    },
+    "ENGRAMPORT_API_KEY": {
+      "required": false,
+      "description": "EngramPort API key for cloud memory (MandelDB backend). Leave blank for local memory.",
+      "default": ""
+    },
+    "WARDEN_FAIL_OPEN": {
+      "required": false,
+      "description": "If true, allow actions when War/Den is unreachable. Default false.",
+      "default": "false"
+    },
+    "WARDEN_AGENT_ID": {
+      "required": false,
+      "description": "Unique identifier for this bot. Default: openclaw-agent.",
+      "default": "openclaw-agent"
+    },
+    "WARDEN_POLICY_FILE": {
+      "required": false,
+      "description": "Path to custom YAML policy file. Uses built-in defaults if blank.",
+      "default": ""
+    },
+    "WARDEN_POLICY_PACKS": {
+      "required": false,
+      "description": "Comma-separated policy pack names: basic_safety, phi_guard, payments_guard.",
+      "default": ""
+    }
+  },
+  "clawhub": {
+    "registry": "clawhub.com",
+    "package": "an2b/warden-governance",
+    "category": "governance",
+    "featured": true,
+    "install_command": "openclaw skill install an2b/warden-governance",
+    "verified": true
+  },
+  "tags": [
+    "governance",
+    "security",
+    "audit",
+    "compliance",
+    "memory",
+    "policy-engine",
+    "sentinel-os",
+    "engramport",
+    "openclaw"
+  ],
+  "community": {
+    "zero_dependencies": true,
+    "local_policy_engine": true,
+    "local_audit_log": true,
+    "local_memory": true,
+    "hash_chain_integrity": true
+  },
+  "enterprise": {
+    "sentinel_os": {
+      "governance_api": "https://getsentinelos.com",
+      "endpoints": ["/api/v1/check", "/api/v1/ingest", "/api/v1/runs", "/api/v1/integrity"],
+      "sdks": ["python", "node"]
+    },
+    "engramport": {
+      "memory_api": "https://mandeldb.com/api/v1/portal",
+      "endpoints": ["/register", "/remember", "/recall", "/reflect", "/stats"],
+      "features": ["vector-search", "aegis-provenance", "eidetic-synthesis", "orchestra"]
+    }
+  }
+}

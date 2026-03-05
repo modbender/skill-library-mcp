@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionSuggesterInput",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "object",
+          "properties": {
+            "new_leads_count": {
+              "type": "integer"
+            },
+            "dataset_mode": {
+              "type": "string",
+              "enum": [
+                "broker_group",
+                "buyer_inquiry",
+                "mixed"
+              ]
+            },
+            "trends": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "record_type_breakdown": {
+              "type": "object",
+              "properties": {
+                "inventory_listing": {
+                  "type": "integer"
+                },
+                "buyer_requirement": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            },
+            "priority_breakdown": {
+              "type": "object",
+              "properties": {
+                "P1": {
+                  "type": "integer"
+                },
+                "P2": {
+                  "type": "integer"
+                },
+                "P3": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            },
+            "urgency_breakdown": {
+              "type": "object",
+              "properties": {
+                "high": {
+                  "type": "integer"
+                },
+                "medium": {
+                  "type": "integer"
+                },
+                "low": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            },
+            "top_localities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "locality": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "locality",
+                  "count"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "new_leads_count"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "summary"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "leads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lead"
+          }
+        }
+      },
+      "required": [
+        "leads"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "lead": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "property_type": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "lead_id",
+        "name",
+        "phone"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,2 @@
+- https://help.aliyun.com/zh/model-studio/qwen-tts-voice-design
+- https://help.aliyun.com/zh/model-studio/newly-released-models

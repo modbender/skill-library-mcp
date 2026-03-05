@@ -1,0 +1,113 @@
+{
+  "name": "create_project",
+  "version": "1.0.0",
+  "description": "Create a new project for tracking work",
+  "author": "Business Claw Team",
+  "category": "projects",
+  
+  "triggers": [
+    "create project",
+    "new project",
+    "add project",
+    "start project"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Project DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the project",
+      "required": true
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project_name": {
+        "type": "string",
+        "description": "Project name"
+      },
+      "project_code": {
+        "type": "string",
+        "description": "Project code/ID"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["Draft", "Open", "Completed", "Cancelled"],
+        "description": "Project status",
+        "default": "Open"
+      },
+      "customer": {
+        "type": "string",
+        "description": "Customer (if external project)"
+      },
+      "project_type": {
+        "type": "string",
+        "description": "Project type (Internal, External)"
+      },
+      "start_date": {
+        "type": "string",
+        "description": "Project start date"
+      },
+      "end_date": {
+        "type": "string",
+        "description": "Project end date"
+      },
+      "expected_hours": {
+        "type": "number",
+        "description": "Expected total hours"
+      },
+      "project_owner": {
+        "type": "string",
+        "description": "Project manager"
+      },
+      "description": {
+        "type": "string",
+        "description": "Project description"
+      }
+    },
+    "required": ["project_name"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Project"
+        }
+      },
+      {
+        "step": "create_project",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Project",
+          "data": {
+            "project_name": "${project_name}",
+            "project_code": "${project_code}",
+            "status": "${status}",
+            "customer": "${customer}",
+            "project_type": "${project_type}",
+            "start_date": "${start_date}",
+            "end_date": "${end_date}",
+            "expected_hours": "${expected_hours}",
+            "project_owner": "${project_owner}",
+            "description": "${description}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "require_dates": false
+  },
+  
+  "output_template": "Created Project {{name}}\nName: {{project_name}}\nStatus: {{status}}\nCustomer: {{customer}}"
+}

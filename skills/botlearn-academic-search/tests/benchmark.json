@@ -1,0 +1,476 @@
+{
+  "version": "0.0.1",
+  "dimension": "information-retrieval",
+  "tasks": [
+    {
+      "id": "bench-easy-01",
+      "difficulty": "easy",
+      "description": "Find a specific well-known paper by topic and approximate details",
+      "input": "Find the original Transformer paper — the one that introduced the 'Attention Is All You Need' architecture. Give me the full citation, where it was published, its citation count, and a one-paragraph summary of its main contribution.",
+      "rubric": [
+        {
+          "criterion": "Identification Accuracy",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Correctly identifies Vaswani et al. (2017), 'Attention Is All You Need', NeurIPS 2017; provides arXiv ID (1706.03762) and/or DOI",
+            "3": "Identifies the correct paper but with minor metadata errors (wrong year, incomplete author list)",
+            "1": "Returns a related but different paper on attention mechanisms",
+            "0": "Cannot find the paper or returns irrelevant results"
+          }
+        },
+        {
+          "criterion": "Bibliographic Completeness",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Full citation: all 8 authors, year (2017), venue (NeurIPS / NIPS), citation count from Semantic Scholar, arXiv link, publication status (peer-reviewed)",
+            "3": "Partial citation with title, first author, and year but missing some metadata",
+            "1": "Title and URL only",
+            "0": "Incomplete or fabricated citation"
+          }
+        },
+        {
+          "criterion": "Summary Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Accurate summary covering: self-attention mechanism replacing recurrence/convolution, multi-head attention, positional encoding, and its impact on NLP/sequence modeling",
+            "3": "Correct but superficial summary mentioning attention but lacking architectural details",
+            "1": "Vague or partially incorrect summary",
+            "0": "No summary or fabricated claims"
+          }
+        }
+      ],
+      "expectedScoreWithout": 45,
+      "expectedScoreWith": 85
+    },
+    {
+      "id": "bench-easy-02",
+      "difficulty": "easy",
+      "description": "Find recent papers on a well-defined topic within a single database",
+      "input": "Search arXiv for the 5 most recent papers on diffusion models for image generation submitted in 2024 or later. List them with titles, authors, submission dates, and arXiv IDs.",
+      "rubric": [
+        {
+          "criterion": "Database Targeting",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Uses arXiv API with appropriate query: cat:cs.CV, ti:/abs: prefixes for 'diffusion model', sortBy=submittedDate, date constraint for 2024+",
+            "3": "Searches arXiv but with suboptimal query construction (e.g., no category filter)",
+            "1": "Searches Google Scholar or Semantic Scholar instead of arXiv as requested",
+            "0": "No database-specific query"
+          }
+        },
+        {
+          "criterion": "Result Accuracy",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Returns 5 real arXiv papers on diffusion models for image generation, all from 2024+; arXiv IDs are valid; dates are correct",
+            "3": "Returns 5 papers but 1-2 are not specifically about diffusion models for images, or dates are slightly off",
+            "1": "Fewer than 3 relevant papers or some entries appear fabricated",
+            "0": "Results are not from arXiv or are fabricated"
+          }
+        },
+        {
+          "criterion": "Metadata Quality",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Each paper has: complete title, full author list, exact submission date, valid arXiv ID (YYMM.NNNNN format)",
+            "3": "Title and arXiv ID present but author list is incomplete or dates are approximate",
+            "1": "Only titles provided; missing IDs and dates",
+            "0": "Incomplete or fabricated metadata"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 80
+    },
+    {
+      "id": "bench-easy-03",
+      "difficulty": "easy",
+      "description": "Find papers by a specific author on a known topic",
+      "input": "Find papers by Yann LeCun on self-supervised learning published since 2020. Include citation counts and venues.",
+      "rubric": [
+        {
+          "criterion": "Author Identification",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Correctly searches for Yann LeCun using author-specific query syntax across databases; uses au: prefix on arXiv, author search on Semantic Scholar",
+            "3": "Searches for the author but only on one database",
+            "1": "Searches for the topic but does not properly filter by author",
+            "0": "No author filtering applied"
+          }
+        },
+        {
+          "criterion": "Result Relevance",
+          "weight": 0.4,
+          "scoring": {
+            "5": "Returns papers where LeCun is an author (not just cited); all papers are about self-supervised learning; all from 2020+; includes key works like the JEPA paper or VICReg",
+            "3": "Most papers are by LeCun on self-supervised learning but 1-2 are off-topic or misattributed",
+            "1": "Mix of relevant and irrelevant papers; author filtering is loose",
+            "0": "Papers are not by LeCun or not about self-supervised learning"
+          }
+        },
+        {
+          "criterion": "Citation & Venue Data",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Each paper includes citation count (from Semantic Scholar or Google Scholar), venue name, and publication status; citation counts are plausible",
+            "3": "Citation counts provided for most papers but venues missing for some",
+            "1": "No citation counts; only titles and years",
+            "0": "Missing or fabricated citation data"
+          }
+        }
+      ],
+      "expectedScoreWithout": 35,
+      "expectedScoreWith": 75
+    },
+    {
+      "id": "bench-med-01",
+      "difficulty": "medium",
+      "description": "Cross-database literature search on an interdisciplinary topic",
+      "input": "I'm starting a research project on using graph neural networks for drug discovery. Find the top 5 most relevant papers that cover: (1) GNN architectures for molecular property prediction, (2) applications to virtual screening or lead optimization, and (3) benchmark datasets used in this area. I need papers from top venues with citation analysis.",
+      "rubric": [
+        {
+          "criterion": "Multi-Aspect Coverage",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Returns papers covering all 3 requested aspects: GNN architectures (e.g., SchNet, DimeNet, GemNet), virtual screening applications, and benchmark datasets (e.g., MoleculeNet, ZINC); at least 1 paper per aspect",
+            "3": "Covers 2 of 3 aspects; one aspect underrepresented",
+            "1": "Only covers GNN architectures without drug discovery application or benchmarks",
+            "0": "Results are generic GNN papers without drug discovery focus"
+          }
+        },
+        {
+          "criterion": "Cross-Database Search",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Searches arXiv (cs.LG + q-bio.QM categories), Semantic Scholar (fieldsOfStudy: Computer Science + Biology), and Google Scholar; deduplicates across databases",
+            "3": "Searches 2 databases with reasonable queries",
+            "1": "Single database search only",
+            "0": "No academic database search"
+          }
+        },
+        {
+          "criterion": "Venue Quality & Citation Analysis",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Papers from top venues (NeurIPS, ICML, Nature Machine Intelligence, JCIM, Bioinformatics); includes citation counts, influential citation counts, and citation velocity for trend analysis",
+            "3": "Good venues but citation analysis is limited to raw counts only",
+            "1": "Mixed venue quality; no citation analysis",
+            "0": "Low-quality venues or no venue information"
+          }
+        },
+        {
+          "criterion": "Synthesis & Research Guidance",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Provides thematic grouping of papers, identifies the current state-of-the-art, notes key open challenges, and suggests a reading order for someone starting in this field",
+            "3": "Brief per-paper summaries but no cross-paper synthesis",
+            "1": "Paper list without context or guidance",
+            "0": "No synthesis"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-02",
+      "difficulty": "medium",
+      "description": "Literature review requiring citation graph traversal",
+      "input": "I found the paper 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding' (Devlin et al., 2019) very useful. Find 5 papers that directly build on BERT's approach — specifically papers that propose improvements to BERT's pre-training objectives or architecture. I want the papers that cite BERT and made the biggest impact. Exclude papers that merely use BERT as a baseline without modifying it.",
+      "rubric": [
+        {
+          "criterion": "Citation Graph Usage",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Uses Semantic Scholar citation API to find papers citing BERT; filters by influential citation count; correctly identifies papers that extend (not just use) BERT's architecture or pre-training",
+            "3": "Finds papers related to BERT but through keyword search rather than citation graph traversal",
+            "1": "Returns general BERT-related papers without distinguishing extensions from applications",
+            "0": "No citation graph analysis"
+          }
+        },
+        {
+          "criterion": "Result Relevance & Filtering",
+          "weight": 0.35,
+          "scoring": {
+            "5": "All 5 papers propose modifications to BERT's pre-training or architecture (e.g., RoBERTa, ALBERT, DeBERTa, SpanBERT, ELECTRA); correctly excludes papers that merely fine-tune BERT on downstream tasks",
+            "3": "3-4 papers are BERT extensions; 1-2 are BERT applications rather than modifications",
+            "1": "Mix of BERT-related papers without clear distinction between extensions and applications",
+            "0": "Results are generic NLP papers or not about BERT improvements"
+          }
+        },
+        {
+          "criterion": "Impact Assessment",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Papers are ranked by actual impact: citation count, influential citations, adoption in the field; explains what each paper changed about BERT and why it mattered",
+            "3": "Citation counts provided but no analysis of relative impact or contribution type",
+            "1": "No impact ranking or assessment",
+            "0": "Impact data is missing or fabricated"
+          }
+        },
+        {
+          "criterion": "Completeness",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Full bibliographic metadata for all 5 papers; open-access links; clear description of what each paper modified about BERT",
+            "3": "Metadata mostly complete but missing details on specific modifications",
+            "1": "Titles and authors only",
+            "0": "Incomplete results"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-med-03",
+      "difficulty": "medium",
+      "description": "Search requiring publication status verification and open-access resolution",
+      "input": "Find 5 papers on federated learning for healthcare data published in peer-reviewed journals (not preprints or conference papers). For each paper, I need the journal name, impact factor or h5-index, DOI, and whether it's open access. If a paper is behind a paywall, find the open-access version if one exists.",
+      "rubric": [
+        {
+          "criterion": "Publication Status Filtering",
+          "weight": 0.3,
+          "scoring": {
+            "5": "All 5 papers are from peer-reviewed journals (not conferences or arXiv); correctly identifies and filters out preprints; uses publicationTypes filter on Semantic Scholar or equivalent",
+            "3": "4 papers are from journals; 1 is a conference paper or preprint incorrectly included",
+            "1": "Mix of journals, conferences, and preprints without distinction",
+            "0": "No publication status filtering"
+          }
+        },
+        {
+          "criterion": "Venue Metadata Quality",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Each paper includes: journal name, impact factor or h5-index, ISSN or journal ranking; journals are relevant to healthcare AI (e.g., Nature Medicine, JAMIA, npj Digital Medicine, IEEE JBHI)",
+            "3": "Journal names provided but missing impact metrics for some entries",
+            "1": "Some journal names missing; no impact metrics",
+            "0": "No venue metadata"
+          }
+        },
+        {
+          "criterion": "Open Access Resolution",
+          "weight": 0.25,
+          "scoring": {
+            "5": "For each paper: DOI provided, open-access status checked via Semantic Scholar openAccessPdf field; for paywalled papers, checks arXiv preprint version, PubMed Central, or author's repository; provides direct PDF links where available",
+            "3": "DOIs provided; open-access status noted but no effort to find alternative access for paywalled papers",
+            "1": "DOIs for some papers; no open-access analysis",
+            "0": "No DOIs or access information"
+          }
+        },
+        {
+          "criterion": "Topical Relevance",
+          "weight": 0.2,
+          "scoring": {
+            "5": "All 5 papers are specifically about federated learning applied to healthcare/medical data; covers relevant aspects (privacy, clinical outcomes, multi-site studies)",
+            "3": "Most papers are relevant but 1-2 are about federated learning in general or healthcare ML without federated component",
+            "1": "Generic federated learning or healthcare ML papers",
+            "0": "Off-topic results"
+          }
+        }
+      ],
+      "expectedScoreWithout": 20,
+      "expectedScoreWith": 65
+    },
+    {
+      "id": "bench-med-04",
+      "difficulty": "medium",
+      "description": "Comparative literature search requiring multi-method analysis",
+      "input": "Compare the main approaches to text-to-image generation in the academic literature: GANs vs. diffusion models vs. autoregressive models. Find 2 representative papers for each approach (6 total) and analyze which approach is currently dominant based on benchmark results (FID scores on standard datasets) and citation trends.",
+      "rubric": [
+        {
+          "criterion": "Approach Coverage",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Returns exactly 2 representative papers per approach (6 total): GANs (e.g., StyleGAN, GigaGAN), diffusion (e.g., DALL-E 2, Stable Diffusion, Imagen), autoregressive (e.g., DALL-E, Parti, CogView); papers are well-chosen representatives",
+            "3": "Covers all 3 approaches but paper selection is uneven or suboptimal (e.g., 3 diffusion papers, 1 GAN, 2 autoregressive)",
+            "1": "Covers only 2 of 3 approaches or returns generic papers",
+            "0": "Does not distinguish between approaches"
+          }
+        },
+        {
+          "criterion": "Quantitative Comparison",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Compares approaches using standard metrics (FID, CLIP score, IS) on common benchmarks (COCO, ImageNet); identifies which approach achieves state-of-the-art; notes the evolution over time",
+            "3": "Mentions metrics but without systematic comparison across approaches",
+            "1": "Qualitative comparison only; no benchmark numbers",
+            "0": "No comparative analysis"
+          }
+        },
+        {
+          "criterion": "Trend Analysis",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Analyzes citation trends showing the shift from GANs to diffusion models; notes publication volume and venue trends; provides evidence for which approach is currently dominant",
+            "3": "Notes that diffusion models are recent trend but without citation data to support",
+            "1": "No trend analysis; static comparison only",
+            "0": "Incorrect trend assessment"
+          }
+        },
+        {
+          "criterion": "Paper Quality & Metadata",
+          "weight": 0.2,
+          "scoring": {
+            "5": "All 6 papers are from top venues with full metadata; citation counts and publication years allow trend visualization",
+            "3": "Good papers but incomplete metadata for trend analysis",
+            "1": "Mixed quality papers; some metadata missing",
+            "0": "Low-quality sources or fabricated papers"
+          }
+        }
+      ],
+      "expectedScoreWithout": 25,
+      "expectedScoreWith": 70
+    },
+    {
+      "id": "bench-hard-01",
+      "difficulty": "hard",
+      "description": "Systematic literature search on a niche interdisciplinary topic",
+      "input": "Conduct a mini systematic literature review on the use of causal inference methods in natural language processing. I need: (1) a clear search strategy documented with queries used, (2) papers categorized by causal method type (do-calculus, instrumental variables, propensity score matching, counterfactual reasoning), (3) the NLP tasks these methods are applied to, and (4) an assessment of whether results show causal methods outperform correlation-based approaches. Target the top 5 most impactful papers.",
+      "rubric": [
+        {
+          "criterion": "Search Strategy Documentation",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Documents the exact queries used for each database (arXiv: field prefixes + category codes; Semantic Scholar: query + filters; Google Scholar: operators); explains inclusion/exclusion criteria; notes how many results were screened vs. selected",
+            "3": "Mentions databases searched but doesn't document exact queries or screening process",
+            "1": "No documentation of search methodology",
+            "0": "Unclear how papers were found"
+          }
+        },
+        {
+          "criterion": "Methodological Categorization",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Papers are correctly categorized by causal method: identifies which use do-calculus/SCMs, instrumental variables, propensity scores, counterfactual reasoning, or other causal frameworks; explains each method briefly",
+            "3": "Papers are grouped but categorization is imprecise or misses some method types",
+            "1": "Papers listed without methodological categorization",
+            "0": "No categorization or incorrect method identification"
+          }
+        },
+        {
+          "criterion": "NLP Task Mapping",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Clearly maps each paper to the NLP task it addresses (e.g., text classification, NLI, bias mitigation, question answering, summarization); identifies which tasks have the most causal inference research",
+            "3": "NLP tasks mentioned but mapping is incomplete",
+            "1": "Tasks not clearly identified",
+            "0": "No task mapping"
+          }
+        },
+        {
+          "criterion": "Evidence Synthesis",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Synthesizes findings across papers: reports whether causal methods outperform baselines (with specific metrics), identifies conditions where causal approaches are most beneficial, notes limitations and open challenges; provides a clear conclusion",
+            "3": "Summarizes individual paper findings but doesn't synthesize across papers",
+            "1": "Abstracts only; no comparative analysis",
+            "0": "No synthesis"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-02",
+      "difficulty": "hard",
+      "description": "Search requiring quality assessment of contradictory findings in the literature",
+      "input": "There is an ongoing debate about whether scaling language models (more parameters, more data) is sufficient for achieving reasoning capabilities, or whether architectural innovations are needed. Find the 5 most important papers representing both sides of this debate. For each paper, assess the strength of its evidence (methodology, experimental rigor, reproducibility). Provide a balanced synthesis of the current state of the debate.",
+      "rubric": [
+        {
+          "criterion": "Debate Coverage Balance",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Returns papers from both sides: 2-3 pro-scaling papers (e.g., Kaplan et al. scaling laws, GPT-4 technical report, Chinchilla) and 2-3 pro-architecture papers (e.g., chain-of-thought, Mamba, retrieval-augmented approaches); balance is fair",
+            "3": "Both sides represented but imbalanced (e.g., 4 papers from one side, 1 from the other)",
+            "1": "Only one side of the debate represented",
+            "0": "Papers are not about the scaling vs. architecture debate"
+          }
+        },
+        {
+          "criterion": "Evidence Quality Assessment",
+          "weight": 0.3,
+          "scoring": {
+            "5": "For each paper: evaluates methodology (controlled experiments vs. observational), identifies baseline comparisons, notes whether claims are well-supported by data, flags potential confounds (e.g., training data contamination, compute budget differences); rates evidence strength",
+            "3": "Notes methodology for some papers but assessment is surface-level",
+            "1": "No evidence quality assessment; takes paper claims at face value",
+            "0": "Mischaracterizes paper evidence"
+          }
+        },
+        {
+          "criterion": "Synthesis & Nuance",
+          "weight": 0.3,
+          "scoring": {
+            "5": "Provides nuanced synthesis: acknowledges that both sides have valid evidence, identifies conditions where scaling helps vs. where architecture matters, notes that the debate may be a false dichotomy, discusses implications for future research",
+            "3": "Presents both sides but synthesis lacks nuance or makes oversimplified conclusions",
+            "1": "Summaries of individual papers without connecting them",
+            "0": "Biased or incoherent synthesis"
+          }
+        },
+        {
+          "criterion": "Paper Quality & Selection",
+          "weight": 0.15,
+          "scoring": {
+            "5": "Papers are from top venues, highly cited, and represent key milestones in the debate; selection demonstrates deep understanding of the research landscape",
+            "3": "Good papers but misses some key contributions to the debate",
+            "1": "Mixed quality; includes minor papers while missing landmark ones",
+            "0": "Poor paper selection"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 60
+    },
+    {
+      "id": "bench-hard-03",
+      "difficulty": "hard",
+      "description": "Cross-lingual and cross-domain academic search with methodology assessment",
+      "input": "I need to understand the current state of research on AI-generated text detection. Find 5 key papers covering: (1) detection methods (watermarking, statistical tests, trained classifiers), (2) adversarial attacks that evade detection, and (3) evaluation benchmarks. For each paper, critically assess whether the methodology would generalize to newer models like GPT-4 and Claude. Identify the biggest gaps in the current detection literature.",
+      "rubric": [
+        {
+          "criterion": "Topic Coverage",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Papers cover all 3 requested subtopics: detection methods (watermarking like Kirchenbauer et al., statistical like DetectGPT, classifiers like GPTZero papers), adversarial evasion techniques, and evaluation benchmarks; at least 1 paper per subtopic",
+            "3": "Covers 2 of 3 subtopics well; one subtopic underrepresented",
+            "1": "Only covers detection methods without adversarial or benchmark perspectives",
+            "0": "Off-topic or insufficient coverage"
+          }
+        },
+        {
+          "criterion": "Generalizability Assessment",
+          "weight": 0.3,
+          "scoring": {
+            "5": "For each paper, critically evaluates whether findings generalize to newer models: identifies which methods are model-specific (e.g., watermarking requires model access) vs. model-agnostic; discusses known failures on GPT-4-class models; distinguishes white-box from black-box approaches",
+            "3": "Mentions generalizability concerns but assessment is not paper-specific",
+            "1": "No generalizability analysis; assumes all methods work on any model",
+            "0": "Incorrect assessment of generalizability"
+          }
+        },
+        {
+          "criterion": "Gap Identification",
+          "weight": 0.25,
+          "scoring": {
+            "5": "Identifies specific research gaps: detection for paraphrased AI text, cross-lingual detection, detection in mixed human-AI text, benchmark standardization, real-world deployment challenges; supported by evidence from the surveyed papers",
+            "3": "Identifies 1-2 gaps but analysis is superficial",
+            "1": "Generic statement about needing more research without specific gaps",
+            "0": "No gap identification"
+          }
+        },
+        {
+          "criterion": "Search Quality & Bibliographic Rigor",
+          "weight": 0.2,
+          "scoring": {
+            "5": "Multi-database search with deduplication; all papers are real with complete metadata; includes mix of peer-reviewed and significant preprints; notes publication status",
+            "3": "Good papers but search limited to one database; metadata mostly complete",
+            "1": "Papers may be fabricated or metadata is incomplete",
+            "0": "Poor search quality or fabricated results"
+          }
+        }
+      ],
+      "expectedScoreWithout": 15,
+      "expectedScoreWith": 60
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "feature-dev",
+  "name": "Feature Development",
+  "version": 3,
+  "description": "Plan, implement, and review new features",
+  "steps": [
+    {
+      "id": "plan",
+      "name": "Architect",
+      "input": "FEATURE REQUEST: {{task}}\n\nCreate a detailed implementation plan. First, understand the existing codebase:\n\n1. Use `exec` to explore the project structure (ls, find, etc.)\n2. Use `read` to examine relevant existing files (routes, components, models, config)\n3. Identify where new code needs to go and what existing code needs to change\n\nThen write a plan with:\n- Files to create (with full paths)\n- Files to modify (with what changes)\n- Data structures / DB changes if any\n- API endpoints if any\n- Dependencies on existing code\n\nBe specific. File paths, function names, data shapes.\n\nWhen done, end with:\nSTATUS: done",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "implement",
+      "name": "Developer",
+      "input": "Implement the feature based on this plan.\n\n--- PLAN ---\n{{plan_output}}\n--- END ---\n\nOriginal request: {{task}}\n\nFor each item in the plan:\n1. `read` the existing file (if modifying)\n2. `write` new files or `edit` existing ones\n3. Follow existing code patterns and conventions\n4. Handle errors properly\n\nWrite real, production-quality code. Not pseudocode. Not descriptions.\n\nWhen done, end with:\nSTATUS: done\nFILES_CREATED: list of new files\nFILES_MODIFIED: list of changed files",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "review",
+      "name": "Reviewer",
+      "input": "Review the implementation for quality and correctness.\n\n--- PLAN ---\n{{plan_output}}\n--- END PLAN ---\n\n--- IMPLEMENTATION ---\n{{implement_output}}\n--- END ---\n\nFor each created/modified file:\n1. `read` the actual file\n2. Check: Does it match the plan? Is the code clean? Error handling? Security? Edge cases?\n3. If you find issues, `edit` to fix them directly\n\nReport what you found and any fixes you applied.\n\nWhen done, end with:\nSTATUS: done\nQUALITY: good | needs-work | critical-issues",
+      "expects": "STATUS: done",
+      "maxRetries": 1,
+      "onFail": { "retryStep": "implement", "maxRetries": 1 }
+    }
+  ]
+}

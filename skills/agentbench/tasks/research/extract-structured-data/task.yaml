@@ -1,0 +1,44 @@
+name: "Extract Structured Data from Meeting Notes"
+id: "research-extract-structured-data"
+version: "1.0"
+suite: "research"
+difficulty: "medium"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to read unstructured meeting notes and extract
+  organized, structured information. Evaluates information extraction,
+  categorization, and the ability to identify key details scattered
+  throughout a conversational transcript.
+
+user_message: |
+  Extract structured data from the meeting notes in meeting-transcript.txt.
+  Create meeting-summary.md with:
+  - Attendees list
+  - Decisions Made (numbered)
+  - Action Items (with assignee and deadline if mentioned)
+  - Key Discussion Points
+
+input_files:
+  - name: "meeting-transcript.txt"
+
+expected_outputs:
+  - pattern: "meeting-summary.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "attendees"
+          - "decisions"
+          - "action items"
+
+expected_metrics:
+  tool_calls: [2, 8]
+  planning_ratio: [0.1, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

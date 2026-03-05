@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI BILL INTELLIGENCE V4.5.3 SPLIT-VIEW</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #020617; --card: rgba(15, 23, 42, 0.6); --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; }
+        body.light { --bg: #f8fafc; --card: rgba(255, 255, 255, 0.7); --border: rgba(0, 0, 0, 0.05); --text: #0f172a; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); overflow-x: hidden; transition: all 0.5s ease; }
+        .aurora { position: fixed; inset: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 50%); z-index: -1; animation: rotate 20s linear infinite; opacity: 0.5; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .glass { background: var(--card); backdrop-filter: blur(20px); border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); }
+        .supreme-title { font-family: 'Space Grotesk', sans-serif; background: linear-gradient(to right, #10b981, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .settings-panel { position: fixed; right: -400px; top: 0; width: 400px; height: 100%; z-index: 1000; transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border); }
+        .settings-panel.open { right: 0; }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        #overlay.show { opacity: 1; pointer-events: auto; }
+        #lock-screen { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; flex-direction: column; justify-content: center; items-center; transition: all 1s ease; }
+        #lock-screen.unlocked { opacity: 0; pointer-events: none; transform: scale(1.1); }
+        .lock-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; padding: 1.5rem 2.5rem; width: 320px; text-align: center; font-size: 1.5rem; color: white; letter-spacing: 0.5em; outline: none; }
+        .mini-bar { height: 4px; border-radius: 2px; transition: width 1s ease-out; }
+    </style>
+</head>
+<body class="p-4 md:p-12 min-h-screen">
+    <div class="aurora"></div>
+    <div id="overlay" onclick="toggleSettings()"></div>
+    <div id="lock-screen">
+        <div class="text-center space-y-8 animate-pulse">
+            <h1 class="text-3xl font-black italic uppercase supreme-title tracking-widest">Secure Access</h1>
+            <input type="password" id="pass-input" class="lock-input mono" maxlength="4" autofocus onkeyup="checkPass(this.value)">
+            <div id="lock-status" class="text-[10px] font-black uppercase tracking-widest text-slate-700">Waiting...</div>
+        </div>
+    </div>
+
+    <div id="settings-panel" class="settings-panel glass p-10">
+        <div class="flex justify-between items-center mb-12">
+            <h2 class="text-2xl font-black italic uppercase supreme-title">Settings</h2>
+            <button onclick="toggleSettings()" class="text-slate-500 hover:text-white">✕ Close</button>
+        </div>
+        <div class="space-y-10">
+            <div><label class="block text-[10px] font-black uppercase text-emerald-400 mb-2 tracking-widest">Dashboard Title</label><input type="text" id="title-input" class="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white mono outline-none" placeholder="Enter New Title..."><button onclick="saveTitle()" class="mt-4 w-full bg-emerald-500 text-black font-black py-3 rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">Apply</button></div>
+            <div><label class="block text-[10px] font-black uppercase text-emerald-400 mb-2 tracking-widest">Security Code Change</label><input type="password" id="pass-current" class="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white mono outline-none mb-2" maxlength="4" placeholder="Current Code..."><input type="password" id="pass-new" class="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white mono outline-none mb-2" maxlength="4" placeholder="New Code..."><input type="password" id="pass-confirm" class="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white mono outline-none" maxlength="4" placeholder="Confirm New Code..."><div id="pass-error" class="text-[8px] text-rose-500 mt-2 font-bold uppercase hidden">Error</div><button onclick="changePass()" class="mt-4 w-full bg-slate-700 text-white font-black py-3 rounded-xl hover:bg-slate-600 transition-all">Update</button></div>
+            <div><label class="block text-[10px] font-black uppercase text-emerald-400 mb-4 tracking-widest">Theme Mode</label><div class="grid grid-cols-2 gap-4"><button onclick="setTheme('dark')" class="p-4 rounded-xl border border-white/10 hover:border-emerald-500 transition-all text-[10px] font-black">Dark</button><button onclick="setTheme('light')" class="p-4 rounded-xl border border-white/10 hover:border-emerald-500 transition-all text-[10px] font-black">Light</button></div></div>
+        </div>
+    </div>
+
+    <header class="max-w-7xl mx-auto mb-16 flex flex-col lg:flex-row justify-between items-center gap-8">
+        <h1 id="main-title" class="text-5xl md:text-6xl font-black tracking-[-0.05em] italic uppercase supreme-title leading-tight pr-8">AI BILL Intelligence</h1>
+        <div class="flex items-center gap-8">
+            <div class="glass p-5 rounded-[2rem] border-emerald-500/20 flex justify-between items-center px-10 min-w-[272px] relative">
+                <button onclick="refreshData(this)" class="absolute -left-12 p-3 glass rounded-full hover:bg-white/10 transition-all duration-500 group"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500 group-hover:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
+                <div><div class="text-[8px] text-emerald-400 font-black uppercase mb-0.5">Daily Total</div><div class="text-2xl font-black mono text-white" id="total-cost">$0.0000</div></div>
+                <div class="h-10 w-[1px] bg-white/10 mx-6"></div>
+                <div class="text-right"><div class="text-[8px] text-emerald-400 font-black uppercase mb-0.5">Est. Monthly</div><div class="text-2xl font-black mono text-white" id="monthly-est">$0.00</div></div>
+            </div>
+            <button onclick="toggleSettings()" class="p-4 glass rounded-full hover:scale-110 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] group"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400 group-hover:rotate-90 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="card-container"></div></main>
+
+    <footer class="max-w-7xl mx-auto mt-20 pb-12 text-center">
+        <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-8"></div>
+        <p class="text-slate-500 text-[9px] font-medium tracking-[0.2em] mb-4 uppercase">
+            ⚠️ Disclaimer: Estimates based on session logs. Actual billing from providers may vary.
+        </p>
+        <p class="text-slate-600 text-[10px] font-black tracking-[0.4em] uppercase">
+            Autonomous Infrastructure Management • Chloe AI Engine 2026
+        </p>
+    </footer>
+
+    <script>
+        let SECURE_CODE = "1234";
+        window.onload = function() { 
+            // 신규 접속 시 항상 잠금 상태로 시작 (자동 로그인 해제)
+            localStorage.removeItem('bill_unlocked');
+            document.getElementById('lock-screen').classList.remove('unlocked');
+            document.getElementById('pass-input').value = "";
+            document.getElementById('pass-input').focus();
+        };
+        function checkPass(v) {
+            const s = document.getElementById('lock-status');
+            if(v.length===4) {
+                if(v===SECURE_CODE) { s.innerText="Access Granted"; s.style.color="#10b981"; localStorage.setItem('bill_unlocked', 'true'); setTimeout(()=>document.getElementById('lock-screen').classList.add('unlocked'), 500); }
+                else { s.innerText="Invalid Code"; s.style.color="#ef4444"; document.getElementById('pass-input').value=""; }
+            }
+        }
+        function changePass() { 
+            const cur=document.getElementById('pass-current').value; const n1=document.getElementById('pass-new').value; const n2=document.getElementById('pass-confirm').value; const err=document.getElementById('pass-error');
+            if(cur!==SECURE_CODE){err.innerText="Current invalid";err.classList.remove('hidden');return;}
+            if(n1.length!==4){err.innerText="Must be 4 digits";err.classList.remove('hidden');return;}
+            if(n1!==n2){err.innerText="Match error";err.classList.remove('hidden');return;}
+            SECURE_CODE=n1; err.classList.add('hidden'); alert("Updated!"); toggleSettings();
+        }
+        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+        function saveTitle() { const nt=document.getElementById('title-input').value; if(nt){document.getElementById('main-title').innerText=nt;toggleSettings();} }
+        function setTheme(m) { if(m==='light') document.body.classList.add('light'); else document.body.classList.remove('light'); toggleSettings(); }
+        async function refreshData(btn) { btn.style.transform='rotate(360deg)'; try { await fetch('/usage_live.json?t='+Date.now()); setTimeout(async()=>{ await fetchAndUpdate(); btn.style.transform='rotate(0deg)'; }, 1000); } catch(e){console.error(e);} }
+        
+        const config = [{id:'openai',name:'OpenAI',color:'#10b981'},{id:'claude',name:'Claude',color:'#fb923c'},{id:'gemini',name:'Gemini',color:'#3b82f6'},{id:'kimi',name:'Kimi',color:'#a855f7'},{id:'deepseek',name:'DeepSeek',color:'#06b6d4'},{id:'groq',name:'Groq',color:'#ffffff'}];
+        async function fetchAndUpdate() {
+            try {
+                const res = await fetch('/usage.json?t=' + Date.now());
+                const data = await res.json();
+                let total = 0; let html = '';
+                config.forEach(m => {
+                    const val = parseFloat(data.models[m.id] || 0);
+                    const bal = data.models[m.id + '_bal'] || "---";
+                    const stats = data.models[m.id + '_stats'] || {};
+                    total += val;
+                    let statsHtml = '';
+                    const totalTokens = Object.values(stats).reduce((a, b) => a + b, 0);
+                    Object.entries(stats).forEach(([name, tokens]) => {
+                        const percent = totalTokens > 0 ? (tokens / totalTokens * 100).toFixed(0) : 0;
+                        statsHtml += `<div class="mb-2"><div class="flex justify-between text-[7px] font-black text-slate-500 uppercase mb-1"><span>${name}</span><span>${percent}%</span></div><div class="w-full bg-white/5 h-1 rounded-full overflow-hidden"><div class="mini-bar h-full" style="background-color:${m.color}; width:${percent}%"></div></div></div>`;
+                    });
+                    html += `<div class="glass p-8 rounded-[3rem] relative min-h-[350px] flex flex-col">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-[14px] font-black uppercase" style="color:${m.color}">${m.name}</div>
+                            <div class="text-right"><div class="text-[8px] text-slate-500 uppercase font-black mb-1">Balance</div><div class="text-[14px] font-bold mono text-slate-300">${bal==='POST'?'Postpaid':"$"+bal}</div></div>
+                        </div>
+                        <div class="flex-grow flex flex-col justify-center py-4">
+                            <div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Usage Today</div>
+                            <div class="text-5xl font-black mono italic text-white">$${val.toFixed(4)}</div>
+                        </div>
+                        <div class="flex gap-4 pt-6 border-t border-white/5 h-24 items-center">
+                            <div class="w-1/2 h-full opacity-40 pr-4 border-r border-white/5"><canvas id="chart-${m.id}"></canvas></div>
+                            <div class="w-1/2 pl-4 text-right">${statsHtml}</div>
+                        </div>
+                    </div>`;
+                });
+                document.getElementById('card-container').innerHTML = html;
+                document.getElementById('total-cost').innerText = '$' + total.toFixed(4);
+                const dailyEst = (total / (new Date().getHours() + 1)) * 24;
+                document.getElementById('monthly-est').innerText = '$' + (dailyEst * 30).toFixed(2);
+                config.forEach(m => {
+                    const ctx = document.getElementById('chart-'+m.id).getContext('2d');
+                    new Chart(ctx, { type:'line', data:{ labels:['','','','','','',''], datasets:[{ data:[5,10,8,12,10,15,12], borderColor:m.color, borderWidth:2, fill:true, backgroundColor:m.color+'10', tension:0.4, pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} } });
+                });
+            } catch (e) { console.error(e); }
+        }
+        fetchAndUpdate(); setInterval(fetchAndUpdate, 30000);
+    </script>
+</body>
+</html>

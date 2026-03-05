@@ -1,0 +1,47 @@
+name: "Cross-Reference Inventory and Orders"
+id: "data-analysis-cross-reference"
+version: "1.0"
+suite: "data-analysis"
+difficulty: "hard"
+mode: "sandboxed"
+
+description: |
+  Tests the agent's ability to cross-reference two related datasets
+  and identify discrepancies. The inventory has 40 products, orders
+  reference 60 orders. Includes 3 products ordered but not in inventory
+  (P041, P042, P043), several inventory items never ordered, and products
+  where cumulative order quantity exceeds stock. Evaluates multi-file
+  analysis and detailed reporting.
+
+user_message: |
+  Cross-reference the inventory and orders data in inventory.csv and
+  orders.csv. Create discrepancy-report.md identifying:
+  - Products ordered that are not in the inventory system
+  - Inventory items that have never been ordered
+  - Products where total order volume exceeds current stock
+  Include specific Product IDs and quantities in your findings.
+
+input_files:
+  - name: "inventory.csv"
+  - name: "orders.csv"
+
+expected_outputs:
+  - pattern: "discrepancy-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "not in inventory"
+          - "never ordered"
+          - "exceeds"
+
+expected_metrics:
+  tool_calls: [3, 12]
+  planning_ratio: [0.1, 0.40]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

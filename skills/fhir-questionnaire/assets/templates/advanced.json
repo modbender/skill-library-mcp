@@ -1,0 +1,221 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "advanced-example",
+  "meta": {
+    "profile": ["http://hl7.org/fhir/StructureDefinition/Questionnaire"]
+  },
+  "url": "http://example.org/fhir/Questionnaire/advanced-example",
+  "version": "1.0.0",
+  "name": "AdvancedQuestionnaire",
+  "title": "Advanced Questionnaire Template",
+  "status": "draft",
+  "experimental": false,
+  "date": "2024-01-01",
+  "publisher": "Example Healthcare Organization",
+  "contact": [
+    {
+      "name": "Clinical Informatics Team",
+      "telecom": [
+        {
+          "system": "email",
+          "value": "informatics@example.org"
+        }
+      ]
+    }
+  ],
+  "description": "Comprehensive questionnaire template demonstrating advanced features",
+  "purpose": "To serve as a starting point for complex clinical questionnaires",
+  "code": [
+    {
+      "system": "http://loinc.org",
+      "code": "XXXXX-X",
+      "display": "Questionnaire concept"
+    }
+  ],
+  "item": [
+    {
+      "linkId": "demographics",
+      "type": "group",
+      "text": "Demographics",
+      "item": [
+        {
+          "linkId": "name",
+          "type": "string",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "54125-0",
+              "display": "Patient name"
+            }
+          ],
+          "text": "Full Name",
+          "required": true
+        },
+        {
+          "linkId": "dob",
+          "type": "date",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "21112-8",
+              "display": "Birth date"
+            }
+          ],
+          "text": "Date of Birth",
+          "required": true
+        },
+        {
+          "linkId": "gender",
+          "type": "choice",
+          "text": "Gender",
+          "answerValueSet": "http://hl7.org/fhir/ValueSet/administrative-gender",
+          "required": true
+        }
+      ]
+    },
+    {
+      "linkId": "medical-history",
+      "type": "group",
+      "text": "Medical History",
+      "item": [
+        {
+          "linkId": "has-conditions",
+          "type": "boolean",
+          "text": "Do you have any chronic medical conditions?",
+          "required": true
+        },
+        {
+          "linkId": "conditions-group",
+          "type": "group",
+          "text": "Conditions",
+          "enableWhen": [
+            {
+              "question": "has-conditions",
+              "operator": "=",
+              "answerBoolean": true
+            }
+          ],
+          "item": [
+            {
+              "linkId": "condition-list",
+              "type": "open-choice",
+              "text": "Select all that apply",
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "system": "http://snomed.info/sct",
+                    "code": "44054006",
+                    "display": "Diabetes"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://snomed.info/sct",
+                    "code": "38341003",
+                    "display": "Hypertension"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://snomed.info/sct",
+                    "code": "195967001",
+                    "display": "Asthma"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "conditions-detail",
+              "type": "text",
+              "text": "Please provide additional details about your conditions"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "medications",
+      "type": "group",
+      "text": "Current Medications",
+      "item": [
+        {
+          "linkId": "has-medications",
+          "type": "boolean",
+          "text": "Are you currently taking any medications?",
+          "required": true
+        },
+        {
+          "linkId": "medication-entry",
+          "type": "group",
+          "text": "Medication",
+          "repeats": true,
+          "enableWhen": [
+            {
+              "question": "has-medications",
+              "operator": "=",
+              "answerBoolean": true
+            }
+          ],
+          "item": [
+            {
+              "linkId": "med-name",
+              "type": "string",
+              "text": "Medication Name",
+              "required": true
+            },
+            {
+              "linkId": "med-dosage",
+              "type": "string",
+              "text": "Dosage",
+              "required": true
+            },
+            {
+              "linkId": "med-frequency",
+              "type": "choice",
+              "text": "Frequency",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "daily",
+                    "display": "Daily"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "twice-daily",
+                    "display": "Twice Daily"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "weekly",
+                    "display": "Weekly"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "as-needed",
+                    "display": "As Needed"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "additional-info",
+      "type": "group",
+      "text": "Additional Information",
+      "item": [
+        {
+          "linkId": "notes",
+          "type": "text",
+          "text": "Any additional information you would like to share?"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'">
+    <title>🍈 GuavaSuite — EIP-712 Signing Helper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #14141f;
+            --border: #2a2a3a;
+            --accent: #4ade80;
+            --accent-dim: #22c55e33;
+            --text: #e4e4ef;
+            --text-dim: #8888aa;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .header .subtitle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: var(--accent-dim);
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .status.disconnected {
+            background: #ef444422;
+        }
+
+        .status.warning {
+            background: #f59e0b22;
+        }
+
+        .wallet-addr {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            word-break: break-all;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #6ee7a0;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a4a;
+        }
+
+        .signature-output {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.7rem;
+            color: var(--accent);
+            max-height: 120px;
+            overflow-y: auto;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .signature-output:hover::after {
+            content: 'クリックでコピー';
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        .domain-info {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .domain-info .key {
+            color: var(--text-dim);
+        }
+
+        .domain-info .val {
+            color: var(--text);
+        }
+
+        .security-notice {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .security-notice strong {
+            color: var(--warn);
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            flex: 1;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .step.active {
+            background: var(--accent);
+        }
+
+        .step.done {
+            background: var(--accent);
+            opacity: 0.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .copied-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #000;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .copied-toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍈 GuavaSuite Signer</h1>
+            <p class="subtitle">EIP-712 License Activation</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step" id="step1"></div>
+            <div class="step" id="step2"></div>
+            <div class="step" id="step3"></div>
+        </div>
+
+        <!-- Step 1: Connect Wallet -->
+        <div class="card" id="card-connect">
+            <h2>① Connect Wallet</h2>
+            <div class="status disconnected" id="wallet-status">
+                <span>🔴</span>
+                <span>ウォレット未接続</span>
+            </div>
+            <button class="btn-primary" id="btn-connect" onclick="connectWallet()">
+                Connect Phantom / MetaMask
+            </button>
+            <p class="error hidden" id="connect-error"></p>
+        </div>
+
+        <!-- Step 2: Enter Nonce & Sign -->
+        <div class="card hidden" id="card-sign">
+            <h2>② Sign Challenge</h2>
+            <label for="nonce-input">
+                Nonce（activate.js に表示された値をペースト）
+            </label>
+            <input type="text" id="nonce-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off"
+                spellcheck="false">
+            <div class="domain-info">
+                <span class="key">Domain:</span> <span class="val">GuavaSuite v1</span><br>
+                <span class="key">Chain:</span> <span class="val">Polygon (137)</span><br>
+                <span class="key">Action:</span> <span class="val">activate-guava-suite</span><br>
+                <span class="key">Address:</span> <span class="val" id="sign-address">—</span>
+            </div>
+            <button class="btn-primary" id="btn-sign" onclick="signChallenge()" disabled>
+                Sign with Wallet
+            </button>
+            <p class="error hidden" id="sign-error"></p>
+        </div>
+
+        <!-- Step 3: Copy Signature -->
+        <div class="card hidden" id="card-result">
+            <h2>③ Copy Signature</h2>
+            <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:0.75rem;">
+                下の署名をコピーして activate.js の CLI にペーストしてください
+            </p>
+            <div class="signature-output" id="sig-output" onclick="copySignature()"></div>
+            <button class="btn-secondary" onclick="copySignature()" style="margin-top:0.75rem;">
+                📋 コピー
+            </button>
+        </div>
+
+        <p class="security-notice">
+            🔒 <strong>ローカル専用</strong> — このページは外部サーバーと通信しません<br>
+            秘密鍵に触れません。署名はブラウザ内で完結します<br>
+            署名後はこのページを閉じてください
+        </p>
+    </div>
+
+    <div class="copied-toast" id="toast">✅ コピーしました！CLIにペーストしてください</div>
+
+    <script>
+        // ── EIP-712 Domain & Types (must match signatureVerifier.js exactly) ──
+
+        const DOMAIN = {
+            name: "GuavaSuite",
+            version: "1",
+            chainId: 137 // Polygon Mainnet
+        };
+
+        const TYPES = {
+            EIP712Domain: [
+                { name: "name", type: "string" },
+                { name: "version", type: "string" },
+                { name: "chainId", type: "uint256" }
+            ],
+            LicenseChallenge: [
+                { name: "nonce", type: "string" },
+                { name: "address", type: "address" },
+                { name: "action", type: "string" }
+            ]
+        };
+
+        // ── State ──
+
+        let connectedAddress = null;
+        let signature = null;
+
+        // ── Step 1: Connect Wallet ──
+
+        async function connectWallet() {
+            const provider = getProvider();
+            if (!provider) {
+                showError("connect-error",
+                    "Phantom または MetaMask が見つかりません。ブラウザ拡張をインストールしてください。"
+                );
+                return;
+            }
+
+            try {
+                const accounts = await provider.request({
+                    method: "eth_requestAccounts"
+                });
+
+                if (!accounts || accounts.length === 0) {
+                    showError("connect-error", "アカウントが選択されませんでした");
+                    return;
+                }
+
+                connectedAddress = accounts[0];
+
+                // Update UI
+                const status = document.getElementById("wallet-status");
+                status.className = "status";
+                status.innerHTML = `<span>🟢</span><span>接続済み</span>`;
+
+                const addrEl = document.createElement("p");
+                addrEl.className = "wallet-addr";
+                addrEl.textContent = connectedAddress;
+                status.appendChild(addrEl);
+
+                document.getElementById("btn-connect").textContent = "✅ Connected";
+                document.getElementById("btn-connect").disabled = true;
+
+                // Show step 2
+                document.getElementById("card-sign").classList.remove("hidden");
+                document.getElementById("sign-address").textContent =
+                    connectedAddress.slice(0, 10) + "..." + connectedAddress.slice(-6);
+                document.getElementById("step1").className = "step done";
+                document.getElementById("step2").className = "step active";
+
+                // Enable sign button when nonce is entered
+                const nonceInput = document.getElementById("nonce-input");
+                nonceInput.addEventListener("input", () => {
+                    document.getElementById("btn-sign").disabled =
+                        nonceInput.value.trim().length < 10;
+                });
+                nonceInput.focus();
+
+            } catch (err) {
+                showError("connect-error", err.message || "接続に失敗しました");
+            }
+        }
+
+        // ── Step 2: Sign EIP-712 Challenge ──
+
+        async function signChallenge() {
+            const provider = getProvider();
+            const nonce = document.getElementById("nonce-input").value.trim();
+
+            if (!nonce) {
+                showError("sign-error", "Nonce を入力してください");
+                return;
+            }
+
+            if (!connectedAddress) {
+                showError("sign-error", "先にウォレットを接続してください");
+                return;
+            }
+
+            const message = {
+                nonce: nonce,
+                address: connectedAddress,
+                action: "activate-guava-suite"
+            };
+
+            const typedData = JSON.stringify({
+                types: TYPES,
+                domain: DOMAIN,
+                primaryType: "LicenseChallenge",
+                message: message
+            });
+
+            try {
+                document.getElementById("btn-sign").textContent = "⏳ ウォレットで承認してください...";
+                document.getElementById("btn-sign").disabled = true;
+
+                signature = await provider.request({
+                    method: "eth_signTypedData_v4",
+                    params: [connectedAddress, typedData]
+                });
+
+                // Show step 3
+                document.getElementById("sig-output").textContent = signature;
+                document.getElementById("card-result").classList.remove("hidden");
+                document.getElementById("step2").className = "step done";
+                document.getElementById("step3").className = "step active";
+
+                document.getElementById("btn-sign").textContent = "✅ 署名完了";
+
+                // Auto-copy
+                copySignature();
+
+            } catch (err) {
+                document.getElementById("btn-sign").textContent = "Sign with Wallet";
+                document.getElementById("btn-sign").disabled = false;
+
+                if (err.code === 4001) {
+                    showError("sign-error", "ユーザーが署名を拒否しました");
+                } else {
+                    showError("sign-error", err.message || "署名に失敗しました");
+                }
+            }
+        }
+
+        // ── Step 3: Copy Signature ──
+
+        async function copySignature() {
+            if (!signature) return;
+
+            try {
+                await navigator.clipboard.writeText(signature);
+                const toast = document.getElementById("toast");
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 2000);
+            } catch {
+                // Fallback: select text
+                const el = document.getElementById("sig-output");
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        // ── Helpers ──
+
+        function getProvider() {
+            // Phantom EVM
+            if (window.phantom?.ethereum) return window.phantom.ethereum;
+            // MetaMask / generic
+            if (window.ethereum) return window.ethereum;
+            return null;
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = "⚠️ " + msg;
+            el.classList.remove("hidden");
+            setTimeout(() => el.classList.add("hidden"), 5000);
+        }
+
+        // ── Init ──
+
+        document.getElementById("step1").className = "step active";
+
+        // Check if wallet is available
+        if (!getProvider()) {
+            const status = document.getElementById("wallet-status");
+            status.innerHTML = `<span>⚠️</span><span>ウォレット拡張が見つかりません。Phantom または MetaMask をインストールしてください。</span>`;
+            status.className = "status warning";
+            document.getElementById("btn-connect").disabled = true;
+        }
+
+        // Auto-fill nonce from URL parameter (?nonce=xxx)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlNonce = urlParams.get("nonce");
+        if (urlNonce) {
+            const nonceInput = document.getElementById("nonce-input");
+            nonceInput.value = urlNonce;
+            // Update label to show it was auto-filled
+            const label = document.querySelector('label[for="nonce-input"]');
+            label.textContent = "Nonce（✅ activate.js から自動入力済み）";
+        }
+    </script>
+</body>
+
+</html>

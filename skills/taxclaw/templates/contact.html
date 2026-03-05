@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row" style="justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
+    <div>
+      <h1 style="margin:0; font-size: 26px;">📬 Contact &amp; Feature Requests</h1>
+      <div class="muted" style="margin-top:6px;">Found a bug? Have a feature idea? We'd love to hear from you.</div>
+    </div>
+  </div>
+
+  {% if sent %}
+    <div class="card" style="border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.06); margin-bottom: 14px;">
+      <div style="font-weight:700;">✅ Message sent — we'll follow up at the email you provided.</div>
+      <div style="margin-top: 10px;">
+        <a class="btn" href="/documents">← Back to documents</a>
+      </div>
+    </div>
+  {% else %}
+    {% if error %}
+      <div class="card" style="border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.06); margin-bottom: 14px;">
+        <div style="font-weight:700;">❌ Couldn't send</div>
+        <div class="muted" style="margin-top:6px;">{{ error }}</div>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <form method="post" action="/contact">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <div style="display:grid; grid-template-columns: 1fr; gap: 12px;">
+          <div>
+            <label class="muted" style="display:block; font-size: 11px; margin-bottom: 6px;">Request type</label>
+            <select name="request_type" required>
+              <option value="bug">Bug report</option>
+              <option value="feature">Feature request</option>
+              <option value="question">Question</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="muted" style="display:block; font-size: 11px; margin-bottom: 6px;">Name (optional)</label>
+              <input type="text" name="name" placeholder="Your name" />
+            </div>
+            <div>
+              <label class="muted" style="display:block; font-size: 11px; margin-bottom: 6px;">Email (optional, for reply)</label>
+              <input type="email" name="email" placeholder="you@example.com" />
+            </div>
+          </div>
+
+          <div>
+            <label class="muted" style="display:block; font-size: 11px; margin-bottom: 6px;">Subject (optional)</label>
+            <input type="text" name="subject" placeholder="A short summary" />
+          </div>
+
+          <div>
+            <label class="muted" style="display:block; font-size: 11px; margin-bottom: 6px;">Message (required)</label>
+            <textarea name="message" required rows="8" style="width: 100%; background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;">{{ request.query_params.get('message','') }}</textarea>
+          </div>
+
+          <div class="row" style="justify-content: flex-start;">
+            <button type="submit">Send →</button>
+            <a class="btn" href="/documents" style="background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.25);">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}

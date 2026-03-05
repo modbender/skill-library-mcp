@@ -1,0 +1,684 @@
+import { html, nothing } from "lit";
+import type { ArchivedSession, ArchivedSessionsResult } from "../controllers/sessions.ts";
+import { formatRelativeTimestamp } from "../format.ts";
+import { pathForTab } from "../navigation.ts";
+import { formatSessionTokens } from "../presenter.ts";
+import type { GatewaySessionRow, SessionsListResult } from "../types.ts";
+
+export type AgentInfo = {
+  id: string;
+  name: string;
+  emoji?: string;
+};
+
+export type SessionsProps = {
+  loading: boolean;
+  result: SessionsListResult | null;
+  error: string | null;
+  activeMinutes: string;
+  limit: string;
+  includeGlobal: boolean;
+  includeUnknown: boolean;
+  basePath: string;
+  agents?: AgentInfo[];
+  agentFilter?: string;
+  onAgentFilterChange?: (agentId: string) => void;
+  onFiltersChange: (next: {
+    activeMinutes: string;
+    limit: string;
+    includeGlobal: boolean;
+    includeUnknown: boolean;
+  }) => void;
+  onRefresh: () => void;
+  onPatch: (
+    key: string,
+    patch: {
+      label?: string | null;
+      thinkingLevel?: string | null;
+      verboseLevel?: string | null;
+      reasoningLevel?: string | null;
+    },
+  ) => void;
+  onDelete: (key: string) => void;
+  onArchive: (key: string) => void;
+  onViewHistory?: (key: string) => void;
+  // Live sessions pagination
+  livePageSize: number;
+  livePage: number;
+  onLivePageSizeChange: (size: number) => void;
+  onLivePageChange: (page: number) => void;
+  // Archived sessions props
+  archivedLoading: boolean;
+  archivedResult: ArchivedSessionsResult | null;
+  archivedError: string | null;
+  archivedSearch: string;
+  archivedPageSize: number;
+  archivedPage: number;
+  onArchivedSearchChange: (search: string) => void;
+  onArchivedRefresh: () => void;
+  onArchivedPageSizeChange: (size: number) => void;
+  onArchivedPageChange: (page: number) => void;
+  onResumeSession: (sessionId: string) => void;
+  onRenameSession: (sessionId: string, name: string) => void;
+  onDeleteArchivedSession: (sessionId: string) => void;
+};
+
+const THINK_LEVELS = ["", "off", "minimal", "low", "medium", "high", "xhigh"] as const;
+const BINARY_THINK_LEVELS = ["", "off", "on"] as const;
+const REASONING_LEVELS = ["", "off", "on", "stream"] as const;
+
+function normalizeProviderId(provider?: string | null): string {
+  if (!provider) {
+    return "";
+  }
+  const normalized = provider.trim().toLowerCase();
+  if (normalized === "z.ai" || normalized === "z-ai") {
+    return "zai";
+  }
+  return normalized;
+}
+
+function isBinaryThinkingProvider(provider?: string | null): boolean {
+  return normalizeProviderId(provider) === "zai";
+}
+
+function resolveThinkLevelOptions(provider?: string | null): readonly string[] {
+  return isBinaryThinkingProvider(provider) ? BINARY_THINK_LEVELS : THINK_LEVELS;
+}
+
+function withCurrentOption(options: readonly string[], current: string): string[] {
+  if (!current || options.includes(current)) {
+    return [...options];
+  }
+  return [...options, current];
+}
+
+function resolveThinkLevelDisplay(value: string, isBinary: boolean): string {
+  if (!isBinary) {
+    return value;
+  }
+  if (!value || value === "off") {
+    return value;
+  }
+  return "on";
+}
+
+function resolveThinkLevelPatchValue(value: string, isBinary: boolean): string | null {
+  if (!value) {
+    return null;
+  }
+  if (!isBinary) {
+    return value;
+  }
+  if (value === "on") {
+    return "low";
+  }
+  return value;
+}
+
+// ── Session display name resolution ──────────────────────────────
+
+function resolveSessionFriendlyName(key: string, row: GatewaySessionRow): string {
+  const label = row.label?.trim();
+  if (label && label !== key) {
+    return label;
+  }
+  const dn = row.displayName?.trim();
+  if (dn && dn !== key) {
+    return dn;
+  }
+  if (key === "main" || key.endsWith(":main")) {
+    return "Main Session";
+  }
+  if (key.includes(":cron:") && key.includes(":run:")) {
+    return "Cron Run";
+  }
+  if (key.includes(":cron:")) {
+    return "Cron Job";
+  }
+  if (key.includes(":subagent:")) {
+    return "Subagent";
+  }
+  if (key.includes(":openai:")) {
+    return "OpenAI Session";
+  }
+  const directMatch = key.match(/:([^:]+):direct:(.+)$/);
+  if (directMatch) {
+    return `${capitalize(directMatch[1])} · ${directMatch[2]}`;
+  }
+  const groupMatch = key.match(/:([^:]+):group:(.+)$/);
+  if (groupMatch) {
+    return `${capitalize(groupMatch[1])} Group`;
+  }
+  return key;
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function extractAgentId(key: string): string {
+  const match = key.match(/^agent:([^:]+):/);
+  return match ? match[1] : "unknown";
+}
+
+function resolveAgentLabel(agentId: string, agents?: AgentInfo[]): string {
+  if (!agents) {
+    return agentId;
+  }
+  const agent = agents.find((a) => a.id === agentId);
+  if (agent) {
+    return `${agent.emoji ?? "🤖"} ${agent.name}`;
+  }
+  return agentId;
+}
+
+const PAGE_SIZES = [10, 20, 25] as const;
+
+function renderPaginationControls(opts: {
+  total: number;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+}) {
+  const totalPages = Math.max(1, Math.ceil(opts.total / opts.pageSize));
+  const page = Math.min(opts.page, totalPages);
+  const start = (page - 1) * opts.pageSize + 1;
+  const end = Math.min(page * opts.pageSize, opts.total);
+
+  return html`
+    <div class="pagination-controls">
+      <label class="field" style="margin:0;">
+        <select
+          style="padding: 4px 8px; font-size: 12px;"
+          @change=${(e: Event) => opts.onPageSizeChange(Number((e.target as HTMLSelectElement).value))}
+        >
+          ${PAGE_SIZES.map(
+            (s) => html`<option value=${s} ?selected=${opts.pageSize === s}>${s} per page</option>`,
+          )}
+        </select>
+      </label>
+      <span class="muted" style="font-size: 12px;">
+        ${opts.total > 0 ? `${start}–${end} of ${opts.total}` : "0 results"}
+      </span>
+      <div style="display:flex; gap:4px;">
+        <button class="btn btn--sm" ?disabled=${page <= 1} @click=${() => opts.onPageChange(page - 1)}>‹ Prev</button>
+        <button class="btn btn--sm" ?disabled=${page >= totalPages} @click=${() => opts.onPageChange(page + 1)}>Next ›</button>
+      </div>
+    </div>
+  `;
+}
+
+export function renderSessions(props: SessionsProps) {
+  const allRows = props.result?.sessions ?? [];
+  const agents = props.agents ?? [];
+  const agentFilter = props.agentFilter ?? "";
+
+  const filteredRows = agentFilter
+    ? allRows.filter((row) => extractAgentId(row.key) === agentFilter)
+    : allRows;
+
+  // Client-side pagination for live sessions
+  const liveTotal = filteredRows.length;
+  const liveTotalPages = Math.max(1, Math.ceil(liveTotal / props.livePageSize));
+  const livePage = Math.min(props.livePage, liveTotalPages);
+  const liveStart = (livePage - 1) * props.livePageSize;
+  const rows = filteredRows.slice(liveStart, liveStart + props.livePageSize);
+
+  return html`
+    <section class="card">
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <div class="card-title">Sessions</div>
+          <div class="card-sub">Inspect active sessions and adjust per-session defaults.</div>
+        </div>
+        <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+          ${props.loading ? "Loading…" : "Refresh"}
+        </button>
+      </div>
+
+      <div class="filters" style="margin-top: 14px;">
+        ${
+          agents.length > 0
+            ? html`
+              <label class="field">
+                <span>Agent</span>
+                <select
+                  @change=${(e: Event) =>
+                    props.onAgentFilterChange?.((e.target as HTMLSelectElement).value)}
+                >
+                  <option value="" ?selected=${!agentFilter}>All Agents</option>
+                  ${agents.map(
+                    (a) =>
+                      html`<option value=${a.id} ?selected=${agentFilter === a.id}>
+                        ${a.emoji ?? "🤖"} ${a.name}
+                      </option>`,
+                  )}
+                </select>
+              </label>
+            `
+            : nothing
+        }
+        <label class="field">
+          <span>Active within (minutes)</span>
+          <input
+            .value=${props.activeMinutes}
+            @input=${(e: Event) =>
+              props.onFiltersChange({
+                activeMinutes: (e.target as HTMLInputElement).value,
+                limit: props.limit,
+                includeGlobal: props.includeGlobal,
+                includeUnknown: props.includeUnknown,
+              })}
+          />
+        </label>
+        <label class="field">
+          <span>Limit</span>
+          <input
+            .value=${props.limit}
+            @input=${(e: Event) =>
+              props.onFiltersChange({
+                activeMinutes: props.activeMinutes,
+                limit: (e.target as HTMLInputElement).value,
+                includeGlobal: props.includeGlobal,
+                includeUnknown: props.includeUnknown,
+              })}
+          />
+        </label>
+        <label class="field checkbox">
+          <span>Include global</span>
+          <input
+            type="checkbox"
+            .checked=${props.includeGlobal}
+            @change=${(e: Event) =>
+              props.onFiltersChange({
+                activeMinutes: props.activeMinutes,
+                limit: props.limit,
+                includeGlobal: (e.target as HTMLInputElement).checked,
+                includeUnknown: props.includeUnknown,
+              })}
+          />
+        </label>
+        <label class="field checkbox">
+          <span>Include unknown</span>
+          <input
+            type="checkbox"
+            .checked=${props.includeUnknown}
+            @change=${(e: Event) =>
+              props.onFiltersChange({
+                activeMinutes: props.activeMinutes,
+                limit: props.limit,
+                includeGlobal: props.includeGlobal,
+                includeUnknown: (e.target as HTMLInputElement).checked,
+              })}
+          />
+        </label>
+      </div>
+
+      ${
+        props.error
+          ? html`<div class="callout danger" style="margin-top: 12px;">${props.error}</div>`
+          : nothing
+      }
+
+      <div class="muted" style="margin-top: 12px;">
+        ${props.result ? `Store: ${props.result.path}` : ""}
+        ${
+          agentFilter && liveTotal === 0
+            ? ` · No sessions for ${resolveAgentLabel(agentFilter, agents)}`
+            : ` · ${liveTotal} session${liveTotal !== 1 ? "s" : ""}`
+        }
+      </div>
+
+      <div class="sessions-grid" style="margin-top: 16px;">
+        <div class="sessions-grid__head">
+          <div>Session</div>
+          <div>Agent</div>
+          <div>Kind</div>
+          <div>Updated</div>
+          <div>Tokens</div>
+          <div>Thinking</div>
+          <div>Reasoning</div>
+          <div>Actions</div>
+        </div>
+        ${
+          rows.length === 0
+            ? html`
+              <div class="muted" style="padding: 16px; grid-column: 1 / -1;">
+                ${
+                  agentFilter
+                    ? `No sessions found for ${resolveAgentLabel(agentFilter, agents)}.`
+                    : "No sessions found."
+                }
+              </div>
+            `
+            : rows.map((row) =>
+                renderRow(
+                  row,
+                  props.basePath,
+                  props.onPatch,
+                  props.onDelete,
+                  props.onArchive,
+                  props.loading,
+                  props.onViewHistory,
+                  agents,
+                ),
+              )
+        }
+      </div>
+      ${liveTotal > 0 ? renderPaginationControls({
+        total: liveTotal,
+        page: livePage,
+        pageSize: props.livePageSize,
+        onPageChange: props.onLivePageChange,
+        onPageSizeChange: props.onLivePageSizeChange,
+      }) : nothing}
+    </section>
+
+    ${renderSessionHistory(props)}
+
+    <style>
+      .sessions-grid {
+        display: grid;
+        grid-template-columns: 2fr 1.2fr 0.6fr 0.8fr 1fr 0.8fr 0.8fr auto;
+        gap: 0;
+        font-size: 13px;
+      }
+      .sessions-grid__head {
+        display: contents;
+      }
+      .sessions-grid__head > div {
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted, #888);
+        border-bottom: 1px solid var(--border, #333);
+      }
+      .sessions-grid__row {
+        display: contents;
+      }
+      .sessions-grid__row > div {
+        padding: 10px 10px;
+        border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+        display: flex;
+        align-items: center;
+      }
+      .sessions-grid__row:hover > div {
+        background: rgba(255,255,255,0.02);
+      }
+      .sessions-grid__row .session-name-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+      }
+      .sessions-grid__row .session-actions {
+        gap: 6px;
+        justify-content: flex-end;
+      }
+      .sessions-grid select {
+        max-width: 100px;
+      }
+    </style>
+  `;
+}
+
+function renderSessionHistory(props: SessionsProps) {
+  const archivedSessions = props.archivedResult?.sessions ?? [];
+
+  return html`
+    <section class="card" style="margin-top: 24px;">
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <div class="card-title">Session History</div>
+          <div class="card-sub">Browse and manage archived sessions.</div>
+        </div>
+        <button class="btn" ?disabled=${props.archivedLoading} @click=${props.onArchivedRefresh}>
+          ${props.archivedLoading ? "Loading…" : "Refresh"}
+        </button>
+      </div>
+
+      <div class="filters" style="margin-top: 14px;">
+        <label class="field" style="flex: 1;">
+          <span>Search</span>
+          <input
+            type="text"
+            placeholder="Search sessions..."
+            .value=${props.archivedSearch}
+            @input=${(e: Event) =>
+              props.onArchivedSearchChange((e.target as HTMLInputElement).value)}
+          />
+        </label>
+      </div>
+
+      ${
+        props.archivedError
+          ? html`<div class="callout danger" style="margin-top: 12px;">${props.archivedError}</div>`
+          : nothing
+      }
+
+      <div class="muted" style="margin-top: 12px;">
+        ${props.archivedResult ? `${props.archivedResult.total} archived session${props.archivedResult.total !== 1 ? "s" : ""}` : ""}
+      </div>
+
+      <div class="archived-sessions-grid" style="margin-top: 16px;">
+        <div class="archived-sessions-grid__head">
+          <div>Session</div>
+          <div>Agent</div>
+          <div>Archived</div>
+          <div>Messages</div>
+          <div>Actions</div>
+        </div>
+        ${
+          props.archivedLoading && archivedSessions.length === 0
+            ? html`
+                <div class="muted" style="padding: 16px; grid-column: 1 / -1; text-align: center">
+                  Loading archived sessions...
+                </div>
+              `
+            : archivedSessions.length === 0
+              ? html`
+                  <div class="muted" style="padding: 16px; grid-column: 1 / -1; text-align: center">
+                    No archived sessions found.
+                  </div>
+                `
+              : archivedSessions.map((session) => renderArchivedSessionRow(session, props))
+        }
+      </div>
+      ${(props.archivedResult?.total ?? 0) > 0 ? renderPaginationControls({
+        total: props.archivedResult?.total ?? 0,
+        page: props.archivedPage,
+        pageSize: props.archivedPageSize,
+        onPageChange: props.onArchivedPageChange,
+        onPageSizeChange: props.onArchivedPageSizeChange,
+      }) : nothing}
+    </section>
+
+    <style>
+      .archived-sessions-grid {
+        display: grid;
+        grid-template-columns: 2fr 1.2fr 1fr 0.8fr auto;
+        gap: 0;
+        font-size: 13px;
+      }
+      .archived-sessions-grid__head {
+        display: contents;
+      }
+      .archived-sessions-grid__head > div {
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted, #888);
+        border-bottom: 1px solid var(--border, #333);
+      }
+      .archived-sessions-grid__row {
+        display: contents;
+      }
+      .archived-sessions-grid__row > div {
+        padding: 10px 10px;
+        border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+        display: flex;
+        align-items: center;
+      }
+      .archived-sessions-grid__row:hover > div {
+        background: rgba(255,255,255,0.02);
+      }
+      .archived-sessions-grid__row .session-name-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+      }
+      .archived-sessions-grid__row .session-actions {
+        gap: 6px;
+        justify-content: flex-end;
+      }
+      .archived-sessions-grid__row .session-actions button {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 12px 10px 4px;
+        border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+        margin-top: 4px;
+      }
+    </style>
+  `;
+}
+
+function renderArchivedSessionRow(session: ArchivedSession, props: SessionsProps) {
+  const displayName =
+    session.displayName ||
+    (session.firstMessage
+      ? session.firstMessage.slice(0, 50) + (session.firstMessage.length > 50 ? "..." : "")
+      : session.sessionId);
+  const archivedTime = formatRelativeTimestamp(session.archivedAt);
+
+  function handleRename() {
+    const newName = window.prompt("Enter new session name:", displayName);
+    if (newName && newName !== displayName) {
+      props.onRenameSession(session.sessionId, newName);
+    }
+  }
+
+  return html`
+    <div class="archived-sessions-grid__row">
+      <div class="session-name-cell">
+        <span style="font-weight: 600;">${displayName}</span>
+        <span class="muted" style="font-size: 11px; opacity: 0.5; font-family: monospace;">
+          ${session.sessionKey}
+        </span>
+      </div>
+      <div>${session.agentId}</div>
+      <div>${archivedTime}</div>
+      <div>${session.messageCount || 0}</div>
+      <div class="session-actions">
+        <button class="btn" @click=${() => props.onResumeSession(session.sessionId)}>
+          Resume
+        </button>
+        <button class="btn" @click=${handleRename}>Rename</button>
+        <button class="btn danger" @click=${() => props.onDeleteArchivedSession(session.sessionId)}>
+          Delete
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderRow(
+  row: GatewaySessionRow,
+  basePath: string,
+  onPatch: SessionsProps["onPatch"],
+  onDelete: SessionsProps["onDelete"],
+  onArchive: SessionsProps["onArchive"],
+  disabled: boolean,
+  onViewHistory?: SessionsProps["onViewHistory"],
+  agents?: AgentInfo[],
+) {
+  const updated = row.updatedAt ? formatRelativeTimestamp(row.updatedAt) : "n/a";
+  const rawThinking = row.thinkingLevel ?? "";
+  const isBinaryThinking = isBinaryThinkingProvider(row.modelProvider);
+  const thinking = resolveThinkLevelDisplay(rawThinking, isBinaryThinking);
+  const thinkLevels = withCurrentOption(resolveThinkLevelOptions(row.modelProvider), thinking);
+  const reasoning = row.reasoningLevel ?? "";
+  const reasoningLevels = withCurrentOption(REASONING_LEVELS, reasoning);
+
+  const friendlyName = resolveSessionFriendlyName(row.key, row);
+  const isMainSession = row.key === "main" || row.key.endsWith(":main");
+  const agentId = extractAgentId(row.key);
+  const agentLabel = resolveAgentLabel(agentId, agents);
+
+  const canLink = row.kind !== "global";
+  const chatUrl = canLink
+    ? `${pathForTab("chat", basePath)}?session=${encodeURIComponent(row.key)}`
+    : null;
+
+  return html`
+    <div class="sessions-grid__row">
+      <div class="session-name-cell">
+        ${
+          canLink
+            ? html`<a href=${chatUrl} class="session-link" style="font-weight: 600; color: var(--accent, #6366f1);">${friendlyName}</a>`
+            : html`<span style="font-weight: 600;">${friendlyName}</span>`
+        }
+        <span class="muted" style="font-size: 11px; opacity: 0.5; font-family: monospace; word-break: break-all;">
+          ${row.key}
+        </span>
+      </div>
+      <div style="font-size: 13px;">${agentLabel}</div>
+      <div>${row.kind}</div>
+      <div>${updated}</div>
+      <div>${formatSessionTokens(row)}</div>
+      <div>
+        <select
+          ?disabled=${disabled}
+          @change=${(e: Event) => {
+            const value = (e.target as HTMLSelectElement).value;
+            onPatch(row.key, {
+              thinkingLevel: resolveThinkLevelPatchValue(value, isBinaryThinking),
+            });
+          }}
+        >
+          ${thinkLevels.map(
+            (level) =>
+              html`<option value=${level} ?selected=${thinking === level}>${level || "inherit"}</option>`,
+          )}
+        </select>
+      </div>
+      <div>
+        <select
+          ?disabled=${disabled}
+          @change=${(e: Event) => {
+            const value = (e.target as HTMLSelectElement).value;
+            onPatch(row.key, { reasoningLevel: value || null });
+          }}
+        >
+          ${reasoningLevels.map(
+            (level) =>
+              html`<option value=${level} ?selected=${reasoning === level}>${level || "inherit"}</option>`,
+          )}
+        </select>
+      </div>
+      <div class="session-actions">
+        ${
+          onViewHistory
+            ? html`<button class="btn" ?disabled=${disabled} @click=${() => onViewHistory(row.key)}>History</button>`
+            : nothing
+        }
+        ${
+          !isMainSession
+            ? html`<button class="btn" ?disabled=${disabled} @click=${() => onArchive(row.key)} title="Archive session and move to history">Archive</button>`
+            : nothing
+        }
+        <button class="btn danger" ?disabled=${disabled} @click=${() => onDelete(row.key)}>Delete</button>
+      </div>
+    </div>
+  `;
+}

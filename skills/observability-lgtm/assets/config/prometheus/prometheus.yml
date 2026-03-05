@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: local-mac
+    env: dev
+
+# ── Scrape targets ────────────────────────────────────────────────────────────
+
+scrape_configs:
+
+  # Self-monitoring
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
+
+  # Grafana
+  - job_name: grafana
+    static_configs:
+      - targets: [grafana:3000]
+
+  # Loki
+  - job_name: loki
+    static_configs:
+      - targets: [loki:3100]
+
+  # Tempo
+  - job_name: tempo
+    static_configs:
+      - targets: [tempo:3200]
+
+  # Alloy
+  - job_name: alloy
+    static_configs:
+      - targets: [alloy:12345]
+
+  # ── Native Mac apps (via file-based service discovery) ────────────────────
+  # Add apps with: scripts/register_app.sh <name> <host_port>
+  # Prometheus reaches the Mac host via host.docker.internal
+  - job_name: openclaw_apps
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/targets/*.json
+        refresh_interval: 30s
+    relabel_configs:
+      # Replace host.docker.internal with the actual host
+      - source_labels: [__address__]
+        target_label: __address__
+
+  # Tempo-generated service graph metrics (RED metrics per service pair)
+  - job_name: tempo_metrics_generator
+    static_configs:
+      - targets: [tempo:3200]
+    metrics_path: /metrics

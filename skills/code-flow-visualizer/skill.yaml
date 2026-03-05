@@ -1,0 +1,41 @@
+# Skill: code_flow_visualizer
+
+transform_code_to_flowchart(code: string, language: string) => string
+
+## Trigger Patterns
+- 可视化代码
+- 生成流程图
+- 代码流程图
+- flowchart
+- 代码结构图
+
+## Implementation
+
+使用正则表达式和 AST 分析提取代码逻辑，生成 Mermaid 流程图代码。
+
+```javascript
+// 简化实现示例
+function transformToFlowchart(code, language) {
+  // 分析代码结构
+  const lines = code.split('\n');
+  let mermaid = 'flowchart TD\n';
+  let id = 1;
+  
+  for (const line of lines) {
+    if (line.includes('if')) {
+      mermaid += `  A${id}[${line.trim()}] --> |condition| `;
+      id++;
+    } else if (line.includes('for') || line.includes('while')) {
+      mermaid += `  A${id}[${line.trim()}] --> |loop| `;
+      id++;
+    } else {
+      mermaid += `  A${id}[${line.trim()}] --> \n`;
+      id++;
+    }
+  }
+  
+  return mermaid;
+}
+```
+
+返回 Mermaid 格式的流程图代码，用户可以在支持 Mermaid 的编辑器中查看。

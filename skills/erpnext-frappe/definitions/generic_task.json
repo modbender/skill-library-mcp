@@ -1,0 +1,242 @@
+{
+  "name": "generic_task",
+  "version": "1.0.0",
+  "description": "Generic skill for handling any custom business task - dynamically discovers and executes appropriate tools based on user intent",
+  "author": "Business Claw Team",
+  "category": "utility",
+  
+  "triggers": [
+    "do something",
+    "handle this",
+    "custom task",
+    "general task",
+    "process",
+    "execute",
+    "run report",
+    "check status",
+    "update record",
+    "bulk operation",
+    "anything else",
+    "other task"
+  ],
+  
+  "capabilities": {
+    "dynamic_doctype_detection": true,
+    "fallback_to_search": true,
+    "multi_step_workflow": true,
+    "error_recovery": true
+  },
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "task_description": {
+        "type": "string",
+        "description": "Natural language description of what needs to be done"
+      },
+      "target_doctype": {
+        "type": "string",
+        "description": "Target DocType (optional - will discover if not provided)"
+      },
+      "target_name": {
+        "type": "string",
+        "description": "Specific document name/ID (optional)"
+      },
+      "filters": {
+        "type": "object",
+        "description": "Filter criteria (optional)"
+      },
+      "data": {
+        "type": "object",
+        "description": "Data to create/update (optional)"
+      },
+      "action": {
+        "type": "string",
+        "enum": ["create", "read", "update", "delete", "list", "search", "submit", "cancel", "custom"],
+        "description": "Action to perform"
+      },
+      "options": {
+        "type": "object",
+        "description": "Additional options (limit, fields, etc.)"
+      }
+    },
+    "required": ["task_description"]
+  },
+  
+  "decision_tree": {
+    "if_action_is_create": {
+      "steps": [
+        {
+          "step": "discover_doctype",
+          "tool": "list_doctypes",
+          "condition": "target_doctype not provided"
+        },
+        {
+          "step": "get_schema",
+          "tool": "get_doctype_meta",
+          "arguments": { "doctype": "${target_doctype}" }
+        },
+        {
+          "step": "validate_data",
+          "tool": "validate_doctype",
+          "arguments": { "doctype": "${target_doctype}" }
+        },
+        {
+          "step": "create_document",
+          "tool": "create_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "data": "${data}",
+            "smart_mode": true
+          }
+        }
+      ]
+    },
+    "if_action_is_read": {
+      "steps": [
+        {
+          "step": "get_document",
+          "tool": "get_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        }
+      ]
+    },
+    "if_action_is_update": {
+      "steps": [
+        {
+          "step": "get_document",
+          "tool": "get_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        },
+        {
+          "step": "update_document",
+          "tool": "update_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}",
+            "data": "${data}"
+          }
+        }
+      ]
+    },
+    "if_action_is_delete": {
+      "steps": [
+        {
+          "step": "get_document",
+          "tool": "get_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        },
+        {
+          "step": "delete_document",
+          "tool": "delete_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        }
+      ]
+    },
+    "if_action_is_list": {
+      "steps": [
+        {
+          "step": "list_documents",
+          "tool": "list_documents",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "filters": "${filters}",
+            "limit": "${options.limit}"
+          }
+        }
+      ]
+    },
+    "if_action_is_search": {
+      "steps": [
+        {
+          "step": "search",
+          "tool": "search_documents",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "query": "${task_description}",
+            "limit": "${options.limit}"
+          }
+        }
+      ]
+    },
+    "if_action_is_submit": {
+      "steps": [
+        {
+          "step": "submit",
+          "tool": "submit_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        }
+      ]
+    },
+    "if_action_is_cancel": {
+      "steps": [
+        {
+          "step": "cancel",
+          "tool": "cancel_document",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}"
+          }
+        }
+      ]
+    },
+    "if_action_is_custom": {
+      "description": "For custom methods - user specifies method name and args",
+      "steps": [
+        {
+          "step": "run_custom_method",
+          "tool": "run_doc_method",
+          "arguments": {
+            "doctype": "${target_doctype}",
+            "name": "${target_name}",
+            "method": "${options.method}",
+            "args": "${options.args}"
+          }
+        }
+      ]
+    }
+  },
+  
+  "error_handling": {
+    "doctype_not_found": {
+      "fallback": "search_documents",
+      "suggestion": "Search for similar documents or list available DocTypes"
+    },
+    "permission_denied": {
+      "fallback": "get_permissions",
+      "suggestion": "Check user permissions for this DocType"
+    },
+    "validation_error": {
+      "fallback": "get_doctype_fields",
+      "suggestion": "Review required fields and data types"
+    },
+    "not_found": {
+      "fallback": "list_documents",
+      "suggestion": "List existing documents of this type"
+    }
+  },
+  
+  "guardrails": {
+    "require_confirmation_for_delete": true,
+    "log_all_operations": true,
+    "validate_permissions": true,
+    "max_bulk_operations": 100
+  },
+  
+  "output_template": "Task completed: {{action}} on {{target_doctype}}\nResult: {{result_summary}}\n{{#if warnings}}Warnings: {{warnings}}{{/if}}"
+}

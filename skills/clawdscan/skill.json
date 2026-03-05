@@ -1,0 +1,140 @@
+{
+  "name": "clawdscan",
+  "version": "0.1.0",
+  "description": "Clawdbot Session Health Analyzer - diagnose bloat, find zombies, reclaim disk space",
+  "author": "Yajat Dua <yajatns@gmail.com>",
+  "license": "MIT",
+  "repository": "https://github.com/yajatns/clawdscan",
+  "keywords": ["clawdbot", "diagnostics", "session", "cleanup", "health"],
+  "engines": {
+    "clawdbot": ">=1.0.0",
+    "python": ">=3.8"
+  },
+  "main": "clawdscan.py",
+  "bin": {
+    "clawdscan": "clawdscan.py"
+  },
+  "tools": [
+    {
+      "name": "clawdscan_scan",
+      "description": "Perform full health scan of Clawdbot sessions",
+      "command": "python3 clawdscan.py scan",
+      "parameters": {
+        "json_output": {
+          "type": "string",
+          "description": "Export scan results to JSON file"
+        }
+      }
+    },
+    {
+      "name": "clawdscan_top",
+      "description": "Show top sessions by size or message count",
+      "command": "python3 clawdscan.py top",
+      "parameters": {
+        "n": {
+          "type": "integer",
+          "description": "Number of top sessions to show (default: 15)"
+        },
+        "sort": {
+          "type": "string",
+          "enum": ["size", "messages"],
+          "description": "Sort by size (bytes) or message count"
+        }
+      }
+    },
+    {
+      "name": "clawdscan_inspect",
+      "description": "Deep-inspect a specific session",
+      "command": "python3 clawdscan.py inspect",
+      "parameters": {
+        "session_id": {
+          "type": "string",
+          "required": true,
+          "description": "Session ID to inspect"
+        }
+      }
+    },
+    {
+      "name": "clawdscan_tools",
+      "description": "Aggregate tool usage statistics",
+      "command": "python3 clawdscan.py tools"
+    },
+    {
+      "name": "clawdscan_models",
+      "description": "Model usage patterns analysis",
+      "command": "python3 clawdscan.py models"
+    },
+    {
+      "name": "clawdscan_disk",
+      "description": "Disk usage breakdown analysis",
+      "command": "python3 clawdscan.py disk"
+    },
+    {
+      "name": "clawdscan_clean",
+      "description": "Clean up sessions (zombies, stale)",
+      "command": "python3 clawdscan.py clean",
+      "parameters": {
+        "zombies": {
+          "type": "boolean",
+          "description": "Clean zombie sessions (created but never used)"
+        },
+        "stale_days": {
+          "type": "integer",
+          "description": "Clean sessions inactive for N days"
+        },
+        "execute": {
+          "type": "boolean",
+          "description": "Execute cleanup (default: preview only)"
+        }
+      }
+    },
+    {
+      "name": "clawdscan_history",
+      "description": "View session health trends over time",
+      "command": "python3 clawdscan.py history",
+      "parameters": {
+        "days": {
+          "type": "integer",
+          "description": "Number of days of history to show (default: 30)"
+        }
+      }
+    }
+  ],
+  "dependencies": {
+    "python": ["pathlib", "datetime", "collections", "json", "argparse"]
+  },
+  "heartbeat": {
+    "enabled": true,
+    "interval": "6h",
+    "command": "clawdscan_scan",
+    "triggers": [
+      {
+        "condition": "bloated_sessions > 5",
+        "action": "notify",
+        "message": "Found {bloated_sessions} bloated sessions - consider cleanup"
+      },
+      {
+        "condition": "total_size > 100MB",
+        "action": "notify", 
+        "message": "Clawdbot sessions using {total_size} - cleanup recommended"
+      }
+    ]
+  },
+  "config": {
+    "clawdbot_dir": {
+      "type": "string",
+      "description": "Clawdbot config directory path",
+      "default": "~/.clawdbot"
+    },
+    "cleanup_auto": {
+      "type": "boolean",
+      "description": "Enable automatic cleanup of zombie sessions",
+      "default": false
+    },
+    "stale_threshold_days": {
+      "type": "integer",
+      "description": "Days before marking sessions as stale",
+      "default": 7
+    }
+  }
+}

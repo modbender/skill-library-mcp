@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Lobster</title>
+<style>
+  * { margin: 0; padding: 0; }
+  html, body {
+    background: transparent;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+  canvas {
+    -webkit-app-region: drag;
+    width: 100vw;
+    height: 100vh;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+</style>
+</head>
+<body>
+<canvas id="c" style="width:100%;height:100%;display:block;"></canvas>
+<script>
+// ═══════════════════════════════════════════════════════
+// PIXEL LOBSTER — Desktop pet with lip-sync
+//
+// Two audio modes:
+//   "system" — captures system audio, reacts to everything
+//   "tts"    — polls a TTS server envelope endpoint, speech-only
+// ═══════════════════════════════════════════════════════
+
+// ── Config from URL params (set by main.js) ──
+const params = new URLSearchParams(window.location.search);
+const AUDIO_MODE = params.get('audioMode') || 'system';
+const TTS_URL = params.get('ttsUrl') || 'http://127.0.0.1:8787';
+const TTS_ENVELOPE_PATH = params.get('ttsEnvelopePath') || '/audio/envelope';
+const TTS_POLL_IDLE = parseInt(params.get('ttsPollIdleMs')) || 500;
+const TTS_POLL_ACTIVE = parseInt(params.get('ttsPollActiveMs')) || 45;
+const LOBSTER_SCALE = parseInt(params.get('lobsterScale')) || 4;
+const SWIM_ENABLED = params.get('swimEnabled') !== 'false';
+const SWIM_SPEED = parseFloat(params.get('swimSpeed')) || 1.0;
+
+const SPRITE = 120;
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+function resizeCanvas() { c.width = window.innerWidth; c.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Re-center lobster when F8 moves window to a new display
+if (window.lobsterAPI?.onDisplayChanged) {
+  window.lobsterAPI.onDisplayChanged(() => {
+    resizeCanvas();
+    lobX = window.innerWidth / 2;
+    lobY = window.innerHeight / 2;
+    swimTarget.x = window.innerWidth / 2;
+    swimTarget.y = window.innerHeight / 2;
+  });
+}
+
+// ── Swimming ──
+let lobX = window.innerWidth / 2;
+let lobY = window.innerHeight / 2;
+let lobVX = (0.4 + Math.random() * 0.3) * SWIM_SPEED;
+let lobVY = (0.2 + Math.random() * 0.2) * SWIM_SPEED;
+let lobFacing = 1;
+let swimTarget = { x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight };
+let swimTimer = 0;
+let bobPhase = 0;
+
+function updateSwim() {
+  if (!SWIM_ENABLED) return;
+  swimTimer -= 0.016;
+  if (swimTimer <= 0) {
+    let margin = SPRITE * LOBSTER_SCALE * 0.5;
+    swimTarget.x = margin + Math.random() * (window.innerWidth - margin * 2);
+    swimTarget.y = margin + Math.random() * (window.innerHeight - margin * 2);
+    swimTimer = 3 + Math.random() * 5;
+  }
+  let dx = swimTarget.x - lobX, dy = swimTarget.y - lobY;
+  let dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > 5) {
+    lobVX += (dx / dist) * 0.02 * SWIM_SPEED;
+    lobVY += (dy / dist) * 0.015 * SWIM_SPEED;
+  }
+  lobVX *= 0.995; lobVY *= 0.995;
+  let maxSpd = (talking ? 0.8 : 1.5) * SWIM_SPEED;
+  let spd = Math.sqrt(lobVX * lobVX + lobVY * lobVY);
+  if (spd > maxSpd) { lobVX *= maxSpd / spd; lobVY *= maxSpd / spd; }
+  lobX += lobVX; lobY += lobVY;
+  let margin = SPRITE * LOBSTER_SCALE * 0.4;
+  if (lobX < margin) { lobX = margin; lobVX = Math.abs(lobVX); }
+  if (lobX > window.innerWidth - margin) { lobX = window.innerWidth - margin; lobVX = -Math.abs(lobVX); }
+  if (lobY < margin) { lobY = margin; lobVY = Math.abs(lobVY); }
+  if (lobY > window.innerHeight - margin) { lobY = window.innerHeight - margin; lobVY = -Math.abs(lobVY); }
+  if (Math.abs(lobVX) > 0.1) lobFacing = lobVX > 0 ? 1 : -1;
+  bobPhase += 0.02;
+}
+
+const W = SPRITE, H = SPRITE;
+
+// ── Colors ──
+const C = {
+  shell:'#c0392b', shellDk:'#962d22', shellLt:'#e74c3c',
+  belly:'#e8a87c', bellyDk:'#d4956a',
+  eye:'#fff', pupil:'#111', shine:'#ccddff',
+  claw:'#c0392b', clawDk:'#962d22',
+  ant:'#c0392b', antTip:'#e74c3c',
+  mouth:'#2c1810', mouthIn:'#1a0f0a',
+  tongue:'#d4657a', tooth:'#f0e6d6', gum:'#8b3a3a',
+  leg:'#b03525'
+};
+
+let audioCtx, analyser, tData, fData;
+let vol=0, sVol=0, talking=false;
+let t=0, blinkT=3, blink=false, breath=0, clawP=0;
+let eyeX=0, eyeY=0, eyeTX=0, eyeTY=0, eyeT=2;
+let mouth=0, viseme='X';
+let bubbles=[];
+
+function px(x,y,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),1,1); }
+function rect(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),w,h); }
+function row(x,y,w,c){ rect(x,y,w,1,c); }
+
+// ── Mouth shapes (6 visemes + closed, all distinct at any intensity) ──
+function drawMouth(cx, cy, shape, i) {
+  i = Math.max(0.3, i);
+  switch(shape) {
+    case 'X': rect(cx-3, cy, 6, 1, C.shellDk); break;
+    case 'A': { let w=Math.round(5+i*3), h=Math.round(3+i*3), mx=cx-Math.floor(w/2), my=cy-Math.floor(h/2); rect(mx-1,my,w+2,h,C.shellDk); rect(mx,my-1,w,h+2,C.shellDk); rect(mx,my,w,h,C.mouth); rect(mx+1,my+1,w-2,Math.max(1,h-2),C.mouthIn); rect(mx+1,my+h-2,w-2,2,C.tongue); px(mx+1,my,C.tooth); px(mx+w-2,my,C.tooth); break; }
+    case 'B': { let w=Math.round(6+i*3), h=Math.round(2+i*1), mx=cx-Math.floor(w/2), my=cy-Math.floor(h/2); rect(mx-1,my,w+2,h,C.shellDk); rect(mx,my,w,h,C.mouth); for(let tt=0;tt<w;tt++) px(mx+tt,my,tt%2===0?C.tooth:C.mouth); if(h>2) rect(mx+1,my+h-1,w-2,1,C.mouthIn); break; }
+    case 'C': { let r=Math.max(2,Math.round(2+i*2)), d=r*2, mx=cx-r, my=cy-r; rect(mx+1,my,d-2,d,C.shellDk); rect(mx,my+1,d,d-2,C.shellDk); rect(mx+1,my+1,d-2,d-2,C.mouth); rect(mx+2,my+2,Math.max(1,d-4),Math.max(1,d-4),C.mouthIn); break; }
+    case 'D': { let d=Math.max(3,Math.round(2+i*2)), mx=cx-Math.floor(d/2), my=cy-Math.floor(d/2); rect(mx+1,my,d-2,d,C.shellDk); rect(mx,my+1,d,d-2,C.shellDk); rect(mx+1,my+1,Math.max(1,d-2),Math.max(1,d-2),C.mouthIn); break; }
+    case 'E': { let w=Math.round(4+i*2), h=Math.round(3+i*2), mx=cx-Math.floor(w/2), my=cy-Math.floor(h/2); rect(mx-1,my,w+2,h,C.shellDk); rect(mx,my-1,w,h+2,C.shellDk); rect(mx,my,w,h,C.mouth); rect(mx+1,my+1,w-2,Math.max(1,h-2),C.mouthIn); rect(mx+1,my+h-1,w-2,1,C.tongue); break; }
+    case 'F': { let w=Math.round(5+i*2), h=Math.round(2+i*2), mx=cx-Math.floor(w/2), my=cy-1; rect(mx-1,my,w+2,h+1,C.shellDk); rect(mx,my,w,1,C.tooth); rect(mx,my+1,w,1,C.gum); rect(mx,my+2,w,Math.max(1,h-1),C.mouth); break; }
+  }
+}
+
+// ── Lobster sprite ──
+function drawLobster() {
+  let by = Math.sin(breath)*0.7, cy = Math.sin(clawP)*(talking?1.8:0.8);
+  for(let i=0;i<12;i++){ px(48-i*0.8+Math.sin(i*0.5+t)*0.8, 20+by-i*1.2, i>9?C.antTip:C.ant); px(72+i*0.8+Math.sin(i*0.5+t+1)*0.8, 20+by-i*1.2, i>9?C.antTip:C.ant); }
+  let lcx=28, lcy=52+by+cy, rcx=86, rcy=52+by-cy, cg=Math.round(mouth*1.5);
+  rect(34,45+by,4,2,C.leg); rect(30,47+by,5,2,C.leg); rect(lcx-2,lcy-2,8,6,C.claw); rect(lcx-1,lcy-3,6,1,C.claw); rect(lcx-1,lcy+4,6,1,C.claw); ctx.clearRect(Math.round(lcx),Math.round(lcy),4,1+cg); rect(lcx-3,lcy-1,2,2,C.clawDk);
+  rect(82,45+by,4,2,C.leg); rect(85,47+by,5,2,C.leg); rect(rcx-2,rcy-2,8,6,C.claw); rect(rcx-1,rcy-3,6,1,C.claw); rect(rcx-1,rcy+4,6,1,C.claw); ctx.clearRect(Math.round(rcx),Math.round(rcy),4,1+cg); rect(rcx+5,rcy-1,2,2,C.clawDk);
+  for(let i=0;i<3;i++){ let lo=Math.sin(t*2+i*1.5); rect(38,72+i*5+by,3,1,C.leg); rect(35+lo,73+i*5+by,4,1,C.leg); rect(79,72+i*5+by,3,1,C.leg); rect(81-lo,73+i*5+by,4,1,C.leg); }
+  rect(52,88+by,16,4,C.shellDk); rect(50,92+by,20,3,C.shellDk); rect(48,95+by,24,2,C.shell); rect(45,97+by,6,3,C.shellLt); rect(52,97+by,16,3,C.shell); rect(69,97+by,6,3,C.shellLt); rect(43,100+by,4,2,C.shellLt); rect(73,100+by,4,2,C.shellLt);
+  rect(42,30+by,36,30,C.shell); rect(40,33+by,40,24,C.shell); rect(44,28+by,32,4,C.shell); for(let i=0;i<5;i++) row(43,35+i*6+by,34,C.shellDk); rect(46,32+by,8,2,C.shellLt); rect(44,34+by,4,8,C.shellLt);
+  rect(48,60+by,24,12,C.belly); rect(50,58+by,20,3,C.belly); row(50,64+by,20,C.bellyDk); row(50,68+by,20,C.bellyDk);
+  rect(44,22+by,32,14,C.shell); rect(46,20+by,28,4,C.shell); rect(48,19+by,24,2,C.shellLt);
+  let ey=18+by;
+  rect(48,ey+2,2,4,C.shell); rect(45,ey-2,8,6,C.eye); rect(44,ey-1,10,4,C.eye);
+  if(blink){ rect(45,ey,8,2,C.shellDk); } else{ let px2=48+Math.round(eyeX*1.2); rect(px2,ey+Math.round(eyeY*0.8),3,3,C.pupil); px(px2+2,ey+Math.round(eyeY*0.8)-1,C.shine); }
+  rect(70,ey+2,2,4,C.shell); rect(67,ey-2,8,6,C.eye); rect(66,ey-1,10,4,C.eye);
+  if(blink){ rect(67,ey,8,2,C.shellDk); } else{ let px2=70+Math.round(eyeX*1.2); rect(px2,ey+Math.round(eyeY*0.8),3,3,C.pupil); px(px2+2,ey+Math.round(eyeY*0.8)-1,C.shine); }
+  drawMouth(60, 33+by, viseme, mouth);
+}
+
+// ── Bubbles ──
+function updateBubbles(){ if(talking&&Math.random()<mouth*0.2) bubbles.push({x:60+(Math.random()-0.5)*8,y:70,r:1+Math.random()*1.5,vx:(Math.random()-0.5)*0.3,vy:-0.5-Math.random()*0.4,life:1}); bubbles=bubbles.filter(b=>{ b.x+=b.vx+Math.sin(t*2+b.x)*0.1;b.y+=b.vy;b.life-=0.012; return b.life>0&&b.y>-5; }); }
+function drawBubbles(){ bubbles.forEach(b=>{ ctx.globalAlpha=b.life*0.3; ctx.fillStyle='rgba(120,180,255,0.4)'; ctx.fillRect(Math.round(b.x),Math.round(b.y),Math.ceil(b.r),Math.ceil(b.r)); ctx.fillStyle='rgba(220,240,255,0.4)'; ctx.fillRect(Math.round(b.x),Math.round(b.y),1,1); }); ctx.globalAlpha=1; }
+
+// ═══════════════════════════════════════════
+// AUDIO ENGINE — dual mode
+// ═══════════════════════════════════════════
+
+let lastEnvId = 0, envData = [], envStartTime = 0, envPlaying = false;
+let prevVol = 0, volDelta = 0, visemeHold = 0;
+let envJitter = 0, envTrend = 0;
+let mouthVel = 0, mouthTarget = 0;
+let syllableUp = false, syllableCount = 0;
+let lastVisemes = ['X','X','X'];
+let audioReady = false;
+
+// ── System audio mode: capture loopback ──
+async function initSystemAudio() {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { width: 1, height: 1, frameRate: 1 },
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+    stream.getVideoTracks().forEach(tr => tr.stop());
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.75;
+    tData = new Uint8Array(analyser.fftSize);
+    fData = new Uint8Array(analyser.frequencyBinCount);
+    const at = stream.getAudioTracks();
+    if (at.length === 0) { console.log('No audio tracks'); return; }
+    audioCtx.createMediaStreamSource(new MediaStream(at)).connect(analyser);
+    audioReady = true;
+    console.log('System audio connected');
+  } catch(e) { console.log('Audio init error:', e.message); }
+}
+
+function analyzeSystemAudio() {
+  if (!audioReady || !analyser) { vol = 0; sVol *= 0.9; talking = false; mouth += (0 - mouth) * 0.15; if (mouth < 0.02) viseme = 'X'; return; }
+  analyser.getByteTimeDomainData(tData);
+  analyser.getByteFrequencyData(fData);
+  let sum = 0;
+  for (let i = 0; i < tData.length; i++) { let v = (tData[i] - 128) / 128; sum += v * v; }
+  vol = Math.min(1, Math.sqrt(sum / tData.length) * 3.5);
+  // Frequency bands
+  let len = fData.length, lo = 0, mi = 0, hi = 0;
+  let q1 = Math.floor(len * 0.15), q2 = Math.floor(len * 0.4);
+  for (let i = 0; i < q1; i++) lo += fData[i];
+  for (let i = q1; i < q2; i++) mi += fData[i];
+  for (let i = q2; i < len; i++) hi += fData[i];
+  let tot = lo + mi + hi + 0.001;
+  let lr = lo / tot, mr = mi / tot, hr = hi / tot;
+
+  sVol += (vol - sVol) * 0.3;
+  talking = sVol > 0.015;
+  if (!talking) { mouth += (0 - mouth) * 0.25; viseme = 'X'; return; }
+  let target = Math.min(0.6, sVol * 1.5);
+  mouth += (target - mouth) * 0.35;
+  if (sVol < 0.04) viseme = 'X';
+  else if (hr > 0.45) viseme = Math.random() > 0.5 ? 'F' : 'B';
+  else if (lr > 0.55 && mouth > 0.4) viseme = Math.random() > 0.4 ? 'A' : 'C';
+  else if (mr > 0.45) viseme = Math.random() > 0.5 ? 'E' : 'B';
+  else if (lr > 0.4 && mouth < 0.3) viseme = 'D';
+  else viseme = mouth > 0.5 ? 'A' : 'E';
+}
+
+// ── TTS envelope mode ──
+function analyzeTTSEnvelope() {
+  if (envPlaying && envData.length > 0) {
+    const elapsed = performance.now() - envStartTime;
+    const idx = Math.floor(elapsed / 50);
+    if (idx >= envData.length) { envPlaying = false; vol = 0; }
+    else if (idx >= 0) {
+      vol = envData[idx];
+      let prev2 = idx > 1 ? envData[idx-2] : vol;
+      let prev1 = idx > 0 ? envData[idx-1] : vol;
+      let next1 = idx < envData.length-1 ? envData[idx+1] : vol;
+      volDelta = vol - prev1;
+      envJitter = Math.abs(vol - prev1) + Math.abs(prev1 - prev2);
+      envTrend = next1 - prev1;
+    } else { vol = 0; }
+  } else { vol = 0; }
+
+  prevVol = vol; sVol += (vol - sVol) * 0.3; talking = sVol > 0.02;
+
+  if (!talking) {
+    mouthTarget = 0;
+    let spring = (mouthTarget - mouth) * 0.08;
+    mouthVel = mouthVel * 0.85 + spring;
+    mouth += mouthVel;
+    if (mouth < 0.01) { mouth = 0; mouthVel = 0; viseme = 'X'; }
+    visemeHold = 0; syllableUp = false; return;
+  }
+
+  let wasUp = syllableUp;
+  syllableUp = volDelta > 0.02;
+  if (syllableUp && !wasUp) syllableCount++;
+
+  mouthTarget = Math.min(0.65, sVol * 1.8);
+  if (volDelta < -0.04 && sVol < 0.15) mouthTarget *= 0.3;
+  let spring = (mouthTarget - mouth) * 0.12;
+  mouthVel = mouthVel * 0.75 + spring;
+  mouthVel += (Math.sin(t * 13.7) * 0.002 + Math.sin(t * 8.3) * 0.001);
+  mouth += mouthVel;
+  mouth = Math.max(0, Math.min(0.65, mouth));
+
+  visemeHold -= 0.016;
+  if (visemeHold <= 0) {
+    let newVis;
+    if (envJitter > 0.15) newVis = 'F';
+    else if (syllableUp && !wasUp && Math.abs(volDelta) > 0.05) newVis = sVol > 0.35 ? 'A' : 'E';
+    else if (volDelta < -0.04) newVis = sVol > 0.2 ? 'C' : 'D';
+    else if (sVol > 0.4) newVis = ['A','E','C'][syllableCount % 3];
+    else if (sVol > 0.15) newVis = ['E','B','D','C'][syllableCount % 4];
+    else newVis = ['D','B'][syllableCount % 2];
+
+    if (newVis === lastVisemes[0] && newVis === lastVisemes[1]) {
+      let alts = ['A','B','C','D','E','F'].filter(v => v !== newVis);
+      newVis = alts[Math.floor(Math.random() * alts.length)];
+    }
+    let hold = 0.06;
+    if ('ACE'.includes(newVis)) hold = 0.08 + Math.random() * 0.06;
+    else if (newVis === 'F') hold = 0.05 + Math.random() * 0.03;
+    else hold = 0.06 + Math.random() * 0.05;
+    lastVisemes.unshift(newVis); lastVisemes.pop();
+    viseme = newVis; visemeHold = hold;
+  }
+}
+
+async function pollEnvelope() {
+  let initialized = false;
+  while (true) {
+    try {
+      const res = await fetch(TTS_URL + TTS_ENVELOPE_PATH);
+      const data = await res.json();
+      if (!initialized) { lastEnvId = data.id || 0; initialized = true; }
+      else if (data.id > lastEnvId && data.envelope && data.envelope.length > 0) {
+        lastEnvId = data.id; envData = data.envelope;
+        const serverElapsed = data.elapsedMs || 0;
+        envStartTime = performance.now() - serverElapsed;
+        envPlaying = true;
+      }
+      if (envPlaying && performance.now() - envStartTime > envData.length * 50) envPlaying = false;
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, envPlaying ? TTS_POLL_ACTIVE : TTS_POLL_IDLE));
+  }
+}
+
+// ── Analyze dispatcher ──
+function analyze() {
+  if (AUDIO_MODE === 'tts') analyzeTTSEnvelope();
+  else analyzeSystemAudio();
+}
+
+// ── Eyes ──
+function updateEyes(){
+  eyeT -= 0.016;
+  if (eyeT <= 0) { eyeTX = (Math.random()-0.5)*(talking?2:1.5); eyeTY = (Math.random()-0.5)*(talking?1.5:1); eyeT = 0.8+Math.random()*2; }
+  eyeX += (eyeTX-eyeX)*0.08; eyeY += (eyeTY-eyeY)*0.08;
+}
+
+// ── Main loop ──
+function loop(){
+  t += 0.016; breath += 0.03; clawP += talking ? 0.06 : 0.02;
+  blinkT -= 0.016;
+  if (blinkT <= 0) { if (blink) { blink = false; blinkT = 2+Math.random()*4; } else { blink = true; blinkT = 0.12; } }
+  analyze(); updateEyes(); updateBubbles(); updateSwim();
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.save();
+  ctx.translate(lobX, lobY + Math.sin(bobPhase) * 8);
+  ctx.scale(lobFacing * LOBSTER_SCALE, LOBSTER_SCALE);
+  ctx.translate(-SPRITE/2, -SPRITE/2);
+  ctx.imageSmoothingEnabled = false;
+  drawBubbles(); drawLobster();
+  ctx.restore();
+  requestAnimationFrame(loop);
+}
+
+// ── Boot ──
+console.log('Pixel Lobster | mode=' + AUDIO_MODE + (AUDIO_MODE === 'tts' ? ' | server=' + TTS_URL : ' | system audio'));
+loop();
+
+if (AUDIO_MODE === 'tts') {
+  pollEnvelope();
+} else {
+  // System audio: click to start (browser requires user gesture), or auto via Electron
+  let started = false;
+  async function tryStart() {
+    if (started) return;
+    started = true;
+    await initSystemAudio();
+  }
+  // Try auto-start (works in Electron with setDisplayMediaRequestHandler)
+  tryStart().catch(() => {
+    started = false;
+    console.log('Click anywhere to start audio capture');
+    document.addEventListener('click', tryStart, { once: true });
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+services:
+  polymarket-api:
+    build: .
+    restart: unless-stopped
+    environment:
+      - PORT=8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.polymarket-api.rule=Host(`api.nshrt.com`)
+      - traefik.http.routers.polymarket-api.entrypoints=web,websecure
+      - traefik.http.routers.polymarket-api.tls=true
+      - traefik.http.routers.polymarket-api.tls.certresolver=mytlschallenge
+      - traefik.http.services.polymarket-api.loadbalancer.server.port=8080
+    networks:
+      - traefik_network
+
+networks:
+  traefik_network:
+    external: true
+    name: n8n_default

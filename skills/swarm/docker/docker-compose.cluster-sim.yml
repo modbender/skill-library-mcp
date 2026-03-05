@@ -1,0 +1,109 @@
+# Swarm Cluster Simulation
+# Simulates a multi-node Mac Mini cluster using Docker containers
+#
+# Usage:
+#   docker-compose -f docker-compose.cluster-sim.yml up
+#
+# This creates:
+#   - 1 coordinator (primary node)
+#   - 3 worker nodes (simulating Mac Minis)
+#   - Internal network simulating local LAN
+
+version: '3.8'
+
+networks:
+  swarm-cluster:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+services:
+  # Primary node - runs the coordinator
+  coordinator:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.coordinator
+    container_name: swarm-coordinator
+    hostname: swarm-primary
+    networks:
+      swarm-cluster:
+        ipv4_address: 172.28.0.10
+    ports:
+      - "9900:9900"   # API
+      - "9901:9901"   # Worker protocol
+    environment:
+      - SWARM_ROLE=primary
+      - SWARM_CLUSTER_NAME=dev-cluster
+      - SWARM_DISCOVERY=mdns
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - coordinator-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9900/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Worker node 1 (simulates Mac Mini)
+  node-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: swarm-node-1
+    hostname: mac-mini-1
+    networks:
+      swarm-cluster:
+        ipv4_address: 172.28.0.11
+    environment:
+      - SWARM_ROLE=worker
+      - SWARM_PRIMARY=172.28.0.10:9901
+      - SWARM_NODE_NAME=mac-mini-1
+      - SWARM_WORKERS=2
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      coordinator:
+        condition: service_healthy
+
+  # Worker node 2 (simulates Mac Mini)
+  node-2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: swarm-node-2
+    hostname: mac-mini-2
+    networks:
+      swarm-cluster:
+        ipv4_address: 172.28.0.12
+    environment:
+      - SWARM_ROLE=worker
+      - SWARM_PRIMARY=172.28.0.10:9901
+      - SWARM_NODE_NAME=mac-mini-2
+      - SWARM_WORKERS=2
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      coordinator:
+        condition: service_healthy
+
+  # Worker node 3 (simulates Mac Mini)
+  node-3:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: swarm-node-3
+    hostname: mac-mini-3
+    networks:
+      swarm-cluster:
+        ipv4_address: 172.28.0.13
+    environment:
+      - SWARM_ROLE=worker
+      - SWARM_PRIMARY=172.28.0.10:9901
+      - SWARM_NODE_NAME=mac-mini-3
+      - SWARM_WORKERS=2
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      coordinator:
+        condition: service_healthy
+
+volumes:
+  coordinator-data:

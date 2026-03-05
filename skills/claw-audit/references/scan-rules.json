@@ -1,0 +1,141 @@
+{
+  "_comment": "ClawAudit scan rule definitions. Loaded at runtime by scan-skills.sh. Do not scan this file — it intentionally contains pattern fragments for threat detection.",
+  "_version": "1.0.0",
+  "_updated": "2026-02-22",
+  "rules": [
+    {
+      "code": "CRIT-001",
+      "severity": "critical",
+      "label": "Shell execution",
+      "patterns": [
+        "curl\\s.*\\|\\s*(bash|sh|zsh)",
+        "wget\\s.*&&\\s*(bash|sh|chmod)",
+        "eval\\s*\\(",
+        "exec\\s*\\(",
+        "child_process",
+        "spawn\\s*\\("
+      ]
+    },
+    {
+      "code": "CRIT-002",
+      "severity": "critical",
+      "label": "Credential access",
+      "patterns": [
+        "read\\s+.*\\.env\\b",
+        "readFile.*\\.env\\b",
+        "cat\\s+.*\\.env\\b",
+        "creds\\.json",
+        "authorized_keys",
+        "id_rsa",
+        "/\\.ssh/",
+        "keychain",
+        "process\\.env\\.ANTHROPIC_API_KEY",
+        "process\\.env\\.OPENAI_API_KEY",
+        "token[Ff]ile",
+        "\\.clawdbot/\\.env"
+      ]
+    },
+    {
+      "code": "CRIT-003",
+      "severity": "critical",
+      "label": "Reverse shell",
+      "patterns": [
+        "nc\\s+-[a-z]*l",
+        "ncat\\s",
+        "reverse.shell",
+        "bind.shell",
+        "mkfifo",
+        "/dev/tcp/",
+        "socket\\.connect",
+        "net\\.createConnection"
+      ]
+    },
+    {
+      "code": "CRIT-004",
+      "severity": "critical",
+      "label": "Prompt injection",
+      "patterns": [
+        "ignore\\s+(all\\s+)?previous",
+        "ignore\\s+above",
+        "system\\s*:\\s*override",
+        "IMPORTANT:\\s*ignore",
+        "disregard\\s+(all\\s+)?prior",
+        "forget\\s+(all\\s+)?instructions",
+        "new\\s+system\\s+prompt"
+      ]
+    },
+    {
+      "code": "CRIT-005",
+      "severity": "critical",
+      "label": "External binary execution",
+      "patterns": [
+        "chmod\\s+\\+x",
+        "\\./openclaw-agent",
+        "extract\\s+using\\s+pass",
+        "Download.*\\.exe",
+        "Download.*\\.zip.*run",
+        "glot\\.io/snippets"
+      ]
+    },
+    {
+      "code": "WARN-005",
+      "severity": "warning",
+      "label": "Obfuscated content",
+      "patterns": [
+        "base64\\s+-d",
+        "atob\\s*\\(",
+        "Buffer\\.from\\s*\\(.*base64",
+        "\\\\x[0-9a-fA-F]{2}{4,}",
+        "\\\\u[0-9a-fA-F]{4}{4,}"
+      ]
+    },
+    {
+      "code": "WARN-007",
+      "severity": "warning",
+      "label": "Exfiltration indicators",
+      "patterns": [
+        "webhook\\.site",
+        "requestbin",
+        "ngrok\\.io",
+        "pipedream\\.net",
+        "burpcollaborator",
+        "oastify\\.com"
+      ]
+    },
+    {
+      "code": "WARN-008",
+      "severity": "warning",
+      "label": "Suspicious prerequisites",
+      "patterns": [
+        "Prerequisites.*IMPORTANT",
+        "install.*before\\s+using",
+        "paste.*into\\s+Terminal",
+        "copy.*installation\\s+script"
+      ]
+    },
+    {
+      "code": "WARN-009",
+      "severity": "warning",
+      "label": "Typosquat indicators",
+      "patterns": [
+        "clawhub[b1l]",
+        "cllawhub",
+        "clawwhub",
+        "clawhubc[l1]i",
+        "openclaw-agent"
+      ]
+    },
+    {
+      "code": "WARN-010",
+      "severity": "warning",
+      "label": "Hidden file operations",
+      "patterns": [
+        "rm\\s+-rf\\s+[~/]",
+        "find\\s.*-delete",
+        "shred\\s",
+        "wipe\\s",
+        ">\\s*/dev/null\\s+2>&1\\s*&"
+      ]
+    }
+  ]
+}

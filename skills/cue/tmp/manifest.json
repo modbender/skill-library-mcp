@@ -1,0 +1,91 @@
+{
+  "name": "Cue",
+  "version": "1.0.4",
+  "description": "Cue - 你的专属调研助理 / Your AI Research Assistant. A multi-agent deep research tool with persistent monitoring capabilities.",
+  "tags": [
+    "deep-research",
+    "finance",
+    "business",
+    "industry",
+    "company-analysis",
+    "multi-agent",
+    "monitoring"
+  ],
+  "requiredEnvVars": [
+    {
+      "name": "CUECUE_API_KEY",
+      "description": "CueCue API Key for deep research (required)",
+      "format": "^skb[a-zA-Z0-9]+$",
+      "required": true,
+      "source": "https://cuecue.cn"
+    }
+  ],
+  "optionalEnvVars": [
+    {
+      "name": "TAVILY_API_KEY",
+      "description": "Tavily API Key for news search and monitoring",
+      "format": "^tvly-[a-zA-Z0-9]+$",
+      "required": false,
+      "source": "https://tavily.com"
+    },
+    {
+      "name": "CHAT_ID",
+      "description": "Target chat/channel ID for notifications (auto-detected from OpenClaw)",
+      "required": false
+    }
+  ],
+  "externalEndpoints": [
+    {
+      "url": "https://cuecue.cn",
+      "purpose": "Deep research API",
+      "dataSent": "Research queries, chat_id"
+    },
+    {
+      "url": "https://api.tavily.com",
+      "purpose": "News search API (optional)",
+      "dataSent": "Search queries"
+    }
+  ],
+  "persistentStorage": [
+    {
+      "path": "$HOME/.cuecue",
+      "description": "User data including tasks, monitors, logs, and secure credential storage",
+      "permissions": "700 (directory), 600 (files)",
+      "isolated": true
+    }
+  ],
+  "backgroundJobs": [
+    {
+      "name": "monitor-daemon",
+      "schedule": "*/30 * * * *",
+      "description": "Checks active monitoring conditions every 30 minutes",
+      "scope": "user-only (node-cron, no system crontab modification)"
+    }
+  ],
+  "securityFeatures": [
+    {
+      "feature": "Isolated credential storage",
+      "description": "API keys stored only in ~/.cuecue/.env.secure, never in shared ~/.openclaw/.env"
+    },
+    {
+      "feature": "File permissions",
+      "description": "All sensitive files created with 600 permissions, directories with 700"
+    },
+    {
+      "feature": "Least privilege",
+      "description": "Does not modify system paths or shared configuration"
+    }
+  ],
+  "installType": "user-package",
+  "installPath": "$HOME/.openclaw/skills/cue",
+  "requiresRoot": false,
+  "systemPathsModified": false,
+  "sharedEnvModified": false,
+  "source": "https://github.com/openclaw/skills/cue",
+  "warnings": [
+    "Creates isolated persistent storage at ~/.cuecue with restricted permissions",
+    "Runs background monitoring jobs using internal scheduler (no system cron)",
+    "Requires external API credentials stored securely in isolated location",
+    "Sends research data to external endpoints (cuecue.cn, optional tavily.com)"
+  ]
+}

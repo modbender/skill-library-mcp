@@ -1,0 +1,126 @@
+{
+  "name": "create_item",
+  "version": "1.0.0",
+  "description": "Create a new item/product with inventory and pricing details",
+  "author": "Business Claw Team",
+  "category": "inventory",
+  
+  "triggers": [
+    "create item",
+    "add item",
+    "new product",
+    "add product",
+    "register item"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Item DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the item",
+      "required": true
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "item_code": {
+        "type": "string",
+        "description": "Unique item code/SKU"
+      },
+      "item_name": {
+        "type": "string",
+        "description": "Item name"
+      },
+      "item_group": {
+        "type": "string",
+        "description": "Item group (e.g., Products, Raw Materials)"
+      },
+      "stock_uom": {
+        "type": "string",
+        "description": "Unit of measure (e.g., Nos, Kg, Box)"
+      },
+      "default_warehouse": {
+        "type": "string",
+        "description": "Default warehouse for stock"
+      },
+      "valuation_rate": {
+        "type": "number",
+        "description": "Standard valuation/cost rate"
+      },
+      "standard_rate": {
+        "type": "number",
+        "description": "Standard selling price"
+      },
+      "min_order_qty": {
+        "type": "number",
+        "description": "Minimum order quantity"
+      },
+      "is_stock_item": {
+        "type": "boolean",
+        "description": "Is this a stock item?",
+        "default": true
+      },
+      "is_sales_item": {
+        "type": "boolean",
+        "description": "Can be sold?",
+        "default": true
+      },
+      "is_purchase_item": {
+        "type": "boolean",
+        "description": "Can be purchased?",
+        "default": true
+      },
+      "description": {
+        "type": "string",
+        "description": "Item description"
+      }
+    },
+    "required": ["item_code", "item_name", "item_group"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Item"
+        }
+      },
+      {
+        "step": "create_item",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Item",
+          "data": {
+            "item_code": "${item_code}",
+            "item_name": "${item_name}",
+            "item_group": "${item_group}",
+            "stock_uom": "${stock_uom}",
+            "default_warehouse": "${default_warehouse}",
+            "valuation_rate": "${valuation_rate}",
+            "standard_rate": "${standard_rate}",
+            "min_order_qty": "${min_order_qty}",
+            "is_stock_item": "${is_stock_item}",
+            "is_sales_item": "${is_sales_item}",
+            "is_purchase_item": "${is_purchase_item}",
+            "description": "${description}"
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "require_unique_code": true,
+    "validate_uom": true
+  },
+  
+  "output_template": "Created Item {{item_code}}\nName: {{item_name}}\nGroup: {{item_group}}\nRate: {{standard_rate}}"
+}

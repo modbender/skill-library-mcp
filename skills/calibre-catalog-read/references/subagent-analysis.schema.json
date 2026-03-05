@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CalibreSubagentAnalysisOutput",
+  "type": "object",
+  "required": ["book_id", "lang", "summary", "highlights", "reread", "tags"],
+  "properties": {
+    "book_id": { "type": "integer", "minimum": 1 },
+    "lang": { "type": "string", "enum": ["ja", "en"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 1200 },
+    "highlights": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 8,
+      "items": { "type": "string", "minLength": 1, "maxLength": 400 }
+    },
+    "reread": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["section", "page", "chunk_id", "reason"],
+        "properties": {
+          "section": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "page": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "chunk_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 300 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tags": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 1, "maxLength": 80 }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "notes": { "type": "string", "maxLength": 1200 }
+  },
+  "additionalProperties": false
+}

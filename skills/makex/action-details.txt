@@ -1,0 +1,38 @@
+Endpoint: POST /api/openclaw/integrations/action-details
+Auth: X-Org-Token header (org service token)
+CORS: Enabled (OPTIONS preflight supported)
+
+Purpose: Retrieve the full specification of a specific action/tool, including its name, description, and input/output parameter schemas.
+
+Request Headers:
+  X-Org-Token: <org-service-token>
+  Content-Type: application/json
+
+Request Body:
+  action_slug (required, string): The slug of the action to retrieve (e.g. "GMAIL_SEND_EMAIL")
+
+Behavior:
+  - Validates org token against database
+  - Calls Composio tools.retrieve() with the provided action slug
+  - Returns the tool's metadata and parameter schemas
+
+Response 200:
+  {
+    "name": "Send Email",
+    "slug": "GMAIL_SEND_EMAIL",
+    "description": "Send an email via Gmail",
+    "inputParameters": {
+      "to": { "type": "string", "description": "Recipient email", "required": true },
+      "subject": { "type": "string", "description": "Email subject" },
+      "body": { "type": "string", "description": "Email body" }
+    },
+    "outputParameters": {
+      "messageId": { "type": "string" },
+      "threadId": { "type": "string" }
+    }
+  }
+
+Error Responses:
+  401 - Missing or invalid X-Org-Token
+  400 - action_slug is required
+  500 - Server error

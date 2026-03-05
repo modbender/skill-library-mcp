@@ -1,0 +1,80 @@
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: braindb-neo4j
+    restart: unless-stopped
+    # No host port mapping — only gateway needs access via internal network
+    expose:
+      - "7474"
+      - "7687"
+    environment:
+      NEO4J_AUTH: "${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env}"
+      NEO4J_PLUGINS: '[]'
+      NEO4J_server_memory_heap_initial__size: "${NEO4J_HEAP:-256m}"
+      NEO4J_server_memory_heap_max__size: "${NEO4J_HEAP:-256m}"
+      NEO4J_server_memory_pagecache_size: "${NEO4J_PAGECACHE:-128m}"
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - braindb-internal
+
+  embedder:
+    build:
+      context: .
+      dockerfile: Dockerfile.embedder
+    container_name: braindb-embedder
+    restart: unless-stopped
+    # No host port mapping — only gateway needs access via internal network
+    expose:
+      - "3334"
+    volumes:
+      - embedder-cache:/app/.cache
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:3334/health')\""]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - braindb-internal
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: braindb-gateway
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-3333}:3333"
+    environment:
+      BRAINDB_CONFIG: /app/config.json
+      BRAINDB_API_KEY: "${BRAINDB_API_KEY:-}"
+      NEO4J_USER: "${NEO4J_USER:-neo4j}"
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env}"
+    volumes:
+      - gateway-data:/app/data
+      - ./config.json:/app/config.json:ro
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      embedder:
+        condition: service_healthy
+    networks:
+      - braindb-internal
+
+networks:
+  braindb-internal:
+    driver: bridge
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+  embedder-cache:
+  gateway-data:

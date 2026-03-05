@@ -1,0 +1,1 @@
+# SEO Checklist 2026\n\n- Title <60 chars\n- Meta desc 150-160\n- H1 unique\n- Keywords density 1-2%\n- Mobile responsive\n- Speed <3s\n- Schema.org\n- Alt texts\n- Canonical

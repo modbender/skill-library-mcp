@@ -1,0 +1,11 @@
+export * from './types.js';
+export { initVault, resolveVault, storeDocument, getDocument, listDocuments, deleteDocument } from './lib/vault.js';
+export { readConfig, writeConfig } from './lib/config.js';
+export { parseDocument, serializeDocument, slugify } from './lib/document.js';
+export { searchDocuments } from './lib/search.js';
+export { getSession, startSession, endSession, updateCheckpoint, getRecentHandoffs } from './lib/session.js';
+export { createNotionClient } from './lib/notion-client.js';
+export { markdownToBlocks, blocksToMarkdown } from './lib/notion-converter.js';
+export { readSyncState, writeSyncState } from './lib/sync-state.js';
+export { pushToNotion, pullFromNotion } from './lib/notion-sync.js';
+export { autoSyncIfEnabled } from './lib/auto-sync.js';

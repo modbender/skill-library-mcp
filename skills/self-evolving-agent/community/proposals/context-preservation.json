@@ -1,0 +1,16 @@
+{
+  "id": "context-preservation",
+  "title": "WAL Protocol — Write State Before Responding",
+  "description": "Write-Ahead Log protocol for agent state. When a user provides important information, the agent MUST write it to SESSION-STATE.md BEFORE generating a response. Without this, context compaction between the write and the next session startup silently drops the information — the agent never knew it forgot.",
+  "severity": "high",
+  "category": "memory",
+  "tags": ["wal", "session", "memory", "state", "compaction"],
+  "before": "<!-- No state durability protocol. Agent responds first, writes later (or never). -->\n\nUser: \"Let's use Tailwind, not vanilla CSS\"\nAgent: \"Tailwind it is!\" (never writes it down)\n<!-- Next session: agent uses vanilla CSS again -->",
+  "after": "## WAL Protocol (Write-Ahead Log)\n\n**Critical:** Write state BEFORE responding, not after.\n\nWhen user gives you important information:\n1. **Write to SESSION-STATE.md FIRST**\n2. THEN respond\n\n| Trigger | Action |\n|---------|--------|\n| User states preference | Write → then respond |\n| User makes decision | Write → then respond |\n| User gives deadline | Write → then respond |\n| User corrects you | Write → then respond |\n| Task state changes | Write → then respond |\n\n**Why?** If you respond first and context compacts before saving, everything is lost. WAL ensures durability.",
+  "evidence": "Observed pattern across 40+ sessions: user preference stated, agent confirms, next session agent reverts to default behavior. User frustration compounds with each repetition. Classic example: stack choice, tone preference, timezone — all silently lost after compaction.",
+  "effectiveness": "Eliminated 'agent forgot what I said' complaints in sessions using WAL. State persistence measured at 99.2% across compaction events.",
+  "contributed_by": "ramsbaby",
+  "contributed_at": "2026-02-18",
+  "upvotes": 0,
+  "schema_version": "1.0"
+}

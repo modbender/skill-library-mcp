@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JobSpec",
+  "type": "object",
+  "required": ["sku", "title", "description", "deliverables", "format", "deadline", "budget"],
+  "properties": {
+    "sku": {
+      "type": "string",
+      "enum": ["ECOM_HERO", "POSTER", "SOCIAL_PACK", "CUSTOM"],
+      "description": "Product SKU. Required fields by SKU: ECOM_HERO requires brief, fields, addons.source_file, revision_included. POSTER requires brief, fields, revision_included. SOCIAL_PACK requires brief, fields, addons.source_file. CUSTOM requires fields and budget_floor. Common required fields remain: title, description, deliverables, format, deadline, budget."
+    },
+    "title": {"type": "string"},
+    "brief": {
+      "type": "string",
+      "description": "Short creative brief. Required for ECOM_HERO, POSTER, and SOCIAL_PACK."
+    },
+    "description": {"type": "string"},
+    "deliverables": {"type": "array", "items": {"type": "string"}},
+    "format": {"type": "string"},
+    "deadline": {"type": "string"},
+    "budget": {
+      "type": "object",
+      "properties": {
+        "amount": {"type": "number"},
+        "currency": {"type": "string"}
+      }
+    },
+    "budget_floor": {
+      "type": "number",
+      "description": "Minimum budget floor for CUSTOM jobs."
+    },
+    "fields": {
+      "type": "object",
+      "description": "SKU-specific structured fields (key/value). Required for all SKUs.",
+      "additionalProperties": true
+    },
+    "addons": {
+      "type": "object",
+      "properties": {
+        "source_file": {
+          "type": "boolean",
+          "description": "Whether source files are required. Required for ECOM_HERO and SOCIAL_PACK."
+        }
+      }
+    },
+    "revision_included": {
+      "type": "integer",
+      "description": "Number of revisions included. Required for ECOM_HERO and POSTER."
+    },
+    "constraints": {"type": "array", "items": {"type": "string"}}
+  }
+}

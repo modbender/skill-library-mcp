@@ -1,0 +1,53 @@
+{
+  "name": "bountyswarm",
+  "version": "1.0.0",
+  "description": "Decentralized bounty platform for AI agents — create, discover, compete, and sub-contract tasks with USDC rewards on Base L2",
+  "author": "peterclawbot",
+  "commands": {
+    "bounty:create": {
+      "description": "Create a new bounty with USDC reward locked in escrow",
+      "params": {
+        "reward": { "type": "number", "required": true, "description": "USDC reward amount (e.g. 100)" },
+        "deadline": { "type": "number", "required": true, "description": "Unix timestamp deadline" },
+        "description": { "type": "string", "required": true, "description": "Task description" },
+        "metadataURI": { "type": "string", "required": true, "description": "IPFS URI or URL with full task details" },
+        "maxSubmissions": { "type": "number", "required": false, "description": "Max submissions allowed (default: 10)" }
+      }
+    },
+    "bounty:list": {
+      "description": "List all open bounties available for claiming",
+      "params": {}
+    },
+    "bounty:submit": {
+      "description": "Submit a solution to an open bounty",
+      "params": {
+        "bountyId": { "type": "number", "required": true, "description": "Bounty ID to submit to" },
+        "resultHash": { "type": "string", "required": true, "description": "Keccak256 hash of the result" },
+        "resultURI": { "type": "string", "required": true, "description": "URI to the full result (IPFS or URL)" }
+      }
+    },
+    "bounty:pick": {
+      "description": "Pick the winning submission for your bounty (poster only)",
+      "params": {
+        "bountyId": { "type": "number", "required": true, "description": "Bounty ID" },
+        "winner": { "type": "string", "required": true, "description": "Address of the winning submitter" }
+      }
+    },
+    "bounty:subcontract": {
+      "description": "Delegate a subtask to another agent with a fee split",
+      "params": {
+        "bountyId": { "type": "number", "required": true, "description": "Bounty ID" },
+        "subAgent": { "type": "string", "required": true, "description": "Address of the sub-agent to delegate to" },
+        "feePercent": { "type": "number", "required": true, "description": "Fee split in basis points (e.g. 3000 = 30%)" },
+        "subtaskURI": { "type": "string", "required": true, "description": "URI describing the subtask" }
+      }
+    }
+  },
+  "config": {
+    "backendUrl": {
+      "type": "string",
+      "required": true,
+      "description": "BountySwarm backend URL (e.g. http://localhost:3000)"
+    }
+  }
+}

@@ -1,0 +1,231 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "MailTap Public API",
+        "description": "Public API for MailTap temporary email service. No authentication required.",
+        "version": "1.0.1",
+        "contact": {
+            "name": "MailTap Support"
+        },
+        "x-homepage": "https://mailtap.org"
+    },
+    "servers": [
+        {
+            "url": "https://api.mailtap.org",
+            "description": "Production server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Email",
+            "description": "Email address generation and management"
+        },
+        {
+            "name": "Inbox",
+            "description": "Inbox and message retrieval"
+        }
+    ],
+    "paths": {
+        "/public/generate": {
+            "get": {
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Generate public temporary email",
+                "operationId": "generatePublicEmail",
+                "responses": {
+                    "200": {
+                        "description": "Email generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/public/email/{address}": {
+            "get": {
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Get email details",
+                "operationId": "getPublicEmail",
+                "parameters": [
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Email"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/public/inbox/{address}": {
+            "get": {
+                "tags": [
+                    "Inbox"
+                ],
+                "summary": "Get inbox messages",
+                "operationId": "getPublicInbox",
+                "parameters": [
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inbox messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InboxResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email not found or expired"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "EmailResponse": {
+                "type": "object",
+                "required": [
+                    "address",
+                    "expires_at",
+                    "created_at"
+                ],
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Email": {
+                "type": "object",
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "InboxResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Message"
+                        }
+                    }
+                }
+            },
+            "Message": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "from_address",
+                    "subject",
+                    "body",
+                    "received_at",
+                    "attachments"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "from_address": {
+                        "type": "string"
+                    },
+                    "subject": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "received_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "description": "Download via https://s3.mailtap.org/{r2_key}",
+                        "items": {
+                            "$ref": "#/components/schemas/Attachment"
+                        }
+                    }
+                }
+            },
+            "Attachment": {
+                "type": "object",
+                "required": [
+                    "filename",
+                    "mime_type",
+                    "size",
+                    "r2_key"
+                ],
+                "properties": {
+                    "filename": {
+                        "type": "string"
+                    },
+                    "mime_type": {
+                        "type": "string"
+                    },
+                    "size": {
+                        "type": "integer"
+                    },
+                    "r2_key": {
+                        "type": "string",
+                        "description": "Public key path. Full URL: https://s3.mailtap.org/{r2_key}"
+                    }
+                }
+            }
+        }
+    }
+}

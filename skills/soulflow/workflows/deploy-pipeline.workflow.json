@@ -1,0 +1,36 @@
+{
+  "id": "deploy-pipeline",
+  "name": "Deploy and Verify",
+  "version": 1,
+  "description": "Run tests, build, deploy, verify health, and rollback on failure",
+  "steps": [
+    {
+      "id": "test",
+      "name": "Run Tests",
+      "input": "Run the test suite for: {{task}}\n\nUse `exec` to run the appropriate test commands (npm test, pytest, go test, etc.). Check the project directory to identify the test framework.\n\nIf tests fail, capture the output and report it.\n\nWhen done, end with:\nSTATUS: done\nTEST_RESULT: passed/failed\nTEST_OUTPUT: summary of results",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "build",
+      "name": "Build Application",
+      "input": "Build the application: {{task}}\n\nPrevious test result: {{test_result}}\n\nIf tests passed, run the build command (npm run build, go build, etc.). Check for build errors.\n\nIf tests failed, skip the build and report that deployment is blocked.\n\nWhen done, end with:\nSTATUS: done\nBUILD_RESULT: success/failed/skipped\nBUILD_OUTPUT: summary",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "deploy",
+      "name": "Deploy to Production",
+      "input": "Deploy the application: {{task}}\n\nBuild result: {{build_result}}\n\nIf build succeeded, execute the deployment (git push, rsync, docker deploy, etc.). Document the deployment method used.\n\nIf build failed, skip deployment.\n\nWhen done, end with:\nSTATUS: done\nDEPLOY_RESULT: deployed/skipped\nDEPLOY_URL: production URL if available",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    },
+    {
+      "id": "verify",
+      "name": "Verify Health",
+      "input": "Verify deployment health: {{task}}\n\nDeploy result: {{deploy_result}}\nDeploy URL: {{deploy_url}}\n\nIf deployment happened:\n1. Use `browser` or `web_fetch` to check the URL\n2. Test critical endpoints (/, /health, /api/status)\n3. Verify expected HTTP status codes\n\nIf health checks fail, document the failure and recommend rollback.\n\nWhen done, end with:\nSTATUS: done\nHEALTH_STATUS: healthy/degraded/failed\nHEALTH_DETAILS: summary of checks",
+      "expects": "STATUS: done",
+      "maxRetries": 1
+    }
+  ]
+}

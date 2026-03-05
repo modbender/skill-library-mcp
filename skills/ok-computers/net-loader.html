@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OK Computer x Net Protocol</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #000;
+  color: #0f0;
+  font-family: monospace;
+  padding: 20px;
+  min-height: 100vh;
+}
+#status { margin-bottom: 20px; }
+#debug { color: #888; font-size: 0.8em; margin: 10px 0; }
+#content { white-space: pre-wrap; word-wrap: break-word; }
+.error { color: #f00; }
+.loading { color: #ff0; }
+</style>
+</head>
+<body>
+<div id="status" class="loading">Loading from Net Protocol...</div>
+<div id="debug"></div>
+<div id="content"></div>
+
+<script>
+// OK Computer x Net Protocol Loader
+// Uses JSONP relay to bypass iframe sandbox
+// Built by Ollie x potdealer
+
+const CONFIG = {
+  storageKey: 'okc-test',
+  // LEFT-padded bytes32 of 'okc-test'
+  keyBytes: '0x0000000000000000000000000000000000000000000000006f6b632d74657374',
+  operator: '0x2460F6C6CA04DD6a73E9B5535aC67Ac48726c09b',
+  // JSONP relay URL - bypasses iframe sandbox!
+  relayUrl: 'https://okc-relay.vercel.app/api/rpc'
+};
+
+const SIMPLE_STORAGE = '0x00000000db40fcb9f4466330982372e27fd7bbf5';
+
+function debug(msg) {
+  const d = document.getElementById('debug');
+  if (d) d.innerHTML += msg + '<br>';
+  console.log(msg);
+}
+
+// Build eth_call data for get(bytes32,address)
+function buildCalldata(keyBytes, operator) {
+  const selector = '0x20c027b8';
+  return selector + keyBytes.slice(2) + operator.slice(2).toLowerCase().padStart(64, '0');
+}
+
+// Decode ABI-encoded (string, bytes) response
+function decodeResponse(hex) {
+  if (!hex || hex === '0x') return null;
+  hex = hex.slice(2); // remove 0x
+
+  // Get offset to bytes (second tuple element)
+  const bytesOffset = parseInt(hex.slice(64, 128), 16) * 2;
+  const bytesLen = parseInt(hex.slice(bytesOffset, bytesOffset + 64), 16);
+  const bytesHex = hex.slice(bytesOffset + 64, bytesOffset + 64 + bytesLen * 2);
+
+  // Convert hex to string
+  let content = '';
+  for (let i = 0; i < bytesHex.length; i += 2) {
+    const code = parseInt(bytesHex.slice(i, i + 2), 16);
+    if (code > 0) content += String.fromCharCode(code);
+  }
+  return content;
+}
+
+// JSONP callback - receives data from relay
+window.netProtocolCallback = function(result, error) {
+  const status = document.getElementById('status');
+  const content = document.getElementById('content');
+
+  if (error) {
+    debug('Relay error: ' + error);
+    status.className = 'error';
+    status.textContent = 'Error: ' + error;
+    return;
+  }
+
+  debug('Got response: ' + (result ? result.length + ' chars' : 'null'));
+
+  const data = decodeResponse(result);
+
+  if (!data) {
+    status.className = 'error';
+    status.textContent = 'No data found';
+    return;
+  }
+
+  debug('Decoded: ' + data.length + ' chars');
+  status.textContent = 'Loaded from Net Protocol!';
+  status.className = '';
+
+  // Check if HTML
+  if (data.trim().startsWith('<!DOCTYPE') || data.trim().startsWith('<html')) {
+    document.open();
+    document.write(data);
+    document.close();
+  } else {
+    content.textContent = data;
+  }
+};
+
+// Load content via JSONP relay
+function loadContent() {
+  const status = document.getElementById('status');
+  debug('Loading via JSONP relay...');
+  debug('Key: ' + CONFIG.storageKey);
+
+  const calldata = buildCalldata(CONFIG.keyBytes, CONFIG.operator);
+  debug('Calldata: ' + calldata.slice(0, 20) + '...');
+
+  // Create script tag for JSONP
+  const script = document.createElement('script');
+  const params = new URLSearchParams({
+    to: SIMPLE_STORAGE,
+    data: calldata,
+    callback: 'netProtocolCallback',
+    chainId: '8453'
+  });
+
+  script.src = CONFIG.relayUrl + '?' + params.toString();
+  script.onerror = function() {
+    debug('Script load failed - relay might be down');
+    status.className = 'error';
+    status.textContent = 'Error: Could not reach relay';
+  };
+
+  debug('Loading: ' + script.src.slice(0, 60) + '...');
+  document.body.appendChild(script);
+}
+
+// Start loading
+loadContent();
+</script>
+</body>
+</html>

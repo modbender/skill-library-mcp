@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Frenzy Auditor Panel</title>
+<style>
+body { font-family: monospace; background: #1a1a1a; color: #0f0; padding: 20px; max-width: 600px; margin: auto; }
+h1 { color: #4af; }
+button { background: #0f6; border: none; padding: 10px 20px; margin: 5px; color: black; font-weight: bold; border-radius: 5px; cursor: pointer; }
+button:hover { background: #0f9; }
+#log { background: #222; padding: 10px; height: 200px; overflow: auto; border-radius: 5px; white-space: pre-wrap; }
+#status { font-size: 18px; margin: 20px 0; }
+</style>
+</head>
+<body>
+<h1>🚨 Frenzy Auditor v1.1</h1>
+<div id='status'>Status: Ready | Last scan: Never</div>
+<button onclick='scan()'>🔍 SCAN NOW</button>
+<button onclick='settings()'>⚙️ SETTINGS</button>
+<button onclick='logs()'>📋 VIEW LOGS</button>
+<button onclick='cronToggle()'>⏰ CRON: OFF</button>
+<div id='log'>Log: Welcome to Frenzy Auditor demo.</div>
+<script>
+let cronStatus = 'OFF';
+let sensitivity = 'HIGH';
+function log(msg) {
+  document.getElementById('log').textContent += `\n[${new Date().toLocaleTimeString()}] ${msg}`;
+  document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+}
+function scan() {
+  document.getElementById('status').innerHTML = 'Status: Scanning...';
+  log('Running audit.sh...');
+  setTimeout(() => {
+    log('PI hits: 0 malicious');
+    log('Gateway: Safe');
+    document.getElementById('status').innerHTML = 'Status: 🟢 CLEAN';
+  }, 2000);
+}
+function settings() {
+  sensitivity = prompt('Sensitivity (HIGH/MED/LOW):', sensitivity) || sensitivity;
+  log('Settings updated: Sensitivity = ' + sensitivity);
+}
+function logs() {
+  log('Full logs: /clawd/audit-report.json');
+}
+function cronToggle() {
+  cronStatus = cronStatus === 'OFF' ? 'ON' : 'OFF';
+  document.querySelector('button:last-of-type').textContent = '⏰ CRON: ' + cronStatus;
+  log('Cron: ' + cronStatus);
+}
+log('Panel loaded. Reply SCAN/SETTINGS in chat for live.');
+</script>
+</body>
+</html>

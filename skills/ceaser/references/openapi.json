@@ -1,0 +1,831 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ceaser x402 ZK Facilitator API",
+    "description": "x402-compatible ZK proof facilitator for privacy protocols on Base L2. Two services in one: (1) Generic x402 ZK Facilitator for gasless withdrawals via zk-relay scheme, (2) Ceaser Protocol API for direct interaction with the privacy pool.",
+    "version": "1.1.0",
+    "contact": {
+      "name": "ZYRKOM",
+      "url": "https://ceaser.org"
+    },
+    "license": {
+      "name": "MIT"
+    },
+    "x-openclaw-skills": [
+      {
+        "slug": "ceaser",
+        "name": "Ceaser",
+        "version": "1.4.0",
+        "install": "clawhub install ceaser",
+        "url": "https://clawhub.ai/Zyra-V21/ceaser",
+        "description": "Read-only queries + shield/unshield via CLI subcommands. User signs transactions manually (e.g., MetaMask). Maximum privacy -- no intermediate wallet, no on-chain links.",
+        "signingMode": "manual",
+        "privacyLevel": "maximum",
+        "requires": ["curl", "jq", "node", "npx"]
+      },
+      {
+        "slug": "ceaser-send",
+        "name": "Ceaser Private Send",
+        "version": "1.3.0",
+        "install": "clawhub install ceaser-send",
+        "url": "https://clawhub.ai/Zyra-V21/ceaser-send",
+        "description": "Fully automated shield-to-unshield flow using an ephemeral hot wallet. Agent signs transactions automatically. Reduced privacy -- creates observable on-chain links between user wallet and hot wallet (funding + refund).",
+        "signingMode": "auto",
+        "privacyLevel": "reduced",
+        "privacyWarning": "Auto-signing creates funding and refund links visible on-chain. Use ceaser (manual) for maximum privacy.",
+        "requires": ["curl", "jq", "node", "npx"]
+      }
+    ]
+  },
+  "servers": [
+    {
+      "url": "https://ceaser.org",
+      "description": "Production (Base Mainnet)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "x402-facilitator",
+      "description": "x402 ZK Facilitator — gasless proof settlement for any registered protocol"
+    },
+    {
+      "name": "ceaser-api",
+      "description": "Ceaser Protocol API — query and interact with the Ceaser privacy pool"
+    },
+    {
+      "name": "health",
+      "description": "Health and status endpoints"
+    },
+    {
+      "name": "indexer",
+      "description": "Indexer API — local Merkle tree state, commitments, and sync status"
+    },
+    {
+      "name": "admin",
+      "description": "Administrative endpoints (protected by ADMIN_KEY in production)"
+    }
+  ],
+  "paths": {
+    "/supported": {
+      "get": {
+        "tags": ["x402-facilitator"],
+        "summary": "x402 capability discovery",
+        "description": "Returns supported schemes, networks, protocols, and proof formats. Used by x402 clients for auto-discovery.",
+        "operationId": "getSupported",
+        "responses": {
+          "200": {
+            "description": "Supported capabilities",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SupportedResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "tags": ["x402-facilitator"],
+        "summary": "Verify a ZK proof (dry run)",
+        "description": "Validates a ZK proof payload without submitting it on-chain. Checks nullifier status, Merkle root validity, and denomination. Returns gas estimate and facilitator fee.",
+        "operationId": "verifyProof",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SettleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VerifyResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/settle": {
+      "post": {
+        "tags": ["x402-facilitator"],
+        "summary": "Submit ZK proof on-chain (gasless)",
+        "description": "Validates and submits a ZK proof on-chain. The facilitator pays gas on behalf of the user. The recipient receives netAmount (amount minus 0.25% protocol fee). Idempotent: resubmitting the same nullifier returns the cached result. Uses sequential nonce management and EIP-1559 gas pricing.",
+        "operationId": "settleProof",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SettleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settlement successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SettleResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": {
+            "description": "Nullifier already being processed (concurrent duplicate)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "503": {
+            "description": "Facilitator paused (circuit breaker tripped) or low on gas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Simple liveness check",
+        "description": "Returns a simple ok response indicating the facilitator is running. No rate limit.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Facilitator is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Facilitator health and stats",
+        "description": "Returns facilitator wallet balance, registered protocols, settlement statistics, circuit breaker state, transaction queue info, persistent transaction tracker stats, and indexer sync status.",
+        "operationId": "getStatus",
+        "responses": {
+          "200": {
+            "description": "Status info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ceaser/denominations": {
+      "get": {
+        "tags": ["ceaser-api"],
+        "summary": "List valid denominations with fee breakdown",
+        "description": "Returns all valid denomination amounts with pre-calculated fee info. Use this to show users what amounts they can shield/unshield and the exact costs.",
+        "operationId": "getDenominations",
+        "responses": {
+          "200": {
+            "description": "Denomination list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DenominationsResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ceaser/merkle-root": {
+      "get": {
+        "tags": ["ceaser-api"],
+        "summary": "Get current Merkle tree root",
+        "description": "Returns the latest Merkle root. Served instantly from the local indexer when available, with automatic fallback to on-chain query. Required when generating ZK proofs.",
+        "operationId": "getMerkleRoot",
+        "responses": {
+          "200": {
+            "description": "Current root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "root": {
+                      "type": "string",
+                      "description": "bytes32 Merkle root",
+                      "example": "0x2f06f13d7f7ad845e3cfce107aa8a89aaffdad3f69bef1062d4525a23621e088"
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": ["indexer", "on-chain"],
+                      "description": "Where the root was sourced from"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/ceaser/nullifier/{hash}": {
+      "get": {
+        "tags": ["ceaser-api"],
+        "summary": "Check if a nullifier is spent",
+        "description": "Returns whether a given nullifier hash has been used (note already unshielded). Useful for checking note status before attempting an unshield.",
+        "operationId": "checkNullifier",
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "description": "bytes32 nullifier hash",
+            "schema": {
+              "type": "string",
+              "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nullifier status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "nullifierHash": { "type": "string" },
+                    "spent": { "type": "boolean", "description": "true if the note has already been unshielded" }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/ceaser/pool/{assetId}": {
+      "get": {
+        "tags": ["ceaser-api"],
+        "summary": "Get pool info for an asset",
+        "description": "Returns total value locked (TVL), total notes created, and protocol fee for a given asset. Use assetId=0 for ETH.",
+        "operationId": "getPoolInfo",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "description": "Asset ID (0 for ETH, uint256(tokenAddress) for ERC20)",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pool info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PoolInfoResponse" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/ceaser/shield/prepare": {
+      "post": {
+        "tags": ["ceaser-api"],
+        "summary": "Build a shield transaction (caller signs)",
+        "description": "Returns pre-built transaction data (to, data, value) for a shield operation. The caller signs and submits this transaction with their own wallet. For ERC20 shields, also returns the required approval amount.",
+        "operationId": "prepareShield",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ShieldPrepareRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pre-built transaction data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ShieldPrepareResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/ceaser/fees/{amount}": {
+      "get": {
+        "tags": ["ceaser-api"],
+        "summary": "Calculate fee breakdown for an amount",
+        "description": "Returns the exact fee split (treasury, relayer, net amount) for a given wei amount. Useful for displaying costs to users before a transaction.",
+        "operationId": "calculateFees",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "required": true,
+            "description": "Amount in wei",
+            "schema": {
+              "type": "string",
+              "example": "100000000000000000"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fee breakdown",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FeeBreakdown" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/ceaser/indexer/status": {
+      "get": {
+        "tags": ["indexer"],
+        "summary": "Indexer sync status",
+        "description": "Returns synchronization state, leaf count, last synced block, and operational statistics for the autonomous Merkle tree indexer.",
+        "operationId": "getIndexerStatus",
+        "responses": {
+          "200": {
+            "description": "Indexer status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IndexerStatusResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Indexer not enabled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ceaser/indexer/root": {
+      "get": {
+        "tags": ["indexer"],
+        "summary": "Indexed Merkle root",
+        "description": "Returns the locally indexed Merkle root with sync status. Instant response without RPC call.",
+        "operationId": "getIndexerRoot",
+        "responses": {
+          "200": {
+            "description": "Root and sync info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "root": { "type": "string", "example": "0x2f06..." },
+                    "synced": { "type": "boolean" },
+                    "leafCount": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Indexer not enabled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ceaser/indexer/commitments": {
+      "get": {
+        "tags": ["indexer"],
+        "summary": "Paginated commitment list",
+        "description": "Returns a paginated list of note commitments stored in the local Merkle tree.",
+        "operationId": "getIndexerCommitments",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Start index (default 0)",
+            "schema": { "type": "integer", "default": 0, "minimum": 0 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max items to return (default 100, max 1000)",
+            "schema": { "type": "integer", "default": 100, "minimum": 1, "maximum": 1000 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated commitments",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CommitmentsResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": {
+            "description": "Indexer not enabled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ceaser/indexer/commitment/{index}": {
+      "get": {
+        "tags": ["indexer"],
+        "summary": "Get commitment by leaf index",
+        "description": "Returns a single commitment from the local Merkle tree by its leaf index.",
+        "operationId": "getIndexerCommitment",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "description": "Leaf index",
+            "schema": { "type": "integer", "minimum": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commitment found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "index": { "type": "integer" },
+                    "commitment": { "type": "string", "example": "0x1a2b...3c4d" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": {
+            "description": "Leaf index not found or indexer not enabled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/circuit-breaker/reset": {
+      "post": {
+        "tags": ["admin"],
+        "summary": "Reset the circuit breaker",
+        "description": "Manually resets a tripped circuit breaker, re-enabling settlement. In production, requires Authorization: Bearer {ADMIN_KEY} header.",
+        "operationId": "resetCircuitBreaker",
+        "security": [{ "adminKey": [] }],
+        "responses": {
+          "200": {
+            "description": "Circuit breaker reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "circuitBreaker": { "$ref": "#/components/schemas/StatusResponse/properties/circuitBreaker" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid ADMIN_KEY)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "description": "Error message" },
+          "message": { "type": "string", "description": "Detailed error info" }
+        },
+        "required": ["error"]
+      },
+      "SupportedResponse": {
+        "type": "object",
+        "properties": {
+          "x402Version": { "type": "integer", "example": 2 },
+          "schemes": {
+            "type": "object",
+            "properties": {
+              "zk-relay": {
+                "type": "object",
+                "properties": {
+                  "supported": { "type": "boolean", "example": true },
+                  "networks": { "type": "array", "items": { "type": "string" }, "example": ["eip155:8453"] },
+                  "protocols": { "type": "array", "items": { "type": "string" }, "example": ["ceaser"] },
+                  "proofFormats": { "type": "array", "items": { "type": "string" }, "example": ["ultrahonk"] }
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnshieldPayload": {
+        "type": "object",
+        "description": "ZK proof payload for unshield settlement",
+        "required": ["proof", "nullifierHash", "amount", "assetId", "recipient", "root"],
+        "properties": {
+          "proof": { "type": "string", "description": "Hex-encoded UltraHonk proof bytes", "example": "0x..." },
+          "nullifierHash": { "type": "string", "description": "bytes32 nullifier hash", "example": "0x..." },
+          "amount": { "type": "string", "description": "Denomination amount in wei", "example": "100000000000000000" },
+          "assetId": { "type": "string", "description": "Asset ID (0=ETH)", "example": "0" },
+          "recipient": { "type": "string", "description": "Recipient address (wallet B)", "example": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18" },
+          "root": { "type": "string", "description": "bytes32 Merkle root used in proof", "example": "0x..." }
+        }
+      },
+      "SettleRequest": {
+        "type": "object",
+        "required": ["protocol", "payload"],
+        "properties": {
+          "protocol": { "type": "string", "description": "Registered protocol name", "example": "ceaser" },
+          "network": { "type": "string", "description": "CAIP-2 network identifier", "example": "eip155:8453" },
+          "payload": { "$ref": "#/components/schemas/UnshieldPayload" }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "properties": {
+          "isValid": { "type": "boolean" },
+          "details": {
+            "type": "object",
+            "properties": {
+              "isKnownRoot": { "type": "boolean" },
+              "isNullifierUnused": { "type": "boolean" },
+              "isValidDenom": { "type": "boolean" },
+              "isValid": { "type": "boolean" }
+            }
+          },
+          "estimatedGas": { "type": "string", "example": "350000" },
+          "facilitatorFee": { "type": "string", "description": "Estimated gas cost in wei", "example": "100000000000000" }
+        }
+      },
+      "SettleResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "txHash": { "type": "string", "description": "On-chain transaction hash", "example": "0x8f3d1a2b..." },
+          "network": { "type": "string", "example": "eip155:8453" },
+          "recipient": { "type": "string", "example": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18" },
+          "netAmount": { "type": "string", "description": "Amount received after 0.25% fee", "example": "99750000000000000" },
+          "idempotent": { "type": "boolean", "description": "True if this is a cached result from a previous settlement of the same nullifier" }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "facilitatorAddress": { "type": "string", "example": "0x90F79bf6EB2c4f870365E785982E1f101E93b906" },
+          "facilitatorBalance": { "type": "string", "example": "10000.5 ETH" },
+          "protocols": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "active": { "type": "boolean" },
+                "totalSettled": { "type": "integer" }
+              }
+            }
+          },
+          "network": { "type": "string", "example": "eip155:8453" },
+          "circuitBreaker": {
+            "type": "object",
+            "description": "Circuit breaker state. Trips on consecutive failures, high failure rate, or low balance.",
+            "properties": {
+              "tripped": { "type": "boolean" },
+              "reason": { "type": "string", "nullable": true },
+              "trippedAt": { "type": "string", "nullable": true, "format": "date-time" },
+              "consecutiveFailures": { "type": "integer" },
+              "recentWindow": {
+                "type": "object",
+                "properties": {
+                  "size": { "type": "integer" },
+                  "successes": { "type": "integer" },
+                  "failures": { "type": "integer" },
+                  "failureRate": { "type": "string", "example": "10%" }
+                }
+              }
+            }
+          },
+          "txQueue": {
+            "type": "object",
+            "description": "Transaction queue state for sequential nonce management.",
+            "properties": {
+              "queueLength": { "type": "integer" },
+              "inFlight": { "type": "integer" },
+              "currentNonce": { "type": "integer" }
+            }
+          },
+          "txTracker": {
+            "type": "object",
+            "description": "Persistent transaction tracker for crash recovery.",
+            "properties": {
+              "pending": { "type": "integer" },
+              "confirmed": { "type": "integer" }
+            }
+          },
+          "indexer": {
+            "type": "object",
+            "description": "Autonomous Merkle tree indexer state. Present when indexer is enabled.",
+            "properties": {
+              "synced": { "type": "boolean" },
+              "syncInProgress": { "type": "boolean" },
+              "lastSyncBlock": { "type": "integer" },
+              "leafCount": { "type": "integer" },
+              "root": { "type": "string" },
+              "stats": { "$ref": "#/components/schemas/IndexerStats" }
+            }
+          }
+        }
+      },
+      "Denomination": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string", "description": "Human-readable amount", "example": "0.1" },
+          "amountWei": { "type": "string", "description": "Amount in wei", "example": "100000000000000000" },
+          "feeWei": { "type": "string", "description": "Protocol fee in wei (0.25%)", "example": "250000000000000" },
+          "totalCostWei": { "type": "string", "description": "Total cost to shield (amount + fee)", "example": "100250000000000000" },
+          "netOnUnshieldWei": { "type": "string", "description": "Amount received on unshield (amount - fee)", "example": "99750000000000000" },
+          "feeBps": { "type": "integer", "description": "Fee in basis points", "example": 25 }
+        }
+      },
+      "DenominationsResponse": {
+        "type": "object",
+        "properties": {
+          "denominations": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Denomination" }
+          }
+        }
+      },
+      "PoolInfoResponse": {
+        "type": "object",
+        "properties": {
+          "assetId": { "type": "string", "example": "0" },
+          "totalLocked": { "type": "string", "description": "TVL in wei", "example": "5000000000000000000" },
+          "totalLockedFormatted": { "type": "string", "description": "TVL formatted", "example": "5.0" },
+          "totalNotes": { "type": "integer", "description": "Total notes ever created", "example": 142 },
+          "feeBps": { "type": "integer", "example": 25 }
+        }
+      },
+      "ShieldPrepareRequest": {
+        "type": "object",
+        "required": ["proof", "commitment", "amount"],
+        "properties": {
+          "proof": { "type": "string", "description": "Hex-encoded UltraHonk proof bytes" },
+          "commitment": { "type": "string", "description": "bytes32 Poseidon commitment" },
+          "amount": { "type": "string", "description": "Denomination amount in wei" },
+          "assetId": { "type": "string", "description": "Asset ID (omit or '0' for ETH)" }
+        }
+      },
+      "ShieldPrepareResponse": {
+        "type": "object",
+        "properties": {
+          "tx": {
+            "type": "object",
+            "description": "Pre-built transaction — sign and send with your wallet",
+            "properties": {
+              "to": { "type": "string", "description": "Contract address" },
+              "data": { "type": "string", "description": "ABI-encoded calldata" },
+              "value": { "type": "string", "description": "ETH value to send (wei). '0' for ERC20." },
+              "approveAmount": { "type": "string", "description": "ERC20 only: amount to approve before sending tx" }
+            }
+          },
+          "fees": { "$ref": "#/components/schemas/FeeBreakdown" }
+        }
+      },
+      "FeeBreakdown": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "string", "description": "Input amount in wei" },
+          "protocolFee": { "type": "string", "description": "Total protocol fee (0.25%)" },
+          "treasuryShare": { "type": "string", "description": "Treasury allocation (0.24%)" },
+          "relayerAlloc": { "type": "string", "description": "Relayer/facilitator allocation (0.01%)" },
+          "netAmount": { "type": "string", "description": "Amount after fee deduction" },
+          "feeBps": { "type": "integer", "description": "Fee in basis points", "example": 25 }
+        }
+      },
+      "IndexerStats": {
+        "type": "object",
+        "properties": {
+          "historicalSyncs": { "type": "integer", "description": "Number of historical sync passes" },
+          "pollCycles": { "type": "integer", "description": "Number of polling cycles completed" },
+          "healChecks": { "type": "integer", "description": "Number of self-healing checks performed" },
+          "fullResyncs": { "type": "integer", "description": "Number of full resyncs triggered" },
+          "errors": { "type": "integer", "description": "Total errors encountered" }
+        }
+      },
+      "IndexerStatusResponse": {
+        "type": "object",
+        "properties": {
+          "synced": { "type": "boolean", "description": "Whether the indexer has completed initial sync" },
+          "syncInProgress": { "type": "boolean", "description": "Whether a sync operation is currently running" },
+          "lastSyncBlock": { "type": "integer", "description": "Last block number processed" },
+          "leafCount": { "type": "integer", "description": "Number of commitments in the local tree" },
+          "root": { "type": "string", "description": "Current local Merkle root (bytes32)" },
+          "stats": { "$ref": "#/components/schemas/IndexerStats" }
+        }
+      },
+      "CommitmentsResponse": {
+        "type": "object",
+        "properties": {
+          "commitments": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of bytes32 commitment hashes"
+          },
+          "total": { "type": "integer", "description": "Total number of commitments in the tree" },
+          "offset": { "type": "integer", "description": "Start index of this page" },
+          "limit": { "type": "integer", "description": "Max items per page" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request parameters",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded (60 req/min read, 5 req/min write per IP)",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    }
+  }
+}

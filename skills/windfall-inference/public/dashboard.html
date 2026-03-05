@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windfall — Dashboard</title>
+<meta name="description" content="View your Windfall usage, savings, and environmental impact.">
+<link rel="stylesheet" href="/assets/shared.css">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  .topo-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 80C60 60 100 100 140 80C180 60 200 80 200 80' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M0 120C40 100 80 140 120 120C160 100 200 120 200 120' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M20 160C60 140 100 180 140 160C180 140 200 160 200 160' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3Cpath d='M0 40C40 20 80 60 120 40C160 20 200 40 200 40' stroke='%23F0EBE1' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+</style>
+</head>
+<body class="bg-warm-50 text-warm-800 font-sans min-h-screen flex flex-col topo-bg" data-page="dashboard">
+
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-sage-600 focus:text-white focus:px-4 focus:py-2 focus:rounded focus:z-50">Skip to content</a>
+
+<main id="main-content" class="flex-1 px-6 py-24">
+  <div class="max-w-2xl mx-auto">
+
+    <!-- Auth Section (shown when not logged in) -->
+    <div id="auth-section" class="text-center">
+      <h1 class="font-serif text-2xl font-bold text-warm-900 mb-2">Dashboard</h1>
+      <p class="text-warm-500 mb-8">View your usage, savings, and environmental impact.</p>
+
+      <!-- Wallet Connect (primary) -->
+      <div class="max-w-sm mx-auto mb-6">
+        <button id="connect-wallet-btn" class="w-full px-5 py-3 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 transition-colors text-sm flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/>
+            <path d="M22 10H18a2 2 0 0 0 0 4h4"/>
+          </svg>
+          Connect wallet
+        </button>
+        <div id="wallet-status" class="text-xs mt-2 text-warm-500"></div>
+      </div>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-3 max-w-sm mx-auto mb-6">
+        <div class="flex-1 border-t border-warm-200"></div>
+        <span class="text-xs text-warm-400">or enter API key</span>
+        <div class="flex-1 border-t border-warm-200"></div>
+      </div>
+
+      <!-- API Key Input (fallback) -->
+      <div class="max-w-sm mx-auto">
+        <input type="text" id="api-key-input" placeholder="wf_..." class="w-full px-4 py-3 border border-warm-200 rounded-lg text-sm focus:outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500 font-mono bg-white" />
+        <div id="key-status" class="text-xs mt-1 text-warm-500 text-left"></div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="hidden text-center py-12">
+      <p class="text-warm-500">Loading...</p>
+    </div>
+
+    <!-- Dashboard header (shown when logged in) -->
+    <div id="dashboard-header" class="hidden mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="font-serif text-2xl font-bold text-warm-900">Dashboard</h1>
+          <p id="dashboard-subtitle" class="text-warm-500 text-sm mt-1"></p>
+        </div>
+        <button id="sign-out-btn" class="text-sm text-warm-500 hover:text-red-500 transition-colors cursor-pointer">
+          Sign out
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard content (hidden until authenticated) -->
+    <div id="dashboard-content" class="hidden">
+
+      <!-- Keys List (for wallet auth — shows all keys) -->
+      <div id="keys-list-section" class="hidden border-b border-warm-200 pb-6 mb-2">
+        <h2 class="font-serif text-lg font-semibold text-warm-900 mb-3">Your API keys</h2>
+        <div id="keys-list" class="space-y-2"></div>
+      </div>
+
+      <!-- Overview Cards -->
+      <section class="border-b border-warm-200 py-8">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-white rounded-xl border border-warm-200 p-5">
+            <div class="text-sm text-warm-500 mb-1">Balance</div>
+            <div id="card-balance" class="text-2xl font-bold text-sage-700">--</div>
+            <div id="card-balance-cta" class="hidden mt-1">
+              <a href="/topup" class="text-sm text-sage-600 hover:underline font-medium">Top up &rarr;</a>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-warm-200 p-5">
+            <div class="text-sm text-warm-500 mb-1">Free Requests</div>
+            <div id="card-free" class="text-2xl font-bold text-warm-900">--</div>
+            <div class="text-sm text-warm-500">remaining</div>
+          </div>
+          <div class="bg-white rounded-xl border border-warm-200 p-5">
+            <div class="text-sm text-warm-500 mb-1">Total Requests</div>
+            <div id="card-requests" class="text-2xl font-bold text-warm-900">--</div>
+            <div class="text-sm text-warm-500">requests served</div>
+          </div>
+          <div class="bg-white rounded-xl border border-warm-200 p-5">
+            <div class="text-sm text-warm-500 mb-1">Total Saved</div>
+            <div id="card-saved" class="text-2xl font-bold text-sage-600">--</div>
+            <div class="text-sm text-warm-500">vs direct API pricing</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Savings Breakdown -->
+      <section class="border-b border-warm-200 py-8">
+        <h2 class="font-serif text-xl font-semibold text-warm-900 mb-4">Your savings</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-warm-600">Identity tier</span>
+            <div class="text-right">
+              <span id="savings-tier" class="font-semibold text-warm-900">--</span>
+              <div id="savings-tier-info" class="text-xs text-warm-500 mt-0.5">--</div>
+            </div>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-warm-600">Average cost per request</span>
+            <span id="savings-avg-cost" class="font-semibold text-warm-900">--</span>
+          </div>
+          <div class="flex justify-between items-start">
+            <span class="text-warm-600">Comparison</span>
+            <div class="text-right">
+              <span class="text-warm-500">Direct API: ~$0.008/req</span>
+              <br>
+              <span id="savings-your-cost" class="font-semibold text-warm-900">Your cost: --</span>
+            </div>
+          </div>
+        </div>
+        <div id="savings-box" class="hidden mt-5 bg-sage-600/10 border border-sage-500/20 rounded-lg p-4 text-sm text-sage-700 font-medium text-center">
+          You've saved <span id="savings-box-amount">$0.00</span> so far
+        </div>
+      </section>
+
+      <!-- Carbon Impact -->
+      <section class="border-b border-warm-200 py-8">
+        <h2 class="font-serif text-xl font-semibold text-warm-900 mb-4">Environmental impact</h2>
+        <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 22c4-4 8-7.5 8-12a8 8 0 1 0-16 0c0 4.5 4 8 8 12z"/>
+                <path d="M12 12V8"/>
+                <path d="M12 8l-2 2"/>
+                <path d="M12 8l2 2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-green-800 mb-1">
+                ~<span id="carbon-amount">0</span>g CO<sub>2</sub> avoided
+              </div>
+              <p class="text-sm text-green-700">
+                Each request routed through green energy saves approximately 0.5g CO<sub>2</sub> compared to US-East default data centers.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="/#green" class="text-sm text-sage-600 hover:underline font-medium">
+            Learn how Windfall routes to clean energy &rarr;
+          </a>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="py-8">
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <a href="/topup" class="inline-block px-5 py-2.5 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 transition-colors text-sm">
+            Top up balance
+          </a>
+          <a href="/#how" class="text-sm text-sage-600 hover:underline font-medium">
+            Get a new API key
+          </a>
+        </div>
+      </section>
+
+    </div><!-- /dashboard-content -->
+
+  </div>
+</main>
+
+<script src="/assets/shared.js" defer></script>
+<script>
+(function() {
+  'use strict';
+
+  // --- DOM refs ---
+  var authSection = document.getElementById('auth-section');
+  var dashboardHeader = document.getElementById('dashboard-header');
+  var dashboardContent = document.getElementById('dashboard-content');
+  var loadingState = document.getElementById('loading-state');
+  var keysListSection = document.getElementById('keys-list-section');
+  var keysList = document.getElementById('keys-list');
+  var connectBtn = document.getElementById('connect-wallet-btn');
+  var walletStatus = document.getElementById('wallet-status');
+  var apiKeyInput = document.getElementById('api-key-input');
+  var keyStatus = document.getElementById('key-status');
+  var signOutBtn = document.getElementById('sign-out-btn');
+  var subtitle = document.getElementById('dashboard-subtitle');
+
+  var debounceTimer;
+
+  var TIER_LABELS = {
+    anonymous: 'Anonymous',
+    wallet: 'Wallet',
+    basename: 'Basename',
+    erc8004: 'ERC-8004 Agent',
+  };
+
+  var TIER_DESCRIPTIONS = {
+    anonymous: '25 free requests',
+    wallet: '50 free requests (wallet linked)',
+    basename: '100 free requests (Basename registered)',
+    erc8004: '100 free requests (Base agent registry)',
+  };
+
+  // --- Render dashboard from data ---
+  function renderDashboard(data, authMode) {
+    // Use aggregated fields (wallet auth) or per-key fields (API key auth)
+    var balance = data.totalBalanceUsd !== undefined ? data.totalBalanceUsd : data.balanceUsd;
+    var freeRemaining = data.totalFreeRemaining !== undefined ? data.totalFreeRemaining : data.freeRequestsRemaining;
+    var totalReqs = data.totalRequests || 0;
+    var totalSpent = data.totalSpentUsd || 0;
+    var totalSaved = data.totalSavedUsd || 0;
+
+    document.getElementById('card-balance').textContent = '$' + balance.toFixed(2);
+    if (balance === 0) {
+      document.getElementById('card-balance-cta').classList.remove('hidden');
+    } else {
+      document.getElementById('card-balance-cta').classList.add('hidden');
+    }
+
+    document.getElementById('card-free').textContent = freeRemaining;
+    document.getElementById('card-requests').textContent = totalReqs.toLocaleString();
+    document.getElementById('card-saved').textContent = '$' + totalSaved.toFixed(2);
+
+    // Savings breakdown
+    var tier = data.identityTier || (data.keys && data.keys.length > 0 ? data.keys[0].identityTier : 'anonymous') || 'anonymous';
+    document.getElementById('savings-tier').textContent = TIER_LABELS[tier] || tier;
+    document.getElementById('savings-tier-info').textContent = TIER_DESCRIPTIONS[tier] || '';
+
+    var avgCost = totalReqs > 0 ? totalSpent / totalReqs : 0;
+    document.getElementById('savings-avg-cost').textContent = '$' + avgCost.toFixed(4) + '/req';
+    document.getElementById('savings-your-cost').textContent = 'Your cost: $' + avgCost.toFixed(4) + '/req';
+
+    if (totalSaved > 0) {
+      document.getElementById('savings-box').classList.remove('hidden');
+      document.getElementById('savings-box-amount').textContent = '$' + totalSaved.toFixed(2);
+    } else {
+      document.getElementById('savings-box').classList.add('hidden');
+    }
+
+    // Carbon impact
+    var co2 = (totalReqs * 0.5).toFixed(0);
+    document.getElementById('carbon-amount').textContent = Number(co2).toLocaleString();
+
+    // Show keys list for wallet auth
+    if (authMode === 'wallet' && data.keys && data.keys.length > 0) {
+      keysListSection.classList.remove('hidden');
+      keysList.innerHTML = data.keys.map(function(k) {
+        return '<div class="flex items-center justify-between bg-white rounded-lg border border-warm-200 px-4 py-3">'
+          + '<div>'
+          + '<span class="font-mono text-sm text-warm-800">' + k.keyPrefix + '</span>'
+          + (k.label ? '<span class="text-xs text-warm-500 ml-2">' + k.label + '</span>' : '')
+          + '</div>'
+          + '<div class="text-right text-xs text-warm-500">'
+          + k.totalRequests + ' reqs &middot; $' + k.totalSpentUsd.toFixed(2) + ' spent'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    } else {
+      keysListSection.classList.add('hidden');
+    }
+
+    // Show dashboard
+    loadingState.classList.add('hidden');
+    authSection.classList.add('hidden');
+    dashboardHeader.classList.remove('hidden');
+    dashboardContent.classList.remove('hidden');
+  }
+
+  // --- Wallet connect (SIWE) ---
+
+  async function connectWallet() {
+    if (!window.ethereum) {
+      walletStatus.textContent = 'No wallet detected. Install MetaMask or Coinbase Wallet.';
+      walletStatus.className = 'text-xs mt-2 text-red-500';
+      return;
+    }
+
+    connectBtn.disabled = true;
+    connectBtn.textContent = 'Connecting...';
+    walletStatus.textContent = '';
+
+    try {
+      // Request accounts
+      var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      var address = accounts[0];
+
+      // Get nonce from server
+      var nonceRes = await fetch('/api/auth/nonce');
+      var nonceData = await nonceRes.json();
+
+      // Build SIWE message
+      var message = 'Sign in to Windfall\n\n'
+        + 'Wallet: ' + address + '\n'
+        + 'Nonce: ' + nonceData.nonce + '\n'
+        + 'Issued: ' + new Date().toISOString();
+
+      // Request signature
+      var signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [message, address],
+      });
+
+      // Verify with server
+      var authRes = await fetch('/api/auth/wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: address, signature: signature, message: message, nonce: nonceData.nonce }),
+      });
+
+      if (!authRes.ok) {
+        var err = await authRes.json();
+        throw new Error(err.error || 'Authentication failed');
+      }
+
+      var session = await authRes.json();
+
+      // Save session
+      localStorage.setItem('wf_wallet_session', session.token);
+      localStorage.setItem('wf_wallet_address', address);
+
+      // Fetch dashboard data
+      await loadWalletDashboard(session.token, address);
+
+    } catch (err) {
+      var msg = err.message || 'Connection failed';
+      if (msg.includes('User rejected') || msg.includes('user rejected') || msg.includes('4001')) {
+        msg = 'Signature request was rejected';
+      }
+      walletStatus.textContent = msg;
+      walletStatus.className = 'text-xs mt-2 text-red-500';
+      connectBtn.disabled = false;
+      connectBtn.innerHTML = '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M22 10H18a2 2 0 0 0 0 4h4"/></svg> Connect wallet';
+    }
+  }
+
+  async function loadWalletDashboard(token, address) {
+    loadingState.classList.remove('hidden');
+    authSection.classList.add('hidden');
+
+    try {
+      var res = await fetch('/api/keys/by-wallet', {
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+
+      if (res.status === 401) {
+        // Session expired
+        localStorage.removeItem('wf_wallet_session');
+        localStorage.removeItem('wf_wallet_address');
+        signOut();
+        return;
+      }
+
+      var data = await res.json();
+      var shortAddr = address.slice(0, 6) + '...' + address.slice(-4);
+      subtitle.textContent = shortAddr + ' \u00b7 ' + data.totalKeys + ' key' + (data.totalKeys !== 1 ? 's' : '');
+      renderDashboard(data, 'wallet');
+
+    } catch (err) {
+      loadingState.classList.add('hidden');
+      authSection.classList.remove('hidden');
+      walletStatus.textContent = 'Failed to load dashboard';
+      walletStatus.className = 'text-xs mt-2 text-red-500';
+    }
+  }
+
+  // --- API Key auth (fallback) ---
+
+  async function fetchKeyData(key) {
+    loadingState.classList.remove('hidden');
+    dashboardContent.classList.add('hidden');
+
+    try {
+      var res = await fetch('/api/keys/me', {
+        headers: { 'Authorization': 'Bearer ' + key },
+      });
+      var data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem('windfall_key', key);
+        subtitle.textContent = data.keyPrefix + ' (' + (data.label || 'no label') + ')';
+        renderDashboard(data, 'api_key');
+      } else {
+        keyStatus.textContent = 'Key not found';
+        keyStatus.className = 'text-xs mt-1 text-red-500 text-left';
+        loadingState.classList.add('hidden');
+      }
+    } catch (err) {
+      keyStatus.textContent = 'Error checking key';
+      keyStatus.className = 'text-xs mt-1 text-red-500 text-left';
+      loadingState.classList.add('hidden');
+    }
+  }
+
+  apiKeyInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    var key = apiKeyInput.value.trim();
+    if (!key.startsWith('wf_') || key.length < 10) {
+      keyStatus.textContent = '';
+      loadingState.classList.add('hidden');
+      dashboardContent.classList.add('hidden');
+      dashboardHeader.classList.add('hidden');
+      return;
+    }
+    keyStatus.textContent = 'Checking...';
+    keyStatus.className = 'text-xs mt-1 text-warm-500 text-left';
+    debounceTimer = setTimeout(function() { fetchKeyData(key); }, 500);
+  });
+
+  // --- Sign out ---
+
+  function signOut() {
+    localStorage.removeItem('wf_wallet_session');
+    localStorage.removeItem('wf_wallet_address');
+    localStorage.removeItem('windfall_key');
+    window.location.reload();
+  }
+
+  signOutBtn.addEventListener('click', signOut);
+  connectBtn.addEventListener('click', connectWallet);
+
+  // --- Auto-restore session ---
+
+  var savedSession = localStorage.getItem('wf_wallet_session');
+  var savedAddress = localStorage.getItem('wf_wallet_address');
+  var savedKey = localStorage.getItem('windfall_key');
+
+  if (savedSession && savedAddress) {
+    loadWalletDashboard(savedSession, savedAddress);
+  } else if (savedKey) {
+    apiKeyInput.value = savedKey;
+    apiKeyInput.dispatchEvent(new Event('input'));
+  }
+
+})();
+</script>
+
+</body>
+</html>

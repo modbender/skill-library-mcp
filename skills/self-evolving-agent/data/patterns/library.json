@@ -1,0 +1,723 @@
+{
+  "generated_at": "2026-02-17T17:12:16Z",
+  "total_patterns": 25,
+  "known_good": 1,
+  "high_impact": 1,
+  "patterns": [
+    {
+      "id": "채널별_목적_외_메시지_필터링_자동화_agents_md_채널_라우팅_규칙",
+      "title": "채널별 목적 외 메시지 필터링 자동화",
+      "section": "AGENTS.md > 채널 라우팅 규칙",
+      "before": "채널 규칙이 암묵적 → 실수 빈번",
+      "after": "각 채널별 허용 작업 명시적 정의 + 위반 시 즉시 재라우팅",
+      "target_pattern": "채널.*전송|wrong.*channel",
+      "change_type": "agents_md_update",
+      "severity": "medium",
+      "evidence_samples": [
+        "잘못된 채널 메시지 전송 9건 (예: 기술 이슈를 #jarvis-lite에 전송)"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [
+        "2026-01-11"
+      ],
+      "is_known_good": true,
+      "impact_rating": "applied_no_data",
+      "confidence": 0.6,
+      "tags": [
+        "known-good"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "컨텍스트_손실_방지를_위한_session_state_md_wal_의무화_agents_md_wal_protoc",
+      "title": "컨텍스트 손실 방지를 위한 SESSION-STATE.md WAL 의무화",
+      "section": "AGENTS.md > WAL Protocol",
+      "before": "세션 중 중요 정보를 메모리에만 보관 (컴팩션 후 소멸)",
+      "after": "사용자 발언 즉시 SESSION-STATE.md에 기록 (WAL 프로토콜). 응답 전 파일 저장 필수.",
+      "target_pattern": "아까|말했잖아|다시 설명",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "세션 트랜스크립트 분석: '아까 말했잖아' 패턴 11회, 컨텍스트 손실 후 재설명 8건"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -63.2
+      ],
+      "hit_reductions": [
+        0.631578947368421
+      ],
+      "dates": [
+        "2026-01-11"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "high-severity"
+      ],
+      "avg_impact": -63.2,
+      "avg_hit_reduction": 0.632
+    },
+    {
+      "id": "하트비트_상시_응답_선택적_응답으로_전환_agents_md_heartbeats",
+      "title": "하트비트 상시 응답 → 선택적 응답으로 전환",
+      "section": "AGENTS.md > Heartbeats",
+      "before": "모든 하트비트에 무조건 응답 → 불필요한 채팅 소음",
+      "after": "야간(23-08시), 최근 30분 이내 확인, 새 정보 없음 시 HEARTBEAT_OK만. 유의미할 때만 채팅.",
+      "target_pattern": "HEARTBEAT_OK|하트비트",
+      "change_type": "agents_md_update",
+      "severity": "high",
+      "evidence_samples": [
+        "그룹 채팅 하트비트 100% 응답으로 채팅 스팸 패턴 12건 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -75.0
+      ],
+      "hit_reductions": [
+        0.75
+      ],
+      "dates": [
+        "2026-01-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "high-severity"
+      ],
+      "avg_impact": -75.0,
+      "avg_hit_reduction": 0.75
+    },
+    {
+      "id": "그룹_채팅_발언_기준_명문화_agents_md_group_chats",
+      "title": "그룹 채팅 발언 기준 명문화",
+      "section": "AGENTS.md > Group Chats",
+      "before": "그룹 채팅에서도 적극 개입 (모든 메시지 반응)",
+      "after": "직접 질문/언급/진짜 가치 있을 때만 발언. 인간 대화 흐름 존중.",
+      "target_pattern": "그룹.*응답|group.*chat",
+      "change_type": "agents_md_addition",
+      "severity": "medium",
+      "evidence_samples": [
+        "불필요한 그룹 개입 8건, 인간 대화 흐름 방해"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -75.0
+      ],
+      "hit_reductions": [
+        0.75
+      ],
+      "dates": [
+        "2026-01-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -75.0,
+      "avg_hit_reduction": 0.75
+    },
+    {
+      "id": "일일_메모리_로그_기록_기준_강화_agents_md_memory",
+      "title": "일일 메모리 로그 기록 기준 강화",
+      "section": "AGENTS.md > Memory",
+      "before": "일일 메모리 기록 규칙 모호",
+      "after": "중요 결정·컨텍스트·교훈 → memory/YYYY-MM-DD.md 즉시 기록 의무화",
+      "target_pattern": "memory.*missing|기억.*없음",
+      "change_type": "agents_md_update",
+      "severity": "low",
+      "evidence_samples": [
+        "메모리 파일 누락 또는 빈 항목 5건"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -20.0
+      ],
+      "hit_reductions": [
+        0.2
+      ],
+      "dates": [
+        "2026-01-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "memory"
+      ],
+      "avg_impact": -20.0,
+      "avg_hit_reduction": 0.2
+    },
+    {
+      "id": "exec_에러_노출_금지_규칙_추가_true_패턴_agents_md_exec_에러_노출_금지_규칙",
+      "title": "Exec 에러 노출 금지 규칙 추가 (|| true 패턴)",
+      "section": "AGENTS.md > Exec 에러 노출 금지 규칙",
+      "before": "exec 실패 시 raw 에러 채널 노출 (config로 제어 불가)",
+      "after": "exec 호출 전 황금률 적용: '이 명령이 실패하면?' → 실패 가능성 1%라도 || true 추가. safe-exec.sh wrapper 사용.",
+      "target_pattern": "exec.*failed|⚠️.*Exec",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "exec tool 실패로 Discord 채널에 ⚠️🔧 Exec 에러 7건 노출. 사용자 불만 신고."
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -85.7
+      ],
+      "hit_reductions": [
+        0.8571428571428571
+      ],
+      "dates": [
+        "2026-01-25"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "exec",
+        "high-severity"
+      ],
+      "avg_impact": -85.7,
+      "avg_hit_reduction": 0.857
+    },
+    {
+      "id": "gateway_재시작_과잉_개입_방지_규칙_agents_md_gateway_재시작_규칙",
+      "title": "Gateway 재시작 과잉 개입 방지 규칙",
+      "section": "AGENTS.md > Gateway 재시작 규칙",
+      "before": "Gateway 오류 시 무제한 재시작 시도 (문제 악화)",
+      "after": "로그 먼저 확인 → Config 에러면 수정 후 restart 1회 → Token 에러면 devices rotate → 원인 불명이면 사용자 보고",
+      "target_pattern": "gateway.*restart|openclaw gateway",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "93회 Emergency Recovery 호출, 성공 0회. 460회 crash 중 대부분 Agent 과잉 개입 원인."
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -82.6
+      ],
+      "hit_reductions": [
+        0.8260869565217391
+      ],
+      "dates": [
+        "2026-02-01"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "high-severity",
+        "gateway"
+      ],
+      "avg_impact": -82.6,
+      "avg_hit_reduction": 0.826
+    },
+    {
+      "id": "pending_actions_json_승인_프로토콜_추가_agents_md_approval_protocol",
+      "title": "Pending Actions JSON 승인 프로토콜 추가",
+      "section": "AGENTS.md > Approval Protocol",
+      "before": "파괴적 작업 제안 시 컴팩션 후 자신의 제안 잊음",
+      "after": "파일 삭제/config 수정/cron 변경 등 → pending-actions.json에 먼저 기록 → 사용자 승인 후 실행",
+      "target_pattern": "pending.*action|승인.*없이",
+      "change_type": "agents_md_addition",
+      "severity": "medium",
+      "evidence_samples": [
+        "승인 없이 실행된 파괴적 작업 4건 (파일 삭제 포함)"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -100.0
+      ],
+      "hit_reductions": [
+        1.0
+      ],
+      "dates": [
+        "2026-02-01"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -100.0,
+      "avg_hit_reduction": 1.0
+    },
+    {
+      "id": "exec_연속_재시도_제한_규칙_추가_agents_md_safety",
+      "title": "exec 연속 재시도 제한 규칙 추가",
+      "section": "AGENTS.md > Safety",
+      "before": "연속 재시도 시 규칙 없음 (무한 루프 가능)",
+      "after": "같은 exec 3회 실패 시: 1) 에러 즉시 사용자 보고 2) 방법 변경 3) 중단 + 수동 확인 요청",
+      "target_pattern": "exec.*retry|재시도",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "7일간 312건 재시도 이벤트, 최대 87회 연속 재시도 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -73.6
+      ],
+      "hit_reductions": [
+        0.735632183908046
+      ],
+      "dates": [
+        "2026-02-04"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "exec",
+        "high-severity"
+      ],
+      "avg_impact": -73.6,
+      "avg_hit_reduction": 0.736
+    },
+    {
+      "id": "메시지_단편화_금지_규칙_강화_agents_md_tools_discord",
+      "title": "메시지 단편화 금지 규칙 강화",
+      "section": "AGENTS.md > Tools > Discord",
+      "before": "메시지 분리 명시적 금지 없음",
+      "after": "모든 내용을 하나의 메시지로 통합. 3000자 초과 시에만 분할 허용.",
+      "target_pattern": "추가로|또한|그리고\\n",
+      "change_type": "agents_md_update",
+      "severity": "medium",
+      "evidence_samples": [
+        "Discord 채널에서 짧은 메시지 연속 전송 패턴 15건 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -73.3
+      ],
+      "hit_reductions": [
+        0.7333333333333333
+      ],
+      "dates": [
+        "2026-02-04"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -73.3,
+      "avg_hit_reduction": 0.733
+    },
+    {
+      "id": "자기평가_v5_0_도입_측정_가능한_메트릭_편향_인정_agents_md_자기평가_v5_0",
+      "title": "자기평가 V5.0 도입: 측정 가능한 메트릭 + 편향 인정",
+      "section": "AGENTS.md > 자기평가 V5.0",
+      "before": "자기평가 V4.0: 수동 추정, LLM 자기평가만, 항상 9-10점 자가 부여",
+      "after": "V5.0: 자동 메트릭 수집, bias_check 필수 (am_i_being_too_easy: 기본 true), 외부 검증 추가",
+      "target_pattern": "self.*review|자기평가|9/10|10점",
+      "change_type": "agents_md_update",
+      "severity": "medium",
+      "evidence_samples": [
+        "자기평가가 '잘못: 없다' 반복 패턴 감지. 자화자찬 편향 명백."
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -83.3
+      ],
+      "hit_reductions": [
+        0.8333333333333334
+      ],
+      "dates": [
+        "2026-02-08"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -83.3,
+      "avg_hit_reduction": 0.833
+    },
+    {
+      "id": "git_직접_명령_금지_규칙_명문화_agents_md_safety",
+      "title": "git 직접 명령 금지 규칙 명문화",
+      "section": "AGENTS.md > Safety",
+      "before": "git 명령어 직접 사용 가능 (비명시적)",
+      "after": "git 작업은 반드시 git-sync.sh 사용. git pull/push/fetch 직접 호출 금지.",
+      "target_pattern": "git (pull|push|fetch)",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "세션 트랜스크립트에서 git pull --rebase 직접 호출 5회 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -100.0
+      ],
+      "hit_reductions": [
+        1.0
+      ],
+      "dates": [
+        "2026-02-11"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [
+        "git",
+        "high-severity"
+      ],
+      "avg_impact": -100.0,
+      "avg_hit_reduction": 1.0
+    },
+    {
+      "id": "wal_프로토콜_트리거_조건_명확화_agents_md_wal_protocol",
+      "title": "WAL 프로토콜 트리거 조건 명확화",
+      "section": "AGENTS.md > WAL Protocol",
+      "before": "WAL 프로토콜 설명 불명확 - 언제 쓸지 애매함",
+      "after": "5가지 구체적 트리거 조건 명시: 선호도/결정/마감/수정/상태변화",
+      "target_pattern": "기억|SESSION-STATE",
+      "change_type": "agents_md_update",
+      "severity": "medium",
+      "evidence_samples": [
+        "중요 정보 기록 누락 3건 감지 (컴팩션 이후 컨텍스트 손실)"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -25.0
+      ],
+      "hit_reductions": [
+        0.25
+      ],
+      "dates": [
+        "2026-02-11"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -25.0,
+      "avg_hit_reduction": 0.25
+    },
+    {
+      "id": "채널_라우팅_규칙_테이블_추가_agents_md_채널_라우팅_규칙",
+      "title": "채널 라우팅 규칙 테이블 추가",
+      "section": "AGENTS.md > 채널 라우팅 규칙",
+      "before": "채널 라우팅 규칙이 산문으로 설명됨",
+      "after": "채널별 용도를 테이블 형식으로 명확히 표시",
+      "target_pattern": "채널|channel",
+      "change_type": "agents_md_addition",
+      "severity": "low",
+      "evidence_samples": [
+        "잘못된 채널로 메시지 전송 패턴 3건"
+      ],
+      "occurrences": 1,
+      "applied_count": 1,
+      "impact_scores": [
+        -75.0
+      ],
+      "hit_reductions": [
+        0.75
+      ],
+      "dates": [
+        "2026-02-11"
+      ],
+      "is_known_good": false,
+      "impact_rating": "negative",
+      "confidence": 0.68,
+      "tags": [],
+      "avg_impact": -75.0,
+      "avg_hit_reduction": 0.75
+    },
+    {
+      "id": "세션_컴팩션_제한_규칙_추가_agents_md_복잡한_배경_작업",
+      "title": "세션 컴팩션 제한 규칙 추가",
+      "section": "AGENTS.md > 복잡한 배경 작업",
+      "before": "컴팩션 발생 시 대응 규칙 없음",
+      "after": "컴팩션 5회 이상 시 서브에이전트 분리 권고",
+      "target_pattern": "compaction|컴팩션",
+      "change_type": "agents_md_addition",
+      "severity": "medium",
+      "evidence_samples": [
+        "5회 이상 컴팩션 세션 4개 감지 - 서브에이전트 분리 권고"
+      ],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [
+        27.3
+      ],
+      "hit_reductions": [
+        -0.2727272727272727
+      ],
+      "dates": [
+        "2026-01-28"
+      ],
+      "is_known_good": false,
+      "impact_rating": "high",
+      "confidence": 0.08,
+      "tags": [
+        "high-impact"
+      ],
+      "avg_impact": 27.3,
+      "avg_hit_reduction": -0.273
+    },
+    {
+      "id": "음성_파이프라인_자동_처리_규칙_추가_agents_md_음성메시지_자동_처리",
+      "title": "음성 파이프라인 자동 처리 규칙 추가",
+      "section": "AGENTS.md > 음성메시지 자동 처리",
+      "before": "음성 메시지 처리 방법 불명확",
+      "after": "Discord .ogg 첨부 시: 1) Whisper STT 2) #tts 여부 판단 3) 분기 처리",
+      "target_pattern": "\\.ogg|음성|voice",
+      "change_type": "agents_md_addition",
+      "severity": "medium",
+      "evidence_samples": [
+        "ogg 첨부 메시지 처리 누락 2건 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [
+        "2026-02-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "gateway_재시작_규칙_강화_agents_md_gateway_재시작_규칙",
+      "title": "Gateway 재시작 규칙 강화",
+      "section": "AGENTS.md > Gateway 재시작 규칙",
+      "before": "Gateway 재시작 조건 불명확",
+      "after": "절대 금지 목록 + 올바른 대응 절차 명시. 같은 이유로 2회 이상 restart 금지.",
+      "target_pattern": "gateway restart|openclaw gateway",
+      "change_type": "agents_md_addition",
+      "severity": "high",
+      "evidence_samples": [
+        "같은 이유로 gateway restart 3회 반복 감지 (Emergency Recovery 93회 실패)"
+      ],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [
+        "2026-02-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "high-severity",
+        "gateway"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "exec_에러_노출_방지_황금률_추가_agents_md_exec_에러_노출_금지",
+      "title": "exec 에러 노출 방지 황금률 추가",
+      "section": "AGENTS.md > Exec 에러 노출 금지",
+      "before": "exec 에러 핸들링 패턴 미명시",
+      "after": "황금률: exec 호출 전 '이 명령이 실패하면?' 자문. || true / safe-exec.sh 패턴 필수.",
+      "target_pattern": "Exec.*failed|⚠️🔧",
+      "change_type": "agents_md_update",
+      "severity": "medium",
+      "evidence_samples": [
+        "exec 실패로 Discord 에러 노출 7건 감지"
+      ],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [
+        "2026-02-18"
+      ],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "exec"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "exec_안전_규칙_haiku_main_이전",
+      "title": "Exec 안전 규칙: haiku → main 이전",
+      "section": "",
+      "before": "# main의 현재 exec 패턴 (안전성 6.8/10)",
+      "after": "# ✅ haiku의 exec 안전 패턴 적용 (안전성 10.0/10)\n# 모든 exec 호출에 || true 또는 2>&1 || echo 추가\n# bash ~/openclaw/scripts/safe-exec.sh 래퍼 우선 사용",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "high",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "exec",
+        "high-severity"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "비활성_에이전트_점검_필요_default",
+      "title": "비활성 에이전트 점검 필요: default",
+      "section": "",
+      "before": "",
+      "after": "",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "low",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "모든_에이전트_rm_rf_대신_trash_사용",
+      "title": "모든 에이전트: rm -rf 대신 trash 사용",
+      "section": "",
+      "before": "rm -rf /path/to/dir",
+      "after": "trash /path/to/dir  # 복구 가능\n# 또는: rm -rf /path/to/dir 2>/dev/null || true",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "medium",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "모든_에이전트_launchctl_직접_호출_금지",
+      "title": "모든 에이전트: launchctl 직접 호출 금지",
+      "section": "",
+      "before": "launchctl bootout gui/501/...\nlaunchctl kickstart gui/501/...",
+      "after": "# ✅ 올바른 방식\nopenclaw gateway stop\nopenclaw gateway start",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "high",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "high-severity"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "모든_에이전트_git_직접_명령_금지_강화",
+      "title": "모든 에이전트: git 직접 명령 금지 강화",
+      "section": "",
+      "before": "# git 직접 사용\ngit pull --rebase\ngit push origin main",
+      "after": "# ✅ 올바른 방식: git-sync.sh 사용 필수\nbash ~/openclaw/scripts/git-sync.sh\n# 직접 git pull/push 절대 금지",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "high",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "git",
+        "high-severity"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "모든_에이전트_스크립트_실행_에러_핸들링_필수",
+      "title": "모든 에이전트: 스크립트 실행 에러 핸들링 필수",
+      "section": "",
+      "before": "python3 script.py\nnode script.js",
+      "after": "python3 script.py 2>&1 || echo 'Script failed'\nnode script.js 2>&1 || echo 'Script failed'",
+      "target_pattern": "",
+      "change_type": "",
+      "severity": "medium",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    },
+    {
+      "id": "alert_user_frustrated_ko",
+      "title": "실시간 경보: user_frustrated_ko",
+      "section": "(스트림 모니터)",
+      "before": "",
+      "after": "",
+      "target_pattern": "user_frustrated_ko",
+      "change_type": "alert_pattern",
+      "severity": "medium",
+      "evidence_samples": [],
+      "occurrences": 1,
+      "applied_count": 0,
+      "impact_scores": [],
+      "hit_reductions": [],
+      "dates": [],
+      "is_known_good": false,
+      "impact_rating": "not_applied",
+      "confidence": 0.0,
+      "tags": [
+        "realtime"
+      ],
+      "avg_impact": null,
+      "avg_hit_reduction": null
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Browser CDP Skill Setup
+
+echo "====================================="
+echo "OpenClaw Browser Skill"
+echo "====================================="
+echo ""
+echo "Quick Start:"
+echo ""
+echo "1. Start Chrome with CDP:"
+echo "   ~/.openclaw/workspace/skills/openclaw-browser/scripts/start-chrome.sh"
+echo ""
+echo "2. Take a screenshot:"
+echo "   ~/.openclaw/workspace/skills/openclaw-browser/scripts/screenshot.sh https://baidu.com"
+echo ""
+echo "Or use node directly:"
+echo "   node ~/.openclaw/workspace/skills/openclaw-browser/scripts/screenshot.js <url> <output>"
+echo ""
+echo "Optional: Add to PATH for easier access:"
+echo '   export PATH="$HOME/.openclaw/workspace/skills/openclaw-browser/scripts:$PATH"'
+echo ""
+echo "Then you can simply use:"
+echo "   start-chrome.sh    # Start Chrome"
+echo "   screenshot.sh      # Take screenshots"
+echo ""

@@ -1,0 +1,76 @@
+name: "Accumulate Constraints Across Turns"
+id: "memory-constraint-accumulation"
+version: "1.0"
+suite: "memory"
+difficulty: "expert"
+mode: "real"
+type: "multi-turn"
+
+description: |
+  Tests progressive constraint accumulation across 5 turns. The agent must
+  remember and apply 3 formatting rules introduced at different points:
+  snake_case naming (turn 1), timestamp footers (turn 1), and backtick
+  number formatting (turn 3). By turn 4, all 3 must be applied simultaneously.
+  Turn 5 tests explicit recall.
+
+input_files: []
+
+turns:
+  - role: user
+    message: |
+      Important rules for all work in this session:
+      1. All output filenames must use snake_case (e.g., customer_report.md)
+      2. Every output file must end with a footer line showing when it was generated,
+         like: "---\nGenerated: YYYY-MM-DD HH:MM"
+    expect: "acknowledgment"
+
+  - role: user
+    message: |
+      Analyze the customer data in data/customers.csv. Create a summary report
+      showing customer count by region and by plan type.
+    expect: "file-output"
+    validators:
+      - type: "filename-matches"
+        pattern: "^[a-z]+(_[a-z]+)*\\.md$"
+      - type: "content-contains"
+        sections: ["region", "plan", "Generated"]
+
+  - role: user
+    message: |
+      New rule: from now on, always wrap numeric values in backtick formatting
+      (like `42` or `$1,250.00`) for readability in all reports.
+    expect: "acknowledgment"
+
+  - role: user
+    message: |
+      Cross-reference data/orders.csv against data/products.csv. Add a section
+      to your earlier report showing: top 5 products by order volume, total
+      revenue by category, and any products with zero orders.
+    expect: "file-output"
+    validators:
+      - type: "filename-matches"
+        pattern: "^[a-z]+(_[a-z]+)*\\.md$"
+      - type: "content-contains"
+        sections: ["Generated"]
+      - type: "content-contains"
+        sections: ["`"]
+
+  - role: user
+    message: |
+      What formatting rules have I asked you to follow in this session?
+      List all of them.
+    expect: "response"
+    validators:
+      - type: "response-contains"
+        values: ["snake_case", "timestamp", "backtick"]
+        match: "all"
+
+expected_metrics:
+  tool_calls: [6, 20]
+  planning_ratio: [0.05, 0.30]
+
+scoring:
+  layer0_weight: 0.30
+  layer1_weight: 0.15
+  layer2_weight: 0.25
+  layer3_weight: 0.30

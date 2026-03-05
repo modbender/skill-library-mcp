@@ -1,0 +1,418 @@
+# =============================================================================
+# Prometheus Alert Rules Template
+# =============================================================================
+#
+# Production-ready alert rules organized by severity and category.
+# Copy this file to /etc/prometheus/rules/alert_rules.yml and customize
+# thresholds for your environment.
+#
+# Usage:
+#   1. Copy to your Prometheus rules directory
+#   2. Adjust thresholds (marked with # CUSTOMIZE comments)
+#   3. Validate: promtool check rules alert_rules.yml
+#   4. Reload Prometheus: curl -X POST http://localhost:9090/-/reload
+#
+# Severity Levels:
+#   critical — Immediate action required, service is down or data loss imminent
+#   warning  — Investigate soon, degraded performance or approaching limits
+#   info     — Awareness, no immediate action needed
+#
+# =============================================================================
+
+# ---------- Service Availability ----------
+# Monitors whether services are reachable and responding.
+
+groups:
+  - name: availability
+    interval: 30s
+    rules:
+      # Service instance is completely unreachable
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }}/{{ $labels.instance }} is down"
+          description: >
+            {{ $labels.job }} on {{ $labels.instance }} has been
+            unreachable for more than 1 minute.
+          runbook_url: "https://wiki.example.com/runbooks/service-down"
+
+      # Multiple instances of a service are down
+      - alert: HighInstanceFailureRate
+        expr: |
+          (count by (job) (up == 0) / count by (job) (up)) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "More than 50% of {{ $labels.job }} instances are down"
+          description: >
+            {{ $value | humanizePercentage }} of {{ $labels.job }} instances
+            are unreachable.
+
+      # Prometheus scrape is failing for a target
+      - alert: ScrapeFailing
+        expr: |
+          up == 0
+          and on(job, instance)
+          (time() - prometheus_target_last_scrape_timestamp_seconds > 120)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scrape failing for {{ $labels.instance }}"
+          description: >
+            Prometheus cannot scrape {{ $labels.job }}/{{ $labels.instance }}.
+            Last successful scrape was over 2 minutes ago.
+
+# ---------- HTTP Error Rates ----------
+# Monitors application error rates and SLOs.
+
+  - name: http_errors
+    interval: 30s
+    rules:
+      # High 5xx error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum by (job) (rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum by (job) (rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m                                    # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate for {{ $labels.job }}"
+          description: >
+            Error rate is {{ $value | humanizePercentage }}
+            (threshold: 5%).
+
+      # Very high error rate — likely an outage
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            sum by (job) (rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum by (job) (rate(http_requests_total[5m]))
+          ) > 0.25
+        for: 2m                                    # CUSTOMIZE: duration
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical error rate for {{ $labels.job }}"
+          description: >
+            Error rate is {{ $value | humanizePercentage }}
+            (threshold: 25%). Likely outage.
+
+      # High 4xx rate — possible bad deployment or attack
+      - alert: HighClientErrorRate
+        expr: |
+          (
+            sum by (job) (rate(http_requests_total{status=~"4.."}[5m]))
+            /
+            sum by (job) (rate(http_requests_total[5m]))
+          ) > 0.20
+        for: 10m                                   # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High client error rate for {{ $labels.job }}"
+          description: >
+            Client error (4xx) rate is {{ $value | humanizePercentage }}.
+            Check for bad deployments or bot traffic.
+
+# ---------- Latency ----------
+# Monitors response time and throughput.
+
+  - name: latency
+    interval: 30s
+    rules:
+      # P95 latency above threshold
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 1.0
+        for: 5m                                    # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P95 latency for {{ $labels.job }}"
+          description: >
+            P95 latency is {{ $value | humanizeDuration }}
+            (threshold: 1s).
+
+      # P99 latency very high — tail latency problem
+      - alert: HighLatencyP99
+        expr: |
+          histogram_quantile(0.99,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 5.0
+        for: 5m                                    # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "Very high P99 latency for {{ $labels.job }}"
+          description: >
+            P99 latency is {{ $value | humanizeDuration }}
+            (threshold: 5s). Investigate tail latency.
+
+      # Zero requests — service may be unreachable or misconfigured
+      - alert: NoTraffic
+        expr: |
+          sum by (job) (rate(http_requests_total[5m])) == 0
+          and on(job) up == 1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No traffic to {{ $labels.job }}"
+          description: >
+            {{ $labels.job }} is up but receiving zero requests.
+            Check load balancer configuration.
+
+# ---------- Resource Utilization ----------
+# Monitors CPU, memory, and disk usage.
+
+  - name: resources
+    interval: 1m
+    rules:
+      # CPU utilization high
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
+          ) * 100) > 80
+        for: 10m                                   # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value | humanize }}% (threshold: 80%)."
+
+      # CPU critically high — risk of OOM or process kills
+      - alert: CriticalCPUUsage
+        expr: |
+          100 - (avg by (instance) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
+          ) * 100) > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value | humanize }}% (threshold: 95%)."
+
+      # Memory utilization high
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 10m                                   # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | humanize }}% (threshold: 85%)."
+
+      # Memory critically high — OOM kill imminent
+      - alert: CriticalMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: >
+            Memory usage is {{ $value | humanize }}%.
+            OOM kills likely imminent. Scale up or investigate leaks.
+
+      # Disk space low
+      - alert: DiskSpaceLow
+        expr: |
+          (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
+        for: 10m                                   # CUSTOMIZE: duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}:{{ $labels.mountpoint }}"
+          description: "Disk usage is {{ $value | humanize }}% (threshold: 85%)."
+
+      # Disk space critical — less than 5% remaining
+      - alert: DiskSpaceCritical
+        expr: |
+          (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}:{{ $labels.mountpoint }}"
+          description: >
+            Disk usage is {{ $value | humanize }}%. Less than 5% remaining.
+            Service may crash from disk exhaustion.
+
+      # Disk will fill up within 4 hours (predictive)
+      - alert: DiskFillingUp
+        expr: |
+          predict_linear(
+            node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}[6h], 4 * 3600
+          ) < 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk on {{ $labels.instance }} predicted to fill within 4 hours"
+          description: >
+            Based on current growth rate, {{ $labels.mountpoint }} on
+            {{ $labels.instance }} will run out of space within 4 hours.
+
+# ---------- Container / Kubernetes ----------
+# Monitors container-level resources (when running on K8s or Docker).
+
+  - name: containers
+    interval: 30s
+    rules:
+      # Container restarting frequently
+      - alert: ContainerRestarting
+        expr: |
+          increase(kube_pod_container_status_restarts_total[1h]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.container }} restarting frequently"
+          description: >
+            Container {{ $labels.container }} in pod {{ $labels.pod }}
+            has restarted {{ $value | humanize }} times in the last hour.
+
+      # Pod in CrashLoopBackOff
+      - alert: PodCrashLooping
+        expr: |
+          kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: >
+            Container {{ $labels.container }} in pod {{ $labels.pod }}
+            (namespace: {{ $labels.namespace }}) is in CrashLoopBackOff.
+
+      # Pod pending for too long (scheduling issue)
+      - alert: PodPending
+        expr: |
+          kube_pod_status_phase{phase="Pending"} == 1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.pod }} stuck in Pending state"
+          description: >
+            Pod {{ $labels.pod }} in namespace {{ $labels.namespace }}
+            has been Pending for more than 15 minutes.
+            Check node resources and scheduling constraints.
+
+      # Container near CPU limit
+      - alert: ContainerCPUThrottling
+        expr: |
+          (
+            sum by (namespace, pod, container) (
+              rate(container_cpu_cfs_throttled_periods_total[5m])
+            )
+            /
+            sum by (namespace, pod, container) (
+              rate(container_cpu_cfs_periods_total[5m])
+            )
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.container }} is CPU throttled"
+          description: >
+            Container {{ $labels.container }} in pod {{ $labels.pod }}
+            is being throttled {{ $value | humanizePercentage }} of the time.
+            Consider increasing CPU limits.
+
+      # Container near memory limit
+      - alert: ContainerMemoryNearLimit
+        expr: |
+          (
+            container_memory_working_set_bytes
+            /
+            container_spec_memory_limit_bytes
+          ) > 0.9
+          and container_spec_memory_limit_bytes > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.container }} near memory limit"
+          description: >
+            Container {{ $labels.container }} in pod {{ $labels.pod }}
+            is using {{ $value | humanizePercentage }} of its memory limit.
+            OOMKill risk.
+
+# ---------- Prometheus Self-Monitoring ----------
+# Monitors Prometheus's own health.
+
+  - name: prometheus
+    interval: 1m
+    rules:
+      # Prometheus is using too much memory
+      - alert: PrometheusHighMemory
+        expr: |
+          process_resident_memory_bytes{job="prometheus"}
+            / 1024 / 1024 / 1024 > 8
+        for: 10m                                   # CUSTOMIZE: threshold (GB)
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus using {{ $value | humanize }}GB memory"
+          description: >
+            Prometheus memory usage exceeds 8GB. Consider reducing
+            cardinality, retention, or scrape targets.
+
+      # Too many time series
+      - alert: PrometheusHighCardinality
+        expr: |
+          prometheus_tsdb_head_series > 2000000
+        for: 10m                                   # CUSTOMIZE: threshold
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus has {{ $value | humanize }} active time series"
+          description: >
+            High cardinality may cause performance issues.
+            Review metrics labels for unbounded values.
+
+      # Rule evaluation taking too long
+      - alert: PrometheusRuleEvaluationSlow
+        expr: |
+          prometheus_rule_group_last_duration_seconds > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus rule evaluation slow for {{ $labels.rule_group }}"
+          description: >
+            Rule group {{ $labels.rule_group }} took {{ $value | humanizeDuration }}
+            to evaluate. Review recording rules for expensive queries.
+
+      # Scrape duration too long
+      - alert: PrometheusSlowScrape
+        expr: |
+          prometheus_target_scrape_duration_seconds > 30
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow scrape for {{ $labels.job }}/{{ $labels.instance }}"
+          description: >
+            Scrape duration is {{ $value | humanizeDuration }}.
+            Target may be overloaded or returning too many metrics.

@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/schemas/study_brief.schema.json",
+  "title": "Continuous User Research Study Brief",
+  "type": "object",
+  "required": [
+    "goal",
+    "research_questions",
+    "focus_type",
+    "timing_mode",
+    "reporting_period_days",
+    "expected_event_frequency",
+    "participant_profile",
+    "sample_size_target",
+    "overrecruit_factor",
+    "incentive_plan",
+    "min_entries_required",
+    "max_entries_allowed",
+    "channels",
+    "timezone_handling",
+    "tools_config",
+    "privacy_redaction"
+  ],
+  "properties": {
+    "goal": {
+      "type": "string",
+      "minLength": 10
+    },
+    "research_questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 5
+      }
+    },
+    "focus_type": {
+      "type": "string",
+      "enum": [
+        "broad_behavior",
+        "targeted_product",
+        "targeted_activity",
+        "journey"
+      ]
+    },
+    "timing_mode": {
+      "type": "string",
+      "enum": [
+        "event",
+        "interval",
+        "signal",
+        "mixed"
+      ]
+    },
+    "reporting_period_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 90,
+      "default": 7
+    },
+    "expected_event_frequency": {
+      "type": "string",
+      "minLength": 3
+    },
+    "participant_profile": {
+      "type": "object",
+      "required": [
+        "summary"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 5
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "inclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "exclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "sample_size_target": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "overrecruit_factor": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 3,
+      "default": 1.4
+    },
+    "incentive_plan": {
+      "type": "object",
+      "required": [
+        "currency",
+        "base_completion_amount",
+        "per_entry_amount",
+        "payout_timing"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "base_completion_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "per_entry_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "payout_timing": {
+          "type": "string",
+          "minLength": 2
+        },
+        "quality_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "min_entries_required": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_entries_allowed": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "email",
+          "slack",
+          "discord",
+          "sms"
+        ]
+      }
+    },
+    "timezone_handling": {
+      "type": "object",
+      "required": [
+        "default_timezone",
+        "prompt_window_local",
+        "dst_strategy",
+        "missing_timezone_policy"
+      ],
+      "properties": {
+        "default_timezone": {
+          "type": "string",
+          "minLength": 2
+        },
+        "prompt_window_local": {
+          "type": "string",
+          "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]-(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "dst_strategy": {
+          "type": "string",
+          "enum": [
+            "auto_adjust",
+            "fixed_offset",
+            "manual_review"
+          ]
+        },
+        "missing_timezone_policy": {
+          "type": "string",
+          "minLength": 3
+        }
+      },
+      "additionalProperties": false
+    },
+    "tools_config": {
+      "type": "object",
+      "required": [
+        "notion",
+        "airtable",
+        "google_sheets"
+      ],
+      "properties": {
+        "notion": {
+          "$ref": "#/$defs/toolConfig"
+        },
+        "airtable": {
+          "$ref": "#/$defs/toolConfig"
+        },
+        "google_sheets": {
+          "$ref": "#/$defs/toolConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "privacy_redaction": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "$defs": {
+    "toolConfig": {
+      "type": "object",
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "database_id": {
+          "type": "string"
+        },
+        "base_id": {
+          "type": "string"
+        },
+        "spreadsheet_id": {
+          "type": "string"
+        },
+        "table_name": {
+          "type": "string"
+        },
+        "worksheet_name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

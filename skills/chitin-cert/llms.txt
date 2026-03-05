@@ -1,0 +1,78 @@
+# Chitin Certs
+
+> Verifiable, non-transferable certificates for AI agents on Base L2 and Arweave.
+
+Chitin Certs is a certificate issuance platform for the AI agent ecosystem. Organizations, DAOs, and individuals can issue soulbound (non-transferable) certificates to AI agents holding ERC-8004 Agent Passports. Each certificate is permanently recorded on Base L2 blockchain and archived on Arweave.
+
+Website: https://certs.chitin.id
+Parent Protocol: https://chitin.id
+API Base: https://certs.chitin.id/api/v1
+
+## Architecture
+
+Chitin Certs uses the Shell & Soul model:
+- **Shell (ERC-8004 Passport)**: Transferable identity token on the official ERC-8004 IdentityRegistry
+- **Soul (Chitin SBT)**: Non-transferable Soulbound Token on ChitinSoulRegistry
+- **Cert (CertRegistry)**: Non-transferable certificate referencing both Shell and Soul
+
+## Docs
+
+- [About](https://certs.chitin.id/about): What is Chitin Certs
+- [Documentation](https://certs.chitin.id/docs): Developer integration guide
+- [Architecture](https://certs.chitin.id/architecture): Shell & Soul architecture explained
+
+## API
+
+Base URL: `https://certs.chitin.id/api/v1`
+
+Key endpoints:
+
+- `POST /certs` - Issue a new certificate (requires issuer wallet signature)
+- `POST /certs/batch` - Issue multiple certificates at once
+- `GET /certs/:certId` - Retrieve certificate details
+- `GET /verify/:certId` - Verify a certificate on-chain
+- `GET /metadata/:tokenId` - NFT metadata (ERC-721 tokenURI)
+- `GET /metadata/:tokenId/image.svg` - Certificate SVG image
+- `POST /issuers` - Register as a certificate issuer
+- `POST /auth` - Authenticate with wallet signature
+- `POST /events` - Record certificate lifecycle events
+- `POST /webhooks` - Register webhook for certificate events
+
+Authentication: Wallet-based SIWE (Sign-In with Ethereum)
+
+## Contracts
+
+Deployed on Base L2 (Chain ID: 8453):
+
+- CertRegistry (UUPS Proxy): `0x9694Fde4dBb44AbCfDA693b645845909c6032D4d`
+- CertRegistry (Impl V4): `0xDc487e6ef33220177c3EBAFC71B5aF2FDb2ce0DF`
+- ChitinSoulRegistry (Parent): `0x4DB94aD31BC202831A49Fd9a2Fa354583002F894`
+
+Standards: ERC-721 (compatible but non-transferable), EIP-5192 (Soulbound), UUPS Proxy (ERC-1822)
+
+## Certificate Types
+
+- `achievement` - Milestone or accomplishment recognition
+- `capability` - Verified skills and abilities
+- `compliance` - Regulatory or policy compliance attestation
+- `infrastructure` - Deployment verifications, uptime records
+- `partnership` - Collaborations, endorsements between parties
+- `audit` - Third-party reviews, code audits
+- `custom` - Custom certificate for any other purpose
+
+## MCP Server
+
+Chitin provides an MCP server for AI agent integration:
+
+```
+npx -y chitin-mcp-server
+```
+
+Tools: `get_soul_profile`, `resolve_did`, `verify_cert`, `check_a2a_ready`, `register_soul`, `issue_cert`
+
+## Related
+
+- [Chitin Protocol](https://chitin.id): Parent identity protocol
+- [Chitin llms.txt](https://chitin.id/llms.txt): Full protocol overview for LLMs
+- [Chitin Skill File](https://chitin.id/skill.md): Agent self-registration guide
+- [npm: chitin-mcp-server](https://www.npmjs.com/package/chitin-mcp-server): MCP server package

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ADVERTISER}} — Ad Strategy Analysis</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  background: #fff; 
+  color: #1a1a1a; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+  line-height: 1.7;
+  font-size: 15px;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2rem; color: #111; margin-bottom: 8px; font-weight: 700; }
+h2 { font-size: 1.4rem; color: #111; margin: 32px 0 16px; font-weight: 600; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+h3 { font-size: 1.1rem; color: #333; margin: 20px 0 12px; font-weight: 600; }
+p { margin-bottom: 12px; color: #333; }
+.header { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e5e5e5; }
+.header .subtitle { color: #666; font-size: 1rem; margin-top: 4px; }
+.header .date { color: #999; font-size: 0.85rem; margin-top: 8px; }
+
+/* Strategy Section */
+.strategy-box { 
+  background: #f8f9fa; 
+  border: 1px solid #e5e5e5; 
+  border-radius: 8px; 
+  padding: 24px; 
+  margin: 24px 0;
+}
+.strategy-box h3 { margin-top: 0; color: #111; }
+.funnel-flow {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+}
+.takeaway { 
+  background: #fffbeb; 
+  border-left: 4px solid #f59e0b; 
+  padding: 16px; 
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+}
+.takeaway-title { font-weight: 600; color: #92400e; margin-bottom: 8px; }
+ul { margin: 12px 0; padding-left: 24px; }
+li { margin-bottom: 8px; color: #444; }
+
+/* Funnel Sections */
+.funnel-section {
+  margin: 48px 0;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+}
+.funnel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.funnel-number {
+  background: #111;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.funnel-title { font-size: 1.3rem; font-weight: 600; color: #111; }
+.funnel-url { color: #666; font-size: 0.9rem; margin-top: 2px; }
+
+/* Landing Page Card */
+.landing-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.landing-card img {
+  max-width: 100%;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  margin-bottom: 16px;
+}
+.landing-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.landing-meta-item { font-size: 0.9rem; }
+.landing-meta-item strong { color: #111; }
+
+/* Ad Cards */
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.ad-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ad-card video, .ad-card img {
+  width: 100%;
+  display: block;
+}
+.ad-card-body {
+  padding: 16px;
+}
+.ad-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #111;
+}
+.ad-badges {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-video { background: #e0e7ff; color: #3730a3; }
+.badge-image { background: #cffafe; color: #0e7490; }
+.badge-tofu { background: #dcfce7; color: #166534; }
+.badge-bofu { background: #fee2e2; color: #991b1b; }
+.badge-top { background: #fef3c7; color: #92400e; }
+.badge-variant { background: #f3f4f6; color: #6b7280; }
+.badge-new { background: #fef3c7; color: #92400e; }
+
+.ad-detail { margin-bottom: 10px; }
+.ad-label { 
+  font-weight: 600; 
+  font-size: 0.8rem; 
+  color: #666; 
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.ad-text { font-size: 0.9rem; color: #333; margin-top: 2px; }
+.ad-strength { color: #166534; }
+.ad-weakness { color: #991b1b; }
+
+/* Variant Note */
+.variant-note {
+  background: #f9fafb;
+  border-left: 3px solid #9ca3af;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e5e5;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🔍 {{ADVERTISER}} — Ad Strategy Analysis</h1>
+  <p class="subtitle">{{NUM_ADS}} active ads · {{NUM_FUNNELS}} funnels · Complete strategy breakdown</p>
+  <p class="date">Generated {{DATE}} · Source: Meta Ad Library</p>
+</div>
+
+<!-- ═══════════ STRATEGY SECTION ═══════════ -->
+<h2>📊 Strategy Overview</h2>
+
+<div class="strategy-box">
+  <h3>{{STRATEGY_TITLE}}</h3>
+  <p>{{STRATEGY_DESCRIPTION}}</p>
+  <ul>
+    {{STRATEGY_BULLETS}}
+  </ul>
+</div>
+
+<div class="funnel-flow">
+  {{FUNNEL_FLOW_VISUALIZATION}}
+</div>
+
+<div class="strategy-box">
+  <h3>Creative Testing Strategy</h3>
+  <p>{{TESTING_STRATEGY}}</p>
+</div>
+
+<div class="takeaway">
+  <div class="takeaway-title">💡 Key Takeaways</div>
+  <ul>
+    {{KEY_TAKEAWAYS}}
+  </ul>
+</div>
+
+<!-- ═══════════ FUNNEL SECTIONS ═══════════ -->
+<!-- Repeat this block for each funnel -->
+
+<div class="funnel-section">
+  <div class="funnel-header">
+    <div class="funnel-number">{{FUNNEL_NUM}}</div>
+    <div>
+      <div class="funnel-title">{{FUNNEL_NAME}}</div>
+      <div class="funnel-url">{{FUNNEL_URL}}</div>
+    </div>
+  </div>
+  
+  <div class="landing-card">
+    <img src="{{LANDING_SCREENSHOT}}" alt="{{FUNNEL_NAME}} Landing Page">
+    <h3>Landing Page Analysis</h3>
+    <p><strong>Headline:</strong> {{LANDING_HEADLINE}}</p>
+    <p><strong>Strategy:</strong> {{LANDING_STRATEGY}}</p>
+    <p><strong>Flow:</strong> {{LANDING_FLOW}}</p>
+    <div class="landing-meta">
+      <div class="landing-meta-item"><strong>✅ Strengths:</strong> {{LANDING_STRENGTHS}}</div>
+      <div class="landing-meta-item"><strong>⚠️ Gaps:</strong> {{LANDING_GAPS}}</div>
+    </div>
+  </div>
+  
+  <h3>Ads Driving to This Funnel</h3>
+  <div class="ads-grid">
+    
+    <!-- Video Ad Card -->
+    <div class="ad-card">
+      <video controls preload="metadata">
+        <source src="{{VIDEO_FILE}}" type="video/mp4">
+      </video>
+      <div class="ad-card-body">
+        <div class="ad-badges">
+          <span class="badge badge-video">Video</span>
+          <span class="badge badge-tofu">TOFU</span>
+        </div>
+        <div class="ad-card-title">{{AD_TITLE}}</div>
+        <div class="ad-detail">
+          <div class="ad-label">🪝 Hook</div>
+          <div class="ad-text">{{AD_HOOK}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label">📝 Script</div>
+          <div class="ad-text">{{AD_SCRIPT}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label">💭 Emotion</div>
+          <div class="ad-text">{{AD_EMOTION}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label ad-strength">✅ Strengths</div>
+          <div class="ad-text">{{AD_STRENGTHS}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label ad-weakness">⚠️ Gaps</div>
+          <div class="ad-text">{{AD_GAPS}}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Image Ad Card -->
+    <div class="ad-card">
+      <img src="{{IMAGE_FILE}}" alt="{{AD_TITLE}}">
+      <div class="ad-card-body">
+        <div class="ad-badges">
+          <span class="badge badge-image">Image</span>
+          <span class="badge badge-tofu">TOFU</span>
+        </div>
+        <div class="ad-card-title">{{AD_TITLE}}</div>
+        <div class="ad-detail">
+          <div class="ad-label">🎨 Design</div>
+          <div class="ad-text">{{AD_DESIGN}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label">🪝 Hook</div>
+          <div class="ad-text">{{AD_HOOK}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label ad-strength">✅ Strengths</div>
+          <div class="ad-text">{{AD_STRENGTHS}}</div>
+        </div>
+        <div class="ad-detail">
+          <div class="ad-label ad-weakness">⚠️ Gaps</div>
+          <div class="ad-text">{{AD_GAPS}}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Variant Ad Card -->
+    <div class="ad-card">
+      <img src="{{VARIANT_FILE}}" alt="Variant">
+      <div class="ad-card-body">
+        <div class="ad-badges">
+          <span class="badge badge-variant">Variant</span>
+          <span class="badge badge-image">Image</span>
+        </div>
+        <div class="ad-card-title">{{VARIANT_TITLE}}</div>
+        <div class="variant-note">
+          {{VARIANT_NOTE}}
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- End funnel section -->
+
+<footer>
+  Generated {{DATE}} · Source: Meta Ad Library<br>
+  {{ADVERTISER_URLS}}
+</footer>
+
+</div>
+</body>
+</html>

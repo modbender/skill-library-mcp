@@ -1,0 +1,130 @@
+{
+  "name": "process_payment",
+  "version": "1.0.0",
+  "description": "Process payment against a sales invoice or sales order",
+  "author": "Business Claw Team",
+  "category": "accounts",
+  
+  "triggers": [
+    "process payment",
+    "record payment",
+    "receive payment",
+    "make payment",
+    "payment entry"
+  ],
+  
+  "tools": [
+    {
+      "name": "get_document",
+      "description": "Fetch invoice/order details",
+      "required": true
+    },
+    {
+      "name": "get_doctype_meta",
+      "description": "Get Payment Entry DocType schema",
+      "required": true
+    },
+    {
+      "name": "create_document",
+      "description": "Create the payment entry",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit the payment",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "party_type": {
+        "type": "string",
+        "enum": ["Customer", "Supplier"],
+        "description": "Party type"
+      },
+      "party": {
+        "type": "string",
+        "description": "Customer or Supplier name"
+      },
+      "amount": {
+        "type": "number",
+        "description": "Payment amount"
+      },
+      "reference_doctype": {
+        "type": "string",
+        "enum": ["Sales Invoice", "Purchase Invoice", "Sales Order", "Purchase Order"],
+        "description": "Reference document type"
+      },
+      "reference_name": {
+        "type": "string",
+        "description": "Reference document number"
+      },
+      "payment_type": {
+        "type": "string",
+        "enum": ["Receive", "Pay"],
+        "description": "Payment type"
+      },
+      "mode_of_payment": {
+        "type": "string",
+        "description": "Mode of payment (Cash, Bank, etc.)"
+      },
+      "transaction_date": {
+        "type": "string",
+        "description": "Payment date"
+      }
+    },
+    "required": ["party", "amount", "payment_type"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "fetch_invoice",
+        "tool": "get_document",
+        "arguments": {
+          "doctype": "${reference_doctype}",
+          "name": "${reference_name}"
+        },
+        "condition": "reference_name is provided"
+      },
+      {
+        "step": "get_schema",
+        "tool": "get_doctype_meta",
+        "arguments": {
+          "doctype": "Payment Entry"
+        }
+      },
+      {
+        "step": "create_payment",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Payment Entry",
+          "data": {
+            "payment_type": "${payment_type}",
+            "party_type": "${party_type}",
+            "party": "${party}",
+            "amount": "${amount}",
+            "mode_of_payment": "${mode_of_payment}",
+            "transaction_date": "${transaction_date}",
+            "references": [
+              {
+                "reference_doctype": "${reference_doctype}",
+                "reference_name": "${reference_name}",
+                "allocated_amount": "${amount}"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "validate_amount": true,
+    "require_reference": false
+  },
+  
+  "output_template": "Created Payment Entry {{name}}\nAmount: {{paid_amount}}\nParty: {{party}}\nReference: {{reference_name}}"
+}

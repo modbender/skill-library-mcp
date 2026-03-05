@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClawRoam — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amber: #D97706;
+    --amber-light: #F59E0B;
+    --amber-dark: #92400E;
+    --surface: #08080f;
+    --surface-raised: #0e0e1a;
+    --surface-card: rgba(255,255,255,0.025);
+    --border: rgba(255,255,255,0.06);
+    --text: #E5E7EB;
+    --text-muted: #6B7280;
+    --text-dim: #4B5563;
+    --green: #10B981;
+    --red: #EF4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 { font-family: 'Instrument Serif', serif; font-weight: 400; }
+  code, .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── Ambient background ── */
+  .bg-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-glow.a { top: -20vh; right: -10vw; width: 50vw; height: 50vw; background: rgba(217,119,6,0.05); }
+  .bg-glow.b { bottom: -30vh; left: -15vw; width: 60vw; height: 60vw; background: rgba(99,102,241,0.03); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .fade-up { animation: fadeUp 0.7s ease-out both; }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1rem 2rem;
+    background: rgba(8,8,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+  .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--amber), var(--amber-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 0 20px rgba(217,119,6,0.25);
+  }
+  .logo-text {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 1rem; color: var(--text); letter-spacing: -0.02em;
+  }
+  .logo-badge {
+    font-size: 0.65rem; color: var(--text-muted);
+    padding: 2px 8px; border: 1px solid var(--border);
+    border-radius: 4px; margin-left: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .nav-right { display: flex; align-items: center; gap: 1.25rem; }
+  .nav-email {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .btn-logout {
+    padding: 0.4rem 1rem; background: transparent; color: var(--text-muted);
+    font-weight: 500; font-size: 0.78rem; border-radius: 6px;
+    border: 1px solid var(--border); cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; transition: all 0.2s;
+  }
+  .btn-logout:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ── Login Screen ── */
+  .login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem;
+  }
+  .login-card {
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem; max-width: 420px; width: 100%;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.5s ease-out both;
+  }
+  .login-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--amber-dark), var(--amber), var(--amber-dark));
+  }
+  .login-header { text-align: center; margin-bottom: 2rem; }
+  .login-header .logo-icon {
+    width: 48px; height: 48px; font-size: 24px;
+    margin: 0 auto 1rem; border-radius: 12px;
+  }
+  .login-header h2 { font-size: 1.75rem; color: #F9FAFB; margin-bottom: 0.5rem; }
+  .login-header p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block; font-size: 0.78rem; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace; margin-bottom: 0.4rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .form-group input {
+    width: 100%; padding: 0.7rem 1rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    font-size: 0.9rem; font-family: 'IBM Plex Mono', monospace;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--amber); }
+  .form-group input::placeholder { color: var(--text-dim); }
+
+  .btn-primary {
+    padding: 0.8rem 2rem; background: var(--amber); color: #000;
+    font-weight: 700; font-size: 0.9rem; border-radius: 8px;
+    text-decoration: none; font-family: 'IBM Plex Mono', monospace;
+    transition: all 0.2s; border: none; cursor: pointer;
+    width: 100%; text-align: center;
+  }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(217,119,6,0.25); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .login-error {
+    font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em;
+    font-family: 'IBM Plex Mono', monospace; color: var(--red);
+    text-align: center;
+  }
+
+  /* ── Dashboard ── */
+  .dashboard { display: none; padding-top: 72px; height: 100vh; flex-direction: column; }
+  .dashboard.active { display: flex; }
+  .login-screen.hidden { display: none; }
+
+  .dashboard-header {
+    padding: 1.5rem 2rem 1rem;
+    flex-shrink: 0;
+  }
+  .dashboard-title {
+    font-size: 1.5rem; color: #F9FAFB; margin-bottom: 0.25rem;
+  }
+  .dashboard-subtitle {
+    font-size: 0.85rem; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Profile columns container ── */
+  .profiles-container {
+    flex: 1; overflow-x: auto; overflow-y: hidden;
+    padding: 0.5rem 2rem 2rem;
+    display: flex; gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .profiles-container::-webkit-scrollbar { height: 8px; }
+  .profiles-container::-webkit-scrollbar-track { background: transparent; }
+  .profiles-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.08); border-radius: 4px;
+  }
+  .profiles-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  /* ── Profile column ── */
+  .profile-column {
+    min-width: 340px; max-width: 380px; width: 340px;
+    background: var(--surface-card); border: 2px solid var(--border);
+    border-radius: 14px; flex-shrink: 0;
+    display: flex; flex-direction: column;
+    max-height: calc(100vh - 170px);
+    transition: border-color 0.25s, box-shadow 0.25s;
+    animation: slideIn 0.4s ease-out both;
+  }
+  .profile-column.drag-over {
+    border-color: var(--amber);
+    box-shadow: 0 0 24px rgba(217,119,6,0.2), inset 0 0 24px rgba(217,119,6,0.03);
+  }
+
+  .profile-header {
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .profile-name {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 1rem; color: #F9FAFB; margin-bottom: 0.4rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .profile-name .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+  }
+  .profile-meta {
+    display: flex; gap: 1rem; font-size: 0.72rem;
+    font-family: 'IBM Plex Mono', monospace; color: var(--text-dim);
+  }
+
+  .profile-files {
+    flex: 1; overflow-y: auto; padding: 0.5rem 0;
+  }
+  .profile-files::-webkit-scrollbar { width: 6px; }
+  .profile-files::-webkit-scrollbar-track { background: transparent; }
+  .profile-files::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.06); border-radius: 3px;
+  }
+  .profile-files::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* ── Category sections ── */
+  .category-section { margin-bottom: 0.25rem; }
+  .category-header {
+    padding: 0.5rem 1.25rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--amber); cursor: pointer;
+    display: flex; align-items: center; gap: 0.5rem;
+    user-select: none; transition: color 0.15s;
+  }
+  .category-header:hover { color: var(--amber-light); }
+  .category-chevron {
+    font-size: 0.6rem; transition: transform 0.2s;
+    display: inline-block;
+  }
+  .category-header.collapsed .category-chevron { transform: rotate(-90deg); }
+  .category-files { overflow: hidden; }
+  .category-files.collapsed { display: none; }
+
+  /* ── File row ── */
+  .file-row {
+    padding: 0.45rem 1.25rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    cursor: pointer; transition: background 0.15s;
+    font-size: 0.82rem; color: var(--text-muted);
+    user-select: none;
+  }
+  .file-row:hover { background: rgba(255,255,255,0.03); }
+  .file-row.dragging { opacity: 0.4; }
+  .file-row .file-icon { font-size: 0.75rem; flex-shrink: 0; width: 1.2em; text-align: center; }
+  .file-row .file-name {
+    flex: 1; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .file-row .file-size {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; color: var(--text-dim); flex-shrink: 0;
+  }
+
+  /* ── Sync rule checkbox ── */
+  .file-checkbox {
+    width: 15px; height: 15px; flex-shrink: 0;
+    accent-color: var(--amber); cursor: pointer;
+    margin-right: 0.1rem;
+  }
+  .file-row.excluded {
+    opacity: 0.38;
+  }
+  .file-row.excluded .file-name {
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,0.25);
+  }
+
+  /* ── Excluded badge in profile header ── */
+  .excluded-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem; color: var(--text-dim);
+    padding: 1px 6px; border: 1px solid var(--border);
+    border-radius: 3px; margin-left: 0.5rem;
+  }
+  .excluded-badge.has-exclusions {
+    color: var(--amber); border-color: rgba(217,119,6,0.3);
+  }
+
+  /* ── Empty / loading states ── */
+  .loading-state, .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 3rem 2rem; text-align: center;
+    color: var(--text-dim); gap: 0.75rem;
+  }
+  .spinner {
+    width: 28px; height: 28px; border: 2px solid var(--border);
+    border-top-color: var(--amber); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .loading-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem; color: var(--text-dim);
+  }
+
+  /* ── File preview modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; padding: 2rem;
+  }
+  .modal-overlay.open { display: flex; opacity: 1; }
+
+  .file-modal {
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 16px; max-width: 720px; width: 100%;
+    max-height: 80vh; display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    animation: slideIn 0.25s ease-out both;
+  }
+  .file-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .file-modal-title {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 0.9rem; color: #F9FAFB;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .file-modal-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem;
+  }
+  .file-modal-close {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 1.5rem; cursor: pointer; line-height: 1;
+    padding: 0.25rem; transition: color 0.15s; flex-shrink: 0;
+  }
+  .file-modal-close:hover { color: var(--text); }
+
+  .file-modal-body {
+    flex: 1; overflow: auto; padding: 1.25rem 1.5rem;
+  }
+  .file-modal-body pre {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    line-height: 1.7; color: var(--text-muted);
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .file-modal-body .modal-spinner {
+    display: flex; align-items: center; justify-content: center;
+    padding: 3rem 0;
+  }
+
+  /* ── Toast notifications ── */
+  .toast-container {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    z-index: 300; display: flex; flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  .toast {
+    padding: 0.75rem 1.25rem;
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 10px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem; color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: slideIn 0.3s ease-out both;
+    display: flex; align-items: center; gap: 0.6rem;
+    max-width: 380px;
+  }
+  .toast.success { border-color: rgba(16,185,129,0.3); }
+  .toast.success .toast-icon { color: var(--green); }
+  .toast.error { border-color: rgba(239,68,68,0.3); }
+  .toast.error .toast-icon { color: var(--red); }
+  .toast.hiding { opacity: 0; transform: translateY(8px); transition: all 0.25s; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    nav { padding: 0.75rem 1rem; }
+    .nav-email { display: none; }
+    .dashboard-header { padding: 1rem 1rem 0.75rem; }
+    .profiles-container { padding: 0.5rem 1rem 1.5rem; }
+    .profile-column { min-width: 300px; width: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- LOGIN SCREEN                                 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-icon">&#x1F99E;</div>
+      <h2>ClawRoam Dashboard</h2>
+      <p>Sign in to manage your vault profiles, browse files, and copy between instances.</p>
+    </div>
+    <form id="login-form" onsubmit="return handleLogin(event)">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="login-vault">Vault ID</label>
+        <input type="text" id="login-vault" placeholder="e.g. a8f3e2c1-..." required autocomplete="off">
+      </div>
+      <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- DASHBOARD                                     -->
+<!-- ════════════════════════════════════════════ -->
+<nav id="dashboard-nav" style="display:none;">
+  <div class="nav-left">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">&#x1F99E;</div>
+      <span class="logo-text">ClawRoam</span>
+      <span class="logo-badge">dashboard</span>
+    </a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-email" id="nav-email"></span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="dashboard" id="dashboard">
+  <div class="dashboard-header">
+    <div class="dashboard-title">Your Profiles</div>
+    <div class="dashboard-subtitle">Drag files between profiles to copy them. Click a file to preview.</div>
+  </div>
+
+  <div class="profiles-container" id="profiles-container">
+    <!-- Profiles loaded dynamically -->
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- FILE PREVIEW MODAL                            -->
+<!-- ════════════════════════════════════════════ -->
+<div class="modal-overlay" id="file-modal">
+  <div class="file-modal">
+    <div class="file-modal-header">
+      <div>
+        <div class="file-modal-title" id="modal-title"></div>
+        <div class="file-modal-meta" id="modal-meta"></div>
+      </div>
+      <button class="file-modal-close" onclick="closeFileModal()">&times;</button>
+    </div>
+    <div class="file-modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+var API_BASE = 'https://clawroam-api.ovisoftblue.workers.dev/v1';
+
+var state = {
+  token: localStorage.getItem('cs_token') || null,
+  vaultId: localStorage.getItem('cs_vault_id') || null,
+  email: localStorage.getItem('cs_email') || null,
+  profiles: [],
+  syncRules: {}   // profileName → Set of excluded paths
+};
+
+// ═══════════════════════════════════════════════
+// SAFE DOM HELPERS
+// ═══════════════════════════════════════════════
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function el(tag, attrs, children) {
+  var node = document.createElement(tag);
+  if (attrs) {
+    Object.keys(attrs).forEach(function(key) {
+      if (key === 'className') { node.className = attrs[key]; }
+      else if (key === 'textContent') { node.textContent = attrs[key]; }
+      else if (key.indexOf('on') === 0) { node.addEventListener(key.slice(2).toLowerCase(), attrs[key]); }
+      else if (key === 'draggable') { node.draggable = attrs[key]; }
+      else if (key === 'style' && typeof attrs[key] === 'object') {
+        Object.keys(attrs[key]).forEach(function(s) { node.style[s] = attrs[key][s]; });
+      }
+      else if (key === 'title') { node.title = attrs[key]; }
+      else if (key.indexOf('data-') === 0) { node.setAttribute(key, attrs[key]); }
+      else { node.setAttribute(key, attrs[key]); }
+    });
+  }
+  if (children) {
+    if (!Array.isArray(children)) children = [children];
+    children.forEach(function(child) {
+      if (typeof child === 'string') { node.appendChild(document.createTextNode(child)); }
+      else if (child) { node.appendChild(child); }
+    });
+  }
+  return node;
+}
+
+function clearChildren(node) {
+  while (node.firstChild) { node.removeChild(node.firstChild); }
+}
+
+// ═══════════════════════════════════════════════
+// API HELPER
+// ═══════════════════════════════════════════════
+function api(method, path, body) {
+  var opts = {
+    method: method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (state.token) {
+    opts.headers['Authorization'] = 'Bearer ' + state.token;
+  }
+  if (body) {
+    opts.body = JSON.stringify(body);
+  }
+
+  return fetch(API_BASE + path, opts).then(function(res) {
+    if (res.status === 401) {
+      logout();
+      return Promise.reject(new Error('Session expired. Please sign in again.'));
+    }
+    if (!res.ok) {
+      return res.json().catch(function() { return {}; }).then(function(err) {
+        return Promise.reject(new Error(err.error || 'Request failed (' + res.status + ')'));
+      });
+    }
+    return res.json();
+  });
+}
+
+// ═══════════════════════════════════════════════
+// SYNC RULES
+// ═══════════════════════════════════════════════
+var syncRulesDebounce = {};
+
+function loadSyncRules(profileName, callback) {
+  state.syncRules[profileName] = null;  // sentinel: loading in progress
+  api('GET', '/vaults/' + state.vaultId + '/profiles/' + encodeURIComponent(profileName) + '/sync-rules')
+    .then(function(data) {
+      state.syncRules[profileName] = new Set(data.excluded || []);
+      if (callback) callback();
+    })
+    .catch(function() {
+      state.syncRules[profileName] = new Set();
+      if (callback) callback();
+    });
+}
+
+function saveSyncRules(profileName, columnEl) {
+  clearTimeout(syncRulesDebounce[profileName]);
+  syncRulesDebounce[profileName] = setTimeout(function() {
+    var excluded = Array.from(state.syncRules[profileName] || []);
+    api('PUT', '/vaults/' + state.vaultId + '/profiles/' + encodeURIComponent(profileName) + '/sync-rules',
+      { excluded: excluded })
+      .then(function() {
+        showToast('Sync rules saved', 'success');
+        updateExcludedBadge(profileName, columnEl);
+      })
+      .catch(function(err) {
+        showToast('Failed to save rules: ' + err.message, 'error');
+      });
+  }, 500);
+}
+
+function updateExcludedBadge(profileName, columnEl) {
+  var badge = columnEl.querySelector('.excluded-badge');
+  if (!badge) return;
+  var count = (state.syncRules[profileName] || new Set()).size;
+  badge.textContent = count > 0 ? count + ' excluded' : '';
+  badge.className = 'excluded-badge' + (count > 0 ? ' has-exclusions' : '');
+}
+
+// ═══════════════════════════════════════════════
+// FORMATTING UTILITIES
+// ═══════════════════════════════════════════════
+function formatSizeMB(mb) {
+  if (mb == null) return '';
+  if (mb < 1) return (mb * 1024).toFixed(0) + ' KB';
+  return mb.toFixed(2) + ' MB';
+}
+
+function formatFileSize(bytes) {
+  if (bytes == null) return '';
+  if (typeof bytes === 'string') return bytes;
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return '';
+  var date = new Date(timestamp);
+  if (isNaN(date.getTime())) return String(timestamp);
+
+  var now = new Date();
+  var diffMs = now - date;
+  var diffMin = Math.floor(diffMs / 60000);
+  var diffHr = Math.floor(diffMs / 3600000);
+  var diffDay = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return diffMin + ' min ago';
+  if (diffHr < 24) return diffHr + 'h ago';
+  if (diffDay < 7) return diffDay + 'd ago';
+
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[date.getMonth()] + ' ' + date.getDate() + ', ' +
+    String(date.getHours()).padStart(2, '0') + ':' +
+    String(date.getMinutes()).padStart(2, '0');
+}
+
+// ═══════════════════════════════════════════════
+// CATEGORY HELPERS
+// ═══════════════════════════════════════════════
+var CATEGORIES = {
+  identity:  { label: 'Identity',  icon: '\uD83D\uDC64', order: 0 },
+  knowledge: { label: 'Knowledge', icon: '\uD83E\uDDE0', order: 1 },
+  config:    { label: 'Config',    icon: '\u2699\uFE0F',  order: 2 },
+  skills:    { label: 'Skills',    icon: '\u26A1',        order: 3 },
+  other:     { label: 'Other',     icon: '\uD83D\uDCC4',  order: 4 }
+};
+
+function getCategoryInfo(cat) {
+  return CATEGORIES[(cat || '').toLowerCase()] || CATEGORIES.other;
+}
+
+function groupFilesByCategory(files) {
+  var groups = {};
+  files.forEach(function(file) {
+    var key = (file.category || 'other').toLowerCase();
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(file);
+  });
+  var sorted = Object.keys(groups).map(function(k) { return [k, groups[k]]; });
+  sorted.sort(function(a, b) {
+    return getCategoryInfo(a[0]).order - getCategoryInfo(b[0]).order;
+  });
+  return sorted;
+}
+
+// ═══════════════════════════════════════════════
+// TOAST NOTIFICATIONS
+// ═══════════════════════════════════════════════
+function showToast(message, type) {
+  var container = document.getElementById('toast-container');
+  var toast = el('div', { className: 'toast ' + (type || 'success') }, [
+    el('span', { className: 'toast-icon', textContent: type === 'error' ? '\u2717' : '\u2713' }),
+    el('span', { textContent: message })
+  ]);
+  container.appendChild(toast);
+
+  setTimeout(function() {
+    toast.classList.add('hiding');
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 3500);
+}
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+function handleLogin(e) {
+  e.preventDefault();
+  var btn = document.getElementById('login-btn');
+  var errEl = document.getElementById('login-error');
+  var email = document.getElementById('login-email').value.trim();
+  var vaultId = document.getElementById('login-vault').value.trim();
+
+  if (!email || !vaultId) return false;
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  errEl.textContent = '';
+
+  api('POST', '/dashboard/auth', { email: email, vault_id: vaultId })
+    .then(function(data) {
+      state.token = data.token;
+      state.vaultId = data.vault_id || vaultId;
+      state.email = data.email || email;
+
+      localStorage.setItem('cs_token', state.token);
+      localStorage.setItem('cs_vault_id', state.vaultId);
+      localStorage.setItem('cs_email', state.email);
+
+      showDashboard();
+    })
+    .catch(function(err) {
+      errEl.textContent = err.message || 'Authentication failed.';
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+    });
+
+  return false;
+}
+
+function logout() {
+  state.token = null;
+  state.vaultId = null;
+  state.email = null;
+  state.profiles = [];
+
+  localStorage.removeItem('cs_token');
+  localStorage.removeItem('cs_vault_id');
+  localStorage.removeItem('cs_email');
+
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('dashboard-nav').style.display = 'none';
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-btn').textContent = 'Sign In';
+  document.getElementById('login-btn').disabled = false;
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD INIT
+// ═══════════════════════════════════════════════
+function showDashboard() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('dashboard').classList.add('active');
+  document.getElementById('dashboard-nav').style.display = 'flex';
+  document.getElementById('nav-email').textContent = state.email || '';
+  loadProfiles();
+}
+
+function buildLoadingState(text) {
+  return el('div', { className: 'loading-state' }, [
+    el('div', { className: 'spinner' }),
+    el('div', { className: 'loading-text', textContent: text })
+  ]);
+}
+
+function buildEmptyState(icon, message, color) {
+  var msgEl = el('p', { textContent: message });
+  if (color) msgEl.style.color = color;
+  return el('div', { className: 'empty-state' }, [
+    el('div', { className: 'empty-icon', textContent: icon, style: { fontSize: '2rem', opacity: '0.4' } }),
+    msgEl
+  ]);
+}
+
+function loadProfiles() {
+  var container = document.getElementById('profiles-container');
+  clearChildren(container);
+  container.appendChild(buildLoadingState('Loading profiles...'));
+
+  api('GET', '/vaults/' + state.vaultId + '/profiles')
+    .then(function(data) {
+      state.profiles = data.profiles || [];
+
+      clearChildren(container);
+
+      if (state.profiles.length === 0) {
+        container.appendChild(buildEmptyState('\uD83E\uDDF3', 'No profiles found in this vault.'));
+        return;
+      }
+
+      state.profiles.forEach(function(profile, i) {
+        var col = createProfileColumn(profile, i);
+        container.appendChild(col);
+        loadProfileFiles(profile.name, col);
+      });
+    })
+    .catch(function(err) {
+      clearChildren(container);
+      container.appendChild(buildEmptyState('\u26A0\uFE0F', err.message, 'var(--red)'));
+    });
+}
+
+function createProfileColumn(profile, index) {
+  var col = el('div', { className: 'profile-column' });
+  col.style.animationDelay = (index * 0.08) + 's';
+  col.setAttribute('data-profile', profile.name);
+
+  var badge = el('span', { className: 'excluded-badge' });
+
+  var header = el('div', { className: 'profile-header' }, [
+    el('div', { className: 'profile-name' }, [
+      el('span', { className: 'dot' }),
+      document.createTextNode(profile.name),
+      badge
+    ]),
+    el('div', { className: 'profile-meta' }, [
+      el('span', { textContent: formatTime(profile.last_push) }),
+      el('span', { textContent: formatSizeMB(profile.size_mb) })
+    ])
+  ]);
+
+  var filesContainer = el('div', { className: 'profile-files' });
+  filesContainer.setAttribute('data-profile', profile.name);
+  filesContainer.appendChild(buildLoadingState('Loading files...'));
+
+  col.appendChild(header);
+  col.appendChild(filesContainer);
+
+  // Drop zone events
+  col.addEventListener('dragover', handleDragOver);
+  col.addEventListener('dragenter', handleDragEnter);
+  col.addEventListener('dragleave', handleDragLeave);
+  col.addEventListener('drop', handleDrop);
+
+  return col;
+}
+
+function loadProfileFiles(profileName, columnEl) {
+  var filesContainer = columnEl.querySelector('.profile-files');
+
+  // Load sync rules first, then files
+  if (state.syncRules[profileName] === undefined) {
+    loadSyncRules(profileName, function() {
+      fetchAndRenderFiles(profileName, columnEl, filesContainer);
+      updateExcludedBadge(profileName, columnEl);
+    });
+  } else if (state.syncRules[profileName] !== null) {
+    fetchAndRenderFiles(profileName, columnEl, filesContainer);
+    updateExcludedBadge(profileName, columnEl);
+  }
+  // if null (loading in progress), do nothing — callback will handle it
+}
+
+function fetchAndRenderFiles(profileName, columnEl, filesContainer) {
+  api('GET', '/vaults/' + state.vaultId + '/profiles/' + encodeURIComponent(profileName) + '/files')
+    .then(function(data) {
+      var files = data.files || [];
+      clearChildren(filesContainer);
+
+      if (files.length === 0) {
+        filesContainer.appendChild(
+          el('div', { className: 'empty-state', style: { padding: '2rem 1rem' } }, [
+            el('p', { textContent: 'No files', style: { fontSize: '0.78rem' } })
+          ])
+        );
+        return;
+      }
+
+      var groups = groupFilesByCategory(files);
+      groups.forEach(function(entry) {
+        var catKey = entry[0];
+        var catFiles = entry[1];
+        var info = getCategoryInfo(catKey);
+
+        var section = el('div', { className: 'category-section' });
+
+        var headerText = info.icon + ' ' + info.label + ' (' + catFiles.length + ')';
+        var chevron = el('span', { className: 'category-chevron', textContent: '\u25BE' });
+        var header = el('div', { className: 'category-header' }, [chevron, document.createTextNode(' ' + headerText)]);
+
+        var filesList = el('div', { className: 'category-files' });
+
+        catFiles.forEach(function(file) {
+          filesList.appendChild(createFileRow(file, profileName, columnEl));
+        });
+
+        header.addEventListener('click', function() {
+          this.classList.toggle('collapsed');
+          filesList.classList.toggle('collapsed');
+        });
+
+        section.appendChild(header);
+        section.appendChild(filesList);
+        filesContainer.appendChild(section);
+      });
+    })
+    .catch(function(err) {
+      clearChildren(filesContainer);
+      filesContainer.appendChild(
+        el('div', { className: 'empty-state', style: { padding: '2rem 1rem' } }, [
+          el('p', { textContent: err.message, style: { fontSize: '0.78rem', color: 'var(--red)' } })
+        ])
+      );
+    });
+}
+
+function createFileRow(file, profileName, columnEl) {
+  var catInfo = getCategoryInfo(file.category);
+  var fileName = file.path.split('/').pop();
+  var isExcluded = (state.syncRules[profileName] || new Set()).has(file.path);
+
+  var checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'file-checkbox';
+  checkbox.title = isExcluded ? 'Excluded from sync' : 'Synced';
+  checkbox.checked = !isExcluded;
+
+  var row = el('div', {
+    className: 'file-row' + (isExcluded ? ' excluded' : ''),
+    draggable: true,
+    title: file.path
+  }, [
+    checkbox,
+    el('span', { className: 'file-icon', textContent: isExcluded ? '\uD83D\uDEAB' : catInfo.icon }),
+    el('span', { className: 'file-name', textContent: fileName }),
+    el('span', { className: 'file-size', textContent: formatFileSize(file.size) })
+  ]);
+
+  row.setAttribute('data-profile', profileName);
+  row.setAttribute('data-filepath', file.path);
+  row.setAttribute('data-category', file.category || 'other');
+
+  // Checkbox toggle
+  checkbox.addEventListener('change', function(e) {
+    e.stopPropagation();
+    var rules = state.syncRules[profileName] || new Set();
+    if (checkbox.checked) {
+      rules.delete(file.path);
+      row.classList.remove('excluded');
+      row.querySelector('.file-icon').textContent = catInfo.icon;
+    } else {
+      rules.add(file.path);
+      row.classList.add('excluded');
+      row.querySelector('.file-icon').textContent = '\uD83D\uDEAB';
+    }
+    state.syncRules[profileName] = rules;
+    saveSyncRules(profileName, columnEl);
+  });
+
+  // Click to preview (only if not dragging, not on checkbox)
+  var wasDragged = false;
+  row.addEventListener('mousedown', function() { wasDragged = false; });
+  row.addEventListener('mousemove', function() { wasDragged = true; });
+  row.addEventListener('click', function(e) {
+    if (e.defaultPrevented || wasDragged || e.target === checkbox) return;
+    openFileModal(profileName, file);
+  });
+
+  row.addEventListener('dragstart', function(e) { wasDragged = true; handleDragStart(e); });
+  row.addEventListener('dragend', handleDragEnd);
+
+  return row;
+}
+
+// ═══════════════════════════════════════════════
+// DRAG AND DROP
+// ═══════════════════════════════════════════════
+var dragData = null;
+
+function handleDragStart(e) {
+  var row = e.currentTarget;
+  dragData = {
+    sourceProfile: row.getAttribute('data-profile'),
+    filepath: row.getAttribute('data-filepath')
+  };
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setData('text/plain', dragData.filepath);
+  row.classList.add('dragging');
+}
+
+function handleDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.profile-column').forEach(function(col) {
+    col.classList.remove('drag-over');
+  });
+  dragData = null;
+}
+
+function handleDragOver(e) {
+  if (!dragData) return;
+  var col = e.currentTarget;
+  if (col.getAttribute('data-profile') === dragData.sourceProfile) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+function handleDragEnter(e) {
+  if (!dragData) return;
+  var col = e.currentTarget;
+  if (col.getAttribute('data-profile') === dragData.sourceProfile) return;
+  e.preventDefault();
+  col.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  var col = e.currentTarget;
+  if (!col.contains(e.relatedTarget)) {
+    col.classList.remove('drag-over');
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  var col = e.currentTarget;
+  col.classList.remove('drag-over');
+
+  if (!dragData) return;
+  if (col.getAttribute('data-profile') === dragData.sourceProfile) return;
+
+  var targetProfile = col.getAttribute('data-profile');
+  var sourceProfile = dragData.sourceProfile;
+  var filepath = dragData.filepath;
+  dragData = null;
+
+  api('POST', '/vaults/' + state.vaultId + '/copy-file', {
+    source_profile: sourceProfile,
+    target_profile: targetProfile,
+    filepath: filepath
+  })
+    .then(function() {
+      var fileName = filepath.split('/').pop();
+      showToast('Copied ' + fileName + ' to ' + targetProfile, 'success');
+      loadProfileFiles(targetProfile, col);
+    })
+    .catch(function(err) {
+      showToast('Copy failed: ' + err.message, 'error');
+    });
+}
+
+// ═══════════════════════════════════════════════
+// FILE PREVIEW MODAL
+// ═══════════════════════════════════════════════
+function openFileModal(profileName, file) {
+  var overlay = document.getElementById('file-modal');
+  var titleEl = document.getElementById('modal-title');
+  var metaEl = document.getElementById('modal-meta');
+  var bodyEl = document.getElementById('modal-body');
+
+  titleEl.textContent = file.path;
+  metaEl.textContent = profileName + ' \u00B7 ' + formatFileSize(file.size);
+
+  clearChildren(bodyEl);
+  var spinnerWrap = el('div', { className: 'modal-spinner' }, [el('div', { className: 'spinner' })]);
+  bodyEl.appendChild(spinnerWrap);
+
+  overlay.classList.add('open');
+
+  api('GET',
+    '/vaults/' + state.vaultId +
+    '/profiles/' + encodeURIComponent(profileName) +
+    '/file/' + file.path
+  )
+    .then(function(data) {
+      clearChildren(bodyEl);
+      var pre = el('pre', { textContent: data.content || '(empty file)' });
+      bodyEl.appendChild(pre);
+    })
+    .catch(function(err) {
+      clearChildren(bodyEl);
+      var isEncrypted = err.message && err.message.indexOf('encrypted') !== -1;
+      bodyEl.appendChild(
+        el('div', { className: 'empty-state', style: { padding: '2rem' } }, [
+          el('div', { textContent: isEncrypted ? '🔒' : '⚠️', style: { fontSize: '2rem', marginBottom: '0.75rem' } }),
+          el('p', {
+            textContent: isEncrypted
+              ? 'File preview is not available — the vault archive is encrypted at rest. Only the metadata (file paths and sizes) is stored server-side.'
+              : err.message,
+            style: { color: isEncrypted ? 'var(--text-muted)' : 'var(--red)', maxWidth: '380px', lineHeight: '1.6' }
+          })
+        ])
+      );
+    });
+}
+
+function closeFileModal() {
+  document.getElementById('file-modal').classList.remove('open');
+}
+
+// Close modal on overlay click
+document.getElementById('file-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeFileModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeFileModal();
+});
+
+// ═══════════════════════════════════════════════
+// INIT ON LOAD
+// ═══════════════════════════════════════════════
+(function init() {
+  if (state.token && state.vaultId) {
+    showDashboard();
+  }
+})();
+</script>
+
+</body>
+</html>

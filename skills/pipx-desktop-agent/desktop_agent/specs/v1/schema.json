@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Desktop Agent Command Response",
+  "description": "Schema for all desktop-agent command responses",
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the command executed successfully"
+    },
+    "command": {
+      "type": "string",
+      "description": "Full command path (e.g., 'mouse.move', 'screen.screenshot')"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp in UTC"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Execution time in milliseconds"
+    },
+    "data": {
+      "type": "object",
+      "description": "Command-specific result data",
+      "properties": {
+        "x": { "type": "integer", "description": "X coordinate" },
+        "y": { "type": "integer", "description": "Y coordinate" },
+        "position": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "integer" },
+            "y": { "type": "integer" }
+          }
+        },
+        "size": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer" },
+            "height": { "type": "integer" }
+          }
+        },
+        "windows": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of window titles"
+        },
+        "text": { "type": "string", "description": "Extracted or input text" },
+        "pixel": {
+          "type": "object",
+          "properties": {
+            "r": { "type": "integer" },
+            "g": { "type": "integer" },
+            "b": { "type": "integer" },
+            "hex": { "type": "string" }
+          }
+        },
+        "message": { "type": "string", "description": "Status message" },
+        "result": { "type": "string", "description": "Generic result" },
+        "on_screen": { "type": "boolean", "description": "Whether coordinates are on screen" },
+        "image_found": { "type": "boolean", "description": "Whether image was found" },
+        "bounding_box": {
+          "type": "object",
+          "properties": {
+            "left": { "type": "integer" },
+            "top": { "type": "integer" },
+            "width": { "type": "integer" },
+            "height": { "type": "integer" },
+            "center_x": { "type": "integer" },
+            "center_y": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "description": "Error details if command failed",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code (e.g., 'invalid_argument', 'image_not_found')"
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional error context"
+        },
+        "recoverable": {
+          "type": "boolean",
+          "description": "Whether the error can be recovered from"
+        }
+      }
+    }
+  },
+  "required": ["success", "command", "timestamp"]
+}
+

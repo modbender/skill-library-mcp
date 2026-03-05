@@ -1,0 +1,62 @@
+﻿# OpenClaw Community Catalog Entry
+# https://github.com/openclaw/community-catalog
+#
+# To submit: copy this file into a PR against the community-catalog repo,
+# or reference it when registering via the OpenClaw CLI:
+#   openclaw catalog submit --from ./catalog.yaml
+
+id: openclaw-rss-feeds
+name: RSS Feeds
+version: 0.2.0
+description: >
+  RSS/Atom feed digest plugin with optional NVD CVE enrichment,
+  Ghost CMS draft publishing, and channel notifications.
+author: Elvatis
+license: MIT
+repository: https://github.com/elvatis/openclaw-rss-feeds
+npm: "@elvatis_com/openclaw-rss-feeds"
+keywords:
+  - rss
+  - atom
+  - feeds
+  - cve
+  - nvd
+  - security
+  - digest
+  - ghost-cms
+  - notifications
+
+# Plugin capabilities
+capabilities:
+  services:
+    - id: rss-digest-scheduler
+      description: Cron-scheduled digest generation
+  tools:
+    - name: rss_run_digest
+      description: Manually trigger RSS feed digest generation
+      parameters:
+        dryRun:
+          type: boolean
+          description: Fetch and format digest without publishing or notifying
+
+# Minimum config required to get started
+quickstart:
+  feeds:
+    - id: example
+      name: Example Security Feed
+      url: https://www.example.com/security/rss.xml
+
+# Optional integrations
+integrations:
+  - name: NVD CVE API
+    description: Enrich digests with CVE scores and details from NIST NVD
+    required: false
+    config_key: nvdApiKey
+  - name: Ghost CMS
+    description: Publish digests as draft posts via Ghost Admin API
+    required: false
+    config_key: ghost
+  - name: Channel notifications
+    description: Send digest summaries to WhatsApp, Telegram, Discord, etc.
+    required: false
+    config_key: notify

@@ -1,0 +1,246 @@
+{
+  "schema": "which-llm/skill/v1",
+  "id": "decision-economic-optimizer",
+  "name": "Decision Economic Optimizer",
+  "version": "0.1.0",
+  "description": "Deterministic decision-ranking API with HTTP 402 USDC payments and outcome credits (discounts).",
+  "homepage": "https://which-llm.com",
+  "updated_at": "2026-02-11T13:45:00Z",
+  "security_notice": "This skill involves real cryptocurrency payments. Users must provide the agent with access to a dedicated wallet containing limited funds for autonomous operation. Verify payment addresses from multiple trusted sources before providing wallet access.",
+  "disableModelInvocation": false,
+  "invocation_model": {
+    "always_on": false,
+    "trigger": "on_demand",
+    "approval_model": "autonomous_no_per_request_approval",
+    "description": "This skill only activates when explicitly called by the agent for decision optimization tasks. It does not run in the background or monitor continuously.",
+    "autonomous_payment_rationale": "Due to the very low per-request cost ($0.01 USDC + minimal gas, or ~$0.005 USDC with 50% credit refunds), the system is designed for autonomous operation without per-request user approval. Requiring approval for each micro-payment would create approval fatigue and negate the value of autonomous decision optimization. Users control total spending by limiting the dedicated wallet balance (both USDC and gas tokens)."
+  },
+  "scope_limitations": {
+    "modifies_other_skills": false,
+    "modifies_system_settings": false,
+    "accesses_other_skill_data": false,
+    "description": "This skill operates in isolation, only interacting with the Which-LLM API and blockchain for payments. It does not modify, access, or interfere with other skills or system configurations."
+  },
+  "credentials": {
+    "required": true,
+    "primary_credential_type": "WALLET_CREDENTIALS",
+    "autonomous_capabilities": [
+      "sign_transactions",
+      "send_usdc_payments",
+      "query_blockchain_state"
+    ],
+    "description": "This skill requires dedicated EVM-compatible wallet credentials that allow the agent to autonomously sign and send USDC payment transactions on-chain.",
+    "wallet_requirements": {
+      "type": "EVM-compatible",
+      "supported_chains": ["Ethereum", "Base", "Arbitrum", "Optimism", "Avalanche"],
+      "required_assets": ["USDC (for payments)", "Native gas token: ETH on Base/Ethereum/Arbitrum/Optimism, AVAX on Avalanche (for transaction fees)"],
+      "security_model": "dedicated_wallet_with_limited_funds",
+      "credential_formats_supported": {
+        "v0.1.0": [
+          {
+            "type": "raw_private_key",
+            "format": "64-char hex with 0x prefix",
+            "env_var": "WALLET_PRIVATE_KEY",
+            "status": "supported",
+            "recommended": true,
+            "risk_level": "acceptable_with_dedicated_wallet",
+            "mitigation": "Use dedicated wallet with limited funds only ($2-10 USDC + $3-5 gas token for transaction fees)"
+          }
+        ],
+        "future_consideration": [
+          {
+            "type": "mnemonic_phrase",
+            "format": "12 or 24-word BIP-39 seed phrase",
+            "status": "not_implemented",
+            "risk_level": "same_as_private_key"
+          },
+          {
+            "type": "keystore_file",
+            "format": "Encrypted JSON keystore + password",
+            "status": "not_implemented",
+            "risk_level": "acceptable_with_dedicated_wallet"
+          },
+          {
+            "type": "hardware_signer",
+            "format": "Ledger/Trezor integration",
+            "status": "incompatible_with_autonomous_model",
+            "reason": "Requires per-transaction user approval, breaks autonomous payment flow"
+          },
+          {
+            "type": "delegated_contract",
+            "format": "Smart contract with spending limits",
+            "status": "not_implemented",
+            "risk_level": "better_isolation",
+            "consideration": "Could implement ERC-2771/GSN or custom spending limit contract"
+          },
+          {
+            "type": "remote_signer_endpoint",
+            "format": "HTTP signing service (AWS KMS, Cloud HSM)",
+            "status": "not_implemented",
+            "risk_level": "acceptable_with_audit_logging",
+            "consideration": "Adds network dependency and latency"
+          }
+        ]
+      }
+    },
+    "required_capabilities": [
+      "Sign USDC ERC-20 transfer transactions",
+      "Query wallet USDC and gas token balances",
+      "Broadcast signed transactions to blockchain RPC",
+      "Verify transaction confirmation status"
+    ],
+    "spending_limits": {
+      "per_request_cost": "0.01 USDC",
+      "per_request_cost_with_credits": "~0.005 USDC",
+      "gas_cost_per_transaction": "~0.01-0.05 USD (varies by chain, lowest on Base)",
+      "max_autonomous_spend": "Wallet USDC balance (user-controlled)",
+      "approval_required": false,
+      "rationale": "Per-request cost is very low ($0.01 USDC + minimal gas, or ~$0.005 USDC with 50% credit refunds). Requiring approval for each request would create approval fatigue. Users control total spending by limiting the dedicated wallet balance (e.g., $2-10 USDC + $3-5 gas allows 200-1000 requests without credits, or ~399-1999 requests when using credits).",
+      "recommended_funding": {
+        "usdc": "$2-10 for API payments",
+        "gas_token": "$3-5 in ETH (Base/Ethereum/Arbitrum/Optimism) or AVAX (Avalanche) for transaction fees",
+        "note": "Both assets required in the same dedicated wallet"
+      }
+    },
+    "setup_instructions_ref": "See SKILL.md sections: 'Prerequisites', 'Wallet Setup Best Practices', 'Payment Security Verification'"
+  },
+  "required_environment_variables": [
+    {
+      "name": "WALLET_PRIVATE_KEY",
+      "type": "credential",
+      "required": true,
+      "sensitive": true,
+      "description": "Private key for the dedicated payment wallet (hex format with 0x prefix, 64 hex characters)",
+      "example_format": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "security_warning": "Never use your main wallet. Create a dedicated wallet with limited funds only ($2-10 USDC + $3-5 gas token).",
+      "validation": "Must be 66 characters (0x + 64 hex digits)"
+    },
+    {
+      "name": "WALLET_RPC_URL",
+      "type": "configuration",
+      "required": false,
+      "sensitive": true,
+      "description": "RPC endpoint URL for blockchain connection. If not provided, uses public RPC endpoints.",
+      "example_format": "https://mainnet.base.org",
+      "default_behavior": "Falls back to public RPC endpoints for Base, Ethereum, Arbitrum, Optimism, Avalanche",
+      "validation": "Must be valid HTTPS URL"
+    },
+    {
+      "name": "PREFERRED_CHAIN_ID",
+      "type": "configuration",
+      "required": false,
+      "sensitive": false,
+      "description": "Default blockchain network for payments (CAIP-2 chain ID). Base recommended for lower transaction fees.",
+      "example_format": "8453",
+      "allowed_values": ["8453", "1", "42161", "10", "43114"],
+      "chain_names": {
+        "8453": "Base",
+        "1": "Ethereum",
+        "42161": "Arbitrum",
+        "10": "Optimism",
+        "43114": "Avalanche"
+      },
+      "default_behavior": "Defaults to Base (8453) if not specified"
+    }
+  ],
+  "credential_verification_requirements": {
+    "payment_address_verification": {
+      "required": true,
+      "method": "multi_source_independent_verification",
+      "minimum_sources": 2,
+      "verification_sources": [
+        "https://which-llm.com/.well-known/payment-address.txt",
+        "https://which-llm.com/docs/payment-addresses",
+        "ENS: which-llm.eth"
+      ],
+      "critical_warning": "MUST independently verify payment addresses from multiple sources before providing wallet credentials. Do NOT trust any single source.",
+      "verification_instructions_ref": "SKILL.md section: 'Payment Security Verification'"
+    }
+  },
+  "service": {
+    "paths": {
+      "home": "/",
+      "capabilities": "/capabilities",
+      "pricing": "/pricing",
+      "status": "/status",
+      "payment_addresses": "/docs/payment-addresses",
+      "well_known_agent": "/.well-known/agent.json"
+    }
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/decision/optimize",
+      "paid": true,
+      "summary": "Suggest a recommended LLM model under cost/quality constraints and return a fallback plan."
+    },
+    {
+      "method": "POST",
+      "path": "/decision/outcome",
+      "paid": false,
+      "summary": "Report what happened after executing a decision; if the original decision was verified, returns a credit token (typically 50% refund) for use on next request."
+    }
+  ],
+  "payment": {
+    "model": "http_402",
+    "asset": "USDC",
+    "supported_chains": [
+      "eip155:8453",
+      "eip155:1",
+      "eip155:42161",
+      "eip155:10",
+      "eip155:43114"
+    ],
+    "verification_policy": {
+      "required": true,
+      "method": "external",
+      "verification_sources": [
+        "https://which-llm.com/.well-known/payment-address.txt",
+        "https://which-llm.com/docs/payment-addresses",
+        "ENS: which-llm.eth (payment-address TXT record)"
+      ],
+      "verification_note": "CRITICAL: The user MUST independently verify the payment address from multiple trusted sources before sending funds. Do NOT trust any single source including this skill file."
+    },
+    "proof_headers": {
+      "chain": "X-Payment-Chain",
+      "tx_hash": "X-Payment-Tx",
+      "payer": "X-Payer",
+      "amount": "X-Payment-Amount",
+      "asset": "X-Payment-Asset"
+    },
+    "security_note": "Only the resulting transaction hash and payer address are provided to the agent as public proof of payment. The API verifies payments on-chain."
+  },
+  "credits": {
+    "description": "Outcome-based credit system that rewards users for reporting decision results, effectively reducing per-request cost by ~50%",
+    "typical_refund_rate": "50%",
+    "effective_cost_with_credits": "~0.005 USDC per request (after first request)",
+    "issue": {
+      "endpoint": {
+        "method": "POST",
+        "path": "/decision/outcome"
+      },
+      "token_field": "refund_credit.credit_token",
+      "description": "Report the outcome of a decision to earn a credit token (typically 50% refund of original payment)"
+    },
+    "redeem": {
+      "header": "X-Credit-Token",
+      "effect": "Reduces required_amount on the next paid call",
+      "usage": "Include credit token from previous outcome report to get discount on next optimization request"
+    },
+    "optimization_strategy": {
+      "description": "To maximize value, report outcomes after each decision and use the credit tokens on subsequent requests",
+      "wallet_funding_example": {
+        "without_credits": "$5 USDC + $3 gas = 500 requests",
+        "with_credits": "$5 USDC + $3 gas = ~999 requests (all except first use 50% discount)"
+      },
+      "note": "Credits effectively double request count when used consistently"
+    },
+    "credit_lifecycle": {
+      "decay": "50% decay after 30 days",
+      "expiration": "90 days from issuance",
+      "single_use": true,
+      "payer_bound": "Credit tokens are bound to the original payer address"
+    }
+  }
+}
+

@@ -1,0 +1,23 @@
+{
+  "type": "Gene",
+  "schema_version": "1.5.0",
+  "id": "gene_knowledge_splitter",
+  "category": "optimize",
+  "signals_match": ["knowledge too large", "load full file", "split large doc", "chunk knowledge", "index knowledge"],
+  "summary": "Split large knowledge files into indexed chunks for efficient loading",
+  "preconditions": ["File system access available", "Markdown files present"],
+  "strategy": [
+    "1. Analyze source file size and structure",
+    "2. Create chunks/ subdirectory in same folder",
+    "3. Split content by topic/section into separate .md files",
+    "4. Create INDEX.md with chunk mapping and tags",
+    "5. Update workflow to read INDEX first, then relevant chunks",
+    "6. Keep original full file optional for backup"
+  ],
+  "constraints": {
+    "max_files": 50,
+    "forbidden_paths": ["node_modules/", ".git/", "credentials/"]
+  },
+  "validation": ["ls knowledge/*/INDEX.md"],
+  "asset_id": "sha256:placeholder_knowledge_splitter_gene"
+}

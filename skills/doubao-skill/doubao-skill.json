@@ -1,0 +1,92 @@
+{
+  "name": "doubao-image-video-skill",
+  "displayName": "Doubao Image Video Generation",
+  "version": "1.0.0",
+  "description": "Doubao Text-to-Image, Image Editing, and Text-to-Video Generation Skill for Openclaw",
+  "author": "wenkangwei",
+  "category": "ai-generation",
+  "capabilities": [
+    "text-to-image",
+    "image-editing",
+    "text-to-video",
+    "task-status-check"
+  ],
+  "parameters": {
+    "action": {
+      "type": "string",
+      "enum": ["img", "edit", "vid", "status"],
+      "required": true,
+      "description": "Operation type: img (text-to-image), edit (image editing), vid (text-to-video), status (check task status)"
+    },
+    "prompt": {
+      "type": "string",
+      "required": false,
+      "description": "Generation or editing prompt (required for img, edit, and vid actions)"
+    },
+    "sync_mode": {
+      "type": "string",
+      "enum": ["sync", "async"],
+      "default": "async",
+      "description": "Wait mode for video generation: 'sync' (wait for completion), 'async' (return task_id immediately)"
+    },
+    "image_url": {
+      "type": "string",
+      "required": false,
+      "description": "Image URL for editing (required for edit action), or reference image for video generation (optional)"
+    },
+    "task_id": {
+      "type": "string",
+      "required": false,
+      "description": "Task ID for status checking (required for status action)"
+    }
+  },
+  "environment": {
+    "ARK_API_KEY": {
+      "required": true,
+      "description": "Volcengine ARK API Key for authentication"
+    }
+  },
+  "dependencies": {
+    "python": ">=3.7",
+    "bash": ">=4.0",
+    "curl": "*",
+    "openssl": "*"
+  },
+  "installation": {
+    "npm": "npm install doubao-skill",
+    "pip": "pip install requests aiohttp",
+    "manual": "Copy files to Openclaw plugins directory"
+  },
+  "examples": [
+    {
+      "description": "Generate an image",
+      "input": {
+        "action": "img",
+        "prompt": "A cute cat on the beach"
+      }
+    },
+    {
+      "description": "Generate a video asynchronously",
+      "input": {
+        "action": "vid",
+        "prompt": "A person dancing",
+        "sync_mode": "async"
+      }
+    },
+    {
+      "description": "Generate a video synchronously",
+      "input": {
+        "action": "vid",
+        "prompt": "A person dancing",
+        "sync_mode": "sync"
+      }
+    },
+    {
+      "description": "Check task status",
+      "input": {
+        "action": "status",
+        "task_id": "task_xxxxx"
+      }
+    }
+  ]
+}

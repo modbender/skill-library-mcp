@@ -1,0 +1,96 @@
+{
+	"name": "create_quotation",
+	"version": "1.0.0",
+	"description": "Create a sales quotation for a customer with items",
+	"author": "Business Claw Team",
+	
+	"tools": [
+		{
+			"name": "doc.get",
+			"description": "Fetch customer details",
+			"required": true
+		},
+		{
+			"name": "meta.get_doctype",
+			"description": "Get Quotation DocType schema",
+			"required": true
+		},
+		{
+			"name": "doc.create",
+			"description": "Create the quotation",
+			"required": true
+		}
+	],
+	
+	"input_schema": {
+		"type": "object",
+		"properties": {
+			"customer_id": {
+				"type": "string",
+				"description": "Customer ID or name"
+			},
+			"items": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"item_code": {"type": "string"},
+						"qty": {"type": "number"},
+						"rate": {"type": "number"}
+					}
+				},
+				"description": "List of items to quote"
+			},
+			"valid_till": {
+				"type": "string",
+				"description": "Valid until date (optional)"
+			},
+			"notes": {
+				"type": "string",
+				"description": "Additional notes (optional)"
+			}
+		},
+		"required": ["customer_id", "items"]
+	},
+	
+	"workflow": {
+		"steps": [
+			{
+				"step": "fetch_customer",
+				"tool": "doc.get",
+				"arguments": {
+					"doctype": "Customer",
+					"name": "${customer_id}"
+				}
+			},
+			{
+				"step": "get_schema",
+				"tool": "meta.get_doctype",
+				"arguments": {
+					"doctype": "Quotation"
+				}
+			},
+			{
+				"step": "create_quotation",
+				"tool": "doc.create",
+				"arguments": {
+					"doctype": "Quotation",
+					"data": {
+						"quotation_to": "Customer",
+						"party_name": "${customer_id}",
+						"items": "${items}",
+						"valid_till": "${valid_till}",
+						"notes": "${notes}"
+					}
+				}
+			}
+		]
+	},
+	
+	"guardrails": {
+		"max_amount": 100000,
+		"require_customer_credit_check": true
+	},
+	
+	"output_template": "Created Quotation {{name}} for {{customer_name}}\nTotal: {{grand_total}}\nValid until: {{valid_till}}"
+}

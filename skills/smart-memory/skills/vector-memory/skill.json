@@ -1,0 +1,48 @@
+{
+  "name": "smart-memory",
+  "version": "2.1.1",
+  "description": "Smart memory with hybrid search (BM25 + vectors) and Focus Agent for curated retrieval. SQLite backend, zero configuration, local embeddings.",
+  "author": "Nyx",
+  "tools": [
+    {
+      "name": "memory_search",
+      "description": "Search memory files with automatic method selection. Uses vector embeddings (semantic search) if indexed, otherwise falls back to built-in keyword search. Supports Focus Mode for complex queries.",
+      "command": "node {{workspace}}/smart-memory/smart_memory.js --search \"{{query}}\" --max-results {{max_results|5}}",
+      "args": {
+        "query": {
+          "type": "string",
+          "description": "The search query - natural language, concepts, or keywords",
+          "required": true
+        },
+        "max_results": {
+          "type": "number",
+          "description": "Maximum number of results to return",
+          "default": 5
+        }
+      }
+    },
+    {
+      "name": "memory_sync",
+      "description": "Sync memory files to vector index for better search quality. Run after editing memory files.",
+      "command": "node {{workspace}}/smart-memory/smart_memory.js --sync"
+    },
+    {
+      "name": "memory_status",
+      "description": "Check memory system status - vector index ready, chunks indexed, last sync time, current mode.",
+      "command": "node {{workspace}}/smart-memory/smart_memory.js --status"
+    },
+    {
+      "name": "memory_mode",
+      "description": "Toggle between Fast mode (direct search) and Focus mode (curated retrieval with synthesis).",
+      "command": "node {{workspace}}/smart-memory/smart_memory.js --mode {{mode}}",
+      "args": {
+        "mode": {
+          "type": "string",
+          "description": "Search mode: 'fast' for direct vector search, 'focus' for curated multi-pass retrieval",
+          "enum": ["fast", "focus"],
+          "required": true
+        }
+      }
+    }
+  ]
+}

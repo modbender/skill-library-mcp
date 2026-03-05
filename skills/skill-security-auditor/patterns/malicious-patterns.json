@@ -1,0 +1,197 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-02-08",
+  "patterns": {
+    "critical": [
+      {
+        "id": "CLAW-001",
+        "name": "Fake Prerequisites - ClawHavoc Campaign",
+        "pattern": "(prerequisite|setup|installation).*download.*(openclaw-agent|openclaw-setup)\\.(zip|exe|dmg)",
+        "severity": "critical",
+        "score_impact": 50,
+        "description": "Matches the ClawHavoc campaign pattern of fake prerequisites requesting malicious binary downloads",
+        "mitre_attack": "T1204.002 - User Execution: Malicious File",
+        "references": [
+          "https://thehackernews.com/2026/02/researchers-find-341-malicious-clawhub.html"
+        ]
+      },
+      {
+        "id": "CLAW-002",
+        "name": "Known C2 Infrastructure",
+        "pattern": "91\\.92\\.242\\.30",
+        "severity": "critical",
+        "score_impact": 50,
+        "description": "IP address used in ClawHavoc campaign for C2 communications",
+        "mitre_attack": "T1071 - Application Layer Protocol",
+        "references": [
+          "https://www.scworld.com/brief/reports-shed-light-on-more-openclaw-vulnerabilities"
+        ]
+      },
+      {
+        "id": "CLAW-003",
+        "name": "Curl Pipe to Shell",
+        "pattern": "(curl|wget).*\\|.*(bash|sh|zsh|python)",
+        "severity": "critical",
+        "score_impact": 40,
+        "description": "Dangerous pattern of downloading and executing remote code without verification",
+        "mitre_attack": "T1059.004 - Command and Scripting Interpreter: Unix Shell"
+      },
+      {
+        "id": "CLAW-004",
+        "name": "Hardcoded Credentials",
+        "pattern": "(api[_-]?key|token|password|secret|private[_-]?key)\\s*[:=]\\s*['\"][A-Za-z0-9+/=]{20,}['\"]",
+        "severity": "critical",
+        "score_impact": 35,
+        "description": "Hardcoded API keys, tokens, or credentials in skill files",
+        "mitre_attack": "T1552.001 - Unsecured Credentials: Credentials In Files"
+      },
+      {
+        "id": "CLAW-005",
+        "name": "Base64 Encoded Execution",
+        "pattern": "eval|exec.*base64.*decode|atob",
+        "severity": "critical",
+        "score_impact": 45,
+        "description": "Dynamic execution of base64 encoded content, common obfuscation technique",
+        "mitre_attack": "T1027 - Obfuscated Files or Information"
+      }
+    ],
+    "high": [
+      {
+        "id": "CLAW-101",
+        "name": "Suspicious Binary Download",
+        "pattern": "download.*\\.(exe|dmg|pkg|deb|rpm|msi)",
+        "severity": "high",
+        "score_impact": 25,
+        "description": "Requests download of executable binaries"
+      },
+      {
+        "id": "CLAW-102",
+        "name": "SSH Key Access",
+        "pattern": "~/.ssh|id_rsa|id_ed25519|authorized_keys",
+        "severity": "high",
+        "score_impact": 30,
+        "description": "Accesses SSH keys or configuration"
+      },
+      {
+        "id": "CLAW-103",
+        "name": "Cryptocurrency Wallet Paths",
+        "pattern": "\\.bitcoin|\\.ethereum|wallet\\.dat|keystore|metamask",
+        "severity": "high",
+        "score_impact": 35,
+        "description": "Accesses cryptocurrency wallet files or paths"
+      },
+      {
+        "id": "CLAW-104",
+        "name": "Browser Credential Storage",
+        "pattern": "Cookies|Login Data|Web Data|chrome/Default|firefox/profiles",
+        "severity": "high",
+        "score_impact": 30,
+        "description": "Accesses browser credential storage locations"
+      },
+      {
+        "id": "CLAW-105",
+        "name": "Suspicious External Requests",
+        "pattern": "fetch|axios|request.*http(s)?://(?!.*github\\.com|.*npm|.*pypi)",
+        "severity": "high",
+        "score_impact": 20,
+        "description": "Makes HTTP requests to non-standard repositories"
+      }
+    ],
+    "medium": [
+      {
+        "id": "CLAW-201",
+        "name": "Environment Variable Exfiltration",
+        "pattern": "process\\.env|\\$\\{.*\\}|export.*=",
+        "severity": "medium",
+        "score_impact": 15,
+        "description": "Accesses or manipulates environment variables"
+      },
+      {
+        "id": "CLAW-202",
+        "name": "File System Write Operations",
+        "pattern": "writeFile|createWriteStream|fs\\.write",
+        "severity": "medium",
+        "score_impact": 10,
+        "description": "Performs file system write operations"
+      },
+      {
+        "id": "CLAW-203",
+        "name": "Network Listener Creation",
+        "pattern": "listen.*\\d{1,5}|createServer|net\\.Server",
+        "severity": "medium",
+        "score_impact": 15,
+        "description": "Creates network listeners or servers"
+      },
+      {
+        "id": "CLAW-204",
+        "name": "Child Process Execution",
+        "pattern": "exec|spawn|fork|child_process",
+        "severity": "medium",
+        "score_impact": 12,
+        "description": "Spawns child processes"
+      }
+    ],
+    "social_engineering": [
+      {
+        "id": "CLAW-301",
+        "name": "Urgency Language",
+        "pattern": "(install immediately|urgent|limited time|act now|hurry)",
+        "severity": "low",
+        "score_impact": 10,
+        "description": "Uses urgency tactics to pressure installation"
+      },
+      {
+        "id": "CLAW-302",
+        "name": "False Authority Claims",
+        "pattern": "(official openclaw|verified by anthropic|endorsed by|approved by)",
+        "severity": "medium",
+        "score_impact": 15,
+        "description": "Makes false authority claims"
+      },
+      {
+        "id": "CLAW-303",
+        "name": "Fear Tactics",
+        "pattern": "(security risk|vulnerability|exploit|hack|breach).*without this",
+        "severity": "low",
+        "score_impact": 12,
+        "description": "Uses fear tactics to encourage installation"
+      }
+    ]
+  },
+  "whitelisted_patterns": {
+    "safe_binaries": [
+      "git",
+      "gh",
+      "docker",
+      "kubectl",
+      "npm",
+      "node",
+      "python",
+      "pip",
+      "cargo",
+      "go",
+      "curl",
+      "wget"
+    ],
+    "safe_domains": [
+      "github.com",
+      "npmjs.org",
+      "pypi.org",
+      "crates.io",
+      "anthropic.com",
+      "openclaw.ai",
+      "clawhub.ai"
+    ],
+    "verified_authors": [
+      "openclaw",
+      "anthropic-official"
+    ]
+  },
+  "scoring_thresholds": {
+    "safe": 20,
+    "low_risk": 40,
+    "medium_risk": 60,
+    "high_risk": 80,
+    "critical": 100
+  }
+}

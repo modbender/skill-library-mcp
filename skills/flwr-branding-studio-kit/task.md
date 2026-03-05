@@ -1,0 +1,27 @@
+# Task: Build Advanced Branding Workflow System
+
+- [x] Extract complete webinar content (RACE, Brand_X, OCR) <!-- id: 0 -->
+- [x] Research top branding methodologies (Verbal & Visual) <!-- id: 1 -->
+- [x] Create implementation plan <!-- id: 2 -->
+- [x] Create Prompt Guide Template from Reference case <!-- id: 3 -->
+- [x] Create Figma-ready asset templates <!-- id: 8 -->
+- [x] Move templates to protected `.agent/templates/` directory <!-- id: 9 -->
+- [x] Build `.agent/rules/branding_agent_rules.md` with Shielding, Context Saver & Reality Check <!-- id: 4 -->
+- [x] Create `.agent/workflows/branding_strategy.md` with "Interrogation Mode" <!-- id: 5 -->
+- [x] Write `scripts/setup_branding_project.py` automation script <!-- id: 6 -->
+- [x] Create Slash Command/Natural Language mapping <!-- id: 10 -->
+- [x] Package as Skill (README.md, SKILL.md) for GitHub <!-- id: 11 -->
+- [x] Implement "Strategic Consistency Protocol" (Consultant Mode)
+- [x] Sanitize Project (Remove specific client references) for Publication
+    - [x] Generalize `strategic_framework_reference.md` content
+    - [x] Rename `sayori_project_structure.md` to `strategic_framework_reference.md`
+    - [x] Replace client references in `branding_agent_rules.md`
+    - [x] Verify `branding_strategy.md` for stray references <!-- id: 12 -->
+- [ ] Test workflow on Reference case for validation <!-- id: 7 -->
+- [x] Prepare Repository for Distribution
+    - [x] Create comprehensive `.gitignore`
+    - [x] Create detailed `README.md` with installation and workflow steps
+    - [x] Organize documentation (`docs/` folder)
+    - [x] Verify `setup_branding_project.py` robustness
+    - [x] Create `CONTRIBUTING.md` (optional but good for distribution)
+    - [x] Push to GitHub remote `origin`

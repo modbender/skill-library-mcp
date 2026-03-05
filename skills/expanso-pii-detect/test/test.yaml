@@ -1,0 +1,45 @@
+# Test cases for pii-detect
+name: pii-detect-tests
+description: Test cases for the pii-detect skill
+
+tests:
+  - name: email_detection
+    description: Detect email addresses
+    input: "Contact me at john.doe@example.com"
+    expected:
+      has_field: findings
+      has_pii: true
+
+  - name: phone_detection
+    description: Detect phone numbers
+    input: "Call us at 555-123-4567 or (800) 555-1234"
+    expected:
+      has_field: findings
+      has_pii: true
+
+  - name: ssn_detection
+    description: Detect Social Security Numbers
+    input: "SSN: 123-45-6789"
+    env:
+      PII_TYPES: ssn
+    expected:
+      has_pii: true
+
+  - name: no_pii
+    description: Text with no PII
+    input: "The weather is nice today. Let's go for a walk."
+    expected:
+      has_pii: false
+      findings_length: 0
+
+  - name: multiple_pii
+    description: Text with multiple PII types
+    input: "John Smith (john@test.com, 555-1234) lives at 123 Main St"
+    expected:
+      has_pii: true
+
+  - name: empty_input
+    description: Handle empty input
+    input: ""
+    expected:
+      error_or_empty: true

@@ -1,0 +1,95 @@
+{
+    "id": "lily-memory",
+    "name": "Lily Memory",
+    "version": "5.0.0",
+    "description": "Persistent memory plugin for OpenClaw agents. SQLite FTS5 keyword search + Ollama vector embeddings with auto-capture, auto-recall, stuck-detection, and memory consolidation.",
+    "kind": "memory",
+    "main": "index.js",
+    "configSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "dbPath": {
+                "type": "string",
+                "default": "~/.openclaw/memory/decisions.db",
+                "description": "Path to the SQLite database. Supports ~ for home directory."
+            },
+            "autoRecall": {
+                "type": "boolean",
+                "default": true,
+                "description": "Inject relevant memories as context before each LLM turn."
+            },
+            "autoCapture": {
+                "type": "boolean",
+                "default": true,
+                "description": "Extract and store facts from conversation messages after each turn."
+            },
+            "maxRecallResults": {
+                "type": "number",
+                "default": 10,
+                "minimum": 1,
+                "maximum": 50,
+                "description": "Maximum FTS5 keyword results to inject per turn."
+            },
+            "maxCapturePerTurn": {
+                "type": "number",
+                "default": 5,
+                "minimum": 1,
+                "maximum": 20,
+                "description": "Maximum facts to extract and store per conversation turn."
+            },
+            "stuckDetection": {
+                "type": "boolean",
+                "default": true,
+                "description": "Detect topic repetition and inject Reflexion-enhanced nudge."
+            },
+            "vectorSearch": {
+                "type": "boolean",
+                "default": true,
+                "description": "Enable semantic similarity search via Ollama embeddings."
+            },
+            "ollamaUrl": {
+                "type": "string",
+                "default": "http://localhost:11434",
+                "description": "Ollama API endpoint for embedding generation."
+            },
+            "embeddingModel": {
+                "type": "string",
+                "default": "nomic-embed-text",
+                "description": "Ollama model name for generating embeddings."
+            },
+            "consolidation": {
+                "type": "boolean",
+                "default": true,
+                "description": "Run memory deduplication on plugin startup."
+            },
+            "vectorSimilarityThreshold": {
+                "type": "number",
+                "default": 0.5,
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Minimum cosine similarity (0-1) for vector search results."
+            },
+            "entities": {
+                "type": "array",
+                "items": { "type": "string" },
+                "default": [],
+                "description": "Additional entity names to recognize (merged with built-in defaults and runtime-added entities)."
+            }
+        }
+    },
+    "uiHints": {
+        "dbPath": { "label": "Database Path", "help": "Path to the SQLite decisions database", "advanced": true },
+        "autoRecall": { "label": "Auto-Recall", "help": "Inject relevant memories before each LLM call" },
+        "autoCapture": { "label": "Auto-Capture", "help": "Extract and store facts from assistant responses" },
+        "maxRecallResults": { "label": "Max Recall Results", "help": "Maximum memories to inject per turn", "advanced": true },
+        "maxCapturePerTurn": { "label": "Max Capture Per Turn", "help": "Maximum facts to extract per response", "advanced": true },
+        "stuckDetection": { "label": "Stuck Detection", "help": "Detect and nudge when the agent repeats topics" },
+        "vectorSearch": { "label": "Vector Search", "help": "Semantic similarity search via Ollama embeddings" },
+        "ollamaUrl": { "label": "Ollama URL", "help": "Ollama API endpoint", "advanced": true },
+        "embeddingModel": { "label": "Embedding Model", "help": "Ollama model for embeddings", "advanced": true },
+        "consolidation": { "label": "Memory Consolidation", "help": "Deduplicate redundant entries on startup" },
+        "vectorSimilarityThreshold": { "label": "Similarity Threshold", "help": "Minimum cosine similarity for vector results", "advanced": true },
+        "entities": { "label": "Additional Entities", "help": "Extra entity names to recognize" }
+    }
+}

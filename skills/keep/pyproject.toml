@@ -1,0 +1,105 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "keep-skill"
+version = "0.43.5"
+description = "Reflective memory - remember and search documents by meaning"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = {text = "MIT"}
+authors = [{name = "Hugh Pyle"}]
+keywords = ["semantic-memory", "vector-search", "embeddings", "chromadb", "agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing",
+    "Topic :: Software Development :: Libraries",
+]
+
+dependencies = [
+    "chromadb>=0.4",
+    "pyyaml>=6.0",
+    "requests>=2.20",
+    "typer>=0.9",
+    "tomli-w>=1.0",
+    # Lightweight API SDKs (~2MB total, no heavy deps)
+    "openai>=1.0",
+    "anthropic>=0.40.0",
+    "google-genai>=1.0.0",
+    # Document extraction
+    "pypdf>=5.0",
+    "beautifulsoup4>=4.9",
+    "python-docx>=1.0",
+    "python-pptx>=1.0",
+    # Audio metadata
+    "tinytag>=2.0",
+    # Image metadata
+    "Pillow>=10.0",
+    # Remote API client
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://keepnotes.ai"
+Documentation = "https://docs.keepnotes.ai/guides/"
+Repository = "https://github.com/hughpyle/keep"
+
+[project.optional-dependencies]
+# Local models (macOS Apple Silicon optimized, ~500MB with PyTorch)
+local = [
+    "mlx>=0.10; platform_system == 'Darwin' and platform_machine == 'arm64'",
+    "mlx-lm>=0.10; platform_system == 'Darwin' and platform_machine == 'arm64'",
+    "sentence-transformers>=2.2",
+]
+# Media description (Apple Silicon vision + audio models)
+media = [
+    "mlx-vlm>=0.1; platform_system == 'Darwin' and platform_machine == 'arm64'",
+    "mlx-whisper>=0.1; platform_system == 'Darwin' and platform_machine == 'arm64'",
+]
+# Development
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+keep = "keep.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["keep"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"SKILL.md" = "keep/SKILL.md"
+"README.md" = "keep/README.md"
+"docs" = "keep/docs"
+"commands/reflect.md" = "keep/data/reflect.md"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/keep",
+    "/keep/data/kiro-hooks",
+    "/docs",
+    "/commands/reflect.md",
+    "/SKILL.md",
+    "/README.md",
+    "/LICENSE",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".venv", "dist", ".git"]
+addopts = "-m 'not slow'"
+markers = [
+    "slow: marks tests as slow (require ML models)",
+    "e2e: marks tests as end-to-end (require real providers)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:importlib._bootstrap",
+]

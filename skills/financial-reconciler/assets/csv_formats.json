@@ -1,0 +1,75 @@
+{
+  "formats": {
+    "chase": {
+      "name": "Chase Bank",
+      "encoding": "utf-8",
+      "columns": {
+        "date": "Transaction Date",
+        "post_date": "Post Date",
+        "description": "Description",
+        "category": "Category",
+        "type": "Type",
+        "amount": "Amount",
+        "memo": "Memo"
+      },
+      "date_format": "%m/%d/%Y",
+      "amount_sign": "signed",
+      "skip_rows": 0,
+      "detection_headers": ["Transaction Date", "Post Date", "Description", "Category", "Type", "Amount"]
+    },
+    "bofa": {
+      "name": "Bank of America",
+      "encoding": "utf-8",
+      "columns": {
+        "date": "Date",
+        "description": "Payee",
+        "description_alt": "Description",
+        "amount": "Amount",
+        "reference": "Reference Number",
+        "type": "Transaction Type"
+      },
+      "date_format": "%m/%d/%Y",
+      "amount_sign": "signed",
+      "skip_rows": 0,
+      "detection_headers": ["Date", "Description", "Amount", "Running Bal."]
+    },
+    "wells_fargo": {
+      "name": "Wells Fargo",
+      "encoding": "utf-8",
+      "columns": {
+        "date": 0,
+        "amount": 1,
+        "unknown1": 2,
+        "unknown2": 3,
+        "description": 4
+      },
+      "date_format": "%m/%d/%Y",
+      "amount_sign": "signed",
+      "skip_rows": 0,
+      "has_header": false,
+      "detection_columns": 5,
+      "detection_hint": "no_header_5_columns"
+    },
+    "generic": {
+      "name": "Generic CSV",
+      "encoding": "utf-8",
+      "columns": {
+        "date": ["date", "transaction date", "trans date", "posting date", "post date", "trans_date", "transaction_date"],
+        "description": ["description", "memo", "payee", "merchant", "name", "narrative", "details", "particulars", "transaction description"],
+        "amount": ["amount", "transaction amount", "debit/credit", "value", "sum", "total"],
+        "debit": ["debit", "debit amount", "withdrawal", "money out", "out"],
+        "credit": ["credit", "credit amount", "deposit", "money in", "in"],
+        "type": ["type", "transaction type", "trans type", "category"],
+        "reference": ["reference", "ref", "reference number", "check number", "cheque"]
+      },
+      "date_format": null,
+      "amount_sign": "auto",
+      "skip_rows": 0
+    }
+  },
+  "auto_detect": {
+    "strategy": "header_match",
+    "fallback": "generic",
+    "confidence_threshold": 0.6
+  }
+}

@@ -1,0 +1,1 @@
+Please generate the image corresponding to {{Detail Page n}} based on the information provided and the image materials I've given you.

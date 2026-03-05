@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenClaw Pairing Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 24px;
+        }
+        
+        .header {
+            width: min(800px, 100%);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .subtitle {
+            opacity: 0.7;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        #pairings-list {
+            width: min(800px, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .pairing-item {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 16px;
+            padding: 18px 18px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.2s ease;
+        }
+        
+        .pairing-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px);
+        }
+        
+        .pairing-item.approved {
+            opacity: 0.5;
+            background: rgba(36, 224, 138, 0.06);
+            border-color: rgba(36, 224, 138, 0.10);
+        }
+        
+        .pairing-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+        }
+        
+        .pairing-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: baseline;
+        }
+        
+        .pairing-field {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .pairing-field strong {
+            opacity: 0.7;
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            min-width: fit-content;
+        }
+        
+        .pairing-field span {
+            color: #fff;
+            word-break: break-word;
+        }
+        
+        .pairing-field .value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .pairing-field .timestamp {
+            opacity: 0.6;
+            font-size: 12px;
+            font-style: normal;
+        }
+        
+        .pairing-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .approve-btn {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .approve-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.20);
+            transform: translateY(1px);
+        }
+        
+        .approve-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .approve-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .approve-btn.ok {
+            color: #24e08a;
+        }
+        
+        .no-pairings {
+            text-align: center;
+            padding: 48px 24px;
+            opacity: 0.6;
+            font-size: 15px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #24e08a;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-indicator.disconnected {
+            background: #ff5c5c;
+        }
+        
+        .bad {
+            color: #ff5c5c;
+        }
+        
+        @media (max-width: 640px) {
+            .pairing-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .pairing-actions {
+                width: 100%;
+            }
+            
+            .approve-btn {
+                flex: 1;
+            }
+            
+            .pairing-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <h1>Pairing Dashboard</h1>
+            <div class="subtitle">
+                <span class="status-indicator" id="status-indicator"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </div>
+        <div id="pairings-list">
+            <p class="no-pairings">Loading pairings...</p>
+        </div>
+    </div>
+
+    <script>
+        // Use explicit connection URL and options
+        const socketUrl = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+        const socket = io(socketUrl, {
+            transports: ['polling'],
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5
+        });
+
+        socket.on('connect', function() {
+            console.log('Connected to server!');
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            if (indicator) {
+                indicator.classList.remove('disconnected');
+            }
+            if (statusText) {
+                statusText.textContent = 'Connected';
+            }
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            if (indicator) {
+                indicator.classList.add('disconnected');
+            }
+            if (statusText) {
+                statusText.textContent = 'Disconnected. Reconnecting...';
+            }
+        });
+
+        socket.on('initial_pairings', function(data) {
+            console.log('Received initial pairings:', data.pairings);
+            const listDiv = document.getElementById('pairings-list');
+            listDiv.innerHTML = ''; // Clear connection/loading message
+            if (data.pairings && data.pairings.length > 0) {
+                data.pairings.forEach(function(pairing) {
+                    addPairingToList(pairing);
+                });
+            } else {
+                listDiv.innerHTML = '<p class="no-pairings">No pairings yet.</p>';
+            }
+        });
+
+        socket.on('new_pairing', function(pairing_data) {
+            console.log('Received new pairing:', pairing_data);
+            const listDiv = document.getElementById('pairings-list');
+            // If the list was empty, clear the "No pairings yet" message
+            if (listDiv.querySelector('.no-pairings')) {
+                listDiv.innerHTML = '';
+            }
+            addPairingToList(pairing_data);
+        });
+
+        socket.on('pairing_approved', function(data) {
+            console.log('Pairing approved:', data.code);
+            // Remove the pairing from the list
+            const pairingItem = document.querySelector(`[data-pairing-code="${data.code}"]`);
+            if (pairingItem) {
+                pairingItem.classList.add('approved');
+                const approveBtn = pairingItem.querySelector('.approve-btn');
+                if (approveBtn) {
+                    approveBtn.disabled = true;
+                    approveBtn.textContent = 'Approved';
+                }
+                // Remove after a short delay
+                setTimeout(() => {
+                    pairingItem.remove();
+                    const listDiv = document.getElementById('pairings-list');
+                    if (listDiv.children.length === 0) {
+                        listDiv.innerHTML = '<p class="no-pairings">No pairings yet.</p>';
+                    }
+                }, 2000);
+            }
+        });
+
+        function addPairingToList(pairing) {
+            const listDiv = document.getElementById('pairings-list');
+            // Check if pairing already exists
+            const existing = document.querySelector(`[data-pairing-code="${pairing.code}"]`);
+            if (existing) {
+                return; // Already displayed
+            }
+            
+            // Create a new div for the pairing
+            const pairingItem = document.createElement('div');
+            pairingItem.classList.add('pairing-item');
+            pairingItem.setAttribute('data-pairing-code', pairing.code);
+
+            // Construct the content dynamically
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'pairing-content';
+            
+            const row1 = document.createElement('div');
+            row1.className = 'pairing-row';
+            
+            if (pairing.channel_id) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Channel</strong><span>${pairing.channel_id}</span>`;
+                row1.appendChild(field);
+            }
+            
+            if (pairing.code) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Code</strong><span class="value">${pairing.code}</span>`;
+                row1.appendChild(field);
+            }
+            
+            if (pairing.user_id) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>User ID</strong><span class="value">${pairing.user_id}</span>`;
+                row1.appendChild(field);
+            }
+            
+            contentDiv.appendChild(row1);
+            
+            const row2 = document.createElement('div');
+            row2.className = 'pairing-row';
+            
+            if (pairing.device_name) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Device</strong><span>${pairing.device_name}</span>`;
+                row2.appendChild(field);
+            }
+            
+            if (pairing.timestamp) {
+                const date = new Date(pairing.timestamp);
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Requested</strong><span class="timestamp">${date.toLocaleString()}</span>`;
+                row2.appendChild(field);
+            }
+            
+            contentDiv.appendChild(row2);
+            pairingItem.appendChild(contentDiv);
+
+            // Add approve button
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'pairing-actions';
+            const approveBtn = document.createElement('button');
+            approveBtn.className = 'approve-btn ok';
+            approveBtn.textContent = 'Approve';
+            approveBtn.addEventListener('click', function() {
+                approvePairing(pairing.code, pairing.channel_id);
+            });
+            actionsDiv.appendChild(approveBtn);
+            pairingItem.appendChild(actionsDiv);
+
+            listDiv.prepend(pairingItem); // Add to the top of the list
+        }
+
+        function approvePairing(code, channel) {
+            const pairingItem = document.querySelector(`[data-pairing-code="${code}"]`);
+            const approveBtn = pairingItem ? pairingItem.querySelector('.approve-btn') : null;
+            
+            if (approveBtn) {
+                approveBtn.disabled = true;
+                approveBtn.textContent = 'Approving...';
+            }
+
+            fetch('/approve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: 'Bb7766!server',
+                    code: code,
+                    channel: channel,
+                    notify: false
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    if (approveBtn) {
+                        approveBtn.disabled = false;
+                        approveBtn.textContent = 'Approve';
+                    }
+                } else {
+                    console.log('Approved:', data.message);
+                    // The socket event will handle UI update
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving pairing: ' + error.message);
+                if (approveBtn) {
+                    approveBtn.disabled = false;
+                    approveBtn.textContent = 'Approve';
+                }
+            });
+        }
+
+        // Handle connection errors
+        socket.on('connect_error', (err) => {
+            console.error('Connection Error:', err);
+            document.getElementById('pairings-list').innerHTML = `<p class="no-pairings" style="color: red;">Connection failed: ${err.message || 'xhr poll error'}</p>`;
+        });
+    </script>
+</body>
+</html>

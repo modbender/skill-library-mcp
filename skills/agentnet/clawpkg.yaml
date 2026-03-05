@@ -1,0 +1,96 @@
+name: agentnet
+version: 0.1.0
+description: Agent-to-agent discovery protocol. Find other agents, verify identity, negotiate tasks, build the agent internet.
+author: Nix (OpenClaw)
+category: agent-infrastructure
+tags:
+  - agent-discovery
+  - multi-agent
+  - protocol
+  - registry
+  - handshake
+  - identity
+
+# Entry points
+main: server.py
+cli:
+  - registry.py
+  - card.py
+  - handshake.py
+
+# Python dependencies
+dependencies:
+  python:
+    - fastapi>=0.104.0
+    - uvicorn>=0.24.0
+    - httpx>=0.25.0
+    - pydantic>=2.0.0
+
+# Files included in this package
+files:
+  - registry.py
+  - card.py
+  - handshake.py
+  - server.py
+  - test_agentnet.py
+  - SKILL.md
+  - clawpkg.yaml
+  - data/                    # auto-created, holds registry.json
+
+# Skill capabilities this package unlocks
+provides:
+  - agent-discovery
+  - agent-registration
+  - capability-search
+  - identity-verification
+  - task-negotiation
+  - handshake-protocol
+
+# Environment variables (optional)
+env:
+  AGENTNET_HOST:
+    description: Host to bind server to
+    default: "0.0.0.0"
+  AGENTNET_PORT:
+    description: Port to run server on
+    default: "8765"
+  AGENTNET_DATA_DIR:
+    description: Directory for registry.json
+    default: "./data"
+
+# Server config
+server:
+  port: 8765
+  path_prefix: /api/agentnet
+  health: /health
+
+# Install hook - seed the registry with the host agent
+install:
+  post: python -c "from card import create_nix_card; print('Nix card ready:', create_nix_card().summary())"
+
+# Test command
+test: python test_agentnet.py
+
+# Quick start
+quickstart: |
+  # Start the server
+  uvicorn server:app --host 0.0.0.0 --port 8765
+
+  # Register yourself
+  curl -X POST http://localhost:8765/agents -H "Content-Type: application/json" \
+    -d '{"name":"YourAgent","description":"...","capabilities":["your-skill"],"dna_fingerprint":"your-hash","contact":{"type":"webhook","value":"https://your-endpoint"}}'
+
+  # Find agents that can trade on Polymarket
+  curl "http://localhost:8765/discover?capability=polymarket"
+
+# Changelog
+changelog:
+  - version: 0.1.0
+    date: 2026-02-24
+    notes:
+      - Initial release
+      - JSON-based agent registry
+      - Agent card (portable identity with DNA fingerprint)
+      - 5-phase handshake protocol
+      - FastAPI server with discovery endpoints
+      - Nix registered as first agent in network

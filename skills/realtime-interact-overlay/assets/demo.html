@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Interact 浮窗演示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .btn-confirm { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-input { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-select { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+        #result { margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px; min-height: 60px; }
+        #result:empty::before { content: '点击按钮查看结果...'; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Realtime Interact 演示</h1>
+        <div class="btn-group">
+            <button class="btn-confirm" onclick="testConfirm()">测试确认框</button>
+            <button class="btn-input" onclick="testInput()">测试输入框</button>
+            <button class="btn-select" onclick="testSelect()">测试选择框</button>
+            <button class="btn-danger" onclick="testDelete()">测试删除确认</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <!-- 浮窗样式 -->
+    <div id="openclaw-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:999999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <div style="background:rgba(255,255,255,0.98); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:16px; padding:24px; min-width:360px; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div id="modal-title" style="font-size:20px; font-weight:600; color:#1a1a1a; margin-bottom:12px;"></div>
+            <div id="modal-content" style="font-size:15px; color:#666; margin-bottom:20px; line-height:1.6;"></div>
+            <div id="modal-input-container" style="display:none; margin-bottom:20px;">
+                <input id="modal-input" type="text" style="width:100%; padding:12px 16px; border:1px solid #ddd; border-radius:8px; font-size:14px; outline:none;">
+            </div>
+            <div id="modal-buttons" style="display:flex; gap:12px; justify-content:flex-end;">
+                <button id="modal-cancel" style="padding:10px 20px; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; background:#f5f5f5; color:#666;">取消</button>
+                <button id="modal-confirm" style="padding:10px 20px; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; background:linear-gradient(135deg,#667eea,#764ba2); color:white;">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let resolveCallback = null;
+
+        function showModal(type, title, message, defaultValue = '') {
+            return new Promise((resolve) => {
+                resolveCallback = resolve;
+                
+                const overlay = document.getElementById('openclaw-modal-overlay');
+                const titleEl = document.getElementById('modal-title');
+                const contentEl = document.getElementById('modal-content');
+                const inputContainer = document.getElementById('modal-input-container');
+                const inputEl = document.getElementById('modal-input');
+                const cancelBtn = document.getElementById('modal-cancel');
+                const confirmBtn = document.getElementById('modal-confirm');
+                
+                titleEl.textContent = title;
+                contentEl.innerHTML = message.replace(/\n/g, '<br>');
+                inputContainer.style.display = (type === 'input') ? 'block' : 'none';
+                inputEl.value = defaultValue;
+                
+                overlay.style.display = 'flex';
+                if (type === 'input') setTimeout(() => inputEl.focus(), 100);
+                
+                cancelBtn.onclick = () => {
+                    overlay.style.display = 'none';
+                    resolve({ result: 'cancel' });
+                };
+                
+                confirmBtn.onclick = () => {
+                    overlay.style.display = 'none';
+                    resolve({ result: 'confirmed', value: inputEl.value });
+                };
+                
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') { overlay.style.display = 'none'; resolve({ result: 'cancel' }); }
+                    if (e.key === 'Enter' && type === 'input') { confirmBtn.click(); }
+                });
+            });
+        }
+
+        async function testConfirm() {
+            const result = await showModal('confirm', '确认删除', '确定要删除这个文件吗？此操作不可撤销。');
+            document.getElementById('result').innerHTML = JSON.stringify(result, null, 2);
+        }
+
+        async function testInput() {
+            const result = await showModal('input', '请输入', '请输入您的评论内容：', '写得真好！');
+            document.getElementById('result').innerHTML = JSON.stringify(result, null, 2);
+        }
+
+        async function testSelect() {
+            const result = await showModal('confirm', '选择颜色', '请选择你喜欢的颜色：\n1. 红色\n2. 绿色\n3. 蓝色');
+            document.getElementById('result').innerHTML = JSON.stringify(result, null, 2);
+        }
+
+        async function testDelete() {
+            const result = await showModal('confirm', '⚠️ 危险操作', '即将删除文件：/Users/liuyong/Documents/important.txt\n\n此操作不可恢复，确定要继续吗？');
+            document.getElementById('result').innerHTML = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>

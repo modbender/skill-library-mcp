@@ -1,0 +1,546 @@
+#!/usr/bin/env bash
+# feed-diet.sh — Main entry point for the Feed Diet skill
+# Audits your information diet and generates a beautiful report
+#
+# Usage:
+#   ./feed-diet.sh audit   --hn USERNAME [--limit N]
+#   ./feed-diet.sh audit   --opml FILE [--limit N]
+#   ./feed-diet.sh digest  --hn USERNAME --goal "GOALS" [--days N]
+#   ./feed-diet.sh report  < classified_items.jsonl
+#
+# Environment:
+#   ANTHROPIC_API_KEY or OPENAI_API_KEY — for LLM classification
+#   FEED_DIET_BATCH_SIZE — items per LLM batch (default: 25)
+
+set -euo pipefail
+source "$(dirname "$0")/common.sh"
+
+VERSION="0.1.1"
+
+# ─── Argument parsing ────────────────────────────────────────────────
+COMMAND="${1:-help}"
+shift || true
+
+HN_USER=""
+OPML_FILE=""
+LIMIT=100
+GOAL=""
+DAYS=7
+OUTPUT_FILE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --hn)       HN_USER="$2"; shift 2 ;;
+    --opml)     OPML_FILE="$2"; shift 2 ;;
+    --limit)
+      if ! [[ "$2" =~ ^[1-9][0-9]*$ ]]; then
+        err "--limit must be a positive integer, got: $2"
+        exit 1
+      fi
+      LIMIT="$2"; shift 2 ;;
+    --goal)     GOAL="$2"; shift 2 ;;
+    --days)
+      if ! [[ "$2" =~ ^[1-9][0-9]*$ ]]; then
+        err "--days must be a positive integer, got: $2"
+        exit 1
+      fi
+      DAYS="$2"; shift 2 ;;
+    --output|-o) OUTPUT_FILE="$2"; shift 2 ;;
+    --help|-h)  COMMAND="help"; shift ;;
+    *)          warn "Unknown option: $1"; shift ;;
+  esac
+done
+
+# ─── Help ─────────────────────────────────────────────────────────────
+show_help() {
+  cat <<'EOF'
+
+  🍽️  Feed Diet v0.1.1 — Audit Your Information Diet
+  ═══════════════════════════════════════════════════
+
+  USAGE:
+    feed-diet audit  --hn USERNAME [--limit 100]     Audit HN submissions
+    feed-diet audit  --opml feeds.opml [--limit 100] Audit RSS feeds
+    feed-diet digest --hn USERNAME --goal "GOALS"    Weekly curated digest
+    feed-diet help                                    Show this help
+
+  OPTIONS:
+    --hn USERNAME     Hacker News username to analyze
+    --opml FILE       Path to OPML file with RSS feeds
+    --limit N         Max items to analyze (default: 100)
+    --goal "TOPICS"   Goal topics for digest mode (comma-separated)
+    --days N          Days to look back for digest (default: 7)
+    --output FILE     Write report to file instead of stdout
+
+  EXAMPLES:
+    feed-diet audit --hn tosh --limit 50
+    feed-diet audit --opml ~/feeds.opml
+    feed-diet digest --hn tosh --goal "systems, compilers, rust"
+
+  ENVIRONMENT:
+    ANTHROPIC_API_KEY   For LLM-powered classification (recommended)
+    OPENAI_API_KEY      Alternative LLM provider
+    (Falls back to keyword matching if neither is set)
+
+EOF
+}
+
+# ─── Report generation ────────────────────────────────────────────────
+generate_report() {
+  local items_file="$1"
+  local source_label="$2"
+  local total
+  total=$(wc -l < "$items_file" | tr -d ' ')
+
+  ITEMS_FILE_ENV="$items_file" SOURCE_LABEL_ENV="$source_label" VERSION_ENV="$VERSION" python3 -c "
+import json, sys, os
+from collections import Counter, defaultdict
+
+# Read classified items
+items_file = os.environ['ITEMS_FILE_ENV']
+source_label = os.environ['SOURCE_LABEL_ENV']
+version = os.environ.get('VERSION_ENV', '0.1.1')
+items = []
+with open(items_file) as f:
+    for line in f:
+        line = line.strip()
+        if line:
+            try:
+                items.append(json.loads(line))
+            except:
+                pass
+
+total = len(items)
+if total == 0:
+    print('❌ No items to report on.')
+    sys.exit(0)
+
+# Count categories
+cat_counts = Counter()
+cat_items = defaultdict(list)
+for item in items:
+    cat = item.get('category', 'news')
+    cat_counts[cat] += 1
+    cat_items[cat].append(item)
+
+# Category metadata
+emoji_map = {
+    'deep-technical': '🔬',
+    'news': '📰',
+    'opinion': '💬',
+    'drama': '🔥',
+    'entertainment': '🎮',
+    'tutorial': '📚',
+    'meta': '🪞',
+}
+desc_map = {
+    'deep-technical': 'Technical depth',
+    'news': 'News & releases',
+    'opinion': 'Opinion & essays',
+    'drama': 'Drama & controversy',
+    'entertainment': 'Fun & entertainment',
+    'tutorial': 'Tutorials & guides',
+    'meta': 'Meta & industry navel-gazing',
+}
+
+# Sort by count descending
+sorted_cats = sorted(cat_counts.items(), key=lambda x: -x[1])
+
+# ═══════════════════════════════════════════════════════════════════
+# REPORT OUTPUT
+# ═══════════════════════════════════════════════════════════════════
+
+print()
+print('# 🍽️  Feed Diet Report')
+print()
+print(f'**Source:** {source_label}')
+print(f'**Items analyzed:** {total}')
+print(f'**Generated by:** Feed Diet v{version}')
+print()
+
+# ─── Category Breakdown Table ─────────────────────────────────────
+print('## 📊 Category Breakdown')
+print()
+print('| Rank | Category | Count | Pct | Distribution |')
+print('|------|----------|------:|----:|--------------|')
+
+max_bar = 20
+for rank, (cat, count) in enumerate(sorted_cats, 1):
+    pct = (count / total) * 100
+    blocks = int((pct / 100) * max_bar + 0.5)
+    bar = '█' * blocks + '░' * (max_bar - blocks)
+    em = emoji_map.get(cat, '❓')
+    print(f'| {rank} | {em} {cat} | {count} | {pct:.1f}% | \`{bar}\` |')
+
+print()
+
+# ─── Top Categories Spotlight ─────────────────────────────────────
+print('## 🏆 Top Categories')
+print()
+for rank, (cat, count) in enumerate(sorted_cats[:3], 1):
+    pct = (count / total) * 100
+    em = emoji_map.get(cat, '❓')
+    medal = ['🥇', '🥈', '🥉'][rank - 1]
+    desc = desc_map.get(cat, cat)
+    print(f'{medal} **{em} {cat}** — {pct:.1f}% ({count} items)')
+    # Show top 3 items in this category
+    top_items = sorted(cat_items[cat], key=lambda x: x.get('score', 0), reverse=True)[:3]
+    for item in top_items:
+        title = item.get('title', item.get('item_title', ''))[:70]
+        score = item.get('score', '')
+        score_str = f' ({score}↑)' if score else ''
+        print(f'   • {title}{score_str}')
+    print()
+
+# ─── Surprising Finds ────────────────────────────────────────────
+print('## 🤔 Surprising Finds')
+print()
+
+findings = []
+top_cat, top_count = sorted_cats[0]
+top_pct = (top_count / total) * 100
+
+# Dominant category warning
+if top_pct >= 50:
+    em = emoji_map.get(top_cat, '❓')
+    if top_cat == 'deep-technical':
+        findings.append(f'{em} **{top_pct:.0f}% deep-technical** — You\\'re a depth machine! Over half your diet is serious technical content. Impressive, but make sure you\\'re not drowning in complexity.')
+    elif top_cat == 'drama':
+        findings.append(f'{em} **{top_pct:.0f}% drama** — Over half your diet is controversy. Your cortisol levels called — they\\'d like a word.')
+    elif top_cat == 'news':
+        findings.append(f'{em} **{top_pct:.0f}% news** — You\\'re a news firehose. Are you staying informed, or just staying busy?')
+    elif top_cat == 'meta':
+        findings.append(f'{em} **{top_pct:.0f}% meta** — More than half your reading is about the tech industry itself. You could be building instead.')
+    else:
+        findings.append(f'{em} **{top_pct:.0f}% {top_cat}** — That\\'s a LOT of {desc_map.get(top_cat, top_cat).lower()}. Is that intentional?')
+elif top_pct >= 40:
+    em = emoji_map.get(top_cat, '❓')
+    findings.append(f'{em} **{top_pct:.0f}% {top_cat}** — This dominates your diet. Consider whether that\\'s by design.')
+
+# Drama check (only if not already the dominant category message)
+drama_count = cat_counts.get('drama', 0)
+drama_pct = (drama_count / total) * 100 if total > 0 else 0
+if drama_pct >= 10 and top_cat != 'drama':
+    findings.append(f'🔥 **{drama_pct:.1f}% drama** — Do you really want that much controversy in your diet?')
+
+# Deep technical praise (only if not already the dominant one)
+tech_count = cat_counts.get('deep-technical', 0)
+tech_pct = (tech_count / total) * 100 if total > 0 else 0
+if tech_pct >= 30 and top_cat != 'deep-technical':
+    findings.append(f'🔬 **{tech_pct:.1f}% deep-technical** — Impressive depth! You\\'re investing in real understanding.')
+elif tech_pct < 10:
+    findings.append(f'📉 **Only {tech_pct:.1f}% deep-technical** — Consider adding more in-depth technical content to your diet.')
+
+# Entertainment balance
+fun_count = cat_counts.get('entertainment', 0)
+fun_pct = (fun_count / total) * 100 if total > 0 else 0
+if fun_pct == 0:
+    findings.append(f'😤 **0% entertainment** — All work and no play! A healthy diet includes some fun.')
+elif fun_pct >= 30:
+    findings.append(f'🎮 **{fun_pct:.1f}% entertainment** — Having fun is great, but is this supporting your goals?')
+
+# Meta check
+meta_count = cat_counts.get('meta', 0)
+meta_pct = (meta_count / total) * 100 if total > 0 else 0
+if meta_pct >= 20 and top_cat != 'meta':
+    findings.append(f'🪞 **{meta_pct:.1f}% meta** — Lots of industry navel-gazing. Try replacing some with hands-on content.')
+
+# Opinion vs tutorial ratio
+opinion_count = cat_counts.get('opinion', 0)
+tutorial_count = cat_counts.get('tutorial', 0)
+if opinion_count > 0 and tutorial_count > 0:
+    ratio = opinion_count / tutorial_count
+    if ratio > 3:
+        findings.append(f'💬 **Opinion-to-Tutorial ratio: {ratio:.1f}:1** — You\\'re reading more hot takes than how-tos.')
+elif opinion_count > 3 and tutorial_count == 0:
+    findings.append(f'💬 **{opinion_count} opinions, 0 tutorials** — Lots of takes, no practical guides. Try balancing with some hands-on content.')
+
+# Diversity score
+num_cats_used = len([c for c, n in cat_counts.items() if n > 0])
+diversity = num_cats_used / 7.0
+if diversity >= 0.85:
+    findings.append(f'🌈 **Diversity score: {diversity*100:.0f}%** — Excellent variety across categories!')
+elif diversity <= 0.4:
+    findings.append(f'📦 **Diversity score: {diversity*100:.0f}%** — Your diet is quite narrow. Consider branching out.')
+
+for f in findings:
+    print(f)
+    print()
+
+if not findings:
+    print('Your diet looks pretty balanced! No major red flags. 👍')
+    print()
+
+# ─── Recommendations ─────────────────────────────────────────────
+print('## 💡 Recommendations')
+print()
+recs = []
+if tech_pct < 15:
+    recs.append('📖 **Add depth:** Subscribe to technical blogs (Julia Evans, Eli Bendersky, Dan Luu)')
+if drama_pct >= 10:
+    recs.append('🧘 **Reduce drama:** Consider unfollowing drama-heavy sources. Your cortisol will thank you.')
+if meta_pct >= 15:
+    recs.append('🔨 **Build, don\\'t meta:** Replace industry commentary with hands-on projects and tutorials.')
+if tutorial_count < 3:
+    recs.append('📚 **More tutorials:** Active learning beats passive reading. Seek out how-to content.')
+if fun_pct == 0:
+    recs.append('🎮 **Have some fun:** A healthy diet includes some entertainment and humor.')
+if opinion_count > tutorial_count * 2:
+    recs.append('⚖️ **Balance opinions with practice:** For every opinion piece, read a tutorial or paper.')
+if diversity < 0.5:
+    recs.append('🌈 **Diversify:** Try exploring categories outside your comfort zone.')
+if top_pct >= 60:
+    recs.append(f'⚖️ **Rebalance:** Your top category is {top_pct:.0f}%. Consider capping any single category at ~40%.')
+
+if recs:
+    for i, rec in enumerate(recs, 1):
+        print(f'{i}. {rec}')
+else:
+    print('Your diet looks well-balanced! Keep it up. 🎉')
+print()
+
+# ─── Quick Stats ─────────────────────────────────────────────────
+print('## 📈 Quick Stats')
+print()
+print(f'- **Total items:** {total}')
+print(f'- **Categories used:** {num_cats_used}/7')
+print(f'- **Diversity score:** {diversity*100:.0f}%')
+top3_pct = sum(c for _, c in sorted_cats[:3]) / total * 100
+print(f'- **Top 3 concentration:** {top3_pct:.1f}%')
+print(f'- **#1 category:** {emoji_map.get(sorted_cats[0][0], \"\")} {sorted_cats[0][0]} ({(sorted_cats[0][1]/total*100):.1f}%)')
+print()
+print('---')
+print(f'*Generated by Feed Diet v{version} 🍽️*')
+print()
+" 2>/dev/null
+}
+
+# ─── Digest generation ────────────────────────────────────────────────
+generate_digest() {
+  local items_file="$1"
+  local goal="$2"
+  local source_label="$3"
+
+  ITEMS_FILE_ENV="$items_file" GOAL_ENV="$goal" SOURCE_LABEL_ENV="$source_label" VERSION_ENV="$VERSION" python3 -c "
+import json, sys, os
+
+goal = os.environ['GOAL_ENV']
+goal_keywords = [w.strip().lower() for w in goal.split(',')]
+version = os.environ.get('VERSION_ENV', '0.1.1')
+
+items_file = os.environ['ITEMS_FILE_ENV']
+source_label = os.environ['SOURCE_LABEL_ENV']
+items = []
+with open(items_file) as f:
+    for line in f:
+        line = line.strip()
+        if line:
+            try:
+                items.append(json.loads(line))
+            except:
+                pass
+
+# Score items by relevance to goals
+scored = []
+for item in items:
+    title = (item.get('title', '') or item.get('item_title', '')).lower()
+    url = item.get('url', '').lower()
+    cat = item.get('category', '')
+    
+    score = 0
+    matched_goals = []
+    for kw in goal_keywords:
+        if kw in title or kw in url:
+            score += 10
+            matched_goals.append(kw)
+    
+    # Boost deep-technical and tutorial content
+    if cat == 'deep-technical':
+        score += 5
+    elif cat == 'tutorial':
+        score += 4
+    elif cat == 'opinion':
+        score += 1
+    
+    # Penalize drama and entertainment for goal-focused digest
+    if cat == 'drama':
+        score -= 3
+    elif cat == 'entertainment':
+        score -= 2
+    
+    if score > 0:
+        item['relevance_score'] = score
+        item['matched_goals'] = matched_goals
+        scored.append(item)
+
+# Sort by relevance
+scored.sort(key=lambda x: -x['relevance_score'])
+top = scored[:20]
+
+emoji_map = {
+    'deep-technical': '🔬',
+    'news': '📰',
+    'opinion': '💬',
+    'drama': '🔥',
+    'entertainment': '🎮',
+    'tutorial': '📚',
+    'meta': '🪞',
+}
+
+print()
+print('# 📬 Weekly Feed Diet Digest')
+print()
+print(f'**Goal:** {goal}')
+print(f'**Source:** {source_label}')
+print(f'**Matching items:** {len(scored)} (showing top {len(top)})')
+print()
+
+if not top:
+    print('No items matched your goals this week. Try broadening your goal keywords.')
+    print()
+else:
+    print('## 🎯 Your Curated Reading List')
+    print()
+    for i, item in enumerate(top, 1):
+        title = item.get('title', item.get('item_title', ''))
+        url = item.get('url', '')
+        cat = item.get('category', 'news')
+        em = emoji_map.get(cat, '❓')
+        score = item.get('score', '')
+        score_str = f' • {score}↑' if score else ''
+        
+        if url:
+            print(f'{i:2d}. {em} [{title}]({url}){score_str}')
+        else:
+            print(f'{i:2d}. {em} {title}{score_str}')
+    
+    print()
+    
+    # Category breakdown of matches
+    from collections import Counter
+    match_cats = Counter(item.get('category', 'news') for item in top)
+    print('**Digest breakdown:**', ', '.join(f'{emoji_map.get(c,\"\")} {c}: {n}' for c, n in match_cats.most_common()))
+    print()
+
+print('---')
+print(f'*Feed Diet Weekly Digest v{version} 🍽️*')
+print()
+" 2>/dev/null
+}
+
+# ─── Main dispatch ────────────────────────────────────────────────────
+case "$COMMAND" in
+  audit)
+    ITEMS_FILE=$(mktemp)
+    CLASSIFIED_FILE=$(mktemp)
+    trap "rm -f '$ITEMS_FILE' '$CLASSIFIED_FILE'" EXIT
+
+    # Fetch items
+    if [ -n "$HN_USER" ]; then
+      SOURCE_LABEL="HN user: $HN_USER (last ${LIMIT} stories)"
+      bash "${SCRIPTS_DIR}/hn-fetch.sh" "$HN_USER" "$LIMIT" > "$ITEMS_FILE"
+    elif [ -n "$OPML_FILE" ]; then
+      SOURCE_LABEL="OPML: $(basename "$OPML_FILE")"
+      bash "${SCRIPTS_DIR}/opml-parse.sh" "$OPML_FILE" "$LIMIT" > "$ITEMS_FILE"
+    else
+      err "Specify --hn USERNAME or --opml FILE"
+      show_help
+      exit 1
+    fi
+
+    ITEM_COUNT=$(wc -l < "$ITEMS_FILE" | tr -d ' ')
+    if [ "$ITEM_COUNT" -eq 0 ]; then
+      err "No items fetched. Cannot generate report."
+      exit 1
+    fi
+
+    # Classify
+    cat "$ITEMS_FILE" | bash "${SCRIPTS_DIR}/classify.sh" > "$CLASSIFIED_FILE"
+
+    # Ensure we have classified items (fallback: use items with 'news' category)
+    CLASSIFIED_COUNT=$(wc -l < "$CLASSIFIED_FILE" | tr -d ' ')
+    if [ "$CLASSIFIED_COUNT" -eq 0 ]; then
+      warn "Classification produced no output. Using unclassified items with default category."
+      while IFS= read -r line; do
+        printf '%s' "$line" | jq -c --arg category "news" '. + {category: $category}' 2>/dev/null
+      done < "$ITEMS_FILE" > "$CLASSIFIED_FILE"
+    fi
+
+    # Generate report
+    if [ -n "$OUTPUT_FILE" ]; then
+      generate_report "$CLASSIFIED_FILE" "$SOURCE_LABEL" > "$OUTPUT_FILE"
+      info "Report written to: $OUTPUT_FILE"
+    else
+      generate_report "$CLASSIFIED_FILE" "$SOURCE_LABEL"
+    fi
+    ;;
+
+  digest)
+    if [ -z "$GOAL" ]; then
+      err "Digest mode requires --goal \"your topics\""
+      show_help
+      exit 1
+    fi
+
+    ITEMS_FILE=$(mktemp)
+    CLASSIFIED_FILE=$(mktemp)
+    trap "rm -f '$ITEMS_FILE' '$CLASSIFIED_FILE'" EXIT
+
+    # Calculate since timestamp
+    SINCE_EPOCH=$(DAYS_ENV="$DAYS" python3 -c "import time,os; print(int(time.time()) - int(os.environ['DAYS_ENV']) * 86400)" 2>/dev/null)
+
+    if [ -n "$HN_USER" ]; then
+      SOURCE_LABEL="HN user: $HN_USER (last ${DAYS} days)"
+      bash "${SCRIPTS_DIR}/hn-fetch.sh" "$HN_USER" "$LIMIT" "$SINCE_EPOCH" > "$ITEMS_FILE"
+    elif [ -n "$OPML_FILE" ]; then
+      SOURCE_LABEL="OPML: $(basename "$OPML_FILE") (recent items)"
+      bash "${SCRIPTS_DIR}/opml-parse.sh" "$OPML_FILE" "$LIMIT" > "$ITEMS_FILE"
+    else
+      err "Specify --hn USERNAME or --opml FILE"
+      show_help
+      exit 1
+    fi
+
+    ITEM_COUNT=$(wc -l < "$ITEMS_FILE" | tr -d ' ')
+    if [ "$ITEM_COUNT" -eq 0 ]; then
+      err "No items found in the last ${DAYS} days."
+      exit 1
+    fi
+
+    # Classify
+    cat "$ITEMS_FILE" | bash "${SCRIPTS_DIR}/classify.sh" > "$CLASSIFIED_FILE"
+
+    CLASSIFIED_COUNT=$(wc -l < "$CLASSIFIED_FILE" | tr -d ' ')
+    if [ "$CLASSIFIED_COUNT" -eq 0 ]; then
+      while IFS= read -r line; do
+        printf '%s' "$line" | jq -c --arg category "news" '. + {category: $category}' 2>/dev/null
+      done < "$ITEMS_FILE" > "$CLASSIFIED_FILE"
+    fi
+
+    # Generate digest
+    if [ -n "$OUTPUT_FILE" ]; then
+      generate_digest "$CLASSIFIED_FILE" "$GOAL" "$SOURCE_LABEL" > "$OUTPUT_FILE"
+      info "Digest written to: $OUTPUT_FILE"
+    else
+      generate_digest "$CLASSIFIED_FILE" "$GOAL" "$SOURCE_LABEL"
+    fi
+    ;;
+
+  report)
+    # Read classified items from stdin
+    CLASSIFIED_FILE=$(mktemp)
+    trap "rm -f '$CLASSIFIED_FILE'" EXIT
+    cat > "$CLASSIFIED_FILE"
+    generate_report "$CLASSIFIED_FILE" "piped input"
+    ;;
+
+  help|--help|-h)
+    show_help
+    ;;
+
+  *)
+    err "Unknown command: $COMMAND"
+    show_help
+    exit 1
+    ;;
+esac

@@ -1,0 +1,37 @@
+官方文档来源（用于后续更新）
+============================
+
+- https://api.aliyun.com/document/RdsAi/2025-05-07/overview
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-overview-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-dir-postgresql/
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/supabase/
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-createappinstance-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-startinstance-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-stopinstance-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-restartinstance-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifyinstanceauthconfig-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifyinstancestorageconfig-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifyinstanceipwhitelist-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifyinstancessl-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeappinstances-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeappinstanceattribute-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstanceendpoints-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-resetinstancepassword-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstanceauthinfo-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstancestorageconfig-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstanceipwhitelist-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstancessl-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifyinstanceragconfig-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeinstanceragconfig-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-chatmessages-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-chatmessagestaskstop-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-getconversations-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-getmessages-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-modifymessagesfeedbacks-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-describeeventslist-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-listcustomagenttools-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-createcustomagent-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-updatecustomagent-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-getcustomagent-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-listcustomagent-postgresql
+- https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-postgresql/api-rdsai-2025-05-07-deletecustomagent-postgresql

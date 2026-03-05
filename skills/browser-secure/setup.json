@@ -1,0 +1,68 @@
+{
+  "setupComplete": false,
+  "onboardingRequired": true,
+  "onboardingScript": "scripts/onboarding.js",
+  "version": "1.0.0",
+  "prerequisites": {
+    "node": {
+      "required": true,
+      "minVersion": "18.0.0",
+      "description": "Node.js 18+",
+      "autoFixable": false
+    },
+    "npm": {
+      "required": true,
+      "description": "npm (comes with Node.js)",
+      "autoFixable": false
+    },
+    "chrome": {
+      "required": true,
+      "description": "Google Chrome browser",
+      "autoFixable": false
+    },
+    "playwrightDeps": {
+      "required": true,
+      "description": "Playwright browser binaries",
+      "autoFixable": true,
+      "installCmd": "npx playwright install chromium"
+    },
+    "bitwarden": {
+      "required": false,
+      "description": "Bitwarden CLI (recommended vault)",
+      "autoFixable": true,
+      "installCmd": "brew install bitwarden-cli"
+    },
+    "onepassword": {
+      "required": false,
+      "description": "1Password CLI (optional vault)",
+      "autoFixable": true,
+      "installCmd": "brew install 1password-cli"
+    }
+  },
+  "setupFlow": {
+    "phases": [
+      "check: Verify prerequisites",
+      "install: Auto-install missing dependencies",
+      "build: npm install + build + link",
+      "config: Create ~/.browser-secure/ directory and config"
+    ],
+    "autoInstall": [
+      "playwright chromium browser",
+      "bitwarden-cli (if brew available)",
+      "1password-cli (if brew available)"
+    ]
+  },
+  "setupInstructions": [
+    "1. Run: npm run setup (interactive, auto-installs deps)",
+    "2. Grant permission when prompted",
+    "3. Login to vault: bw login && export BW_SESSION=$(bw unlock --raw)",
+    "4. Test: browser-secure navigate https://example.com"
+  ],
+  "verifySetup": "browser-secure --version",
+  "permissions": {
+    "installGlobalCommand": "Installs 'browser-secure' CLI globally via npm link",
+    "createConfigDir": "Creates ~/.browser-secure/ directory for config and audit logs",
+    "browserAutomation": "Controls Chrome browser for automation (Playwright)",
+    "brewInstall": "May run 'brew install' for CLI tools (Bitwarden/1Password)"
+  }
+}

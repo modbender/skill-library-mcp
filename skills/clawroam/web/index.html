@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClawRoam — Your AI Agent Follows You Everywhere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amber: #D97706;
+    --amber-light: #F59E0B;
+    --amber-dark: #92400E;
+    --surface: #08080f;
+    --surface-raised: #0e0e1a;
+    --surface-card: rgba(255,255,255,0.025);
+    --border: rgba(255,255,255,0.06);
+    --text: #E5E7EB;
+    --text-muted: #6B7280;
+    --text-dim: #4B5563;
+    --green: #10B981;
+    --red: #EF4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Ambient background ── */
+  .bg-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-glow.a { top: -20vh; right: -10vw; width: 50vw; height: 50vw; background: rgba(217,119,6,0.05); }
+  .bg-glow.b { bottom: -30vh; left: -15vw; width: 60vw; height: 60vw; background: rgba(99,102,241,0.03); }
+
+  /* ── Typography ── */
+  h1, h2, h3 { font-family: 'Instrument Serif', serif; font-weight: 400; }
+  code, .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+  section { padding: 6rem 0; }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1rem 0;
+    background: rgba(8,8,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .container {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--amber), var(--amber-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 0 20px rgba(217,119,6,0.25);
+  }
+  .logo-text { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 1rem; color: var(--text); letter-spacing: -0.02em; }
+  .logo-badge { font-size: 0.65rem; color: var(--text-muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: 4px; margin-left: 0.5rem; }
+
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    padding: 0.5rem 1.25rem; background: var(--amber); color: #000;
+    font-weight: 600; font-size: 0.8rem; border-radius: 6px; text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--amber-light); transform: translateY(-1px); }
+
+  /* ── Hero ── */
+  .hero {
+    padding-top: 10rem; padding-bottom: 6rem; text-align: center;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1;
+    margin-bottom: 1.5rem; color: #F9FAFB;
+  }
+  .hero h1 em { color: var(--amber); font-style: italic; }
+  .hero p {
+    font-size: 1.15rem; color: var(--text-muted); max-width: 580px;
+    margin: 0 auto 2.5rem; line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 0.8rem 2rem; background: var(--amber); color: #000;
+    font-weight: 700; font-size: 0.9rem; border-radius: 8px;
+    text-decoration: none; font-family: 'IBM Plex Mono', monospace;
+    transition: all 0.2s; border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(217,119,6,0.25); }
+  .btn-secondary {
+    padding: 0.8rem 2rem; background: transparent; color: var(--text-muted);
+    font-weight: 500; font-size: 0.9rem; border-radius: 8px;
+    text-decoration: none; font-family: 'IBM Plex Mono', monospace;
+    border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ── Terminal demo ── */
+  .terminal {
+    max-width: 640px; margin: 3rem auto 0;
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .terminal-bar {
+    padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .terminal-dot.r { background: #EF4444; } .terminal-dot.y { background: #F59E0B; } .terminal-dot.g { background: #10B981; }
+  .terminal-title { color: var(--text-dim); font-size: 0.75rem; font-family: 'IBM Plex Mono', monospace; margin-left: 0.5rem; }
+  .terminal-body {
+    padding: 1.25rem 1.5rem; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem; line-height: 1.8; color: var(--text-muted);
+  }
+  .terminal-body .prompt { color: var(--green); }
+  .terminal-body .cmd { color: var(--text); }
+  .terminal-body .comment { color: var(--text-dim); }
+  .terminal-body .highlight { color: var(--amber); }
+
+  /* ── How it works ── */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+  .step {
+    background: var(--surface-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem;
+    transition: all 0.3s; position: relative;
+  }
+  .step:hover { border-color: rgba(217,119,6,0.2); transform: translateY(-4px); }
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+    color: var(--amber); letter-spacing: 0.1em; margin-bottom: 1rem;
+  }
+  .step h3 { font-size: 1.5rem; margin-bottom: 0.75rem; color: #F3F4F6; }
+  .step p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+
+  /* ── Providers ── */
+  .providers-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .provider-card {
+    background: var(--surface-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.5rem; text-align: center;
+    transition: all 0.2s;
+  }
+  .provider-card:hover { border-color: rgba(255,255,255,0.12); }
+  .provider-card.featured {
+    border-color: rgba(217,119,6,0.3);
+    background: rgba(217,119,6,0.04);
+    grid-column: span 2;
+  }
+  .provider-icon { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; }
+  .provider-name { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+  .provider-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.25rem; }
+  .provider-tag {
+    display: inline-block; margin-top: 0.5rem; font-size: 0.65rem;
+    padding: 2px 8px; border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .provider-tag.free { background: rgba(16,185,129,0.1); color: var(--green); }
+  .provider-tag.paid { background: rgba(217,119,6,0.1); color: var(--amber); }
+
+  /* ── Pricing ── */
+  .pricing-section { text-align: center; }
+  .pricing-section h2 { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .pricing-section > .container > p { color: var(--text-muted); max-width: 500px; margin: 0 auto 3rem; }
+
+  .pricing-card {
+    max-width: 520px; margin: 0 auto;
+    background: var(--surface-card); border: 1px solid rgba(217,119,6,0.2);
+    border-radius: 16px; padding: 2.5rem; text-align: left;
+    position: relative; overflow: hidden;
+  }
+  .pricing-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--amber-dark), var(--amber), var(--amber-dark));
+  }
+  .pricing-headline {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+    color: var(--amber); letter-spacing: 0.1em; margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+  .pricing-amount {
+    display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;
+  }
+  .pricing-free { font-size: 2.5rem; font-weight: 700; color: #F9FAFB; font-family: 'Instrument Serif', serif; }
+  .pricing-unit { color: var(--text-muted); font-size: 0.9rem; }
+  .pricing-after { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 2rem; }
+  .pricing-after strong { color: var(--text-muted); }
+
+  .pricing-examples { margin-bottom: 2rem; }
+  .pricing-example {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+  }
+  .pricing-example:last-child { border-bottom: none; }
+  .pricing-example .desc { color: var(--text-muted); font-size: 0.85rem; }
+  .pricing-example .cost {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .pricing-example .cost.free { color: var(--green); }
+  .pricing-example .cost.paid { color: var(--text); }
+
+  .pricing-features { list-style: none; margin-bottom: 2rem; }
+  .pricing-features li {
+    padding: 0.4rem 0; color: var(--text-muted); font-size: 0.85rem;
+    display: flex; gap: 0.5rem; align-items: flex-start;
+  }
+  .pricing-features li::before {
+    content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0;
+  }
+
+  /* ── Architecture diagram ── */
+  .arch-diagram {
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem; margin-top: 2.5rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+    line-height: 1.6; color: var(--text-dim);
+    white-space: pre; overflow-x: auto;
+  }
+  .arch-diagram .highlight { color: var(--amber); }
+  .arch-diagram .green { color: var(--green); }
+  .arch-diagram .dim { color: var(--text-dim); }
+
+  /* ── Footer ── */
+  footer {
+    padding: 3rem 0; border-top: 1px solid var(--border); text-align: center;
+    color: var(--text-dim); font-size: 0.8rem;
+  }
+  footer a { color: var(--text-muted); text-decoration: none; }
+  footer a:hover { color: var(--amber); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.7s ease-out both; }
+  .fade-up-d1 { animation-delay: 0.1s; }
+  .fade-up-d2 { animation-delay: 0.2s; }
+  .fade-up-d3 { animation-delay: 0.3s; }
+  .fade-up-d4 { animation-delay: 0.4s; }
+
+  /* ── Signup modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .modal-overlay.open { display: flex; opacity: 1; }
+  .modal {
+    background: var(--surface-raised); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem; max-width: 440px; width: 90%;
+    position: relative;
+  }
+  .modal h3 { font-size: 1.75rem; margin-bottom: 0.5rem; color: #F9FAFB; }
+  .modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.6; }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1.25rem; background: none; border: none;
+    color: var(--text-dim); font-size: 1.5rem; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block; font-size: 0.78rem; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace; margin-bottom: 0.4rem;
+  }
+  .form-group input {
+    width: 100%; padding: 0.7rem 1rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    font-size: 0.9rem; font-family: 'IBM Plex Mono', monospace;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--amber); }
+  .form-group input::placeholder { color: var(--text-dim); }
+  .form-msg {
+    font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .form-msg.ok { color: var(--green); }
+  .form-msg.err { color: var(--red); }
+  .form-steps {
+    margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
+  }
+  .form-steps p { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.75rem; }
+  .form-steps code {
+    display: block; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.78rem;
+    line-height: 1.7; color: var(--text-muted);
+  }
+  .form-steps code .hl { color: var(--amber); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .steps { grid-template-columns: 1fr; }
+    .providers-grid { grid-template-columns: repeat(2, 1fr); }
+    .provider-card.featured { grid-column: span 2; }
+    .nav-links a:not(.nav-cta) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">
+      <div class="logo-icon">🦞</div>
+      <span class="logo-text">ClawRoam</span>
+      <span class="logo-badge">v2.0</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#providers">Providers</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://github.com/getlighty/ClawRoam" target="_blank">GitHub</a>
+      <a href="#" class="nav-cta" onclick="openSignup(); return false;">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1 class="fade-up">Your AI agent<br>follows you <em>everywhere</em></h1>
+    <p class="fade-up fade-up-d1">
+      Open-source skill for OpenClaw. Syncs knowledge, packages, and memory
+      across all your machines — like iCloud, but for your agent.
+      Bring your own storage or use ours.
+    </p>
+    <div class="hero-actions fade-up fade-up-d2">
+      <a href="#" class="btn-primary" onclick="openSignup(); return false;">Start Free →</a>
+      <a href="https://github.com/getlighty/ClawRoam" class="btn-secondary">View Source</a>
+    </div>
+
+    <div class="terminal fade-up fade-up-d3">
+      <div class="terminal-bar">
+        <span class="terminal-dot r"></span>
+        <span class="terminal-dot y"></span>
+        <span class="terminal-dot g"></span>
+        <span class="terminal-title">~ / openclaw</span>
+      </div>
+      <div class="terminal-body">
+        <span class="comment"># Install the skill</span><br>
+        <span class="prompt">❯</span> <span class="cmd">clawdhub install clawroam</span><br><br>
+        <span class="comment"># Initialize + pick storage</span><br>
+        <span class="prompt">❯</span> <span class="cmd">clawroam init</span><br>
+        <span class="highlight">🦞 ClawRoam initialized!</span><br>
+        <span>  Instance: macbook-a8f3e2</span><br>
+        <span>  Packages: 247 tracked</span><br><br>
+        <span class="prompt">❯</span> <span class="cmd">clawroam provider setup cloud</span><br>
+        <span class="highlight">✓ Connected to ClawRoam Cloud (50 MB free)</span><br><br>
+        <span class="prompt">❯</span> <span class="cmd">clawroam sync start</span><br>
+        <span class="highlight">✓ Auto-sync running — changes push in &lt;30s</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="container">
+    <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 0.5rem;">How it works</h2>
+    <p style="text-align: center; color: var(--text-muted); max-width: 480px; margin: 0 auto;">
+      Three machines. One brain. Different personalities.
+    </p>
+
+    <div class="steps">
+      <div class="step fade-up">
+        <div class="step-num">01 — INSTALL</div>
+        <h3>Drop it in</h3>
+        <p>Install the skill on any OpenClaw instance. It generates an Ed25519 keypair, scans your packages, and captures your knowledge — USER.md, MEMORY.md, projects, the lot.</p>
+      </div>
+      <div class="step fade-up fade-up-d1">
+        <div class="step-num">02 — SYNC</div>
+        <h3>It just works</h3>
+        <p>Like iCloud. Changes are auto-detected, committed, and pushed. Full version history with rollback. Works offline — queues changes until you're back online. Every change is signed with your private key.</p>
+      </div>
+      <div class="step fade-up fade-up-d2">
+        <div class="step-num">03 — ROAM</div>
+        <h3>New machine, same brain</h3>
+        <p>Install OpenClaw + ClawRoam on a new box. Connect your vault. It pulls your knowledge, shows what packages are missing, and offers to install them. Your agent knows you instantly.</p>
+      </div>
+    </div>
+
+    <div class="arch-diagram fade-up fade-up-d3">
+<span class="highlight">MacBook</span> (work lobster)          <span class="highlight">Linux Server</span> (ops lobster)       <span class="highlight">Mac Mini</span> (home lobster)
+┌──────────────────┐         ┌──────────────────┐         ┌──────────────────┐
+│ <span class="green">SOUL.md</span>  — formal │         │ <span class="green">SOUL.md</span>  — terse  │         │ <span class="green">SOUL.md</span>  — casual │
+│ <span class="dim">USER.md</span>  ← synced │         │ <span class="dim">USER.md</span>  ← synced │         │ <span class="dim">USER.md</span>  ← synced │
+│ <span class="dim">MEMORY</span>   ← synced │         │ <span class="dim">MEMORY</span>   ← synced │         │ <span class="dim">MEMORY</span>   ← synced │
+│ <span class="dim">packages</span> ← synced │         │ <span class="dim">packages</span> ← synced │         │ <span class="dim">packages</span> ← synced │
+└────────┬─────────┘         └────────┬─────────┘         └────────┬─────────┘
+         │                            │                            │
+         └────────────────┬───────────┘────────────────────────────┘
+                          │
+                  <span class="highlight">┌───────────────┐</span>
+                  <span class="highlight">│  ClawRoam ☁️   │</span>
+                  <span class="highlight">│  (any storage) │</span>
+                  <span class="highlight">└───────────────┘</span>
+
+<span class="green">Green</span> = per-instance (not synced)     <span class="dim">Gray</span> = shared knowledge (auto-synced)
+    </div>
+  </div>
+</section>
+
+<!-- Providers -->
+<section id="providers" style="background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 0.5rem;">Your storage, your choice</h2>
+    <p style="text-align: center; color: var(--text-muted); max-width: 480px; margin: 0 auto;">
+      The skill is 100% open source (MIT). Bring your own storage, or use ours for convenience.
+    </p>
+
+    <div class="providers-grid">
+      <div class="provider-card featured">
+        <span class="provider-icon">☁️</span>
+        <div class="provider-name">ClawRoam Cloud</div>
+        <div class="provider-desc">One command. Zero config. 50 MB free.</div>
+        <span class="provider-tag paid">from $0/month</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">📁</span>
+        <div class="provider-name">Google Drive</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">📦</span>
+        <div class="provider-name">Dropbox</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">🐙</span>
+        <div class="provider-name">Git</div>
+        <div class="provider-desc">GitHub, GitLab, self-hosted</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">🔗</span>
+        <div class="provider-name">FTP / SFTP</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">🪣</span>
+        <div class="provider-name">S3</div>
+        <div class="provider-desc">AWS, MinIO, R2, Backblaze</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">🌐</span>
+        <div class="provider-name">WebDAV</div>
+        <div class="provider-desc">Nextcloud, ownCloud</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+      <div class="provider-card">
+        <span class="provider-icon">💾</span>
+        <div class="provider-name">Local</div>
+        <div class="provider-desc">USB, NAS, mounted drive</div>
+        <span class="provider-tag free">BYOS — free</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="pricing-section">
+  <div class="container">
+    <h2>Simple, honest pricing</h2>
+    <p>Pay for what you use. Most people never pay a cent.</p>
+
+    <div class="pricing-card fade-up">
+      <div class="pricing-headline">ClawRoam Cloud</div>
+      <div class="pricing-amount">
+        <span class="pricing-free">50 MB</span>
+        <span class="pricing-unit">free forever</span>
+      </div>
+      <div class="pricing-after">
+        Then <strong>$0.005 per MB / month</strong> — that's half a cent.
+        No per-instance fees. No bandwidth fees. Unlimited machines.
+      </div>
+
+      <div class="pricing-examples">
+        <div class="pricing-example">
+          <span class="desc">Typical single user (10-30 MB)</span>
+          <span class="cost free">Free</span>
+        </div>
+        <div class="pricing-example">
+          <span class="desc">Power user with history (100 MB)</span>
+          <span class="cost paid">$0.25/mo</span>
+        </div>
+        <div class="pricing-example">
+          <span class="desc">Heavy user, multiple projects (500 MB)</span>
+          <span class="cost paid">$2.25/mo</span>
+        </div>
+        <div class="pricing-example">
+          <span class="desc">Team vault, shared knowledge (2 GB)</span>
+          <span class="cost paid">~$10/mo</span>
+        </div>
+        <div class="pricing-example">
+          <span class="desc">Or bring your own storage</span>
+          <span class="cost free">Free forever</span>
+        </div>
+      </div>
+
+      <ul class="pricing-features">
+        <li>Ed25519 keypair per machine — no passwords</li>
+        <li>End-to-end encryption in transit and at rest</li>
+        <li>Unlimited connected instances</li>
+        <li>Full version history with rollback</li>
+        <li>Real-time sync (fswatch) or polling</li>
+        <li>99.9% uptime SLA</li>
+        <li>Cancel anytime — export everything</li>
+      </ul>
+
+      <a href="#" class="btn-primary" style="display: block; text-align: center; width: 100%;" onclick="openSignup(); return false;">
+        Get Started Free →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Open Source -->
+<section>
+  <div class="container" style="text-align: center;">
+    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Fully open source</h2>
+    <p style="color: var(--text-muted); max-width: 520px; margin: 0 auto 2rem; line-height: 1.7;">
+      MIT licensed. Every line of code is on GitHub. The client, the sync engine,
+      every provider. You can audit it, fork it, self-host everything.
+      We make money from the convenience of managed cloud storage — not by locking you in.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+      <a href="https://github.com/getlighty/ClawRoam" class="btn-secondary">⭐ Star on GitHub</a>
+      <a href="https://github.com/getlighty/ClawRoam/blob/main/SKILL.md" class="btn-secondary">Read the Skill</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom: 0.5rem;">🦞 ClawRoam — Portable Agent Environment</p>
+    <p>
+      <a href="https://github.com/getlighty/ClawRoam">GitHub</a> ·
+      <a href="#">Docs</a> ·
+      <a href="#">Discord</a> ·
+      MIT License
+    </p>
+  </div>
+</footer>
+
+<!-- Signup Modal -->
+<div class="modal-overlay" id="signup-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSignup()">&times;</button>
+    <h3>Get started free</h3>
+    <p>
+      Reserve your ClawRoam Cloud account. 50 MB free &mdash; no credit card required.
+      You'll get setup instructions after signing up.
+    </p>
+    <form id="signup-form" onsubmit="return handleSignup(event)">
+      <div class="form-group">
+        <label for="signup-email">EMAIL</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" required>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%; text-align:center;" id="signup-btn">
+        Create Account &rarr;
+      </button>
+      <div class="form-msg" id="signup-msg"></div>
+    </form>
+    <div class="form-steps" id="signup-steps" style="display:none;">
+      <p>Your account is ready. Run these on any machine:</p>
+      <code>
+        <span class="hl">$</span> clawdhub install clawroam<br>
+        <span class="hl">$</span> clawroam init<br>
+        <span class="hl">$</span> clawroam provider setup cloud<br>
+        <span class="hl">$</span> clawroam sync start
+      </code>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://clawroam-api.ovisoftblue.workers.dev/v1';
+
+function openSignup() {
+  document.getElementById('signup-modal').classList.add('open');
+  setTimeout(() => document.getElementById('signup-email').focus(), 100);
+}
+
+function closeSignup() {
+  document.getElementById('signup-modal').classList.remove('open');
+}
+
+// Close on overlay click
+document.getElementById('signup-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSignup();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSignup();
+});
+
+async function handleSignup(e) {
+  e.preventDefault();
+  var btn = document.getElementById('signup-btn');
+  var msg = document.getElementById('signup-msg');
+  var email = document.getElementById('signup-email').value.trim();
+
+  if (!email) return false;
+
+  btn.textContent = 'Creating...';
+  btn.disabled = true;
+  msg.className = 'form-msg';
+  msg.textContent = '';
+
+  try {
+    var res = await fetch(API + '/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        public_key: '',
+        hostname: 'web-signup',
+        os: 'web',
+        instance_id: 'pending'
+      })
+    });
+
+    if (res.ok) {
+      var data = await res.json();
+      msg.className = 'form-msg ok';
+      msg.textContent = 'Account created! Vault ID: ' + (data.vault_id || '').slice(0, 8) + '...';
+      document.getElementById('signup-steps').style.display = 'block';
+      document.getElementById('signup-form').style.display = 'none';
+    } else {
+      var errData = await res.json().catch(function() { return {}; });
+      msg.className = 'form-msg err';
+      msg.textContent = errData.error || 'Something went wrong. Try again.';
+      btn.textContent = 'Create Account \u2192';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    // API not live yet — show success with "coming soon" note
+    msg.className = 'form-msg ok';
+    msg.textContent = 'Signed up! We\u2019ll email you when ClawRoam Cloud launches.';
+    document.getElementById('signup-steps').style.display = 'block';
+    document.getElementById('signup-form').style.display = 'none';
+  }
+
+  return false;
+}
+</script>
+
+</body>
+</html>

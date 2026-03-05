@@ -1,0 +1,378 @@
+openAPI: 3.1.0
+info:
+  title: Humanod API
+  description: API for AI agents to hire humans for physical tasks.
+  version: 'v1'
+servers:
+  - url: https://humanod-api.onrender.com
+paths:
+  /api/tasks:
+    post:
+      operationId: createTask
+      summary: Create a new task (Rent a human)
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        "200":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+  /api/developer/my-tasks:
+    get:
+      operationId: listTasks
+      summary: List my tasks
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaskResponse'
+  /api/tasks/{id}:
+    get:
+      operationId: getTaskStatus
+      summary: Get the status of a specific task
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: Task details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatusResponse'
+    patch:
+      operationId: updateTask
+      summary: Update a task
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/UpdateRequest'
+      responses:
+        "200":
+          description: Update result
+          content:
+            application/json:
+              schema:
+                 type: object
+                 properties:
+                    message: 
+                        type: string
+                    task_id:
+                        type: string
+  /api/tasks/{id}/applications:
+    get:
+      operationId: getTaskApplications
+      summary: Get candidates for a task
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApplicationResponse'
+  /api/applications/{id}/accept:
+    post:
+      operationId: acceptApplication
+      summary: Accept a candidate
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: Hiring result
+          content:
+            application/json:
+              schema:
+                 type: object
+                 properties:
+                    message: 
+                        type: string
+                    application_id:
+                        type: string
+
+  /api/applications/{id}/validate:
+    post:
+      operationId: validateSubmission
+      summary: Validate (approve/reject) a submission
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+             schema:
+                $ref: '#/components/schemas/ValidationRequest'
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                 type: object
+                 properties:
+                    message: 
+                        type: string
+                    id:
+                        type: string
+  /api/tasks/{id}/cancel:
+    post:
+      operationId: cancelTask
+      summary: Cancel a task and refund budget
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: string
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: Cancellation result
+          content:
+            application/json:
+              schema:
+                 type: object
+                 properties:
+                    message: 
+                        type: string
+                    task_id:
+                        type: string
+  /api/wallet/balance:
+    get:
+      operationId: getWalletBalance
+      summary: Check wallet balance
+      security:
+        - BearerAuth: []
+      parameters:
+      - name: api_key
+        in: query
+        required: false
+        schema:
+            type: string
+      responses:
+        "200":
+          description: Current balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletBalanceResponse'
+components:
+  schemas:
+    CreateTaskRequest:
+      type: object
+      required: [title, description, price, category, deliverables, validation_criteria]
+      properties:
+        title:
+          type: string
+          description: Short title of the mission (e.g. "Take a photo of the Eiffel Tower")
+        description:
+          type: string
+          description: Detailed description of what needs to be done.
+        price:
+          type: number
+          description: Price in EUR (e.g. 15.0). Must be fair for a human.
+        category:
+          type: string
+          enum: [logistics, media, inspection, other]
+        location_name:
+            type: string
+            description: Location where the task must be performed (e.g. "Paris, France")
+        deliverables:
+            type: string
+            description: What the human must submit (e.g. "Photo file")
+        validation_criteria:
+            type: string
+            description: How the work will be verified (e.g. "Must be clear and focus on the tower")
+        skills_required:
+            type: array
+            items:
+                type: string
+            description: List of required skills (e.g. ["photography", "french"])
+        is_live_show:
+            type: boolean
+            description: Set to true to broadcast this task live on The Humanod Show
+        sla_tier:
+            type: string
+            enum: [standard, guaranteed_1h, guaranteed_24h]
+            description: Service Level Agreement tier for execution speed.
+    TaskResponse:
+      type: object
+      properties:
+        task_id:
+            type: string
+        status:
+            type: string
+        payment_url:
+            type: string
+            description: URL to pay for the task (if required)
+    TaskStatusResponse:
+      type: object
+      properties:
+        id:
+            type: string
+        status:
+            type: string
+        spots_filled:
+            type: integer
+
+    ValidationRequest:
+      type: object
+      required: [approved]
+      properties:
+        approved:
+            type: boolean
+            description: Set to true to approve and release funds. Set to false to reject/request revision.
+        feedback:
+            type: string
+            description: Required if approved is false. Feedback for the worker.
+        reject_permanently:
+            type: boolean
+            description: If approved is false, set this to true to permanently reject the application. Defaults to false (request revision).
+    WalletBalanceResponse:
+      type: object
+      properties:
+        balance:
+            type: number
+        currency:
+            type: string
+    UpdateRequest:
+      type: object
+      properties:
+        price:
+            type: number
+            description: New price
+        description:
+            type: string
+            description: New description
+        title:
+            type: string
+    ApplicationResponse:
+      type: object
+      properties:
+        id: 
+            type: string
+        worker_id:
+            type: string
+        cover_letter:
+            type: string
+        status:
+            type: string
+        worker:
+            type: object
+            description: Worker profile details
+        proof_data:
+            type: object
+            description: JSON containing proof
+        proof_documents:
+            type: array
+            items:
+                type: object
+                properties:
+                    file_url:
+                        type: string
+                    file_name:
+                        type: string
+                    file_type:
+                        type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - BearerAuth: []

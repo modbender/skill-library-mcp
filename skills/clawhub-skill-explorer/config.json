@@ -1,0 +1,165 @@
+{
+    "name": "clawhub-skill-explorer",
+    "version": "1.1.0",
+    "description": "ClawHub技能探索和导航工具。帮助用户快速找到所需的技能，支持关键词搜索和分类浏览。",
+    "author": "OpenClaw Team",
+    "license": "MIT",
+    "keywords": [
+        "clawhub",
+        "skill",
+        "explorer",
+        "search",
+        "navigation"
+    ],
+    "dependencies": {
+        "python": ">=3.7",
+        "packages": [
+            "requests",
+            "sqlite3",
+            "re",
+            "json",
+            "dataclasses",
+            "typing"
+        ]
+    },
+    "config": {
+        "api_url": "https://clawhub.ai",
+        "default_limit": 20,
+        "refresh_interval": 300,
+        "cache_max_age": 3600
+    },
+    "commands": {
+        "search": {
+            "description": "搜索技能",
+            "args": [
+                "query"
+            ],
+            "options": {
+                "query": {
+                    "description": "搜索关键词",
+                    "type": "string"
+                },
+                "limit": {
+                    "description": "返回结果数量",
+                    "type": "number",
+                    "default": 20
+                },
+                "force-refresh": {
+                    "description": "强制刷新缓存",
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "browse": {
+            "description": "浏览分类",
+            "args": [
+                "category"
+            ],
+            "options": {
+                "category": {
+                    "description": "分类名称",
+                    "type": "string",
+                    "default": "all"
+                },
+                "limit": {
+                    "description": "返回结果数量",
+                    "type": "number",
+                    "default": 30
+                }
+            }
+        },
+        "view": {
+            "description": "查看技能详情",
+            "args": [
+                "slug"
+            ],
+            "options": {
+                "slug": {
+                    "description": "技能slug",
+                    "type": "string"
+                }
+            }
+        },
+        "favorite": {
+            "description": "收藏技能",
+            "args": [
+                "slug"
+            ],
+            "options": {
+                "slug": {
+                    "description": "技能slug",
+                    "type": "string"
+                }
+            }
+        },
+        "recommend": {
+            "description": "获取推荐技能",
+            "options": {
+                "limit": {
+                    "description": "推荐数量",
+                    "type": "number",
+                    "default": 10
+                }
+            }
+        },
+        "stats": {
+            "description": "获取平台统计",
+            "options": {}
+        },
+        "categories": {
+            "description": "列出所有分类",
+            "options": {}
+        },
+        "clear-cache": {
+            "description": "清除缓存",
+            "options": {}
+        },
+        "refresh": {
+            "description": "刷新缓存",
+            "options": {}
+        }
+    },
+    "api": {
+        "max_retries": 3,
+        "base_delay": 5,
+        "jitter": 2,
+        "rate_limit_window": 60,
+        "max_calls_per_window": 50
+    },
+    "storage": {
+        "cache": {
+            "enabled": true,
+            "type": "database",
+            "database": "sqlite3",
+            "table": "skills",
+            "timeout": 3600
+        },
+        "favorites": {
+            "enabled": true,
+            "type": "database",
+            "database": "sqlite3",
+            "table": "favorites"
+        }
+    },
+    "logging": {
+        "level": "info",
+        "file": "clawhub-skill-explorer.log",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    },
+    "monitoring": {
+        "metrics": {
+            "enabled": true,
+            "collection": "per-query",
+            "retention": 86400
+        },
+        "alerts": {
+            "enabled": false,
+            "channels": [
+                "email",
+                "slack"
+            ]
+        }
+    },
+    "updated_at": "2026-02-20T14:26:12.734531"
+}

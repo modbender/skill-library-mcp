@@ -1,0 +1,60 @@
+{
+  "plugins": {
+    "openclaw-rss-feeds": {
+      "feeds": [
+        {
+          "id": "fortinet",
+          "name": "Fortinet PSIRT",
+          "url": "https://www.fortiguard.com/rss/ir.xml",
+          "keywords": ["fortinet", "fortigate", "fortios"],
+          "enrichCve": true,
+          "cvssThreshold": 7,
+          "tags": ["fortinet", "security", "digest"],
+          "docsUrlTemplate": "https://docs.fortinet.com/product/{product}/{version}/release-notes",
+          "productHighlightPattern": "Forti(?:Gate|OS|Analyzer|Manager|Client|Proxy)"
+        },
+        {
+          "id": "m365",
+          "name": "Microsoft 365 Message Center",
+          "url": "https://www.microsoft.com/en-us/microsoft-365/roadmap?filters=&searchterms=&rss=1",
+          "keywords": ["security", "vulnerability", "defender"],
+          "enrichCve": true,
+          "cvssThreshold": 6.5,
+          "tags": ["microsoft-365", "security"]
+        },
+        {
+          "id": "bsi",
+          "name": "BSI CERT-Bund",
+          "url": "https://wid.cert-bund.de/portal/wid/securityadvisory?rss",
+          "keywords": ["kritisch", "critical", "cve"],
+          "enrichCve": false,
+          "tags": ["bsi", "cert-bund"]
+        },
+        {
+          "id": "heise-security",
+          "name": "Heise Security",
+          "url": "https://www.heise.de/security/rss/news-atom.xml",
+          "keywords": ["cve", "security", "ransomware"],
+          "enrichCve": false,
+          "tags": ["heise", "security-news"]
+        }
+      ],
+      "schedule": "0 9 1 * *",
+      "lookbackDays": 31,
+      "ghost": {
+        "url": "https://blog.example.com",
+        "adminKey": "YOUR_KEY_ID:YOUR_SECRET_HEX"
+      },
+      "notify": [
+        "whatsapp:+491234567890",
+        "telegram:123456789"
+      ],
+      "nvdApiKey": "YOUR_NVD_API_KEY",
+      "retry": {
+        "maxRetries": 3,
+        "initialDelayMs": 1000,
+        "backoffMultiplier": 2
+      }
+    }
+  }
+}

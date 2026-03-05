@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kalshi Autopilot User Profile",
+  "description": "Defines what a user cares about — sports, situations, stats, player matchups, and risk preferences. The autopilot scores every opportunity against this profile to find YOUR edges.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Profile name (e.g., 'CBB Unders Hunter', 'NBA Live Value')"
+    },
+
+    "sports": {
+      "type": "object",
+      "description": "Which sports and how to weight them",
+      "properties": {
+        "cbb": { "$ref": "#/$defs/sportConfig" },
+        "nba": { "$ref": "#/$defs/sportConfig" },
+        "nhl": { "$ref": "#/$defs/sportConfig" },
+        "soccer": { "$ref": "#/$defs/sportConfig" }
+      }
+    },
+
+    "situations": {
+      "type": "object",
+      "description": "Situational filters — boost or require specific game contexts",
+      "properties": {
+        "home_dogs": { "$ref": "#/$defs/situationPref", "description": "Home underdogs (market undervalues home court)" },
+        "road_favorites": { "$ref": "#/$defs/situationPref", "description": "Road teams laying points" },
+        "letdown_spots": { "$ref": "#/$defs/situationPref", "description": "Teams after a big win (emotional hangover)" },
+        "revenge_games": { "$ref": "#/$defs/situationPref", "description": "Rematches where loser has motivation edge" },
+        "rest_advantage": { "$ref": "#/$defs/situationPref", "description": "Extra rest days vs opponent" },
+        "back_to_back": { "$ref": "#/$defs/situationPref", "description": "B2B games (fatigue = unders, worse shooting)" },
+        "conference_games": { "$ref": "#/$defs/situationPref", "description": "Conference matchups (familiarity factor)" },
+        "trap_games": { "$ref": "#/$defs/situationPref", "description": "Overlooked opponents before a big game" },
+        "monday_games": { "$ref": "#/$defs/situationPref", "description": "Less public attention = more model edge" },
+        "large_spread": { "$ref": "#/$defs/situationPref", "description": "Spreads > 10 points" },
+        "close_spread": { "$ref": "#/$defs/situationPref", "description": "Tight lines (1-3 pts) where model has small edge" }
+      }
+    },
+
+    "stats": {
+      "type": "object",
+      "description": "Statistical filters — target specific matchup profiles",
+      "properties": {
+        "min_fpr_gap": {
+          "type": "number",
+          "description": "Minimum FPR rank gap between teams (e.g., 50 = only when #20 plays #70+)"
+        },
+        "defense_matters": {
+          "type": "boolean",
+          "description": "Prioritize games where one team has elite defense (top 30 FPR defense)"
+        },
+        "tempo_mismatch": {
+          "type": "boolean",
+          "description": "Flag games with big pace differential (fast vs slow)"
+        },
+        "shooting_splits": {
+          "type": "boolean",
+          "description": "Consider 3P% and FT% differentials"
+        },
+        "ats_trends": {
+          "type": "object",
+          "description": "Against-the-spread trend requirements",
+          "properties": {
+            "min_cover_pct": { "type": "number", "description": "Min ATS cover % (e.g., 55 = team covers 55%+ of spreads)" },
+            "streak_direction": { "enum": ["covering", "not_covering", "any"], "description": "ATS streak direction" },
+            "min_streak": { "type": "integer", "description": "Min consecutive ATS results in streak_direction" }
+          }
+        },
+        "over_under_trends": {
+          "type": "object",
+          "description": "Totals trend requirements",
+          "properties": {
+            "bias": { "enum": ["over", "under", "any"], "description": "Prefer overs or unders" },
+            "min_trend_games": { "type": "integer", "description": "Min consecutive games hitting the bias" }
+          }
+        }
+      }
+    },
+
+    "players": {
+      "type": "object",
+      "description": "Player-level analysis preferences",
+      "properties": {
+        "fpr_matchup_check": {
+          "type": "boolean",
+          "description": "Compare top players by FPR rank — flag when one team's best player significantly outranks the other"
+        },
+        "min_player_fpr_gap": {
+          "type": "integer",
+          "description": "Minimum FPR rank gap between teams' best players (e.g., 30)"
+        },
+        "injury_awareness": {
+          "type": "boolean",
+          "description": "Note when key players (top 3 FPR on team) may be out"
+        },
+        "props_enabled": {
+          "type": "boolean",
+          "description": "Include player props (points, rebounds, assists, goals) when available"
+        },
+        "prop_types": {
+          "type": "array",
+          "items": { "enum": ["points", "rebounds", "assists", "threes", "goals", "saves", "shots"] },
+          "description": "Which player prop types to surface"
+        }
+      }
+    },
+
+    "market_types": {
+      "type": "object",
+      "description": "Which bet types to consider",
+      "properties": {
+        "spreads": { "type": "boolean", "default": true },
+        "totals": { "type": "boolean", "default": true },
+        "moneylines": { "type": "boolean", "default": true },
+        "player_props": { "type": "boolean", "default": false },
+        "btts": { "type": "boolean", "default": false, "description": "Both teams to score (soccer)" },
+        "first_half": { "type": "boolean", "default": false, "description": "1H lines" }
+      }
+    },
+
+    "edge_requirements": {
+      "type": "object",
+      "description": "Minimum edge thresholds by market type",
+      "properties": {
+        "spread_min_edge": { "type": "number", "default": 10.0, "description": "Min edge % for spreads" },
+        "total_min_edge": { "type": "number", "default": 10.0, "description": "Min edge % for totals" },
+        "ml_min_edge": { "type": "number", "default": 15.0, "description": "Min edge % for moneylines" },
+        "prop_min_edge": { "type": "number", "default": 8.0, "description": "Min edge % for player props" },
+        "global_min_edge": { "type": "number", "default": 5.0, "description": "Absolute floor — nothing below this" }
+      }
+    },
+
+    "risk": {
+      "type": "object",
+      "description": "Risk management settings",
+      "properties": {
+        "bet_size_dollars": { "type": "number", "default": 2.0, "description": "Flat bet amount in dollars" },
+        "sizing_method": { "enum": ["flat", "kelly", "percentage"], "default": "flat" },
+        "kelly_fraction": { "type": "number", "default": 0.25, "description": "Fraction of full Kelly (0.25 = quarter Kelly)" },
+        "max_daily_bets": { "type": "integer", "default": 10 },
+        "max_daily_loss_dollars": { "type": "number", "default": 10.0 },
+        "max_single_bet_dollars": { "type": "number", "default": 5.0 },
+        "max_exposure_per_game": { "type": "number", "default": 5.0, "description": "Max total $ on one game across all markets" }
+      }
+    },
+
+    "presentation": {
+      "type": "object",
+      "description": "How results are shown",
+      "properties": {
+        "show_model_reasoning": { "type": "boolean", "default": true, "description": "Include situational factor explanations" },
+        "show_player_data": { "type": "boolean", "default": true, "description": "Include key player stats in output" },
+        "show_team_stats": { "type": "boolean", "default": true, "description": "Include team FPR/efficiency data" },
+        "max_opportunities": { "type": "integer", "default": 5, "description": "Max opportunities to show per scan" },
+        "tiers": { "type": "boolean", "default": true, "description": "Show safer/riskier tiers" }
+      }
+    }
+  },
+
+  "$defs": {
+    "sportConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "weight": { "type": "number", "default": 1.0, "description": "Priority weight (higher = prefer this sport)" },
+        "leagues": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Soccer only: which leagues (EPL, ESP, GER, ITA, FRA, UCL, MLS)"
+        }
+      }
+    },
+    "situationPref": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "boost": { "type": "number", "default": 1.0, "description": "Multiplier for edge score (1.5 = 50% boost when this situation applies)" },
+        "require": { "type": "boolean", "default": false, "description": "If true, ONLY show opportunities matching this situation" }
+      }
+    }
+  }
+}

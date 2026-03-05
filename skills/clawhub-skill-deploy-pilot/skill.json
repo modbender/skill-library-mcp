@@ -1,0 +1,124 @@
+{
+  "name": "deploy-pilot",
+  "version": "1.0.0",
+  "title": "Docker/LXC Deployment Automation",
+  "description": "Zero-downtime deployments with versioning, health checks, rollback, and chat approval workflows. Deploy with confidence.",
+  "author": "OpenClaw",
+  "category": "Infrastructure",
+  "tags": ["docker", "deployment", "automation", "lxc", "proxmox", "zero-downtime", "rollback"],
+  "keywords": ["docker-compose", "container", "deploy", "devops", "automation", "health-check", "approval-workflow"],
+  "complexity": "advanced",
+  "executables": [
+    {
+      "name": "deploy-pilot",
+      "path": "deploy-pilot.py",
+      "description": "Main deployment orchestrator",
+      "type": "python3"
+    }
+  ],
+  "dependencies": {
+    "system": [
+      "python3.8+",
+      "bash 4.0+",
+      "docker (for Docker Compose)",
+      "curl (for HTTP health checks)",
+      "jq (for JSON parsing)"
+    ],
+    "python": [
+      "urllib (stdlib)",
+      "json (stdlib)",
+      "subprocess (stdlib)",
+      "pathlib (stdlib)"
+    ],
+    "optional": {
+      "system": [
+        "pvesh (Proxmox client, for LXC)",
+        "ssh (for SSH health checks)"
+      ],
+      "python": [
+        "PyYAML (for parsing docker-compose.yml)"
+      ]
+    }
+  },
+  "permissions": [
+    "exec:docker",
+    "exec:pvesh",
+    "exec:ssh",
+    "file:read ~/.openclaw/workspace/deploy-pilot",
+    "file:write ~/.openclaw/workspace/deploy-pilot",
+    "net:http"
+  ],
+  "features": {
+    "core": [
+      "Version-tracked deployments",
+      "Docker Compose support",
+      "LXC/Proxmox support",
+      "Blue-green deployments",
+      "Health checks (HTTP, TCP, SSH, custom)",
+      "Automatic rollback",
+      "Pre/post deployment hooks",
+      "Deployment history and audit trail",
+      "JSON configuration"
+    ],
+    "integrations": [
+      "OpenClaw message tool (WhatsApp/Telegram approval workflows)",
+      "OpenClaw cron (scheduled deployments)",
+      "OpenClaw canvas (deployment dashboards)"
+    ]
+  },
+  "commands": {
+    "init": "Initialize deploy-pilot configuration",
+    "add": "Register a new Docker or LXC stack",
+    "stacks": "List all managed stacks",
+    "deploy": "Deploy a stack with health checks",
+    "rollback": "Rollback to previous version",
+    "health": "Check stack health status",
+    "history": "Show deployment history",
+    "config": "Configure health checks and hooks",
+    "hook": "Manage pre/post deployment hooks",
+    "cron-setup": "Schedule automatic deployments"
+  },
+  "examples": [
+    "deploy-pilot init",
+    "deploy-pilot add docker web-api /path/to/docker-compose.yml",
+    "deploy-pilot deploy web-api",
+    "deploy-pilot rollback web-api",
+    "deploy-pilot health web-api --verbose"
+  ],
+  "safety": {
+    "destructive": false,
+    "network": true,
+    "disk": true,
+    "process": true,
+    "notes": "Manages containers and can stop/start services. Always use health checks. Rollback is automatic on health failure."
+  },
+  "pricing": {
+    "model": "freemium",
+    "free_tier": {
+      "stacks": 3,
+      "history": "Last 10 deployments per stack",
+      "features": ["basic deployment", "health checks", "rollback", "docker support"]
+    },
+    "pro_tier": {
+      "stacks": "unlimited",
+      "history": "unlimited",
+      "features": ["all free features", "LXC/Proxmox support", "parallel deployments", "approval workflows", "cron scheduling"]
+    }
+  },
+  "requirements": {
+    "openclaw_min_version": "0.1.0",
+    "nodejs": false,
+    "python": true,
+    "python_version": "3.8+"
+  },
+  "testing": {
+    "unit_tests": "test_deploy_pilot.py",
+    "integration_tests": "test_deploy_pilot_integration.sh",
+    "smoke_test": "deploy-pilot --help && deploy-pilot init && deploy-pilot stacks"
+  },
+  "changelog": {
+    "1.0.0": "Initial release: Docker Compose support, health checks, rollback, approval workflows"
+  },
+  "repository": "https://github.com/OpenClaw/clawhub-skills/tree/main/deploy-pilot",
+  "license": "MIT"
+}

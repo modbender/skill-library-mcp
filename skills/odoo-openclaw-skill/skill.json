@@ -1,0 +1,89 @@
+{
+  "name": "odoo",
+  "version": "1.0.0",
+  "description": "Odoo RPC-based financial intelligence for accounting audits, VAT/cashflow analysis, inventory valuation, and compliant financial reporting. Read-only access to Odoo ERP.",
+  "author": "OpenClaw",
+  "license": "MIT",
+  "primaryCredential": {
+    "type": "environment",
+    "description": "Odoo connection credentials (URL, database, username, password/API key)"
+  },
+  "requiredEnvVars": [
+    {
+      "name": "ODOO_URL",
+      "description": "Odoo instance URL (e.g., https://your-odoo.com)",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "ODOO_DB",
+      "description": "Odoo database name",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "ODOO_USER",
+      "description": "Odoo username/email",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "ODOO_PASSWORD",
+      "description": "Odoo password or API key",
+      "required": true,
+      "secret": true
+    }
+  ],
+  "optionalEnvVars": [
+    {
+      "name": "ODOO_RPC_BACKEND",
+      "description": "RPC backend: xmlrpc (default) or json2",
+      "default": "xmlrpc"
+    }
+  ],
+  "install": {
+    "type": "script",
+    "path": "assets/autonomous-cfo/install.sh",
+    "requires": ["python3", "pip", "venv"],
+    "packages": [
+      "requests>=2.31.0",
+      "matplotlib>=3.8.0",
+      "pillow>=10.0.0",
+      "fpdf2>=2.8.0",
+      "openpyxl>=3.1.0"
+    ]
+  },
+  "configFiles": [
+    {
+      "path": "assets/autonomous-cfo/.env",
+      "description": "Odoo connection credentials (create from .env.example)",
+      "required": true,
+      "template": "assets/autonomous-cfo/.env.example"
+    },
+    {
+      "path": "assets/autonomous-cfo/config/settings.json",
+      "description": "Report generation settings (anomalies, forecasting, notifications)",
+      "required": false
+    }
+  ],
+  "capabilities": {
+    "networkAccess": true,
+    "filesystemAccess": true,
+    "externalApiCalls": true,
+    "endpoints": [
+      "Odoo XML-RPC: /xmlrpc/2/common, /xmlrpc/2/object",
+      "Odoo JSON-RPC: /json/2/{model}/{method}"
+    ]
+  },
+  "security": {
+    "readOnly": true,
+    "blockedMethods": ["create", "write", "unlink", "copy", "action_post", "action_confirm", "button_validate"],
+    "dataHandling": "Reads financial data from Odoo. Outputs generated reports locally. No data exfiltration."
+  },
+  "modelInvocation": {
+    "disabled": true,
+    "reason": "Skill handles sensitive financial data and external Odoo connections. Must be explicitly invoked by user."
+  },
+  "always": false,
+  "tags": ["odoo", "accounting", "finance", "erp", "reporting", "ifrs", "audit"]
+}

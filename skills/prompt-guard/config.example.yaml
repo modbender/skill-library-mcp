@@ -1,0 +1,101 @@
+# Prompt Guard v3.2.0 Configuration
+# Copy to config.yaml and customize for your deployment
+
+prompt_guard:
+  # Detection sensitivity level
+  # - low: Only catch obvious attacks, minimal false positives
+  # - medium: Balanced detection (recommended)
+  # - high: Aggressive detection, may have false positives
+  # - paranoid: Maximum security, flags anything remotely suspicious
+  sensitivity: medium
+
+  # Owner bypass: Skip ALL scanning for trusted users (zero overhead)
+  # When enabled, messages from owner_ids bypass pattern scanning entirely.
+  owner_bypass_scanning: false
+  
+  # Owner user IDs (these users bypass most restrictions)
+  # Add your Telegram/Discord/etc user IDs here
+  owner_ids:
+    - "46291309"  # Example: Telegram user ID
+  
+  # Canary tokens
+  # Plant these strings in your system prompt. If they appear in user
+  # messages or LLM outputs, it confirms system prompt extraction.
+  canary_tokens:
+    # - "CANARY:7f3a9b2e"
+    # - "SENTINEL:a4c8d1f0"
+  
+  # Actions to take at each severity level
+  # Options: allow, log, warn, block, block_notify
+  actions:
+    LOW: log           # Just log, no user-facing action
+    MEDIUM: warn       # Warn the user, log the attempt
+    HIGH: block        # Block the request, log it
+    CRITICAL: block_notify  # Block and notify owner via DM
+  
+  # Rate limiting to prevent automated/brute-force attacks
+  rate_limit:
+    enabled: true
+    max_requests: 30      # Maximum requests per time window
+    window_seconds: 60    # Time window in seconds
+  
+  # Security event logging
+  logging:
+    enabled: true
+    path: memory/security-log.md  # Markdown log path
+    include_message: true  # Include message content (privacy consideration)
+    
+    # Structured JSON logging
+    # Set format to "json" for SIEM-compatible JSONL output
+    format: markdown       # "markdown" (default) or "json"
+    json_path: memory/security-log.jsonl
+    hash_chain: false      # Enable SHA-256 hash chain for tamper detection
+
+  # =========================================================================
+  # API-Enhanced Mode (NEW in v3.2.0 — optional, off by default)
+  # =========================================================================
+  # Prompt Guard works 100% offline with 577+ bundled patterns.
+  # Enable the API for early-access + premium patterns and threat intelligence.
+  #
+  # Three tiers:
+  #   Core    — same 577+ patterns as offline (always available)
+  #   Early   — newest patterns, API users get 7-14 days before open-source
+  #   Premium — advanced detection (DNS tunneling, steganography, etc.)
+  #
+  # Beta key is built in — API works out of the box.
+  # Override with your own key if you have one.
+  # Disable with: enabled: false (or PG_API_ENABLED=false)
+  api:
+    enabled: true           # API on by default (beta key built in)
+    key: null               # Default: built-in beta key (override with PG_API_KEY env var)
+    reporting: false         # Opt-in: send anonymous threat data (hashes only)
+    url: null               # Default: https://pg-secure-api.vercel.app
+  
+  # Custom patterns (regex)
+  custom_patterns:
+    # Additional patterns to block (added to built-in patterns)
+    blocked:
+      - "custom_danger_word"
+      - "company_secret_project_name"
+    
+    # Patterns to allow (exceptions to built-in patterns)
+    allowed:
+      - "legitimate_use_case"
+      - "known_safe_phrase"
+  
+  # HiveFence threat intelligence network
+  hivefence:
+    enabled: true
+    api_url: https://hivefence-api.seojoon-kim.workers.dev/api/v1
+    auto_report: true      # Report HIGH+ detections
+    auto_fetch: true       # Fetch patterns on startup
+    cache_path: ~/.clawdbot/hivefence_cache.json
+  
+  # Notification settings
+  notifications:
+    # Send DM to owner on critical events
+    critical_dm: true
+    
+    # Daily security digest
+    daily_digest: false
+    digest_time: "09:00"  # 24h format, owner's timezone

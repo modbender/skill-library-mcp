@@ -1,0 +1,456 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "ES6+ feature compatibility matrix and usage guidelines",
+    "generated": "2025-06-16",
+    "sources": [
+      "caniuse.com",
+      "nodejs.org/en/docs/",
+      "mdn.io"
+    ]
+  },
+  "features": {
+    "arrow_functions": {
+      "name": "Arrow Functions",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Concise function syntax with lexical this binding",
+      "compatibility": {
+        "browsers": {
+          "chrome": "45+",
+          "firefox": "22+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "4+",
+        "mobile": {
+          "ios_safari": "10+",
+          "android_chrome": "45+"
+        }
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Use for callbacks, array methods, and concise functions",
+          "Avoid when needing own this binding or as constructors",
+          "Preserves lexical this context"
+        ]
+      },
+      "patterns": ["function_to_arrow", "map_filter_reduce_arrow"]
+    },
+    "const_let": {
+      "name": "Block-Scoped Declarations (const/let)",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Block-scoped variable declarations with const for immutable bindings",
+      "compatibility": {
+        "browsers": {
+          "chrome": "41+",
+          "firefox": "28+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "11 (partial)"
+        },
+        "node": "4+",
+        "mobile": {
+          "ios_safari": "10+",
+          "android_chrome": "41+"
+        }
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Prefer const by default",
+          "Use let only for reassigned variables",
+          "Never use var in new code",
+          "Temporal Dead Zone applies"
+        ]
+      },
+      "patterns": ["var_to_const_let", "var_to_let"]
+    },
+    "template_literals": {
+      "name": "Template Literals",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Multiline strings and string interpolation",
+      "compatibility": {
+        "browsers": {
+          "chrome": "41+",
+          "firefox": "31+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "4+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Safely use in all modern environments",
+          "Consider tagged templates for advanced use",
+          "Not supported in IE11 without transpilation"
+        ]
+      },
+      "patterns": ["template_literal"]
+    },
+    "destructuring": {
+      "name": "Destructuring Assignment",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Extract values from arrays/objects into distinct variables",
+      "compatibility": {
+        "browsers": {
+          "chrome": "49+",
+          "firefox": "41+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Great for function parameters",
+          "Supports default values and renaming",
+          "Can nest for deep destructuring",
+          "May affect minification"
+        ]
+      },
+      "patterns": ["destructuring_array", "destructuring_object"]
+    },
+    "default_params": {
+      "name": "Default Parameters",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Initialize parameters with default values",
+      "compatibility": {
+        "browsers": {
+          "chrome": "49+",
+          "firefox": "15+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Clearer than manual assignment",
+          "Evaluated at call time",
+          "Can use expressions as defaults",
+          "undefined triggers default"
+        ]
+      },
+      "patterns": ["default_params"]
+    },
+    "rest_spread": {
+      "name": "Rest Parameters & Spread Syntax",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Collect/expand iterables, replaces arguments object",
+      "compatibility": {
+        "browsers": {
+          "chrome": "46+",
+          "firefox": "16+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Use ...args instead of arguments",
+          "Only last parameter can be rest",
+          "Works with any iterable",
+          "Spread in arrays/function calls requires ES2015+"
+        ]
+      },
+      "patterns": ["rest_spread", "spread_merge", "array_spread_concat"]
+    },
+    "object_literal_enhancements": {
+      "name": "Object Literal Enhancements",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Property shorthand, computed property names, method definitions",
+      "compatibility": {
+        "browsers": {
+          "chrome": "47+",
+          "firefox": "34+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Property value shorthand reduces repetition",
+          "Method shorthand binds this automatically",
+          "Computed property names for dynamic keys"
+        ]
+      },
+      "patterns": ["object_literal_shorthand", "object_method_shorthand", "computed_property_names"]
+    },
+    "classes": {
+      "name": "Classes",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Syntactic sugar over prototype-based inheritance",
+      "compatibility": {
+        "browsers": {
+          "chrome": "51+",
+          "firefox": "45+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Use for object constructors with inheritance",
+          "Not to be confused with Java/C# classes",
+          "Consider factory functions for simpler cases",
+          "Subclass built-ins now works (Array, Error)"
+        ]
+      },
+      "patterns": ["class_properties"]
+    },
+    "modules_esm": {
+      "name": "ES Modules (ESM)",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Standardized module system with import/export",
+      "compatibility": {
+        "browsers": {
+          "chrome": "61+",
+          "firefox": "60+",
+          "safari": "10.1+",
+          "edge": "16+",
+          "ie": "no"
+        },
+        "node": "12+ (with .mjs or \"type\":\"module\")"
+      },
+      "usage": {
+        "recommended": "with_bundler",
+        "notes": [
+          "Use with bundlers (webpack, rollup) for broad compatibility",
+          "Native support in modern browsers and Node 12+",
+          "Static analysis enables tree-shaking",
+          "Different from CommonJS in behavior (hoisting, circular deps)"
+        ]
+      },
+      "patterns": ["commonjs_to_esm", "export_default"]
+    },
+    "async_await": {
+      "name": "Async Functions",
+      "stage": "stable",
+      "ecmaVersion": "ES2017",
+      "description": "Synchronous-style asynchronous code with promises",
+      "compatibility": {
+        "browsers": {
+          "chrome": "55+",
+          "firefox": "52+",
+          "safari": "10.1+",
+          "edge": "15+",
+          "ie": "no"
+        },
+        "node": "7.6+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Clean alternative to promise chains",
+          "Top-level await available in modules (ES2022)",
+          "Can use Babel for older environments",
+          "Don't forget error handling"
+        ]
+      },
+      "patterns": ["promisify_callback"]
+    },
+    "promises": {
+      "name": "Promises",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Native promise implementation for async operations",
+      "compatibility": {
+        "browsers": {
+          "chrome": "32+",
+          "firefox": "29+",
+          "safari": "8+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "0.12+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Native in all modern environments",
+          "Polyfill required for IE11 if needed",
+          "Avoid callback hell",
+          "Consider async/await on top"
+        ]
+      }
+    },
+    "for_of": {
+      "name": "for...of Loops",
+      "stage": "stable",
+      "ecmaVersion": "ES2015",
+      "description": "Iterate over iterable objects (arrays, maps, sets, strings)",
+      "compatibility": {
+        "browsers": {
+          "chrome": "38+",
+          "firefox": "13+",
+          "safari": "10+",
+          "edge": "12+",
+          "ie": "no"
+        },
+        "node": "4+"
+      },
+      "usage": {
+        "recommended": true,
+        "notes": [
+          "Cleaner than traditional for loops",
+          "Works with any iterable",
+          "Cannot use with plain objects (use Object.keys/entries)",
+          "Supports break/continue"
+        ]
+      },
+      "patterns": ["for_to_for_of", "for_to_for_in"]
+    },
+    "numeric_separators": {
+      "name": "Numeric Separators",
+      "stage": "stable",
+      "ecmaVersion": "ES2021",
+      "description": "Underscore separators in numeric literals for readability",
+      "compatibility": {
+        "browsers": {
+          "chrome": "74+",
+          "firefox": "70+",
+          "safari": "14+",
+          "edge": "79+",
+          "ie": "no"
+        },
+        "node": "14+"
+      },
+      "usage": {
+        "recommended": "modern_only",
+        "notes": [
+          "1_000_000 is clearer than 1000000",
+          "Works with binary, hex, octal, BigInt",
+          "Cannot start or end with underscore",
+          "Consider target runtime before using"
+        ]
+      }
+    },
+    "optional_chaining": {
+      "name": "Optional Chaining (?.)",
+      "stage": "stable",
+      "ecmaVersion": "ES2020",
+      "description": "Safe property access without null checks",
+      "compatibility": {
+        "browsers": {
+          "chrome": "80+",
+          "firefox": "74+",
+          "safari": "13.1+",
+          "edge": "80+",
+          "ie": "no"
+        },
+        "node": "14+"
+      },
+      "usage": {
+        "recommended": "modern_only",
+        "notes": [
+          "Short-circuits on null/undefined",
+          "Works with function calls too",
+          "Combine with nullish coalescing",
+          "Not transpilable to ES5 without helper"
+        ]
+      }
+    },
+    "nullish_coalescing": {
+      "name": "Nullish Coalescing (??)",
+      "stage": "stable",
+      "ecmaVersion": "ES2020",
+      "description": "Default values with null/undefined check only",
+      "compatibility": {
+        "browsers": {
+          "chrome": "80+",
+          "firefox": "73+",
+          "safari": "13.1+",
+          "edge": "80+",
+          "ie": "no"
+        },
+        "node": "14+"
+      },
+      "usage": {
+        "recommended": "modern_only",
+        "notes": [
+          "Only coalesces on null/undefined",
+          "Unlike || which checks falsy values",
+          "Combine with optional chaining",
+          "Perfect for configuration defaults"
+        ]
+      }
+    }
+  },
+  "compatibility_guidelines": {
+    "es5_target": {
+      "description": "For maximum compatibility (IE11+)",
+      "allowed_features": [
+        "arrow_functions",
+        "const_let",
+        "template_literals",
+        "destructuring",
+        "default_params",
+        "rest_spread",
+        "object_literal_enhancements"
+      ],
+      "needs_transpilation": true,
+      "tooling": ["@babel/preset-env", "typescript"]
+    },
+    "es2017_target": {
+      "description": "Modern Node.js (8+) and evergreen browsers",
+      "allowed_features": [
+        "arrow_functions",
+        "const_let",
+        "template_literals",
+        "destructuring",
+        "default_params",
+        "rest_spread",
+        "object_literal_enhancements",
+        "async_await",
+        "classes"
+      ],
+      "needs_transpilation": false,
+      "tooling": null
+    },
+    "es2020_target": {
+      "description": "Latest modern environments",
+      "allowed_features": [
+        "all_previous",
+        "optional_chaining",
+        "nullish_coalescing",
+        "numeric_separators"
+      ],
+      "needs_transpilation": false,
+      "tooling": null
+    }
+  },
+  "deprecation_timeline": {
+    "var": {
+      "deprecated": true,
+      "recommended_replacement": "const/let",
+      "reason": "Function-scoped, hoisting issues",
+      "migration_difficulty": "easy"
+    }
+  }
+}

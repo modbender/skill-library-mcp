@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Channel Approvals - OpenClaw</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 24px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        .header {
+            width: min(900px, 100%);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0 0 12px 0;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            opacity: 0.8;
+            font-size: 15px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        #pairings-list {
+            width: min(900px, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .pairing-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
+                        0 0 0 0 rgba(36, 224, 138, 0);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pairing-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #24e08a 0%, #1db973 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .pairing-item:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+            border-color: rgba(36, 224, 138, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(36, 224, 138, 0.2);
+        }
+        
+        .pairing-item:hover::before {
+            opacity: 1;
+        }
+        
+        .pairing-item.approved {
+            opacity: 0.6;
+            background: linear-gradient(135deg, rgba(36, 224, 138, 0.1) 0%, rgba(36, 224, 138, 0.05) 100%);
+            border-color: rgba(36, 224, 138, 0.3);
+        }
+        
+        .pairing-content {
+            flex: 1;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            min-width: 0;
+        }
+        
+        .pairing-row {
+            display: contents;
+        }
+        
+        .pairing-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .pairing-field:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .pairing-field strong {
+            opacity: 0.7;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .pairing-field span {
+            color: #fff;
+            word-break: break-word;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .pairing-field .value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: 15px;
+            color: #24e08a;
+            font-weight: 700;
+            background: rgba(36, 224, 138, 0.15);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(36, 224, 138, 0.3);
+            display: inline-block;
+            width: fit-content;
+        }
+        
+        .pairing-field .timestamp {
+            opacity: 0.8;
+            font-size: 14px;
+            font-style: normal;
+            color: #ccc;
+            font-weight: 500;
+        }
+        
+        .pairing-field.channel-field {
+            background: linear-gradient(135deg, rgba(92, 158, 255, 0.15) 0%, rgba(92, 158, 255, 0.08) 100%);
+            border-color: rgba(92, 158, 255, 0.3);
+        }
+        
+        .pairing-field.channel-field span {
+            color: #5c9eff;
+            font-weight: 700;
+        }
+        
+        .pairing-field.channel-field:hover {
+            background: linear-gradient(135deg, rgba(92, 158, 255, 0.2) 0%, rgba(92, 158, 255, 0.12) 100%);
+            border-color: rgba(92, 158, 255, 0.4);
+        }
+        
+        .pairing-actions {
+            padding: 20px 28px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .approve-btn {
+            appearance: none;
+            border: none;
+            background: linear-gradient(135deg, #24e08a 0%, #1db973 100%);
+            color: #000;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(36, 224, 138, 0.4),
+                        0 0 0 0 rgba(36, 224, 138, 0.5);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 140px;
+        }
+        
+        .approve-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .approve-btn:hover:not(:disabled)::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .approve-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2ef09a 0%, #24e08a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(36, 224, 138, 0.6),
+                        0 0 0 4px rgba(36, 224, 138, 0.2);
+        }
+        
+        .approve-btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(36, 224, 138, 0.3);
+        }
+        
+        .approve-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+        }
+        
+        .approve-btn.ok {
+            color: #000;
+        }
+        
+        .no-pairings {
+            text-align: center;
+            padding: 64px 24px;
+            opacity: 0.5;
+            font-size: 16px;
+            font-weight: 500;
+            color: #888;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #24e08a;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(36, 224, 138, 0.6);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
+        }
+        
+        .status-indicator.disconnected {
+            background: #ff5c5c;
+            box-shadow: 0 0 10px rgba(255, 92, 92, 0.6);
+        }
+        
+        .bad {
+            color: #ff5c5c;
+        }
+        
+        /* Add special styling for channel field */
+        .pairing-field.channel-field span {
+            background: linear-gradient(135deg, rgba(92, 158, 255, 0.2) 0%, rgba(92, 158, 255, 0.1) 100%);
+            color: #5c9eff;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid rgba(92, 158, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .pairing-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .pairing-actions {
+                padding: 16px 20px;
+            }
+            
+            .approve-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .wrap {
+                padding: 20px 16px;
+            }
+            
+            .pairing-content {
+                padding: 20px;
+            }
+            
+            .pairing-field {
+                padding: 12px;
+            }
+            
+            .pairing-field span {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <a href="/dashboard" style="display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:14px;margin-bottom:16px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">← Back to Dashboard</a>
+            <h1>Channel Approvals</h1>
+            <div class="subtitle">
+                <span class="status-indicator" id="status-indicator"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </div>
+        <div id="pairings-list">
+            <p class="no-pairings">Loading pairings...</p>
+        </div>
+    </div>
+
+    <script>
+        // Wait for DOM to be ready
+        (function() {
+            console.log('Channel approvals script starting...');
+            
+            // Use explicit connection URL and options
+            const socketUrl = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+            console.log('Connecting to:', socketUrl);
+            
+            const socket = io(socketUrl, {
+                transports: ['polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 5
+            });
+
+            socket.on('connect', function() {
+                console.log('Channel approvals: Connected to server!', socket.id);
+                const indicator = document.getElementById('status-indicator');
+                const statusText = document.getElementById('status-text');
+                if (indicator) {
+                    indicator.classList.remove('disconnected');
+                }
+                if (statusText) {
+                    statusText.textContent = 'Connected';
+                }
+            });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            if (indicator) {
+                indicator.classList.add('disconnected');
+            }
+            if (statusText) {
+                statusText.textContent = 'Disconnected. Reconnecting...';
+            }
+        });
+
+        socket.on('initial_pairings', function(data) {
+            console.log('Received initial pairings:', data.pairings);
+            const listDiv = document.getElementById('pairings-list');
+            listDiv.innerHTML = ''; // Clear connection/loading message
+            if (data.pairings && data.pairings.length > 0) {
+                data.pairings.forEach(function(pairing) {
+                    addPairingToList(pairing);
+                });
+            } else {
+                listDiv.innerHTML = '<p class="no-pairings">No pairings yet.</p>';
+            }
+        });
+
+        socket.on('new_pairing', function(pairing_data) {
+            console.log('Received new pairing:', pairing_data);
+            const listDiv = document.getElementById('pairings-list');
+            // If the list was empty, clear the "No pairings yet" message
+            if (listDiv.querySelector('.no-pairings')) {
+                listDiv.innerHTML = '';
+            }
+            addPairingToList(pairing_data);
+        });
+
+        socket.on('pairing_approved', function(data) {
+            console.log('Pairing approved:', data.code);
+            // Remove the pairing from the list
+            const pairingItem = document.querySelector(`[data-pairing-code="${data.code}"]`);
+            if (pairingItem) {
+                pairingItem.classList.add('approved');
+                const approveBtn = pairingItem.querySelector('.approve-btn');
+                if (approveBtn) {
+                    approveBtn.disabled = true;
+                    approveBtn.textContent = 'Approved';
+                }
+                // Remove after a short delay
+                setTimeout(() => {
+                    pairingItem.remove();
+                    const listDiv = document.getElementById('pairings-list');
+                    if (listDiv.children.length === 0) {
+                        listDiv.innerHTML = '<p class="no-pairings">No pairings yet.</p>';
+                    }
+                }, 2000);
+            }
+        });
+
+        function addPairingToList(pairing) {
+            const listDiv = document.getElementById('pairings-list');
+            // Check if pairing already exists
+            const existing = document.querySelector(`[data-pairing-code="${pairing.code}"]`);
+            if (existing) {
+                return; // Already displayed
+            }
+            
+            // Create a new div for the pairing
+            const pairingItem = document.createElement('div');
+            pairingItem.classList.add('pairing-item');
+            pairingItem.setAttribute('data-pairing-code', pairing.code);
+
+            // Construct the content dynamically
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'pairing-content';
+            
+            // Channel field
+            if (pairing.channel_id) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field channel-field';
+                field.innerHTML = `<strong>Channel</strong><span>${pairing.channel_id}</span>`;
+                contentDiv.appendChild(field);
+            }
+            
+            // Code field
+            if (pairing.code) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Code</strong><span class="value">${pairing.code}</span>`;
+                contentDiv.appendChild(field);
+            }
+            
+            // User ID field
+            if (pairing.user_id) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>User ID</strong><span class="value">${pairing.user_id}</span>`;
+                contentDiv.appendChild(field);
+            }
+            
+            // Device field
+            if (pairing.device_name) {
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Device</strong><span>${pairing.device_name}</span>`;
+                contentDiv.appendChild(field);
+            }
+            
+            // Timestamp field
+            if (pairing.timestamp) {
+                const date = new Date(pairing.timestamp);
+                const field = document.createElement('div');
+                field.className = 'pairing-field';
+                field.innerHTML = `<strong>Requested</strong><span class="timestamp">${date.toLocaleString()}</span>`;
+                contentDiv.appendChild(field);
+            }
+            
+            pairingItem.appendChild(contentDiv);
+
+            // Add approve button
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'pairing-actions';
+            const approveBtn = document.createElement('button');
+            approveBtn.className = 'approve-btn ok';
+            approveBtn.textContent = 'Approve';
+            approveBtn.addEventListener('click', function() {
+                approvePairing(pairing.code, pairing.channel_id);
+            });
+            actionsDiv.appendChild(approveBtn);
+            pairingItem.appendChild(actionsDiv);
+
+            listDiv.prepend(pairingItem); // Add to the top of the list
+        }
+
+        function approvePairing(code, channel) {
+            const pairingItem = document.querySelector(`[data-pairing-code="${code}"]`);
+            const approveBtn = pairingItem ? pairingItem.querySelector('.approve-btn') : null;
+            
+            if (approveBtn) {
+                approveBtn.disabled = true;
+                approveBtn.textContent = 'Approving...';
+            }
+
+            fetch('/approve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: 'Bb7766!server',
+                    code: code,
+                    channel: channel,
+                    notify: false
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    if (approveBtn) {
+                        approveBtn.disabled = false;
+                        approveBtn.textContent = 'Approve';
+                    }
+                } else {
+                    console.log('Approved:', data.message);
+                    // The socket event will handle UI update
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving pairing: ' + error.message);
+                if (approveBtn) {
+                    approveBtn.disabled = false;
+                    approveBtn.textContent = 'Approve';
+                }
+            });
+        }
+
+        // Handle connection errors
+        socket.on('connect_error', (err) => {
+            console.error('Connection Error:', err);
+            const listDiv = document.getElementById('pairings-list');
+            if (listDiv) {
+                listDiv.innerHTML = `<p class="no-pairings" style="color: red;">Connection failed: ${err.message || 'xhr poll error'}</p>`;
+            }
+        });
+        })(); // End IIFE
+    </script>
+</body>
+</html>
+

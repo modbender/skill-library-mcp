@@ -1,0 +1,611 @@
+{
+  "$schema": "framework-definition-v1",
+  "id": "ccpa",
+  "name": "CCPA/CPRA",
+  "version": "2023",
+  "description": "The California Consumer Privacy Act (CCPA), as amended by the California Privacy Rights Act (CPRA), grants California consumers comprehensive rights over their personal information and imposes obligations on businesses that collect, use, share, or sell personal information. Enforced by the California Privacy Protection Agency (CPPA), the law applies to for-profit businesses meeting specific revenue, data volume, or data sale thresholds, and establishes requirements for transparency, data minimization, purpose limitation, and the protection of sensitive personal information.",
+  "domains": [
+    {
+      "id": "CCPA-RIGHTS",
+      "name": "Consumer Rights",
+      "description": "Core consumer rights under CCPA/CPRA including the right to know, delete, correct, opt-out of sale/sharing, limit use of sensitive personal information, and non-discrimination for exercising privacy rights.",
+      "controls": [
+        {
+          "id": "CCPA-R1",
+          "title": "Right to Know / Access",
+          "description": "Consumers have the right to request that a business disclose the categories and specific pieces of personal information it has collected about them, the categories of sources, the business or commercial purpose for collecting or selling the information, and the categories of third parties with whom the business shares personal information. Businesses must respond within 45 days.",
+          "category": "Consumer Rights",
+          "priority": 5,
+          "typical_evidence": [
+            "Consumer request intake and verification procedures",
+            "Request fulfillment workflow documentation",
+            "Response templates for access requests",
+            "Request tracking log with timestamps and response times",
+            "Identity verification procedures for consumer requests"
+          ],
+          "mappings": {
+            "gdpr": ["Art.15.1"],
+            "nist-csf": ["PR.IP-1", "ID.AM-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P5.1", "P5.2"]
+          }
+        },
+        {
+          "id": "CCPA-R2",
+          "title": "Right to Delete",
+          "description": "Consumers have the right to request the deletion of personal information that a business has collected from them. Businesses must delete the information and direct any service providers or contractors to also delete the information, subject to specific exceptions such as completing transactions, detecting security incidents, or complying with legal obligations.",
+          "category": "Consumer Rights",
+          "priority": 5,
+          "typical_evidence": [
+            "Deletion request handling procedures",
+            "Technical deletion capability documentation across all systems",
+            "Service provider deletion notification process",
+            "Deletion verification and confirmation records",
+            "Exception criteria documentation for denied deletion requests"
+          ],
+          "mappings": {
+            "gdpr": ["Art.17.1"],
+            "nist-csf": ["PR.IP-6"],
+            "iso27001": ["A.8.3.2", "A.18.1.4"],
+            "soc2": ["P4.2", "P6.1"]
+          }
+        },
+        {
+          "id": "CCPA-R3",
+          "title": "Right to Opt-Out of Sale or Sharing",
+          "description": "Consumers have the right to direct a business that sells or shares their personal information to stop selling or sharing that information. Businesses must provide a clear and conspicuous 'Do Not Sell or Share My Personal Information' link on their website and honor Global Privacy Control (GPC) signals.",
+          "category": "Consumer Rights",
+          "priority": 5,
+          "typical_evidence": [
+            "Do Not Sell or Share link implementation evidence",
+            "Global Privacy Control (GPC) signal detection and honoring mechanism",
+            "Opt-out request processing procedures",
+            "Downstream notification to third parties upon opt-out",
+            "Opt-out preference management system documentation"
+          ],
+          "mappings": {
+            "gdpr": ["Art.21.1"],
+            "nist-csf": ["PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P6.1", "P6.2"]
+          }
+        },
+        {
+          "id": "CCPA-R4",
+          "title": "Right to Correct",
+          "description": "Consumers have the right to request that a business correct inaccurate personal information that it maintains about them. Businesses must use commercially reasonable efforts to correct the information as directed by the consumer and instruct service providers and contractors to make the same correction.",
+          "category": "Consumer Rights",
+          "priority": 4,
+          "typical_evidence": [
+            "Correction request intake and handling procedures",
+            "Data accuracy verification workflow",
+            "Service provider correction notification process",
+            "Correction request tracking log",
+            "Documentation of commercially reasonable efforts standard"
+          ],
+          "mappings": {
+            "gdpr": ["Art.16"],
+            "nist-csf": ["PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["PI1.1", "P6.1"]
+          }
+        },
+        {
+          "id": "CCPA-R5",
+          "title": "Right to Limit Use of Sensitive Personal Information",
+          "description": "Consumers have the right to direct a business to limit its use and disclosure of sensitive personal information to that which is necessary to perform the services or provide the goods reasonably expected by an average consumer. Businesses must provide a 'Limit the Use of My Sensitive Personal Information' link.",
+          "category": "Consumer Rights",
+          "priority": 5,
+          "typical_evidence": [
+            "Limit the Use of My Sensitive Personal Information link implementation",
+            "Sensitive personal information use limitation procedures",
+            "Technical controls restricting SPI processing to permitted purposes",
+            "Consumer preference management for SPI limitations",
+            "Service provider notification of SPI use limitations"
+          ],
+          "mappings": {
+            "gdpr": ["Art.9.1"],
+            "nist-csf": ["PR.AC-1", "PR.DS-5"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P3.1", "P3.2"]
+          }
+        },
+        {
+          "id": "CCPA-R6",
+          "title": "Right to Non-Discrimination",
+          "description": "Businesses shall not discriminate against a consumer because the consumer exercised any of their CCPA rights. Discrimination includes denying goods or services, charging different prices or rates, providing a different level or quality of goods or services, or suggesting that the consumer will receive a different price or quality. Financial incentive programs are permitted with proper notice and opt-in consent.",
+          "category": "Consumer Rights",
+          "priority": 4,
+          "typical_evidence": [
+            "Non-discrimination policy documentation",
+            "Pricing and service level consistency monitoring",
+            "Financial incentive program disclosures and opt-in records",
+            "Training materials on non-discriminatory practices",
+            "Consumer complaint tracking related to discrimination"
+          ],
+          "mappings": {
+            "gdpr": ["Art.22.1"],
+            "nist-csf": ["ID.GV-3"],
+            "iso27001": ["A.18.1.1"],
+            "soc2": ["P1.1", "CC1.1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CCPA-OBLIGATIONS",
+      "name": "Business Obligations",
+      "description": "Requirements for businesses regarding notice at collection, data minimization, purpose limitation, and data retention, ensuring transparent and responsible handling of consumer personal information.",
+      "controls": [
+        {
+          "id": "CCPA-O1",
+          "title": "Notice at Collection",
+          "description": "Businesses must inform consumers at or before the point of collection about the categories of personal information to be collected, the purposes for which the information will be used, whether the information is sold or shared, and the length of time the business intends to retain each category of personal information.",
+          "category": "Business Obligations",
+          "priority": 4,
+          "typical_evidence": [
+            "Privacy notice at point of collection (website, app, in-store)",
+            "Notice content review against CCPA requirements checklist",
+            "Notice versioning and update history",
+            "Evidence of notice accessibility across all collection channels",
+            "Retention period disclosures per category of personal information"
+          ],
+          "mappings": {
+            "gdpr": ["Art.12.1", "Art.13.1"],
+            "nist-csf": ["ID.GV-3"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P1.1", "CC2.1"]
+          }
+        },
+        {
+          "id": "CCPA-O2",
+          "title": "Privacy Policy",
+          "description": "Businesses must maintain a comprehensive privacy policy that is updated at least every 12 months. The privacy policy must include a description of consumer rights, categories of personal information collected, sold, or shared in the preceding 12 months, and instructions for submitting verifiable consumer requests.",
+          "category": "Business Obligations",
+          "priority": 4,
+          "typical_evidence": [
+            "Current privacy policy document",
+            "Annual privacy policy review and update records",
+            "Privacy policy change log with effective dates",
+            "Metrics disclosure on categories of information collected, sold, and shared",
+            "Consumer request submission method documentation"
+          ],
+          "mappings": {
+            "gdpr": ["Art.12.1", "Art.5.1.a"],
+            "nist-csf": ["ID.GV-3", "PR.IP-1"],
+            "iso27001": ["A.18.1.4", "A.5.1.1"],
+            "soc2": ["P1.1", "P1.2"]
+          }
+        },
+        {
+          "id": "CCPA-O3",
+          "title": "Data Minimization",
+          "description": "A business's collection, use, retention, and sharing of a consumer's personal information shall be reasonably necessary and proportionate to achieve the purposes for which the personal information was collected or processed. Businesses must not collect more personal information than is needed for the disclosed purpose.",
+          "category": "Business Obligations",
+          "priority": 4,
+          "typical_evidence": [
+            "Data minimization assessment documentation",
+            "Data collection justification for each category of personal information",
+            "Periodic reviews of data collection practices",
+            "System configuration evidence showing minimal data fields",
+            "Data mapping showing necessity for each data element"
+          ],
+          "mappings": {
+            "gdpr": ["Art.5.1.c"],
+            "nist-csf": ["PR.DS-5", "PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P3.1", "P3.2"]
+          }
+        },
+        {
+          "id": "CCPA-O4",
+          "title": "Purpose Limitation",
+          "description": "Businesses shall not collect or use personal information for additional purposes that are incompatible with the disclosed purpose for which the personal information was collected without providing the consumer with notice. Secondary uses must be compatible with the context in which the information was originally collected.",
+          "category": "Business Obligations",
+          "priority": 3,
+          "typical_evidence": [
+            "Purpose specification documentation per data collection activity",
+            "Compatibility assessment records for secondary uses",
+            "Consumer notification procedures for new purposes",
+            "Processing activity register linking data to declared purposes",
+            "Controls preventing unauthorized purpose expansion"
+          ],
+          "mappings": {
+            "gdpr": ["Art.5.1.b"],
+            "nist-csf": ["PR.IP-1", "ID.GV-3"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P1.1", "P3.1"]
+          }
+        },
+        {
+          "id": "CCPA-O5",
+          "title": "Data Retention Limitations",
+          "description": "A business shall not retain a consumer's personal information for each disclosed purpose for which the personal information was collected for longer than is reasonably necessary for that disclosed purpose. Businesses must disclose retention periods or the criteria used to determine retention periods.",
+          "category": "Business Obligations",
+          "priority": 3,
+          "typical_evidence": [
+            "Data retention policy with defined periods per category",
+            "Retention schedule mapped to collection purposes",
+            "Automated data purge and archival configurations",
+            "Retention period justification documentation",
+            "Periodic retention compliance audit records"
+          ],
+          "mappings": {
+            "gdpr": ["Art.5.1.e"],
+            "nist-csf": ["PR.IP-6"],
+            "iso27001": ["A.8.3.2", "A.18.1.3"],
+            "soc2": ["P4.1", "P4.2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CCPA-PROTECTION",
+      "name": "Data Protection",
+      "description": "Security safeguards, breach notification requirements, and risk assessment obligations to protect consumer personal information from unauthorized access, destruction, use, modification, or disclosure.",
+      "controls": [
+        {
+          "id": "CCPA-P1",
+          "title": "Reasonable Security Measures",
+          "description": "Businesses that own, license, or maintain personal information about California residents shall implement and maintain reasonable security procedures and practices appropriate to the nature of the information, to protect the personal information from unauthorized or illegal access, destruction, use, modification, or disclosure. Failure to do so may result in a private right of action under the CCPA data breach provisions.",
+          "category": "Data Protection",
+          "priority": 5,
+          "typical_evidence": [
+            "Information security policy and program documentation",
+            "Security controls inventory mapped to CIS or NIST frameworks",
+            "Encryption standards for data at rest and in transit",
+            "Access control policies and implementation evidence",
+            "Penetration testing and vulnerability assessment reports"
+          ],
+          "mappings": {
+            "gdpr": ["Art.32.1"],
+            "nist-csf": ["PR.AC-1", "PR.DS-1", "PR.DS-2", "PR.IP-1"],
+            "iso27001": ["A.9.1.1", "A.10.1.1", "A.12.2.1", "A.14.1.2"],
+            "soc2": ["CC6.1", "CC6.6", "CC6.7"]
+          }
+        },
+        {
+          "id": "CCPA-P2",
+          "title": "Data Breach Notification",
+          "description": "Any business that owns or licenses computerized personal information shall disclose a breach of the security of the system to any California resident whose unencrypted personal information was, or is reasonably believed to have been, acquired by an unauthorized person. Notification must be made in the most expedient time possible and without unreasonable delay.",
+          "category": "Data Protection",
+          "priority": 5,
+          "typical_evidence": [
+            "Data breach response plan and playbook",
+            "Breach detection and escalation procedures",
+            "Consumer breach notification templates",
+            "Attorney General notification procedures and records",
+            "Breach impact assessment methodology documentation"
+          ],
+          "mappings": {
+            "gdpr": ["Art.33.1", "Art.34.1"],
+            "nist-csf": ["RS.CO-2", "RS.CO-3", "DE.AE-1"],
+            "iso27001": ["A.16.1.2", "A.16.1.3", "A.16.1.5"],
+            "soc2": ["CC7.3", "CC7.4", "CC7.5"]
+          }
+        },
+        {
+          "id": "CCPA-P3",
+          "title": "Cybersecurity Audit",
+          "description": "Businesses whose processing of consumers' personal information presents significant risk to consumers' privacy or security shall perform an annual cybersecurity audit. The audit must be thorough and independent, and the scope must be defined by CPPA regulations.",
+          "category": "Data Protection",
+          "priority": 4,
+          "typical_evidence": [
+            "Annual cybersecurity audit report",
+            "Audit scope and methodology documentation",
+            "Independent auditor qualifications and engagement letter",
+            "Remediation plans for audit findings",
+            "Board or management review of audit results"
+          ],
+          "mappings": {
+            "gdpr": ["Art.5.2", "Art.24.1"],
+            "nist-csf": ["ID.GV-4", "PR.IP-7"],
+            "iso27001": ["A.18.2.1", "A.18.2.2"],
+            "soc2": ["CC4.1", "CC4.2"]
+          }
+        },
+        {
+          "id": "CCPA-P4",
+          "title": "Risk Assessment for Processing",
+          "description": "Businesses whose processing of consumers' personal information presents significant risk to consumers' privacy or security shall submit to the CPPA on a regular basis a risk assessment with respect to their processing of personal information. The assessment must weigh the benefits of the processing against the potential risks to consumer rights.",
+          "category": "Data Protection",
+          "priority": 4,
+          "typical_evidence": [
+            "Risk assessment reports submitted to CPPA",
+            "Processing risk identification and evaluation methodology",
+            "Risk-benefit analysis documentation",
+            "Mitigation measures for identified risks",
+            "Risk assessment update and review schedule"
+          ],
+          "mappings": {
+            "gdpr": ["Art.35.1"],
+            "nist-csf": ["ID.RA-1", "ID.RA-4", "ID.RA-5"],
+            "iso27001": ["A.18.1.4", "A.18.2.1"],
+            "soc2": ["CC3.2", "CC3.4"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CCPA-SPI",
+      "name": "Sensitive Personal Information",
+      "description": "Special requirements for the collection, use, and protection of sensitive personal information including Social Security numbers, financial information, precise geolocation, racial or ethnic origin, religious beliefs, genetic data, biometric data, health information, sex life or sexual orientation, and contents of communications.",
+      "controls": [
+        {
+          "id": "CCPA-S1",
+          "title": "Sensitive Personal Information Identification and Classification",
+          "description": "Businesses must identify and classify sensitive personal information (SPI) they collect and process, including government identifiers, financial account information, precise geolocation, racial or ethnic origin, religious beliefs, contents of mail/email/text, genetic data, biometric information, health data, and sex life or sexual orientation data.",
+          "category": "Sensitive Personal Information",
+          "priority": 4,
+          "typical_evidence": [
+            "Sensitive personal information data inventory",
+            "Data classification scheme including SPI categories",
+            "Data mapping showing SPI flows across systems",
+            "SPI identification procedures for new data collection activities",
+            "Technical tagging or labeling of SPI in systems"
+          ],
+          "mappings": {
+            "gdpr": ["Art.9.1"],
+            "nist-csf": ["ID.AM-1", "ID.AM-3", "PR.DS-1"],
+            "iso27001": ["A.8.2.1", "A.8.2.2"],
+            "soc2": ["C1.1", "P3.1"]
+          }
+        },
+        {
+          "id": "CCPA-S2",
+          "title": "Consent for Sensitive Personal Information Use",
+          "description": "Where a consumer has exercised their right to limit, a business may only use or disclose sensitive personal information for purposes authorized by the CCPA regulations, such as performing services expected by the consumer, ensuring security, and verifying quality. Additional uses beyond these permitted purposes require explicit consumer consent.",
+          "category": "Sensitive Personal Information",
+          "priority": 4,
+          "typical_evidence": [
+            "Consent collection mechanism for SPI processing beyond permitted purposes",
+            "Consent records and management system documentation",
+            "Permitted purpose justification for each SPI use",
+            "Consumer-facing disclosures about SPI use and limitation rights",
+            "Technical controls enforcing SPI processing restrictions"
+          ],
+          "mappings": {
+            "gdpr": ["Art.9.2"],
+            "nist-csf": ["PR.AC-1", "PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P2.1", "P3.1"]
+          }
+        },
+        {
+          "id": "CCPA-S3",
+          "title": "Enhanced Protections for Sensitive Personal Information",
+          "description": "Businesses must implement enhanced safeguards for sensitive personal information including additional access controls, encryption, monitoring, and retention limitations. SPI requires a higher standard of protection commensurate with the increased risks to consumers if the information is compromised.",
+          "category": "Sensitive Personal Information",
+          "priority": 4,
+          "typical_evidence": [
+            "Enhanced access controls for SPI data stores",
+            "Encryption standards specific to SPI at rest and in transit",
+            "SPI-specific audit logging and monitoring procedures",
+            "Shorter retention periods for SPI categories",
+            "SPI handling training and awareness materials"
+          ],
+          "mappings": {
+            "gdpr": ["Art.32.1", "Art.9.1"],
+            "nist-csf": ["PR.AC-1", "PR.DS-1", "PR.DS-5"],
+            "iso27001": ["A.9.1.1", "A.10.1.1", "A.12.4.1"],
+            "soc2": ["CC6.1", "CC6.7", "C1.1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CCPA-THIRDPARTY",
+      "name": "Service Provider and Third Party Requirements",
+      "description": "Contractual, due diligence, and oversight requirements for service providers, contractors, and third parties that receive, process, or access consumer personal information on behalf of or from the business.",
+      "controls": [
+        {
+          "id": "CCPA-T1",
+          "title": "Service Provider and Contractor Agreements",
+          "description": "Businesses must enter into written contracts with service providers and contractors that prohibit selling or sharing personal information received, retaining or using the information for purposes other than those specified in the contract, and combining the information with personal information from other sources. Contracts must require compliance with CCPA obligations.",
+          "category": "Third Party Management",
+          "priority": 4,
+          "typical_evidence": [
+            "Service provider and contractor agreement templates with CCPA clauses",
+            "Executed contracts with required CCPA provisions",
+            "Contract review checklist for CCPA compliance",
+            "Contract inventory tracking CCPA-compliant agreements",
+            "Legal review records for service provider and contractor terms"
+          ],
+          "mappings": {
+            "gdpr": ["Art.28.1", "Art.28.3"],
+            "nist-csf": ["ID.SC-1", "ID.SC-3"],
+            "iso27001": ["A.15.1.1", "A.15.1.2"],
+            "soc2": ["CC9.2", "P6.4"]
+          }
+        },
+        {
+          "id": "CCPA-T2",
+          "title": "Third Party Due Diligence",
+          "description": "Businesses must exercise due diligence to ensure that third parties, service providers, and contractors are capable of complying with CCPA requirements. Businesses must determine whether the entity receiving personal information is acting as a service provider, contractor, or third party, and apply appropriate contractual and oversight mechanisms.",
+          "category": "Third Party Management",
+          "priority": 3,
+          "typical_evidence": [
+            "Third party privacy and security assessment questionnaires",
+            "Due diligence evaluation reports for data recipients",
+            "Third party classification records (service provider, contractor, or third party)",
+            "Risk-based tiering of third party relationships",
+            "Due diligence renewal schedule and completion records"
+          ],
+          "mappings": {
+            "gdpr": ["Art.28.1"],
+            "nist-csf": ["ID.SC-1", "ID.SC-2"],
+            "iso27001": ["A.15.1.1", "A.15.2.1"],
+            "soc2": ["CC9.1", "CC9.2"]
+          }
+        },
+        {
+          "id": "CCPA-T3",
+          "title": "Third Party Monitoring and Audit Rights",
+          "description": "Businesses must monitor service providers' and contractors' compliance with contractual CCPA obligations and exercise audit rights when warranted. If a business becomes aware that a service provider or contractor is using personal information in violation of the contract, the business must take reasonable steps to stop and remediate the unauthorized use.",
+          "category": "Third Party Management",
+          "priority": 3,
+          "typical_evidence": [
+            "Service provider compliance monitoring procedures",
+            "Audit right clauses in contracts and audit schedules",
+            "Service provider audit reports or certification reviews",
+            "Remediation records for identified non-compliance",
+            "Incident escalation procedures for third party CCPA violations"
+          ],
+          "mappings": {
+            "gdpr": ["Art.28.1", "Art.28.3.h"],
+            "nist-csf": ["ID.SC-4", "DE.CM-6"],
+            "iso27001": ["A.15.2.1", "A.15.2.2"],
+            "soc2": ["CC4.1", "CC9.2"]
+          }
+        },
+        {
+          "id": "CCPA-T4",
+          "title": "Consumer Request Fulfillment Across the Supply Chain",
+          "description": "When a business receives a verifiable consumer request, it must notify all service providers, contractors, and third parties that have received the consumer's personal information to comply with the request (e.g., deletion, correction, opt-out). Businesses must maintain processes to propagate consumer requests throughout the data supply chain.",
+          "category": "Third Party Management",
+          "priority": 4,
+          "typical_evidence": [
+            "Consumer request propagation procedures to downstream entities",
+            "Service provider and third party notification records",
+            "Downstream compliance confirmation tracking",
+            "Automated mechanisms for request propagation where applicable",
+            "SLA documentation for third party response to consumer requests"
+          ],
+          "mappings": {
+            "gdpr": ["Art.17.2", "Art.19"],
+            "nist-csf": ["PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P6.1", "P6.5"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CCPA-GOVERNANCE",
+      "name": "Privacy Program Management",
+      "description": "Governance, accountability, and operational requirements for establishing and maintaining a privacy program that ensures ongoing compliance with CCPA/CPRA, including data protection impact assessments, training, record keeping, and automated decision-making transparency.",
+      "controls": [
+        {
+          "id": "CCPA-G1",
+          "title": "Privacy Program Governance",
+          "description": "Businesses must establish and maintain a comprehensive privacy program with assigned accountability, adequate resources, and executive oversight. The program must include policies, procedures, and controls to ensure compliance with all CCPA/CPRA requirements, including designated personnel responsible for privacy compliance.",
+          "category": "Governance",
+          "priority": 4,
+          "typical_evidence": [
+            "Privacy program charter and governance framework",
+            "Designated privacy officer or responsible person appointment",
+            "Privacy program budget and resource allocation records",
+            "Executive and board reporting on privacy compliance",
+            "Privacy program maturity assessment documentation"
+          ],
+          "mappings": {
+            "gdpr": ["Art.24.1", "Art.37.1"],
+            "nist-csf": ["ID.GV-1", "ID.GV-2"],
+            "iso27001": ["A.5.1.1", "A.6.1.1"],
+            "soc2": ["CC1.1", "CC1.2", "CC1.3"]
+          }
+        },
+        {
+          "id": "CCPA-G2",
+          "title": "Privacy Training and Awareness",
+          "description": "All individuals responsible for handling consumer inquiries about the business's privacy practices or the business's compliance with CCPA must be informed of the requirements of the CCPA and how to direct consumers to exercise their rights. Businesses should implement regular privacy training for all personnel who handle personal information.",
+          "category": "Governance",
+          "priority": 3,
+          "typical_evidence": [
+            "CCPA-specific training curriculum and materials",
+            "Training completion records for all relevant personnel",
+            "Annual training refresher schedule and attendance logs",
+            "Consumer-facing staff training on rights request handling",
+            "Training effectiveness assessment and knowledge verification"
+          ],
+          "mappings": {
+            "gdpr": ["Art.39.1.b"],
+            "nist-csf": ["PR.AT-1", "PR.AT-2"],
+            "iso27001": ["A.7.2.2"],
+            "soc2": ["CC1.4", "CC2.2"]
+          }
+        },
+        {
+          "id": "CCPA-G3",
+          "title": "Record Keeping and Request Metrics",
+          "description": "Businesses that handle 10 million or more consumers' personal information annually must compile metrics on consumer requests received, complied with, denied, and the median response time. These metrics must be disclosed in the privacy policy or posted on the business's website. All businesses must maintain records of consumer requests and responses for at least 24 months.",
+          "category": "Governance",
+          "priority": 3,
+          "typical_evidence": [
+            "Consumer request tracking system and database",
+            "Quarterly and annual request metrics reports",
+            "Metrics disclosures in privacy policy or on website",
+            "24-month record retention for consumer request records",
+            "Request categorization and outcome classification records"
+          ],
+          "mappings": {
+            "gdpr": ["Art.30.1"],
+            "nist-csf": ["ID.AM-1", "PR.IP-1"],
+            "iso27001": ["A.18.1.4", "A.18.1.3"],
+            "soc2": ["CC1.1", "P1.1"]
+          }
+        },
+        {
+          "id": "CCPA-G4",
+          "title": "Data Protection Impact Assessment",
+          "description": "Businesses whose processing presents significant risk to consumers' privacy or security must conduct regular data protection impact assessments that identify and weigh the benefits of the processing against the potential risks to consumer rights. Assessments must be submitted to the CPPA and updated when processing activities materially change.",
+          "category": "Governance",
+          "priority": 4,
+          "typical_evidence": [
+            "DPIA methodology and assessment templates",
+            "Completed DPIA reports for high-risk processing activities",
+            "Risk-benefit analysis documentation",
+            "CPPA submission records for completed DPIAs",
+            "DPIA update triggers and review schedule"
+          ],
+          "mappings": {
+            "gdpr": ["Art.35.1"],
+            "nist-csf": ["ID.RA-1", "ID.RA-4", "ID.RA-5"],
+            "iso27001": ["A.18.1.4", "A.18.2.1"],
+            "soc2": ["CC3.2", "CC3.4"]
+          }
+        },
+        {
+          "id": "CCPA-G5",
+          "title": "Automated Decision-Making Transparency",
+          "description": "Businesses that use automated decision-making technology, including profiling, that produces legal or similarly significant effects on consumers must provide meaningful information about the logic involved, the significance, and the envisaged consequences of such processing. Consumers have the right to opt out of automated decision-making and to access information about how such decisions are made.",
+          "category": "Governance",
+          "priority": 3,
+          "typical_evidence": [
+            "Inventory of automated decision-making systems and profiling activities",
+            "Logic and methodology documentation for automated decisions",
+            "Consumer-facing disclosures about automated decision-making",
+            "Opt-out mechanism for automated decision-making",
+            "Human review procedures for consequential automated decisions"
+          ],
+          "mappings": {
+            "gdpr": ["Art.22.1"],
+            "nist-csf": ["ID.GV-3", "PR.IP-1"],
+            "iso27001": ["A.18.1.4"],
+            "soc2": ["P1.1", "CC7.2"]
+          }
+        },
+        {
+          "id": "CCPA-G6",
+          "title": "Children's Personal Information Protections",
+          "description": "Businesses must obtain opt-in consent before selling or sharing the personal information of consumers under 16 years of age. For consumers under 13, the consent must come from the consumer's parent or guardian. Businesses with actual knowledge that they collect personal information from children must implement additional safeguards and verification procedures.",
+          "category": "Governance",
+          "priority": 4,
+          "typical_evidence": [
+            "Age verification procedures and technical implementation",
+            "Parental and guardian consent collection mechanisms for under-13 consumers",
+            "Opt-in consent workflows for consumers aged 13-15",
+            "Records of consent for minors' personal information processing",
+            "Enhanced privacy protections for children's data"
+          ],
+          "mappings": {
+            "gdpr": ["Art.8.1"],
+            "nist-csf": ["PR.IP-1", "PR.AC-1"],
+            "iso27001": ["A.18.1.1", "A.18.1.4"],
+            "soc2": ["P2.1", "P3.1"]
+          }
+        }
+      ]
+    }
+  ]
+}

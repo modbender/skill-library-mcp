@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="author" content="Jincoco" />
+  <link rel="author" href="/humans.txt" />
+  <title>JARVIS</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ff4e42" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JARVIS" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="space-background"></div>
+
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-container">
+      <div class="preloader-canvas-container">
+        <canvas id="preloader-canvas" class="preloader-canvas" width="180" height="180"></canvas>
+      </div>
+      <div class="loading-text">INITIALIZING SCANNER</div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification">Anomaly detected</div>
+
+  <div id="three-container"></div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="circular-visualizer">
+    <canvas id="circular-canvas"></canvas>
+  </div>
+
+  <div class="audio-wave" id="audio-wave"></div>
+
+  <div class="floating-particles" id="floating-particles"></div>
+
+  <div class="interface-container">
+    <div class="header">
+      <div class="header-item"></div>
+      <div class="header-item"></div>
+    </div>
+
+    <div class="scanner-frame">
+      <div class="corner-tl"></div>
+      <div class="corner-tr"></div>
+      <div class="corner-bl"></div>
+      <div class="corner-br"></div>
+      <div class="scanner-id" id="orb-status">IDLE</div>
+      <div class="scanner-id-right" id="orb-meta"></div>
+    </div>
+  </div>
+
+  <!-- [DISABLED] MODEL STATUS — 已合併至 SYSTEM STATUS
+  <div class="data-panel model-status" style="position: absolute; top: 20px; left: 20px;">
+    <div class="data-panel-title">
+      <span>MODEL STATUS</span>
+      <span id="model-indicator">●</span>
+    </div>
+    <div class="data-bar">
+      <div class="data-bar-fill" id="context-bar" style="width: 0%;"></div>
+    </div>
+    <div class="data-readouts">
+      <div class="data-row">
+        <span class="data-label">CONTEXT USAGE:</span>
+        <span class="data-value" id="context-value">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">MODEL:</span>
+        <span class="data-value" id="model-name">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">TOKENS IN:</span>
+        <span class="data-value" id="tokens-in">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">TOKENS OUT:</span>
+        <span class="data-value" id="tokens-out">—</span>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- [DISABLED] SYSTEM MONITOR — 已合併至 SYSTEM STATUS
+  <div class="data-panel system-monitor" style="position: absolute; top: 20px; right: 20px;">
+    <div class="data-panel-title">
+      <span>SYSTEM MONITOR</span>
+      <span id="sys-status-indicator">●</span>
+    </div>
+    <div class="waveform">
+      <canvas id="cpu-canvas" class="waveform-canvas"></canvas>
+    </div>
+    <div class="data-readouts">
+      <div class="data-row">
+        <span class="data-label">CPU USAGE:</span>
+        <span class="data-value" id="cpu-value">0%</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">MEMORY:</span>
+        <span class="data-value" id="mem-value">0 / 0 GB</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">UPTIME:</span>
+        <span class="data-value" id="uptime-value">00:00:00</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">PROCESSES:</span>
+        <span class="data-value" id="proc-value">0</span>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- SYSTEM STATUS（合併 System Monitor + Model Status） -->
+  <div class="data-panel system-status" style="position: absolute; top: 20px; left: 20px;">
+    <div class="data-panel-title">
+      <span>SYSTEM STATUS</span>
+      <span id="model-indicator" class="model-dot">●</span>
+      <span id="timestamp">00:00:00</span>
+    </div>
+
+    <div class="status-columns">
+      <!-- 左側：系統資源 -->
+      <div class="status-col status-col-system">
+        <div class="waveform">
+          <canvas id="cpu-canvas" class="waveform-canvas"></canvas>
+        </div>
+        <div class="data-readouts">
+          <div class="data-row">
+            <span class="data-label">CPU:</span>
+            <span class="data-value" id="cpu-value">0%</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">MEMORY:</span>
+            <span class="data-value" id="mem-value">0 / 0 GB</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">UPTIME:</span>
+            <span class="data-value" id="uptime-value">00:00:00</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">PROCESSES:</span>
+            <span class="data-value" id="proc-value">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側：模型狀態 -->
+      <div class="status-col status-col-model">
+        <div class="status-divider-v"></div>
+        <div class="status-col-inner">
+          <div class="status-section-label">── MODEL ──</div>
+          <div class="data-bar">
+            <div class="data-bar-fill" id="context-bar" style="width: 0%;"></div>
+            <span class="data-bar-label" id="context-bar-label">0%</span>
+          </div>
+          <div class="data-readouts">
+            <div class="data-row">
+              <span class="data-label">MODEL:</span>
+              <span class="data-value" id="model-name">—</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">TOKENS IN:</span>
+              <span class="data-value" id="tokens-in">—</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">TOKENS OUT:</span>
+              <span class="data-value" id="tokens-out">—</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">CONTEXT:</span>
+              <span class="data-value" id="context-value">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-panel info-center" style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+    <div class="panel-header">
+      <span class="data-panel-title">DATA CENTER</span>
+      <span class="drag-handle" id="info-center-handle">⋮⋮</span>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn-r active" data-rtab="tasks">TASKS</button>
+      <button class="tab-btn-r" data-rtab="skills">SKILLS</button>
+      <button class="tab-btn-r" data-rtab="memory">MEMORY</button>
+      <button class="tab-btn-r" data-rtab="schedule">SCHEDULE</button>
+      <button class="tab-btn-r" data-rtab="controls">CONTROLS</button>
+    </div>
+
+    <!-- [DISABLED] METRICS Tab — 暫時停用，保留供日後參考
+    <div class="rtab-content" id="rtab-metrics">
+      <div class="data-readouts">
+        <div class="data-row">
+          <span class="data-label">PEAK FREQUENCY:</span>
+          <span class="data-value" id="peak-value">127.3 HZ</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">AMPLITUDE:</span>
+          <span class="data-value" id="amplitude-value">0.56</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">PHASE SHIFT:</span>
+          <span class="data-value" id="phase-value">π/4</span>
+        </div>
+      </div>
+    </div>
+    -->
+
+    <!-- TASKS Tab -->
+    <div class="rtab-content active" id="rtab-tasks">
+      <!-- 由 tasks.js 動態渲染 -->
+    </div>
+
+    <!-- SKILLS Tab -->
+    <div class="rtab-content" id="rtab-skills">
+      <!-- 由 skills.js 動態渲染 -->
+    </div>
+
+    <!-- MEMORY Tab -->
+    <div class="rtab-content" id="rtab-memory">
+      <!-- 由 memory.js 動態渲染 -->
+    </div>
+
+    <!-- SCHEDULE Tab -->
+    <div class="rtab-content" id="rtab-schedule">
+      <!-- 由 schedule.js 動態渲染 -->
+    </div>
+
+    <!-- CONTROLS Tab -->
+    <div class="rtab-content" id="rtab-controls">
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">ROTATION SPEED</span>
+          <span class="control-value" id="rotation-value">1.0</span>
+        </div>
+        <div class="slider-container">
+          <input type="range" min="0" max="5" value="1" step="0.1" class="slider" id="rotation-slider">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">RESOLUTION</span>
+          <span class="control-value" id="resolution-value">32</span>
+        </div>
+        <div class="slider-container">
+          <input type="range" min="12" max="64" value="32" step="4" class="slider" id="resolution-slider">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">DISTORTION</span>
+          <span class="control-value" id="distortion-value">1.0</span>
+        </div>
+        <div class="slider-container">
+          <input type="range" min="0" max="3" value="1" step="0.1" class="slider" id="distortion-slider">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">AUDIO REACTIVITY</span>
+          <span class="control-value" id="reactivity-value">1.0</span>
+        </div>
+        <div class="slider-container">
+          <input type="range" min="0" max="2" value="1" step="0.1" class="slider" id="reactivity-slider">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">THEME PALETTE</span>
+        </div>
+        <div id="theme-palette" style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; justify-content: center;"></div>
+      </div>
+      <div class="control-group">
+        <div class="control-row">
+          <span class="control-label">TTS ENGINE</span>
+          <span class="control-value" id="tts-engine-label">—</span>
+        </div>
+        <div id="tts-engine-btns" style="display: flex; gap: 8px; margin-top: 8px;"></div>
+      </div>
+      <div class="buttons">
+        <button class="btn" id="powersave-btn" title="Power Save Mode">ECO</button>
+        <button class="btn" id="reset-btn">RESET</button>
+        <button class="btn" id="save-btn">SAVE</button>
+      </div>
+      <div class="history-limit-group" title="Chat history messages to load">
+        <label for="history-limit">HISTORY</label>
+        <select id="history-limit">
+          <option value="20">20</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- [DISABLED] COMMAND CENTER — 已合併至 DATA CENTER
+  <div class="control-panel" style="top: 50%; left: 20px; transform: translateY(-50%);">
+    <div class="panel-header">
+      <span class="data-panel-title">COMMAND CENTER</span>
+      <span class="drag-handle" id="control-panel-handle">⋮⋮</span>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="controls">CONTROLS</button>
+      <button class="tab-btn" data-tab="tasks">TASKS</button>
+      <button class="tab-btn" data-tab="skills">SKILLS</button>
+    </div>
+    <div class="tab-content active" id="tab-controls"></div>
+    <div class="tab-content" id="tab-tasks"></div>
+    <div class="tab-content" id="tab-skills"></div>
+  </div>
+  -->
+
+  <!-- 手機版浮動工具列 -->
+  <div class="mobile-toolbar" id="mobile-toolbar">
+    <button class="mobile-toolbar-btn" data-panel="spectrum" title="Audio Spectrum">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </button>
+    <button class="mobile-toolbar-btn" data-panel="info-center" title="Data Center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </button>
+    <!-- [DISABLED] COMMAND CENTER 按鈕 — 已合併至 DATA CENTER
+    <button class="mobile-toolbar-btn" data-panel="control" title="Command Center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    -->
+  </div>
+
+  <!-- 手機版面板 overlay 背景 -->
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+
+  <div class="terminal-panel chat-panel">
+    <div class="terminal-header">
+      <span>JARVIS CHAT</span>
+      <span id="terminal-status">ONLINE</span>
+    </div>
+    <div class="terminal-content" id="terminal-content">
+      <div class="terminal-line system-line">CONNECTION ESTABLISHED. WELCOME BACK.</div>
+    </div>
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" class="chat-input" placeholder="TYPE A MESSAGE..." />
+      <button class="btn chat-attach-btn" id="chat-attach" title="ATTACH FILE"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+      <button class="btn chat-send-btn" id="chat-send">SEND</button>
+      <input type="file" id="chat-file-input" style="display:none" accept="image/*,.pdf,.txt,.js,.ts,.py,.json,.md,.csv,.html,.css,.xml,.yaml,.yml,.log,.sh,.sql" multiple />
+    </div>
+  </div>
+
+  <div class="spectrum-analyzer">
+    <div class="spectrum-header">
+      <span>♪ AUDIO</span>
+      <canvas id="waveform-canvas" class="waveform-canvas spectrum-waveform"></canvas>
+      <div class="spectrum-header-controls">
+        <span class="drag-handle" id="spectrum-handle">⋮⋮</span>
+        <button class="collapse-btn" id="spectrum-collapse">▼</button>
+      </div>
+    </div>
+    <div class="spectrum-body">
+    <div class="spectrum-content">
+      <canvas id="spectrum-canvas" class="spectrum-canvas"></canvas>
+    </div>
+    <div class="audio-controls">
+      <div class="demo-tracks">
+        <span class="demo-tracks-label">DEMO TRACKS:</span>
+        <button class="demo-track-btn" data-url="./assets/audio/Merkaba.mp3">MERKABA</button>
+        <button class="demo-track-btn" data-url="./assets/audio/Dhamika.mp3">DHAMIKA</button>
+        <button class="demo-track-btn" data-url="./assets/audio/Vacant.mp3">VACANT</button>
+        <button class="demo-track-btn" data-url="./assets/audio/lxstnght-back_1.mp3">LXSTNGHT</button>
+      </div>
+
+      <input type="file" id="audio-file-input" class="audio-file-input" accept="audio/*">
+      <button class="audio-file-btn" id="file-btn">UPLOAD AUDIO FILE</button>
+      <div class="audio-file-label" id="file-label">NO FILE SELECTED</div>
+
+      <audio id="audio-player" class="audio-player" crossorigin="anonymous"></audio>
+
+      <div class="controls-row">
+        <div class="audio-sensitivity" style="flex: 1;">
+          <div class="audio-sensitivity-label">
+            <span>SENSITIVITY</span>
+            <span class="audio-sensitivity-value" id="sensitivity-value">5.0</span>
+          </div>
+          <input type="range" min="1" max="10" value="5" step="0.1" class="slider" id="sensitivity-slider">
+        </div>
+      </div>
+    </div>
+    </div><!-- /spectrum-body -->
+  </div>
+
+  <script src="./vendor/gsap/gsap.min.js"></script>
+  <script src="./vendor/gsap/Draggable.min.js"></script>
+  <script src="./vendor/gsap/InertiaPlugin.min.js"></script>
+  <script src="./vendor/gsap/Physics2DPlugin.min.js"></script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

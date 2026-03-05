@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容管理 - 文章列表</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ft-brand-color: #005DEB;
+            --ft-brand-color-hover: #267DFF;
+            --ft-brand-color-active: #004BBF;
+            --ft-brand-color-bg: #EFF0FA;
+            --ft-grey-0: #FFFFFF;
+            --ft-grey-1: #F7F8FA;
+            --ft-grey-2: #F2F3F5;
+            --ft-grey-3: #E6E8EC;
+            --ft-grey-4: #D1D5DB;
+            --ft-grey-5: #9CA3AF;
+            --ft-grey-6: #6B7280;
+            --ft-grey-7: #39485E;
+            --ft-grey-8: #1F2937;
+            --ft-grey-9: #111827;
+            --ft-success-color: #10B981;
+            --ft-warning-color: #F59E0B;
+            --ft-error-color: #EF4444;
+            --ft-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --ft-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --ft-radius-sm: 2px;
+            --ft-radius-md: 4px;
+            --ft-sidebar-width: 240px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--ft-grey-1);
+            color: var(--ft-grey-7);
+            line-height: 1.5;
+        }
+
+        /* Sidebar */
+        .ft-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--ft-sidebar-width);
+            height: 100vh;
+            background: var(--ft-grey-0);
+            border-right: 1px solid var(--ft-grey-3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ft-sidebar-logo {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ft-brand-color);
+            border-bottom: 1px solid var(--ft-grey-2);
+        }
+
+        .ft-sidebar-logo i { margin-right: 8px; font-size: 24px; }
+
+        .ft-sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .ft-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--ft-grey-7);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .ft-menu-item i { margin-right: 12px; font-size: 18px; }
+        .ft-menu-item:hover { background-color: var(--ft-grey-1); color: var(--ft-brand-color); }
+        .ft-menu-item.active {
+            background-color: var(--ft-brand-color-bg);
+            color: var(--ft-brand-color);
+            font-weight: 500;
+        }
+        .ft-menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 16px;
+            background-color: var(--ft-brand-color);
+        }
+
+        .ft-menu-group {
+            margin-top: 16px;
+            padding: 0 24px 8px;
+            font-size: 12px;
+            color: var(--ft-grey-5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Content */
+        .ft-main {
+            margin-left: var(--ft-sidebar-width);
+            min-height: 100vh;
+        }
+
+        .ft-page-header {
+            background: var(--ft-grey-0);
+            padding: 24px;
+            border-bottom: 1px solid var(--ft-grey-2);
+        }
+
+        .ft-page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ft-grey-9);
+            margin-bottom: 8px;
+        }
+
+        .ft-breadcrumb {
+            font-size: 14px;
+            color: var(--ft-grey-5);
+        }
+
+        .ft-breadcrumb span:last-child { color: var(--ft-grey-8); font-weight: 500; }
+
+        .ft-page-content {
+            padding: 24px;
+        }
+
+        .ft-card {
+            background: var(--ft-grey-0);
+            border-radius: var(--ft-radius-sm);
+            box-shadow: var(--ft-shadow-sm);
+            border: 1px solid var(--ft-grey-2);
+            overflow: hidden;
+        }
+
+        /* Filter Section */
+        .ft-filter-section {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ft-filter-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ft-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ft-filter-item label {
+            font-size: 14px;
+            color: var(--ft-grey-7);
+            white-space: nowrap;
+        }
+
+        /* Buttons */
+        .ft-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            padding: 0 15px;
+            font-size: 14px;
+            border-radius: var(--ft-radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--ft-grey-7);
+            user-select: none;
+            text-decoration: none;
+        }
+
+        .ft-btn-primary {
+            background: var(--ft-brand-color);
+            color: #fff;
+            border-color: var(--ft-brand-color);
+        }
+        .ft-btn-primary:hover { background: var(--ft-brand-color-hover); border-color: var(--ft-brand-color-hover); }
+        .ft-btn-primary:active { background: var(--ft-brand-color-active); border-color: var(--ft-brand-color-active); }
+
+        .ft-btn-default {
+            background: #fff;
+            border-color: var(--ft-grey-3);
+            color: var(--ft-grey-7);
+        }
+        .ft-btn-default:hover { color: var(--ft-brand-color); border-color: var(--ft-brand-color); }
+
+        .ft-btn-link {
+            color: var(--ft-brand-color);
+            padding: 0 4px;
+            height: auto;
+        }
+        .ft-btn-link:hover { color: var(--ft-brand-color-hover); }
+
+        .ft-btn i { margin-right: 4px; }
+
+        /* Input & Select */
+        .ft-input {
+            height: 32px;
+            padding: 4px 12px;
+            font-size: 14px;
+            border: 1px solid var(--ft-grey-3);
+            border-radius: var(--ft-radius-sm);
+            background-color: #fff;
+            transition: all 0.3s;
+            color: var(--ft-grey-7);
+            outline: none;
+            min-width: 200px;
+        }
+
+        .ft-input:hover { border-color: var(--ft-brand-color); }
+        .ft-input:focus { border-color: var(--ft-brand-color); box-shadow: 0 0 0 2px rgba(0, 93, 235, 0.1); }
+        .ft-input::placeholder { color: var(--ft-grey-4); }
+
+        .ft-select {
+            position: relative;
+            height: 32px;
+            padding: 0 32px 0 12px;
+            font-size: 14px;
+            border: 1px solid var(--ft-grey-3);
+            border-radius: var(--ft-radius-sm);
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--ft-grey-7);
+            appearance: none;
+            min-width: 150px;
+        }
+
+        .ft-select:hover { border-color: var(--ft-brand-color); }
+
+        /* Table */
+        .ft-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .ft-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .ft-table th {
+            background-color: var(--ft-grey-1);
+            color: var(--ft-grey-8);
+            font-weight: 500;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--ft-grey-3);
+        }
+
+        .ft-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--ft-grey-2);
+            color: var(--ft-grey-7);
+        }
+
+        .ft-table tr:hover td { background-color: var(--ft-grey-1); }
+
+        .ft-table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Tag */
+        .ft-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 22px;
+            font-size: 12px;
+            border-radius: 2px;
+            border: 1px solid var(--ft-grey-3);
+            background: var(--ft-grey-1);
+            color: var(--ft-grey-7);
+        }
+
+        .ft-tag-success { background: #ECFDF5; border-color: #10B981; color: #10B981; }
+        .ft-tag-warning { background: #FFFBEB; border-color: #F59E0B; color: #F59E0B; }
+        .ft-tag-error { background: #FEF2F2; border-color: #EF4444; color: #EF4444; }
+
+        /* Pagination */
+        .ft-pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            background: var(--ft-grey-0);
+            border-top: 1px solid var(--ft-grey-2);
+        }
+
+        .ft-page-item {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--ft-grey-3);
+            border-radius: var(--ft-radius-sm);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: var(--ft-grey-7);
+            background: #fff;
+        }
+
+        .ft-page-item:hover { border-color: var(--ft-brand-color); color: var(--ft-brand-color); }
+        .ft-page-item.active { background: var(--ft-brand-color); color: #fff; border-color: var(--ft-brand-color); }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="ft-sidebar">
+        <div class="ft-sidebar-logo">
+            <i class="ri-box-3-fill"></i>
+            <span>内容管理系统</span>
+        </div>
+        <nav class="ft-sidebar-menu">
+            <div class="ft-menu-group">主菜单</div>
+            <a href="#" class="ft-menu-item"><i class="ri-dashboard-line"></i>工作台</a>
+            <a href="cms-list.html" class="ft-menu-item active"><i class="ri-file-list-3-line"></i>文章管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-folder-line"></i>分类管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-user-line"></i>用户管理</a>
+            <a href="#" class="ft-menu-item"><i class="ri-settings-3-line"></i>系统设置</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ft-main">
+        <!-- Page Header -->
+        <div class="ft-page-header">
+            <div class="ft-breadcrumb">
+                <span>首页</span>
+                <span style="margin: 0 8px;">/</span>
+                <span>文章管理</span>
+            </div>
+            <div class="ft-page-title">文章列表</div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="ft-page-content">
+            <div class="ft-card">
+                <!-- Filter Section -->
+                <div class="ft-filter-section">
+                    <div class="ft-filter-row">
+                        <div class="ft-filter-item">
+                            <label>标题：</label>
+                            <input type="text" class="ft-input" placeholder="请输入文章标题">
+                        </div>
+                        <div class="ft-filter-item">
+                            <label>状态：</label>
+                            <select class="ft-select">
+                                <option>全部</option>
+                                <option>已发布</option>
+                                <option>草稿</option>
+                                <option>已下线</option>
+                            </select>
+                        </div>
+                        <div class="ft-filter-item">
+                            <label>分类：</label>
+                            <select class="ft-select">
+                                <option>全部分类</option>
+                                <option>技术文章</option>
+                                <option>产品动态</option>
+                                <option>行业资讯</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ft-filter-row">
+                        <button class="ft-btn ft-btn-primary"><i class="ri-search-line"></i>查询</button>
+                        <button class="ft-btn ft-btn-default"><i class="ri-refresh-line"></i>重置</button>
+                        <div style="flex: 1;"></div>
+                        <a href="cms-form.html" class="ft-btn ft-btn-primary"><i class="ri-add-line"></i>新建文章</a>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="ft-table-wrapper">
+                    <table class="ft-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">ID</th>
+                                <th>标题</th>
+                                <th style="width: 120px;">分类</th>
+                                <th style="width: 100px;">作者</th>
+                                <th style="width: 100px;">状态</th>
+                                <th style="width: 100px;">浏览量</th>
+                                <th style="width: 160px;">更新时间</th>
+                                <th style="width: 180px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1001</td>
+                                <td>如何构建高性能的前端应用</td>
+                                <td>技术文章</td>
+                                <td>张三</td>
+                                <td><span class="ft-tag ft-tag-success">已发布</span></td>
+                                <td>1,234</td>
+                                <td>2024-02-05 10:30</td>
+                                <td>
+                                    <div class="ft-table-actions">
+                                        <a href="cms-detail.html" class="ft-btn ft-btn-link">查看</a>
+                                        <a href="cms-form.html" class="ft-btn ft-btn-link">编辑</a>
+                                        <button class="ft-btn ft-btn-link" style="color: var(--ft-error-color);">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1002</td>
+                                <td>2024年产品规划与roadmap</td>
+                                <td>产品动态</td>
+                                <td>李四</td>
+                                <td><span class="ft-tag ft-tag-warning">草稿</span></td>
+                                <td>0</td>
+                                <td>2024-02-04 16:20</td>
+                                <td>
+                                    <div class="ft-table-actions">
+                                        <a href="cms-detail.html" class="ft-btn ft-btn-link">查看</a>
+                                        <a href="cms-form.html" class="ft-btn ft-btn-link">编辑</a>
+                                        <button class="ft-btn ft-btn-link" style="color: var(--ft-error-color);">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1003</td>
+                                <td>AI大模型在企业中的应用实践</td>
+                                <td>行业资讯</td>
+                                <td>王五</td>
+                                <td><span class="ft-tag ft-tag-success">已发布</span></td>
+                                <td>3,456</td>
+                                <td>2024-02-03 14:15</td>
+                                <td>
+                                    <div class="ft-table-actions">
+                                        <a href="cms-detail.html" class="ft-btn ft-btn-link">查看</a>
+                                        <a href="cms-form.html" class="ft-btn ft-btn-link">编辑</a>
+                                        <button class="ft-btn ft-btn-link" style="color: var(--ft-error-color);">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1004</td>
+                                <td>设计系统实战指南</td>
+                                <td>技术文章</td>
+                                <td>赵六</td>
+                                <td><span class="ft-tag ft-tag-error">已下线</span></td>
+                                <td>890</td>
+                                <td>2024-02-02 09:45</td>
+                                <td>
+                                    <div class="ft-table-actions">
+                                        <a href="cms-detail.html" class="ft-btn ft-btn-link">查看</a>
+                                        <a href="cms-form.html" class="ft-btn ft-btn-link">编辑</a>
+                                        <button class="ft-btn ft-btn-link" style="color: var(--ft-error-color);">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1005</td>
+                                <td>B端产品设计的10个原则</td>
+                                <td>产品动态</td>
+                                <td>张三</td>
+                                <td><span class="ft-tag ft-tag-success">已发布</span></td>
+                                <td>2,567</td>
+                                <td>2024-02-01 11:20</td>
+                                <td>
+                                    <div class="ft-table-actions">
+                                        <a href="cms-detail.html" class="ft-btn ft-btn-link">查看</a>
+                                        <a href="cms-form.html" class="ft-btn ft-btn-link">编辑</a>
+                                        <button class="ft-btn ft-btn-link" style="color: var(--ft-error-color);">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="ft-pagination">
+                    <span style="color: var(--ft-grey-5); margin-right: 16px;">共 47 条</span>
+                    <div class="ft-page-item"><i class="ri-arrow-left-s-line"></i></div>
+                    <div class="ft-page-item active">1</div>
+                    <div class="ft-page-item">2</div>
+                    <div class="ft-page-item">3</div>
+                    <div class="ft-page-item">4</div>
+                    <div class="ft-page-item">5</div>
+                    <div class="ft-page-item"><i class="ri-arrow-right-s-line"></i></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

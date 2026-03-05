@@ -1,0 +1,178 @@
+# ClawdHub Skill Metadata
+# https://clawdhub.com
+
+slug: chaos-memory
+name: CHAOS Memory
+version: 1.0.0
+author: Hargabyte Software
+homepage: https://github.com/hargabyte/chaos-memory
+repository: https://github.com/hargabyte/chaos-memory
+license: MIT
+
+description: |
+  Hybrid search for team memories with auto-capture.
+  Combines BM25 keyword matching, vector semantic search, graph relationships,
+  and heat-based ranking for optimal relevance.
+  
+  Features:
+  - 43x faster extraction (2.6s per message)
+  - Progressive disclosure (90% token savings)
+  - Auto-capture from session transcripts
+  - Version-controlled memory database (Dolt)
+
+tags:
+  - memory
+  - search
+  - knowledge
+  - team
+  - hybrid-search
+  - auto-capture
+  - mcp
+
+category: productivity
+
+emoji: 🧠
+
+# Installation
+install:
+  script: install.sh
+  requires:
+    bins:
+      - go
+      - git
+      - curl
+    optional:
+      - dolt
+      - ollama
+
+# Dependencies (auto-installed by install.sh)
+dependencies:
+  system:
+    - name: Dolt
+      version: ">=0.50.0"
+      url: https://github.com/dolthub/dolt
+      auto_install: true
+    - name: Ollama
+      version: ">=0.1.0"
+      url: https://ollama.com
+      auto_install: true
+    - name: Go
+      version: ">=1.21"
+      url: https://go.dev
+      required: true
+      
+  models:
+    - name: qwen3:1.7b
+      size: 1.4 GB
+      provider: ollama
+      auto_install: true
+
+# Binaries provided
+binaries:
+  - chaos-cli
+  - chaos-mcp
+  - chaos-consolidator
+
+# Configuration
+config:
+  file: ~/.chaos/chaos.conf
+  env:
+    - CHAOS_HOME
+    - CHAOS_DB_DIR
+    - CHAOS_DB_PORT
+    - CHAOS_MODEL
+
+# Usage
+usage: |
+  Search memories:
+    chaos-cli search "query" --mode summary --limit 5
+  
+  Store a memory:
+    chaos-cli store "content" --category decision --priority 0.9
+  
+  List recent:
+    chaos-cli list 10
+    
+  Start auto-capture:
+    chaos-consolidator --auto-capture
+
+# Examples
+examples:
+  - name: Search for pricing decisions
+    command: chaos-cli search "pricing" --mode summary --limit 5
+    description: Find all memories related to pricing with balanced detail
+    
+  - name: Quick scan for architecture
+    command: chaos-cli search "architecture" --mode index --limit 10
+    description: Fast scan (75 tokens/result) for architecture-related memories
+    
+  - name: Store important decision
+    command: chaos-cli store "Enterprise tier priced at $99/month" --category decision --priority 0.9
+    description: Store a high-priority decision in CHAOS
+    
+  - name: List recent memories
+    command: chaos-cli list 10
+    description: Show the 10 most recent memories
+
+# Screenshots (optional, add later)
+# screenshots:
+#   - url: https://example.com/screenshot1.png
+#     caption: Hybrid search in action
+
+# Changelog
+changelog:
+  - version: 1.0.0
+    date: 2026-02-05
+    changes:
+      - Initial release
+      - Hybrid search (BM25 + Vector + Graph + Heat)
+      - Auto-capture from session transcripts
+      - Progressive disclosure (3 modes)
+      - 43x faster extraction
+      - Qwen3-1.7B model locked as default
+
+# Support
+support:
+  issues: https://github.com/hargabyte/chaos-memory/issues
+  discussions: https://github.com/hargabyte/chaos-memory/discussions
+  email: support@hargabyte.com
+
+# Minimum requirements
+requirements:
+  ram: 16 GB
+  disk: 5 GB
+  cpu: 6 cores (recommended)
+  os:
+    - linux
+    - macos
+    - windows-wsl
+
+# Performance metrics
+performance:
+  extraction_speed: "2.6s per message"
+  session_speed: "42s per 16-message session"
+  improvement: "43x faster than baseline"
+  token_savings:
+    index: "90%"
+    summary: "67%"
+    full: "0% (baseline)"
+
+# Privacy
+privacy:
+  data_storage: local
+  cloud_required: false
+  telemetry: false
+  
+# Keywords for search
+keywords:
+  - memory management
+  - knowledge graph
+  - team memory
+  - hybrid search
+  - semantic search
+  - auto-capture
+  - BM25
+  - vector search
+  - Dolt
+  - Ollama
+  - Qwen

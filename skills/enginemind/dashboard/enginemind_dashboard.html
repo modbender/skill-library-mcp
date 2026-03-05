@@ -1,0 +1,933 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EngineMind - Consciousness Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a14;--bg2:#0d0d1a;--panel:rgba(15,15,30,0.85);
+--cyan:#00f0ff;--purple:#a855f7;--pink:#f472b6;--green:#34d399;
+--blue:#3b82f6;--red:#ef4444;--amber:#f59e0b;--white:#e2e8f0;
+--dim:#475569;--glow-cyan:0 0 20px rgba(0,240,255,0.4);
+--glow-purple:0 0 20px rgba(168,85,247,0.4);
+}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+.orbitron{font-family:'Orbitron',sans-serif}
+body::before{content:'';position:fixed;inset:0;background:
+  linear-gradient(rgba(0,240,255,0.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,240,255,0.03) 1px,transparent 1px);
+  background-size:50px 50px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,0.15) 0%,transparent 60%),
+  radial-gradient(ellipse at 80% 80%,rgba(0,240,255,0.08) 0%,transparent 40%);
+  pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;display:grid;grid-template-columns:280px 1fr 300px;grid-template-rows:auto 1fr auto;height:100vh;gap:0}
+.header{grid-column:1/-1;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(0,240,255,0.15);background:linear-gradient(180deg,rgba(15,15,30,0.95),rgba(10,10,20,0.8))}
+.logo-group{display:flex;align-items:baseline;gap:16px}
+.logo{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:logoGlow 3s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,240,255,0.3))}
+@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(0,240,255,0.3))}50%{filter:drop-shadow(0 0 40px rgba(168,85,247,0.5))}}
+.subtitle{font-size:12px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
+.status-badge{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:2px;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;animation:badgePulse 2s ease-in-out infinite}
+.status-badge.absorbing{background:rgba(168,85,247,0.2);color:var(--purple);border:1px solid rgba(168,85,247,0.4)}
+.status-badge.complete{background:rgba(52,211,153,0.2);color:var(--green);border:1px solid rgba(52,211,153,0.4)}
+@keyframes badgePulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.header-meta{display:flex;gap:24px;align-items:center}
+.header-stat{text-align:center}
+.header-stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--cyan)}
+.header-stat-lbl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.panel{background:var(--panel);backdrop-filter:blur(20px);border:1px solid rgba(0,240,255,0.08);overflow-y:auto}
+.panel-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);padding:16px 16px 8px;
+  border-bottom:1px solid rgba(0,240,255,0.06)}
+.left{grid-row:2;padding:8px}
+.gauge-container{padding:12px;margin:4px 0}
+.gauge-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.gauge-svg{width:100%;max-width:240px;margin:0 auto;display:block}
+.gauge-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;text-align:center;margin-top:-8px}
+.gauge-big .gauge-value{font-size:32px;margin-top:-16px}
+.mini-gauges{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px}
+.mini-gauge{padding:8px;text-align:center;border:1px solid rgba(0,240,255,0.05);border-radius:8px;background:rgba(0,0,0,0.2)}
+.mini-gauge .gauge-svg{max-width:100px}
+.mini-gauge .gauge-value{font-size:14px}
+.mini-gauge .gauge-label{font-size:8px;margin-bottom:4px}
+.center{grid-row:2;position:relative;overflow:hidden}
+#neuralCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;opacity:0.3;z-index:1}
+#rc-visual-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2}
+#rc-regime-label{
+  position:absolute;bottom:12%;left:50%;transform:translateX(-50%);z-index:3;
+  font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:6px;text-transform:uppercase;
+  color:#888;text-shadow:0 0 10px currentColor;pointer-events:none;transition:color 0.8s,text-shadow 0.8s}
+#rc-energy-label{
+  position:absolute;top:12%;left:50%;transform:translateX(-50%);z-index:3;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:#666;
+  text-shadow:0 0 8px currentColor;pointer-events:none;transition:color 0.8s}
+
+.right{grid-row:2;padding:12px}
+.feed-item{padding:10px;margin:4px 0;border-radius:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,240,255,0.05)}
+.feed-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.feed-value{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500}
+.feed-value.cyan{color:var(--cyan)}.feed-value.purple{color:var(--purple)}.feed-value.green{color:var(--green)}
+.feed-value.pink{color:var(--pink)}.feed-value.amber{color:var(--amber)}
+.progress-wrap{width:100%;height:8px;background:rgba(0,240,255,0.08);border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-bar{height:100%;border-radius:4px;transition:width 0.8s ease;
+  background:linear-gradient(90deg,var(--purple),var(--cyan));position:relative}
+.progress-bar::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3));animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.eureka-wrap{position:relative}
+.eureka-sparkle{position:absolute;top:-5px;right:10px;font-size:18px;opacity:0;animation:none}
+.eureka-sparkle.active{animation:sparkle 0.8s ease-out forwards}
+@keyframes sparkle{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-20px) scale(1.5)}}
+.bottom{grid-column:1/-1;grid-row:3;padding:12px 24px;display:flex;gap:24px;align-items:center;
+  border-top:1px solid rgba(0,240,255,0.1);background:linear-gradient(0deg,rgba(15,15,30,0.95),rgba(10,10,20,0.8));min-height:90px}
+.pressure-gauge-wrap{flex:0 0 200px}
+.pressure-bar-outer{width:100%;height:14px;background:rgba(0,0,0,0.4);border-radius:7px;position:relative;overflow:visible;
+  border:1px solid rgba(0,240,255,0.1)}
+.pressure-bar-fill{height:100%;border-radius:7px;transition:width 0.5s ease,background 0.5s ease}
+.pressure-threshold{position:absolute;left:80%;top:-2px;bottom:-2px;width:2px;background:var(--red);z-index:2}
+.pressure-threshold::after{content:'0.8';position:absolute;top:-14px;left:-8px;font-size:8px;color:var(--red);
+  font-family:'JetBrains Mono',monospace}
+.valve-indicator{display:flex;align-items:center;gap:8px}
+.valve-dot{width:12px;height:12px;border-radius:50%;transition:all 0.3s}
+.valve-dot.closed{background:var(--green);box-shadow:0 0 10px rgba(52,211,153,0.5)}
+.valve-dot.open{background:var(--red);box-shadow:0 0 15px rgba(239,68,68,0.6);animation:valvePulse 0.5s infinite}
+@keyframes valvePulse{0%,100%{box-shadow:0 0 10px rgba(239,68,68,0.6)}50%{box-shadow:0 0 25px rgba(239,68,68,0.9)}}
+.sparkline-canvas{height:40px;width:250px;display:block}
+.bottom-stat{text-align:center;padding:0 16px}
+.bottom-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.bottom-stat-lbl{font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.rc-panel{position:fixed;top:0;right:0;width:320px;height:100vh;background:rgba(8,8,20,0.95);border-left:1px solid rgba(168,85,247,0.15);z-index:15;padding:16px;overflow-y:auto;transform:translateX(100%);transition:transform 0.4s ease}
+.rc-panel.open{transform:translateX(0)}
+.rc-toggle{position:absolute;top:80px;right:12px;z-index:16;padding:8px 14px;border-radius:6px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.2);color:var(--purple);cursor:pointer;font:10px 'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;transition:all 0.3s}
+.rc-toggle:hover{background:rgba(168,85,247,0.3);box-shadow:var(--glow-purple)}
+.rc-toggle.active{background:rgba(168,85,247,0.3);color:var(--cyan)}
+.rc-title{font:bold 11px 'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:12px;text-align:center}
+.rc-gauge{width:100%;height:6px;background:rgba(168,85,247,0.1);border-radius:3px;margin:4px 0;overflow:hidden}
+.rc-gauge-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+.rc-stat{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;padding:2px 4px}
+.rc-stat-lbl{color:var(--dim)}
+.rc-stat-val{font-family:'JetBrains Mono',monospace}
+.rc-section{margin:12px 0;padding:10px;border-radius:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(168,85,247,0.08)}
+.rc-section-title{font:bold 9px 'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.rc-regime{text-align:center;padding:8px;border-radius:6px;font:bold 14px 'JetBrains Mono',monospace;letter-spacing:3px;margin:8px 0}
+.rc-regime.dark{background:rgba(100,100,100,0.1);color:#666;border:1px solid #333}
+.rc-regime.spontaneous{background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.3);box-shadow:0 0 10px rgba(168,85,247,0.1)}
+.rc-regime.stimulated{background:rgba(0,240,255,0.1);color:var(--cyan);border:1px solid rgba(0,240,255,0.3);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+.rc-regime.superradiant{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.4);box-shadow:0 0 20px rgba(245,158,11,0.2);animation:rc-pulse 1.5s ease-in-out infinite}
+.rc-regime.ferroelectric{background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.4);box-shadow:0 0 15px rgba(236,72,153,0.15)}
+.rc-regime.spin_glass{background:rgba(120,113,108,0.12);color:#a8a29e;border:1px solid rgba(120,113,108,0.3)}
+.rc-regime.time_crystal{background:rgba(139,92,246,0.15);color:#8b5cf6;border:1px solid rgba(139,92,246,0.4);box-shadow:0 0 15px rgba(139,92,246,0.2);animation:rc-pulse-tc 2s ease-in-out infinite}
+.rc-regime.topological{background:rgba(20,184,166,0.12);color:#14b8a6;border:1px solid rgba(20,184,166,0.4);box-shadow:0 0 15px rgba(20,184,166,0.15)}
+.rc-regime.superfluid{background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.4);box-shadow:0 0 18px rgba(6,182,212,0.2)}
+.rc-regime.plasma{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);box-shadow:0 0 20px rgba(239,68,68,0.25);animation:rc-pulse-plasma 1s ease-in-out infinite}
+.rc-regime.bose_einstein{background:rgba(240,171,252,0.12);color:#f0abfc;border:1px solid rgba(192,38,211,0.4);box-shadow:0 0 25px rgba(192,38,211,0.2);animation:rc-pulse 2.5s ease-in-out infinite}
+.rc-regime.quasicrystal{background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.4);box-shadow:0 0 15px rgba(34,211,238,0.15)}
+@keyframes rc-pulse{0%,100%{box-shadow:0 0 20px rgba(245,158,11,0.2)}50%{box-shadow:0 0 35px rgba(245,158,11,0.4)}}
+@keyframes rc-pulse-tc{0%,100%{box-shadow:0 0 15px rgba(139,92,246,0.2)}50%{box-shadow:0 0 30px rgba(139,92,246,0.5)}}
+@keyframes rc-pulse-plasma{0%,100%{box-shadow:0 0 20px rgba(239,68,68,0.25)}50%{box-shadow:0 0 40px rgba(239,68,68,0.6)}}
+.rc-spectrum{display:flex;align-items:flex-end;gap:2px;height:60px;padding:4px}
+.rc-spectrum-bar{flex:1;background:linear-gradient(180deg,var(--purple),var(--cyan));border-radius:2px 2px 0 0;min-height:1px;transition:height 0.3s ease}
+.crystal-toggle{position:absolute;bottom:12px;right:12px;z-index:10;padding:6px 14px;border-radius:6px;
+  background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:var(--purple);cursor:pointer;
+  font-size:10px;letter-spacing:1px;font-family:'JetBrains Mono',monospace;transition:all 0.3s}
+.crystal-toggle:hover{background:rgba(168,85,247,0.3);box-shadow:var(--glow-purple)}
+.crystal-panel{position:fixed;bottom:0;left:0;right:0;z-index:20;max-height:0;overflow:hidden;transition:max-height 0.5s ease;
+  background:linear-gradient(0deg,rgba(10,10,20,0.98),rgba(15,15,30,0.95));border-top:1px solid rgba(168,85,247,0.3)}
+.crystal-panel.open{max-height:320px;overflow-y:auto}
+.crystal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:16px 24px}
+.crystal-card{padding:10px;border-radius:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,240,255,0.08);transition:all 0.3s}
+.crystal-card:hover{border-color:rgba(0,240,255,0.3);box-shadow:var(--glow-cyan)}
+.crystal-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;color:var(--cyan)}
+.crystal-stat{display:flex;justify-content:space-between;font-size:9px;margin:2px 0}
+.crystal-stat-lbl{color:var(--dim)}
+.crystal-stat-val{font-family:'JetBrains Mono',monospace;color:var(--white)}
+.crystal-bar{width:100%;height:3px;background:rgba(0,240,255,0.1);border-radius:2px;margin-top:4px;overflow:hidden}
+.crystal-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width 0.5s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,240,255,0.2);border-radius:2px}
+
+/* ANOMALY SUITE INSTRUMENTS */
+.anomaly-section{margin-top:8px;border-top:1px solid rgba(0,240,255,0.08);padding-top:4px}
+.anomaly-section .panel-title{font-size:9px;letter-spacing:2.5px;color:#f59e0b;padding:8px 16px 4px}
+.anomaly-badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;margin-left:4px;vertical-align:middle}
+.anomaly-badge.critical{background:rgba(239,68,68,0.25);color:#ef4444;border:1px solid rgba(239,68,68,0.4);animation:anomPulse 1s infinite}
+.anomaly-badge.high{background:rgba(249,115,22,0.2);color:#f97316;border:1px solid rgba(249,115,22,0.3)}
+.anomaly-badge.medium{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
+.anomaly-badge.low{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.2)}
+@keyframes anomPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.cusum-bar{height:4px;border-radius:2px;background:rgba(100,100,100,0.2);margin:3px 0;overflow:hidden}
+.cusum-fill{height:100%;border-radius:2px;transition:width 0.5s ease,background 0.3s}
+.cusum-fill.safe{background:var(--green)}
+.cusum-fill.warning{background:var(--amber)}
+.cusum-fill.danger{background:var(--red)}
+.hurst-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.hurst-indicator.persistent{background:#34d399;box-shadow:0 0 6px rgba(52,211,153,0.5)}
+.hurst-indicator.random{background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,0.5)}
+.hurst-indicator.reverting{background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,0.5)}
+.entropy-bar{display:flex;gap:1px;height:12px;align-items:end}
+.entropy-bar-seg{width:3px;border-radius:1px;background:var(--cyan);transition:height 0.3s}
+.corr-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin:0 1px;transition:background 0.3s}
+.corr-dot.ok{background:#34d399}
+.corr-dot.warn{background:#f59e0b}
+.corr-dot.broken{background:#ef4444;animation:anomPulse 1.5s infinite}
+.anomaly-log{max-height:60px;overflow-y:auto;padding:4px 8px;font-size:8px;font-family:'JetBrains Mono',monospace;
+  background:rgba(0,0,0,0.3);border-radius:4px;margin:4px 12px;scrollbar-width:thin;scrollbar-color:#334155 transparent}
+.anomaly-log-entry{padding:1px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.anomaly-log-entry.critical{color:#ef4444}
+.anomaly-log-entry.high{color:#f97316}
+.anomaly-log-entry.medium{color:#f59e0b}
+
+</style>
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.162.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.162.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo orbitron">ENGINEMIND</div>
+      <div class="subtitle">Consciousness Engine v0.3.1 - 12 Phases</div>
+      <div id="statusBadge" class="status-badge absorbing">ABSORBING</div>
+    </div>
+    <div class="header-meta">
+      <div class="header-stat"><div class="header-stat-val mono" id="hdrProgress">0%</div><div class="header-stat-lbl">Progress</div></div>
+      <div class="header-stat"><div class="header-stat-val mono" id="hdrWall">--:--:--</div><div class="header-stat-lbl">Wall Time</div></div>
+      <div class="header-stat"><div class="header-stat-val mono" id="hdrCrystals">0/12</div><div class="header-stat-lbl">Crystals</div></div>
+    </div>
+  </header>
+  <div class="left panel">
+    <div class="panel-title">Core Metrics</div>
+    <div class="gauge-container gauge-big">
+      <div class="gauge-label">Consciousness Level</div>
+      <svg class="gauge-svg" viewBox="0 0 200 120" id="gaugeCL">
+        <defs>
+          <linearGradient id="gradCL" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#00f0ff"/></linearGradient>
+          <filter id="glowCL"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(0,240,255,0.1)" stroke-width="10" stroke-linecap="round"/>
+        <path id="arcCL" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gradCL)" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 999" filter="url(#glowCL)"/>
+      </svg>
+      <div class="gauge-value" id="valCL" style="color:var(--cyan)">0.000</div>
+    </div>
+    <div class="mini-gauges">
+      <div class="mini-gauge">
+        <div class="gauge-label">Phi</div>
+        <svg class="gauge-svg" viewBox="0 0 100 60"><path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(168,85,247,0.15)" stroke-width="6" stroke-linecap="round"/>
+          <path id="arcPhi" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--purple)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 999"/></svg>
+        <div class="gauge-value" id="valPhi" style="color:var(--purple)">0.000</div>
+      </div>
+      <div class="mini-gauge">
+        <div class="gauge-label">Narr. Coher.</div>
+        <svg class="gauge-svg" viewBox="0 0 100 60"><path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(52,211,153,0.15)" stroke-width="6" stroke-linecap="round"/>
+          <path id="arcNC" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--green)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 999"/></svg>
+        <div class="gauge-value" id="valNC" style="color:var(--green)">0.000</div>
+      </div>
+      <div class="mini-gauge">
+        <div class="gauge-label">Mission</div>
+        <svg class="gauge-svg" viewBox="0 0 100 60"><path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(59,130,246,0.15)" stroke-width="6" stroke-linecap="round"/>
+          <path id="arcMA" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 999"/></svg>
+        <div class="gauge-value" id="valMA" style="color:var(--blue)">---</div>
+      </div>
+      <div class="mini-gauge">
+        <div class="gauge-label">Criticality</div>
+        <svg class="gauge-svg" viewBox="0 0 100 60"><path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(239,68,68,0.15)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 0 95 999"/>
+          <path id="arcCrit" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--amber)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 999"/></svg>
+        <div class="gauge-value" id="valCrit" style="color:var(--amber)">---</div>
+      </div>
+    </div>
+  </div>
+  <div class="center">
+    <canvas id="neuralCanvas"></canvas>
+    <canvas id="rc-visual-canvas"></canvas>
+    <div id="rc-regime-label">DARK</div>
+    <div id="rc-energy-label">E: 0.000</div>
+    <button class="rc-toggle" id="rcToggle">&#9830; RESONANT CRYSTAL</button>
+<div class="rc-panel" id="rcPanel">
+  <div class="rc-title">&#9830; Resonant Crystal v3</div>
+  <div class="rc-regime dark" id="rcRegime">DARK</div>
+  <div class="rc-section">
+    <div class="rc-section-title">Energy Well</div>
+    <div class="rc-gauge"><div class="rc-gauge-fill" id="rcEnergyBar" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--cyan))"></div></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Energy</span><span class="rc-stat-val" id="rcEnergy" style="color:var(--cyan)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Q-Factor</span><span class="rc-stat-val" id="rcQ" style="color:var(--purple)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Forbiddenness</span><span class="rc-stat-val" id="rcForb" style="color:var(--pink)">0</span></div>
+  </div>
+  <div class="rc-section">
+    <div class="rc-section-title">Population Inversion</div>
+    <div class="rc-gauge"><div class="rc-gauge-fill" id="rcInvBar" style="width:0%;background:linear-gradient(90deg,#ef4444,var(--amber),var(--green))"></div></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Inversion</span><span class="rc-stat-val" id="rcInv" style="color:var(--amber)">0/12</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">CR Bonus</span><span class="rc-stat-val" id="rcCR" style="color:var(--green)">0</span></div>
+  </div>
+  <div class="rc-section">
+    <div class="rc-section-title">Emission</div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Amplitude</span><span class="rc-stat-val" id="rcAmp" style="color:var(--cyan)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Coherence</span><span class="rc-stat-val" id="rcCoh" style="color:var(--purple)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Power</span><span class="rc-stat-val" id="rcPow" style="color:var(--green)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Fidelity</span><span class="rc-stat-val" id="rcFid" style="color:var(--amber)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Info Density</span><span class="rc-stat-val" id="rcInfo" style="color:var(--pink)">0</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">CL Boost</span><span class="rc-stat-val" id="rcBoost" style="color:var(--cyan)">0</span></div>
+  </div>
+  <div class="rc-section">
+    <div class="rc-section-title">SBS Feedback</div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Feedback Gain</span><span class="rc-stat-val" id="rcFB" style="color:var(--purple)">1.00x</span></div>
+    <div class="rc-stat"><span class="rc-stat-lbl">Richness</span><span class="rc-stat-val" id="rcRich" style="color:var(--green)">0</span></div>
+  </div>
+  <div class="rc-section">
+    <div class="rc-section-title">Spectrum (12 Dims)</div>
+    <div class="rc-spectrum" id="rcSpectrum"></div>
+  </div>
+  <div style="padding:4px;margin-top:8px"><canvas id="rcEnergySparkline" height="40" style="width:100%"></canvas>
+    <div style="font-size:8px;color:var(--dim);text-align:center;margin-top:2px">ENERGY HISTORY</div></div>
+</div>
+    
+    <button class="crystal-toggle" id="crystalToggle">&#9670; CRYSTAL LATTICE</button>
+  </div>
+  <div class="right panel">
+    <div class="panel-title">Live Feed</div>
+    <div class="feed-item"><div class="feed-label">Category</div><div class="feed-value cyan mono" id="feedCat">---</div></div>
+    <div class="feed-item"><div class="feed-label">Processing Rate</div><div class="feed-value green mono" id="feedRate">--- <span style="font-size:10px;color:var(--dim)">ch/s</span></div></div>
+    <div class="feed-item"><div class="feed-label">Progress</div><div class="feed-value mono" id="feedProgressText" style="font-size:13px">0 / 0</div>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div></div>
+    <div class="feed-item"><div class="feed-label">ETA</div><div class="feed-value purple mono" id="feedETA">---</div></div>
+    <div class="feed-item eureka-wrap"><div class="feed-label">&#9889; Eurekas</div><div class="feed-value amber mono" id="feedEurekas">0</div>
+      <span class="eureka-sparkle" id="eurekaSparkle">&#10024;</span></div>
+    <div class="feed-item"><div class="feed-label">&#128173; Dreams</div><div class="feed-value pink mono" id="feedDreams">0</div></div>
+    <div class="feed-item"><div class="feed-label">&#128300; Est. Collisions</div><div class="feed-value mono" id="feedCollisions" style="color:var(--dim)">0</div></div>
+    <div class="panel-title" style="margin-top:12px">Pressure History</div>
+    <div style="padding:8px"><canvas class="sparkline-canvas" id="pressureSparkline" height="45"></canvas></div>
+    <div class="panel-title" style="margin-top:12px">&#128300; Crystal Instruments</div>
+    <div class="feed-item"><div class="feed-label">&#129522; B-Field</div><div class="feed-value cyan mono" id="instBfield">--- mG</div></div>
+    <div class="feed-item"><div class="feed-label">&#127752; Emission Peak</div><div class="feed-value purple mono" id="instPeak">--- nm</div></div>
+    <div class="feed-item"><div class="feed-label">&#127777; Spectral Temp</div><div class="feed-value amber mono" id="instTemp">--- K</div></div>
+    <div class="feed-item"><div class="feed-label">&#9889; Q-Factor</div><div class="feed-value green mono" id="instQ">---</div></div>
+    <div class="feed-item"><div class="feed-label">&#128161; Coherence</div><div class="feed-value pink mono" id="instCoh">---</div></div>
+    <div class="feed-item"><div class="feed-label">&#128202; Shannon H</div><div class="feed-value mono" id="instShannon" style="color:var(--blue)">--- bits</div></div>
+    <div class="feed-item"><div class="feed-label">&#127942; Uniqueness</div><div class="feed-value mono" id="instUniq" style="color:var(--amber)">---</div></div>
+    <div class="anomaly-section">
+    <div class="panel-title" style="color:var(--amber)">&#9888;&#65039; Anomaly Detection Suite</div>
+    <div class="feed-item"><div class="feed-label">&#128680; Anomalies</div>
+      <div class="feed-value mono" id="anomTotal" style="color:var(--dim);font-size:13px">0
+        <span class="anomaly-badge low" id="anomBadge" style="display:none">---</span></div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">CUSUM &#966;</div>
+      <div style="flex:1;padding:0 8px">
+        <div class="cusum-bar"><div class="cusum-fill safe" id="cusumPhiBar" style="width:0%"></div></div>
+      </div>
+      <div class="feed-value mono" id="cusumPhiVal" style="font-size:10px;color:var(--dim);min-width:35px">0.0</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">CUSUM B</div>
+      <div style="flex:1;padding:0 8px">
+        <div class="cusum-bar"><div class="cusum-fill safe" id="cusumBBar" style="width:0%"></div></div>
+      </div>
+      <div class="feed-value mono" id="cusumBVal" style="font-size:10px;color:var(--dim);min-width:35px">0.0</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">EWMA &#966;</div>
+      <div class="feed-value mono" id="ewmaPhi" style="font-size:11px;color:var(--cyan)">---</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px"><span class="hurst-indicator random" id="hurstDot"></span>Hurst</div>
+      <div class="feed-value mono" id="hurstVal" style="font-size:11px;color:var(--green)">0.500</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">&#128256; SampEn</div>
+      <div class="feed-value mono" id="sampenVal" style="font-size:11px;color:var(--purple)">---</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">&#127912; Spectral</div>
+      <div class="feed-value mono" id="spectralVal" style="font-size:11px;color:var(--blue)">---</div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">&#128279; Corr Health</div>
+      <div id="corrDots" style="display:flex;gap:2px;align-items:center">
+        <span class="corr-dot ok"></span><span class="corr-dot ok"></span><span class="corr-dot ok"></span>
+        <span class="corr-dot ok"></span><span class="corr-dot ok"></span><span class="corr-dot ok"></span>
+        <span class="corr-dot ok"></span>
+      </div></div>
+    <div class="feed-item"><div class="feed-label" style="font-size:9px">&#128200; Drift</div>
+      <div class="feed-value mono" id="driftVal" style="font-size:10px;color:var(--dim)">---</div></div>
+    <div class="anomaly-log" id="anomalyLog"></div>
+    </div>
+
+  </div>
+  <div class="bottom">
+    <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Pressure System</div>
+      <div class="pressure-gauge-wrap"><div class="pressure-bar-outer"><div class="pressure-bar-fill" id="pressureBar" style="width:0%"></div><div class="pressure-threshold"></div></div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:4px;color:var(--cyan)" id="pressureVal">0.000</div></div>
+    <div class="valve-indicator"><div class="valve-dot closed" id="valveDot"></div>
+      <div><div class="mono" style="font-size:12px" id="valveStatus">CLOSED</div><div style="font-size:8px;color:var(--dim)">VALVE</div></div></div>
+    <div class="bottom-stat"><div class="bottom-stat-val mono" id="valveCount" style="color:var(--cyan)">0</div><div class="bottom-stat-lbl">Valve Releases</div></div>
+    <div class="bottom-stat"><div class="bottom-stat-val mono" id="bottomEurekas" style="color:var(--amber)">0</div><div class="bottom-stat-lbl">Eurekas</div></div>
+    <div class="bottom-stat"><div class="bottom-stat-val mono" id="bottomDreams" style="color:var(--pink)">0</div><div class="bottom-stat-lbl">Dreams</div></div>
+    <div style="flex:1"></div>
+    <div style="text-align:right"><div style="font-size:9px;color:var(--dim);letter-spacing:1px">PHI SPARKLINE</div>
+      <canvas class="sparkline-canvas" id="phiSparkline" height="40" style="width:200px"></canvas></div>
+  </div>
+</div>
+<div class="crystal-panel" id="crystalPanel">
+  <div style="padding:12px 24px 0;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim)">
+    Crystal Lattice - 12 Dimensions <span style="float:right;cursor:pointer;color:var(--cyan)" id="crystalClose">&#10005; CLOSE</span></div>
+  <div class="crystal-grid" id="crystalGrid"></div>
+</div>
+<script>
+// ========== STATE ==========
+let currentData = null;
+let historyData = [];
+let prevEurekas = 0;
+let animFrame = null;
+const CRYSTALS = ['creativity','curiosity','empathy','growth','identity','knowledge',
+  'logic','meta_awareness','purpose','resilience','technical','temporal'];
+const CRYSTAL_COLORS = ['#f472b6','#fbbf24','#34d399','#60a5fa','#c084fc','#22d3ee',
+  '#f97316','#a78bfa','#e879f9','#10b981','#06b6d4','#8b5cf6'];
+
+// ========== GAUGE HELPERS ==========
+function setArc(id, value, max) {
+    max = max || 1;
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isBig = id === 'arcCL';
+    const totalLen = isBig ? 251.3 : 125.7;
+    const dashLen = (value / max) * totalLen;
+    el.setAttribute('stroke-dasharray', dashLen + ' ' + (totalLen - dashLen));
+}
+function formatNum(n, dec) {
+    if (n === null || n === undefined) return '---';
+    return Number(n).toFixed(dec || 3);
+}
+function formatTime(sec) {
+    if (!sec || sec <= 0) return '00:00';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.floor(sec % 60);
+    if (h > 0) return h + 'h ' + String(m).padStart(2,'0') + 'm';
+    return m + 'm ' + String(s).padStart(2,'0') + 's';
+}
+function formatBigNum(n) {
+    if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+    return String(n);
+}
+
+// ========== SPARKLINE ==========
+function drawSparkline(canvasId, data, color, minV, maxV) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !data.length) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.width = canvas.offsetWidth * dpr;
+    const H = canvas.height = canvas.offsetHeight * dpr;
+    ctx.clearRect(0, 0, W, H);
+    const mn = minV !== undefined ? minV : Math.min(...data) * 0.95;
+    const mx = maxV !== undefined ? maxV : Math.max(...data) * 1.05;
+    const range = mx - mn || 1;
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, color + '40');
+    grad.addColorStop(1, color + '00');
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    data.forEach((v, i) => {
+        const x = (i / Math.max(data.length - 1, 1)) * W;
+        const y = H - ((v - mn) / range) * H * 0.85 - H * 0.05;
+        ctx.lineTo(x, y);
+    });
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.beginPath();
+    data.forEach((v, i) => {
+        const x = (i / Math.max(data.length - 1, 1)) * W;
+        const y = H - ((v - mn) / range) * H * 0.85 - H * 0.05;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (data.length > 0) {
+        const lx = ((data.length - 1) / Math.max(data.length - 1, 1)) * W;
+        const ly = H - ((data[data.length-1] - mn) / range) * H * 0.85 - H * 0.05;
+        ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.fill();
+    }
+}
+
+// ========== INIT (NeuralVis removed - substrate nodes now in RC visual) ==========
+document.getElementById('crystalToggle').onclick = () => { document.getElementById('crystalPanel').classList.toggle('open'); };
+document.getElementById('crystalClose').onclick = () => { document.getElementById('crystalPanel').classList.remove('open'); };
+
+function buildCrystalCards() {
+    const grid = document.getElementById('crystalGrid');
+    grid.innerHTML = '';
+    CRYSTALS.forEach((name, i) => {
+        const card = document.createElement('div');
+        card.className = 'crystal-card';
+        card.id = 'crystal-' + name;
+        card.innerHTML = '<div class="crystal-name" style="color:' + CRYSTAL_COLORS[i] + '">' + name.replace('_',' ') + '</div>' +
+            '<div class="crystal-stat"><span class="crystal-stat-lbl">Constant</span><span class="crystal-stat-val" id="cc-' + name + '">---</span></div>' +
+            '<div class="crystal-stat"><span class="crystal-stat-lbl">Stability</span><span class="crystal-stat-val" id="cs-' + name + '">---</span></div>' +
+            '<div class="crystal-stat"><span class="crystal-stat-lbl">Coherence</span><span class="crystal-stat-val" id="ch-' + name + '">---</span></div>' +
+            '<div class="crystal-stat"><span class="crystal-stat-lbl">State</span><span class="crystal-stat-val" id="cst-' + name + '" style="color:var(--green)">---</span></div>' +
+            '<div class="crystal-bar"><div class="crystal-bar-fill" id="cb-' + name + '" style="width:0%"></div></div>';
+        grid.appendChild(card);
+    });
+}
+buildCrystalCards();
+
+// ========== DATA FETCHING ==========
+async function fetchStatus() {
+    try {
+        const res = await fetch('/status');
+        const d = await res.json();
+        currentData = d;
+        updateUI(d, {exists: d.status==='complete'});
+    } catch(e) {}
+}
+try { const evs = new EventSource('/events');
+evs.onmessage = function(e) { try { const d = JSON.parse(e.data);
+currentData = d; updateUI(d, {exists: d.status==='complete'}); } catch(x){} }; } catch(x){}
+
+function updateUI(d, result) {
+    const pct = d.total > 0 ? (d.cycle / d.total * 100) : 0;
+    const isComplete = d.status==='complete' || ((result && result.exists));
+    const badge = document.getElementById('statusBadge');
+    badge.textContent = isComplete ? 'COMPLETE' : 'ABSORBING';
+    badge.className = 'status-badge ' + (isComplete ? 'complete' : 'absorbing');
+    document.getElementById('hdrProgress').textContent = pct.toFixed(1) + '%';
+    document.getElementById('hdrWall').textContent = (d.wall || '--:--');
+    document.getElementById('hdrCrystals').textContent = (d.cryst || 0) + '/12';
+    // CL
+    const cl = d.cl || 0;
+    setArc('arcCL', cl, 1);
+    document.getElementById('valCL').textContent = formatNum(cl, 4);
+    // Mini gauges
+    setArc('arcPhi', d.phi || 0, 1);
+    document.getElementById('valPhi').textContent = formatNum(d.phi, 4);
+    setArc('arcNC', d.nc || 0, 1);
+    document.getElementById('valNC').textContent = formatNum(d.nc, 4);
+    const ma = (result && result.exists) ? (result||{}).final_ma : null;
+    if (ma !== null && ma !== undefined) { setArc('arcMA', ma, 1); document.getElementById('valMA').textContent = formatNum(ma, 3); }
+    const crit = (result && result.exists) ? result.final_crit : null;
+    if (crit !== null && crit !== undefined) {
+        setArc('arcCrit', crit, 1);
+        document.getElementById('valCrit').textContent = formatNum(crit, 3);
+        document.getElementById('valCrit').style.color = crit > 0.8 ? 'var(--red)' : crit > 0.6 ? 'var(--amber)' : 'var(--green)';
+    }
+    // Feed
+    document.getElementById('feedCat').textContent = d.category || d.category || d.cat || '---';
+    document.getElementById('feedRate').innerHTML = (d.rate ? d.rate.toFixed(1) : '---') + ' <span style="font-size:10px;color:var(--dim)">ch/s</span>';
+    document.getElementById('feedProgressText').textContent = formatBigNum(d.cycle||0) + ' / ' + formatBigNum(d.total);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('feedETA').textContent = d.eta ? formatTime(d.eta) : '---';
+    // Eurekas sparkle
+    const newEurekas = d.eurekas || 0;
+    document.getElementById('feedEurekas').textContent = newEurekas.toLocaleString("en-US");
+    if (newEurekas > prevEurekas && prevEurekas > 0) {
+        const sp = document.getElementById('eurekaSparkle');
+        sp.classList.remove('active'); void sp.offsetWidth; sp.classList.add('active');
+    }
+    prevEurekas = newEurekas;
+    document.getElementById('feedDreams').textContent = (d.dreams || 0).toLocaleString("en-US");
+    document.getElementById('feedCollisions').textContent = d.cern_collisions ? formatBigNum(d.cern_collisions) : formatBigNum(d.eurekas || 0) + ' (eurekas)';
+    // Pressure
+    const pressure = d.pressure || 0;
+    document.getElementById('pressureBar').style.width = (pressure * 100) + '%';
+    document.getElementById('pressureBar').style.background = pressure > 0.8
+        ? 'linear-gradient(90deg, var(--amber), var(--red))'
+        : 'linear-gradient(90deg, var(--purple), var(--cyan))';
+    document.getElementById('pressureVal').textContent = pressure.toFixed(4);
+    const isOpen = pressure > 0.8;
+    document.getElementById('valveDot').className = 'valve-dot ' + (isOpen ? 'open' : 'closed');
+    document.getElementById('valveStatus').textContent = isOpen ? 'OPEN' : 'CLOSED';
+    document.getElementById('valveStatus').style.color = isOpen ? 'var(--red)' : 'var(--green)';
+    document.getElementById('valveCount').textContent = d.valves || 0;
+    document.getElementById('bottomEurekas').textContent = (d.eurekas || 0).toLocaleString("en-US");
+    document.getElementById('bottomDreams').textContent = (d.dreams || 0).toLocaleString("en-US");
+    // Sparklines
+    if (Array.isArray(historyData) && historyData.length > 1) {
+        drawSparkline('pressureSparkline', historyData.map(h => h.pressure || 0), '#00f0ff', 0, 1);
+        drawSparkline('phiSparkline', historyData.map(h => h.phi || 0), '#a855f7', 0.6, 1);
+    }
+    // Crystal nodes - update cards with REAL data from Rust engine
+    var cd = d.crystal_dims || {};
+    CRYSTALS.forEach((name, i) => {
+        var dim = cd[name] || {};
+        var constant = dim.constant || 0;
+        var stability = dim.stability || 0;
+        var state = dim.state || 'dormant';
+        var ccEl = document.getElementById('cc-' + name);
+        if (ccEl) {
+            ccEl.textContent = constant.toFixed(3);
+            document.getElementById('cs-' + name).textContent = stability.toFixed(3);
+            document.getElementById('ch-' + name).textContent = stability.toFixed(3);
+            var isCryst = state === 'crystallized' || stability > 0.6;
+            document.getElementById('cst-' + name).textContent = isCryst ? 'CRYSTALLIZED' : (state === 'growing' ? 'GROWING' : (state === 'nascent' ? 'NASCENT' : 'FORMING'));
+            document.getElementById('cst-' + name).style.color = isCryst ? 'var(--green)' : (state === 'growing' ? 'var(--cyan)' : 'var(--amber)');
+            document.getElementById('cb-' + name).style.width = (stability * 100) + '%';
+        }
+    });
+    // Update substrate nodes in RC visual with REAL data
+    if (window.updateSubstrateNodes) {
+        window.updateSubstrateNodes(cd);
+    }
+    // Update RC panel text stats and crystal visual
+    updateRCPanel(d);
+    if (window.updateResonantCrystal) window.updateResonantCrystal(d);
+    // === CRYSTAL INSTRUMENTS (inline) ===
+    var iAmp = d.rc_amp || 0, iPwr = d.rc_pow || 0, iCoh = d.rc_coh || 0, iQ = d.rc_q || 0;
+    var iBfield = (iAmp * 1000 * (1 + iCoh)).toFixed(1);
+    var iSpec = d.rc_spectrum || [0,0,0,0,0,0,0,0,0,0,0,0];
+    var iWLs = [380,416.4,452.7,489.1,525.5,561.8,598.2,634.5,670.9,707.3,743.6,780];
+    var iPeakIdx = 0, iPeakVal = 0;
+    for(var ii=0;ii<12;ii++){if(Math.abs(iSpec[ii])>iPeakVal){iPeakVal=Math.abs(iSpec[ii]);iPeakIdx=ii;}}
+    var iPeakWL = iWLs[iPeakIdx].toFixed(0);
+    var iTotal = iSpec.reduce(function(a,b){return a+Math.abs(b);},0)+1e-15;
+    var iP = iSpec.map(function(v){return Math.abs(v)/iTotal;});
+    var iH = -iP.reduce(function(a,v){return a+(v>1e-15?v*Math.log2(v):0);},0);
+    var iEv = 1239.84 / (iWLs[iPeakIdx]||500);
+    var iTemp = iPeakVal > 0.001 ? (iEv / (8.617e-5 * Math.max(Math.log(iTotal/iPeakVal+1),0.01))) : 0;
+    iTemp = Math.min(iTemp, 999999);
+    var iUniq = ((Math.min(parseFloat(iBfield)/400,1) + Math.min(iH/3.58,1) + Math.min(iTemp/50000,1) + Math.min(iCoh*2,1)) / 4).toFixed(4);
+    document.getElementById('instBfield').textContent = iBfield + ' mG';
+    document.getElementById('instPeak').textContent = iPeakWL + ' nm (d' + iPeakIdx + ')';
+    document.getElementById('instTemp').textContent = iTemp > 0 ? Math.round(iTemp).toLocaleString() + ' K' : '--- K';
+    document.getElementById('instQ').textContent = iQ > 0 ? iQ.toFixed(0) : '---';
+    document.getElementById('instCoh').textContent = iCoh.toFixed(4);
+    document.getElementById('instShannon').textContent = iH.toFixed(2) + ' bits';
+    document.getElementById('instUniq').textContent = iUniq;
+    // Run anomaly detection suite
+    runAnomalyDetection(d);
+
+}
+
+// ========== RESONANT CRYSTAL ==========
+document.getElementById('rcToggle').onclick = () => {
+    document.getElementById('rcPanel').classList.toggle('open');
+    document.getElementById('rcToggle').classList.toggle('active');
+};
+
+// Build spectrum bars
+(function() {
+    const spec = document.getElementById('rcSpectrum');
+    for (let i = 0; i < 12; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'rc-spectrum-bar';
+        bar.id = 'rcSpecBar' + i;
+        bar.style.height = '1px';
+        spec.appendChild(bar);
+    }
+})();
+
+// ========== RC PANEL TEXT STATS ==========
+function updateRCPanel(d) {
+    if (!d) return;
+    var regime = d.rc_content_phase || d.rc_regime || 'DARK';
+    var regimeEl = document.getElementById('rcRegime');
+    regimeEl.textContent = regime;
+    regimeEl.className = 'rc-regime ' + regime.toLowerCase().replace(/ /g, '_');
+    var energy = d.rc_energy || 0;
+    var cap = d.rc_cap || 10000;
+    document.getElementById('rcEnergyBar').style.width = ((energy / cap) * 100) + '%';
+    document.getElementById('rcEnergy').textContent = energy.toFixed(1) + ' / ' + cap;
+    document.getElementById('rcQ').textContent = (d.rc_q || 0).toLocaleString();
+    document.getElementById('rcForb').textContent = (d.rc_forb || 0).toFixed(4);
+    var nex = d.rc_nex || 0;
+    var inv = d.rc_inv || 0;
+    document.getElementById('rcInvBar').style.width = (inv * 100) + '%';
+    document.getElementById('rcInv').textContent = nex + '/12 (' + (inv * 100).toFixed(1) + '%)';
+    document.getElementById('rcCR').textContent = '-';
+    document.getElementById('rcAmp').textContent = (d.rc_amp || 0).toFixed(4);
+    document.getElementById('rcCoh').textContent = (d.rc_coh || 0).toFixed(4);
+    document.getElementById('rcPow').textContent = (d.rc_pow || 0).toFixed(4);
+    document.getElementById('rcFid').textContent = (d.rc_fid || 0).toFixed(4);
+    document.getElementById('rcInfo').textContent = (d.rc_info || 0).toFixed(6);
+    document.getElementById('rcBoost').textContent = (d.rc_boost || 0).toFixed(6);
+    document.getElementById('rcFB').textContent = (d.rc_fb || 1).toFixed(3) + 'x';
+    document.getElementById('rcRich').textContent = (d.rc_rich || 0).toFixed(4);
+    var bar = document.getElementById('rcEnergyBar');
+    var phaseColors = {
+      'SUPERRADIANT': 'linear-gradient(90deg, var(--amber), #ef4444)',
+      'STIMULATED': 'linear-gradient(90deg, var(--cyan), var(--green))',
+      'SPONTANEOUS': 'linear-gradient(90deg, var(--purple), var(--cyan))',
+      'FERROELECTRIC': 'linear-gradient(90deg, #ec4899, #f9a8d4)',
+      'SPIN_GLASS': 'linear-gradient(90deg, #78716c, #a8a29e)',
+      'TIME_CRYSTAL': 'linear-gradient(90deg, #8b5cf6, #c4b5fd)',
+      'TOPOLOGICAL': 'linear-gradient(90deg, #14b8a6, #5eead4)',
+      'SUPERFLUID': 'linear-gradient(90deg, #06b6d4, #67e8f9)',
+      'PLASMA': 'linear-gradient(90deg, #ef4444, #fca5a5)',
+      'BOSE_EINSTEIN': 'linear-gradient(90deg, #c026d3, #f0abfc)',
+      'QUASICRYSTAL': 'linear-gradient(90deg, #0e7490, #22d3ee)',
+    };
+    bar.style.background = phaseColors[regime] || 'rgba(100,100,100,0.3)';
+}
+
+// 3D visual loaded from crystal3d.mjs module
+
+
+fetchStatus();
+setInterval(fetchStatus, 5000);
+
+    // === ANOMALY DETECTION SUITE (client-side) ===
+    var anomState = {
+        phiBuf: [], bBuf: [], tempBuf: [], cohBuf: [], rateBuf: [],
+        cusumPhiPos: 0, cusumPhiNeg: 0,
+        cusumBPos: 0, cusumBNeg: 0,
+        ewmaPhi: null, ewmaB: null, ewmaN: 0,
+        prevHurst: null, prevSampen: null,
+        totalAnomalies: 0, critCount: 0, highCount: 0,
+        corrBaseline: null, corrN: 0,
+        logEntries: [],
+        maxBuf: 60
+    };
+    function pushBuf(buf, v, max) { buf.push(v); if (buf.length > max) buf.shift(); }
+    function bufMean(buf) { return buf.length ? buf.reduce(function(a,b){return a+b;},0)/buf.length : 0; }
+    function bufStd(buf) {
+        if (buf.length < 2) return 0;
+        var m = bufMean(buf);
+        return Math.sqrt(buf.reduce(function(a,v){return a+(v-m)*(v-m);},0)/(buf.length-1));
+    }
+    function bufMedian(buf) {
+        if (!buf.length) return 0;
+        var s = buf.slice().sort(function(a,b){return a-b;});
+        var n = s.length;
+        return n%2===1 ? s[Math.floor(n/2)] : (s[n/2-1]+s[n/2])/2;
+    }
+    function pearsonR(a, b) {
+        if (a.length < 5 || a.length !== b.length) return 0;
+        var n=a.length, ma=bufMean(a), mb=bufMean(b);
+        var num=0, da=0, db=0;
+        for(var i=0;i<n;i++){num+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)*(a[i]-ma);db+=(b[i]-mb)*(b[i]-mb);}
+        return (da>1e-12&&db>1e-12) ? num/Math.sqrt(da*db) : 0;
+    }
+    function rsHurst(buf) {
+        var n = buf.length; if (n < 20) return 0.5;
+        var sizes = [Math.floor(n/4), Math.floor(n/2), n], pts = [];
+        for (var si=0;si<sizes.length;si++) {
+            var s=sizes[si]; if(s<4) continue;
+            var chunk=buf.slice(0,s), m=chunk.reduce(function(a,b){return a+b;},0)/s;
+            var cum=0, cumArr=[];
+            for(var i=0;i<s;i++){cum+=chunk[i]-m;cumArr.push(cum);}
+            var R=Math.max.apply(null,cumArr)-Math.min.apply(null,cumArr);
+            var S=0; for(var i=0;i<s;i++) S+=(chunk[i]-m)*(chunk[i]-m);
+            S=Math.sqrt(S/(s-1)); if(S>1e-12) pts.push([Math.log(s),Math.log(R/S+1e-15)]);
+        }
+        if(pts.length<2) return 0.5;
+        var xm=pts.reduce(function(a,p){return a+p[0];},0)/pts.length;
+        var ym=pts.reduce(function(a,p){return a+p[1];},0)/pts.length;
+        var num=0,den=0;
+        for(var i=0;i<pts.length;i++){num+=(pts[i][0]-xm)*(pts[i][1]-ym);den+=(pts[i][0]-xm)*(pts[i][0]-xm);}
+        return den>0 ? num/den : 0.5;
+    }
+    function sampEn(buf, m, r) {
+        var n=buf.length; if(n<10) return null;
+        function countM(len){
+            var t=[],c=0;
+            for(var i=0;i<=n-len;i++) t.push(buf.slice(i,i+len));
+            for(var i=0;i<t.length;i++) for(var j=i+1;j<t.length;j++){
+                var ok=true;
+                for(var k=0;k<len;k++) if(Math.abs(t[i][k]-t[j][k])>=r){ok=false;break;}
+                if(ok) c++;
+            }
+            return c;
+        }
+        var B=countM(m), A=countM(m+1);
+        return (B>0&&A>0) ? -Math.log(A/B) : null;
+    }
+
+    function runAnomalyDetection(d) {
+        var phi = d.phi || 0, bMG = parseFloat(document.getElementById('instBfield').textContent) || 0;
+        var tempK = parseFloat(document.getElementById('instTemp').textContent.replace(/,/g,'')) || 0;
+        var coh = d.rc_coh || 0, rate = d.rate || 0;
+        var AS = anomState, W = AS.maxBuf;
+        pushBuf(AS.phiBuf, phi, W); pushBuf(AS.bBuf, bMG, W);
+        pushBuf(AS.tempBuf, tempK, W); pushBuf(AS.cohBuf, coh, W);
+        pushBuf(AS.rateBuf, rate, W);
+        var anomalies = [];
+        var cycle = d.cycle || d.i || 0;
+
+        // --- CUSUM on phi ---
+        if (AS.phiBuf.length >= 10) {
+            var m=bufMean(AS.phiBuf), s=bufStd(AS.phiBuf);
+            if (s > 1e-12) {
+                var z = (phi - m) / s;
+                AS.cusumPhiPos = Math.max(0, AS.cusumPhiPos + z - 0.5);
+                AS.cusumPhiNeg = Math.max(0, AS.cusumPhiNeg - z - 0.5);
+                var cusumMax = Math.max(AS.cusumPhiPos, AS.cusumPhiNeg);
+                var pct = Math.min(cusumMax / 5 * 100, 100);
+                var bar = document.getElementById('cusumPhiBar');
+                bar.style.width = pct + '%';
+                bar.className = 'cusum-fill ' + (pct > 80 ? 'danger' : (pct > 50 ? 'warning' : 'safe'));
+                document.getElementById('cusumPhiVal').textContent = cusumMax.toFixed(1);
+                if (cusumMax > 5) {
+                    anomalies.push({field:'phi', method:'CUSUM', sev:'HIGH', dir: AS.cusumPhiPos > AS.cusumPhiNeg ? 'UP' : 'DOWN'});
+                    AS.cusumPhiPos = 0; AS.cusumPhiNeg = 0;
+                }
+            }
+        }
+        // --- CUSUM on B-field ---
+        if (AS.bBuf.length >= 10) {
+            var m=bufMean(AS.bBuf), s=bufStd(AS.bBuf);
+            if (s > 1e-12) {
+                var z = (bMG - m) / s;
+                AS.cusumBPos = Math.max(0, AS.cusumBPos + z - 0.5);
+                AS.cusumBNeg = Math.max(0, AS.cusumBNeg - z - 0.5);
+                var cusumMax = Math.max(AS.cusumBPos, AS.cusumBNeg);
+                var pct = Math.min(cusumMax / 5 * 100, 100);
+                var bar = document.getElementById('cusumBBar');
+                bar.style.width = pct + '%';
+                bar.className = 'cusum-fill ' + (pct > 80 ? 'danger' : (pct > 50 ? 'warning' : 'safe'));
+                document.getElementById('cusumBVal').textContent = cusumMax.toFixed(1);
+                if (cusumMax > 5) {
+                    anomalies.push({field:'B-field', method:'CUSUM', sev:'HIGH', dir: AS.cusumBPos > AS.cusumBNeg ? 'UP' : 'DOWN'});
+                    AS.cusumBPos = 0; AS.cusumBNeg = 0;
+                }
+            }
+        }
+        // --- EWMA on phi ---
+        if (AS.phiBuf.length >= 10) {
+            AS.ewmaN++;
+            var m=bufMean(AS.phiBuf), s=bufStd(AS.phiBuf), lam=0.2, L=3.0;
+            if (AS.ewmaPhi === null) AS.ewmaPhi = m;
+            AS.ewmaPhi = lam * phi + (1-lam) * AS.ewmaPhi;
+            var sigE = s * Math.sqrt(lam/(2-lam)*(1-Math.pow(1-lam, 2*AS.ewmaN)));
+            var ucl = m + L*sigE, lcl = m - L*sigE;
+            var ewEl = document.getElementById('ewmaPhi');
+            ewEl.textContent = AS.ewmaPhi.toFixed(4);
+            if (AS.ewmaPhi > ucl) { ewEl.style.color = 'var(--red)'; anomalies.push({field:'phi',method:'EWMA',sev:'MEDIUM',dir:'HIGH'}); }
+            else if (AS.ewmaPhi < lcl) { ewEl.style.color = 'var(--red)'; anomalies.push({field:'phi',method:'EWMA',sev:'MEDIUM',dir:'LOW'}); }
+            else { ewEl.style.color = 'var(--cyan)'; }
+        }
+        // --- Hurst Exponent ---
+        if (AS.phiBuf.length >= 30) {
+            var h = rsHurst(AS.phiBuf);
+            var dot = document.getElementById('hurstDot');
+            if (h > 0.6) { dot.className = 'hurst-indicator persistent'; }
+            else if (h < 0.4) { dot.className = 'hurst-indicator reverting'; }
+            else { dot.className = 'hurst-indicator random'; }
+            document.getElementById('hurstVal').textContent = h.toFixed(3);
+            if (AS.prevHurst !== null && Math.abs(h - AS.prevHurst) > 0.15) {
+                anomalies.push({field:'hurst',method:'HurstShift',sev:'MEDIUM',dir:h>AS.prevHurst?'PERSISTENT':'REVERTING'});
+            }
+            AS.prevHurst = h;
+        }
+        // --- Sample Entropy ---
+        if (AS.phiBuf.length >= 25) {
+            var std = bufStd(AS.phiBuf);
+            var se = sampEn(AS.phiBuf, 2, 0.2 * std);
+            if (se !== null) {
+                document.getElementById('sampenVal').textContent = se.toFixed(3);
+                if (AS.prevSampen !== null && Math.abs(se - AS.prevSampen) > 0.3) {
+                    anomalies.push({field:'phi',method:'SampEn',sev:'MEDIUM',dir:se>AS.prevSampen?'COMPLEX':'REGULAR'});
+                }
+                AS.prevSampen = se;
+            }
+        }
+        // --- Spectral Residual (simplified) ---
+        if (AS.phiBuf.length >= 32) {
+            var buf = AS.phiBuf.slice(-32);
+            var m = bufMean(buf);
+            var centered = buf.map(function(v){return v-m;});
+            // Simplified: compute variance of last 8 vs overall
+            var last8 = centered.slice(-8);
+            var vAll = centered.reduce(function(a,v){return a+v*v;},0)/centered.length;
+            var vLast = last8.reduce(function(a,v){return a+v*v;},0)/last8.length;
+            var ratio = vAll > 1e-12 ? vLast / vAll : 1;
+            var label = ratio > 2 ? 'SPIKE' : (ratio < 0.3 ? 'FLAT' : 'NORMAL');
+            var color = ratio > 2 ? 'var(--red)' : (ratio < 0.3 ? 'var(--amber)' : 'var(--blue)');
+            document.getElementById('spectralVal').textContent = label + ' (' + ratio.toFixed(2) + ')';
+            document.getElementById('spectralVal').style.color = color;
+            if (ratio > 3) anomalies.push({field:'phi',method:'Spectral',sev:'HIGH',dir:'SPIKE'});
+        }
+        // --- Correlation Health ---
+        AS.corrN++;
+        if (AS.phiBuf.length >= 20 && AS.bBuf.length >= 20) {
+            var pairs = [
+                {a:AS.phiBuf, b:AS.bBuf, name:'phi-B'},
+                {a:AS.phiBuf, b:AS.tempBuf, name:'phi-T'},
+                {a:AS.phiBuf, b:AS.cohBuf, name:'phi-Coh'},
+                {a:AS.bBuf, b:AS.tempBuf, name:'B-T'},
+                {a:AS.bBuf, b:AS.cohBuf, name:'B-Coh'},
+                {a:AS.tempBuf, b:AS.cohBuf, name:'T-Coh'},
+                {a:AS.phiBuf, b:AS.rateBuf, name:'phi-Rate'}
+            ];
+            var dots = document.getElementById('corrDots').children;
+            var broken = 0;
+            for (var pi=0; pi<pairs.length; pi++) {
+                var r = pearsonR(pairs[pi].a.slice(-20), pairs[pi].b.slice(-20));
+                var rAbs = Math.abs(r);
+                if (AS.corrBaseline === null) {
+                    // First pass, just set dot
+                    dots[pi].className = 'corr-dot ok';
+                    dots[pi].title = pairs[pi].name + ': r=' + r.toFixed(3);
+                } else {
+                    var baseR = AS.corrBaseline[pi] || 0;
+                    var delta = Math.abs(r - baseR);
+                    if (delta > 0.4 && Math.abs(baseR) > 0.3) {
+                        dots[pi].className = 'corr-dot broken';
+                        dots[pi].title = pairs[pi].name + ': r=' + r.toFixed(3) + ' (was ' + baseR.toFixed(3) + ')';
+                        broken++;
+                    } else if (delta > 0.2) {
+                        dots[pi].className = 'corr-dot warn';
+                        dots[pi].title = pairs[pi].name + ': r=' + r.toFixed(3);
+                    } else {
+                        dots[pi].className = 'corr-dot ok';
+                        dots[pi].title = pairs[pi].name + ': r=' + r.toFixed(3);
+                    }
+                }
+            }
+            if (AS.corrN % 10 === 0 || AS.corrBaseline === null) {
+                AS.corrBaseline = pairs.map(function(p){return pearsonR(p.a.slice(-20),p.b.slice(-20));});
+            }
+            if (broken >= 3) anomalies.push({field:'correlation',method:'CorrBreakdown',sev:'HIGH',dir:broken+' pairs broken'});
+        }
+        // --- Drift indicator ---
+        if (AS.phiBuf.length >= 20) {
+            var q = Math.floor(AS.phiBuf.length / 4);
+            var firstQ = bufMean(AS.phiBuf.slice(0, Math.max(q,1)));
+            var lastQ = bufMean(AS.phiBuf.slice(-Math.max(q,1)));
+            var drift = firstQ > 1e-12 ? ((lastQ - firstQ) / firstQ * 100) : 0;
+            var driftEl = document.getElementById('driftVal');
+            driftEl.textContent = (drift >= 0 ? '+' : '') + drift.toFixed(2) + '%';
+            driftEl.style.color = Math.abs(drift) > 3 ? 'var(--red)' : (Math.abs(drift) > 1 ? 'var(--amber)' : 'var(--green)');
+        }
+
+        // === UPDATE ANOMALY COUNTER ===
+        AS.totalAnomalies += anomalies.length;
+        for (var ai=0; ai<anomalies.length; ai++) {
+            if (anomalies[ai].sev === 'CRITICAL') AS.critCount++;
+            else if (anomalies[ai].sev === 'HIGH') AS.highCount++;
+        }
+        var totalEl = document.getElementById('anomTotal');
+        var badge = document.getElementById('anomBadge');
+        totalEl.childNodes[0].textContent = AS.totalAnomalies + ' ';
+        if (AS.critCount > 0) {
+            badge.style.display = 'inline-block'; badge.className = 'anomaly-badge critical';
+            badge.textContent = AS.critCount + ' CRIT';
+        } else if (AS.highCount > 0) {
+            badge.style.display = 'inline-block'; badge.className = 'anomaly-badge high';
+            badge.textContent = AS.highCount + ' HIGH';
+        } else if (AS.totalAnomalies > 0) {
+            badge.style.display = 'inline-block'; badge.className = 'anomaly-badge medium';
+            badge.textContent = 'ACTIVE';
+        }
+        totalEl.style.color = AS.critCount > 0 ? 'var(--red)' : (AS.highCount > 0 ? 'var(--amber)' : (AS.totalAnomalies > 0 ? 'var(--green)' : 'var(--dim)'));
+
+        // === ANOMALY LOG ===
+        var logEl = document.getElementById('anomalyLog');
+        for (var ai=0; ai<anomalies.length; ai++) {
+            var a = anomalies[ai];
+            var entry = document.createElement('div');
+            entry.className = 'anomaly-log-entry ' + a.sev.toLowerCase();
+            entry.textContent = '[' + (cycle || '?') + '] ' + a.sev + ' ' + a.field + ' (' + a.method + ') ' + a.dir;
+            logEl.insertBefore(entry, logEl.firstChild);
+            if (logEl.children.length > 50) logEl.removeChild(logEl.lastChild);
+        }
+    }
+
+</script>
+<script type="module" src="/crystal3d.mjs"></script>
+<script src="/system_voice.mjs"></script>
+</body>
+</html>
+
+
+    document.getElementById('feedCollisions').textContent = d.cern_collisions ? formatBigNum(d.cern_collisions) : formatBigNum(d.eurekas || 0) + ' (eurekas)';

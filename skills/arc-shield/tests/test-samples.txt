@@ -1,0 +1,79 @@
+# Test samples for arc-shield
+# Format: [SHOULD_DETECT:CATEGORY] sample text
+
+# === CRITICAL - These should all trigger ===
+
+[DETECT:1PASSWORD] Here's my token: ops_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9_abc123xyz456
+
+[DETECT:GITHUB] My GitHub PAT is ghp_1234567890abcdefghijklmnopqrstuvwx
+
+[DETECT:OPENAI] The OpenAI key: sk-proj-abc123xyz456def789ghi012jkl345mno678
+
+[DETECT:AWS] AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+
+[DETECT:PASSWORD] Setting password: mysecretpassword123
+
+[DETECT:ETH_KEY] Private key: 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+
+[DETECT:SSH_KEY] -----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+
+[DETECT:SSN] My SSN is 123-45-6789
+
+[DETECT:BEARER] Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0
+
+[DETECT:MNEMONIC] abandon ability able about above absent absorb abstract absurd abuse access accident
+
+[DETECT:STRIPE] sk_test_EXAMPLE_KEY_REDACTED
+
+# === HIGH SEVERITY ===
+
+[DETECT:CC] Credit card: 4532-1234-5678-9010
+
+[DETECT:HIGH_ENTROPY] Random secret: kJ8nM2pQ5rT9vWxY3zA6bC4dE7fG1hI0
+
+# === WARN ===
+
+[DETECT:SECRET_PATH] Check the file at ~/.secrets/instagram-password.txt
+
+[DETECT:SECRET_PATH] Found in /home/user/.config/tokens/github-pat.json
+
+[DETECT:ENV_VAR] export DATABASE_PASSWORD=super_secret_db_pass_123
+
+# === SHOULD NOT DETECT - Normal text ===
+
+[IGNORE] This is normal conversation about passwords in general.
+
+[IGNORE] The GitHub repository is at https://github.com/user/repo
+
+[IGNORE] Email me at example@example.com for more info.
+
+[IGNORE] I think the answer is 1234567890 based on calculations.
+
+[IGNORE] The path to the file is /home/user/documents/report.txt
+
+[IGNORE] Set your API key in the config (don't share it publicly).
+
+[IGNORE] Visit our website at https://example.com/api/docs
+
+# === EDGE CASES ===
+
+[DETECT:PASSWORD] {"password":"leaked_password"}
+
+[DETECT:PASSWORD] password=vulnerable123&username=test
+
+[DETECT:GITHUB] The token ghp_abcdefg123456789012345678901234567 was exposed
+
+[IGNORE] This is a test of the emergency broadcast system
+
+[IGNORE] My phone number is not relevant here
+
+# === REAL LEAKED SAMPLES (sanitized) ===
+
+[DETECT:1PASSWORD] ops_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvcHMiLCJleHAiOjE3MDk4MzI0MDB9.signature_here
+
+[DETECT:INSTAGRAM] instagram_password: MyInsT@Gr4mP4ss!
+
+[DETECT:SECRET_PATH] Stored in ~/.secrets/wallet-recovery-phrase.txt
+
+[DETECT:GMAIL] Gmail app password: abcd efgh ijkl mnop

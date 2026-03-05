@@ -1,0 +1,316 @@
+{
+  "name": "Data Backup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Daily Backup Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pre-backup validation\nconst validations = [\n  { check: 'disk_space', status: 'pending' },\n  { check: 'source_accessible', status: 'pending' },\n  { check: 'destination_accessible', status: 'pending' }\n];\n\nconsole.log('Starting pre-backup validation...');\nreturn validations.map(v => ({ json: v }));"
+      },
+      "id": "2",
+      "name": "Pre-Backup Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "df -h /backup | tail -1 | awk '{print $4}' | sed 's/G//'",
+        "options": {}
+      },
+      "id": "3",
+      "name": "Check Disk Space",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:6333/healthz",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "4",
+      "name": "Check Source Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine validation results\nconst diskSpace = $input.first().json.stdout;\nconst sourceHealth = $input.all()[1].json;\n\nconst availableGB = parseFloat(diskSpace) || 0;\nconst hasEnoughSpace = availableGB > 5; // Need 5GB\nconst sourceHealthy = sourceHealth.status === 'ok';\n\nconst allValid = hasEnoughSpace && sourceHealthy;\n\nreturn [{\n  json: {\n    validations: {\n      disk_space: hasEnoughSpace ? 'pass' : 'fail',\n      source_accessible: sourceHealthy ? 'pass' : 'fail'\n    },\n    can_proceed: allValid,\n    details: {\n      available_gb: availableGB,\n      source_status: sourceHealth.status\n    }\n  }\n}];"
+      },
+      "id": "5",
+      "name": "Validate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.can_proceed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "6",
+      "name": "Can Proceed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "command": "pg_dump -h localhost -U backup_user mydb > /backup/mydb_$(date +%Y%m%d_%H%M%S).sql",
+        "options": {}
+      },
+      "id": "7",
+      "name": "Backup Database",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "sshPassword": {
+          "id": "YOUR_SSH_CRED_ID",
+          "name": "SSH Password"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "ls -lh /backup/*.sql | tail -5",
+        "options": {}
+      },
+      "id": "8",
+      "name": "Verify Backup",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format success message\nconst backup = $input.first();\nconst backupFiles = backup.json.stdout;\n\nconst message = `\u2705 *Backup Successful*\\n\\nDatabase backed up successfully.\\n\\nRecent backups:\\n${backupFiles}\\n\\n\ud83d\udd50 Completed at: ${new Date().toLocaleString()}`;\n\nreturn [{\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: message,\n    parse_mode: 'Markdown'\n  }\n}];"
+      },
+      "id": "9",
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format failure message\nconst validation = $input.first();\nconst v = validation.json.validations;\n\nlet message = '\ud83d� *Backup Failed*\\n\\nPre-backup validation failed:\\n';\n\nfor (const [check, status] of Object.entries(v)) {\n  const emoji = status === 'pass' ? '\u2705' : '\u274c';\n  message += `${emoji} ${check.replace(/_/g, ' ')}: ${status}\\n`;\n}\n\nmessage += `\\n\ud83d\udd50 Failed at: ${new Date().toLocaleString()}`;\n\nreturn [{\n  json: {\n    chat_id: '{{$env.TELEGRAM_CHAT_ID}}',\n    text: message,\n    parse_mode: 'Markdown'\n  }\n}];"
+      },
+      "id": "10",
+      "name": "Format Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "options": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "11",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [1850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Backup Schedule": {
+      "main": [
+        [
+          {
+            "node": "Pre-Backup Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pre-Backup Check": {
+      "main": [
+        [
+          {
+            "node": "Check Disk Space",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Source Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Disk Space": {
+      "main": [
+        [
+          {
+            "node": "Validate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Source Health": {
+      "main": [
+        [
+          {
+            "node": "Validate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Results": {
+      "main": [
+        [
+          {
+            "node": "Can Proceed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can Proceed?": {
+      "main": [
+        [
+          {
+            "node": "Backup Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup Database": {
+      "main": [
+        [
+          {
+            "node": "Verify Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Backup": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Failure": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "id": "1",
+      "name": "backup",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "database",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "maintenance",
+      "createdAt": "2026-02-10T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    }
+  ]
+}

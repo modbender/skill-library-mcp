@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Device Pairings - OpenClaw</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav a:hover {
+            color: #fff;
+            border-color: #ff6b6b;
+        }
+        
+        .nav a.active {
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            background: #ff6b6b;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .badge.green {
+            background: #2ecc71;
+        }
+        
+        .device-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        
+        .device-card:hover {
+            border-color: #444;
+        }
+        
+        .device-card.pending {
+            border-left: 3px solid #f39c12;
+        }
+        
+        .device-card.paired {
+            border-left: 3px solid #2ecc71;
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .device-info {
+            flex: 1;
+        }
+        
+        .device-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .device-meta {
+            color: #888;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        
+        .device-meta span {
+            margin-right: 15px;
+        }
+        
+        .device-id {
+            color: #666;
+            font-size: 11px;
+            font-family: monospace;
+            margin-top: 6px;
+            word-break: break-all;
+        }
+        
+        .device-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-approve {
+            background: #2ecc71;
+            color: #fff;
+        }
+        
+        .btn-approve:hover:not(:disabled) {
+            background: #27ae60;
+        }
+        
+        .btn-reject {
+            background: #e74c3c;
+            color: #fff;
+        }
+        
+        .btn-reject:hover:not(:disabled) {
+            background: #c0392b;
+        }
+        
+        .btn-refresh {
+            background: #333;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .btn-refresh:hover {
+            background: #444;
+        }
+        
+        .btn-approve-all {
+            background: #2ecc71;
+            color: #fff;
+            margin-bottom: 20px;
+            margin-left: 10px;
+        }
+        
+        .btn-approve-all:hover:not(:disabled) {
+            background: #27ae60;
+        }
+        
+        .empty {
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: #111;
+            border-radius: 8px;
+            border: 1px dashed #333;
+        }
+        
+        .status-bar {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .status-bar.success {
+            color: #2ecc71;
+            border-color: #2ecc71;
+        }
+        
+        .status-bar.error {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .scopes-list {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        
+        .scope-tag {
+            background: #1a1a2e;
+            color: #7b68ee;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        @media (max-width: 600px) {
+            .device-header {
+                flex-direction: column;
+            }
+            .device-actions {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" style="display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:14px;margin-bottom:16px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">← Back to Dashboard</a>
+        <h1>🦞 Device Pairings</h1>
+        <p class="subtitle">Manage browser and device connections to the OpenClaw gateway</p>
+        
+        <div id="status-bar" class="status-bar" style="display:none;"></div>
+        
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-refresh" onclick="loadDevices()">↻ Refresh</button>
+            <button class="btn btn-approve-all" id="btn-approve-latest" onclick="approveLatest()" style="display:none;">✓ Approve Latest</button>
+            <button class="btn" id="copy-token-btn" onclick="copyToken()" style="background:#1a1a2e;color:#7b68ee;border:1px solid #333;">🔑 Copy Gateway Token</button>
+        </div>
+        
+        <!-- Pending Section -->
+        <div class="section">
+            <div class="section-title">
+                Pending Requests
+                <span class="badge" id="pending-count">0</span>
+            </div>
+            <div id="pending-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+        
+        <!-- Paired Section -->
+        <div class="section">
+            <div class="section-title">
+                Paired Devices
+                <span class="badge green" id="paired-count">0</span>
+            </div>
+            <div id="paired-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const socket = io({ transports: ['polling'] });
+        
+        function showStatus(message, type) {
+            const bar = document.getElementById('status-bar');
+            bar.textContent = message;
+            bar.className = 'status-bar ' + (type || '');
+            bar.style.display = 'block';
+            if (type === 'success') {
+                setTimeout(() => { bar.style.display = 'none'; }, 4000);
+            }
+        }
+        
+        function formatTime(ts) {
+            if (!ts) return 'Unknown';
+            const d = new Date(ts);
+            return d.toLocaleString();
+        }
+        
+        function platformIcon(platform) {
+            if (!platform) return '💻';
+            const p = platform.toLowerCase();
+            if (p.includes('iphone') || p.includes('ios')) return '📱';
+            if (p.includes('mac') || p.includes('darwin')) return '🍎';
+            if (p.includes('win')) return '🪟';
+            if (p.includes('linux')) return '🐧';
+            if (p.includes('android')) return '🤖';
+            return '💻';
+        }
+        
+        function renderPending(items) {
+            const container = document.getElementById('pending-list');
+            document.getElementById('pending-count').textContent = items.length;
+            
+            const approveLatestBtn = document.getElementById('btn-approve-latest');
+            approveLatestBtn.style.display = items.length > 0 ? 'inline-block' : 'none';
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty">No pending pairing requests</div>';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => `
+                <div class="device-card pending" id="pending-${item.requestId}">
+                    <div class="device-header">
+                        <div class="device-info">
+                            <div class="device-name">${platformIcon(item.platform)} ${item.platform || 'Unknown'} — ${item.clientMode || item.clientId || 'device'}</div>
+                            <div class="device-meta">
+                                <span>⏰ ${formatTime(item.ts)}</span>
+                                <span>🌐 ${item.remoteIp || 'local'}</span>
+                                <span>👤 ${item.role || 'operator'}</span>
+                                ${item.isRepair ? '<span>🔧 Repair</span>' : '<span>🆕 New</span>'}
+                            </div>
+                            <div class="device-id">ID: ${item.deviceId || 'n/a'}</div>
+                            ${item.scopes ? `<div class="scopes-list">${item.scopes.map(s => `<span class="scope-tag">${s}</span>`).join('')}</div>` : ''}
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-approve" onclick="approveDevice('${item.requestId}', this)">✓ Approve</button>
+                            <button class="btn btn-reject" onclick="rejectDevice('${item.requestId}', this)">✗ Reject</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderPaired(items) {
+            const container = document.getElementById('paired-list');
+            document.getElementById('paired-count').textContent = items.length;
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty">No paired devices</div>';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => `
+                <div class="device-card paired">
+                    <div class="device-header">
+                        <div class="device-info">
+                            <div class="device-name">${platformIcon(item.platform)} ${item.platform || 'Unknown'} — ${item.clientMode || item.clientId || 'device'}</div>
+                            <div class="device-meta">
+                                <span>✅ Paired ${formatTime(item.approvedAtMs)}</span>
+                                <span>🌐 ${item.remoteIp || 'local'}</span>
+                                <span>👤 ${(item.roles || [item.role]).join(', ') || 'operator'}</span>
+                            </div>
+                            <div class="device-id">ID: ${item.deviceId || 'n/a'}</div>
+                            ${item.tokens ? `<div class="device-meta" style="margin-top:6px">${
+                                (Array.isArray(item.tokens) ? item.tokens : Object.values(item.tokens)).map(t =>
+                                    `<span>🔑 ${t.role}${t.lastUsedAtMs ? ' (last used: ' + formatTime(t.lastUsedAtMs) + ')' : ' (never used)'}</span>`
+                                ).join('')
+                            }</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadDevices() {
+            try {
+                const resp = await fetch('/api/device-pairings');
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    showStatus('Failed to load: ' + (err.error || 'Unknown error'), 'error');
+                    return;
+                }
+                const data = await resp.json();
+                renderPending(data.pending || []);
+                renderPaired(data.paired || []);
+            } catch (e) {
+                showStatus('Error loading devices: ' + e.message, 'error');
+            }
+        }
+        
+        async function approveDevice(requestId, btn) {
+            if (btn) btn.disabled = true;
+            showStatus('Approving device...', '');
+            
+            try {
+                const resp = await fetch('/api/device-pair/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requestId })
+                });
+                const data = await resp.json();
+                
+                if (resp.ok) {
+                    showStatus('Device approved successfully!', 'success');
+                    // Remove from pending list
+                    const card = document.getElementById('pending-' + requestId);
+                    if (card) card.style.display = 'none';
+                    // Refresh the full list after a short delay
+                    setTimeout(loadDevices, 1000);
+                } else {
+                    showStatus('Approve failed: ' + (data.error || 'Unknown error'), 'error');
+                    if (btn) btn.disabled = false;
+                }
+            } catch (e) {
+                showStatus('Error: ' + e.message, 'error');
+                if (btn) btn.disabled = false;
+            }
+        }
+        
+        async function rejectDevice(requestId, btn) {
+            if (!confirm('Reject this device pairing request?')) return;
+            if (btn) btn.disabled = true;
+            showStatus('Rejecting device...', '');
+            
+            try {
+                const resp = await fetch('/api/device-pair/reject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requestId })
+                });
+                const data = await resp.json();
+                
+                if (resp.ok) {
+                    showStatus('Device rejected.', 'success');
+                    const card = document.getElementById('pending-' + requestId);
+                    if (card) card.style.display = 'none';
+                    setTimeout(loadDevices, 1000);
+                } else {
+                    showStatus('Reject failed: ' + (data.error || 'Unknown error'), 'error');
+                    if (btn) btn.disabled = false;
+                }
+            } catch (e) {
+                showStatus('Error: ' + e.message, 'error');
+                if (btn) btn.disabled = false;
+            }
+        }
+        
+        async function approveLatest() {
+            showStatus('Approving latest pending request...', '');
+            try {
+                const resp = await fetch('/api/device-pair/approve-latest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await resp.json();
+                
+                if (resp.ok) {
+                    showStatus('Latest device approved!', 'success');
+                    setTimeout(loadDevices, 1000);
+                } else {
+                    showStatus('Failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (e) {
+                showStatus('Error: ' + e.message, 'error');
+            }
+        }
+        
+        // Listen for real-time updates
+        socket.on('device_pairing_approved', () => {
+            setTimeout(loadDevices, 500);
+        });
+        
+        socket.on('device_pairing_rejected', () => {
+            setTimeout(loadDevices, 500);
+        });
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadDevices, 30000);
+        
+        function copyToken() {
+            const token = '{{ gateway_token }}';
+            const btn = document.getElementById('copy-token-btn');
+            navigator.clipboard.writeText(token).then(() => {
+                btn.textContent = '✓ Copied!';
+                btn.style.borderColor = '#2ecc71';
+                btn.style.color = '#2ecc71';
+                setTimeout(() => {
+                    btn.textContent = '🔑 Copy Gateway Token';
+                    btn.style.borderColor = '#333';
+                    btn.style.color = '#7b68ee';
+                }, 2000);
+            });
+        }
+        
+        // Initial load
+        loadDevices();
+    </script>
+</body>
+</html>
+

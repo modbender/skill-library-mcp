@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shaniidev/lance/assets/templates/finding.schema.json",
+  "title": "Lance Finding",
+  "type": "object",
+  "required": [
+    "title",
+    "severity",
+    "confidence",
+    "target",
+    "chain_environment",
+    "attack_prerequisites",
+    "exploit_path",
+    "impact",
+    "evidence",
+    "recommended_fix"
+  ],
+  "properties": {
+    "title": { "type": "string", "minLength": 3 },
+    "severity": {
+      "type": "string",
+      "enum": ["Critical", "High", "Medium", "Low"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["Confirmed", "Probable", "Theoretical"]
+    },
+    "target": { "type": "string", "minLength": 1 },
+    "chain_environment": { "type": "string", "minLength": 1 },
+    "affected_components": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "attack_prerequisites": { "type": "string" },
+    "exploit_path": { "type": "string" },
+    "expected_vs_actual_state_change": { "type": "string" },
+    "economic_feasibility": { "type": "string" },
+    "impact": { "type": "string", "minLength": 10 },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "suggested_verification": { "type": "string" },
+    "recommended_fix": { "type": "string", "minLength": 5 },
+    "triage_readiness": {
+      "type": "string",
+      "enum": ["Accepted", "Needs More Evidence", "Rejected"]
+    }
+  },
+  "additionalProperties": true
+}

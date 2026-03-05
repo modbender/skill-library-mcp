@@ -1,0 +1,86 @@
+[
+  {
+    "name": "search_primary_data",
+    "description": "检索官方、学术或法律等高置信度一手信源",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "搜索关键词"
+        },
+        "filter": {
+          "type": "string",
+          "enum": ["gov", "edu", "report", "patent"],
+          "description": "信源类型过滤"
+        }
+      },
+      "required": ["query"]
+    }
+  },
+  {
+    "name": "extract_semantic_links",
+    "description": "从长文本中提取实体间的因果关系与时间戳",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "待分析的长文本"
+        },
+        "entities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "关注的实体列表（可选）"
+        }
+      },
+      "required": ["text"]
+    }
+  },
+  {
+    "name": "calculate_confidence",
+    "description": "调用 logic_engine.py 计算证据链置信度",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "evidence_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["primary", "secondary", "tertiary", "unknown"] },
+              "count": { "type": "number" }
+            }
+          },
+          "description": "证据列表"
+        },
+        "logic_entropy": {
+          "type": "number",
+          "minimum": 1.0,
+          "maximum": 3.0,
+          "description": "逻辑熵因子 (1.0-3.0)"
+        }
+      },
+      "required": ["evidence_list"]
+    }
+  },
+  {
+    "name": "red_team_attack",
+    "description": "执行红队对抗，识别证据链脆弱点",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "hypothesis": {
+          "type": "string",
+          "description": "待验证的假设/结论"
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "支撑证据列表"
+        }
+      },
+      "required": ["hypothesis", "evidence"]
+    }
+  }
+]

@@ -1,0 +1,1597 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Location API",
+    "description": "The Locations API provides access to all locations, chains, and departments that are owned by The Kroger Co. <br><br>\n\n### Rate Limit\n\nThe Public Locations API has a **1,600 call a day per endpoint** rate limit. \n\nFor the Locations API, there are three endpoints that each have a 1,600 call per day rate limit. Since we enforce the rate limit by the number of calls the client makes to the endpoint and not individual operations, you can distribute the 1,600 calls across operations using the same endpoint as you see fit. <br><br>\n\n### Pagination\n\nThe Locations API does not support pagination. Since the response has a default limit of ten results, the response is always one page. You can extend the total number of results for the page using the `filter.limit` parameter (200 maximum). \n\n**Note**: The mile radius is set to a 10 mile default. If you extend the number of results using the `filter.limit` parameter, you may need to extend the mile radius using the `filter.radiusInMiles` parameter to get the correct number of results. <br><br>\n\n### API Operations\n\nThe Locations API supports the following operations: <br>\n<table>\n<tr>\n    <th>Name</th>\n    <th>Method</th>\n    <th>Description</th>\n</tr>\n<tr>\n    <td>Location list</td>\n    <td>GET</td>\n    <td>Returns a list of locations matching a given criteria.</td>\n</tr>\n<tr>\n    <td>Location details</td>\n    <td>GET</td>\n    <td>Returns the details of a specific location.</td>\n</tr>\n<tr>\n    <td>Location query</td>\n    <td>HEAD</td>\n    <td>Determines if a specific location exists.</td>\n</tr>\n<tr>\n    <td>Chain list</td>\n    <td>GET</td>\n    <td>Returns a list of all chains owned by The Kroger Co.</td>\n</tr>\n<tr>\n    <td>Chain details</td>\n    <td>GET</td>\n    <td>Returns the details of a specific chain.</td>\n</tr>\n<tr>\n    <td>Chain query</td>\n    <td>HEAD</td>\n    <td>Determines if a specific chain exists.</td>\n</tr>\n<tr>\n    <td>Department list</td>\n    <td>GET</td>\n    <td>Returns a list of all departments for a specific location.</td>\n</tr>\n<tr>\n    <td>Department details</td>\n    <td>GET</td>\n    <td>Returns the details of a specific department.</td>\n</tr>\n<tr>\n    <td>Department query</td>\n    <td>HEAD</td>\n    <td>Determines if a specific department exists.</td>\n</tr>\n</table>\n",
+    "termsOfService": "https://developer.kroger.com/terms",
+    "contact": {
+      "name": "API Support",
+      "email": "APISupport@kroger.com",
+      "url": "https://developer.kroger.com"
+    },
+    "version": "1.2.3"
+  },
+  "servers": [
+    {
+      "url": "https://api.kroger.com",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://api-ce.kroger.com",
+      "description": "Certification Environment"
+    }
+  ],
+  "security": [
+    {
+      "ClientContext": [
+        "any"
+      ]
+    }
+  ],
+  "paths": {
+    "/v1/locations": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Location list",
+        "description": "Provides access to a list of locations. If the parameter `filter.chain` is not provided, the results include all locations and chains owned by The Kroger Co.<br>You may include one of the following parameters to narrow search results within a geographic area:<br><br> <ul> <li> <code>filter.zipCode.near</code></li> <li> <code>filter.latLong.near</code></li> <li> <code>filter.lat.near</code> and <code>filter.lon.near</code></li> </ul>",
+        "operationId": "SearchLocations",
+        "parameters": [
+          {
+            "name": "filter.zipCode.near",
+            "in": "query",
+            "description": "The zip code to use as a starting point for results.",
+            "example": 45044,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.latLong.near",
+            "in": "query",
+            "description": "The latitude and longitude to use as a starting point for results.",
+            "example": "39.306346,-84.278902",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.lat.near",
+            "in": "query",
+            "description": "The latitude to use as a starting point for results.",
+            "example": 39.306346,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.lon.near",
+            "in": "query",
+            "description": "The longitude to use as a starting point for results.",
+            "example": -84.278902,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.radiusInMiles",
+            "in": "query",
+            "description": "The mile radius of results. This will be ignored if you do not use one of the 3 starting point filters (zipCode, latLong, or lat and lon)",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "filter.limit",
+            "in": "query",
+            "description": "The number of results to return.",
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "filter.chain",
+            "in": "query",
+            "description": "The chain name of the chain. When using this filter, only stores matching the provided chain name are returned.",
+            "example": "Kroger",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.department",
+            "in": "query",
+            "description": "The departmentId of the department. Lists must be comma-separated. When using this filter, only stores that have all of the departments provided are returned.",
+            "example": 13,
+            "schema": {
+              "maxLength": 2,
+              "minLength": 2,
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter.locationId",
+            "in": "query",
+            "description": "Comma-separated list of locationIds.",
+            "example": "01400390",
+            "schema": {
+              "maxLength": 8,
+              "minLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.locationSearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_locationId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_zipCode"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_latLong"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_radiusInMiles"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_limit"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_department"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/locations' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/locations\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/locations\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/locations\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/locations/{locationId}": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Location details",
+        "description": "Provides access to the details of a specific location by using the `locationId`.",
+        "operationId": "LocationsGetByID",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "description": "The locationId of the store.",
+            "example": "01400943",
+            "required": true,
+            "schema": {
+              "maxLength": 8,
+              "minLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.locationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_locationId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\\\\n  'https://api.kroger.com/v1/locations/{{LOCATION_ID}}'\n\\\\\\n  -H 'Accept: application/json' \\\\\\n  -H 'Authorization: Bearer {{TOKEN}}'\n\\n\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\",\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Location query",
+        "description": "Determines if a specific location exists by using the `locationId`.",
+        "operationId": "LocationsExistsByID",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "description": "The locationId of the store.",
+            "example": "01400943",
+            "required": true,
+            "schema": {
+              "maxLength": 8,
+              "minLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.noContent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "incorrect locationId format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Invalid_locationId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X HEAD \\\\\\n  'https://api.kroger.com/v1/locations/{{LOCATION_ID}}'\n\\\\\\n  -H 'Accept: application/json' \\\\\\n  -H 'Authorization: Bearer {{TOKEN}}'\n\\n\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\"\n\n  req, _ := http.NewRequest(\"HEAD\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\",\n  \"method\": \"HEAD\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\",\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/locations/{{LOCATION_ID}}\")\n  .head()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/chains": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Chain list",
+        "description": "Provides access to a list of all chains owned by The Kroger Co.",
+        "operationId": "ListChains",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.chainsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/chains' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/chains\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/chains\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\",\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/chains\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/chains/{name}": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Chain details",
+        "description": "Provides access to the details of a specific chian by using the chain `name`.",
+        "operationId": "GetChain",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The name of a chain owned by The Kroger Co. <br><br> **Note**:\nthe chain `name` is returned from the [/chains](#operation/ListChains) endpoint\nas `name` and from the [/locations](#operation/SearchLocations) endpoint\nas `chain`.\n",
+            "example": "Kroger",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.chainResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\\\\n  'https://api.kroger.com/v1/chains/{{NAME}}' \\\\\\n\n\\ -H 'Accept: application/json' \\\\\\n  -H 'Authorization: Bearer {{TOKEN}}'\n\\n\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/chains/{{NAME}}\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/chains/{{NAME}}\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/chains/{{NAME}}\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Chain query",
+        "description": "Determine if a specific chain exists by using the chain `name`.",
+        "operationId": "ChainExists",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The name of a chain owned by The Kroger Co. <br><br> **Note**:\nthe chain `name` is returned from the [/chains](#operation/ListChains) endpoint\nas `name` and from the [/locations](#operation/SearchLocations) endpoint\nas `chain`.\n",
+            "example": "Kroger",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.noContent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X HEAD \\\\\\n  'https://api.kroger.com/v1/chains/{{NAME}}' \\\\\\n\n\\ -H 'Accept: application/json' \\\\\\n  -H 'Authorization: Bearer {{TOKEN}}'\n\\n\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/chains/{{NAME}}\"\n\n  req, _ := http.NewRequest(\"HEAD\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/chains/{{NAME}}\",\n  \"method\": \"HEAD\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/chains/{{NAME}}\")\n  .head()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/departments": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Department list",
+        "description": "Provides access to a list of all departments, including departments of chains owned by The Kroger Co.",
+        "operationId": "ListDepartments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.departmentsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/departments' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/departments\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/departments\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/departments\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"X-Correlation-ID\", \"4cbcad8a-597e-4d42-a9f7-c88e53f430db\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    },
+    "/v1/departments/{id}": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Department details",
+        "description": "Provides access to the details of a specific department by using the `departmentId`. ",
+        "operationId": "GetDepartment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The departmentId of the department to return.",
+            "example": 13,
+            "required": true,
+            "schema": {
+              "maxLength": 2,
+              "minLength": 2,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locations.departmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.departmentsId.badRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \\\n  'https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\"\n\n  req, _ := http.NewRequest(\"GET\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\")\n  .get()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Department query",
+        "description": "Determine if a specific department exists by using the `departmentId`. ",
+        "operationId": "DepartmentExists",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The departmentId of the department to return.",
+            "example": 13,
+            "required": true,
+            "schema": {
+              "maxLength": 2,
+              "minLength": 2,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.noContent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.departmentsId.badRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.notFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError.locations.serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientContext": [
+              "N/A"
+            ]
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X HEAD \\\n  'https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}' \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {{TOKEN}}'\n"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n  \"fmt\"\n  \"net/http\"\n  \"io/ioutil\"\n)\n\nfunc main() {\n\n  url := \"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\"\n\n  req, _ := http.NewRequest(\"HEAD\", url, nil)\n\n  req.Header.Add(\"Accept\", \"application/json\")\n  req.Header.Add(\"Authorization\", \"Bearer {{TOKEN}}\")\n\n  res, _ := http.DefaultClient.Do(req)\n\n  defer res.Body.Close()\n  body, _ := ioutil.ReadAll(res.Body)\n\n  fmt.Println(res)\n  fmt.Println(string(body))\n\n}\n"
+          },
+          {
+            "lang": "JavaScript",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\",\n  \"method\": \"HEAD\",\n  \"headers\": {\n    \"Accept\": \"application/json\",\n    \"Authorization\": \"Bearer {{TOKEN}}\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});\n"
+          },
+          {
+            "lang": "Java",
+            "source": "OkHttpClient client = new OkHttpClient();\n\nRequest request = new Request.Builder()\n  .url(\"https://api.kroger.com/v1/departments/{{DEPARTMENT_ID}}\")\n  .head()\n  .addHeader(\"Accept\", \"application/json\")\n  .addHeader(\"Authorization\", \"Bearer {{TOKEN}}\")\n  .build();\n\nResponse response = client.newCall(request).execute();\n"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "APIError": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "APIError.departmentsId.badRequest": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "Invalid department ID"
+              },
+              "code": {
+                "type": "string",
+                "example": "LOCATION-2119"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564159296910
+              }
+            }
+          }
+        }
+      },
+      "APIError.unauthorized": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "error_description": {
+                "type": "string",
+                "example": "The access token is invalid or has expired"
+              },
+              "error": {
+                "type": "string",
+                "example": "invalid_token"
+              }
+            }
+          }
+        }
+      },
+      "APIError.locations.serverError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "example": "Internal server error"
+              },
+              "code": {
+                "type": "string",
+                "example": "LOCATION-4xxx-xxx"
+              },
+              "timestamp": {
+                "type": "number",
+                "example": 1564159296910
+              }
+            }
+          }
+        }
+      },
+      "APIError.noContent": {
+        "type": "object"
+      },
+      "APIError.notFound": {
+        "type": "object"
+      },
+      "locations.address": {
+        "type": "object",
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "description": "The street address of the location.",
+            "example": "2900 W. St. Rt. 22 & 3"
+          },
+          "addressLine2": {
+            "type": "string",
+            "description": "An optional secondary address of the location.",
+            "example": ""
+          },
+          "city": {
+            "type": "string",
+            "description": "The city of the location.",
+            "example": "Maineville"
+          },
+          "county": {
+            "type": "string",
+            "description": "The county of the location.",
+            "example": "WARREN COUNTY"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state or province of the location. US locations use a two-letter codes for states.",
+            "example": "OH"
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "The postal code of the location.",
+            "example": "45039"
+          }
+        }
+      },
+      "locations.chain": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the chain.",
+            "example": "KROGER"
+          },
+          "divisionNumbers": {
+            "type": "array",
+            "description": "A list of all management division numbers within the brand.",
+            "example": [
+              "01",
+              "02"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain": {
+            "type": "string",
+            "description": "The domain of the chain.",
+            "example": "kroger.com"
+          },
+          "friendlyBannerName": {
+            "type": "string",
+            "description": "The friendly name for this chain.",
+            "example": "Baker's"
+          },
+          "defaultTitle": {
+            "type": "string",
+            "description": "The default title for this chain.",
+            "example": "Baker's"
+          },
+          "titleExtension": {
+            "type": "string",
+            "description": "The title extension for this chain.",
+            "example": "Fresh Food. Low Prices. | Shop Groceries Online"
+          },
+          "appleAppId": {
+            "type": "string",
+            "description": "The Apple app ID for this chain.",
+            "example": "app-id=584405207"
+          },
+          "googleAppId": {
+            "type": "string",
+            "description": "The Google app ID for this chain.",
+            "example": "app-id=com.bakersplus.mobile"
+          },
+          "themeColor": {
+            "type": "string",
+            "description": "The theme color for this chain.",
+            "example": "#ef3e42"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description for this chain.",
+            "example": "Shop low prices on groceries & choose pickup or delivery. Fill prescriptions, save with 100s of digital coupons, get fuel points, cash checks, send money & more at Baker's."
+          },
+          "modalityCapabilities": {
+            "type": "object",
+            "description": "The e-commerce modality capabilities for this chain.",
+            "properties": {
+              "delivery": {
+                "type": "boolean",
+                "description": "Flag for if this chain supports e-commerce delivery."
+              },
+              "instore": {
+                "type": "boolean",
+                "description": "Flag for if this chain supports e-commerce in-store shopping."
+              },
+              "curbside": {
+                "type": "boolean",
+                "description": "Flag for if this chain supports e-commerce pickup."
+              },
+              "shiptohome": {
+                "type": "boolean",
+                "description": "Flag for if this chain supports e-commerce shipping."
+              }
+            }
+          }
+        }
+      },
+      "locations.chainResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/locations.chain"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "locations.chainsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/locations.chain"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaModel"
+          }
+        }
+      },
+      "locations.dailyHours": {
+        "type": "object",
+        "properties": {
+          "open": {
+            "type": "string",
+            "description": "The time the department or location opens.",
+            "example": "05:00"
+          },
+          "close": {
+            "type": "string",
+            "description": "The time the department or location closes.",
+            "example": 1380
+          },
+          "open24": {
+            "type": "boolean",
+            "description": "Indicates if the location or department is open 24 hours.",
+            "example": false
+          }
+        }
+      },
+      "locations.departmentAtLocation": {
+        "type": "object",
+        "properties": {
+          "departmentId": {
+            "type": "string",
+            "description": "The 2-digit department code.",
+            "example": "01"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the department.",
+            "example": "Drug & General Merchandise"
+          },
+          "phone": {
+            "type": "string",
+            "description": "The phone number of the department.",
+            "example": "5551234567"
+          },
+          "hours": {
+            "$ref": "#/components/schemas/locations.departmentHours"
+          }
+        }
+      },
+      "locations.department": {
+        "type": "object",
+        "properties": {
+          "departmentId": {
+            "type": "string",
+            "description": "The 2-digit department code.",
+            "example": "01"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the department.",
+            "example": "Drug & General Merchandise"
+          }
+        }
+      },
+      "locations.departmentResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/locations.department"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "locations.departmentsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/locations.department"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaModel"
+          }
+        }
+      },
+      "locations.geoLocation": {
+        "type": "object",
+        "properties": {
+          "latLng": {
+            "type": "string",
+            "description": "The latitude and longitude of the location, comma separated",
+            "example": "39.3110881,-84.2751167"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The latitude of the location",
+            "example": 39.3110881
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The longitude of the location",
+            "example": -84.2751167
+          }
+        }
+      },
+      "locations.locationHours": {
+        "type": "object",
+        "properties": {
+          "Open24": {
+            "type": "boolean",
+            "description": "Indicates if the location is open 24 hours."
+          },
+          "gmtOffset": {
+            "type": "string",
+            "description": "The utc timezone offset from gmt.",
+            "example": "(UTC-05:00) Eastern Time (US Canada)"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The timezone of the location.",
+            "example": "America/New_York"
+          },
+          "friday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "monday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "saturday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "sunday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "thursday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "tuesday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "wednesday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          }
+        }
+      },
+      "locations.departmentHours": {
+        "type": "object",
+        "properties": {
+          "Open24": {
+            "type": "boolean",
+            "description": "Indicates if the location is open 24 hours.",
+            "example": false
+          },
+          "monday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "tuesday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "wednesday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "thursday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "friday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "saturday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          },
+          "sunday": {
+            "$ref": "#/components/schemas/locations.dailyHours"
+          }
+        }
+      },
+      "locations.location": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/locations.address"
+          },
+          "chain": {
+            "type": "string",
+            "description": "The name of the chain.",
+            "example": "KROGER"
+          },
+          "phone": {
+            "type": "string",
+            "description": "The phone number of the location.",
+            "example": "5551234567"
+          },
+          "departments": {
+            "type": "array",
+            "description": "The available departments at the location.",
+            "items": {
+              "$ref": "#/components/schemas/locations.departmentAtLocation"
+            }
+          },
+          "geolocation": {
+            "$ref": "#/components/schemas/locations.geoLocation"
+          },
+          "hours": {
+            "$ref": "#/components/schemas/locations.locationHours"
+          },
+          "locationId": {
+            "type": "string",
+            "description": "The 3-digit management division number followed by the 5-digit store number.",
+            "example": "01400376"
+          },
+          "storeNumber": {
+            "type": "string",
+            "description": "The 5-digit store number.",
+            "example": "00376"
+          },
+          "divisionNumber": {
+            "type": "string",
+            "description": "The 3-digit management division number.",
+            "example": "014"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the location. The name generally consists of the chain followed by a vanity name.",
+            "example": "Kroger Landen"
+          }
+        }
+      },
+      "locations.locationSearchResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/locations.location"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaModel"
+          }
+        }
+      },
+      "locations.locationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/locations.location"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaModel"
+          }
+        }
+      },
+      "MetaModel": {
+        "type": "object",
+        "properties": {
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "start": {
+                "type": "number"
+              },
+              "limit": {
+                "type": "number"
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Invalid_locationId": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'locationId' must have a length of 8 characters"
+          }
+        }
+      },
+      "Invalid_zipCode": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'filter.zipCode.near' must 5 digits"
+          }
+        }
+      },
+      "Invalid_latLong": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'filter.latLong.near' improper coordinate location, must be on Earth"
+          }
+        }
+      },
+      "Invalid_radiusInMiles": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'filter.radiusInMiles' outside of distance limits, distance range is 1 - 100 miles."
+          }
+        }
+      },
+      "Invalid_department": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'filter.department' contains invalid department ID(s)"
+          }
+        }
+      },
+      "Invalid_limit": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "example": 1569851999383
+          },
+          "code": {
+            "type": "string",
+            "example": "API-4101-400"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Field 'limit' must be a number between 1 and 200 (inclusive)"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ClientContext": {
+        "type": "oauth2",
+        "description": "To make an API request that interacts with generalized information and does not require customer consent, use the [Client Credentials Grant Type](https://developer.kroger.com/reference/api/authorization-endpoints-public#tag/OAuth2/operation/accessToken) to authenticate your OAuth2 application.\n",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.kroger.com/v1/connect/oauth2/token",
+            "scopes": {
+              "N/A": "No scope required."
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "API Reference",
+      "tags": [
+        "Locations"
+      ]
+    }
+  ]
+}

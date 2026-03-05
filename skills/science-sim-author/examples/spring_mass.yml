@@ -1,0 +1,76 @@
+id: spring_mass_damper
+title: Spring-Mass-Damper Oscillator
+domain: mechanics
+level: high_school
+dt:
+  default: 0.01
+  min: 0.001
+  max: 0.05
+state:
+  - name: x
+    unit: m
+  - name: v
+    unit: m/s
+params:
+  - name: m
+    unit: kg
+    value: 1
+    min: 0.2
+    max: 5
+    desc: Mass attached to the spring
+  - name: k
+    unit: N/m
+    value: 10
+    min: 1
+    max: 30
+    desc: Spring constant
+  - name: c
+    unit: N*s/m
+    value: 0.4
+    min: 0
+    max: 3
+    desc: Damping coefficient
+  - name: drive_amp
+    unit: N
+    value: 0
+    min: 0
+    max: 8
+    desc: Driving force amplitude
+  - name: drive_omega
+    unit: rad/s
+    value: 0
+    min: 0
+    max: 8
+    desc: Driving force angular frequency
+initial:
+  x: 0.5
+  v: 0
+equations:
+  dx: v
+  dv: (-k * x - c * v + drive_amp * Math.sin(drive_omega * t)) / m
+outputs:
+  - type: plot
+    x: t
+    y: x
+    label: Displacement vs time
+  - type: plot
+    x: t
+    y: v
+    label: Velocity vs time
+worksheet:
+  predict:
+    - Predict what happens to the oscillation period if the spring constant increases while mass stays fixed.
+    - If damping increases, predict how the displacement peaks will change over time.
+    - Predict what happens when the drive amplitude increases from zero while damping stays small.
+  test:
+    - Keep the initial displacement fixed and compare a low-damping run with a high-damping run using the plot.
+    - Hold m, k, and c fixed, then turn on the driving force and compare the motion to the undriven case.
+  explain:
+    - Explain why the oscillation period changes when the mass changes even though the initial displacement is the same.
+    - Explain how damping changes the energy visible in the displacement-time curve.
+  misconceptions:
+    - Does stronger damping move the equilibrium point, or only change how the motion approaches it?
+    - If the mass starts farther from equilibrium, does that automatically change the natural period?
+success_criteria:
+  - Increasing damping reduces the amplitude envelope over time.
+  - Reset restores the exact initial displacement and velocity.

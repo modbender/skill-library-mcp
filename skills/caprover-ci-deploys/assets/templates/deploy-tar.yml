@@ -1,0 +1,43 @@
+name: Deploy to CapRover
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: a7ul/tar-action@v1.1.0
+        with:
+          command: c
+          cwd: ./
+          files: |
+            dist/
+            captain-definition
+          outPath: deploy.tar
+
+      - uses: caprover/deploy-from-github@v1
+        with:
+          server: ${{ secrets.CAPROVER_HOST }}
+          app: ${{ secrets.CAPROVER_APP }}
+          token: ${{ secrets.CAPROVER_APP_TOKEN }}

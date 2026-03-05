@@ -1,0 +1,223 @@
+{
+  "$schema": "https://clawd.bot/schemas/lead-enrichment-config.json",
+  "version": "1.0.0",
+
+  "enrichment": {
+    "depth": "standard",
+    "_depth_options": ["quick", "standard", "deep"],
+    "_depth_quick": "Basic profile only (name, title, LinkedIn, company) — ~10 sec",
+    "_depth_standard": "Above + social profiles + recent activity — ~30 sec (default)",
+    "_depth_deep": "Above + news mentions + talking points + shared connections — ~60 sec",
+
+    "sources": {
+      "linkedin": {
+        "enabled": true,
+        "use_public_search": true,
+        "max_results_to_check": 5,
+        "_note": "Public profile search only, respects robots.txt"
+      },
+      "twitter": {
+        "enabled": true,
+        "fetch_recent_tweets": true,
+        "max_tweets": 10,
+        "_note": "Bio, recent activity, follower count"
+      },
+      "github": {
+        "enabled": true,
+        "fetch_repos": true,
+        "fetch_recent_activity": true,
+        "_note": "Great for technical leads — repos, commits, README"
+      },
+      "company_website": {
+        "enabled": true,
+        "check_team_page": true,
+        "check_about_page": true,
+        "check_press_page": true,
+        "_note": "Scrapes team directories, bios, company info"
+      },
+      "news": {
+        "enabled": true,
+        "search_google_news": true,
+        "max_articles": 5,
+        "recency_days": 30,
+        "_note": "Recent mentions in news/blogs"
+      },
+      "crunchbase": {
+        "enabled": true,
+        "use_public_data": true,
+        "_note": "Company funding, size, industry (no API key needed for basics)"
+      }
+    },
+
+    "premium_sources": {
+      "_note": "Optional paid services — add API keys to ~/.clawdbot/secrets.env",
+      "hunter_io": {
+        "enabled": false,
+        "api_key_env": "HUNTER_API_KEY",
+        "verify_emails": true,
+        "_benefit": "95%+ email accuracy with verification"
+      },
+      "clearbit": {
+        "enabled": false,
+        "api_key_env": "CLEARBIT_API_KEY",
+        "_benefit": "Enhanced company data, logo, social profiles"
+      },
+      "apollo": {
+        "enabled": false,
+        "api_key_env": "APOLLO_API_KEY",
+        "_benefit": "Direct contact info (email + phone)"
+      }
+    }
+  },
+
+  "contact_discovery": {
+    "email": {
+      "enabled": true,
+      "try_common_patterns": true,
+      "patterns": [
+        "{first}@{domain}",
+        "{first}.{last}@{domain}",
+        "{f}{last}@{domain}",
+        "{first}{last}@{domain}",
+        "{first}_{last}@{domain}",
+        "{last}@{domain}"
+      ],
+      "min_confidence": 0.50,
+      "verify_mx_records": true,
+      "_note": "Pattern-based guessing. Add Hunter.io for verification."
+    },
+    "phone": {
+      "enabled": true,
+      "sources": ["linkedin_public", "company_website", "news_articles"],
+      "_note": "Only finds publicly listed numbers (rare)"
+    }
+  },
+
+  "output": {
+    "format": "json",
+    "_format_options": ["json", "markdown", "csv"],
+    "_format_json": "Structured data, easy to parse",
+    "_format_markdown": "Human-readable reports",
+    "_format_csv": "Import to CRM/spreadsheet",
+
+    "include": {
+      "contact_info": true,
+      "social_profiles": true,
+      "recent_activity": true,
+      "company_intel": true,
+      "talking_points": true,
+      "raw_sources": true,
+      "_note": "Toggle what appears in output"
+    },
+
+    "save_to_disk": true,
+    "storage_path": "~/.config/lead-enrichment/data/leads",
+    "filename_pattern": "{name_slug}-{company_slug}.json",
+
+    "also_output_markdown": false,
+    "_also_output_markdown_note": "Generate .md file alongside .json for quick review"
+  },
+
+  "talking_points": {
+    "enabled": true,
+    "count": 5,
+    "style": "professional",
+    "_style_options": ["professional", "friendly", "bold"],
+    "_style_professional": "Formal, business-focused",
+    "_style_friendly": "Conversational, warm",
+    "_style_bold": "Direct, provocative (for cold outreach)",
+
+    "include_sections": {
+      "recent_activity_hooks": true,
+      "shared_interests": true,
+      "company_news_tie_ins": true,
+      "mutual_connections": true,
+      "pain_point_guesses": true
+    },
+
+    "ai_model": "claude-sonnet-4",
+    "_note": "Requires Claude. Falls back to rule-based if not available."
+  },
+
+  "intelligence": {
+    "job_change_detection": {
+      "enabled": true,
+      "recency_days": 90,
+      "_note": "Check if they recently changed roles (high-value signal)"
+    },
+    "company_news_signals": {
+      "enabled": true,
+      "keywords": ["funding", "acquisition", "launch", "hiring", "expansion", "pivot"],
+      "_note": "Identify timing opportunities (just raised money, hiring, etc.)"
+    },
+    "shared_connections": {
+      "enabled": false,
+      "_note": "Future: check mutual connections via agent networks"
+    },
+    "interest_extraction": {
+      "enabled": true,
+      "sources": ["bio", "recent_posts", "github_repos"],
+      "max_interests": 10,
+      "_note": "Extract topics they care about for personalization"
+    }
+  },
+
+  "privacy": {
+    "respect_robots_txt": true,
+    "rate_limit_delay_ms": 2000,
+    "_rate_limit_note": "2-second delay between requests to same domain",
+
+    "respect_linkedin_robots": true,
+    "_linkedin_note": "Use public search only, no profile scraping",
+
+    "store_locally": true,
+    "data_retention_days": 30,
+    "_retention_note": "Cache expires after 30 days, then re-enriches",
+
+    "include_source_urls": true,
+    "_source_urls_note": "Transparency — show where data came from"
+  },
+
+  "batch": {
+    "parallel_workers": 3,
+    "_parallel_note": "Process 3 leads concurrently (balance speed vs rate limits)",
+
+    "resume_on_failure": true,
+    "save_progress_every": 10,
+    "_progress_note": "Checkpoint every 10 leads so you can resume if interrupted",
+
+    "error_handling": {
+      "retry_failed": true,
+      "max_retries": 2,
+      "log_errors_to": "~/.config/lead-enrichment/data/batch-errors.json"
+    },
+
+    "input_formats": ["csv", "json", "jsonl"],
+    "_csv_columns": "Expected columns: name, company, email, linkedin_url (min: name OR email)",
+    "_json_format": "Array of objects: [{\"name\": \"...\", \"company\": \"...\"}, ...]"
+  },
+
+  "integrations": {
+    "trawl": {
+      "enabled": false,
+      "auto_enrich_qualified_leads": false,
+      "_note": "Auto-enrich leads that reach QUALIFIED state in trawl"
+    },
+    "crm": {
+      "enabled": false,
+      "webhook_url": null,
+      "_note": "POST enriched leads to your CRM after processing"
+    }
+  },
+
+  "experimental": {
+    "linkedin_chrome_extension": {
+      "enabled": false,
+      "_note": "Future: enrich from browser while viewing LinkedIn profile"
+    },
+    "real_time_alerts": {
+      "enabled": false,
+      "_note": "Future: alert when a cached lead has new activity"
+    }
+  }
+}

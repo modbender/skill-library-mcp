@@ -1,0 +1,58 @@
+# Expanso Pipeline: json-validate (MCP mode)
+# ===========================================
+#
+# Usage:
+#   PORT=8080 expanso-edge run pipeline-mcp.yaml &
+#   curl -X POST http://localhost:8080/validate \
+#     -d '{"json": "{\"key\": \"value\"}"}'
+
+name: "json-validate-mcp"
+type: pipeline
+
+config:
+  http:
+    enabled: true
+    address: "0.0.0.0:${PORT:-8080}"
+
+  input:
+    http_server:
+      path: /validate
+      allowed_verbs: [POST]
+      timeout: 30s
+
+  pipeline:
+    processors:
+      - mapping: |
+          let json_content = this.json.or(content())
+          meta input_hash = $json_content.hash("sha256").encode("hex")
+          meta input_length = $json_content.length()
+          meta trace_id = uuid_v4()
+
+          let parsed = $json_content.parse_json().catch(null)
+          let error = if $parsed == null { "Invalid JSON syntax" } else { null }
+
+          root.valid = $parsed != null
+          root.error = $error
+          root.parsed = $parsed
+          root.stats = if $parsed != null {
+            {
+              "type": $parsed.type(),
+              "length": $json_content.length()
+            }
+          } else { null }
+          root.metadata = {
+            "skill": "json-validate",
+            "mode": "mcp",
+            "input_hash": meta("input_hash"),
+            "input_length": meta("input_length"),
+            "trace_id": meta("trace_id"),
+            "timestamp": now()
+          }
+
+      - log:
+          level: INFO
+          message: |
+            [json-validate] Valid: ${! root.valid } (trace: ${! meta("trace_id").slice(0, 8) })
+
+  output:
+    sync_response: {}

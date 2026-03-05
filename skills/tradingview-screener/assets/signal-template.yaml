@@ -1,0 +1,58 @@
+# Signal Template - Copy and customize
+# Save to state/signals/{your-signal-name}.yaml
+
+name: my-signal              # Required: unique signal name
+description: ""              # Required: what this signal detects
+asset_class: stock           # Required: stock|crypto|forex|bond|futures|coin
+timeframe: "1D"              # Optional: 1|5|15|30|60|120|240|1D|1W|1M
+
+# API pre-filters (server-side, fast)
+filters:
+  - field: MARKET_CAPITALIZATION
+    op: ">"
+    value: 1000000000
+  # - field: VOLUME
+  #   op: ">="
+  #   value: 500000
+  # Operators: > >= < <= == != between isin
+  # For between: value: [min, max]
+  # For isin: value: [val1, val2, ...]
+
+# Columns to fetch (use full enum names)
+columns:
+  - NAME
+  - PRICE
+  - CHANGE_PERCENT
+  - VOLUME
+  # More: SIMPLE_MOVING_AVERAGE_50, SIMPLE_MOVING_AVERAGE_200,
+  #       RELATIVE_STRENGTH_INDEX_14, MACD_LEVEL_12_26,
+  #       AVERAGE_VOLUME_30_DAY, MARKET_CAPITALIZATION, SECTOR
+
+# Post-fetch computed signals (pandas, client-side)
+computed:
+  # Crossover: detect MA/indicator crossovers
+  - type: crossover
+    fast: SIMPLE_MOVING_AVERAGE_50
+    slow: SIMPLE_MOVING_AVERAGE_200
+    direction: up            # up|down|both
+
+  # Threshold: field vs value comparison
+  # - type: threshold
+  #   field: RELATIVE_STRENGTH_INDEX_14
+  #   op: "<"
+  #   value: 30
+
+  # Expression: pandas eval expression (use enum-style field names)
+  # - type: expression
+  #   expr: "VOLUME > AVERAGE_VOLUME_30_DAY * 2"
+
+  # Range: field between bounds
+  # - type: range
+  #   field: RELATIVE_STRENGTH_INDEX_14
+  #   min: 40
+  #   max: 60
+
+# Output control
+sort_by: VOLUME
+sort_order: desc             # asc|desc
+limit: 20                    # Max results

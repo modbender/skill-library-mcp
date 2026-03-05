@@ -1,0 +1,94 @@
+{
+  "name": "epistemic_council",
+  "version": "2.0.0",
+  "description": "Cross-domain reasoning with adversarial validation. Orchestrated by OpenClaw.",
+  "author": "Epistemic Council Project",
+  "type": "skill",
+
+  "triggers": [
+    "analyze cross-domain",
+    "find analogies",
+    "structural similarities",
+    "epistemic reasoning",
+    "validated insights",
+    "cross-domain patterns",
+    "run council",
+    "run pipeline",
+    "substrate status",
+    "epistemic status",
+    "council status"
+  ],
+
+  "permissions": {
+    "workspace": "read_write",
+    "filesystem": [
+      "epistemic_council/epistemic.db",
+      "epistemic_council/memory/**",
+      "epistemic_council/agent_learning.json",
+      "epistemic_council/openclaw_memory.json"
+    ],
+    "shell": true,
+    "network": "localhost_only"
+  },
+
+  "workspace": {
+    "root": "../",
+    "access": "read_write",
+    "allowedPaths": [
+      "epistemic_council/**",
+      "memory/**",
+      "HEARTBEAT.md",
+      "MEMORY.md",
+      "USER.md",
+      "IDENTITY.md",
+      "SOUL.md",
+      "AGENTS.md",
+      "TOOLS.md"
+    ],
+    "deniedPaths": []
+  },
+
+  "capabilities": {
+    "reasoning": true,
+    "validation": true,
+    "learning": true,
+    "provenance": true,
+    "shell_execution": true,
+    "file_read": true,
+    "file_write": true
+  },
+
+  "entrypoints": {
+    "dispatch": "epistemic_skill.py",
+    "pipeline": "run.py",
+    "health": "substrate_health.py",
+    "validate": "validate_claim.py",
+    "gaps": "evidence_search.py",
+    "rechallenge": "adversarial_rechallenge.py",
+    "boundary": "boundary_audit.py",
+    "compress": "memory_compress.py"
+  },
+
+  "requirements": {
+    "python": ">=3.8",
+    "ollama": true,
+    "model": "qwen2.5:14b"
+  },
+
+  "configuration": {
+    "min_confidence": 0.5,
+    "max_insights": 5,
+    "enable_learning": true,
+    "validation_mode": "strict",
+    "db_path": "epistemic.db",
+    "memory_dir": "memory"
+  },
+
+  "storage": {
+    "database": "epistemic.db",
+    "learning": "agent_learning.json",
+    "memory": "openclaw_memory.json",
+    "heartbeat_state": "memory/heartbeat-state.json",
+    "runs_log": "memory/openclaw-runs/"
+  }
+}

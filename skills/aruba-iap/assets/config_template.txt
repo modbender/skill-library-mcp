@@ -1,0 +1,156 @@
+# Aruba IAP Configuration Template
+# Replace values in <brackets> with your actual configuration
+
+#
+# System Configuration
+#
+
+! Enter configuration mode
+configure terminal
+
+! Hostname configuration
+hostname <AP-HOSTNAME>
+
+! Domain name (optional)
+ip domain-name <domain-name>
+
+! DNS servers (optional)
+ip name-server 8.8.8.8
+ip name-server 8.8.4.4
+
+!
+# Network Configuration
+#
+
+! Management IP Address
+ip address <IP-ADDRESS> <NETMASK>
+
+! Default Gateway
+ip default-gateway <GATEWAY-IP>
+
+! Timezone (example: America/New_York)
+clock timezone <TIMEZONE>
+
+!
+# Management Access
+#
+
+! Create admin user
+mgmt-user admin privilege 15
+! Set admin password (do this interactively for security)
+! admin-password
+
+! Enable SSH
+security-management enable
+
+!
+# WLAN Configuration
+#
+
+! Corporate WLAN
+wlan corporate
+ssid <CORPORATE-SSID>
+broadcast-ssid enable
+security wpa2-enterprise
+auth-server <RADIUS-SERVER-IP>
+auth-server port 1812
+auth-server secret <RADIUS-SHARED-SECRET>
+security eap-type peap
+vlan-id <VLAN-ID>
+opmode access
+exit
+
+! Guest WLAN
+wlan guest
+ssid <GUEST-SSID>
+broadcast-ssid enable
+security wpa2-psk
+wpa2-passphrase <GUEST-PASSWORD>
+vlan-id <GUEST-VLAN-ID>
+opmode access
+exit
+
+! IoT WLAN (optional)
+wlan iot
+ssid <IOT-SSID>
+broadcast-ssid enable
+security wpa2-psk
+wpa2-passphrase <IOT-PASSWORD>
+vlan-id <IOT-VLAN-ID>
+opmode access
+exit
+
+!
+# Interface Configuration
+#
+
+! Uplink interface (typically port 0 or ge-0/1)
+interface port0
+switchport mode trunk
+switchport trunk native-vlan <NATIVE-VLAN-ID>
+switchport trunk allowed-vlan <VLAN-LIST-COMMA-SEPARATED>
+no shutdown
+
+! Switch ports (for IAP-205/215 etc.)
+interface port1
+switchport mode access
+switchport access vlan <VLAN-ID>
+no shutdown
+
+interface port2
+switchport mode access
+switchport access vlan <VLAN-ID>
+no shutdown
+
+!
+# Radio Configuration
+#
+
+! 2.4 GHz radio
+radio 2.4GHz
+channel <CHANNEL-1>
+channel-width 40
+tx-power-level 50
+dfs-enable enable
+
+! 5 GHz radio
+radio 5GHz
+channel <CHANNEL-2>
+channel-width 80
+tx-power-level 50
+dfs-enable enable
+
+!
+# Cluster Configuration (if applicable)
+#
+
+! Create AP group
+ap-group <CLUSTER-NAME>
+master-redundancy enable
+
+! Configure master IAP (optional)
+! master <MAC-ADDRESS>
+
+!
+# Security Configuration
+#
+
+! Enable WIDS (Wireless Intrusion Detection)
+wids enable
+
+! Configure rogue AP detection
+! wids rogue-ap classification enable
+
+!
+# QoS Configuration (optional)
+#
+
+! Voice traffic priority (DSCP EF = 46)
+! qos wlan corporate trust dscp 46
+
+!
+# Save Configuration
+!
+
+write memory
+exit

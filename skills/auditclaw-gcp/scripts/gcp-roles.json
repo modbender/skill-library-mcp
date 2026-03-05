@@ -1,0 +1,61 @@
+{
+  "provider": "gcp",
+  "title": "GCP IAM Roles",
+  "description": "Required GCP IAM roles for AuditClaw compliance scanning",
+  "authentication": {
+    "recommended": "Service Account Key (JSON)",
+    "alternative": "gcloud auth application-default login",
+    "env_vars": {
+      "GOOGLE_APPLICATION_CREDENTIALS": "Path to service account JSON key file",
+      "GCP_PROJECT_ID": "Target GCP project ID"
+    }
+  },
+  "roles": [
+    {
+      "role": "roles/viewer",
+      "scope": "Project",
+      "reason": "Read access to most GCP resources (storage, compute, firewall, BigQuery)"
+    },
+    {
+      "role": "roles/iam.securityReviewer",
+      "scope": "Project",
+      "reason": "Read access to IAM policies, service account keys, and security settings"
+    },
+    {
+      "role": "roles/cloudsql.viewer",
+      "scope": "Project",
+      "reason": "Read access to Cloud SQL instance configurations and SSL settings"
+    },
+    {
+      "role": "roles/logging.viewer",
+      "scope": "Project",
+      "reason": "Read access to audit log configuration and log sinks"
+    },
+    {
+      "role": "roles/dns.reader",
+      "scope": "Project",
+      "reason": "Read access to Cloud DNS zones for DNSSEC verification"
+    },
+    {
+      "role": "roles/cloudkms.viewer",
+      "scope": "Project",
+      "reason": "Read access to KMS key rotation policies"
+    }
+  ],
+  "setup_commands": {
+    "create_sa": "gcloud iam service-accounts create auditclaw-scanner --display-name='AuditClaw Scanner'",
+    "grant_roles": "for role in roles/viewer roles/iam.securityReviewer roles/cloudsql.viewer roles/logging.viewer roles/dns.reader roles/cloudkms.viewer; do\n  gcloud projects add-iam-policy-binding PROJECT_ID \\\n    --member=serviceAccount:auditclaw-scanner@PROJECT_ID.iam.gserviceaccount.com \\\n    --role=$role\ndone",
+    "create_key": "gcloud iam service-accounts keys create key.json --iam-account=auditclaw-scanner@PROJECT_ID.iam.gserviceaccount.com"
+  },
+  "checks_covered": {
+    "storage": "Uniform bucket-level access, public access prevention",
+    "firewall": "No unrestricted SSH/RDP/all-ports ingress from 0.0.0.0/0",
+    "iam": "Service account key rotation (90 days), no SA with admin privileges",
+    "logging": "Audit logging enabled for all services, log export sink exists",
+    "kms": "KMS key rotation period <= 90 days",
+    "dns": "DNSSEC enabled on public DNS zones",
+    "bigquery": "No datasets accessible to allUsers or allAuthenticatedUsers",
+    "compute": "No VMs using default SA with cloud-platform scope",
+    "cloudsql": "SSL enforcement enabled, no public IP with 0.0.0.0/0 access"
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "name": "complete_sales_workflow",
+  "version": "1.0.0",
+  "description": "Execute a complete sales workflow: Quotation → Sales Order → Invoice → Payment",
+  "author": "Business Claw Team",
+  "category": "sales",
+  
+  "triggers": [
+    "complete sales workflow",
+    "full sales process",
+    "end to end sales",
+    "process order to payment"
+  ],
+  
+  "tools": [
+    {
+      "name": "create_document",
+      "description": "Create quotation",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit quotation",
+      "required": false
+    },
+    {
+      "name": "create_document",
+      "description": "Create sales order from quotation",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit sales order",
+      "required": false
+    },
+    {
+      "name": "create_document",
+      "description": "Create sales invoice",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit invoice",
+      "required": false
+    },
+    {
+      "name": "create_document",
+      "description": "Record payment",
+      "required": true
+    },
+    {
+      "name": "submit_document",
+      "description": "Submit payment",
+      "required": false
+    }
+  ],
+  
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_id": {
+        "type": "string",
+        "description": "Customer ID"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_code": {"type": "string"},
+            "qty": {"type": "number"},
+            "rate": {"type": "number"}
+          }
+        },
+        "description": "List of items"
+      },
+      "auto_submit": {
+        "type": "boolean",
+        "description": "Auto-submit all documents",
+        "default": false
+      }
+    },
+    "required": ["customer_id", "items"]
+  },
+  
+  "workflow": {
+    "steps": [
+      {
+        "step": "create_quotation",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Quotation",
+          "data": {
+            "quotation_to": "Customer",
+            "party_name": "${customer_id}",
+            "items": "${items}"
+          }
+        }
+      },
+      {
+        "step": "create_sales_order",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Sales Order",
+          "data": {
+            "customer": "${customer_id}",
+            "items": "${items}"
+          }
+        }
+      },
+      {
+        "step": "create_invoice",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Sales Invoice",
+          "data": {
+            "customer": "${customer_id}",
+            "items": "${items}"
+          }
+        }
+      },
+      {
+        "step": "create_payment",
+        "tool": "create_document",
+        "arguments": {
+          "doctype": "Payment Entry",
+          "data": {
+            "payment_type": "Receive",
+            "party_type": "Customer",
+            "party": "${customer_id}",
+            "paid_amount": "${total}",
+            "references": [
+              {
+                "reference_doctype": "Sales Invoice",
+                "reference_name": "${invoice_name}",
+                "allocated_amount": "${total}"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  
+  "guardrails": {
+    "max_amount": 1000000,
+    "require_credit_check": true,
+    "validate_stock": true
+  },
+  
+  "output_template": "Completed Sales Workflow\nQuotation: {{quotation_name}}\nSales Order: {{sales_order_name}}\nInvoice: {{invoice_name}}\nPayment: {{payment_name}}\nTotal Value: {{grand_total}}"
+}

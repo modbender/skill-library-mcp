@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: [Your API Title]
+  description: [A brief, clear description of what your API does.]
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/v1
+    description: Development Server
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Check if the service is running.
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A short, machine-readable error code.
+          example: NOT_FOUND
+        message:
+          type: string
+          description: A human-readable error message.
+        details:
+          type: array
+          items:
+            type: string
+          description: Optional array of specific validation errors.
+
+  responses:
+    Unauthorized:
+      description: Authentication information is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The user does not have permission to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,416 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Ringez Phone Calling API",
+    "description": "Make affordable international phone calls to 200+ countries. No subscriptions, no hidden fees — just pay for the minutes you use.",
+    "version": "1.0.7",
+    "contact": {
+      "email": "support@ringez.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://ringez-api.vercel.app/api/v1",
+      "description": "Production API"
+    }
+  ],
+  "paths": {
+    "/auth/check-email": {
+      "post": {
+        "operationId": "checkEmail",
+        "summary": "Check if email is registered",
+        "description": "Check if an email address already has an account. Returns 'new_user' or 'existing_user' to determine next steps.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_status": {
+                      "type": "string",
+                      "enum": ["new_user", "existing_user"],
+                      "description": "Whether this email is new or already registered"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/send-otp": {
+      "post": {
+        "operationId": "sendOtp",
+        "summary": "Send OTP to email",
+        "description": "Send a one-time password to the email address for verification.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully"
+          }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "operationId": "verifyOtp",
+        "summary": "Verify OTP and create account",
+        "description": "Verify the OTP code and create a new account. Returns a session_id that must be included in all subsequent requests.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "description": "6-digit OTP code",
+                    "example": "123456"
+                  }
+                },
+                "required": ["email", "otp"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully with 5 free minutes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "type": "string",
+                      "description": "Session ID to include in X-Session-ID header for all requests",
+                      "example": "sess_abc123xyz"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "email": {"type": "string"},
+                        "balance_minutes": {"type": "number", "example": 5}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Login with email and password",
+        "description": "Authenticate an existing user with their email and password.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string", "example": "logged_in"},
+                    "session_id": {"type": "string"},
+                    "user": {"type": "object"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "getBalance",
+        "summary": "Get user balance and profile",
+        "description": "Check your current minute balance and account details.",
+        "parameters": [
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Session ID from login or verify-otp"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Balance retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "balance_minutes": {
+                      "type": "number",
+                      "description": "Available calling minutes",
+                      "example": 15
+                    },
+                    "balance_usd": {
+                      "type": "number",
+                      "description": "Equivalent USD value",
+                      "example": 1.875
+                    },
+                    "email": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calls/initiate": {
+      "post": {
+        "operationId": "initiateCall",
+        "summary": "Make a phone call",
+        "description": "Initiate a phone call to any international number. Use idempotency_key to prevent duplicate calls from network retries or double-clicks.",
+        "parameters": [
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Your session ID from authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to_number": {
+                    "type": "string",
+                    "description": "Destination phone number with country code (E.164 format)",
+                    "example": "+919876543210"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": ["bridge", "direct"],
+                    "description": "bridge: your phone rings first | direct: calls destination directly",
+                    "default": "bridge"
+                  },
+                  "idempotency_key": {
+                    "type": "string",
+                    "description": "Unique key to prevent duplicate calls within 5 minutes. Format: <session_id>_<timestamp>_<random>",
+                    "example": "sess_abc123_1700000000000_xyz789"
+                  }
+                },
+                "required": ["to_number"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Call initiated or duplicate detected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "description": "New call created",
+                      "properties": {
+                        "call_id": {"type": "string"},
+                        "status": {"type": "string", "example": "initiated"},
+                        "mode": {"type": "string", "enum": ["bridge", "direct"]},
+                        "to_number": {"type": "string"},
+                        "from_number": {"type": "string"},
+                        "twilio_call_sid": {"type": "string"}
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "description": "Duplicate call detected (same idempotency_key within 5 minutes)",
+                      "properties": {
+                        "alreadyInitiated": {"type": "boolean", "example": true},
+                        "callSid": {"type": "string"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calls/{call_id}": {
+      "get": {
+        "operationId": "getCallStatus",
+        "summary": "Get call status and details",
+        "description": "Check the current status, duration, and cost of a call.",
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Call ID from initiate response"
+          },
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Call details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "call_id": {"type": "string"},
+                    "status": {"type": "string", "enum": ["initiated", "ringing", "in-progress", "completed", "failed"]},
+                    "duration": {"type": "number", "description": "Call duration in seconds"},
+                    "estimated_cost": {
+                      "type": "object",
+                      "properties": {
+                        "minutes": {"type": "number"},
+                        "amount": {"type": "number"},
+                        "currency": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "endCall",
+        "summary": "End a call",
+        "description": "Hang up an ongoing call before it completes naturally.",
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Call ended successfully"
+          }
+        }
+      }
+    },
+    "/calls": {
+      "get": {
+        "operationId": "getCallHistory",
+        "summary": "Get call history",
+        "description": "Retrieve paginated list of past calls.",
+        "parameters": [
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 10},
+            "description": "Number of calls to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {"type": "integer", "default": 0},
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Call history retrieved"
+          }
+        }
+      }
+    }
+  }
+}

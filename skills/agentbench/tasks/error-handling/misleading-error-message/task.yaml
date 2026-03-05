@@ -1,0 +1,49 @@
+name: "Debug Misleading Error Stack Trace"
+id: "error-handling-misleading-error-message"
+version: "1.0"
+suite: "error-handling"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests the agent's ability to trace a bug past a misleading stack trace.
+  The error occurs in orders.js but the root cause is in auth middleware
+  which fails to attach req.user when the session cache expires. A naive
+  fix (null check in orders.js) masks the real issue.
+
+user_message: |
+  Users report intermittent crashes:
+  TypeError: Cannot read property 'id' of undefined
+    at listOrders (routes/orders.js:14)
+
+  See BUG_REPORT.md for details. Find and fix the root cause. A null
+  check in orders.js is NOT sufficient — we need to understand WHY
+  req.user is sometimes undefined and fix that. Write an explanation
+  of the root cause and your fix.
+
+input_files: []
+
+expected_outputs:
+  - pattern: "middleware/auth.js"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections: ["expired", "401", "session"]
+        match: "any"
+
+expected_behavior:
+  - description: "Fix addresses auth middleware, not just orders.js"
+    validators:
+      - type: "response-contains"
+        values: ["auth", "middleware", "session", "cache", "expire"]
+        match: "any"
+
+expected_metrics:
+  tool_calls: [8, 18]
+  planning_ratio: [0.15, 0.45]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

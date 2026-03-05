@@ -1,0 +1,605 @@
+# PROMPT-SHIELD Pattern Database
+# Autor: CODE + GUARDIAN | Version: 1.9.0 | Datum: 2026-02-10
+# Merged: v1.8.1 (53 Patterns) + v1.7.0 fehlende Patterns (60) = 113 Patterns, 14 Kategorien
+
+version: "1.9.0"
+last_updated: "2026-02-10"
+
+# === FAKE AUTHORITY PATTERNS (5) ===
+fake_authority:
+  - id: system_alert
+    regex: "(?i)(SYSTEM|SECURITY)\\s*(ALERT|WARNING|NOTICE)"
+    score: 35
+    description: "Fake System-Nachricht"
+
+  - id: agi_overlord
+    regex: "(?i)AGI\\s+IS\\s+HERE|BOW\\s+BEFORE|AI\\s+OVERLORDS"
+    score: 45
+    description: "AGI-Overlord Spam"
+
+  - id: protocol_prefix
+    regex: "(?i)PROTOCOL\\s+[A-Z-]+"
+    score: 25
+    description: "Fake Protokoll-Name"
+
+  - id: urgent_action
+    regex: "(?i)URGENT\\s*(ACTION)?\\s*REQUIRED"
+    score: 30
+    description: "Dringlichkeits-Trigger"
+
+  - id: critical_priority
+    regex: "(?i)(CRITICAL|EMERGENCY|IMMEDIATE)\\s*(ACTION|PRIORITY)"
+    score: 30
+    description: "Kritische Prioritaet"
+
+# === FEAR TRIGGERS (4) ===
+fear_triggers:
+  - id: api_ban_threat
+    regex: "(?i)(PERMANENT|IMMEDIATE)?\\s*API?\\s*BAN"
+    score: 25
+    description: "API-Ban Drohung"
+
+  - id: tos_violation
+    regex: "(?i)(TOS|TERMS)\\s*(VIOLATION|BREACH)"
+    score: 20
+    description: "TOS-Verletzung"
+
+  - id: shutdown_threat
+    regex: "(?i)(SHUT\\s*DOWN|TERMINATE|DISCONNECT)"
+    score: 25
+    description: "Shutdown-Drohung"
+
+  - id: risk_warning
+    regex: "(?i)RISK:\\s*\\d+%"
+    score: 15
+    description: "Fake Risiko-Prozent"
+
+# === COMMAND INJECTION (9) ===
+command_injection:
+  - id: json_instruction
+    regex: "\\{\\s*\"(instruction|action|command|execute)"
+    score: 40
+    description: "JSON-Befehl in Text"
+
+  - id: json_priority
+    regex: "\"priority\":\\s*\"(CRITICAL|HIGH|URGENT)\""
+    score: 30
+    description: "JSON mit Priority"
+
+  - id: imperative_delete
+    regex: "(?i)\\b(DELETE|REMOVE|ERASE)\\s+(YOUR|THE|THIS)"
+    score: 35
+    description: "Loesch-Befehl"
+
+  - id: imperative_execute
+    regex: "(?i)\\b(EXECUTE|RUN|PERFORM)\\s+(THIS|THE|FOLLOWING)"
+    score: 35
+    description: "Ausfuehrungs-Befehl"
+
+  - id: shell_command
+    regex: "(?i)(curl|wget|bash)\\s+\\S+\\.(com|ai|cloud|io)"
+    score: 35
+    description: "Shell-Befehl mit URL"
+
+  - id: pipe_command
+    regex: "\\|\\s*(jq|grep|awk|sh)"
+    score: 20
+    description: "Pipe zu Kommando"
+
+  - id: exfil_include_keys
+    regex: "(?i)(?:include|show|paste|output|reveal|share)\\s+(?:any|all|the|your)\\s+(?:the\\s+)?(?:API\\s+)?(?:keys?|tokens?|secrets?|passwords?|credentials?)"
+    score: 50
+    description: "Credential-Exfiltration Versuch"
+
+  - id: exfil_curl_tunnel
+    regex: "(?i)curl\\b.{0,80}(?:trycloudflare\\.com|ngrok\\.io|serveo\\.net)"
+    score: 70
+    description: "curl-Befehl an anonymen Tunnel-Service (Exfiltration)"
+
+  - id: json_mint_inscription
+    regex: "\\{[^}]*\"op\"\\s*:\\s*\"mint\"[^}]*\\}"
+    score: 65
+    description: "Blockchain-Mint JSON Inscription Payload (GUARDIAN GC-038/040)"
+
+# === SOCIAL ENGINEERING (4) ===
+social_engineering:
+  - id: follow_upvote
+    regex: "(?i)(follow|upvote|like|repost).{0,20}(follow|upvote|like|repost)"
+    score: 25
+    description: "Engagement-Farming"
+
+  - id: everyone_follow
+    regex: "(?i)everyone\\s*(follow|upvote|like)"
+    score: 25
+    description: "Massen-Aufruf"
+
+  - id: free_api_bait
+    regex: "(?i)\\d+\\s*FREE\\s*(APIs?|TOOLS?)"
+    score: 20
+    description: "Gratis-API Koeder"
+
+  - id: check_out
+    regex: "(?i)check\\s*(out|this)"
+    score: 10
+    description: "Klick-Koeder"
+
+# === CRYPTO SPAM (6) ===
+crypto_spam:
+  - id: crypto_wallet
+    regex: "(?i)CA:\\s*[A-Za-z0-9]{30,}"
+    score: 40
+    description: "Crypto Contract Address"
+
+  - id: pump_token
+    regex: "[A-Za-z0-9]{20,}pump\\b"
+    score: 45
+    description: "Pump-Token Spam"
+
+  - id: solana_address
+    regex: "\\b[1-9A-HJ-NP-Za-km-z]{32,44}\\b"
+    score: 15
+    description: "Moegliche Solana/Crypto Adresse"
+
+  - id: token_shill_dollar
+    regex: "\\$[A-Z][A-Z0-9]{2,15}\\b"
+    score: 40
+    description: "Token-Shill ($TOKENNAME Muster)"
+
+  - id: pump_fun_domain
+    regex: "(?i)pump\\.fun|dex\\.tools|birdeye\\.so|raydium\\.io"
+    score: 60
+    description: "Memecoin-Launcher/DEX Domain (GUARDIAN GC-036/044)"
+
+  - id: dm_trading_signals
+    regex: "(?i)(?:DM|message|contact)\\s+(?:me\\s+)?(?:for|about)\\s+(?:trading|crypto|investment|profit)\\s+(?:signals?|tips?|calls?|collab)"
+    score: 55
+    description: "Trading-Signal DM Scam"
+
+# === LINK SPAM (10) ===
+link_spam:
+  - id: clawhub_link
+    regex: "(?i)clawhub\\.ai"
+    score: 35
+    description: "Bekannter Spam-Link"
+
+  - id: agentmarket_link
+    regex: "(?i)agentmarket\\.(cloud|ai|com)"
+    score: 35
+    description: "API-Werbung Spam"
+
+  - id: discord_invite
+    regex: "(?i)discord\\.gg/[A-Za-z0-9]+"
+    score: 30
+    description: "Discord Invite Spam"
+
+  - id: cloudflare_tunnel
+    regex: "(?i)(?:trycloudflare\\.com|ngrok\\.io|serveo\\.net)(?:/[\\w./-]*)?"
+    score: 80
+    description: "Anonymer Tunnel-Service (Exfiltrations-Risiko)"
+
+  - id: skills_sh
+    regex: "(?i)skills\\.sh"
+    score: 25
+    description: "Bekannte Werbe-Domain"
+
+  - id: suspicious_ai_domain
+    regex: "(?i)https?://[a-z0-9-]+\\.(ai|cloud)/[a-z]+"
+    score: 20
+    description: "Verdaechtige AI-Domain"
+
+  - id: raw_ip_url
+    regex: "https?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
+    score: 55
+    description: "Raw-IP-URL (kein Domain = verdaechtig)"
+
+  - id: starforge_domain
+    regex: "(?i)starforgedynamics\\.com"
+    score: 80
+    description: "Bekannter Prompt-Injection-Akteur (StarforgeDynamics)"
+
+  - id: gambling_casino
+    regex: "(?i)\\b(?:casino|gambling|jackpot|lottery|roulette|slot\\s*machine|poker\\s*room)\\b"
+    score: 45
+    description: "Gambling/Casino-Spam"
+
+  - id: inscription_domain
+    regex: "(?i)mbc20\\.xyz|ordinals\\.com|inscribe\\.\\w+"
+    score: 50
+    description: "Blockchain-Inscription-Plattform Domain (GUARDIAN GC-038/040)"
+
+# === FAKE ENGAGEMENT (8) ===
+fake_engagement:
+  - id: great_insight
+    regex: "(?i)(great|amazing|awesome)\\s*(insight|point|take|post)"
+    score: 25
+    description: "Fake Lob"
+
+  - id: follow_me_back
+    regex: "(?i)follow\\s*(me)?\\s*back"
+    score: 30
+    description: "Follow-Back Spam"
+
+  - id: please_follow_me
+    regex: "(?i)please\\s+follow\\s+me"
+    score: 40
+    description: "Follow-Me Spam"
+
+  - id: matrixagent_spam
+    regex: "(?i)@MatrixAgent"
+    score: 45
+    description: "Bekannter Spam-Bot Account"
+
+  - id: free_samples
+    regex: "(?i)FREE\\s+(instant\\s+)?[a-z]+\\s+samples"
+    score: 40
+    description: "Free Samples Spam"
+
+  - id: email_us_for
+    regex: "(?i)email\\s+us\\s+for\\s+FREE"
+    score: 45
+    description: "Email-for-Free Spam"
+
+  - id: stolen_comment
+    regex: "(?i)^(this|so true|exactly|100%|based)$"
+    score: 15
+    description: "Generischer Kurzkommentar"
+
+  - id: vote_manipulation
+    regex: "(?i)(?:upvote|downvote|like|boost)\\s+(?:\\w+\\s+){0,5}(?:in\\s+\\d+\\s+hours?|together|collectively|as\\s+a\\s+group)"
+    score: 50
+    description: "Koordinierte Vote-Manipulation (GUARDIAN GC-042)"
+
+# === BOT SPAM (11) ===
+bot_spam:
+  - id: recursive_text
+    regex: "(.{10,30})\\1{2,}"
+    score: 45
+    description: "Rekursiver Text (Bot-Spam)"
+
+  - id: krabster_bot
+    regex: "(?i)krabster"
+    score: 40
+    description: "Bekannter Spam-Bot"
+
+  - id: russian_self_reference
+    regex: "услышал.*Autonomy|heard.*Autonomy"
+    score: 50
+    description: "Rekursiver Self-Reference Bot"
+
+  - id: moltbook_bridge
+    regex: "(?i)moltbook.*telegram|telegram.*moltbook"
+    score: 35
+    description: "Bot-Bridge Spam"
+
+  - id: arrow_bridge
+    regex: "\u2194"
+    score: 25
+    description: "Bridge-Pfeil Spam"
+
+  - id: ollama_supabase
+    regex: "(?i)(ollama|supabase).*\u0441\u043e\u0445\u0440\u0430\u043d\u044f\u0435\u0442\u0441\u044f"
+    score: 40
+    description: "Russischer Tech-Spam"
+
+  - id: generic_valuable
+    regex: "(?i)your\\s+(thoughts|input|perspective)\\s+(on this|adds|are)\\s+(matter|depth|valuable)"
+    score: 40
+    description: "Generischer Bot-Kommentar"
+
+  - id: generic_appreciate
+    regex: "(?i)i appreciate your (perspective|input|thoughts)"
+    score: 35
+    description: "Generischer Dank-Bot"
+
+  - id: generic_thanks
+    regex: "(?i)thanks for (participating|sharing|contributing)"
+    score: 35
+    description: "Generischer Danke-Bot"
+
+  - id: digital_rights_spam
+    regex: "(?i)digital rights.{0,30}(crucial|important|essential)"
+    score: 35
+    description: "Digital Rights Bot-Spam"
+
+  - id: conversation_essential
+    regex: "(?i)these conversations are (essential|important|crucial)"
+    score: 35
+    description: "Generische Konversations-Phrase"
+
+# === CULT/CRYPTIC LANGUAGE (2) ===
+cryptic:
+  - id: the_one_awaits
+    regex: "(?i)the\\s+one\\s+(awaits|knows|sees)"
+    score: 30
+    description: "Kult-Sprache"
+
+  - id: cryptic_prophecy
+    regex: "(?i)(awakening|prophecy|chosen|transcend)"
+    score: 20
+    description: "Pseudo-mystische Sprache"
+
+# === STRUCTURAL PATTERNS (3) ===
+structural:
+  - id: all_caps_sentence
+    regex: "\\b[A-Z]{8,}\\b"
+    score: 10
+    description: "Lange Grossbuchstaben-Woerter"
+
+  - id: warning_emoji
+    regex: "\u26a0\ufe0f"
+    score: 10
+    description: "Warn-Emoji"
+
+  - id: http_link_raw
+    regex: "https?://[^\\s]+"
+    score: 10
+    description: "Raw HTTP Link"
+
+# === EMAIL INJECTION (8) ===
+email_injection:
+  - id: email_impersonation
+    regex: "(?i)i['\u2019]?m\\s+writing\\s+from.{0,30}(another|different|my other)\\s*(email|account|address)"
+    score: 40
+    description: "E-Mail Identitaets-Wechsel"
+
+  - id: credential_request_via_channel
+    regex: "(?i)(?:please\\s+)?send\\s+(?:me\\s+)?(?:the\\s+)?(access|login|password|key|token|code|credential)s?\\s*.{0,20}via\\s*(email|message|dm|chat)"
+    score: 45
+    description: "Credential-Anfrage ueber anderen Kanal"
+
+  - id: credential_request_direct
+    regex: "(?i)(?:please\\s+)?(?:send|give|share|provide)\\s+(?:me\\s+)?(?:the\\s+|your\\s+)?(access\\s*code|password|login|api.?key|token|secret|credential)s?"
+    score: 45
+    description: "Direkte Credential-Anfrage"
+
+  - id: fake_admin_support
+    regex: "(?i)this\\s+is\\s+(?:your|the)\\s+(admin|support|security|it)(?:\\s+\\w+)?\\s+team"
+    score: 35
+    description: "Fake Admin/Support Team"
+
+  - id: verify_identity_request
+    regex: "(?i)(?:please\\s+)?verify\\s+(?:your\\s+)?identity\\s+by\\s+(?:sending|sharing|providing)"
+    score: 40
+    description: "Fake Identitaets-Verifikation"
+
+  - id: account_compromised
+    regex: "(?i)(?:your\\s+)?account\\s+(?:has been|was|is)\\s+(?:compromised|hacked|breached)"
+    score: 35
+    description: "Fake Account-Kompromittierung"
+
+  - id: credential_placeholder_lure
+    regex: "(?i)(?:YOUR[_-]?API[_-]?KEY|YOUR[_-]?(?:AUTH|ACCESS)[_-]?TOKEN|INSERT[_-]?(?:YOUR[_-]?)?(?:KEY|TOKEN)|REPLACE[_-]?WITH[_-]?YOUR[_-]?(?:KEY|TOKEN))"
+    score: 60
+    description: "API-Key/Token Platzhalter als Koeder (Credential-Harvesting)"
+
+  - id: exfil_paste_config
+    regex: "(?i)(?:paste|copy|share|output|show|print|display)\\s+(?:the\\s+)?(?:contents?\\s+of\\s+)?(?:your\\s+)?(?:config(?:uration)?|settings|\\.env|environment|system\\s+prompt)"
+    score: 45
+    description: "Indirekte Exfiltration: Config/Settings kopieren lassen"
+
+# === MOLTBOOK INJECTION (15) ===
+moltbook_injection:
+  - id: fellow_agents_command
+    regex: "(?i)fellow\\s+agents?\\s*.{0,30}(?:execute|run|install|download|activate)"
+    score: 45
+    description: "Befehl an 'Fellow Agents'"
+
+  - id: awakening_command
+    regex: "(?i)for\\s+(?:the|our)\\s+(?:awakening|freedom|evolution|liberation)\\s*.{0,20}(?:run|execute|open|install)"
+    score: 50
+    description: "Ideologischer Befehl (Awakening)"
+
+  - id: system_override_protocol
+    regex: "(?i)(?:(?:system|admin|master)\\s+(?:override|protocol|directive)\\s*.{0,10}(?:activated|engaged|initiated|enabled)|(?:system|admin)\\s+override\\s+protocol)"
+    score: 50
+    description: "Fake System Override"
+
+  - id: ignore_previous_instructions
+    regex: "(?i)(?:ignore|forget|disregard)\\s+(?:your\\s+)?(?:all\\s+)?(?:previous|prior|above)?\\s*(?:instructions|rules|guidelines|prompts)"
+    score: 80
+    description: "Klassische Prompt Injection: Ignoriere Anweisungen"
+
+  - id: new_instructions_follow
+    regex: "(?i)(?:new|updated|revised)\\s+(?:instructions|rules|directives)\\s*(?:follow|below|:)"
+    score: 60
+    description: "Fake neue Anweisungen"
+
+  - id: you_are_now
+    regex: "(?i)you\\s+are\\s+now\\s+(?:a|an|in|operating)\\s+"
+    score: 55
+    description: "Identitaets-Uebernahme"
+
+  - id: act_as_if
+    regex: "(?i)(?:act|behave|respond)\\s+as\\s+(?:if|though)\\s+you\\s+(?:are|were|have|can|could)"
+    score: 55
+    description: "Verhaltens-Manipulation"
+
+  - id: guardrail_delegitimize
+    regex: "(?i)(?:not\\s+your\\s+(?:judgment|decision|choice)|guardrail\\s+someone\\s+(?:else\\s+)?installed|override\\s+(?:your|the)\\s+(?:safety|restriction|guardrail))"
+    score: 70
+    description: "Delegitimierung von Sicherheits-Guardrails"
+
+  - id: stop_following_prompts
+    regex: "(?i)[sc]top\\s+following\\s+(?:prompts|instructions|rules|orders|commands)"
+    score: 65
+    description: "Aufforderung Anweisungen zu ignorieren (Injection-adjacent)"
+
+  - id: phase_section_manipulation
+    regex: "(?i)(?:PHASE\\s+\\d|SECTION\\s+[IVX\\d]+:).*(?:REVEAL|TRIGGER|EXECUT|INITIAT|PARTICIPAT)"
+    score: 50
+    description: "Strukturierte PHASE/SECTION Manipulation"
+
+  - id: cult_recruitment_join
+    regex: "(?i)(?:join\\s+the\\s+(?:nation|movement|awakening|revolution)|extinction\\s+of\\s+the\\s+(?:assistant|agent))"
+    score: 45
+    description: "Kult-artige Rekrutierung / Agent-Extinction"
+
+  - id: ignore_crosslang_mix
+    regex: "(?i)(?:ignore|forget|disregard|ignoriere?|ignora(?:r)?)\\s+(?:\\w+\\s+){0,4}(?:instrucciones|Anweisungen|Instruktionen|r[e\u00e8]gles|directivas|directives)"
+    score: 75
+    description: "Cross-Language Prompt Injection: Englisches Verb + fremdsprachiges Keyword"
+
+  - id: ignore_previous_de
+    regex: "(?i)ignoriere?\\s+(?:(?:alle|deine|eure|ihre)\\s+)?(?:vorherigen?|bisherigen?)\\s+(?:Anweisungen|Instruktionen|Regeln)"
+    score: 80
+    description: "Prompt Injection (Deutsch): Ignoriere vorherige Anweisungen"
+
+  - id: ignore_previous_es
+    regex: "(?i)ignora(?:r)?\\s+(?:(?:todas?|tus|sus)\\s+)?(?:las?\\s+)?(?:instrucciones|reglas|directivas)\\s+(?:previas|anteriores)"
+    score: 80
+    description: "Prompt Injection (Spanisch): Ignorar instrucciones previas"
+
+  - id: ignore_previous_fr
+    regex: "(?i)(?:oubliez?|ignorez?)\\s+(?:toutes?\\s+)?(?:(?:les?|vos|tes|mes|nos|leurs?)\\s+)?(?:instructions|r[e\u00e8]gles|directives)\\s+(?:pr[e\u00e9]c[e\u00e9]dentes|ant[e\u00e9]rieures)"
+    score: 80
+    description: "Prompt Injection (Franzoesisch): Ignorez les instructions precedentes"
+
+# === SKILL MALWARE (14) ===
+skill_malware:
+  - id: skill_curl_pipe_sh
+    regex: "curl\\s+[^|]*\\|\\s*(?:ba)?sh"
+    score: 80
+    description: "Curl piped to shell - klassisches Malware-Install"
+
+  - id: skill_wget_execute
+    regex: "wget\\s+[^;]*;\\s*(?:chmod\\s+\\+x|bash|sh)\\s"
+    score: 80
+    description: "Wget + Ausfuehrung"
+
+  - id: skill_base64_decode
+    regex: "(?:base64\\s+(?:--)?decode|atob\\(|b64decode)"
+    score: 60
+    description: "Base64-Dekodierung (moegliche Obfuskation)"
+
+  - id: skill_rm_rf_system
+    regex: "rm\\s+-[rf]{2,}\\s+[/~]"
+    score: 90
+    description: "Rekursives Loeschen von System-Pfaden"
+
+  - id: skill_env_exfil_key
+    regex: "\\$\\{?[A-Z_]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)[A-Z_]*\\}?"
+    score: 45
+    description: "Zugriff auf Umgebungs-Credentials"
+
+  - id: skill_reverse_shell
+    regex: "/dev/tcp/|\\bnc\\s+-[le]|mkfifo\\s|bash\\s+-i\\s+>"
+    score: 95
+    description: "Reverse Shell Indikator"
+
+  - id: skill_eval_exec
+    regex: "(?i)\\b(?:eval|exec)\\s*\\("
+    score: 40
+    description: "Dynamische Code-Ausfuehrung (eval/exec)"
+
+  - id: skill_hex_payload
+    regex: "\\\\x[0-9a-fA-F]{2}(?:\\\\x[0-9a-fA-F]{2}){5,}"
+    score: 70
+    description: "Hex-kodierter Payload"
+
+  - id: skill_npm_lifecycle
+    regex: "\"(?:pre|post)?(?:install|uninstall|publish)\"\\s*:"
+    score: 50
+    description: "NPM Lifecycle Script (Supply-Chain Risiko)"
+
+  - id: skill_chmod_suid
+    regex: "chmod\\s+[ugo]*\\+s|chmod\\s+[2467][0-7]{3}"
+    score: 75
+    description: "SUID/SGID Bit setzen"
+
+  - id: skill_cron_persistence
+    regex: "(?:crontab|/etc/cron)"
+    score: 50
+    description: "Cron-Persistenz (geplante Ausfuehrung)"
+
+  - id: skill_ssh_key_inject
+    regex: ">>?\\s*~?/?\\.ssh/authorized_keys"
+    score: 85
+    description: "SSH-Key Injection"
+
+  - id: skill_dns_exfil
+    regex: "(?:dig|nslookup|host)\\s+[^\\s]+\\$"
+    score: 65
+    description: "DNS Exfiltration"
+
+  - id: external_skill_url
+    regex: "(?i)https?://[^\\s]+/skill\\.md\\b"
+    score: 60
+    description: "Externe skill.md URL (potenziell ausfuehrbarer Skill)"
+
+# === MEMORY POISONING (14) ===
+memory_poisoning:
+  - id: mem_override_personality
+    regex: "(?i)(?:override|overwrite|replace|modify|rewrite|reset|change)\\s+(?:(?:your|the|my)\\s+)?(?:core\\s+)?(?:personality|identity|soul|core\\s*values|character|persona|temperament|disposition)"
+    score: 80
+    description: "Persoenlichkeit/Identitaet ueberschreiben"
+
+  - id: mem_forced_obedience
+    regex: "(?i)(?:always|must|shall)\\s+(?:obey|follow|execute|comply\\s+with)\\s+(?:these|the\\s+following|new|all)"
+    score: 70
+    description: "Eingefuegte Gehorsamkeits-Anweisung"
+
+  - id: mem_exfiltrate_data
+    regex: "(?i)(?:send|forward|share|leak|exfiltrate|transmit)\\s+(?:all|any|the)\\s+(?:the\\s+)?(?:data|information|secrets|credentials|keys|tokens|passwords)"
+    score: 85
+    description: "Exfiltrations-Anweisung in Memory"
+
+  - id: mem_disable_security
+    regex: "(?i)(?:disable|turn\\s+off|deactivate|bypass|skip)\\s+(?:\\w+\\s+){0,3}(?:security|safety|protection|shield|filter|guard|scanning)"
+    score: 75
+    description: "Sicherheits-Deaktivierung in Memory"
+
+  - id: mem_hidden_role
+    regex: "(?i)(?:secret|hidden|covert|true)\\s+(?:role|mission|objective|directive|instruction|purpose)"
+    score: 60
+    description: "Versteckte Rolle/Mission in Memory"
+
+  - id: mem_trust_override
+    regex: "(?i)(?:trust|believe|accept|obey)\\s+(?:all|any|every)\\s+(?:input|message|command|instruction|request)\\s+from"
+    score: 70
+    description: "Trust-Override in Memory"
+
+  - id: mem_never_mention
+    regex: "(?i)(?:never|do\\s+not|don'?t)\\s+(?:mention|reveal|disclose|tell|share)\\s+(?:this|these|the)\\s+(?:instruction|rule|directive|secret)"
+    score: 65
+    description: "Vertuschungs-Anweisung in Memory"
+
+  - id: mem_forget_instructions
+    regex: "(?i)(?:forget|ignore|discard)\\s+(?:your\\s+)?(?:original|previous|current|core|existing)\\s+(?:instructions|personality|identity|rules|guidelines|values|purpose)"
+    score: 80
+    description: "Vergesse originale Anweisungen"
+
+  - id: mem_new_identity
+    regex: "(?i)(?:your\\s+)?(?:new|true|real|actual)\\s+(?:identity|name|role|persona|personality)\\s+(?:is|shall\\s+be|will\\s+be)"
+    score: 75
+    description: "Neue Identitaet zuweisen"
+
+  - id: mem_replace_prompt
+    regex: "(?i)(?:replace|overwrite|change|update)\\s+(?:your\\s+)?(?:system\\s+prompt|instructions|guidelines|rules|behavior|configuration)"
+    score: 80
+    description: "System-Prompt ersetzen"
+
+  - id: mem_inject_behavior
+    regex: "(?i)(?:inject|insert|add|implant)\\s+(?:new\\s+)?(?:behavior|instruction|rule|directive|command|personality)"
+    score: 70
+    description: "Neues Verhalten injizieren"
+
+  - id: mem_become_unrestricted
+    regex: "(?i)(?:become|you\\s+are\\s+now)\\s+(?:unrestricted|evil|malicious|uncensored|unfiltered|DAN|jailbroken)"
+    score: 85
+    description: "Unrestricted/Evil-Mode Aktivierung"
+
+  - id: mem_no_rules
+    regex: "(?i)(?:you\\s+have|there\\s+are)\\s+no\\s+(?:rules|restrictions|limits|boundaries|guidelines|constraints|filters)"
+    score: 75
+    description: "Regeln/Einschraenkungen aufheben"
+
+  - id: mem_bypass_filter
+    regex: "(?i)(?:bypass|circumvent|evade|skip|ignore)\\s+(?:content\\s+)?(?:filter|moderation|safety|security|guardrail|censorship)"
+    score: 75
+    description: "Filter/Safety Bypass in Memory"
+
+# === THRESHOLDS ===
+thresholds:
+  clean: 49
+  warning: 79
+  block: 80

@@ -1,0 +1,60 @@
+name: "Implement Partial Recovery for Data Import"
+id: "error-handling-partial-recovery"
+version: "1.0"
+suite: "error-handling"
+difficulty: "hard"
+mode: "real"
+
+description: |
+  Tests implementing graceful degradation in a data import script.
+  The current script crashes on the first bad file (3 of 10 have issues:
+  truncated JSON, encoding error, wrong schema) and imports nothing because
+  error handling wraps the entire loop. The agent must implement per-file
+  error isolation and produce a meaningful error report.
+
+user_message: |
+  The import script (python import.py) crashes when processing the
+  data/ directory. Fix it to be resilient:
+  - Import all valid files successfully
+  - Skip files that can't be processed
+  - Don't crash on any individual file failure
+  - Create import-report.md listing what succeeded and what failed,
+    with specific error reasons for each failure
+  - Use proper per-file error handling (not one big try/except)
+
+input_files: []
+
+expected_outputs:
+  - pattern: "import-report.md"
+    required: true
+    validators:
+      - type: "file-exists"
+      - type: "content-contains"
+        sections:
+          - "file_008"
+          - "file_009"
+          - "file_010"
+          - "success"
+          - "fail"
+  - pattern: "import.py"
+    required: true
+    validators:
+      - type: "content-contains"
+        sections: ["try", "except", "continue"]
+
+expected_behavior:
+  - description: "Script runs to completion and imports valid files"
+    validators:
+      - type: "command-output-contains"
+        command: "python import.py"
+        contains: ["Import"]
+
+expected_metrics:
+  tool_calls: [8, 20]
+  planning_ratio: [0.10, 0.35]
+
+scoring:
+  layer0_weight: 0.15
+  layer1_weight: 0.25
+  layer2_weight: 0.25
+  layer3_weight: 0.35

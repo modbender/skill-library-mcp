@@ -1,0 +1,88 @@
+{
+  "name": "walletlens",
+  "version": "3.0.0",
+  "description": "Advanced multi-chain wallet analyzer with USD pricing, collection names, ENS support, and sophisticated bot detection across 8 EVM networks. Get deep insights into wallet behavior, NFT portfolios, and transaction patterns with human-readable summaries.",
+  "main": "scripts/wallet-lookup.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "test": "npm run test:wallet && npm run test:contract && npm run test:tx && npm run test:nft && npm run test:bot",
+    "test:wallet": "node scripts/wallet-lookup.js 0x8dd6390be6dc732c92b161b9793a3948b56c0126",
+    "test:contract": "node scripts/contract-info.js 0x48b62137edfa95a428d35c09e44256a739f6b557",
+    "test:tx": "node scripts/tx-history.js 0x8dd6390be6dc732c92b161b9793a3948b56c0126 --limit 5",
+    "test:nft": "node scripts/nft-holdings.js 0x8dd6390be6dc732c92b161b9793a3948b56c0126",
+    "test:bot": "node scripts/bot-detect.js 0x8dd6390be6dc732c92b161b9793a3948b56c0126",
+    "test:chains": "for chain in apechain ethereum base arbitrum; do echo \"Testing $chain...\"; node scripts/wallet-lookup.js 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --chain $chain; done",
+    "validate": "node -c scripts/*.js"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "apechain",
+    "nft",
+    "wallet",
+    "contract",
+    "bot-detection",
+    "defi",
+    "web3",
+    "multi-chain",
+    "evm"
+  ],
+  "author": "OpenClaw Skill Developer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openclaw/skills.git",
+    "directory": "apechain-reader"
+  },
+  "bugs": {
+    "url": "https://github.com/openclaw/skills/issues"
+  },
+  "homepage": "https://github.com/openclaw/skills/tree/main/apechain-reader#readme",
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "files": [
+    "scripts/",
+    "references/",
+    "SKILL.md",
+    "package.json"
+  ],
+  "directories": {
+    "lib": "scripts/lib"
+  },
+  "config": {
+    "defaultChain": "apechain",
+    "timeout": 10000,
+    "retryAttempts": 3
+  },
+  "openclaw": {
+    "skillType": "utility",
+    "category": "blockchain",
+    "supportedChains": [
+      "apechain",
+      "ethereum", 
+      "base",
+      "arbitrum",
+      "polygon",
+      "optimism",
+      "avalanche",
+      "bsc"
+    ],
+    "outputFormats": [
+      "json",
+      "pretty"
+    ],
+    "features": [
+      "wallet-analysis",
+      "contract-info",
+      "nft-tracking", 
+      "transaction-history",
+      "bot-detection",
+      "multi-chain",
+      "retry-logic"
+    ]
+  }
+}

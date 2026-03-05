@@ -1,0 +1,83 @@
+{
+  "name": "@openclaw/unified-logger",
+  "version": "1.2.5",
+  "description": "Dual-output conversation logger for OpenClaw - JSONL backup + Memvid semantic search",
+  "main": "tools/log.py",
+  "scripts": {
+    "test": "python3 -m pytest tests/",
+    "lint": "flake8 tools/"
+  },
+  "keywords": [
+    "openclaw",
+    "skill",
+    "memory",
+    "logging",
+    "memvid",
+    "conversation",
+    "search"
+  ],
+  "author": "AnToni <anthony@stachowitz.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stackBlock/openclaw-memvid-logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stackBlock/openclaw-memvid-logger/issues"
+  },
+  "homepage": "https://github.com/stackBlock/openclaw-memvid-logger#readme",
+  "engines": {
+    "openclaw": ">=2026.2.12",
+    "python": ">=3.8"
+  },
+  "peerDependencies": {
+    "memvid": ">=2.0.0"
+  },
+  "openclaw": {
+    "type": "skill",
+    "category": "memory",
+    "tools": [
+      {
+        "name": "log_conversation",
+        "description": "Append conversation turn to JSONL and Memvid",
+        "command": "python3 tools/log.py",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "timestamp": {"type": "string", "format": "date-time"},
+            "session_id": {"type": "string"},
+            "role": {"type": "string", "enum": ["user", "assistant"]},
+            "content": {"type": "string"},
+            "tool_calls": {"type": ["array", "null"]}
+          },
+          "required": ["timestamp", "session_id", "role", "content"]
+        }
+      }
+    ],
+    "hooks": {
+      "message_out": {
+        "description": "Called after each assistant response",
+        "command": "python3 tools/log.py"
+      }
+    },
+    "config": {
+      "env": {
+        "JSONL_LOG_PATH": {
+          "description": "Path to JSONL backup file",
+          "default": "~/workspace/conversation_log.jsonl",
+          "type": "string"
+        },
+        "MEMVID_PATH": {
+          "description": "Path to Memvid .mv2 file",
+          "default": "~/workspace/memory.mv2",
+          "type": "string"
+        },
+        "MEMVID_BIN": {
+          "description": "Path to memvid CLI binary",
+          "default": "~/.npm-global/bin/memvid",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

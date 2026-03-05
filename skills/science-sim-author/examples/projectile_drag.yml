@@ -1,0 +1,67 @@
+id: projectile_drag
+title: Projectile Motion with Linear Drag
+domain: mechanics
+level: high_school
+dt:
+  default: 0.01
+  min: 0.001
+  max: 0.05
+state:
+  - name: x
+    unit: m
+  - name: y
+    unit: m
+  - name: vx
+    unit: m/s
+  - name: vy
+    unit: m/s
+params:
+  - name: g
+    unit: m/s^2
+    value: 9.81
+    min: 0
+    max: 20
+    step: 0.01
+    desc: Gravitational field strength
+  - name: k
+    unit: 1/s
+    value: 0
+    min: 0
+    max: 0.2
+    step: 0.001
+    desc: Linear drag coefficient
+initial:
+  x: 0
+  y: 0
+  vx: 10
+  vy: 12
+equations:
+  dx: vx
+  dy: vy
+  dvx: -k * vx
+  dvy: -g - k * vy
+outputs:
+  - type: trace
+    what: [x, y]
+    label: Trajectory
+  - type: plot
+    x: t
+    y: y
+    label: Height vs time
+worksheet:
+  predict:
+    - If drag increases while launch speed stays fixed, predict how the range changes.
+    - Predict how the peak height changes when gravity is reduced but drag stays at zero.
+    - If the initial vertical speed is larger than the horizontal speed, predict how the curve shape changes.
+  test:
+    - Keep gravity fixed and compare two runs with low and high drag using the trajectory and the height-time plot.
+    - Reset to the same initial conditions, then vary only gravity and compare the time to reach the peak.
+  explain:
+    - Explain why the peak height drops when drag increases even if the launch speed is unchanged.
+    - Explain how the plot shows the moment when the projectile changes direction vertically.
+  misconceptions:
+    - Does adding drag change only the landing point, or does it also change the whole path?
+    - If gravity is halved, does the projectile stay in the air exactly twice as long in every case?
+success_criteria:
+  - When k = 0, the trajectory matches ideal projectile motion within a small numerical tolerance.
+  - The plot shows height rising to a single peak and then falling back toward ground level.
