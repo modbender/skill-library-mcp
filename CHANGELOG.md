@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/modbender/skill-library-mcp/compare/v1.2.0...v1.3.0) (2026-03-05)
+
+
+### Features
+
+* add more skills and fixes ([#6](https://github.com/modbender/skill-library-mcp/issues/6)) ([5c1511c](https://github.com/modbender/skill-library-mcp/commit/5c1511c8ffa69f79d0f32fe0cc691e7232c6ca88))
+
+
+### Bug Fixes
+
+* missing files ([3e50553](https://github.com/modbender/skill-library-mcp/commit/3e505534d653bc28006f2eff78af48bc29b92c7f))
+
 ## [1.2.0](https://github.com/modbender/skill-library-mcp/compare/v1.1.1...v1.2.0) (2026-03-04)
 
 
