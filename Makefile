@@ -1,4 +1,4 @@
-.PHONY: test build ci dev clean mcp-test validate-skills clean-skills
+.PHONY: test build ci dev clean mcp-test validate-skills clean-skills fix-skills
 
 test:        ## Run vitest
 	pnpm test
@@ -11,6 +11,9 @@ validate-skills:  ## Validate skills/ directory structure
 
 clean-skills:     ## Fix skills/ directory structure (dry run by default)
 	pnpm clean-skills
+
+fix-skills:       ## Fix broken skills (dry run by default, --no-dry-run to apply)
+	pnpm fix-skills
 
 ci: test validate-skills build  ## Run CI locally (test + validate + build)
 
