@@ -21,6 +21,7 @@ make mcp-test         # Build and send initialize request to verify MCP handshak
 pnpm dedup            # Check for duplicate skills
 pnpm validate-skills  # Validate skills/ directory structure
 pnpm clean-skills     # Remove invalid skill dirs (dry run by default, --no-dry-run to apply)
+pnpm fix-skills       # Fix broken skills: missing frontmatter, broken YAML, dupes (dry run by default)
 tsx scripts/import-skills.ts <source-dir> [--no-dry-run]  # Import skills from external source
 ```
 
@@ -38,6 +39,7 @@ The data flow is: `skills/` → `buildIndex()` → `SearchIndex` → `createServ
 - `scripts/import-skills.ts` — Imports skills from external directories (supports flat and nested `author/skill-name` layouts) with content-based dedup and dry-run support
 - `scripts/validate-skills.ts` — Validates all skill dirs have `SKILL.md` with valid frontmatter (`name` + `description`) and detects exact duplicates (O(n) hash-based). Runs in CI
 - `scripts/clean-skills.ts` — Removes skill dirs that lack `SKILL.md`. Dry run by default
+- `scripts/fix-skills.ts` — Fixes broken skills: adds missing frontmatter, repairs broken YAML (unquoted colons, numeric names), fills missing descriptions, removes exact duplicates. Dry run by default
 
 ## Skill Directory Structure
 

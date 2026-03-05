@@ -1,18 +1,19 @@
 # Skill Library MCP
 
-**690+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
+**14,500+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
 
 [![npm version](https://img.shields.io/npm/v/skill-library-mcp)](https://www.npmjs.com/package/skill-library-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 
-An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 690+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
+An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 14,500+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
 
 ## Why?
 
-- **690+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
+- **14,500+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
 - **On-demand loading** — skills are fetched only when needed, not crammed into every conversation
 - **IDF-weighted search** — finds the right skill even from natural language queries like "help me debug a memory leak"
+- **Browse by category** — 13 categories to discover skills you didn't know existed
 - **Works with any MCP-compatible tool** — Claude Code, Cursor, Windsurf, VS Code, Claude Desktop, and others
 - **Claude Code plugin** — one-command install with `claude plugin install`
 - **Zero config** — run with `npx`, no setup needed
@@ -199,21 +200,33 @@ Load the full content of a skill by name. Optionally includes resource files.
 load_skill({ name: "brainstorming", include_resources: true })
 ```
 
+### `list_categories`
+
+Browse all skill categories with counts and examples. Use to discover skills before searching.
+
+```
+list_categories()
+```
+
 ## Skill Categories
 
-The library includes 690+ skills across areas like:
+The library includes 14,500+ skills across 13 categories:
 
 | Category | Examples |
 |----------|----------|
-| **Frontend** | React patterns, Angular, Tailwind, accessibility, web performance |
-| **Backend** | Node.js, FastAPI, Django, NestJS, GraphQL, API design |
-| **DevOps & Cloud** | Terraform, Kubernetes, Docker, AWS, CI/CD, GitOps |
-| **Testing** | TDD workflows, Playwright, testing patterns, E2E testing |
-| **Security** | Penetration testing, OWASP, threat modeling, security scanning |
-| **AI & ML** | LLM application dev, RAG implementation, agent patterns, prompt engineering |
-| **Databases** | PostgreSQL, database design, migrations, SQL optimization |
-| **Automation** | Slack, GitHub, Jira, Salesforce, Zapier, and 40+ integrations |
-| **Architecture** | Microservices, event sourcing, CQRS, clean code, design patterns |
+| **Frontend** | React patterns, Angular, Vue, Svelte, Next.js, Tailwind, accessibility |
+| **Backend** | Node.js, FastAPI, Django, NestJS, Express, GraphQL, REST API design |
+| **AI & LLM** | LLM app dev, RAG implementation, agent patterns, prompt engineering, embeddings |
+| **DevOps & Infra** | Terraform, Kubernetes, Docker, AWS, GCP, Azure, CI/CD |
+| **Data & Databases** | PostgreSQL, MongoDB, Redis, SQL optimization, ETL pipelines, analytics |
+| **Security** | Penetration testing, OWASP, threat modeling, vulnerability scanning, encryption |
+| **Testing** | TDD workflows, Playwright, Vitest, Jest, E2E testing patterns |
+| **Mobile** | React Native, Flutter, iOS, Android, Expo |
+| **Automation** | Workflow automation, n8n, Zapier, web scraping, bots |
+| **Python** | Django, Flask, FastAPI, pandas, Python tooling |
+| **TypeScript & JS** | TypeScript, JavaScript, Deno, Bun |
+| **Architecture** | Microservices, system design, design patterns, monorepos |
+| **Other** | Hundreds of specialized and niche skills |
 
 ## Skill Format
 
@@ -249,8 +262,15 @@ pnpm test             # Run tests
 pnpm build            # Build to dist/
 pnpm dev              # Run server locally
 pnpm dedup            # Check for duplicate skills
-make ci               # Run test + build
+pnpm validate-skills  # Validate skills/ directory structure
+pnpm fix-skills       # Fix broken skills (dry run by default)
+pnpm clean-skills     # Remove invalid skill dirs (dry run by default)
+make ci               # Run test + validate + build
 ```
+
+## Third-Party Content
+
+This project includes skills from [openclaw/skills](https://github.com/openclaw/skills), licensed under the MIT License. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
 
 ## License
 
