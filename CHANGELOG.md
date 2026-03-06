@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.3](https://github.com/modbender/skill-library-mcp/compare/v1.3.2...v1.3.3) (2026-03-06)
+
+
+### Bug Fixes
+
+* CLAUDE ([eefca45](https://github.com/modbender/skill-library-mcp/commit/eefca45332adbb31a84b62682e4c0758a5631fef))
+* invalid skills ([b09f5c6](https://github.com/modbender/skill-library-mcp/commit/b09f5c6c4a80b820b5467e3d1e472cfeb6e81424))
+* prevent skill detection ([613e443](https://github.com/modbender/skill-library-mcp/commit/613e443422aa995c562ac5d8053f8504db66fa2f))
+
 ## [1.3.2](https://github.com/modbender/skill-library-mcp/compare/v1.3.1...v1.3.2) (2026-03-05)
 
 
