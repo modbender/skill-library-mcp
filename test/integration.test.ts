@@ -7,7 +7,7 @@ import { loadSkill } from "../src/loader.js";
 import type { SearchIndex } from "../src/types.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const skillsDir = join(__dirname, "..", "skills");
+const skillsDir = join(__dirname, "..", "data");
 
 let index: SearchIndex;
 

@@ -1,7 +1,7 @@
 import { readdir, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-const SKILLS_DIR = process.argv[2] || join(process.cwd(), "skills");
+const SKILLS_DIR = process.argv[2] || join(process.cwd(), "data");
 const DRY_RUN = !process.argv.includes("--no-dry-run");
 
 async function isDirectory(path: string): Promise<boolean> {

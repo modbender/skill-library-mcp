@@ -89,7 +89,7 @@ export async function findDuplicates(skillsDir: string): Promise<DuplicateReport
 
 // CLI entrypoint
 if (process.argv[1] && (process.argv[1].endsWith("dedup.ts") || process.argv[1].endsWith("dedup.js"))) {
-  const dir = process.argv[2] || join(process.cwd(), "skills");
+  const dir = process.argv[2] || join(process.cwd(), "data");
 
   findDuplicates(dir).then((report) => {
     if (report.exactDuplicates.length > 0) {

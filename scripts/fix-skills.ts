@@ -422,7 +422,7 @@ async function applyFix(
 
 async function main() {
   const args = process.argv.slice(2);
-  const skillsDir = args.find((a) => !a.startsWith("--")) || join(process.cwd(), "skills");
+  const skillsDir = args.find((a) => !a.startsWith("--")) || join(process.cwd(), "data");
   const dryRun = !args.includes("--no-dry-run");
 
   console.log(`\nFix broken skills in: ${skillsDir}`);

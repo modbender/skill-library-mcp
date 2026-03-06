@@ -304,13 +304,13 @@ const args = process.argv.slice(2);
 const sourceDir = args.find((a) => !a.startsWith("--"));
 const sourceName = args.find((a) => a.startsWith("--source="))?.split("=")[1] ?? basename(sourceDir ?? "");
 const dryRun = !args.includes("--no-dry-run");
-const targetDir = args.find((a) => a.startsWith("--target="))?.split("=")[1] ?? join(process.cwd(), "skills");
+const targetDir = args.find((a) => a.startsWith("--target="))?.split("=")[1] ?? join(process.cwd(), "data");
 
 if (!sourceDir) {
   console.error("Usage: tsx scripts/import-skills.ts <source-dir> [--source=name] [--target=dir] [--no-dry-run]");
   console.error("\nOptions:");
   console.error("  --source=name     Name of the source (for logging)");
-  console.error("  --target=dir      Target skills directory (default: ./skills)");
+  console.error("  --target=dir      Target skills directory (default: ./data)");
   console.error("  --no-dry-run      Actually copy files (default is dry-run)");
   process.exit(1);
 }

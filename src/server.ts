@@ -7,9 +7,6 @@ import { loadSkill } from "./loader.js";
 export function createServer(index: SearchIndex, skillsDir: string): McpServer {
   const server = new McpServer(
     { name: "skill-library", version: "1.2.0" },
-    {
-      instructions: `Skill library with ${index.totalDocs} skills across ${index.categories.size} categories. Use search_skill to find skills by keyword, or list_categories to browse available categories.`,
-    },
   );
 
   // Build lookup map keyed by both dirName and frontmatter name

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { parseFrontmatter } from "../src/skill-index.js";
 
-const SKILLS_DIR = process.argv[2] || join(process.cwd(), "skills");
+const SKILLS_DIR = process.argv[2] || join(process.cwd(), "data");
 
 interface Violation {
   skill: string;

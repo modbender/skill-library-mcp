@@ -5,7 +5,7 @@ import { findDuplicates, jaccardSimilarity } from "../src/dedup.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const dedupFixturesDir = join(__dirname, "fixtures-dedup");
-const skillsDir = join(__dirname, "..", "skills");
+const skillsDir = join(__dirname, "..", "data");
 
 describe("jaccardSimilarity", () => {
   it("returns 1 for identical strings", () => {

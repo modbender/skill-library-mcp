@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Skills directory is at the project root, sibling to dist/
-const skillsDir = join(__dirname, "..", "skills");
+const skillsDir = join(__dirname, "..", "data");
 
 async function main() {
   const index = await buildIndex(skillsDir);
