@@ -1,3 +1,10 @@
+---
+name: Medical Billing & Revenue Cycle Management
+description: Analyze medical billing workflows, identify revenue leaks, optimize
+  claim submissions, and reduce denial rates. Built for healthcare practices,
+  billing companies, and revenue cycle teams.
+---
+
 # Medical Billing & Revenue Cycle Management
 
 Analyze medical billing workflows, identify revenue leaks, optimize claim submissions, and reduce denial rates. Built for healthcare practices, billing companies, and revenue cycle teams.

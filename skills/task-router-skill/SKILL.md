@@ -1,7 +1,14 @@
 ---
 name: task-router
-description: Distributed task queue and agent coordinator for OpenClaw multi-agent systems. Route tasks to specialized agents by capability matching, track task lifecycle, handle async handoffs, rebalance loads, and manage dead letters. Use when: (1) Creating tasks programmatically or from heartbeats, (2) Routing work to specialized agents based on capabilities, (3) Monitoring task status and completion, (4) Coordinating multi-step workflows across agents, (5) Handling async agent work without blocking main sessions.
+description: "Distributed task queue and agent coordinator for OpenClaw
+  multi-agent systems. Route tasks to specialized agents by capability matching,
+  track task lifecycle, handle async handoffs, rebalance loads, and manage dead
+  letters. Use when: (1) Creating tasks programmatically or from heartbeats, (2)
+  Routing work to specialized agents based on capabilities, (3) Monitoring task
+  status and completion, (4) Coordinating multi-step workflows across agents,
+  (5) Handling async agent work without blocking main sessions."
 ---
+
 
 # Task Router
 

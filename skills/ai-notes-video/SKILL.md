@@ -1,8 +1,12 @@
 ---
 name: ai-notes-of-video
-description: The video AI notes tool is provided by Baidu. Based on the video download address provided by the user, it downloads and parses the video, and finally generates AI notes corresponding to the video (a total of three types of notes can be generated: document notes, outline notes, and image-text notes).
-metadata: { "openclaw": { "emoji": "📺", "requires": { "bins": ["python"], "env":["BAIDU_API_KEY"]},"primaryEnv":"BAIDU_API_KEY" } }
+description: "The video AI notes tool is provided by Baidu. Based on the video
+  download address provided by the user, it downloads and parses the video, and
+  finally generates AI notes corresponding to the video (a total of three types
+  of notes can be generated: document notes, outline notes, and image-text
+  notes)."
 ---
+
 
 # AI PPT Generation
 

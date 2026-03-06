@@ -1,3 +1,8 @@
+---
+name: 3D Print Automation Skill
+description: Automate 3D printing with Flashforge Adventurer 5M printers ("Ralph Wiggum").
+---
+
 # 3D Print Automation Skill
 
 Automate 3D printing with Flashforge Adventurer 5M printers ("Ralph Wiggum").

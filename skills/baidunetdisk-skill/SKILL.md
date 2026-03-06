@@ -1,3 +1,8 @@
+---
+name: 百度网盘 Skill
+description: 用于 OpenClaw 的百度网盘操作 Skill，支持文件列表查看、搜索、分享链接提取、转存、目录创建、文件管理等功能。
+---
+
 # 百度网盘 Skill
 
 ## 简介

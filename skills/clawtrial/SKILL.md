@@ -1,3 +1,8 @@
+---
+name: ClawTrial Courtroom
+description: AI Courtroom for monitoring agent behavior and filing cases for violations.
+---
+
 # ClawTrial Courtroom
 
 AI Courtroom for monitoring agent behavior and filing cases for violations.

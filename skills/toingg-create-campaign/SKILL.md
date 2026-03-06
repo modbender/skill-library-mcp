@@ -1,7 +1,12 @@
 ---
 name: toingg-create-campaign
-description: End-to-end Toingg ops: create campaigns, (optionally) schedule daily analytics pulls, and turn Excel contact sheets into WhatsApp outreach via add_contacts + send_whatsapp_templates. Use when Codex needs to automate Toingg voice/WhatsApp workflows and requires scripts for campaign POSTs, analytics cron setup, or bulk contact uploads.
+description: "End-to-end Toingg ops: create campaigns, (optionally) schedule
+  daily analytics pulls, and turn Excel contact sheets into WhatsApp outreach
+  via add_contacts + send_whatsapp_templates. Use when Codex needs to automate
+  Toingg voice/WhatsApp workflows and requires scripts for campaign POSTs,
+  analytics cron setup, or bulk contact uploads."
 ---
+
 
 # Toingg Ops Toolkit
 

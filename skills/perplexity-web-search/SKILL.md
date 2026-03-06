@@ -1,9 +1,12 @@
 ---
 name: web_search
-description: Web search and URL fetching via Perplexity (default: sonar, optional: sonar-pro). Use when searching the web, looking up information, fetching URL content, or configuring web search settings. Covers web_search tool (Perplexity direct API) and web_fetch tool (HTML to markdown extraction).
-homepage: https://github.com/aligurelli/clawd/tree/main/skills/web_search
-metadata: {"clawdbot":{"emoji":"🔎"}}
+description: "Web search and URL fetching via Perplexity (default: sonar,
+  optional: sonar-pro). Use when searching the web, looking up information,
+  fetching URL content, or configuring web search settings. Covers web_search
+  tool (Perplexity direct API) and web_fetch tool (HTML to markdown
+  extraction)."
 ---
+
 
 # Web Search Skill
 

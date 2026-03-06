@@ -1,3 +1,10 @@
+---
+name: Risk Assessment Framework
+description: Comprehensive risk assessment for business operations, projects,
+  and strategic decisions. Identifies, scores, and prioritizes risks with
+  mitigation plans.
+---
+
 # Risk Assessment Framework
 
 Comprehensive risk assessment for business operations, projects, and strategic decisions. Identifies, scores, and prioritizes risks with mitigation plans.

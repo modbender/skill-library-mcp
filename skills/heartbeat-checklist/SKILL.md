@@ -1,3 +1,8 @@
+---
+name: Heartbeat Checklist Skill
+description: Run these checks periodically (2-4x daily).
+---
+
 # Heartbeat Checklist Skill
 
 Run these checks periodically (2-4x daily).

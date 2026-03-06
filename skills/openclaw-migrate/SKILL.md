@@ -1,3 +1,8 @@
+---
+name: OpenClaw Migration Skill
+description: Migrate OpenClaw from one host to another via SSH.
+---
+
 # OpenClaw Migration Skill
 
 Migrate OpenClaw from one host to another via SSH.

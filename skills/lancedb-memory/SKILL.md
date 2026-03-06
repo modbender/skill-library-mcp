@@ -1,3 +1,10 @@
+---
+name: Global instance
+description: '#!/usr/bin/env python3 """ LanceDB integration for long-term
+  memory management. Provides vector search and semantic memory capabilities.
+  """'
+---
+
 #!/usr/bin/env python3
 """
 LanceDB integration for long-term memory management.

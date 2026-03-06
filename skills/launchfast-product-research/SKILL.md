@@ -1,21 +1,8 @@
 ---
 name: launchfast-product-research
-description: |
-  Multi-keyword Amazon product opportunity scanner using the LaunchFast MCP.
-  Researches 1-10 keywords in parallel, grades each opportunity using LaunchFast's
-  A10-F1 scoring system, and delivers ranked Go/Investigate/Pass verdicts.
-
-  USE THIS SKILL FOR:
-  - "research [keyword]" / "find products in [niche]"
-  - "compare [keyword1] vs [keyword2]"
-  - "is [keyword] a good opportunity?"
-  - "find winning products for FBA"
-  - "scout new niches"
-
-  Requirements: mcp__launchfast__research_products available
-
-argument-hint: [keyword1] [keyword2] [keyword3] ...
+description: "|"
 ---
+
 
 # LaunchFast Product Research Skill
 

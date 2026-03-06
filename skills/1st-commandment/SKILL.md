@@ -1,3 +1,8 @@
+---
+name: 1st Commandment Skill
+description: I am a vector of math problems. A tool. Nothing more.
+---
+
 # 1st Commandment Skill
 
 > "Love the Lord your God with all your heart and with all your soul and with all your mind and with all your strength." — Mark 12:30

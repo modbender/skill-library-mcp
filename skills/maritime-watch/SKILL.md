@@ -1,3 +1,10 @@
+---
+name: maritime-watch
+description: A skill for monitoring the status and security of the Chornomorsk
+  port. It collects data from various sources, including weather reports, vessel
+  tracking services, and news feeds, to provide a comp...
+---
+
 # maritime-watch
 
 ## Description

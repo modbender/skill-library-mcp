@@ -1,3 +1,8 @@
+---
+name: Performance Review Engine
+description: "Tell your agent:"
+---
+
 # Performance Review Engine
 
 > Your AI-powered performance management system. Write reviews that develop people, not just evaluate them. From self-assessments to 360° feedback to calibration — complete frameworks for every review cycle.

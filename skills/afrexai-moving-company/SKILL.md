@@ -1,3 +1,10 @@
+---
+name: Moving Company Operations
+description: Complete operations assistant for residential and commercial moving
+  companies. Covers pricing, DOT/FMCSA compliance, crew management, claims
+  handling, and growth strategy.
+---
+
 # Moving Company Operations
 
 Complete operations assistant for residential and commercial moving companies. Covers pricing, DOT/FMCSA compliance, crew management, claims handling, and growth strategy.

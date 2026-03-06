@@ -1,3 +1,10 @@
+---
+name: Jira Skill
+description: export JIRAEMAIL="you@example.com" export
+  JIRAAPITOKEN="your-api-token" export
+  JIRAURL="https://your-domain.atlassian.net"
+---
+
 ```markdown
 ---
 name: jira

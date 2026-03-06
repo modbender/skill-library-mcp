@@ -1,3 +1,10 @@
+---
+name: config-validator
+description: A utility skill to validate OpenClaw configuration files
+  (openclaw.json, .env, package.json) and ensure critical settings are present
+  and correctly formatted.
+---
+
 # config-validator
 
 A utility skill to validate OpenClaw configuration files (`openclaw.json`, `.env`, `package.json`) and ensure critical settings are present and correctly formatted.

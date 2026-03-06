@@ -1,7 +1,12 @@
 ---
 name: jasper-recall
-description: Local RAG system for agent memory using ChromaDB and sentence-transformers. Provides semantic search over session logs, daily notes, and memory files. Use when you need persistent memory across sessions, want to search past conversations, or build agents that remember context. Commands: recall "query", index-digests, digest-sessions.
+description: 'Local RAG system for agent memory using ChromaDB and
+  sentence-transformers. Provides semantic search over session logs, daily
+  notes, and memory files. Use when you need persistent memory across sessions,
+  want to search past conversations, or build agents that remember context.
+  Commands: recall "query", index-digests, digest-sessions.'
 ---
+
 
 # Jasper Recall
 

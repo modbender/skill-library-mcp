@@ -1,7 +1,10 @@
 ---
 name: receipt-manager
-description: Receipt management skill. Use when: (1) User sends a receipt image, (2) User asks about expenses or receipts, (3) User wants monthly spending summary.
+description: "Receipt management skill. Use when: (1) User sends a receipt
+  image, (2) User asks about expenses or receipts, (3) User wants monthly
+  spending summary."
 ---
+
 
 # Receipt Manager
 

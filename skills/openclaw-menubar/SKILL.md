@@ -1,8 +1,12 @@
 ---
-slug: openclaw-menubar
-displayName: OpenClaw Menu Bar
-description: Enable OpenClaw as a native macOS menu bar app with quick access popup. **macOS ONLY** - not compatible with Windows or Linux. Use when user asks to "enable menubar", "add menu bar", "run in menu bar", "make it accessible from menu bar", or wants quick OpenClaw access without opening full dashboard.
+name: openclaw-menubar
+description: Enable OpenClaw as a native macOS menu bar app with quick access
+  popup. **macOS ONLY** - not compatible with Windows or Linux. Use when user
+  asks to "enable menubar", "add menu bar", "run in menu bar", "make it
+  accessible from menu bar", or wants quick OpenClaw access without opening full
+  dashboard.
 ---
+
 
 # OpenClaw Menu Bar
 

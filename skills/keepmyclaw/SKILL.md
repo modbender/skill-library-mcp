@@ -1,7 +1,13 @@
 ---
 name: keepmyclaw
-description: Backup, restore, and manage encrypted snapshots of OpenClaw agent data via the Keep My Claw API. Use when backing up agent configuration, workspace files, and credentials; restoring an agent on a fresh machine; listing or pruning backup snapshots; or setting up backup infrastructure. Triggers on: backup, restore, snapshot, keepmyclaw, agent backup, disaster recovery.
+description: "Backup, restore, and manage encrypted snapshots of OpenClaw agent
+  data via the Keep My Claw API. Use when backing up agent configuration,
+  workspace files, and credentials; restoring an agent on a fresh machine;
+  listing or pruning backup snapshots; or setting up backup infrastructure.
+  Triggers on: backup, restore, snapshot, keepmyclaw, agent backup, disaster
+  recovery."
 ---
+
 
 # Keep My Claw
 

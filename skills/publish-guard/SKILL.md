@@ -1,3 +1,8 @@
+---
+name: PublishGuard — Post Verification & Platform Credential Manager
+description: "<!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-PG01 -->"
+---
+
 # PublishGuard — Post Verification & Platform Credential Manager
 
 <!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-PG01 -->

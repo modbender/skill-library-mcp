@@ -1,3 +1,10 @@
+---
+name: passive-income-monitor
+description: Monitors multiple passive income streams from a single command.
+  Tracks bandwidth monetization nodes (Grass.io, Mysterium Network),
+  decentralized storage earnings (Storj), DeFi yield positions, and ...
+---
+
 # passive-income-monitor
 
 **Version:** 1.0.0  

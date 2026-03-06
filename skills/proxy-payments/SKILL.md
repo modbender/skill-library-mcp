@@ -1,3 +1,10 @@
+---
+name: Proxy Pay MCP
+description: Give your OpenClaw agent a credit card. Proxy lets AI agents
+  autonomously request and use virtual payment cards within policy-defined
+  spending limits.
+---
+
 | name | description | homepage | metadata |
 |------|-------------|----------|----------|
 | proxy-mcp | AI agent payments via Proxy. Create payment intents, provision virtual cards, check balances, and track transactions. OAuth authentication required. | https://useproxy.ai | clawdbot: requires: bins: mcporter |

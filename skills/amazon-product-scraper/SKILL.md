@@ -1,3 +1,8 @@
+---
+name: Amazon Product Scraper
+description: 这个 Skill 用于抓取亚马逊产品页面的完整信息，包括标题、价格、排名、五点描述、规格参数等，生成结构化的竞品分析报告。
+---
+
 # Amazon Product Scraper
 
 > 亚马逊竞品分析工具 - 使用 OpenClaw 内置浏览器抓取亚马逊产品Listing信息

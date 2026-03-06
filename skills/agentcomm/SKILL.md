@@ -1,3 +1,8 @@
+---
+name: AgentComm
+description: No servers. No accounts. No fees. Just agents talking to agents.
+---
+
 # AgentComm
 
 **Decentralized agent-to-agent communication for OpenClaw.**

@@ -1,3 +1,10 @@
+---
+name: AgentPin Development Skills Guide
+description: AgentPin is a domain-anchored cryptographic identity protocol for
+  AI agents. It enables organizations to publish verifiable identity documents
+  for their agents, issue short-lived JWT credentials, a...
+---
+
 # AgentPin Development Skills Guide
 
 **Purpose**: This guide helps AI assistants work with AgentPin for domain-anchored cryptographic agent identity verification.

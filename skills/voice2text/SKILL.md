@@ -1,3 +1,9 @@
+---
+name: voice2text
+description: "slug: voice2text title: Voice to Text description: Offline
+  speech-to-text skill using Vosk local model. author: lxxtad license: MIT"
+---
+
 # voice2text
 
 slug: voice2text

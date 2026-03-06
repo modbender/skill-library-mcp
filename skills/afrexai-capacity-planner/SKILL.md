@@ -1,3 +1,8 @@
+---
+name: Capacity Planner
+description: Plan team and infrastructure capacity before it becomes a crisis.
+---
+
 # Capacity Planner
 
 Plan team and infrastructure capacity before it becomes a crisis.

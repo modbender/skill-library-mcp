@@ -1,24 +1,8 @@
 ---
 name: MiniMax TTS
 description: 调用 MiniMax 语音合成 API 生成语音。支持系统音色、克隆音色、流式/非流式输出。使用场景：用户需要生成高质量中文语音、语音合成、文本转语音。
-homepage: https://platform.minimax.io/docs/api-reference/speech-t2a-http
-metadata:
-  openclaw:
-    emoji: 🎙️
-    requires:
-      bins: [python3]
-      env: [MINIMAX_API_KEY]
-      pip: [requests]
-    primaryEnv: MINIMAX_API_KEY
-    envHelp:
-      MINIMAX_API_KEY:
-        required: true
-        description: MiniMax API Key
-        howToGet: 1. 打开 https://platform.minimax.io
-2. 注册账号并登录
-3. 获取 API Key（账户管理 → API Keys）
-        url: https://platform.minimax.io
 ---
+
 
 # MiniMax TTS Skill
 

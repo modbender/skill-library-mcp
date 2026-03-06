@@ -1,3 +1,9 @@
+---
+name: Software License Manager
+description: Audit, track, and optimize your organization's software licenses.
+  Finds waste, flags compliance risks, and builds a renewal calendar.
+---
+
 # Software License Manager
 
 Audit, track, and optimize your organization's software licenses. Finds waste, flags compliance risks, and builds a renewal calendar.

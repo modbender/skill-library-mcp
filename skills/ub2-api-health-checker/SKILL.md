@@ -1,3 +1,9 @@
+---
+name: API Health Checker
+description: A skill that enables Claw to test API endpoints, verify their
+  responses, measure performance, and generate a health report.
+---
+
 # API Health Checker
 
 A skill that enables Claw to test API endpoints, verify their responses, measure performance, and generate a health report.

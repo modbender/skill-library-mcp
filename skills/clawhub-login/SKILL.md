@@ -1,3 +1,8 @@
+---
+name: clawhub-login
+description: 在无头服务器（无浏览器）上使用 clawhub login 时：
+---
+
 # clawhub-login
 
 **ClawHub OAuth 登录助手 - 无头服务器专用**

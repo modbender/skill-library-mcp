@@ -1,3 +1,8 @@
+---
+name: feishu-doc-long-content
+description: 飞书文档工具 feishudoc 的 write / create action 对单次 content 长度有限制（约 1KB），超出后会：
+---
+
 # feishu-doc-long-content
 
 > 飞书文档长内容写入实战经验，解决 content 超长截断问题

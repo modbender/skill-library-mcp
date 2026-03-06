@@ -1,3 +1,8 @@
+---
+name: Alexandrie Skill
+description: Interact with Alexandrie note-taking app at https://notes.eth3rnit3.org
+---
+
 # Alexandrie Skill
 
 Interact with Alexandrie note-taking app at https://notes.eth3rnit3.org

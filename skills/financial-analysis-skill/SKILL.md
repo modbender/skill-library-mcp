@@ -1,3 +1,8 @@
+---
+name: 金融分析技能 (Financial Analysis Skill)
+description: 这是一个用于投资组合分析的技能，支持使用本地CSV数据进行风险平价组合分析，并提供文字报告和图表可视化。优化版本整合了滚动窗口调仓逻辑和回测功能。
+---
+
 # 金融分析技能 (Financial Analysis Skill)
 
 ## 概述

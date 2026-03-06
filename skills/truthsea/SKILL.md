@@ -1,18 +1,10 @@
 ---
-metadata:
-  openclaw:
-    skillKey: truthsea
-    primaryEnv: DEPLOYER_PRIVATE_KEY
-    requires:
-      env:
-        - DEPLOYER_PRIVATE_KEY
-        - TRUTH_DAG_ADDRESS
-        - TRUTH_STAKING_ADDRESS
-    os:
-      - darwin
-      - linux
-      - win32
+name: truthsea
+description: Verify claims, build epistemological dependency graphs, and earn
+  TRUTH tokens on Base L2. Security-hardened contracts (V2.5) with
+  ReentrancyGuard, era emission caps, and Slither-audited code.
 ---
+
 
 # TruthSea Verifier
 

@@ -1,7 +1,11 @@
 ---
 name: seo-audit
-description: Scan content and websites for SEO gaps, identify opportunities to outrank competitors. Use when: (1) Analyzing page SEO, (2) Checking meta tags and structured data, (3) Reviewing content for keyword optimization, (4) Auditing technical SEO factors.
+description: "Scan content and websites for SEO gaps, identify opportunities to
+  outrank competitors. Use when: (1) Analyzing page SEO, (2) Checking meta tags
+  and structured data, (3) Reviewing content for keyword optimization, (4)
+  Auditing technical SEO factors."
 ---
+
 
 # SEO Audit
 

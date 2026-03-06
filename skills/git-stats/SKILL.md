@@ -1,6 +1,9 @@
 ---
-description: Analyze git repository statistics — contributor rankings, commit frequency, file churn, and activity patterns.
+name: git-stats
+description: Analyze git repository statistics — contributor rankings, commit
+  frequency, file churn, and activity patterns.
 ---
+
 
 # Git Stats
 

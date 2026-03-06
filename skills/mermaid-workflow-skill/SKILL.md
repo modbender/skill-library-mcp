@@ -1,3 +1,9 @@
+---
+name: Mermaid Workflow Skill
+description: 按照新的工作流程创建和处理Mermaid图表：先生成Mermaid格式的图表定义文件(.mmd)，然后调用终端命令运行mmdc
+  (Mermaid CLI)将.mmd转换为PNG，最后将图片链接插入Markdown文件对应的位置。
+---
+
 # Mermaid Workflow Skill
 
 ## 描述

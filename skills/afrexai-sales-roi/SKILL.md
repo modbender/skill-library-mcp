@@ -1,3 +1,10 @@
+---
+name: Sales ROI Calculator
+description: Calculate return on investment for any business initiative —
+  software purchases, hiring, marketing spend, automation projects, or tool
+  adoption.
+---
+
 # Sales ROI Calculator
 
 Calculate return on investment for any business initiative — software purchases, hiring, marketing spend, automation projects, or tool adoption.

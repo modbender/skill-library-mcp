@@ -1,7 +1,17 @@
 ---
 name: code2animation
-description: End-to-end video production skill using the code2animation framework (https://github.com/etrobot/code2animation). Use this skill whenever the user wants to produce a code animation video, tech explainer video, or any animated video using code2animation — including writing the script, generating TTS audio, creating HTML/React visual assets, and rendering the final MP4. Trigger on any of: "make a video", "create an animation", "generate a code animation", "produce a tech video", "write a code2animation script", "render a video with code2animation", or any request that involves scripting + TTS + rendering in this stack. Always use this skill for the full pipeline, not just individual steps.
+description: 'End-to-end video production skill using the code2animation
+  framework (https://github.com/etrobot/code2animation). Use this skill whenever
+  the user wants to produce a code animation video, tech explainer video, or any
+  animated video using code2animation — including writing the script, generating
+  TTS audio, creating HTML/React visual assets, and rendering the final MP4.
+  Trigger on any of: "make a video", "create an animation", "generate a code
+  animation", "produce a tech video", "write a code2animation script", "render a
+  video with code2animation", or any request that involves scripting + TTS +
+  rendering in this stack. Always use this skill for the full pipeline, not just
+  individual steps.'
 ---
+
 
 # Code2Animation Skill
 

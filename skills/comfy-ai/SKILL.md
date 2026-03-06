@@ -1,3 +1,10 @@
+---
+name: ComfyAI Skill for Clawdbot
+description: "Integrates with local ComfyUI instance at http://192.168.31.7:8000
+  to generate images from text (txt2img) and edit images using uploaded
+  references (img2img). Uses the workflow: /clawd/skills/comfy..."
+---
+
 # ComfyAI Skill for Clawdbot
 
 ## Description

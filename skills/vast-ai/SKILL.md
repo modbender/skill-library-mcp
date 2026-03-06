@@ -1,3 +1,9 @@
+---
+name: "Skill: VAST.ai GPU Rental"
+description: This skill allows you to provision on-demand GPU infrastructure.
+  You must have a user-provided API Key before performing write actions.
+---
+
 # Skill: VAST.ai GPU Rental
 
 ## Overview

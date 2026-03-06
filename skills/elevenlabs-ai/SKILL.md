@@ -1,7 +1,10 @@
 ---
 name: elevenlabs-ai
-description: OpenClaw skill for ElevenLabs APIs: text-to-speech, speech-to-speech, realtime speech-to-text, voices/models, and dialogue workflows.
+description: "OpenClaw skill for ElevenLabs APIs: text-to-speech,
+  speech-to-speech, realtime speech-to-text, voices/models, and dialogue
+  workflows."
 ---
+
 
 # ElevenLabs API Skill (Advanced)
 

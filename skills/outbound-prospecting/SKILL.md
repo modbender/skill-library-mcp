@@ -1,3 +1,10 @@
+---
+name: SKILL.md - Outbound Prospecting
+description: This skill provides a structured workflow for researching and
+  initiating contact with potential leads. It follows the "Overseer Baseline"
+  from MEMORY.md, operating in copilot mode only.
+---
+
 # SKILL.md - Outbound Prospecting
 
 This skill provides a structured workflow for researching and initiating contact with potential leads. It follows the "Overseer Baseline" from MEMORY.md, operating in copilot mode only.

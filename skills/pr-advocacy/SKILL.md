@@ -1,3 +1,10 @@
+---
+name: PR Advocacy Skill
+description: Actively monitor, respond to, and drive Pull Request reviews to
+  completion. This skill ensures PRs don't get stuck in review limbo and
+  addresses maintainer feedback promptly.
+---
+
 # PR Advocacy Skill
 
 ## Purpose

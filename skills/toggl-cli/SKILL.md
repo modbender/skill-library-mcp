@@ -1,3 +1,8 @@
+---
+name: toggl-cli
+description: Interact with your Toggl Track workspace via the toggl-cli.
+---
+
 # toggl-cli
 
 Interact with your Toggl Track workspace via the toggl-cli.

@@ -1,3 +1,10 @@
+---
+name: Crisis Detector
+description: Life-saving crisis detection system for identifying self-harm,
+  suicide ideation, and mental health emergencies. Uses NLP, sentiment analysis,
+  and behavioral patterns to detect users in crisis and c...
+---
+
 # Crisis Detector
 
 ## Metadata

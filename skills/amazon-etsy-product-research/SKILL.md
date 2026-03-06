@@ -1,3 +1,10 @@
+---
+name: 🛍️ Amazon & Etsy Bestseller Product Research Engine
+description: Every dropshipper, Amazon FBA seller, Etsy creator, and e-commerce
+  founder spends 20-40 hours/week manually researching products. That's the most
+  painful, repetitive, high-stakes task in their busi...
+---
+
 # 🛍️ Amazon & Etsy Bestseller Product Research Engine
 
 **Slug:** `amazon-etsy-product-research`  

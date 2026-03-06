@@ -1,3 +1,8 @@
+---
+name: Naver Search Skill 명세서
+description: 이 문서는 OpenClaw 에이전트가 네이버 검색 스킬을 가장 효율적으로 호출하고 결과를 분석할 수 있도록 돕는 지침서입니다.
+---
+
 # Naver Search Skill 명세서
 
 이 문서는 OpenClaw 에이전트가 네이버 검색 스킬을 가장 효율적으로 호출하고 결과를 분석할 수 있도록 돕는 지침서입니다.

@@ -1,3 +1,9 @@
+---
+name: How To Skill
+description: A skill that teaches your agent how to make skills. Yes, this is a
+  skill about skills. You're welcome.
+---
+
 # How To Skill
 
 A skill that teaches your agent how to make skills. Yes, this is a skill about skills. You're welcome.

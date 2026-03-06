@@ -1,3 +1,10 @@
+---
+name: 🎯 LinkedIn B2B Buying Signal Detector
+description: Most lead gen tools find who to contact. This skill tells you when
+  to contact them — at the exact moment they have budget, urgency, and intent.
+  No SaaS equivalent under $2,000/month.
+---
+
 # 🎯 LinkedIn B2B Buying Signal Detector
 
 **Slug:** `linkedin-buying-signal-detector`  

@@ -1,3 +1,9 @@
+---
+name: 🐾 AI Cost Tracker — Know What You Spend
+description: Track every AI API call, generate spend reports, and get routing
+  suggestions to cut costs.
+---
+
 # 🐾 AI Cost Tracker — Know What You Spend
 
 > by Odin's Eye Enterprises — Ancient Wisdom. Modern Intelligence.

@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: 自动化数据处理和洞察分析服务。
+---
+
 # SKILL.md
 
 # Data Analysis Service

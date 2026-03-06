@@ -1,3 +1,8 @@
+---
+name: QA & Testing Engine — Complete Software Quality System
+description: Before writing a single test, design the strategy.
+---
+
 # QA & Testing Engine — Complete Software Quality System
 
 > The definitive testing methodology for AI agents. From test strategy to execution, coverage to reporting — everything you need to ship quality software.

@@ -1,3 +1,10 @@
+---
+name: Negotiation Mastery
+description: Complete negotiation system for business deals, salary talks,
+  vendor contracts, partnerships, and high-stakes conversations. Combines
+  multiple proven frameworks (FBI tactical empathy, Harvard princ...
+---
+
 # Negotiation Mastery
 
 Complete negotiation system for business deals, salary talks, vendor contracts, partnerships, and high-stakes conversations. Combines multiple proven frameworks (FBI tactical empathy, Harvard principled negotiation, SPIN, anchoring science) into one actionable playbook.

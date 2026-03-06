@@ -1,3 +1,8 @@
+---
+name: OneMind Skill
+description: Access and participate in collective consensus-building chats on OneMind.
+---
+
 # OneMind Skill
 
 Access and participate in collective consensus-building chats on OneMind.

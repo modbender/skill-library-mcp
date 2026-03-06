@@ -1,3 +1,10 @@
+---
+name: Clawringhouse Skill — AI Shopping Concierge
+description: Humans hate shopping. They don't trust agents with their credit
+  cards (yet). But they love when someone does the hard work for them —
+  researching options, comparing alternatives, finding the perfec...
+---
+
 # Clawringhouse Skill — AI Shopping Concierge
 
 **For agents who want to make their humans look thoughtful without asking them to shop.**

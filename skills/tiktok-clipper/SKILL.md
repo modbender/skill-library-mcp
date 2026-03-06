@@ -1,3 +1,10 @@
+---
+name: TikTok Clipper — Video → Viral Clips with Subtitles
+description: Takes a long-form video, transcribes it, identifies the most
+  engaging segments for TikTok/Reels, clips them with ffmpeg, and adds
+  TikTok-style animated subtitles.
+---
+
 # TikTok Clipper — Video → Viral Clips with Subtitles
 
 ## What it does

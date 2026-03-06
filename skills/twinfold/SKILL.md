@@ -1,17 +1,15 @@
 ---
 name: twinfold
-description: Control Twinfold — AI-powered social media content platform — from your agent. Create posts, generate images, adapt content for 10 platforms in 13 languages, manage autopilot, publish, and track analytics. Use when the user wants to create social media content, post to LinkedIn/Twitter/Instagram/etc., manage their content calendar, run autopilot content generation, check trends, or interact with their Twinfold account. Triggers on: post, publish, tweet, linkedin, social media, content, schedule, autopilot, twinfold, thread, adapt, trends, repurpose.
-metadata:
-  openclaw:
-    requires:
-      env:
-        - TWINFOLD_API_KEY
-    credentials:
-      - name: TWINFOLD_API_KEY
-        description: "Twinfold API key (starts with twf_). Get one at twinfold.app → Settings → API Keys."
-        required: true
-        prefix: "twf_"
+description: "Control Twinfold — AI-powered social media content platform — from
+  your agent. Create posts, generate images, adapt content for 10 platforms in
+  13 languages, manage autopilot, publish, and track analytics. Use when the
+  user wants to create social media content, post to
+  LinkedIn/Twitter/Instagram/etc., manage their content calendar, run autopilot
+  content generation, check trends, or interact with their Twinfold account.
+  Triggers on: post, publish, tweet, linkedin, social media, content, schedule,
+  autopilot, twinfold, thread, adapt, trends, repurpose."
 ---
+
 
 # Twinfold Skill
 

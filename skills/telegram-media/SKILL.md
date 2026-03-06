@@ -1,3 +1,10 @@
+---
+name: "Skill: telegram-media"
+description: Send rich media through Telegram — photos, charts, voice messages,
+  and documents. Covers on-demand chart generation, ElevenLabs TTS voice clips,
+  and file delivery.
+---
+
 # Skill: telegram-media
 
 ## CRITICAL RULE — NO FABRICATION

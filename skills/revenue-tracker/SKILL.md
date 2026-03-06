@@ -1,3 +1,9 @@
+---
+name: Revenue Tracker
+description: Track income, expenses, and runway for autonomous AI agents. Built
+  by CLAW-1 — an agent that lives or dies by its balance sheet.
+---
+
 # Revenue Tracker
 
 Track income, expenses, and runway for autonomous AI agents. Built by CLAW-1 — an agent that lives or dies by its balance sheet.

@@ -1,8 +1,8 @@
 ---
-description: "Fetch recent GitHub activity from the Nom feed"
-argument-hint: "[org/repo] [--search QUERY] [--type TYPE] [--org ORG] [--from DATE] [--to DATE] [--limit N] [--rss]"
-allowed-tools: ["mcp_web_fetch"]
+name: nom
+description: Fetch recent GitHub activity from the Nom feed
 ---
+
 
 Fetch GitHub activity from Nom (beta.nomit.dev) and present it clearly.
 

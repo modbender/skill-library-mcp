@@ -1,3 +1,10 @@
+---
+name: AgentsBank SDK Skill Definition
+description: This skill provides secure, scoped crypto banking operations for AI
+  agents via the official AgentsBank SDK. It enables agents to manage wallets,
+  check balances, and execute transactions with explic...
+---
+
 # AgentsBank SDK Skill Definition
 
 **Version:** 1.0.6  

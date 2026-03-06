@@ -1,3 +1,10 @@
+---
+name: Client Retention — Keep Clients Paying Monthly
+description: "Turn one-time projects into recurring revenue and reduce churn.
+  The cheapest client to acquire is the one you already have. Sources:
+  SerpSculpt (B2B retention stats 2025), Breakthrough3x (recurring..."
+---
+
 # Client Retention — Keep Clients Paying Monthly
 
 Turn one-time projects into recurring revenue and reduce churn. The cheapest client to acquire is the one you already have.

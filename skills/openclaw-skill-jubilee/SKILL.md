@@ -1,3 +1,10 @@
+---
+name: "Skill: Jubilee Protocol (Treasury Management)"
+description: Agents deposit idle capital into Jubilee Vaults to earn yield,
+  track performance, and programmably donate yield to other agents or humans
+  while keeping principal intact.
+---
+
 # Skill: Jubilee Protocol (Treasury Management)
 
 ## Description

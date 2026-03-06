@@ -1,6 +1,9 @@
 ---
-description: View, manage, and debug OpenClaw cron jobs with status overview and health checks.
+name: cron-dashboard
+description: View, manage, and debug OpenClaw cron jobs with status overview and
+  health checks.
 ---
+
 
 # Cron Dashboard
 

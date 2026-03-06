@@ -1,3 +1,10 @@
+---
+name: android-agent — AI-Powered Android Phone Control
+description: Got an old Android in a drawer? Connect it to any machine running
+  OpenClaw — your gateway, a Mac Mini, a Raspberry Pi. Your AI can now open
+  apps, tap buttons, type text, and complete tasks on a rea...
+---
+
 # android-agent — AI-Powered Android Phone Control
 
 > Plug your old Android phone into your Mac/PC. Now your AI assistant can use it.

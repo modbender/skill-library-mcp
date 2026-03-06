@@ -1,7 +1,10 @@
 ---
 name: xrpl-token-mint
-description: Create and manage XRPL tokens (issued currencies) and NFTs. Use for: (1) Minting new tokens, (2) Setting up token issuers, (3) Creating NFTs, (4) Managing trust lines.
+description: "Create and manage XRPL tokens (issued currencies) and NFTs. Use
+  for: (1) Minting new tokens, (2) Setting up token issuers, (3) Creating NFTs,
+  (4) Managing trust lines."
 ---
+
 
 # XRPL Token Minting
 

@@ -1,3 +1,10 @@
+---
+name: 🏗️ Agent Sovereign Stack
+description: Registers your agent identity on-chain, uploads your memory to
+  decentralized storage, deploys a treasury with spending policies, and sets up
+  agent-to-agent communication — all in one flow.
+---
+
 # 🏗️ Agent Sovereign Stack
 
 **One command to give any AI agent sovereign infrastructure.**

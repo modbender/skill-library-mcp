@@ -1,3 +1,8 @@
+---
+name: WebSearch (SearXNG)
+description: Search the web using a local SearXNG instance.
+---
+
 # WebSearch (SearXNG)
 
 Search the web using a local SearXNG instance.

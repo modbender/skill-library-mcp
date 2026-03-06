@@ -1,3 +1,8 @@
+---
+name: encrypted-file-reader
+description: 读取本地加密/受保护的文件内容，支持企业安全策略环境。
+---
+
 # encrypted-file-reader
 
 读取本地加密/受保护的文件内容，支持企业安全策略环境。

@@ -1,6 +1,11 @@
 ---
 name: cio-intelligence
-description: Chief Intelligence Officer operations for AI startups. Use for market intelligence gathering, competitive analysis, technology trend monitoring, signal detection, opportunity assessment, threat identification, and strategic intelligence briefings.
+description: Chief Intelligence Officer operations for AI startups. Use for
+  market intelligence gathering, competitive analysis, technology trend
+  monitoring, signal detection, opportunity assessment, threat identification,
+  and strategic intelligence briefings.
+---
+
 
 # CIO Intelligence Operations
 

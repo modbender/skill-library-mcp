@@ -1,3 +1,8 @@
+---
+name: Kite AI Agent Smart Wallet Permissionless Protocol
+description: "!Version !Kite AI !Telegram"
+---
+
 # Kite AI Agent Smart Wallet Permissionless Protocol
 
 > 让用户通过Telegram控制加密货币钱包 / Telegram wallet control for Kite AI

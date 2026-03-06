@@ -1,3 +1,9 @@
+---
+name: AI Prompt Template Skill
+description: "This skill was converted from a Twitter post by @lexxaura.
+  Original: https://x.com/lexxaura/status/2016947883807850906"
+---
+
 # AI Prompt Template Skill
 
 ## Description

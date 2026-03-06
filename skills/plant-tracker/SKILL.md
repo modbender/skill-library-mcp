@@ -1,7 +1,13 @@
 ---
 name: plant-tracker
-description: Personal plant and garden management for gardeners. Track your plants, set care schedules, and monitor growth. Use when you need to manage your garden, track watering/fertilizing schedules, or maintain plant inventories. Security: file exports are restricted to safe directories only (workspace, home, /tmp). Perfect for home gardeners, indoor plant enthusiasts, and anyone growing their own food.
+description: "Personal plant and garden management for gardeners. Track your
+  plants, set care schedules, and monitor growth. Use when you need to manage
+  your garden, track watering/fertilizing schedules, or maintain plant
+  inventories. Security: file exports are restricted to safe directories only
+  (workspace, home, /tmp). Perfect for home gardeners, indoor plant enthusiasts,
+  and anyone growing their own food."
 ---
+
 
 # Plant Tracker
 

@@ -1,8 +1,13 @@
 ---
 name: multi-model-critique
-description: Run complex prompts through a multi-model deliberation pipeline with structured self-improvement. Use when the user sets a complex flag (e.g., complex=true/complex) or asks for high-stakes, ambiguous, or long-form reasoning where one model is not enough. Produces outputs by: (1) parallel model runs, (2) cross-critique, (3) critique-driven revision, and (4) final synthesized answer with uncertainties and evidence notes.
-metadata: {"openclaw":{"emoji":"🧠"}}
+description: "Run complex prompts through a multi-model deliberation pipeline
+  with structured self-improvement. Use when the user sets a complex flag (e.g.,
+  complex=true/complex) or asks for high-stakes, ambiguous, or long-form
+  reasoning where one model is not enough. Produces outputs by: (1) parallel
+  model runs, (2) cross-critique, (3) critique-driven revision, and (4) final
+  synthesized answer with uncertainties and evidence notes."
 ---
+
 
 # Multi-Model Critique
 

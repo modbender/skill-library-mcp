@@ -1,3 +1,8 @@
+---
+name: NSFW Detection Skills
+description: Skills for detecting adult/inappropriate content.
+---
+
 # NSFW Detection Skills
 
 Skills for detecting adult/inappropriate content.

@@ -1,3 +1,8 @@
+---
+name: Smart Router - 4D 压缩智能分发器
+description: neo smart router
+---
+
 # Smart Router - 4D 压缩智能分发器
 
 **版本：** 1.3（配置驱动修复版）  

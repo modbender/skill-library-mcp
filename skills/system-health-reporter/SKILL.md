@@ -1,6 +1,9 @@
 ---
-description: Generate system health reports with CPU, memory, disk, network diagnostics and recommendations.
+name: system-health-reporter
+description: Generate system health reports with CPU, memory, disk, network
+  diagnostics and recommendations.
 ---
+
 
 # System Health Reporter
 

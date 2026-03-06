@@ -1,3 +1,9 @@
+---
+name: Ollama x/z-image-turbo Skill
+description: Génère des images via Ollama (modèle x/z-image-turbo) et les envoie
+  sur WhatsApp.
+---
+
 # Ollama x/z-image-turbo Skill
 
 ## Description

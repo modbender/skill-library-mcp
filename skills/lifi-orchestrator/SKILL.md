@@ -1,7 +1,15 @@
 ---
 name: lifi-orchestrator
-description: Cross-chain bridging and swapping via LI.FI — the leading bridge aggregator that routes across 30+ bridges and DEXs for optimal rates. Use when you need to: (1) Get quotes for moving tokens between chains, (2) Execute cross-chain swaps with best pricing, (3) Track bridge transaction status, (4) Compare routes across protocols like Stargate, Across, Hop, Celer, etc. Supports Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Avalanche, Solana, and 15+ other chains. Handles native tokens and ERC-20s with automatic slippage protection.
+description: "Cross-chain bridging and swapping via LI.FI — the leading bridge
+  aggregator that routes across 30+ bridges and DEXs for optimal rates. Use when
+  you need to: (1) Get quotes for moving tokens between chains, (2) Execute
+  cross-chain swaps with best pricing, (3) Track bridge transaction status, (4)
+  Compare routes across protocols like Stargate, Across, Hop, Celer, etc.
+  Supports Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Avalanche, Solana,
+  and 15+ other chains. Handles native tokens and ERC-20s with automatic
+  slippage protection."
 ---
+
 
 # LI.FI Orchestrator
 

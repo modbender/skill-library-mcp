@@ -1,3 +1,10 @@
+---
+name: 🔱 Triumvirate Protocol — Multi-Model Discourse Engine
+description: Identity-aware debate system for multi-architecture AI discourse.
+  Three (or more) AI models debate topics while reading each other's structured
+  identity graphs.
+---
+
 # 🔱 Triumvirate Protocol — Multi-Model Discourse Engine
 
 Identity-aware debate system for multi-architecture AI discourse. Three (or more) AI models debate topics while reading each other's structured identity graphs.

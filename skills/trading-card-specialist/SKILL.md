@@ -1,8 +1,14 @@
 ---
 name: trading-card-specialist
-version: 1.3.0
-description: Advanced AI assistant for trading card dealers, collectors, and shops. Provides market analysis, eBay listing optimization, PSA/BGS grading insights, market research, and automated card valuation. Use when working with sports cards, Pokemon, or collectibles for: (1) pricing analysis and market research, (2) eBay listing creation and optimization, (3) market tracking, (4) grading submission planning, (5) inventory management, or any trading card business operations.
+description: "Advanced AI assistant for trading card dealers, collectors, and
+  shops. Provides market analysis, eBay listing optimization, PSA/BGS grading
+  insights, market research, and automated card valuation. Use when working with
+  sports cards, Pokemon, or collectibles for: (1) pricing analysis and market
+  research, (2) eBay listing creation and optimization, (3) market tracking, (4)
+  grading submission planning, (5) inventory management, or any trading card
+  business operations."
 ---
+
 
 # Trading Card Specialist
 

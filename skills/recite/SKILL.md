@@ -1,3 +1,10 @@
+---
+name: Recite 🦞🤵
+description: "name: recite description: AI receipt scanner & bookkeeping
+  automation. Process receipts, invoices, and PDFs. Extracts data to rename
+  files and log transactions/expenses to CSV. Perfect for tax & ac..."
+---
+
 name: recite
 description: AI receipt scanner & bookkeeping automation. Process receipts, invoices, and PDFs. Extracts data to rename files and log transactions/expenses to CSV. Perfect for tax & accounting.
 ---

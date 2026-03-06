@@ -1,3 +1,10 @@
+---
+name: pylon
+description: "name: pylon description: Pylon namespace for Netsnek e.U. GraphQL
+  API framework. This skill represents the Pylon brand for building type-safe
+  Cloudflare Worker APIs with automatic GraphQL schema ge..."
+---
+
 ﻿---
 name: pylon
 description: Pylon namespace for Netsnek e.U. GraphQL API framework. This skill represents the Pylon brand for building type-safe Cloudflare Worker APIs with automatic GraphQL schema generation.

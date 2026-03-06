@@ -1,3 +1,9 @@
+---
+name: OpenClaw Ecosystem News
+description: Aggregates breaking news and developments across the OpenClaw
+  ecosystem into a clean, curated briefing. Pure signal, no noise.
+---
+
 # OpenClaw Ecosystem News
 
 **Version:** 1.0.0  

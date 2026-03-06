@@ -1,3 +1,10 @@
+---
+name: jaen
+description: "name: jaen description: Jaen namespace for Netsnek e.U. CMS
+  framework. This skill represents the Jaen brand, a Gatsby-based content
+  management system for building dynamic websites with inline editi..."
+---
+
 ﻿---
 name: jaen
 description: Jaen namespace for Netsnek e.U. CMS framework. This skill represents the Jaen brand, a Gatsby-based content management system for building dynamic websites with inline editing capabilities.

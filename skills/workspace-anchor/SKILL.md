@@ -1,3 +1,10 @@
+---
+name: ⚓ Workspace Anchor
+description: Multi-agent workspace awareness and safety system. Discovers,
+  lists, switches, and validates projects using environment-based naming to
+  prevent agent drift.
+---
+
 # ⚓ Workspace Anchor
 
 Multi-agent workspace awareness and safety system. Discovers, lists, switches, and validates projects using environment-based naming to prevent agent drift.

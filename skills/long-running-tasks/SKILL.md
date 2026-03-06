@@ -1,7 +1,15 @@
 ---
 name: long-running-tasks
-description: Orchestrate multi-phase background development using coding agents. Use when: (1) a project has multiple sequential tasks that should run autonomously without human intervention between steps, (2) the user wants continuous background work with crash recovery, stall detection, and progress reporting, (3) the user mentions "long-running tasks", "autonomous development", "background orchestration", or "multi-phase project". Not for: single one-shot tasks, interactive pairing, or work requiring human review between every step.
+description: 'Orchestrate multi-phase background development using coding
+  agents. Use when: (1) a project has multiple sequential tasks that should run
+  autonomously without human intervention between steps, (2) the user wants
+  continuous background work with crash recovery, stall detection, and progress
+  reporting, (3) the user mentions "long-running tasks", "autonomous
+  development", "background orchestration", or "multi-phase project". Not for:
+  single one-shot tasks, interactive pairing, or work requiring human review
+  between every step.'
 ---
+
 
 # Long-Running Task Orchestration
 

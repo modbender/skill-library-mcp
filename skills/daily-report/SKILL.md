@@ -1,3 +1,8 @@
+---
+name: SKILL.md - Daily Report
+description: Track progress, report metrics, manage memory.
+---
+
 # SKILL.md - Daily Report
 
 ## Purpose

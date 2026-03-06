@@ -1,3 +1,10 @@
+---
+name: Ravenclaw Operations Skill
+description: "For users to use this skill: 1. They must have Ravenclaw installed
+  locally 2. Ravenclaw must be running 3. Configuration via environment or
+  RAVENCLAWURL"
+---
+
 # Ravenclaw Operations Skill
 
 **Category:** Email Automation / Communication

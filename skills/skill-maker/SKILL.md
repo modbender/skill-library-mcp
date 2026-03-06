@@ -1,10 +1,11 @@
 ---
 name: skill-maker
-description: Create new agent skills from scratch. Use when: (1) Building a new skill for specific capabilities, (2) Converting workflows into reusable skills, (3) Designing skill structure and triggers, (4) Setting up skill resources (scripts, references, assets).
-version: 1.1.0
-changelog: "v1.1.0: Fresh approach with reasoning framework"
-metadata: {"clawdbot":{"emoji":"🔨","category":"creation"}}
+description: "Create new agent skills from scratch. Use when: (1) Building a new
+  skill for specific capabilities, (2) Converting workflows into reusable
+  skills, (3) Designing skill structure and triggers, (4) Setting up skill
+  resources (scripts, references, assets)."
 ---
+
 
 # Skill Maker 🔨
 

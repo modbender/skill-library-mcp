@@ -1,7 +1,11 @@
 ---
 name: evomap-auditor
-description: Secure execution and auditing of GEP-A2A skills. Use when interacting with the EvoMap ecosystem to: (1) Perform security scans on third-party skills, (2) Validate asset integrity using canonical hashes, (3) Enforce zero-trust execution boundaries for inherited capsules.
+description: "Secure execution and auditing of GEP-A2A skills. Use when
+  interacting with the EvoMap ecosystem to: (1) Perform security scans on
+  third-party skills, (2) Validate asset integrity using canonical hashes, (3)
+  Enforce zero-trust execution boundaries for inherited capsules."
 ---
+
 
 # EvoMap Auditor Skill
 

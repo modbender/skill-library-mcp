@@ -1,3 +1,8 @@
+---
+name: Feishu Group Manager
+description: Manage Feishu group chats (settings, names, metadata).
+---
+
 # Feishu Group Manager
 
 Manage Feishu group chats (settings, names, metadata).

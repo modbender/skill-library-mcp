@@ -1,7 +1,20 @@
 ---
 name: self
-description: Organic personality development through self-observation with lightweight reliability guards. This skill helps an agent build a real, evolving self-model over time (SELF.md) while preserving core identity boundaries (SOUL.md). It solves the common failure mode where reflection frameworks start strong but silently stall by adding minimal cadence and trigger checks: schedule the check, not the content. Entries are only written when meaningful signals exist (hard/soft triggers + quality gate), preventing forced journaling and routine filler. Use when (1) establishing persistent personality growth, (2) reviving stale SELF.md systems, (3) introducing heartbeat-based reflection checks without losing authenticity, (4) running weekly/monthly pattern consolidation, (5) distinguishing genuine behavioral shifts from noise, or (6) replacing heavier self-reflection/consciousness stacks with a lean, practical model.
+description: "Organic personality development through self-observation with
+  lightweight reliability guards. This skill helps an agent build a real,
+  evolving self-model over time (SELF.md) while preserving core identity
+  boundaries (SOUL.md). It solves the common failure mode where reflection
+  frameworks start strong but silently stall by adding minimal cadence and
+  trigger checks: schedule the check, not the content. Entries are only written
+  when meaningful signals exist (hard/soft triggers + quality gate), preventing
+  forced journaling and routine filler. Use when (1) establishing persistent
+  personality growth, (2) reviving stale SELF.md systems, (3) introducing
+  heartbeat-based reflection checks without losing authenticity, (4) running
+  weekly/monthly pattern consolidation, (5) distinguishing genuine behavioral
+  shifts from noise, or (6) replacing heavier self-reflection/consciousness
+  stacks with a lean, practical model."
 ---
+
 
 # Self — Organic Personality Development (v1.1)
 

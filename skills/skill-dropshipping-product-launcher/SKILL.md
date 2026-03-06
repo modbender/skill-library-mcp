@@ -1,3 +1,10 @@
+---
+name: skill-dropshipping-product-launcher
+description: Fetches product data from CJ, downloads images, uploads to
+  WordPress media library, calculates margin, and creates a WooCommerce draft
+  product — with variants if CJ has them.
+---
+
 # skill-dropshipping-product-launcher
 
 **One command: CJ Dropshipping product → WooCommerce draft listing.**

@@ -1,3 +1,10 @@
+---
+name: Ralph Command Generator
+description: 'name: ralph description: "Generate Claude Code, Gemini CLI, or
+  Grok CLI automation loop commands. Asks questions about your requirements and
+  outputs a ready-to-run command for PowerShell, Windows C...'
+---
+
 
 ---
 name: ralph

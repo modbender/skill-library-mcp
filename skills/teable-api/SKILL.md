@@ -1,3 +1,9 @@
+---
+name: Teable API
+description: Complete Teable API management skill for OpenClaw. Provides full
+  CRUD operations for records, bases, spaces, tables, dashboards, and trash.
+---
+
 # Teable API
 
 Complete Teable API management skill for OpenClaw. Provides full CRUD operations for records, bases, spaces, tables, dashboards, and trash.

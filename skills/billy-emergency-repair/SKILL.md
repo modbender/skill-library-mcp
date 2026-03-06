@@ -1,3 +1,9 @@
+---
+name: Billy Emergency Repair Skill
+description: ⚠️ NEILL-ONLY COMMAND ⚠️ Only Neill can authorize emergency repairs
+  to Billy. Never run without explicit Neill authorization.
+---
+
 # Billy Emergency Repair Skill
 
 ## Use When

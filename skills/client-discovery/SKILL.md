@@ -1,3 +1,10 @@
+---
+name: Client Discovery — Qualify, Diagnose, Close
+description: "Run discovery conversations that qualify prospects, diagnose real
+  problems, and position your solution as the obvious next step. Sources:
+  Consulting Success (2026), Melisa Liberman (36 questions fr..."
+---
+
 # Client Discovery — Qualify, Diagnose, Close
 
 Run discovery conversations that qualify prospects, diagnose real problems, and position your solution as the obvious next step.

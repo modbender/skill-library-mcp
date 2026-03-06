@@ -1,3 +1,9 @@
+---
+name: TOON (Token-Oriented Object Notation) Skill
+description: This skill provides instructions for reducing token usage by 30-60%
+  when dealing with structured data (JSON, directory structures, API responses).
+---
+
 # TOON (Token-Oriented Object Notation) Skill
 
 This skill provides instructions for reducing token usage by 30-60% when dealing with structured data (JSON, directory structures, API responses). 

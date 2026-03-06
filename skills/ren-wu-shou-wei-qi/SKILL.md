@@ -1,3 +1,9 @@
+---
+name: 任务收尾器
+description: "name: 任务收尾器 version: 1.0.2 description:
+  强制任务收尾与证据提交。确保每个任务都有明确的目标、进度、下一步和完成证据。"
+---
+
 ﻿---
 name: 任务收尾器
 version: 1.0.2

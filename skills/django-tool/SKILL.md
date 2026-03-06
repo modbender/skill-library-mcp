@@ -1,3 +1,10 @@
+---
+name: django-tool
+description: This project eliminates the time wasted on creating virtual
+  machines and setting up environments from scratch. It automatically provisions
+  a ready-to-use development environment with commonly used ...
+---
+
 This project eliminates the time wasted on creating virtual machines and setting up environments from scratch. It automatically provisions a ready-to-use development environment with commonly used default requirements, allowing you to choose between Django or Django REST Framework depending on your project needs.
 
 The goal is to standardize and accelerate project initialization by providing a consistent, production-ready structure from day one. Instead of manually configuring dependencies, environments, and base settings, developers can instantly bootstrap a fully configured backend setup with best practices already applied.

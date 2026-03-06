@@ -1,3 +1,8 @@
+---
+name: Solana Development Skill (framework-kit-first)
+description: "Use this Skill when the user asks for:"
+---
+
 # Solana Development Skill (framework-kit-first)
 
 **Source**: https://solana.com/SKILL.md  

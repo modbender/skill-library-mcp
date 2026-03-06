@@ -1,3 +1,9 @@
+---
+name: "Skill: Facture Make"
+description: Ce skill permet de générer et d'envoyer des factures
+  professionnelles vers Make.com après une étape de confirmation humaine.
+---
+
 # Skill: Facture Make
 
 Ce skill permet de générer et d'envoyer des factures professionnelles vers Make.com après une étape de confirmation humaine.

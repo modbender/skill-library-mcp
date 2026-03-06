@@ -1,3 +1,11 @@
+---
+name: BABY Brain - Ultimate AI Assistant Platform
+description: <p align="center"> <img
+  src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version"> <img
+  src="https://img.shields.io/badge/Author-Baby-orange" alt="Author"> <img
+  src="https://img.shields.i...
+---
+
 # BABY Brain - Ultimate AI Assistant Platform
 
 <p align="center">

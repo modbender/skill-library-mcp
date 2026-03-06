@@ -1,7 +1,14 @@
 ---
 name: mayar-payment
-description: Mayar.id payment integration for generating invoices, payment links, and tracking transactions via MCP. Use when needing to: (1) Create payment invoices/links for customers, (2) Track payment status and transactions, (3) Generate WhatsApp-friendly payment messages, (4) Handle Indonesian payment methods (bank transfer, e-wallet, QRIS), (5) Manage subscriptions/memberships, or (6) Automate payment workflows for e-commerce, services, or digital products.
+description: "Mayar.id payment integration for generating invoices, payment
+  links, and tracking transactions via MCP. Use when needing to: (1) Create
+  payment invoices/links for customers, (2) Track payment status and
+  transactions, (3) Generate WhatsApp-friendly payment messages, (4) Handle
+  Indonesian payment methods (bank transfer, e-wallet, QRIS), (5) Manage
+  subscriptions/memberships, or (6) Automate payment workflows for e-commerce,
+  services, or digital products."
 ---
+
 
 # Mayar Payment Integration
 

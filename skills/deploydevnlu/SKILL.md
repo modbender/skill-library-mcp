@@ -1,3 +1,8 @@
+---
+name: DeployDevNLU
+description: Deploy the application to SupplyWhy via Slack natural language commands.
+---
+
 # DeployDevNLU
 
 Deploy the application to SupplyWhy via Slack natural language commands.

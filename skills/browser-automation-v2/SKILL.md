@@ -1,3 +1,9 @@
+---
+name: Browser Automation v2
+description: Enterprise-grade browser automation for OpenClaw with robust
+  resource management.
+---
+
 # Browser Automation v2
 
 Enterprise-grade browser automation for OpenClaw with robust resource management.

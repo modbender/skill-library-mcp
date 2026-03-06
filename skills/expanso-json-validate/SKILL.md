@@ -1,3 +1,8 @@
+---
+name: json-validate
+description: '"Validate JSON syntax and structure"'
+---
+
 # json-validate
 
 "Validate JSON syntax and structure"

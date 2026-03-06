@@ -1,13 +1,9 @@
 ---
 name: askgina-polymarket
-displayName: Polymarket via Gina
-description: Fast setup for Claw bots: paste your Gina MCP token and start trading Polymarket in minutes.
-version: 0.1.2
-metadata:
-  tags: polymarket, prediction-markets, trading, betting, gina, mcp, ask gina, crypto, agent, agentic, bot, automated
-authors:
-  - Gina (@askginadotai)
+description: "Fast setup for Claw bots: paste your Gina MCP token and start
+  trading Polymarket in minutes."
 ---
+
 
 # Polymarket via Gina
 

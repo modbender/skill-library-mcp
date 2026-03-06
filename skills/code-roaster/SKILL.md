@@ -1,3 +1,9 @@
+---
+name: Code Roaster
+description: Get your code brutally roasted with humor AND useful feedback. Like
+  a code review from that one senior dev who's funny but also right.
+---
+
 # Code Roaster
 
 Get your code brutally roasted with humor AND useful feedback. Like a code review from that one senior dev who's funny but also right.

@@ -1,3 +1,10 @@
+---
+name: Negotiation — Close Deals and Protect Your Value
+description: "Negotiate rates, scope, and terms using Chris Voss's FBI-proven
+  frameworks adapted for freelance and consulting deals. Sources: Chris Voss
+  (Never Split the Difference), Gong.io, NAHC, Klenty, Aviso..."
+---
+
 # Negotiation — Close Deals and Protect Your Value
 
 Negotiate rates, scope, and terms using Chris Voss's FBI-proven frameworks adapted for freelance and consulting deals.

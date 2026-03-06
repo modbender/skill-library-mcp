@@ -1,3 +1,9 @@
+---
+name: Medium Writer
+description: Writing and publishing articles for the Medium Partner Program.
+  Creating monetizable articles.
+---
+
 # Medium Writer
 
 Writing and publishing articles for the Medium Partner Program. Creating monetizable articles.

@@ -1,3 +1,9 @@
+---
+name: Auto-Research Skill
+description: An autonomous research agent for OpenClaw that searches,
+  synthesizes, and stores findings with full source tracking.
+---
+
 # Auto-Research Skill
 
 An autonomous research agent for OpenClaw that searches, synthesizes, and stores findings with full source tracking.

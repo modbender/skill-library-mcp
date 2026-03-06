@@ -1,17 +1,10 @@
 ---
 name: qrcode
-description: Generate styled QR codes (SVG/PNG/JPG) with custom colors, shapes, and error correction. Agent should display generated files. Secure: all outputs saved to workspace root.
-homepage: https://github.com/HeXavi8/skills
-metadata:
-  {
-    "clawdbot":
-      {
-        "emoji": "",
-        "requires": { "bins": ["node"], "packages": ["qrcode", "sharp"] },
-        "primaryEnv": null,
-      },
-  }
+description: "Generate styled QR codes (SVG/PNG/JPG) with custom colors, shapes,
+  and error correction. Agent should display generated files. Secure: all
+  outputs saved to workspace root."
 ---
+
 
 # QRCode Generator
 

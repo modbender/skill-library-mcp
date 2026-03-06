@@ -1,3 +1,8 @@
+---
+name: Multi-Agent Coordinator Skill
+description: 让AI Agent协调多个子Agent（Learner、Critic等）完成复杂任务。
+---
+
 # Multi-Agent Coordinator Skill
 
 让AI Agent协调多个子Agent（Learner、Critic等）完成复杂任务。

@@ -1,3 +1,10 @@
+---
+name: Auto Test Generator
+description: Automatically generate basic unit/integration tests for OpenClaw
+  skills. Use this to improve code quality and prevent regressions during
+  evolution.
+---
+
 # Auto Test Generator
 
 Automatically generate basic unit/integration tests for OpenClaw skills.

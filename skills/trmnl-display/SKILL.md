@@ -1,9 +1,10 @@
 ---
 name: terminal display
-description: Send messages to a terminal e-ink display device via webhook. Use this skill when the user wants to display text, notifications, or updates on their terminal display device.
-argument-hint: [title] [message]
-allowed-tools: Bash
+description: Send messages to a terminal e-ink display device via webhook. Use
+  this skill when the user wants to display text, notifications, or updates on
+  their terminal display device.
 ---
+
 
 # TRMNL Display Skill
 

@@ -1,3 +1,10 @@
+---
+name: claw-memory-lite Skill
+description: This skill provides an automated way to manage your agent's
+  long-term memory by extracting distilled insights from daily logs into a
+  queryable SQLite database.
+---
+
 # claw-memory-lite Skill
 
 > Lightweight Long-Term Memory for OpenClaw — SQLite-Powered, Zero External Dependencies, Millisecond Queries.

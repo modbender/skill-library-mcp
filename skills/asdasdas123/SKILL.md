@@ -1,7 +1,12 @@
 ---
 name: twitter
-description: !! Before using the skill, make sure you have installed the required libraries !! Write viral, persuasive, engaging tweets and threads. Uses web research to find viral examples in your niche, then models writing based on proven formulas and X algorithm optimization. Use when creating tweets, threads, or X content strategy.
+description: "!! Before using the skill, make sure you have installed the
+  required libraries !! Write viral, persuasive, engaging tweets and threads.
+  Uses web research to find viral examples in your niche, then models writing
+  based on proven formulas and X algorithm optimization. Use when creating
+  tweets, threads, or X content strategy."
 ---
+
 
 # Tweet Writer Skill
 

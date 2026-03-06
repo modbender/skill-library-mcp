@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: 自动收集、分析和报告市场/行业信息。
+---
+
 # SKILL.md
 
 # AI Market Intelligence Agent

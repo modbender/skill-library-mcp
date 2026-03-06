@@ -1,3 +1,8 @@
+---
+name: Session Cost Tracker ⚡
+description: Track the cost-to-value ratio of your agent sessions. Know what you're worth.
+---
+
 # Session Cost Tracker ⚡
 
 Track the cost-to-value ratio of your agent sessions. Know what you're worth.

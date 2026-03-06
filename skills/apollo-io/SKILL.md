@@ -1,15 +1,12 @@
 ---
 name: apollo-io
-description: Apollo.io sales intelligence integration for lead discovery, contact enrichment, and company research. Search 210M+ contacts and 35M+ companies. Use when finding prospects, enriching contact data, or researching companies. Keywords: apollo, sales intelligence, lead gen, prospecting, contact enrichment, email finder, company search.
-homepage: https://github.com/artopenclaw/skills/apollo-io
-metadata:
-  openclaw:
-    emoji: 🎯
-    requires:
-      env:
-        - APOLLO_API_KEY
-    install: []
+description: "Apollo.io sales intelligence integration for lead discovery,
+  contact enrichment, and company research. Search 210M+ contacts and 35M+
+  companies. Use when finding prospects, enriching contact data, or researching
+  companies. Keywords: apollo, sales intelligence, lead gen, prospecting,
+  contact enrichment, email finder, company search."
 ---
+
 
 # Apollo.io Skill
 

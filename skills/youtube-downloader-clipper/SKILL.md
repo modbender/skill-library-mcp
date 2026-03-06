@@ -1,3 +1,10 @@
+---
+name: ClawHub - YouTube Video Clipper & Downloader
+description: Extract specific sections from YouTube videos with precise
+  timestamps. A powerful ClawHub skill that makes video clipping effortless -
+  just provide a URL and time range.
+---
+
 # ClawHub - YouTube Video Clipper & Downloader
 
 Extract specific sections from YouTube videos with precise timestamps. A powerful ClawHub skill that makes video clipping effortless - just provide a URL and time range.

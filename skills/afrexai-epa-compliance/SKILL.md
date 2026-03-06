@@ -1,3 +1,10 @@
+---
+name: Environmental Compliance Manager
+description: Assess, track, and maintain environmental regulatory compliance
+  across EPA, state agencies, and industry-specific requirements. Built for
+  manufacturing, construction, energy, logistics, and any bus...
+---
+
 # Environmental Compliance Manager
 
 Assess, track, and maintain environmental regulatory compliance across EPA, state agencies, and industry-specific requirements. Built for manufacturing, construction, energy, logistics, and any business with environmental obligations.

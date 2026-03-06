@@ -1,7 +1,15 @@
 ---
 name: skill-reviewer-pro
-description: Comprehensive skill review and validation for OpenClaw skills. Performs multi-level review: (1) Format validation, (2) Writing quality assessment (structure, description, examples, scoring), (3) Functional verification (templates match OpenClaw specs), (4) Best practices check, (5) Optimization recommendations, (6) Workflow validation (for workflow tools). Use when auditing skills before publishing, evaluating downloaded skills, or improving existing skills. IMPORTANT: Always respond in the same language as the user's request (auto-adapt to user's language).
+description: "Comprehensive skill review and validation for OpenClaw skills.
+  Performs multi-level review: (1) Format validation, (2) Writing quality
+  assessment (structure, description, examples, scoring), (3) Functional
+  verification (templates match OpenClaw specs), (4) Best practices check, (5)
+  Optimization recommendations, (6) Workflow validation (for workflow tools).
+  Use when auditing skills before publishing, evaluating downloaded skills, or
+  improving existing skills. IMPORTANT: Always respond in the same language as
+  the user's request (auto-adapt to user's language)."
 ---
+
 
 # Skill Reviewer Pro
 

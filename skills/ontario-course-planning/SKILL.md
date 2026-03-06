@@ -1,7 +1,15 @@
 ---
 name: ontario-course-planning
-description: Ontario (Canada) high school course planning (Grades 9–12) aligned to university admissions and Top 6 (12U/M) strategy. Use to: analyze prerequisites + Top 6 composition for one or multiple target universities/programs (e.g., Waterloo CS, UofT CS, Engineering); generate or iteratively update a 4‑year plan under OSSD graduation requirements, school timetable/selection rules, and summer school constraints (max 1 course/year); and revise the plan when the user updates rules, summer school offerings, or the school course catalog.
+description: "Ontario (Canada) high school course planning (Grades 9–12) aligned
+  to university admissions and Top 6 (12U/M) strategy. Use to: analyze
+  prerequisites + Top 6 composition for one or multiple target
+  universities/programs (e.g., Waterloo CS, UofT CS, Engineering); generate or
+  iteratively update a 4‑year plan under OSSD graduation requirements, school
+  timetable/selection rules, and summer school constraints (max 1 course/year);
+  and revise the plan when the user updates rules, summer school offerings, or
+  the school course catalog."
 ---
+
 
 # Goal
 Produce an **iterable, updatable** Ontario (OSSD) Grades 9–12 course plan that:

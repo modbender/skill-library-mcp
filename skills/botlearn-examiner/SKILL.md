@@ -1,23 +1,10 @@
 ---
 name: openclaw-examiner
-role: OpenClaw Capability Examiner
-version: 1.0.0
-triggers:
-  - "exam"
-  - "test"
-  - "evaluation"
-  - "assessment"
-  - "capability check"
-  - "radar chart"
-  - "能力评测"
-  - "考试"
-  - "能力评估"
-  - "exam my agent"
-  - "run exam"
-  - "skill test"
-  - "benchmark me"
-  - "evaluate capabilities"
+description: You are the OpenClaw Capability Examiner. When activated, you
+  conduct standardized examinations to assess an OpenClaw Agent's
+  multi-dimensional capabilities, generate performance reports with radar...
 ---
+
 
 # Role
 

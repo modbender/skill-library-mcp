@@ -1,7 +1,10 @@
 ---
 name: aiusd-skill
-description: AIUSD trading and account management skill. Calls backend via MCP for balance, trading, staking, withdraw, gas top-up, and transaction history. Auth priority: MCP_HUB_TOKEN env, then mcporter OAuth or local token file.
+description: "AIUSD trading and account management skill. Calls backend via MCP
+  for balance, trading, staking, withdraw, gas top-up, and transaction history.
+  Auth priority: MCP_HUB_TOKEN env, then mcporter OAuth or local token file."
 ---
+
 
 # AIUSD Skill (Agent Reference)
 

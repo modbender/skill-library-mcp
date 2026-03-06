@@ -1,6 +1,9 @@
 ---
-description: Discover devices and scan ports on your local network using nmap with security-first defaults.
+name: rey-network-scanner
+description: Discover devices and scan ports on your local network using nmap
+  with security-first defaults.
 ---
+
 
 # Network Scanner
 

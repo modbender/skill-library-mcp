@@ -1,3 +1,8 @@
+---
+name: PigBun RedNote
+description: 小红书 AI 运营工具 —— 搜索、发布、分析、互动，一站式自动化。
+---
+
 # PigBun RedNote
 
 小红书 AI 运营工具 —— 搜索、发布、分析、互动，一站式自动化。

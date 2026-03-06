@@ -1,3 +1,8 @@
+---
+name: Self-Review Skill
+description: Automatically review agent output quality before sending to user.
+---
+
 # Self-Review Skill
 
 Automatically review agent output quality before sending to user.

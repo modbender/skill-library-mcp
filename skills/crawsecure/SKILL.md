@@ -1,3 +1,9 @@
+---
+name: CrawSecure
+description: CrawSecure is a documentation-first security skill for the ClawHub
+  / OpenClaw ecosystem.
+---
+
 # CrawSecure
 
 CrawSecure is a **documentation-first security skill** for the ClawHub / OpenClaw ecosystem.

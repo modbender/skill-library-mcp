@@ -1,3 +1,8 @@
+---
+name: Home Assistant Skill
+description: Control smart home devices via Home Assistant API.
+---
+
 # Home Assistant Skill
 
 Control smart home devices via Home Assistant API.

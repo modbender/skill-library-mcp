@@ -1,7 +1,11 @@
 ---
 name: token-saver-75plus
-description: Always-on token optimization + model routing protocol. Auto-classifies requests (T1-T4), routes execution to the cheapest capable model via sessions_spawn, and applies maximum output compression. Target: 75%+ token savings.
+description: "Always-on token optimization + model routing protocol.
+  Auto-classifies requests (T1-T4), routes execution to the cheapest capable
+  model via sessions_spawn, and applies maximum output compression. Target: 75%+
+  token savings."
 ---
+
 
 # Token Saver 75+ with Model Routing
 

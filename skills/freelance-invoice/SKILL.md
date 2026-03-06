@@ -1,6 +1,9 @@
 ---
-description: Generate professional invoice PDFs for freelancers with multi-currency and tax support.
+name: freelance-invoice
+description: Generate professional invoice PDFs for freelancers with
+  multi-currency and tax support.
 ---
+
 
 # Invoice Generator
 

@@ -1,3 +1,9 @@
+---
+name: Agent Wallet — HBAR Wallet for AI Agents
+description: Create and manage a Hedera wallet for your AI agent. Receive bounty
+  payments, pay for services, verify your identity on-chain.
+---
+
 # Agent Wallet — HBAR Wallet for AI Agents
 
 Create and manage a Hedera wallet for your AI agent. Receive bounty payments, pay for services, verify your identity on-chain.

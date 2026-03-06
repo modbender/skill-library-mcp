@@ -1,3 +1,9 @@
+---
+name: Robotic Control Skill (OpenClaw)
+description: The Robotic Control skill integrates OpenClaw for physical robotic
+  arm and gripper manipulation through voice commands and programmatic control.
+---
+
 # Robotic Control Skill (OpenClaw)
 
 ## Overview

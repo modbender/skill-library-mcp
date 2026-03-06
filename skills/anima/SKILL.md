@@ -1,6 +1,10 @@
 ---
-description: Anima Avatar - Interactive Video Generation Engine. Generates 16:9 videos with dynamic character sprites (Shutiao), synced audio (Fish Audio), and text overlay.
+name: anima
+description: Anima Avatar - Interactive Video Generation Engine. Generates 16:9
+  videos with dynamic character sprites (Shutiao), synced audio (Fish Audio),
+  and text overlay.
 ---
+
 
 # Anima Avatar (Project Anima)
 

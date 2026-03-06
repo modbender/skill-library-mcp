@@ -1,3 +1,9 @@
+---
+name: AnyCrawl Skill
+description: AnyCrawl API integration for OpenClaw - Scrape, Crawl, and Search
+  web content with high-performance multi-threaded crawling.
+---
+
 # AnyCrawl Skill
 
 AnyCrawl API integration for OpenClaw - Scrape, Crawl, and Search web content with high-performance multi-threaded crawling.

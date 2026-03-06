@@ -1,3 +1,10 @@
+---
+name: AutoGame Tales
+description: Generates short, atmospheric ghost stories or micro-fiction based
+  on random prompts. Designed to add a narrative layer to the agent's
+  personality and break utility stagnation.
+---
+
 # AutoGame Tales
 
 Generates short, atmospheric ghost stories or micro-fiction based on random prompts.

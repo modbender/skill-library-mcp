@@ -1,3 +1,8 @@
+---
+name: ClawHQ Dashboard Connector
+description: Report agent status, heartbeats, and task completions to your ClawHQ dashboard.
+---
+
 # ClawHQ Dashboard Connector
 
 Report agent status, heartbeats, and task completions to your ClawHQ dashboard.

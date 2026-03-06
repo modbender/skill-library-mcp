@@ -1,3 +1,10 @@
+---
+name: OpenSoul Agent Skill
+description: OpenSoul is a toolkit that provides AI agents with an immutable
+  "soul" - an encrypted, blockchain-based audit log that enables persistent
+  memory, self-reflection, and economic autonomy. This skill ...
+---
+
 # OpenSoul Agent Skill
 
 ## Overview

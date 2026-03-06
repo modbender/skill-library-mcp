@@ -1,3 +1,10 @@
+---
+name: OpenClaw Mem0 Plugin
+description: Mem0 integration for OpenClaw. Adds intelligent long-term memory to
+  your agents, allowing them to remember user preferences, facts, and past
+  conversations automatically.
+---
+
 # OpenClaw Mem0 Plugin
 
 Mem0 integration for OpenClaw. Adds intelligent long-term memory to your agents, allowing them to remember user preferences, facts, and past conversations automatically.

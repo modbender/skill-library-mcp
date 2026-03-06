@@ -1,3 +1,9 @@
+---
+name: AI Lead Generator Skill
+description: Generate qualified B2B leads for any industry using AI-powered
+  research and LinkedIn/Apollo integration.
+---
+
 # AI Lead Generator Skill
 
 Generate qualified B2B leads for any industry using AI-powered research and LinkedIn/Apollo integration.

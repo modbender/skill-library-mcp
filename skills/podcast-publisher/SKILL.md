@@ -1,6 +1,9 @@
 ---
-description: Generate valid podcast RSS 2.0 feeds with iTunes extensions for Apple Podcasts, Spotify, and more.
+name: podcast-publisher
+description: Generate valid podcast RSS 2.0 feeds with iTunes extensions for
+  Apple Podcasts, Spotify, and more.
 ---
+
 
 # Podcast Publisher
 

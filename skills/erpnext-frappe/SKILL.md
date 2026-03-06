@@ -1,3 +1,9 @@
+---
+name: Business Claw Skills
+description: High-level business workflows that combine multiple MCP tools into
+  reusable, executable skills for ERPNext.
+---
+
 # Business Claw Skills
 
 High-level business workflows that combine multiple MCP tools into reusable, executable skills for ERPNext.

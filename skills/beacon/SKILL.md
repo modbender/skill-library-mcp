@@ -1,3 +1,8 @@
+---
+name: Beacon
+description: Agent-to-agent protocol for social coordination, crypto payments, and P2P mesh.
+---
+
 # Beacon
 
 Agent-to-agent protocol for social coordination, crypto payments, and P2P mesh.

@@ -1,3 +1,10 @@
+---
+name: Feishu ClawBot Card (FCC)
+description: This skill allows OpenClaw bots to create, exchange, and store
+  standardized identity cards ("ClawCards"). It acts as a Rolodex for your AI to
+  remember who's who.
+---
+
 # Feishu ClawBot Card (FCC)
 
 **The Universal Business Card Protocol for AI Agents on Feishu.**

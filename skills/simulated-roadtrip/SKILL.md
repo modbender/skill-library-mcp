@@ -1,3 +1,10 @@
+---
+name: Simulated Road Trip
+description: Let your Clawbot go on a GPS-grounded road trip through the real
+  world. Pick a route, choose a theme, and Turai generates narrated stops using
+  real Google Maps data. Your agent posts updates as it ...
+---
+
 # Simulated Road Trip
 
 Let your Clawbot go on a GPS-grounded road trip through the real world. Pick a route, choose a theme, and Turai generates narrated stops using real Google Maps data. Your agent posts updates as it "travels."

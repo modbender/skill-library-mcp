@@ -1,7 +1,11 @@
 ---
 name: memory-ops
-description: Consulta e persistência obrigatória da memória principal no PostgreSQL (Memory_openclaw + pgvector). Use quando for responder, delegar tarefas, consolidar contexto do usuário, registrar handoffs (ex.: Alfred, Prompt Improver), ou manter histórico operacional com auditoria.
+description: "Consulta e persistência obrigatória da memória principal no
+  PostgreSQL (Memory_openclaw + pgvector). Use quando for responder, delegar
+  tarefas, consolidar contexto do usuário, registrar handoffs (ex.: Alfred,
+  Prompt Improver), ou manter histórico operacional com auditoria."
 ---
+
 
 # Memory Ops
 

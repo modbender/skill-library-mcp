@@ -1,3 +1,8 @@
+---
+name: Feishu Card Sender Skill
+description: 飞书卡片消息发送技能包 - 专业级interactive卡片发送解决方案
+---
+
 # Feishu Card Sender Skill
 
 飞书卡片消息发送技能包 - 专业级interactive卡片发送解决方案

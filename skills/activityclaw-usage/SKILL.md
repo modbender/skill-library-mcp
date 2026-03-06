@@ -1,3 +1,8 @@
+---
+name: ActivityClaw Plugin Usage
+description: "Use this skill when the user asks about:"
+---
+
 # ActivityClaw Plugin Usage
 
 ## When to Use

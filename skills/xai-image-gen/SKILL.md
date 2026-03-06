@@ -1,3 +1,8 @@
+---
+name: xai-image-gen
+description: Generate images using xAI's Grok API (grok-imagine-image model).
+---
+
 # xai-image-gen
 
 Generate images using xAI's Grok API (grok-imagine-image model).

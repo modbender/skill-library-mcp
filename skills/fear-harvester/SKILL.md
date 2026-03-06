@@ -1,3 +1,8 @@
+---
+name: FearHarvester Skill
+description: Autonomous DCA agent for extreme fear markets.
+---
+
 # FearHarvester Skill
 
 Autonomous DCA agent for extreme fear markets.

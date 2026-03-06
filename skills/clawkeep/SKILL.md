@@ -1,3 +1,10 @@
+---
+name: ClawKeep — Agent Skill
+description: ClawKeep gives you version-controlled backups of your workspace
+  files. You can go back to any point in time if something goes wrong — a bad
+  memory update, corrupted config, accidental deletion.
+---
+
 # ClawKeep — Agent Skill
 
 > Git-powered versioned backups for your workspace. Every change tracked, every state recoverable.

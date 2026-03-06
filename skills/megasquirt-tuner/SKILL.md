@@ -1,7 +1,16 @@
 ---
 name: megasquirt-tuner
-description: Megasquirt ECU tuning and calibration using TunerStudio. Use when working with Megasquirt engine management systems for: (1) VE table tuning and fuel map optimization, (2) Ignition timing maps and spark advance, (3) Idle control and warmup enrichment, (4) AFR target tuning and closed-loop feedback, (5) Sensor calibration (TPS, MAP, CLT, IAT, O2), (6) Acceleration enrichment and deceleration fuel cut, (7) Boost control and launch control setup, (8) Datalog analysis and troubleshooting, (9) Base engine configuration and injector setup, (10) MSQ tune file analysis and safety review, (11) Any Megasquirt/TunerStudio ECU tuning tasks.
+description: "Megasquirt ECU tuning and calibration using TunerStudio. Use when
+  working with Megasquirt engine management systems for: (1) VE table tuning and
+  fuel map optimization, (2) Ignition timing maps and spark advance, (3) Idle
+  control and warmup enrichment, (4) AFR target tuning and closed-loop feedback,
+  (5) Sensor calibration (TPS, MAP, CLT, IAT, O2), (6) Acceleration enrichment
+  and deceleration fuel cut, (7) Boost control and launch control setup, (8)
+  Datalog analysis and troubleshooting, (9) Base engine configuration and
+  injector setup, (10) MSQ tune file analysis and safety review, (11) Any
+  Megasquirt/TunerStudio ECU tuning tasks."
 ---
+
 
 # Megasquirt ECU Tuning with TunerStudio
 

@@ -1,3 +1,10 @@
+---
+name: Customer Journey Mapping
+description: Map every touchpoint from first click to loyal advocate. Identify
+  drop-off points, emotional peaks, and automation opportunities across your
+  entire customer lifecycle.
+---
+
 # Customer Journey Mapping
 
 Map every touchpoint from first click to loyal advocate. Identify drop-off points, emotional peaks, and automation opportunities across your entire customer lifecycle.

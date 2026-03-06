@@ -1,3 +1,8 @@
+---
+name: Channel Reminders
+description: Навык для создания напоминаний через cron jobs с доставкой в Telegram.
+---
+
 # Channel Reminders
 
 Навык для создания напоминаний через cron jobs с доставкой в Telegram.

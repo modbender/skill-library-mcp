@@ -1,3 +1,9 @@
+---
+name: Super Proactive Agent
+description: "Most AI agents just wait for prompts. This skill transforms your
+  agent into a proactive partner that:"
+---
+
 # Super Proactive Agent
 
 **The ultimate proactive + memory system for AI agents.** Combines the best of 11 top-rated skills into one unified architecture.

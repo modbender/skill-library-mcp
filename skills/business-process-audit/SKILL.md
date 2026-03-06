@@ -1,3 +1,10 @@
+---
+name: Business Process Audit
+description: Identify automation opportunities across any business. Analyzes
+  workflows, estimates time savings, and prioritizes which processes to automate
+  first based on ROI.
+---
+
 # Business Process Audit
 
 Identify automation opportunities across any business. Analyzes workflows, estimates time savings, and prioritizes which processes to automate first based on ROI.

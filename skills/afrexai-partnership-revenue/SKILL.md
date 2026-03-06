@@ -1,3 +1,10 @@
+---
+name: Partnership & Channel Revenue Engine
+description: Turn partnerships from handshake deals into a systematic revenue
+  machine. This is the complete playbook for finding, qualifying, structuring,
+  launching, and scaling partner-driven growth — whether ...
+---
+
 # Partnership & Channel Revenue Engine
 
 Turn partnerships from handshake deals into a systematic revenue machine. This is the complete playbook for finding, qualifying, structuring, launching, and scaling partner-driven growth — whether you're building integration partnerships, reseller channels, affiliate programs, or strategic alliances.

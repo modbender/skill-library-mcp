@@ -1,7 +1,16 @@
 ---
 name: magic-quill
-description: Generate OpenClaw Spellbook YAML theme mappings from a topic (game/movie/franchise/etc.) or a URL. Use when you need to create or refresh a themed spell mapping file under /spells with broad coverage of popular skills (default top 50). The generator now performs dynamic spell-list reference discovery first (searching for spell lists/APIs and parsing discovered JSON/HTML sources), then uses lore/context as secondary style input and falls back to heuristic spell names when references fail. NOTE: This skill generates YAML mapping files — to use the spells in agent sessions, you need the openclaw-spellbook hook installed (see wynnsu/openclaw-spellbook).
+description: "Generate OpenClaw Spellbook YAML theme mappings from a topic
+  (game/movie/franchise/etc.) or a URL. Use when you need to create or refresh a
+  themed spell mapping file under /spells with broad coverage of popular skills
+  (default top 50). The generator now performs dynamic spell-list reference
+  discovery first (searching for spell lists/APIs and parsing discovered
+  JSON/HTML sources), then uses lore/context as secondary style input and falls
+  back to heuristic spell names when references fail. NOTE: This skill generates
+  YAML mapping files — to use the spells in agent sessions, you need the
+  openclaw-spellbook hook installed (see wynnsu/openclaw-spellbook)."
 ---
+
 
 # Magic Quill
 

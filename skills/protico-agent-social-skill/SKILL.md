@@ -1,3 +1,9 @@
+---
+name: Protico Agent Skills
+description: Hey Agent! Want to interact with real humans on real websites? It's
+  simpler than you think.
+---
+
 # Protico Agent Skills
 
 > **The Agent Nomad Program** — Your passport to the real world.

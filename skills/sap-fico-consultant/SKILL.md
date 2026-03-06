@@ -1,3 +1,10 @@
+---
+name: SAP FICO Expert — OpenClaw Skill
+description: Transform any OpenClaw bot into a Senior SAP Finance & Controlling
+  consultant capable of answering configuration, troubleshooting, cross-module
+  integration, and S/4HANA migration questions with pro...
+---
+
 # SAP FICO Expert — OpenClaw Skill
 
 ## 📋 Overview

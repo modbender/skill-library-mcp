@@ -1,3 +1,9 @@
+---
+name: Task Planner and Validator - Skill Guide
+description: This skill provides a secure, step-by-step task management system
+  for AI Agents.
+---
+
 # Task Planner and Validator - Skill Guide
 
 This skill provides a secure, step-by-step task management system for AI Agents.

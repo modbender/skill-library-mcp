@@ -1,3 +1,8 @@
+---
+name: Catbox/Litterbox File Uploader
+description: Upload files to catbox.moe (permanent) or litterbox.catbox.moe (temporary).
+---
+
 # Catbox/Litterbox File Uploader
 
 Upload files to catbox.moe (permanent) or litterbox.catbox.moe (temporary).

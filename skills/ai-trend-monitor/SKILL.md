@@ -1,3 +1,8 @@
+---
+name: AI Trend Monitor
+description: 监控 AI 市场趋势和技术前沿，支持实时重大新闻推送 + 定时汇总推送。
+---
+
 # AI Trend Monitor
 
 监控 AI 市场趋势和技术前沿，支持实时重大新闻推送 + 定时汇总推送。

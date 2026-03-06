@@ -1,3 +1,10 @@
+---
+name: Commit Analyzer Skill
+description: Analyzes git commit patterns to monitor autonomous operation
+  health. Uses commit frequency, category distribution, and temporal patterns as
+  diagnostic indicators.
+---
+
 # Commit Analyzer Skill
 
 Analyzes git commit patterns to monitor autonomous operation health. Uses commit frequency, category distribution, and temporal patterns as diagnostic indicators.

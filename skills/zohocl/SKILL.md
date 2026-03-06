@@ -1,3 +1,9 @@
+---
+name: Zoho API Skill for OpenClaw
+description: A comprehensive skill for authenticating and interacting with Zoho
+  APIs (CRM, Books, Desk, Creator, and more).
+---
+
 # Zoho API Skill for OpenClaw
 
 A comprehensive skill for authenticating and interacting with Zoho APIs (CRM, Books, Desk, Creator, and more).

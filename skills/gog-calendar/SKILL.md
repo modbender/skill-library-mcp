@@ -1,8 +1,12 @@
 ---
 name: gog-calendar
-description: Google Calendar via gogcli: reliable cross-calendar agenda (today/week/range) and best-effort keyword search across calendars (iterate + aggregate). Token-efficient output (`--plain` default, `--json` only when needed). Post-filters unwanted calendars (e.g., holidays) and confirms before writes.
-metadata: {"openclaw":{"emoji":"📅","requires":{"bins":["gog"]},"install":[{"id":"brew","kind":"brew","formula":"steipete/tap/gogcli","bins":["gog"],"label":"Install gogcli (brew)"}]}}
+description: "Google Calendar via gogcli: reliable cross-calendar agenda
+  (today/week/range) and best-effort keyword search across calendars (iterate +
+  aggregate). Token-efficient output (`--plain` default, `--json` only when
+  needed). Post-filters unwanted calendars (e.g., holidays) and confirms before
+  writes."
 ---
+
 
 # gog-calendar
 

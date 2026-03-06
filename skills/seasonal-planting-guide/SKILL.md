@@ -1,7 +1,12 @@
 ---
 name: seasonal-planting-guide
-description: Seasonal planting calendar for gardeners. Find what to plant each month in your growing zone. Use when planning your garden, checking planting schedules, or finding plants for the current season. Security: file exports restricted to safe directories. Perfect for home gardeners, small farmers, and anyone planning a productive garden.
+description: "Seasonal planting calendar for gardeners. Find what to plant each
+  month in your growing zone. Use when planning your garden, checking planting
+  schedules, or finding plants for the current season. Security: file exports
+  restricted to safe directories. Perfect for home gardeners, small farmers, and
+  anyone planning a productive garden."
 ---
+
 
 # Seasonal Planting Guide
 

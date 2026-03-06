@@ -1,7 +1,10 @@
 ---
 name: canvas-design
-description: Generates visual art and posters by expressing original design philosophies as meticulously crafted PNG or PDF assets. Use when: (1) Creating visual art, (2) Designing posters, (3) Expressing design ideas as assets.
+description: "Generates visual art and posters by expressing original design
+  philosophies as meticulously crafted PNG or PDF assets. Use when: (1) Creating
+  visual art, (2) Designing posters, (3) Expressing design ideas as assets."
 ---
+
 
 # Canvas Design
 

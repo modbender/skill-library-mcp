@@ -1,3 +1,9 @@
+---
+name: Ultimate Unified Memory System (Overkill Memory System)
+description: A comprehensive 6-tier memory architecture with neuroscience
+  integration, WAL protocol, and full automation for OpenClaw agents.
+---
+
 # Ultimate Unified Memory System (Overkill Memory System)
 ## VERSION 1.9.3 (SPEED-FIRST)
 

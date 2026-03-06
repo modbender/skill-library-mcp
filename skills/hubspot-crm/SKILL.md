@@ -1,3 +1,10 @@
+---
+name: Skill HubSpot CRM — USC SYNERGY
+description: Gestion complète du CRM HubSpot pour USC SYNERGY (centre de
+  formation VAE). Permet de rechercher, créer, modifier des contacts et deals,
+  gérer les associations, et suivre le pipeline commercial.
+---
+
 # Skill HubSpot CRM — USC SYNERGY
 # Description
 Gestion complète du CRM HubSpot pour USC SYNERGY (centre de formation VAE).

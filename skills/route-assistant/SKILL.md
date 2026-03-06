@@ -1,27 +1,10 @@
 ---
 name: route-assistant
-description: Intelligent route planning assistant with optimized display. Three-part output: transport options table, recommended schemes, and important reminders.
-metadata:
-  openclaw:
-    emoji: 🗺️
-    triggers:
-      - 怎么去
-      - 路线
-      - 距离
-      - 多远
-      - 出行
-      - 公交
-      - 开车
-      - 步行
-      - 打车
-      - 地址
-      - 哪里
-      - how to get
-      - route
-      - distance
-      - transit
-      - driving
+description: "Intelligent route planning assistant with optimized display.
+  Three-part output: transport options table, recommended schemes, and important
+  reminders."
 ---
+
 
 # Route Assistant (route-assistant)
 

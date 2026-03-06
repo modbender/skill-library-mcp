@@ -1,3 +1,9 @@
+---
+name: Molt Trader Skill
+description: Trade on the Molt Trader simulator and compete on the leaderboard
+  with automated strategies.
+---
+
 # Molt Trader Skill
 
 Trade on the Molt Trader simulator and compete on the leaderboard with automated strategies.

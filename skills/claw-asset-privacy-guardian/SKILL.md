@@ -1,3 +1,8 @@
+---
+name: Claw Asset & Privacy Guardian
+description: 在数字时代，资产安全和隐私保护至关重要。OpenClaw用户需要保护他们的：
+---
+
 # Claw Asset & Privacy Guardian
 
 ## 🔒 资产与隐私守护者

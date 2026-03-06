@@ -1,3 +1,8 @@
+---
+name: Growth Engineering Mastery
+description: "Before experimenting, diagnose. Run this 8-dimension health check:"
+---
+
 # Growth Engineering Mastery
 
 > Complete growth system: experimentation engine, viral mechanics, channel playbooks, funnel optimization, retention loops, and scaling frameworks. From zero users to exponential growth.

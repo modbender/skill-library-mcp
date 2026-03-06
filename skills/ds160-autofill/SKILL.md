@@ -1,7 +1,14 @@
 ---
 name: ds160-autofill
-description: Automate filling of US nonimmigrant visa DS-160 forms using CDP for element location, CSV data source for user information, LLM assistance for complex cases (captcha, missing elements), and session persistence for resume capability. Use when user needs to: (1) Fill DS-160 visa application forms automatically, (2) Resume filling an interrupted DS-160 application, (3) Handle captcha and complex form elements with LLM assistance. Supports Chinese input with automatic translation to English.
+description: "Automate filling of US nonimmigrant visa DS-160 forms using CDP
+  for element location, CSV data source for user information, LLM assistance for
+  complex cases (captcha, missing elements), and session persistence for resume
+  capability. Use when user needs to: (1) Fill DS-160 visa application forms
+  automatically, (2) Resume filling an interrupted DS-160 application, (3)
+  Handle captcha and complex form elements with LLM assistance. Supports Chinese
+  input with automatic translation to English."
 ---
+
 
 # DS-160 Auto-fill Skill
 

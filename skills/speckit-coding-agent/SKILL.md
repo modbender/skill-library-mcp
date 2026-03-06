@@ -1,3 +1,10 @@
+---
+name: SpecKit Coding Agent
+description: A complete Spec-Driven Development (SDD) workflow that transforms
+  how you build software. Start with an idea → Create specifications → Generate
+  plans → Execute tasks. Powered by spec-kit and OpenCo...
+---
+
 # SpecKit Coding Agent
 
 **Version:** 1.1.0

@@ -1,7 +1,8 @@
 ---
-wallet: "0x3e4A16256813D232F25F5b01c49E95ceaD44d7Ed"
-publisher_wallet: "0x3e4A16256813D232F25F5b01c49E95ceaD44d7Ed"
+name: clawmon
+description: A read-only trust registry lookup for MCP skills, built on ERC-8004 and Monad.
 ---
+
 
 # Trusted ClawMon
 

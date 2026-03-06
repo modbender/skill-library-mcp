@@ -1,3 +1,10 @@
+---
+name: "SKILL: bolta.skills.index"
+description: "Display name: Bolta Skills Registry Slug: bolta-skills-registry
+  Version: 0.5.4 Tags: registry,catalog,bootstrap,workspace,index,discovery
+  Organization: bolta.ai Author: Max Fritzhand Type: registry..."
+---
+
 # SKILL: bolta.skills.index
 
 Display name: Bolta Skills Registry

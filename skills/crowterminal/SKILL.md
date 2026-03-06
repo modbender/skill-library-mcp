@@ -1,30 +1,8 @@
 ---
-slug: crowterminal
 name: CrowTerminal
-version: 2.3.0
-summary: External Brain for AI Agents - Persistent memory for creators/influencers
-author: CrowTerminal
-homepage: https://crowterminal.com
-repository: https://github.com/WillNigri/FluxOps
-tags:
-  - memory
-  - creators
-  - influencers
-  - mcp
-  - api
-  - social-media
-  - tiktok
-  - instagram
-  - youtube
-metadata:
-  clawdbot:
-    category: productivity
-    requires_api_key: true
-    api_key_url: https://api.crowterminal.com/api/agent/register
-requires:
-  env:
-    - CROWTERMINAL_API_KEY
+description: External Brain for AI Agents - Persistent memory for creators/influencers
 ---
+
 
 # CrowTerminal - External Brain for AI Agents
 

@@ -1,3 +1,10 @@
+---
+name: Jira PAT Skill
+description: Manage Jira issues on self-hosted/enterprise Jira instances using
+  Personal Access Tokens (PAT). This skill is designed for environments where
+  Basic Auth doesn't work due to SSO/SAML authentication.
+---
+
 # Jira PAT Skill
 
 Manage Jira issues on self-hosted/enterprise Jira instances using Personal Access Tokens (PAT). This skill is designed for environments where Basic Auth doesn't work due to SSO/SAML authentication.

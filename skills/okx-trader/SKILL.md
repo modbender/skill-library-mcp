@@ -1,3 +1,10 @@
+---
+name: OKX Trader Skill
+description: A professional-grade automated trading agent skill for OKX. This
+  skill enables the AI agent to manage grid trading strategies, monitor account
+  performance, and handle market execution with built-in...
+---
+
 # OKX Trader Skill
 
 A professional-grade automated trading agent skill for OKX. This skill enables the AI agent to manage grid trading strategies, monitor account performance, and handle market execution with built-in safety protocols.

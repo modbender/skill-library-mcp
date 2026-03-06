@@ -1,7 +1,16 @@
 ---
 name: mindgraph
-description: Obsidian-style [[wikilink]] knowledge graph and learnable MindSkills for OpenClaw workspaces. Use for ALL of these: (1) Any workspace file read/write — always use [[wikilinks]] for people, projects, tools, concepts. (2) Running learned processes like knockout-test, seo-validator, competitor-analysis. (3) Querying knowledge — "what do I know about X", "show connections to Y". (4) Learning new repeatable processes — "learn a new mindskill called Z". (5) Memory maintenance — finding orphans, dead links, unconnected files. This skill is always active — treat [[wikilinks]] as standard practice in every markdown file you write.
+description: 'Obsidian-style [[wikilink]] knowledge graph and learnable
+  MindSkills for OpenClaw workspaces. Use for ALL of these: (1) Any workspace
+  file read/write — always use [[wikilinks]] for people, projects, tools,
+  concepts. (2) Running learned processes like knockout-test, seo-validator,
+  competitor-analysis. (3) Querying knowledge — "what do I know about X", "show
+  connections to Y". (4) Learning new repeatable processes — "learn a new
+  mindskill called Z". (5) Memory maintenance — finding orphans, dead links,
+  unconnected files. This skill is always active — treat [[wikilinks]] as
+  standard practice in every markdown file you write.'
 ---
+
 
 # MindGraph 🕸️🧠
 

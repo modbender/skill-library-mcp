@@ -1,3 +1,9 @@
+---
+name: Post-Mortem & Incident Review Framework
+description: Run structured post-mortems that actually prevent repeat failures.
+  Blameless analysis, root cause identification, and action tracking.
+---
+
 # Post-Mortem & Incident Review Framework
 
 Run structured post-mortems that actually prevent repeat failures. Blameless analysis, root cause identification, and action tracking.

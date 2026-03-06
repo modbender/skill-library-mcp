@@ -1,3 +1,8 @@
+---
+name: Social Media Scheduler
+description: Optimize posting schedule for maximum engagement.
+---
+
 # Social Media Scheduler
 
 Optimize posting schedule for maximum engagement.

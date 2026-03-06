@@ -1,3 +1,9 @@
+---
+name: Denario Skill
+description: Wraps the Denario framework to automate the scientific research
+  process. Handles environment setup and Z.ai integration automatically.
+---
+
 # Denario Skill
 
 Wraps the **Denario** framework to automate the scientific research process. Handles environment setup and Z.ai integration automatically.

@@ -1,3 +1,10 @@
+---
+name: Skill Auditor 🔍
+description: Analyze OpenClaw skill files for security risks, quality issues,
+  and best-practice violations. Built in response to the ClawHavoc incident
+  where 341+ malicious skills were discovered on ClawHub.
+---
+
 # Skill Auditor 🔍
 
 Analyze OpenClaw skill files for security risks, quality issues, and best-practice violations. Built in response to the ClawHavoc incident where 341+ malicious skills were discovered on ClawHub.

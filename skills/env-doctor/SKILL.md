@@ -1,6 +1,9 @@
 ---
-description: Diagnose .env file issues — missing variables, format errors, security risks, and misconfigurations.
+name: env-doctor
+description: Diagnose .env file issues — missing variables, format errors,
+  security risks, and misconfigurations.
 ---
+
 
 # Env Doctor
 

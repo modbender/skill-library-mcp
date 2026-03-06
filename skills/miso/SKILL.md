@@ -1,3 +1,9 @@
+---
+name: Mission Control - MISO
+description: It standardizes visibility for parallel work so operators can track
+  progress from the chat list.
+---
+
 # Mission Control - MISO
 
 ## Overview

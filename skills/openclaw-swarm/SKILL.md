@@ -1,3 +1,8 @@
+---
+name: openclaw-swarm
+description: Use OpenClaw Swarm features for advanced subagent orchestration.
+---
+
 # openclaw-swarm
 
 Use OpenClaw Swarm features for advanced subagent orchestration.

@@ -1,50 +1,8 @@
 ---
-triggers:
-  - nano-banana-2
-  - nanobanana
-  - nano banana
-  - 生图技能
-  - 文生图
-  - 我要做文生图
-  - 文生图测试
-  - 图生图
-  - 我要做图生图
-  - 图生图测试
-  - 生图联调
-  - image generation test
-  - image edit test
-max_tokens: 400
-lock_session: true
-param_guard:
-  enabled: true
-  params:
-    - key: api_key
-      label: API Key
-      type: api_key
-      required: true
-      prompt: 请提供 Nano Banana API Key
-      aliases: ["apikey", "api key", "key"]
-      env_vars: ["NANO_BANANA_API_KEY"]
-      saved_file: "~/.whaleclaw/credentials/nano_banana_api_key.txt"
-    - key: prompt
-      label: 提示词
-      type: text
-      required: true
-      prompt: 请提供提示词
-      aliases: ["提示词", "prompt"]
-    - key: ratio
-      label: 尺寸/比例
-      type: ratio
-      required: false
-      prompt: 可选，例 4:3 或 1024x1024
-      aliases: ["比例", "尺寸", "size"]
-    - key: images
-      label: 图生图图片
-      type: images
-      required: false
-      min_count: 1
-      prompt: 图生图时请上传至少 1 张图片
+name: nano-banana-image-t8
+description: 用户要求验证 nano-banana-2（或兼容模型）是否可用，并需要文生图和图生图的真实调用结果。
 ---
+
 
 # Nano Banana 生图联调
 

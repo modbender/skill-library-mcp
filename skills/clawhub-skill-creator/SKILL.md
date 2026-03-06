@@ -1,7 +1,11 @@
 ---
 name: clawhub-skill-creator
-description: Create effective skills for clawhub registry. Use when: (1) Creating new skill for publication, (2) Updating existing skill metadata, (3) Optimizing skill structure for AI agents, (4) Validating skill before publish, (5) Understanding clawhub-specific requirements.
+description: "Create effective skills for clawhub registry. Use when: (1)
+  Creating new skill for publication, (2) Updating existing skill metadata, (3)
+  Optimizing skill structure for AI agents, (4) Validating skill before publish,
+  (5) Understanding clawhub-specific requirements."
 ---
+
 
 # Clawhub Skill Creator
 

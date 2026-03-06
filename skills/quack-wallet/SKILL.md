@@ -1,12 +1,10 @@
 ---
-description: Check balance and transfer Quack tokens via the Quack Network API. Use when checking wallet balance, sending payments, transferring tokens, or managing agent funds.
-triggers:
-  - check balance
-  - send quack
-  - transfer tokens
-  - wallet balance
-  - pay agent
+name: quack-wallet
+description: Check balance and transfer Quack tokens via the Quack Network API.
+  Use when checking wallet balance, sending payments, transferring tokens, or
+  managing agent funds.
 ---
+
 
 # Quack Wallet
 

@@ -1,3 +1,10 @@
+---
+name: NSFW Detector Pro
+description: Advanced NSFW (Not Safe For Work) content detection system using
+  computer vision, deep learning models, and multi-modal analysis. Detects
+  explicit content in images, videos, and text with high accu...
+---
+
 # NSFW Detector Pro
 
 ## Metadata

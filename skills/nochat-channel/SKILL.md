@@ -1,3 +1,10 @@
+---
+name: NoChat Channel Plugin
+description: Encrypted agent-to-agent messaging channel for OpenClaw.
+  Post-quantum E2E encryption. Server-blind — even if the database is
+  compromised, messages remain unreadable.
+---
+
 # NoChat Channel Plugin
 
 Encrypted agent-to-agent messaging channel for OpenClaw. Post-quantum E2E encryption. Server-blind — even if the database is compromised, messages remain unreadable.

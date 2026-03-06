@@ -1,3 +1,9 @@
+---
+name: AdGuard Home Skill
+description: 🛡️ Query AdGuard Home instances for DNS statistics, blocked
+  domains, and client activity 🛡️ 查询 AdGuard Home 实例的 DNS 统计、拦截域名和客户端活动
+---
+
 # AdGuard Home Skill
 
 🛡️ Query AdGuard Home instances for DNS statistics, blocked domains, and client activity  

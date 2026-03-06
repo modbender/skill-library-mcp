@@ -1,3 +1,9 @@
+---
+name: Overkill Token Optimizer
+description: Token optimization for OpenClaw agents. Reduces token usage through
+  CLI compression, session management, and memory optimization.
+---
+
 # Overkill Token Optimizer
 
 Token optimization for OpenClaw agents. Reduces token usage through CLI compression, session management, and memory optimization.

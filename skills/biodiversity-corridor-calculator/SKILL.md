@@ -1,3 +1,10 @@
+---
+name: biodiversity-corridor-calculator
+description: "Open Claw Agent Skill: Biodiversity Corridor Analyst Description
+  This skill allows an autonomous agent to analyze and value biodiversity
+  corridors using advanced landscape ecology models. It proces..."
+---
+
 Open Claw Agent Skill: Biodiversity Corridor Analyst
 Description
 This skill allows an autonomous agent to analyze and value biodiversity corridors using advanced landscape ecology models. It processes H3 geospatial indices to calculate connectivity scores, visualize landscape resistance, and assess ecological premium values for conservation projects.

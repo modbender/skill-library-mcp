@@ -1,3 +1,8 @@
+---
+name: Cross-Agent Memory Sharing Protocol — 跨 Agent 记忆共享协议
+description: 多个 Agent 独立运行时：
+---
+
 # Cross-Agent Memory Sharing Protocol — 跨 Agent 记忆共享协议
 
 > 打造"Agent 集体智慧"，让多个 Agent 共享知识

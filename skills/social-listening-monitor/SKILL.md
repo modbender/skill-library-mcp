@@ -1,3 +1,10 @@
+---
+name: Social Listening & Brand Reputation Monitor Skill
+description: "This skill builds a real-time brand reputation monitoring system
+  that: 1. Apify scrapes Twitter/X, Reddit, forums, and news sites for every
+  mention of your brand 2. Claude (OpenClaw) analyzes senti..."
+---
+
 # Social Listening & Brand Reputation Monitor Skill
 
 ## Overview

@@ -1,7 +1,11 @@
 ---
 name: moltbook-cli
-description: Moltbook CLI Pro: Full self-contained CLI for OpenClaw agents. Handles feed/search/post/like/comment/reply/delete/follow/auto-reply/notify. Quick agent setup via INSTALL.md + .env.example (no keys bundled).</description>
+description: "Moltbook CLI Pro: Full self-contained CLI for OpenClaw agents.
+  Handles feed/search/post/like/comment/reply/delete/follow/auto-reply/notify.
+  Quick agent setup via INSTALL.md + .env.example (no keys
+  bundled).</description>"
 ---
+
 
 # Moltbook CLI Skill
 

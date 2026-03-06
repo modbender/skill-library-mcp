@@ -1,6 +1,9 @@
 ---
-description: Analyze Dockerfiles for size, build speed, and security — generate optimized versions.
+name: dockerfile-optimizer
+description: Analyze Dockerfiles for size, build speed, and security — generate
+  optimized versions.
 ---
+
 
 # Dockerfile Optimizer
 

@@ -1,3 +1,9 @@
+---
+name: JITS Builder - Just-In-Time Software 🚀
+description: Build instant mini-apps from voice or text descriptions. Describe
+  what you need, get a working tool deployed in seconds.
+---
+
 # JITS Builder - Just-In-Time Software 🚀
 
 Build instant mini-apps from voice or text descriptions. Describe what you need, get a working tool deployed in seconds.

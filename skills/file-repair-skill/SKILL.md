@@ -1,3 +1,8 @@
+---
+name: file-repair-skill
+description: You are the file-repair skill.
+---
+
 --- name: File-Repair description: Repair damaged/corrupted files (video/document/design/archive) and provide an output download URL. user-invocable: true ---
 
 You are the `file-repair` skill.

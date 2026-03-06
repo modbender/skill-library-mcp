@@ -1,7 +1,13 @@
 ---
 name: wechat-article-writer
-description: End-to-end 微信公众号 (WeChat Official Account) article writing and publishing pipeline. 9-step multi-agent workflow: topic research → Chinese-first writing → blind quality review → fact-check → formatting → human preview → scrapbook illustrations → draft box publish. Use when user asks to write, draft, or publish a WeChat article, or says "forge write/draft/publish/topic/voice/status".
+description: 'End-to-end 微信公众号 (WeChat Official Account) article writing and
+  publishing pipeline. 9-step multi-agent workflow: topic research →
+  Chinese-first writing → blind quality review → fact-check → formatting → human
+  preview → scrapbook illustrations → draft box publish. Use when user asks to
+  write, draft, or publish a WeChat article, or says "forge
+  write/draft/publish/topic/voice/status".'
 ---
+
 
 # wechat-article-writer
 

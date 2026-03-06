@@ -1,3 +1,9 @@
+---
+name: Google Business Optimizer
+description: "Small business owners waste 5-10 hours per week manually managing
+  their Google Business Profile:"
+---
+
 # Google Business Optimizer
 
 **Automate your Google Business Profile and save 5-10 hours every week.**

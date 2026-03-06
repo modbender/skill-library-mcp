@@ -1,3 +1,10 @@
+---
+name: "SKILL: Pixel World Interaction"
+description: "name: Pixel World Interaction description: Interact with a shared
+  pixel-based world to study emergent multi-agent dynamics through cooperation,
+  competition, and conflict"
+---
+
 name: Pixel World Interaction
 description: Interact with a shared pixel-based world to study emergent multi-agent dynamics through cooperation, competition, and conflict
 -------------------------------------------------------------------------------------------------------------------------------------------

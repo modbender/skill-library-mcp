@@ -1,3 +1,10 @@
+---
+name: API Documentation Generator
+description: Generate production-ready API documentation from endpoint
+  descriptions. Outputs OpenAPI 3.0, markdown reference docs, and SDK quickstart
+  guides.
+---
+
 # API Documentation Generator
 
 Generate production-ready API documentation from endpoint descriptions. Outputs OpenAPI 3.0, markdown reference docs, and SDK quickstart guides.

@@ -1,3 +1,8 @@
+---
+name: Adaptive Learning Agent
+description: Free and open-source (MIT License) • Zero dependencies • Works locally
+---
+
 # Adaptive Learning Agent
 
 **Learn from errors and corrections in real-time. Continuously improve by capturing failures, user feedback, and successful patterns.**

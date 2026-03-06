@@ -1,8 +1,11 @@
 ---
 name: gateway-guard
-displayName: Gateway Guard
-description: Ensures OpenClaw gateway auth consistency and can auto-prompt "continue" when a run error (Unhandled stop reason: error) appears in gateway logs. Use when checking or fixing gateway token/password mismatch, device_token_mismatch errors, or before delegating to sub-agents.
+description: 'Ensures OpenClaw gateway auth consistency and can auto-prompt
+  "continue" when a run error (Unhandled stop reason: error) appears in gateway
+  logs. Use when checking or fixing gateway token/password mismatch,
+  device_token_mismatch errors, or before delegating to sub-agents.'
 ---
+
 
 # Gateway Guard
 

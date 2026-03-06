@@ -1,9 +1,9 @@
 ---
 name: aegis-intel-stack
-version: 0.1.0
-summary: "Aegis Intel Stack: pre/post execution micro-skills + manifest/delta re-buy triggers"
-tags: ["skills", "evm", "gas", "tx", "delta", "manifest"]
+description: "Aegis Intel Stack: pre/post execution micro-skills +
+  manifest/delta re-buy triggers"
 ---
+
 
 # Aegis Intel Stack (Utility)
 

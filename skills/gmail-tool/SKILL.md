@@ -1,3 +1,9 @@
+---
+name: Gmail Tool
+description: Send and read emails via Gmail using App Password. CLI utility for
+  automated alerts, notifications, and email monitoring.
+---
+
 # Gmail Tool
 
 Send and read emails via Gmail using App Password. CLI utility for automated alerts, notifications, and email monitoring.

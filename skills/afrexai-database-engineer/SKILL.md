@@ -1,3 +1,8 @@
+---
+name: Database Engineering Mastery
+description: "Before writing any DDL, fill this out:"
+---
+
 # Database Engineering Mastery
 
 > Complete database design, optimization, migration, and operations system. From schema design to production monitoring — covers PostgreSQL, MySQL, SQLite, and general SQL patterns.

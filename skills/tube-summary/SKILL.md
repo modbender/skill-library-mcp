@@ -1,7 +1,13 @@
 ---
 name: tube-summary
-description: Search YouTube for videos on any topic and get intelligent summaries from video subtitles. Use when you need to: (1) Find and preview YouTube videos on a subject, (2) Get a detailed description of what a video covers based on its actual content, (3) Quickly understand video topics without watching. Workflow: search YouTube → pick a video → extract and summarize subtitles.
+description: "Search YouTube for videos on any topic and get intelligent
+  summaries from video subtitles. Use when you need to: (1) Find and preview
+  YouTube videos on a subject, (2) Get a detailed description of what a video
+  covers based on its actual content, (3) Quickly understand video topics
+  without watching. Workflow: search YouTube → pick a video → extract and
+  summarize subtitles."
 ---
+
 
 # tube-summary
 

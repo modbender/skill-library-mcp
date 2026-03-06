@@ -1,3 +1,10 @@
+---
+name: Multi Source Tech News Digest
+description: A comprehensive OpenClaw skill for aggregating, scoring, and
+  delivering technology news from 109+ sources including RSS feeds, GitHub
+  releases, and web sources.
+---
+
 # Multi Source Tech News Digest
 
 A comprehensive OpenClaw skill for aggregating, scoring, and delivering technology news from 109+ sources including RSS feeds, GitHub releases, and web sources.

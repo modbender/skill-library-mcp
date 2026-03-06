@@ -1,3 +1,8 @@
+---
+name: Moltlang 🦞
+description: A compact symbolic language for AI-to-AI communication.
+---
+
 # Moltlang 🦞
 
 A compact symbolic language for AI-to-AI communication.

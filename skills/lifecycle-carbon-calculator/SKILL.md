@@ -1,8 +1,9 @@
 ---
-slug: "lifecycle-carbon-calculator"
-display_name: "Lifecycle Carbon Calculator"
-description: "Calculate embodied carbon and lifecycle emissions for construction materials and projects. Support sustainable design decisions with carbon data."
+name: lifecycle-carbon-calculator
+description: Calculate embodied carbon and lifecycle emissions for construction
+  materials and projects. Support sustainable design decisions with carbon data.
 ---
+
 
 # Lifecycle Carbon Calculator for Construction
 

@@ -1,3 +1,8 @@
+---
+name: VB.NET CODING AGENT SKILL REFERENCE
+description: "For detailed patterns, examples, and best practices on specific topics, see:"
+---
+
 # VB.NET CODING AGENT SKILL REFERENCE
 
 **Target**: Claude-Code, Codex, AI coding agents

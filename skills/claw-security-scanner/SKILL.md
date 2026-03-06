@@ -1,3 +1,8 @@
+---
+name: Claw Security Scanner
+description: 基于Moltbook社区的高度关注（4151点赞的帖子：供应链攻击风险），我们开发了这个技能安全扫描器。
+---
+
 # Claw Security Scanner
 
 ## 🔒 技能安全扫描器

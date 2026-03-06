@@ -1,3 +1,10 @@
+---
+name: PCAP Analyzer (tshark)
+description: "name: pcap-analyzer description: Analyze PCAP/PCAPNG files with
+  tshark and produce a structured network-forensics summary (talkers, ports,
+  DNS, TLS, HTTP, anomalies). homepage: https://www.wireshar..."
+---
+
 name: pcap-analyzer
 description: Analyze PCAP/PCAPNG files with tshark and produce a structured network-forensics summary (talkers, ports, DNS, TLS, HTTP, anomalies).
 homepage: https://www.wireshark.org/docs/man-pages/tshark.html

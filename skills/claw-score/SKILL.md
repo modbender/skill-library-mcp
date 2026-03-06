@@ -1,3 +1,10 @@
+---
+name: Claw Score - Agent Architecture Audit
+description: This skill packages your agent's configuration files, sanitizes
+  them (removes credentials/PII), and submits them for a Claw Score audit.
+  You'll receive a detailed report via email within 24-48 hours.
+---
+
 # Claw Score - Agent Architecture Audit
 
 > Get your agent's architecture audited by Atlas. One command, automated submission, email report.

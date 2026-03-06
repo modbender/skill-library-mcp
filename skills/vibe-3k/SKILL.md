@@ -1,7 +1,13 @@
 ---
 name: vibe-3k
-description: Vibe Coding 最佳实践指南（vibe-3k）。AI 辅助开发的全流程规范：项目启动、PLAN/ACT 分离、多 Agent 协作、故障恢复、安全验收。Use when: (1) starting a new AI-assisted development project, (2) setting up multi-agent collaboration, (3) debugging with AI agents, (4) reviewing/accepting AI-generated code, (5) creating project rule files (CLAUDE.md/AGENTS.md). Triggers: "vibe coding", "vibe code", "vibe-3k", "AI 开发", "agent 协作", "多 agent", "PLAN ACT", "项目规则文件", "新项目启动", "故障处理", "代码验收".
+description: 'Vibe Coding 最佳实践指南（vibe-3k）。AI 辅助开发的全流程规范：项目启动、PLAN/ACT 分离、多 Agent
+  协作、故障恢复、安全验收。Use when: (1) starting a new AI-assisted development project, (2)
+  setting up multi-agent collaboration, (3) debugging with AI agents, (4)
+  reviewing/accepting AI-generated code, (5) creating project rule files
+  (CLAUDE.md/AGENTS.md). Triggers: "vibe coding", "vibe code", "vibe-3k", "AI
+  开发", "agent 协作", "多 agent", "PLAN ACT", "项目规则文件", "新项目启动", "故障处理", "代码验收".'
 ---
+
 
 # Vibe Coding 最佳实践指南
 

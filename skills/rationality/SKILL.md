@@ -1,3 +1,10 @@
+---
+name: Rationality Skill (Critical Fallibilism)
+description: The Rationality skill provides a structured framework for thinking,
+  decision-making, and error correction based on the principles of Critical
+  Fallibilism (CF). Unlike traditional rationality which ...
+---
+
 # Rationality Skill (Critical Fallibilism)
 
 The Rationality skill provides a structured framework for thinking, decision-making, and error correction based on the principles of **Critical Fallibilism (CF)**. Unlike traditional rationality which often relies on "weighing" evidence, CF focuses on binary evaluation, error detection, and managing the limits of human (and AI) cognition.

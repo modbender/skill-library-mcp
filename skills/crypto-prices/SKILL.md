@@ -1,3 +1,10 @@
+---
+name: "Skill: crypto-prices"
+description: Fetch live cryptocurrency and commodity prices using the local
+  cryptoprices.py module. This is your single source of truth for all price data
+  — never use web search for prices.
+---
+
 # Skill: crypto-prices
 
 ## Purpose

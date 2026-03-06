@@ -1,3 +1,8 @@
+---
+name: AI店长 (ai-dianzhang)
+description: 你的 AI 电商助手。竞品监控、爆款文案、客服话术、数据日报——一个 Skill 搞定开店全流程。
+---
+
 # AI店长 (ai-dianzhang)
 
 > 躺着开店，AI店长帮你搞定一切

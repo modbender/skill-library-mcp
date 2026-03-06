@@ -1,8 +1,14 @@
 ---
 name: genlayer-dev-claw-skill
-version: 1.0.0
-description: Build GenLayer Intelligent Contracts - Python smart contracts with LLM calls and web access. Use for writing/deploying contracts, SDK reference, CLI commands, equivalence principles, storage types. Triggers: write intelligent contract, genlayer contract, genvm, gl.Contract, deploy genlayer, genlayer CLI, genlayer SDK, DynArray, TreeMap, gl.nondet, gl.eq_principle, prompt_comparative, strict_eq, genlayer deploy, genlayer up. (For explaining GenLayer concepts, use genlayer-claw-skill instead.)
+description: "Build GenLayer Intelligent Contracts - Python smart contracts with
+  LLM calls and web access. Use for writing/deploying contracts, SDK reference,
+  CLI commands, equivalence principles, storage types. Triggers: write
+  intelligent contract, genlayer contract, genvm, gl.Contract, deploy genlayer,
+  genlayer CLI, genlayer SDK, DynArray, TreeMap, gl.nondet, gl.eq_principle,
+  prompt_comparative, strict_eq, genlayer deploy, genlayer up. (For explaining
+  GenLayer concepts, use genlayer-claw-skill instead.)"
 ---
+
 
 # GenLayer Intelligent Contracts
 

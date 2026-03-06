@@ -1,3 +1,9 @@
+---
+name: 🐾 Humanizer — AI Content De-Robotifier
+description: Strip the AI out of AI-generated text. Makes content sound like a
+  human wrote it.
+---
+
 # 🐾 Humanizer — AI Content De-Robotifier
 
 > by Odin's Eye Enterprises — Ancient Wisdom. Modern Intelligence.

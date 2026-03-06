@@ -1,6 +1,9 @@
 ---
-description: Detect duplicate bookmarks, check for dead links, and organize bookmark exports.
+name: browser-bookmarks
+description: Detect duplicate bookmarks, check for dead links, and organize
+  bookmark exports.
 ---
+
 
 # Browser Bookmarks
 

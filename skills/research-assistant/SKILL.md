@@ -1,7 +1,13 @@
 ---
 name: research-assistant
-description: Organized research and knowledge management for agents. Use when you need to structure, store, retrieve, and export research notes across topics. Supports adding notes with tags, listing topics, searching across all notes, and exporting to markdown. Security: file exports are restricted to safe directories only (workspace, home, /tmp). Perfect for multi-session projects, tracking ideas, and maintaining structured knowledge.
+description: "Organized research and knowledge management for agents. Use when
+  you need to structure, store, retrieve, and export research notes across
+  topics. Supports adding notes with tags, listing topics, searching across all
+  notes, and exporting to markdown. Security: file exports are restricted to
+  safe directories only (workspace, home, /tmp). Perfect for multi-session
+  projects, tracking ideas, and maintaining structured knowledge."
 ---
+
 
 # Research Assistant
 

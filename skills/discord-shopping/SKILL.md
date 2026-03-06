@@ -1,7 +1,14 @@
 ---
 name: discord-shopping
-description: Dedicated shopping deal finder optimized for Discord: wide search across new/used/refurbished vendors (Amazon, eBay, Best Buy, Walmart, Swappa, Back Market), top 3 results with prices/links, coupon code checks. Trigger exclusively on Discord keywords/phrases like &quot;shop&quot;, &quot;find me a deal&quot;, &quot;best price for [product]&quot;, &quot;cheap [product]&quot;, &quot;where to buy [product]&quot;. Use in Discord group/direct chats to quickly inform buying decisions.
+description: "Dedicated shopping deal finder optimized for Discord: wide search
+  across new/used/refurbished vendors (Amazon, eBay, Best Buy, Walmart, Swappa,
+  Back Market), top 3 results with prices/links, coupon code checks. Trigger
+  exclusively on Discord keywords/phrases like &quot;shop&quot;, &quot;find me a
+  deal&quot;, &quot;best price for [product]&quot;, &quot;cheap [product]&quot;,
+  &quot;where to buy [product]&quot;. Use in Discord group/direct chats to
+  quickly inform buying decisions."
 ---
+
 
 # Discord Shopping Deals
 

@@ -1,7 +1,12 @@
 ---
 name: openclaw-sacred-rules
-description: OpenClaw configuration safety rules to prevent system disasters. Use when: (1) Making OpenClaw config changes, (2) Troubleshooting auth failures, (3) Taking system backups, (4) Recovering from config disasters, (5) User asks about config best practices, or (6) Before enabling/disabling system features like sandbox mode.
+description: "OpenClaw configuration safety rules to prevent system disasters.
+  Use when: (1) Making OpenClaw config changes, (2) Troubleshooting auth
+  failures, (3) Taking system backups, (4) Recovering from config disasters, (5)
+  User asks about config best practices, or (6) Before enabling/disabling system
+  features like sandbox mode."
 ---
+
 
 # OpenClaw Sacred Rules
 

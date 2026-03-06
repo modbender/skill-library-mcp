@@ -1,3 +1,10 @@
+---
+name: People-Strategy Agent Skill
+description: A people relationship management agent skill that provides
+  persistent graph-based storage using SQLite database. This skill enables AI
+  agents to create, manage, and query a network of people and th...
+---
+
 # People-Strategy Agent Skill
 
 ## Overview

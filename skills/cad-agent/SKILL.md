@@ -1,3 +1,10 @@
+---
+name: CAD Agent
+description: CAD Agent is a rendering server that lets AI agents see what
+  they're building. Send modeling commands → receive rendered images → iterate
+  visually.
+---
+
 # CAD Agent
 
 > Give your AI agent eyes for CAD work.

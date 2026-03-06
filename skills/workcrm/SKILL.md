@@ -1,3 +1,8 @@
+---
+name: WorkCRM (OpenClaw Skill)
+description: A lightweight, local-first CRM with an explicit confirmation gate.
+---
+
 # WorkCRM (OpenClaw Skill)
 
 A lightweight, local-first CRM with an explicit confirmation gate.

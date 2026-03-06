@@ -1,8 +1,10 @@
 ---
 name: openclaw-ledger
-user-invocable: true
-metadata: {"openclaw":{"emoji":"📒","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Tamper-evident audit trail for agent workspaces. Every workspace
+  change is recorded in a hash-chained log — if anyone alters an entry, the
+  chain breaks and you know.
 ---
+
 
 # OpenClaw Ledger
 

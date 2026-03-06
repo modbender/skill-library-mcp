@@ -1,3 +1,10 @@
+---
+name: Google Scholar Search
+description: Search for academic literature and research papers through Google
+  Scholar. This skill provides powerful search capabilities with advanced
+  filtering options including author-specific searches and ye...
+---
+
 # Google Scholar Search
 
 > **AI-Powered Academic Literature Search Tool** - Search academic papers through Google Scholar

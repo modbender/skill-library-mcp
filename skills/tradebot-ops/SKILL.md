@@ -1,3 +1,10 @@
+---
+name: tradebot-ops
+description: "Operate and monitor the trading bot safely: detect stalls, verify
+  LIVE/halting state, validate data freshness, restart cleanly, and produce
+  human-readable health summaries."
+---
+
 # tradebot-ops
 
 ## Purpose

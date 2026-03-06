@@ -1,3 +1,10 @@
+---
+name: OpenClaw Model Manager v1.5 🛠️
+description: Why pay $15/1M tokens for simple translations or summaries when you
+  can pay $0.60/1M? That's a 25x price difference (96% savings) for suitable
+  tasks.
+---
+
 # OpenClaw Model Manager v1.5 🛠️
 
 **💰 Optimize Your API Costs: Route Simple Tasks to Cheaper Models.**

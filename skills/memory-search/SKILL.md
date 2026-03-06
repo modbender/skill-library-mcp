@@ -1,3 +1,8 @@
+---
+name: Memory Search
+description: You have two tools for recalling information from your memory files. Use them.
+---
+
 # Memory Search
 
 You have two tools for recalling information from your memory files. Use them.

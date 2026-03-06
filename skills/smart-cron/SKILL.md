@@ -1,3 +1,9 @@
+---
+name: Smart Cron — Natural Language Cron Scheduler for OpenClaw
+description: Schedule any OpenClaw task using plain English. No cron syntax
+  required. Just say what you want, when you want it.
+---
+
 # Smart Cron — Natural Language Cron Scheduler for OpenClaw
 
 Schedule any OpenClaw task using plain English. No cron syntax required. Just say what you want, when you want it.

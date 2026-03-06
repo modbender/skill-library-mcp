@@ -1,12 +1,10 @@
 ---
-description: Execute multi-step workflows via Orchestrate. Use when running complex workflows, parallel tasks, multi-model orchestration, or automating multi-step processes.
-triggers:
-  - run workflow
-  - orchestrate
-  - multi-step
-  - parallel tasks
-  - workflow yaml
+name: quack-workflow
+description: Execute multi-step workflows via Orchestrate. Use when running
+  complex workflows, parallel tasks, multi-model orchestration, or automating
+  multi-step processes.
 ---
+
 
 # Workflow Engine
 

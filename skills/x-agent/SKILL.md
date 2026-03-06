@@ -1,7 +1,12 @@
 ---
 name: x-agent
-description: Plan and run X (Twitter) operations in three modes: (1) monitor-only intelligence, (2) draft-and-approve posting, and (3) limited automation with strict guardrails. Use when setting up X account workflows, drafting posts/replies/threads, defining safety policy, scheduling content, or reviewing performance.
+description: "Plan and run X (Twitter) operations in three modes: (1)
+  monitor-only intelligence, (2) draft-and-approve posting, and (3) limited
+  automation with strict guardrails. Use when setting up X account workflows,
+  drafting posts/replies/threads, defining safety policy, scheduling content, or
+  reviewing performance."
 ---
+
 
 # X Agent (Phased Setup)
 

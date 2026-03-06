@@ -1,3 +1,10 @@
+---
+name: Discord Voice Memo Upgrades - Skill Documentation
+description: This skill provides a core patch for Moltbot that fixes voice memo
+  TTS auto-replies. The issue occurs when block streaming prevents the final
+  payload from reaching the TTS synthesis pipeline.
+---
+
 # Discord Voice Memo Upgrades - Skill Documentation
 
 ## Overview

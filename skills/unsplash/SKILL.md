@@ -1,3 +1,9 @@
+---
+name: Unsplash API
+description: Search, browse, and download high-quality free photos from
+  Unsplash's library of millions of images.
+---
+
 # Unsplash API
 
 Search, browse, and download high-quality free photos from Unsplash's library of millions of images.

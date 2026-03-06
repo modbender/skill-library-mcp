@@ -1,3 +1,10 @@
+---
+name: Model Switchboard v3.0 — Safe AI Model Configuration for OpenClaw
+description: "Editing openclaw.json directly for model changes is the #1 cause
+  of OpenClaw gateway crashes. Wrong model type in wrong slot = instant death.
+  No backup = hours rebuilding. This skill eliminates tha..."
+---
+
 # Model Switchboard v3.0 — Safe AI Model Configuration for OpenClaw
 
 > ⛔ **HARD RULE: NEVER edit `openclaw.json` model fields directly.**

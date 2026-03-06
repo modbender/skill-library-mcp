@@ -1,3 +1,8 @@
+---
+name: JobHunter Master
+description: Most job seekers spray and pray. This skill hunts.
+---
+
 # JobHunter Master
 
 **The aggressive job hunting skill that goes beyond "Easy Apply".**

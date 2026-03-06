@@ -1,3 +1,10 @@
+---
+name: EmailAgent README
+description: The EmailAgent class provides an AI-powered email composition and
+  sending capability using LangChain with OpenAI's GPT model. It includes
+  human-in-the-loop middleware that requires approval before ...
+---
+
 # EmailAgent README
 
 ## Overview

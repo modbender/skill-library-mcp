@@ -1,7 +1,11 @@
 ---
 name: remember-me
-description: Remember-this trigger: memory updates + recall for preferences, goals, boundaries, prior work, decisions, dates, and todos. Use whenever user asks to remember, continue previous context, personalize behavior, or retrieve what was decided earlier.
+description: "Remember-this trigger: memory updates + recall for preferences,
+  goals, boundaries, prior work, decisions, dates, and todos. Use whenever user
+  asks to remember, continue previous context, personalize behavior, or retrieve
+  what was decided earlier."
 ---
+
 
 # Remember Me
 

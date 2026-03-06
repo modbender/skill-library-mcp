@@ -1,3 +1,9 @@
+---
+name: Product Studio Shot
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce image generation.
+---
+
 # Product Studio Shot
 
 **Version**: 1.0.0

@@ -1,3 +1,10 @@
+---
+name: messageguard
+description: "1. Clone the repository: git clone
+  git@github.com:AndrewAndrewsen/MessageGuard.git. 2. Navigate to the directory.
+  The skill is dependency-free, relying only on the Python standard library."
+---
+
 
 ### MessageGuard: Outgoing Message Filter Skill
 

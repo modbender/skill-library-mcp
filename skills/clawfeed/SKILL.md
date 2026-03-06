@@ -1,3 +1,9 @@
+---
+name: ClawFeed
+description: AI-powered news digest tool. Automatically generates structured
+  summaries (4H/daily/weekly/monthly) from Twitter and RSS feeds.
+---
+
 # ClawFeed
 
 AI-powered news digest tool. Automatically generates structured summaries (4H/daily/weekly/monthly) from Twitter and RSS feeds.

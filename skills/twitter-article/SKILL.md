@@ -1,3 +1,8 @@
+---
+name: Twitter Article Skill
+description: Notion 文章一键同步到 Twitter/X Article（Premium+ 长文，图文混排）。
+---
+
 # Twitter Article Skill
 
 Notion 文章一键同步到 Twitter/X Article（Premium+ 长文，图文混排）。

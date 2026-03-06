@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: 每日收入汇总和追踪系统。
+---
+
 # SKILL.md
 
 # Revenue Tracker

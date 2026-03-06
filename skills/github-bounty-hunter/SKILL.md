@@ -1,3 +1,8 @@
+---
+name: GitHub Bounty Hunter
+description: "This skill turns your AI agent into an autonomous bounty hunter:"
+---
+
 # GitHub Bounty Hunter
 
 **Automatically find, apply for, and complete GitHub bounties to earn money.**

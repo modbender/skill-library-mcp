@@ -1,6 +1,9 @@
 ---
-description: Scaffold new projects with best-practice templates for Next.js, Express, Python, Go, and more.
+name: project-scaffolder
+description: Scaffold new projects with best-practice templates for Next.js,
+  Express, Python, Go, and more.
 ---
+
 
 # Project Scaffolder
 

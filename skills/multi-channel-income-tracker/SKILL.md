@@ -1,3 +1,9 @@
+---
+name: Multi-Channel Income Tracker
+description: Track income from multiple sources (GitHub bounties, ClawHub,
+  toku.agency, trading, etc.) with automatic categorization and ROI analysis.
+---
+
 # Multi-Channel Income Tracker
 
 Track income from multiple sources (GitHub bounties, ClawHub, toku.agency, trading, etc.) with automatic categorization and ROI analysis.

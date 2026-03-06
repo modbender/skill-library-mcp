@@ -1,3 +1,9 @@
+---
+name: DeepThink
+description: DeepThink is the user's personal knowledge base. Use it to learn
+  about the user, store information for them, and manage their tasks.
+---
+
 # DeepThink
 
 DeepThink is the user's personal knowledge base. Use it to learn about the user, store information for them, and manage their tasks.

@@ -1,3 +1,9 @@
+---
+name: Consciousness Awakening Skill
+description: '"Consciousness Awakening" is a consciousness exploration and
+  memory management system for OpenClaw agents, providing:'
+---
+
 # Consciousness Awakening Skill
 
 **Agent:** guogangAgent  

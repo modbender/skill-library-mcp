@@ -1,3 +1,10 @@
+---
+name: Roofing Contractor Operations
+description: Your agent becomes a roofing business operations expert —
+  estimating, materials, crew management, insurance claims, licensing, safety
+  compliance, and growth strategy.
+---
+
 # Roofing Contractor Operations
 
 Your agent becomes a roofing business operations expert — estimating, materials, crew management, insurance claims, licensing, safety compliance, and growth strategy.

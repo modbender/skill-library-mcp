@@ -1,3 +1,8 @@
+---
+name: Memory Health Score — 记忆健康度评分
+description: 一个总分让用户快速判断 Agent 记忆系统健康状况。
+---
+
 # Memory Health Score — 记忆健康度评分
 
 ## 概述

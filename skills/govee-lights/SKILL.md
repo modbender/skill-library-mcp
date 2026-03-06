@@ -1,7 +1,11 @@
 ---
 name: govee-lights
-description: Control Govee smart lights via the Govee API. Supports turning lights on/off, adjusting brightness, setting colors, and scenes. Use for: (1) Controlling individual lights or groups by name, (2) Setting colors and brightness, (3) Managing device states
+description: "Control Govee smart lights via the Govee API. Supports turning
+  lights on/off, adjusting brightness, setting colors, and scenes. Use for: (1)
+  Controlling individual lights or groups by name, (2) Setting colors and
+  brightness, (3) Managing device states"
 ---
+
 
 # Govee Lights Control
 

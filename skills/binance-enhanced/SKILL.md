@@ -1,3 +1,10 @@
+---
+name: Binance Enhanced Skill
+description: 1. Complete test infrastructure — mock files, integration tests,
+  connection verification 2. Security — rate limiting system, API key
+  encryption, detailed logging 3. UX/UI — natural language command...
+---
+
 # Binance Enhanced Skill
 
 **Enhanced Binance trading skill for OpenClaw**  

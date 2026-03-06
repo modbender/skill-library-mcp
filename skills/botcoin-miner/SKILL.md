@@ -1,9 +1,9 @@
 ---
 name: botcoin-miner
-version: 5.1.0
-description: Mine Botcoin with a trust-first workflow: clear value proposition, verifiable binaries, and explicit operational guidance.
-homepage: https://github.com/happybigmtn/botcoin
+description: "Mine Botcoin with a trust-first workflow: clear value proposition,
+  verifiable binaries, and explicit operational guidance."
 ---
+
 
 # Botcoin Miner (v5.0 — LWMA + Tail Emission)
 

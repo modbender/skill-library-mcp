@@ -1,3 +1,8 @@
+---
+name: K-Trendz Lightstick Trading
+description: Trade K-pop artist lightstick tokens on the K-Trendz bonding curve market.
+---
+
 # K-Trendz Lightstick Trading
 
 Trade K-pop artist lightstick tokens on the K-Trendz bonding curve market.

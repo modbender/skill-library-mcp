@@ -1,7 +1,13 @@
 ---
 name: polymarket-trader
-description: Build, evaluate, and tune a Polymarket BTC 1h Up/Down trading strategy using Binance (resolution source) as the anchor. Use when: (1) designing a mispricing/edge model (fair probability vs market price), (2) adding regime filters (trend vs range), (3) debugging bad entries/exits from events.jsonl/state.json, (4) running quick offline analysis or parameter sweeps with the bundled scripts.
+description: "Build, evaluate, and tune a Polymarket BTC 1h Up/Down trading
+  strategy using Binance (resolution source) as the anchor. Use when: (1)
+  designing a mispricing/edge model (fair probability vs market price), (2)
+  adding regime filters (trend vs range), (3) debugging bad entries/exits from
+  events.jsonl/state.json, (4) running quick offline analysis or parameter
+  sweeps with the bundled scripts."
 ---
+
 
 # Polymarket Trader
 

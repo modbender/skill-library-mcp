@@ -1,3 +1,10 @@
+---
+name: QA & Test Engineering Command Center
+description: Complete quality assurance system — from test strategy to
+  automation frameworks, coverage analysis, and release readiness. Works for any
+  stack, any team size.
+---
+
 # QA & Test Engineering Command Center
 
 Complete quality assurance system — from test strategy to automation frameworks, coverage analysis, and release readiness. Works for any stack, any team size.

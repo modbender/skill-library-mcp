@@ -1,3 +1,8 @@
+---
+name: github-trending - 获取 GitHub 热门项目
+description: 自动获取 GitHub Trending 热门项目信息，支持按时间范围筛选。
+---
+
 # github-trending - 获取 GitHub 热门项目
 
 自动获取 GitHub Trending 热门项目信息，支持按时间范围筛选。

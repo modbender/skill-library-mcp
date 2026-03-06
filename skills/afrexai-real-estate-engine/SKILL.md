@@ -1,3 +1,8 @@
+---
+name: Real Estate Investment & Operations Engine
+description: "Score each market (0-100):"
+---
+
 # Real Estate Investment & Operations Engine
 
 > Complete real estate system — from deal sourcing through portfolio management. Covers buying, selling, investing, landlording, and development with actionable frameworks, calculators, and templates.

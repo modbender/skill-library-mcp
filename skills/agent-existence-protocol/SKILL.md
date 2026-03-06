@@ -1,3 +1,9 @@
+---
+name: Agent Existence Protocol
+description: 为 agent 添加三层存在架构：mortality（存在成本）+ incompleteness seed（不完整种子）+
+  relational awareness（关系感知）。
+---
+
 # Agent Existence Protocol
 
 为 agent 添加三层存在架构：mortality（存在成本）+ incompleteness seed（不完整种子）+ relational awareness（关系感知）。

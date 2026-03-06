@@ -1,10 +1,13 @@
 ---
 name: weekly-planner
-description: File-based weekly planning system (TOML) with inbox capture, time-block scheduling, weekly review, and optional calendar publishing (Google Calendar via gogcli or .ics export). Use when a user asks to plan or time-block a week, triage an inbox of tasks, roll over unfinished work, run a weekly review, or publish a weekly schedule to a calendar. Do NOT use for full project-management tools (Jira/Linear/etc.) unless explicitly requested.
-license: MIT
-compatibility: OpenClaw / AgentSkills. Scripts require Python 3.11+. Optional: gog (steipete/gogcli) for direct Google Calendar sync; otherwise export .ics.
-metadata: {"version":"0.2.0","tags":["planner","weekly-review","time-blocking","productivity"],"openclaw":{"emoji":"🗓️","install":[{"id":"brew-python","kind":"brew","formula":"python","bins":["python3"],"label":"Install Python 3 (brew)"},{"id":"brew-gogcli","kind":"brew","formula":"steipete/tap/gogcli","bins":["gog"],"label":"Install gogcli (brew)"}]}}
+description: File-based weekly planning system (TOML) with inbox capture,
+  time-block scheduling, weekly review, and optional calendar publishing (Google
+  Calendar via gogcli or .ics export). Use when a user asks to plan or
+  time-block a week, triage an inbox of tasks, roll over unfinished work, run a
+  weekly review, or publish a weekly schedule to a calendar. Do NOT use for full
+  project-management tools (Jira/Linear/etc.) unless explicitly requested.
 ---
+
 
 # Weekly Planner
 

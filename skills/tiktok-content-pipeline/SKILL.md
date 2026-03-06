@@ -1,3 +1,9 @@
+---
+name: TikTok Content Pipeline — OpenClaw Skill
+description: Automated TikTok carousel content generation, publishing,
+  scheduling, and analytics-driven optimization for any niche.
+---
+
 # TikTok Content Pipeline — OpenClaw Skill
 
 Automated TikTok carousel content generation, publishing, scheduling, and analytics-driven optimization for any niche.

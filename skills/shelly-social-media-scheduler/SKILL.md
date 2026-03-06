@@ -1,3 +1,10 @@
+---
+name: Social Media Scheduler 📅
+description: Generate a full week of social media content for any topic or
+  niche. Outputs platform-optimized posts for Twitter/X, LinkedIn, and
+  Instagram.
+---
+
 # Social Media Scheduler 📅
 
 Generate a full week of social media content for any topic or niche. Outputs platform-optimized posts for **Twitter/X**, **LinkedIn**, and **Instagram**.

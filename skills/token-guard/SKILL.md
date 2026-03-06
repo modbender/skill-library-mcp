@@ -1,3 +1,8 @@
+---
+name: TokenGuard — LLM API 429 Prevention Engine
+description: "<!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-TG01 -->"
+---
+
 # TokenGuard — LLM API 429 Prevention Engine
 
 <!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-TG01 -->

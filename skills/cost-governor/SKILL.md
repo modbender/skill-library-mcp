@@ -1,8 +1,10 @@
 ---
 name: cost-governor
-user-invocable: true
-metadata: {"openclaw":{"emoji":"💰","requires":{"bins":["node"]},"os":["darwin","linux","win32"]}}
+description: Cost Governor tracks your LLM API costs in real-time across all
+  providers (OpenAI, Anthropic, Google, etc.), enforces budget limits with
+  circuit breakers, and prevents you from burning through your...
 ---
+
 
 # Cost Governor - OpenClaw Skill
 

@@ -1,3 +1,11 @@
+---
+name: "qfc-order AgentSkill (Robust v3: Reliable adds w/ scroll, qty select, OOS
+  alts/search vars, cart confirm)"
+description: "Automate QFC (qfc.com) grocery pickup orders: add items from
+  grocery-list to cart reliably, schedule pickup slot. Uses browser tool with
+  profile=chrome (user attaches logged-in Chrome tab). No cred..."
+---
+
 # qfc-order AgentSkill (Robust v3: Reliable adds w/ scroll, qty select, OOS alts/search vars, cart confirm)
 
 ## Description

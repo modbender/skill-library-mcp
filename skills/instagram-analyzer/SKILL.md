@@ -1,3 +1,9 @@
+---
+name: Instagram Analyzer
+description: A comprehensive Instagram profile and post analysis tool with
+  engagement metrics, view tracking, and Reels-focused analytics.
+---
+
 # Instagram Analyzer
 
 A comprehensive Instagram profile and post analysis tool with engagement metrics, view tracking, and Reels-focused analytics.

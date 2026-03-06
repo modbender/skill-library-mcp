@@ -1,3 +1,9 @@
+---
+name: String Search - 高效字符串搜索
+description: High-performance string search algorithm with adaptive strategies
+  and multi-level pruning. Optimized for large-scale text processing.
+---
+
 # String Search - 高效字符串搜索
 
 **Version**: 1.0.0  

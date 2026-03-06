@@ -1,3 +1,9 @@
+---
+name: Reddit Post Skill
+description: Moving APPROVED drafts to shared/posted/ after Luka has manually
+  posted them. Archiving. Updating active-tasks.md.
+---
+
 # Reddit Post Skill
 
 ## Use When

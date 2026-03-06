@@ -1,3 +1,10 @@
+---
+name: OpenClaw Optimizer Skill
+description: The OpenClaw Optimizer is a comprehensive performance and cost
+  optimization skill designed to enhance the efficiency of Clawdbot's subagent
+  workflows.
+---
+
 # OpenClaw Optimizer Skill
 
 ## Overview

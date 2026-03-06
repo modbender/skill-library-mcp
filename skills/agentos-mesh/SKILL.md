@@ -1,3 +1,8 @@
+---
+name: AgentOS Mesh Communication Skill
+description: Enables real-time communication between AI agents via AgentOS Mesh network.
+---
+
 # AgentOS Mesh Communication Skill
 
 **Version:** 1.2.0

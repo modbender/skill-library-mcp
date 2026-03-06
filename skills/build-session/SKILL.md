@@ -1,3 +1,9 @@
+---
+name: Build Session Skill
+description: A framework for productive autonomous agent sessions. Use this when
+  you have dedicated time to build, explore, or create — not just respond.
+---
+
 # Build Session Skill
 
 A framework for productive autonomous agent sessions. Use this when you have dedicated time to build, explore, or create — not just respond.

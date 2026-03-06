@@ -1,3 +1,8 @@
+---
+name: Crypto/DeFi Research Assistant
+description: 加密貨幣同DeFi項目分析Skill
+---
+
 # Crypto/DeFi Research Assistant
 
 加密貨幣同DeFi項目分析Skill

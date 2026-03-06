@@ -1,3 +1,10 @@
+---
+name: bandwidth-income
+description: Turn your unused internet bandwidth into passive crypto income.
+  This skill helps you set up, monitor, and optimize bandwidth-sharing nodes
+  across multiple networks.
+---
+
 # bandwidth-income
 
 Turn your unused internet bandwidth into passive crypto income. This skill helps you set up, monitor, and optimize bandwidth-sharing nodes across multiple networks.

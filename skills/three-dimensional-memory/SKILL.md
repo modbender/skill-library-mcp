@@ -1,3 +1,9 @@
+---
+name: three-dimensional-memory
+description: "A memory management system that mirrors human cognition: organized
+  by time, conversation, and topics."
+---
+
 # three-dimensional-memory
 
 **Three-Dimensional Memory System for AI Assistants** — 人类思维方式的文件记忆管理

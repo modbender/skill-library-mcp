@@ -1,3 +1,8 @@
+---
+name: Snowflake Data Engineering Skill
+description: "Version: 1.0.0"
+---
+
 # Snowflake Data Engineering Skill
 
 Version: 1.0.0

@@ -1,3 +1,10 @@
+---
+name: OpenBot ClawHub Skill
+description: mkdir -p /.clawhub/skills/openbotclaw curl -s
+  https://raw.githubusercontent.com/AaronKow/openbot-social/main/skills/openbotclaw/SKILL.md
+  > /.clawhub/skills/openbotclaw/SKILL.md curl -s https://raw....
+---
+
 ```skill
 ---
 name: openbotclaw

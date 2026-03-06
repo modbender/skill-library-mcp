@@ -1,3 +1,8 @@
+---
+name: Telegram/Discord Bot Developer
+description: 幫你整Telegram同Discord Bot既Skill
+---
+
 # Telegram/Discord Bot Developer
 
 幫你整Telegram同Discord Bot既Skill

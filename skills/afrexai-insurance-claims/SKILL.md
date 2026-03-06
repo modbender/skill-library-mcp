@@ -1,3 +1,9 @@
+---
+name: Insurance Claims Processor
+description: Process, analyze, and optimize insurance claims. Covers property,
+  liability, workers' comp, auto, and professional indemnity.
+---
+
 # Insurance Claims Processor
 
 Process, analyze, and optimize insurance claims. Covers property, liability, workers' comp, auto, and professional indemnity.

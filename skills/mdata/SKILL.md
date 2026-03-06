@@ -1,3 +1,9 @@
+---
+name: System Diagnostics
+description: A comprehensive system diagnostics and troubleshooting toolkit for
+  DevOps engineers and system administrators.
+---
+
 # System Diagnostics
 
 A comprehensive system diagnostics and troubleshooting toolkit for DevOps engineers and system administrators.

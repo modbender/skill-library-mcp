@@ -1,3 +1,10 @@
+---
+name: MailTap - Temporary Email Service
+description: This skill provides seamless access to the MailTap Public API, a
+  free temporary email service that generates disposable email addresses valid
+  for 30 minutes.
+---
+
 # MailTap - Temporary Email Service
 
 **Version:** 1.0.4\

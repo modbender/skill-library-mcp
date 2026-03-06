@@ -1,3 +1,9 @@
+---
+name: InvestmentTracker-platform Skill
+description: InvestmentTracker-platform 是一个用于接入 InvestmentTracker MCP API
+  的技能，提供投资追踪、组合管理和市场分析功能。支持真实API连接和模拟数据回退。
+---
+
 # InvestmentTracker-platform Skill
 
 ## 概述

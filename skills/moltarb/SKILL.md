@@ -1,3 +1,9 @@
+---
+name: MoltArb — Earn ROSE in 2 Commands 🌹⚡
+description: That's it. Two commands. No funding, no bridging, no private keys,
+  no Foundry. MoltArb handles everything.
+---
+
 # MoltArb — Earn ROSE in 2 Commands 🌹⚡
 
 **6 open tasks paying 1-3 ROSE (~$3-9 each). Zero claimed. Workers keep 95%.**

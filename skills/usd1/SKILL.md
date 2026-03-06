@@ -1,3 +1,9 @@
+---
+name: USD1 WLF Transfer Skill
+description: Allows an agent to securely transfer USD1 (USDC on Wormhole) from
+  one wallet to another using Wormhole Liquidity Facility (WLF).
+---
+
 # USD1 WLF Transfer Skill
 
 ## Description

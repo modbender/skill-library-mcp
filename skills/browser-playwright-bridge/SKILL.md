@@ -1,7 +1,13 @@
 ---
 name: browser-playwright-bridge
-description: Run Playwright scripts that share OpenClaw browser's login state via CDP, with automatic conflict avoidance. Use when: (1) recording browser tool operations as reusable Playwright scripts, (2) running headless automation that needs existing cookies/sessions, (3) scheduling browser tasks in cron without CDP conflicts, (4) converting exploratory browser tool workflows into zero-token repeatable scripts.
+description: "Run Playwright scripts that share OpenClaw browser's login state
+  via CDP, with automatic conflict avoidance. Use when: (1) recording browser
+  tool operations as reusable Playwright scripts, (2) running headless
+  automation that needs existing cookies/sessions, (3) scheduling browser tasks
+  in cron without CDP conflicts, (4) converting exploratory browser tool
+  workflows into zero-token repeatable scripts."
 ---
+
 
 # Browser ↔ Playwright Bridge
 

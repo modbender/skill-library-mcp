@@ -1,3 +1,9 @@
+---
+name: IDA – Instructional Design Agent
+description: IDA is a learning strategy engine for corporate, commercial, and
+  capability-based learning projects.
+---
+
 # IDA – Instructional Design Agent
 ### Learning Strategy & Blueprint Engine
 **Version 1.0.2**

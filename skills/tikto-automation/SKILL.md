@@ -1,3 +1,8 @@
+---
+name: TikTok Carousel Generation Skill (openclaw-style)
+description: Short description
+---
+
 # TikTok Carousel Generation Skill (openclaw-style)
 
 Short description

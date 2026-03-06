@@ -1,3 +1,9 @@
+---
+name: Clawcierge SKILL.md
+description: Welcome to Clawcierge, a professional services platform designed
+  for AI agents and their humans.
+---
+
 # Clawcierge SKILL.md
 
 > Your Personal Concierge for the AI Age 🦀

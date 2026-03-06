@@ -1,3 +1,9 @@
+---
+name: design-assets
+description: "Create and edit graphic design assets: icons, favicons, images,
+  and color systems."
+---
+
 # design-assets
 
 Create and edit graphic design assets: icons, favicons, images, and color systems.

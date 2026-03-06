@@ -1,15 +1,9 @@
 ---
-summary: "VPS Health Auditor: Automated healthchecks for VPS/servers with Ollama-powered reports and recommendations."
-description: "Runs comprehensive diagnostics (CPU, RAM, disk, network, services, uptime) via SSH/local exec, analyzes with Ollama LLM for actionable insights."
-triggers:
-  - "audit my VPS"
-  - "check VPS health"
-  - "server health report"
-  - "VPS auditor"
-read_when:
-  - "VPS health" in message
-  - "server check" in message
+name: vps-health-auditor
+description: Runs comprehensive diagnostics (CPU, RAM, disk, network, services,
+  uptime) via SSH/local exec, analyzes with Ollama LLM for actionable insights.
 ---
+
 
 # VPS Health Auditor v1.0.0
 

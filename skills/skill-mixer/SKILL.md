@@ -1,3 +1,8 @@
+---
+name: 🎯 SkillMixer - Upload Ready!
+description: "Everything is ready. You have:"
+---
+
 # 🎯 SkillMixer - Upload Ready! 
 
 ## 📊 Project Completion Status

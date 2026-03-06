@@ -1,7 +1,14 @@
 ---
 name: doubleword-batches
-description: Create and manage batch inference jobs using the Doubleword API (api.doubleword.ai). Use when users want to: (1) Process multiple AI requests in batch mode, (2) Submit JSONL batch files for async inference, (3) Monitor batch job progress and retrieve results, (4) Work with OpenAI-compatible batch endpoints, (5) Handle large-scale inference workloads that don't require immediate responses, (6) Use tool calling or structured outputs in batches, (7) Automatically batch API calls with autobatcher.
+description: "Create and manage batch inference jobs using the Doubleword API
+  (api.doubleword.ai). Use when users want to: (1) Process multiple AI requests
+  in batch mode, (2) Submit JSONL batch files for async inference, (3) Monitor
+  batch job progress and retrieve results, (4) Work with OpenAI-compatible batch
+  endpoints, (5) Handle large-scale inference workloads that don't require
+  immediate responses, (6) Use tool calling or structured outputs in batches,
+  (7) Automatically batch API calls with autobatcher."
 ---
+
 
 # Doubleword Batch Inference
 

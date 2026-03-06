@@ -1,3 +1,8 @@
+---
+name: Image Detection Skills
+description: Skills for analyzing and detecting AI-generated images.
+---
+
 # Image Detection Skills
 
 Skills for analyzing and detecting AI-generated images.

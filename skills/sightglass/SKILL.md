@@ -1,3 +1,9 @@
+---
+name: 🔍 Sightglass — Agent Supply Chain Intelligence
+description: Your AI coding agent just added 47 dependencies to your project. Do
+  you know why it picked any of them?
+---
+
 # 🔍 Sightglass — Agent Supply Chain Intelligence
 
 Your AI coding agent just added 47 dependencies to your project. Do you know why it picked any of them?

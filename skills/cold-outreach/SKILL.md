@@ -1,3 +1,10 @@
+---
+name: Cold Outreach — Intent-Based Conversion Framework
+description: Generate high-converting cold outreach (email, SMS, LinkedIn DM)
+  using battle-tested frameworks from Hormozi's $100M Leads, Cleverly, Hypergen,
+  and SalesHandy analysis of 100K+ campaigns.
+---
+
 # Cold Outreach — Intent-Based Conversion Framework
 
 Generate high-converting cold outreach (email, SMS, LinkedIn DM) using battle-tested frameworks from Hormozi's $100M Leads, Cleverly, Hypergen, and SalesHandy analysis of 100K+ campaigns.

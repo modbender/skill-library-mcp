@@ -1,3 +1,10 @@
+---
+name: Web3 & Blockchain Engineering
+description: Complete methodology for evaluating, designing, building, securing,
+  and operating blockchain-based systems. Covers smart contract development,
+  DeFi protocol design, token economics, security auditi...
+---
+
 # Web3 & Blockchain Engineering
 
 Complete methodology for evaluating, designing, building, securing, and operating blockchain-based systems. Covers smart contract development, DeFi protocol design, token economics, security auditing, and production operations.

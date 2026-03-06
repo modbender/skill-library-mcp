@@ -1,3 +1,9 @@
+---
+name: Data Governance Framework
+description: Assess, score, and remediate your organization's data governance
+  posture across 6 domains.
+---
+
 # Data Governance Framework
 
 Assess, score, and remediate your organization's data governance posture across 6 domains.

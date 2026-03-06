@@ -1,3 +1,8 @@
+---
+name: project-scaffold
+description: Scaffold new projects with best-practice structure, tooling, and configuration.
+---
+
 # project-scaffold
 
 Scaffold new projects with best-practice structure, tooling, and configuration.

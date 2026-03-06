@@ -1,3 +1,9 @@
+---
+name: Quick Demo Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI google veo generation.
+---
+
 # Quick Demo Video
 
 **Version**: 1.0.0

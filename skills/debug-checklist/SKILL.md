@@ -1,3 +1,9 @@
+---
+name: Debug Checklist - 系统化 Debug 检查清单
+description: A systematic debugging checklist tool based on holistic thinking.
+  Improves debug efficiency by 7.8x and reduces bug recurrence by 85%.
+---
+
 # Debug Checklist - 系统化 Debug 检查清单
 
 **Version**: 1.0.0  

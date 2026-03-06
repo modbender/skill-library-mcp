@@ -1,3 +1,10 @@
+---
+name: Incident Response Playbook
+description: Structured incident response for business and IT teams. Guides you
+  through detection, triage, containment, resolution, and post-mortem — with
+  auto-generated timelines and action items.
+---
+
 # Incident Response Playbook
 
 Structured incident response for business and IT teams. Guides you through detection, triage, containment, resolution, and post-mortem — with auto-generated timelines and action items.

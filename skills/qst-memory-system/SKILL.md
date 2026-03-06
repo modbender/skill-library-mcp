@@ -1,3 +1,8 @@
+---
+name: QST Memory Skill
+description: 利用 QST 理論（E8 幾何結構、DSI 層次、ICT Collapse）實現高效記憶存取。
+---
+
 # QST Memory Skill
 
 **OpenClaw Skill** - QST Matrix-based Memory System

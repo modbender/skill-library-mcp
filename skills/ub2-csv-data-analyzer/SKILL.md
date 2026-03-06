@@ -1,3 +1,10 @@
+---
+name: CSV Data Analyzer
+description: A skill that enables Claw to load, explore, analyze, and visualize
+  CSV datasets, providing statistical insights and answering questions about the
+  data.
+---
+
 # CSV Data Analyzer
 
 A skill that enables Claw to load, explore, analyze, and visualize CSV datasets, providing statistical insights and answering questions about the data.

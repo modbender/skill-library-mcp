@@ -1,14 +1,9 @@
 ---
-metadata:
-  name: BacktestBot
-  description: Backtest trading strategies against historical market data with performance analytics and risk metrics
-  version: 0.0.2
-  tags: [finance, trading, backtesting, strategy, quantitative]
-  openclaw:
-    requires:
-      env: [BACKTESTBOT_API_KEY]
-    primaryEnv: BACKTESTBOT_API_KEY
+name: backtestbot
+description: Backtest trading strategies against historical market data with
+  detailed performance analytics.
 ---
+
 
 # BacktestBot
 

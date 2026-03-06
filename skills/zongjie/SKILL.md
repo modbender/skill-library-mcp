@@ -1,3 +1,8 @@
+---
+name: "Skill: 总结 (Zongjie)"
+description: 将重要事件整理成结构化文档，沉淀经验到记忆系统。
+---
+
 # Skill: 总结 (Zongjie)
 
 将重要事件整理成结构化文档，沉淀经验到记忆系统。

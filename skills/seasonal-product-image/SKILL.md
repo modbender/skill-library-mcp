@@ -1,3 +1,9 @@
+---
+name: Seasonal Product Image
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce image generation.
+---
+
 # Seasonal Product Image
 
 **Version**: 1.0.0

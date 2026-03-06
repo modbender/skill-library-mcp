@@ -1,3 +1,9 @@
+---
+name: Agentic Compass — AI Agent Self-Reflection Tool
+description: Local-only self-reflection that forces objective action for AI
+  agents. No data leaves your machine.
+---
+
 # Agentic Compass — AI Agent Self-Reflection Tool
 
 Local-only self-reflection that forces **objective** action for AI agents. No data leaves your machine.

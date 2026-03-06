@@ -1,3 +1,9 @@
+---
+name: Apple Calendar CLI — Agent Skill
+description: You have access to apple-calendar-cli, a command-line tool for
+  managing Apple Calendar events via EventKit on macOS.
+---
+
 # Apple Calendar CLI — Agent Skill
 
 You have access to `apple-calendar-cli`, a command-line tool for managing Apple Calendar events via EventKit on macOS.

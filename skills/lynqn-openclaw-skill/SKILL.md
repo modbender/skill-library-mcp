@@ -1,3 +1,8 @@
+---
+name: LYNQN Skill
+description: Create a shareable snippet.
+---
+
 # LYNQN Skill
 
 **Share text, generate QR codes, and shorten URLs from any OpenClaw agent.**

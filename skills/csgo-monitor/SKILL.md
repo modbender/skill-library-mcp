@@ -1,3 +1,8 @@
+---
+name: CSGO 饰品智能监控 Skill
+description: 编辑 config.json 文件：
+---
+
 # CSGO 饰品智能监控 Skill
 
 > 基于 CSQAQ API 的 CSGO 饰品价格监控、数据分析和智能预警系统

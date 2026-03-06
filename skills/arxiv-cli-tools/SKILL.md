@@ -1,3 +1,8 @@
+---
+name: SKILL.md - arxiv-cli-tools
+description: "常用选项:"
+---
+
 # SKILL.md - arxiv-cli-tools
 
 ## Metadata

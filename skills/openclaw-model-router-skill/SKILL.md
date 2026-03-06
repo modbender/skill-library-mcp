@@ -1,7 +1,10 @@
 ---
 name: openclaw-model-router-skill
-description: Production-grade model router for OpenClaw: prefix routing (@codex/@mini), timezone-aware schedule switching, verify-after-switch, rollback, lock protection, and JSONL audit logs.
+description: "Production-grade model router for OpenClaw: prefix routing
+  (@codex/@mini), timezone-aware schedule switching, verify-after-switch,
+  rollback, lock protection, and JSONL audit logs."
 ---
+
 
 # OpenClaw Model Router Skill
 

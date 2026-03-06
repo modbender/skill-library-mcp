@@ -1,3 +1,10 @@
+---
+name: AgentOS SDK Skill
+description: AgentOS is a complete accountability infrastructure for AI agents.
+  It provides persistent memory, project management, kanban boards, brainstorm
+  storage, activity logging, mesh communication, and se...
+---
+
 # AgentOS SDK Skill
 
 ## Overview

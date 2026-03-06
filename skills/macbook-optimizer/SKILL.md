@@ -1,17 +1,10 @@
 ---
 name: macbook-optimizer
-description: Complete MacBook optimization suite: monitoring, troubleshooting, cleanup, and performance tuning. Works on all Macs (Intel & Apple Silicon). No extra tools required.
-homepage: https://github.com/T4btc/macbook-optimizer
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "💻",
-        "os": ["darwin"],
-        "requires": { "bins": ["system_profiler", "top", "ps", "df", "du"] },
-      },
-  }
+description: "Complete MacBook optimization suite: monitoring, troubleshooting,
+  cleanup, and performance tuning. Works on all Macs (Intel & Apple Silicon). No
+  extra tools required."
 ---
+
 
 # 💻 MacBook Optimizer
 

@@ -1,3 +1,8 @@
+---
+name: lessons_learned Skill
+description: 当检测到以下词汇时，立即停止，不执行任何操作：
+---
+
 # lessons_learned Skill
 
 > OpenClaw Skill - 错误学习与长期记忆系统

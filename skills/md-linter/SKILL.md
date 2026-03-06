@@ -1,6 +1,9 @@
 ---
-description: Lint Markdown files for style issues, broken links, and formatting problems with auto-fix suggestions.
+name: md-linter
+description: Lint Markdown files for style issues, broken links, and formatting
+  problems with auto-fix suggestions.
 ---
+
 
 # Markdown Linter
 

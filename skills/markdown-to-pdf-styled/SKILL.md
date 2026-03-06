@@ -1,3 +1,8 @@
+---
+name: md-to-pdf
+description: Use this skill to convert Markdown to PDF with consistent styles.
+---
+
 # md-to-pdf
 
 **version:** 1.0.0  

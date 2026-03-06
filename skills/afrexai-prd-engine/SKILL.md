@@ -1,3 +1,10 @@
+---
+name: PRD Engine — Product Requirements That Ship
+description: "Complete product requirements methodology: from idea to spec to
+  shipped feature. Not just a JSON template — a full system for writing PRDs
+  that developers actually follow and stakeholders actually ..."
+---
+
 # PRD Engine — Product Requirements That Ship
 
 Complete product requirements methodology: from idea to spec to shipped feature. Not just a JSON template — a full system for writing PRDs that developers actually follow and stakeholders actually approve.

@@ -1,3 +1,9 @@
+---
+name: Agent Trust Validator 🛡️
+description: Unified verification layer for agent credentials across multiple
+  trust protocols (ERC-8004, ANP, KYA, SATI).
+---
+
 # Agent Trust Validator 🛡️
 
 Unified verification layer for agent credentials across multiple trust protocols (ERC-8004, ANP, KYA, SATI).

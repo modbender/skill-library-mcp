@@ -1,12 +1,9 @@
 ---
-
 name: mt5-http-trader
-
-description: Call local MT5 trading HTTP API (signal → draft → confirm) with safety confirmation
-
-metadata: { "openclaw": { "os": \["win32"], "emoji": "📈" } }
-
+description: Call local MT5 trading HTTP API (signal → draft → confirm) with
+  safety confirmation
 ---
+
 
 
 

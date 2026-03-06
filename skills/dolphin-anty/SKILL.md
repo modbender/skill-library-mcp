@@ -1,3 +1,8 @@
+---
+name: Dolphin Anty — Antidetect Browser Automation
+description: Agent (OpenClaw / any LLM agent)
+---
+
 ```skill
 ---
 name: dolphin-anty

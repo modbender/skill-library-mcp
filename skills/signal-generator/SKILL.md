@@ -1,3 +1,8 @@
+---
+name: Signal Generator Skill
+description: Generate automated trading signals and send alerts to Discord/Telegram.
+---
+
 # Signal Generator Skill
 
 Generate automated trading signals and send alerts to Discord/Telegram.

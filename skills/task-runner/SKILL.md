@@ -1,7 +1,14 @@
 ---
 name: task-runner
-description: Manage tasks and projects across sessions with persistent task tracking. Use when you need to organize work, track progress, and maintain todo lists that persist between conversations. Features: add tasks with projects and priorities, list pending/completed tasks, mark tasks complete, export projects to markdown. Security: file exports are restricted to safe directories only (workspace, home, /tmp). Perfect for multi-session projects, experiment tracking, and maintaining productivity.
+description: "Manage tasks and projects across sessions with persistent task
+  tracking. Use when you need to organize work, track progress, and maintain
+  todo lists that persist between conversations. Features: add tasks with
+  projects and priorities, list pending/completed tasks, mark tasks complete,
+  export projects to markdown. Security: file exports are restricted to safe
+  directories only (workspace, home, /tmp). Perfect for multi-session projects,
+  experiment tracking, and maintaining productivity."
 ---
+
 
 # Task Runner
 

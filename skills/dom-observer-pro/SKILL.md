@@ -1,3 +1,10 @@
+---
+name: DOM Observer Pro
+description: Efficient DOM monitoring system for real-time content detection in
+  web browsers. Uses MutationObserver, IntersectionObserver, and intelligent
+  debouncing to detect AI-generated content as it appears...
+---
+
 # DOM Observer Pro
 
 ## Metadata

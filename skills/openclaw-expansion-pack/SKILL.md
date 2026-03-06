@@ -1,3 +1,10 @@
+---
+name: OpenClaw Expansion Pack
+description: "Complete infrastructure suite for production OpenClaw deployments.
+  Four integrated skills: Security scanner + Cost reduction (60-80%) +
+  Self-healing quality system + Skill discovery. Transform Open..."
+---
+
 # OpenClaw Expansion Pack
 
 Complete infrastructure suite for production OpenClaw deployments. Four integrated skills: Security scanner + Cost reduction (60-80%) + Self-healing quality system + Skill discovery. Transform OpenClaw from prototype to enterprise-ready.

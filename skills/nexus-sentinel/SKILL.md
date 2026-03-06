@@ -1,3 +1,9 @@
+---
+name: "Skill: Nexus-Sentinel (V1.1)"
+description: Nexus-Sentinel est un agent SRE autonome. Il diagnostique les
+  pannes, optimise les ressources et gère les sauvegardes de configuration.
+---
+
 # Skill: Nexus-Sentinel (V1.1)
 
 Nexus-Sentinel est un agent SRE autonome. Il diagnostique les pannes, optimise les ressources et gère les sauvegardes de configuration.

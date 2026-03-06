@@ -1,3 +1,8 @@
+---
+name: YouTube Channel Scraper
+description: A browser-based YouTube channel discovery and scraping tool.
+---
+
 # YouTube Channel Scraper
 
 A browser-based YouTube channel discovery and scraping tool.

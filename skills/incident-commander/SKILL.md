@@ -1,3 +1,10 @@
+---
+name: Incident Commander Skill
+description: The Incident Commander skill provides a comprehensive incident
+  response framework for managing technology incidents from detection through
+  resolution and post-incident review. This skill implements...
+---
+
 # Incident Commander Skill
 
 **Category:** Engineering Team  

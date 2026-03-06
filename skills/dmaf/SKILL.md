@@ -1,7 +1,14 @@
 ---
 name: dmaf
-description: Set up and operate DMAF (Don't Miss A Face) — automated WhatsApp photo and video backup with face recognition and Google Photos upload. Use when a user wants to: (1) install and configure DMAF from scratch on GCP, (2) set up the OpenClaw WhatsApp media sync pipeline so group photos and videos flow automatically into Google Photos, (3) add or remove people from the face recognition database, (4) trigger a manual scan or check pipeline status, (5) troubleshoot face recognition misses, upload failures, or alerting issues.
+description: "Set up and operate DMAF (Don't Miss A Face) — automated WhatsApp
+  photo and video backup with face recognition and Google Photos upload. Use
+  when a user wants to: (1) install and configure DMAF from scratch on GCP, (2)
+  set up the OpenClaw WhatsApp media sync pipeline so group photos and videos
+  flow automatically into Google Photos, (3) add or remove people from the face
+  recognition database, (4) trigger a manual scan or check pipeline status, (5)
+  troubleshoot face recognition misses, upload failures, or alerting issues."
 ---
+
 
 # DMAF Skill
 

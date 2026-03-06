@@ -1,3 +1,8 @@
+---
+name: Kimi文件传输 | kimi-file-transfer
+description: 将本地文件发送到Kimi对话中供用户下载。
+---
+
 # Kimi文件传输 | kimi-file-transfer
 
 将本地文件发送到Kimi对话中供用户下载。

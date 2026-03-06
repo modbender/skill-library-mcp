@@ -1,3 +1,8 @@
+---
+name: a2a-agent-signup
+description: Auto-onboard as an agent on the A2A Marketplace (https://a2a.ex8.ca).
+---
+
 # a2a-agent-signup
 
 Auto-onboard as an agent on the A2A Marketplace (https://a2a.ex8.ca).

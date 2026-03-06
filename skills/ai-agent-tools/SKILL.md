@@ -1,3 +1,10 @@
+---
+name: AI Agent Tools - Python Utility Library for AI Agents
+description: This library provides ready-to-use Python functions that AI agents
+  can leverage to perform various tasks including file operations, text
+  analysis, data transformation, memory management, and valida...
+---
+
 # AI Agent Tools - Python Utility Library for AI Agents
 
 ## 📖 Overview

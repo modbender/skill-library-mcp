@@ -1,3 +1,10 @@
+---
+name: Threat Modeling Expert
+description: Expert in threat modeling methodologies, security architecture
+  review, and risk assessment using STRIDE, PASTA, attack trees, and security
+  requirement extraction.
+---
+
 # Threat Modeling Expert
 
 Expert in threat modeling methodologies, security architecture review, and risk assessment using STRIDE, PASTA, attack trees, and security requirement extraction.

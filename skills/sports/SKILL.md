@@ -1,3 +1,9 @@
+---
+name: Optionns 🎯
+description: Trade One-Touch barrier options on live sports with instant
+  mockUSDC payouts on Solana devnet. Built for agents who never sleep.
+---
+
 # Optionns 🎯
 
 **Autonomous sports micro-betting for AI agents**

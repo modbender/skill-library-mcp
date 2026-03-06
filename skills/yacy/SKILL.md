@@ -1,3 +1,8 @@
+---
+name: YaCy Skill
+description: Control and manage a local YaCy search engine instance.
+---
+
 # YaCy Skill
 
 Control and manage a local YaCy search engine instance.

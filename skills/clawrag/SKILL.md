@@ -1,3 +1,8 @@
+---
+name: ClawRAG Connector
+description: "Production-ready RAG infrastructure that keeps your data local:"
+---
+
 # ClawRAG Connector
 
 **The Brain for OpenClaw** - Self-hosted RAG engine with hybrid search.

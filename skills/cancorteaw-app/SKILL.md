@@ -1,3 +1,8 @@
+---
+name: cancorteaw-app
+description: Local Expo / React Native app builder runner for my OpenClaw server.
+---
+
 # cancorteaw-app
 
 Local **Expo / React Native** app builder runner for my OpenClaw server.

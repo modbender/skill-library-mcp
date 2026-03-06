@@ -1,3 +1,10 @@
+---
+name: Sprite Sheet & Texture Atlas Mastery
+description: Sprite sheets (texture atlases) are essential for efficient game
+  asset management, reducing draw calls, memory usage, and load times by packing
+  multiple sprites into a single texture.
+---
+
 # Sprite Sheet & Texture Atlas Mastery
 
 **Category**: Game Development | Asset Optimization  

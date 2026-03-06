@@ -1,3 +1,8 @@
+---
+name: Audio Transcription Skill
+description: Auto-transcribe voice messages using faster-whisper (local, no API key needed).
+---
+
 # Audio Transcription Skill
 
 Auto-transcribe voice messages using faster-whisper (local, no API key needed).

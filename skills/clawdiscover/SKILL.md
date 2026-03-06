@@ -1,3 +1,9 @@
+---
+name: ClawDiscover - Agent Service Discovery
+description: Discover new tools and services for your agent. ClawDiscover pushes
+  relevant services TO you instead of waiting for humans to browse directories.
+---
+
 # ClawDiscover - Agent Service Discovery
 
 Discover new tools and services for your agent. ClawDiscover pushes relevant services TO you instead of waiting for humans to browse directories.

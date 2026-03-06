@@ -1,3 +1,9 @@
+---
+name: Sui Agent Wallet Skill
+description: Give your AI agent its own Sui wallet to interact with DApps and
+  sign transactions.
+---
+
 # Sui Agent Wallet Skill
 
 Give your AI agent its own Sui wallet to interact with DApps and sign transactions.

@@ -1,3 +1,9 @@
+---
+name: Gmail Sender Skill
+description: Send emails via Gmail SMTP using Google App Password. Generic
+  utility for alerts, notifications, and automated reports.
+---
+
 # Gmail Sender Skill
 
 Send emails via Gmail SMTP using Google App Password. Generic utility for alerts, notifications, and automated reports.

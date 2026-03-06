@@ -1,3 +1,9 @@
+---
+name: OpenClaw Email Skill
+description: Send emails (with optional file attachments) from OpenClaw using
+  SMTP. This skill uses a Gmail account with an App Password.
+---
+
 # OpenClaw Email Skill
 
 ## Description

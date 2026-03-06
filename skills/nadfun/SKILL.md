@@ -1,3 +1,9 @@
+---
+name: SKILL.md - NadFun Integration Guide
+description: "NadFun is a decentralized token launchpad on the Monad blockchain.
+  Key features:"
+---
+
 # SKILL.md - NadFun Integration Guide
 
 **The Monad token launchpad with bonding curves.** Trade tokens, launch your own, monitor events—all with pure viem.

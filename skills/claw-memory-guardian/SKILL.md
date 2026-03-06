@@ -1,3 +1,8 @@
+---
+name: Claw Memory Guardian
+description: 基于我们亲身经历的"失忆"教训，为OpenClaw用户提供完整的防丢失记忆系统。自动建立、维护和恢复AI助手的记忆，防止工作进度丢失。
+---
+
 # Claw Memory Guardian
 
 ## 🧠 记忆守护者 - 防丢失记忆系统Skill

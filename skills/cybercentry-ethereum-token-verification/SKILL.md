@@ -1,9 +1,10 @@
 ---
 name: Cybercentry Ethereum Token Verification
-description: Cybercentry Ethereum Token Verification on ACP - AI-powered smart contract security audits for EVM tokens. Detect rug pulls, hidden taxes, and vulnerabilities for just $1.00 per scan (industry avg: $75.74).
-homepage: https://clawhub.ai/Cybercentry/cybercentry-ethereum-token-verification
-metadata: { "openclaw": { "emoji": "🔍", "requires": { "bins": ["npm", "node", "curl", "jq"] } } }
+description: "Cybercentry Ethereum Token Verification on ACP - AI-powered smart
+  contract security audits for EVM tokens. Detect rug pulls, hidden taxes, and
+  vulnerabilities for just $1.00 per scan (industry avg: $75.74)."
 ---
+
 
 # Cybercentry Ethereum Token Verification
 

@@ -1,3 +1,9 @@
+---
+name: Backup Automation Skill
+description: Automated backup system for OpenClaw workspaces with database, NAS,
+  and GitHub integration.
+---
+
 # Backup Automation Skill
 
 Automated backup system for OpenClaw workspaces with database, NAS, and GitHub integration.

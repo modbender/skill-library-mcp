@@ -1,7 +1,10 @@
 ---
 name: deterministic-controller
-description: Deterministic, evidence-gated controller templates for OpenClaw (HEARTBEAT/ACTIVITIES + sprint template + poll cron payload). Docs-only: installs no services and makes no config changes by itself.
+description: "Deterministic, evidence-gated controller templates for OpenClaw
+  (HEARTBEAT/ACTIVITIES + sprint template + poll cron payload). Docs-only:
+  installs no services and makes no config changes by itself."
 ---
+
 
 # Deterministic Controller for OpenClaw (Docs-only)
 

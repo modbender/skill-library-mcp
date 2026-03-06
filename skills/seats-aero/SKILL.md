@@ -1,7 +1,10 @@
 ---
 name: seats-aero
-description: Search award flight availability via seats.aero API. Triggers on: award flights, mileage bookings, points redemptions, finding business/first class availability, route availability searches.
+description: "Search award flight availability via seats.aero API. Triggers on:
+  award flights, mileage bookings, points redemptions, finding business/first
+  class availability, route availability searches."
 ---
+
 
 # Seats.aero Award Flight Search
 

@@ -1,3 +1,8 @@
+---
+name: book-reader
+description: Read books (epub, pdf, txt) from various sources with progress tracking.
+---
+
 # book-reader
 
 Read books (epub, pdf, txt) from various sources with progress tracking.

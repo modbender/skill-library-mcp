@@ -1,3 +1,8 @@
+---
+name: Cash Flow Forecast
+description: Build a 13-week rolling cash flow forecast from your actual numbers.
+---
+
 # Cash Flow Forecast
 
 Build a 13-week rolling cash flow forecast from your actual numbers.

@@ -1,3 +1,9 @@
+---
+name: DevLog Skill 🦞
+description: A standardized journaling skill for OpenClaw agents to track
+  progress, tasks, and project status using dev-log-cli.
+---
+
 # DevLog Skill 🦞
 
 A standardized journaling skill for OpenClaw agents to track progress, tasks, and project status using `dev-log-cli`.

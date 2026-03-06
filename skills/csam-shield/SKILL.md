@@ -1,3 +1,9 @@
+---
+name: CSAM Shield
+description: "This skill handles the most serious form of online abuse.
+  Implementation requires:"
+---
+
 # CSAM Shield
 
 ## Metadata

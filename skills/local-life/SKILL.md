@@ -1,3 +1,10 @@
+---
+name: local-life
+description: "name: local-life description: Fornece um dashboard visual com
+  informações locais em tempo real. Ative esta skill quando o usuário perguntar
+  sobre o clima, temperatura, cotação de moedas, ou pedir u..."
+---
+
 name: local-life
 description: Fornece um dashboard visual com informações locais em tempo real. Ative esta skill quando o usuário perguntar sobre o clima, temperatura, cotação de moedas, ou pedir um resumo geral do dia para uma cidade específica. Gatilhos comuns incluem: "como está o dia em Goiânia?", "resumo do dia", "status local", "local-life", "qual a previsão do tempo para hoje?".
 

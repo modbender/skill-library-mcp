@@ -1,3 +1,8 @@
+---
+name: FileWave UEM API Skill
+description: Query and manage FileWave UEM device inventory via REST API.
+---
+
 # FileWave UEM API Skill
 
 Query and manage FileWave UEM device inventory via REST API.

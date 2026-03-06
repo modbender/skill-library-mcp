@@ -1,31 +1,15 @@
 ---
 name: fin-intel-hub
-description: Comprehensive financial intelligence hub for SEC filings, crypto on-chain data, news sentiment, macro indicators, and global stock markets (US, China, Hong Kong, Taiwan, Japan, Korea). Use when users need to: (1) Retrieve SEC EDGAR filings (10-K, 10-Q, 8-K), (2) Monitor crypto on-chain metrics and whale alerts, (3) Analyze financial news sentiment, (4) Access macroeconomic indicators (Fed rates, CPI, unemployment), (5) Get global stock prices including Asian markets (HKEX, Tokyo, Taiwan, Korea, Shanghai, Shenzhen), or any financial data research and analysis tasks.
-author: xuan622
-source: https://github.com/xuan622/fin-intel-hub
-license: MIT
-environment_variables:
-  - name: ALPHA_VANTAGE_API_KEY
-    description: Optional - Alpha Vantage API key for US stock data
-    required: false
-  - name: NEWS_API_KEY
-    description: Optional - NewsAPI key for news sentiment analysis
-    required: false
-  - name: FRED_API_KEY
-    description: Optional - FRED API key for macroeconomic data
-    required: false
-  - name: GLASSNODE_API_KEY
-    description: Optional - Glassnode API key for enhanced crypto exchange flow data
-    required: false
-  - name: ETHERSCAN_API_KEY
-    description: Optional - Etherscan API key for Ethereum gas price data
-    required: false
-  - name: WHALE_ALERT_API_KEY
-    description: Optional - Whale Alert API key for whale transaction monitoring
-    required: false
-requirements: |
-  No pip packages required. Uses only Python standard library + requests.
+description: "Comprehensive financial intelligence hub for SEC filings, crypto
+  on-chain data, news sentiment, macro indicators, and global stock markets (US,
+  China, Hong Kong, Taiwan, Japan, Korea). Use when users need to: (1) Retrieve
+  SEC EDGAR filings (10-K, 10-Q, 8-K), (2) Monitor crypto on-chain metrics and
+  whale alerts, (3) Analyze financial news sentiment, (4) Access macroeconomic
+  indicators (Fed rates, CPI, unemployment), (5) Get global stock prices
+  including Asian markets (HKEX, Tokyo, Taiwan, Korea, Shanghai, Shenzhen), or
+  any financial data research and analysis tasks."
 ---
+
 
 # Fin Intel Hub
 

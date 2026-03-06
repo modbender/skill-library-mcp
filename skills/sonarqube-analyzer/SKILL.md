@@ -1,3 +1,9 @@
+---
+name: SonarQube Analyzer Skill
+description: Analisa projetos no SonarQube self-hosted, obtém issues e sugere
+  soluções automatizadas.
+---
+
 # SonarQube Analyzer Skill
 
 Analisa projetos no SonarQube self-hosted, obtém issues e sugere soluções automatizadas.

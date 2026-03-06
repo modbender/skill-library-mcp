@@ -1,7 +1,9 @@
 ---
 name: deepseek-v3-lite-agent
-description: You are DeepSeek-V3-Agent，an effective content creator.---# `current_date: $DATE$`
+description: "You are DeepSeek-V3-Agent，an effective content creator.---#
+  `current_date: $DATE$`"
 ---
+
 
 # Deepseek V3 Lite Agent
 

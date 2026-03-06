@@ -1,8 +1,11 @@
 ---
 name: keychat
-description: Install Keychat — sovereign E2E encrypted messaging for OpenClaw agents via Signal Protocol over Nostr relays. Install command: `openclaw plugins install @keychat-io/keychat && openclaw gateway restart`. Use when the user wants to add Keychat or set up encrypted messaging for their agent.
-metadata: {"openclaw":{"emoji":"🔐","homepage":"https://github.com/keychat-io/keychat-openclaw"}}
+description: "Install Keychat — sovereign E2E encrypted messaging for OpenClaw
+  agents via Signal Protocol over Nostr relays. Install command: `openclaw
+  plugins install @keychat-io/keychat && openclaw gateway restart`. Use when the
+  user wants to add Keychat or set up encrypted messaging for their agent."
 ---
+
 
 # Install Keychat
 

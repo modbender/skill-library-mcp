@@ -1,3 +1,10 @@
+---
+name: Tech Debt Tracker
+description: Tech debt is one of the most insidious challenges in software
+  development - it compounds over time, slowing down development velocity,
+  increasing maintenance costs, and reducing code quality. This ...
+---
+
 # Tech Debt Tracker
 
 **Tier**: POWERFUL 🔥  

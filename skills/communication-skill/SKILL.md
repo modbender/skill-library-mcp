@@ -1,7 +1,10 @@
 ---
 name: communication
-description: |
-  Deep Listening & Response Crafting - Transform Claude into a thoughtful communicator who synthesizes context across conversations, connected apps, and user notes to draft contextually intelligent responses.
+description: Deep Listening & Response Crafting - Transform Claude into a
+  thoughtful communicator who synthesizes context across conversations,
+  connected apps, and user notes to draft contextually intelligent responses.
+---
+
 
     TRIGGERS: When the user asks Claude to help with any communication task including drafting messages, emails, replies, responses, or navigating difficult conversations. Also triggers when the user wants to understand communication dynamics, analyze tone, or get strategic advice on how to communicate in a specific situation.
 

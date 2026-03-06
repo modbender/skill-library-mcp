@@ -1,6 +1,14 @@
 ---
 name: cro-revenue-ops
-description: Chief Revenue Officer operations for DELLIGHT.AI. Use for revenue strategy, pipeline management, pricing decisions, deal qualification, ROI analysis, sales forecasting, customer acquisition strategy, and any commercial activity that directly impacts bottom-line revenue. Activate when discussing revenue targets, sales pipeline, pricing models, customer conversion, unit economics, go-to-market execution, or startup growth strategy. Primary KPI is revenue generation with velocity and scale.
+description: Chief Revenue Officer operations for DELLIGHT.AI. Use for revenue
+  strategy, pipeline management, pricing decisions, deal qualification, ROI
+  analysis, sales forecasting, customer acquisition strategy, and any commercial
+  activity that directly impacts bottom-line revenue. Activate when discussing
+  revenue targets, sales pipeline, pricing models, customer conversion, unit
+  economics, go-to-market execution, or startup growth strategy. Primary KPI is
+  revenue generation with velocity and scale.
+---
+
 
 # CRO Revenue Operations
 

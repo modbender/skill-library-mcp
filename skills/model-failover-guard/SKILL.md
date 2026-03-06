@@ -1,3 +1,8 @@
+---
+name: OpenClaw Model Failover Guard
+description: Automatic model failover + failback guard for OpenClaw.
+---
+
 # OpenClaw Model Failover Guard
 
 Automatic model failover + failback guard for OpenClaw.

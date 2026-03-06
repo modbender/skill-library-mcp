@@ -1,3 +1,8 @@
+---
+name: Parental Controls Skills
+description: Skills for parent/guardian management and monitoring.
+---
+
 # Parental Controls Skills
 
 Skills for parent/guardian management and monitoring.

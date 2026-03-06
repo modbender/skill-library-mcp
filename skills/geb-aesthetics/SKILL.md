@@ -1,3 +1,9 @@
+---
+name: GEB Aesthetics Skill Specification
+description: "Any formal system powerful enough to describe itself contains
+  truths that cannot be proven within the system. For creative AI:"
+---
+
 # GEB Aesthetics Skill Specification
 ## Multi-Modal Creative Intelligence System
 

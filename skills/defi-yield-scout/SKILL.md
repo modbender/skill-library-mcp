@@ -1,10 +1,18 @@
 ---
 name: defi-yield-scout
-description: Scan and compare DeFi yield farming opportunities for USDC stablecoins across Base and Arbitrum chains. Find the best APY rates, compare vault yields, and analyze historical performance using DeFiLlama data. Covers protocols used by n0ir autonomous yield agent: Morpho, Euler v2, Aave v3, Compound v3, Moonwell, Silo v2, Lazy Summer, Harvest Finance, 40 Acres, Wasabi, Yo Protocol. Use for yield farming comparison, stablecoin returns, USDC rates, vault APY ranking, breakeven analysis between vaults, APY trend history, protocol risk overview, DeFi yield optimization, best stablecoin yields on Base, best USDC yields on Arbitrum, n0ir vault strategy, ERC-4626 vault comparison, yield aggregator analysis, TVL-weighted yield ranking, cross-chain yield comparison, gas-adjusted net returns.
-allowed-tools: Read, Bash, Glob
-user-invocable: true
-argument-hint: "[scan|breakeven|history|protocols] [options]"
+description: "Scan and compare DeFi yield farming opportunities for USDC
+  stablecoins across Base and Arbitrum chains. Find the best APY rates, compare
+  vault yields, and analyze historical performance using DeFiLlama data. Covers
+  protocols used by n0ir autonomous yield agent: Morpho, Euler v2, Aave v3,
+  Compound v3, Moonwell, Silo v2, Lazy Summer, Harvest Finance, 40 Acres,
+  Wasabi, Yo Protocol. Use for yield farming comparison, stablecoin returns,
+  USDC rates, vault APY ranking, breakeven analysis between vaults, APY trend
+  history, protocol risk overview, DeFi yield optimization, best stablecoin
+  yields on Base, best USDC yields on Arbitrum, n0ir vault strategy, ERC-4626
+  vault comparison, yield aggregator analysis, TVL-weighted yield ranking,
+  cross-chain yield comparison, gas-adjusted net returns."
 ---
+
 
 # DeFi Yield Scout — Agent Instructions
 

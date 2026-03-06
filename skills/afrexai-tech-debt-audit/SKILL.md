@@ -1,3 +1,10 @@
+---
+name: Technical Debt Audit
+description: Systematic technical debt assessment for engineering teams.
+  Identifies, scores, and prioritizes debt across your codebase with business
+  impact analysis and remediation roadmaps.
+---
+
 # Technical Debt Audit
 
 Systematic technical debt assessment for engineering teams. Identifies, scores, and prioritizes debt across your codebase with business impact analysis and remediation roadmaps.

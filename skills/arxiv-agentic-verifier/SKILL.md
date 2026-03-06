@@ -1,3 +1,10 @@
+---
+name: ArXiv Agentic Verifier
+description: This skill implements an "Agentic Verifier" that actively reasons
+  about code correctness by generating targeted, "discriminative" test cases.
+  Instead of random sampling, it analyzes the problem con...
+---
+
 # ArXiv Agentic Verifier
 
 **Source Paper:** [Scaling Agentic Verifier for Competitive Coding](https://arxiv.org/abs/2602.09012) (ID: 4a4c4dae6a5145ebc4d62eb2d64b0f0f)

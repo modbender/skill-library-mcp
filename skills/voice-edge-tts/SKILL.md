@@ -1,3 +1,9 @@
+---
+name: Voice Skill (Edge TTS)
+description: Text-to-speech skill using Microsoft Edge TTS engine with real-time
+  streaming playback support.
+---
+
 # Voice Skill (Edge TTS)
 
 Text-to-speech skill using Microsoft Edge TTS engine with real-time streaming playback support.

@@ -1,3 +1,8 @@
+---
+name: Package SEO Skill
+description: "Use this skill when:"
+---
+
 # Package SEO Skill
 
 > SEO best practices for npm packages, GitHub repos, and AI agent skills. Maximize discoverability.

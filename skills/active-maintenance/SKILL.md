@@ -1,3 +1,9 @@
+---
+name: Active Maintenance Skill
+description: Inspired by the ClawIntelligentMemory project, this skill ensures
+  Kim Assistant's environment stays clean and its memory stays dense.
+---
+
 # Active Maintenance Skill
 
 **Automated system health and memory metabolism for OpenClaw.**

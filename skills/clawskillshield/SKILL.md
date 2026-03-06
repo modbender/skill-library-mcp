@@ -1,3 +1,8 @@
+---
+name: ClawSkillShield 🛡️
+description: Pure Python. No network calls. Runs entirely locally.
+---
+
 # ClawSkillShield 🛡️
 
 **Local-first security scanner for OpenClaw/ClawHub skills.**

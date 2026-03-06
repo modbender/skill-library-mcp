@@ -1,3 +1,9 @@
+---
+name: openclaw-spacesuit
+description: "The Spacesuit is a batteries-included framework layer for OpenClaw
+  workspaces. It provides:"
+---
+
 # openclaw-spacesuit
 
 **A framework scaffold for OpenClaw workspaces.**

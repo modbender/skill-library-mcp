@@ -1,3 +1,10 @@
+---
+name: Data Engineering Command Center
+description: Complete methodology for designing, building, operating, and
+  scaling data pipelines and infrastructure. Zero dependencies — pure agent
+  skill.
+---
+
 # Data Engineering Command Center
 
 Complete methodology for designing, building, operating, and scaling data pipelines and infrastructure. Zero dependencies — pure agent skill.

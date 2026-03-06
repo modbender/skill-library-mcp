@@ -1,3 +1,9 @@
+---
+name: project-context-sync
+description: Keep a living project state document updated after each commit, so
+  any agent (or future session) can instantly understand where things stand.
+---
+
 # project-context-sync
 
 Keep a living project state document updated after each commit, so any agent (or future session) can instantly understand where things stand.

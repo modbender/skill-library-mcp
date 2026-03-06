@@ -1,3 +1,9 @@
+---
+name: Proposal Engine — Win More Deals
+description: "Turn discovery calls into winning proposals. Full lifecycle:
+  qualify → scope → price → write → present → close."
+---
+
 # Proposal Engine — Win More Deals
 
 Turn discovery calls into winning proposals. Full lifecycle: qualify → scope → price → write → present → close.

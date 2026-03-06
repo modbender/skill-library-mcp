@@ -1,3 +1,9 @@
+---
+name: taskboardai-skill
+description: <skill> <name>taskboard</name> <description> Manage tasks and
+  projects using the TaskBoardAI Kanban system.
+---
+
 <skill>
   <name>taskboard</name>
   <description>

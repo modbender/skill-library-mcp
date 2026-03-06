@@ -1,3 +1,9 @@
+---
+name: Speckit Swarm - Agent Orchestration System
+description: Native implementation of oh-my-opencode-style orchestration using
+  OpenClaw's tools.
+---
+
 # Speckit Swarm - Agent Orchestration System
 
 ## Overview

@@ -1,7 +1,19 @@
 ---
 name: amazon-product-search-api-skill
-description: This skill is designed to help users automatically extract product data from Amazon search results. The Agent should proactively apply this skill when users request: 1. Search for products related to [keyword]; 2. Find best-selling items from [brand]; 3. Monitor product prices and availability on Amazon; 4. Extract product listings for market research; 5. Collect product ratings and review counts for competitive analysis; 6. Find specific products with a maximum count of [number]; 7. Search Amazon in [language] for localized results; 8. Track monthly sales estimates for [brand] products; 9. Gather product URLs and titles for a product catalog; 10. Scan Amazon for "Best Seller" tags in a specific category; 11. Monitor shipping and delivery information for [brand] items; 12. Build a structured dataset of Amazon search results.
+description: 'This skill is designed to help users automatically extract product
+  data from Amazon search results. The Agent should proactively apply this skill
+  when users request: 1. Search for products related to [keyword]; 2. Find
+  best-selling items from [brand]; 3. Monitor product prices and availability on
+  Amazon; 4. Extract product listings for market research; 5. Collect product
+  ratings and review counts for competitive analysis; 6. Find specific products
+  with a maximum count of [number]; 7. Search Amazon in [language] for localized
+  results; 8. Track monthly sales estimates for [brand] products; 9. Gather
+  product URLs and titles for a product catalog; 10. Scan Amazon for "Best
+  Seller" tags in a specific category; 11. Monitor shipping and delivery
+  information for [brand] items; 12. Build a structured dataset of Amazon search
+  results.'
 ---
+
 
 # Amazon Product Search Automation Skill
 

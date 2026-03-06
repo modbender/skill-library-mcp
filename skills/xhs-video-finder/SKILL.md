@@ -1,3 +1,10 @@
+---
+name: xhs-video-finder
+description: Find fresh, viral videos on Xiaohongshu (小红书 / RedNote) for
+  repurposing to YouTube Shorts or other platforms. Uses browser automation to
+  search, filter by type and publish date, and extract video U...
+---
+
 # xhs-video-finder
 
 Find fresh, viral videos on Xiaohongshu (小红书 / RedNote) for repurposing to YouTube Shorts or other platforms. Uses browser automation to search, filter by type and publish date, and extract video URLs.

@@ -1,3 +1,9 @@
+---
+name: shellphone-gateway
+description: Private WebSocket gateway for connecting iOS to your AI agents. No
+  Telegram. No Discord. No middleman.
+---
+
 # shellphone-gateway
 
 Private WebSocket gateway for connecting iOS to your AI agents. No Telegram. No Discord. No middleman.

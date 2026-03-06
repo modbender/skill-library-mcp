@@ -1,3 +1,8 @@
+---
+name: Job Execution Monitor
+description: Monitor scheduled jobs (cron) and alert when they fail or miss their schedule.
+---
+
 # Job Execution Monitor
 
 Monitor scheduled jobs (cron) and alert when they fail or miss their schedule.

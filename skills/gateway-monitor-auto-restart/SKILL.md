@@ -1,3 +1,10 @@
+---
+name: Gateway Monitor Auto-Restart Skill
+description: Automatically monitors the OpenClaw gateway status and restarts it
+  if it becomes unresponsive. Features 3-hour checks, smart restart logic, issue
+  diagnosis, and 7-day log rotation.
+---
+
 # Gateway Monitor Auto-Restart Skill
 
 Automatically monitors the OpenClaw gateway status and restarts it if it becomes unresponsive. Features 3-hour checks, smart restart logic, issue diagnosis, and 7-day log rotation.

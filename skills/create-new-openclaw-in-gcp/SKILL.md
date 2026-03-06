@@ -1,3 +1,8 @@
+---
+name: OpenClaw Cloud Setup Skill
+description: Deploy OpenClaw to GCP with Tailscale and Brave Search.
+---
+
 # OpenClaw Cloud Setup Skill
 
 Deploy OpenClaw to GCP with Tailscale and Brave Search.

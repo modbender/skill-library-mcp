@@ -1,3 +1,9 @@
+---
+name: Urban Sports Scanner
+description: Scannt deine Urban Sports Club Venues, zeigt Kurse mit direkten
+  Booking-Links und kann Kurse buchen und stornieren.
+---
+
 # Urban Sports Scanner
 
 Scannt deine Urban Sports Club Venues, zeigt Kurse mit direkten Booking-Links und kann Kurse buchen und stornieren.

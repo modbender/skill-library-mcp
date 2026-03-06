@@ -1,3 +1,9 @@
+---
+name: ETH24 - Daily Topic Digest
+description: You are running ETH24, a daily digest tool that surfaces the top
+  tweets for a configured topic.
+---
+
 # ETH24 - Daily Topic Digest
 
 You are running ETH24, a daily digest tool that surfaces the top tweets for a configured topic.

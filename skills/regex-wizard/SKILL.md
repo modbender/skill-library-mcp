@@ -1,6 +1,9 @@
 ---
-description: Generate, test, and explain regular expressions from natural language descriptions.
+name: regex-wizard
+description: Generate, test, and explain regular expressions from natural
+  language descriptions.
 ---
+
 
 # Regex Wizard
 

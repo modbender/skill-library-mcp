@@ -1,6 +1,9 @@
 ---
-description: Generate GitHub profile READMEs with stats badges, language charts, and contribution streaks.
+name: github-profile-readme
+description: Generate GitHub profile READMEs with stats badges, language charts,
+  and contribution streaks.
 ---
+
 
 # GitHub Profile README Generator
 

@@ -1,3 +1,10 @@
+---
+name: Disk Usage Watcher
+description: Monitors disk space and inode usage on specified paths, sending
+  alerts when thresholds are exceeded. Essential for preventing disk-full
+  incidents.
+---
+
 # Disk Usage Watcher
 
 ## Description

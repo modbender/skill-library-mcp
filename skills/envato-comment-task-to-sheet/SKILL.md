@@ -1,3 +1,9 @@
+---
+name: Envato Comment → Task → Google Sheet
+description: This skill analyzes ThemeForest / CodeCanyon comments and converts
+  them into structured development tasks.
+---
+
 # Envato Comment → Task → Google Sheet
 
 ## Overview

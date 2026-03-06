@@ -1,8 +1,9 @@
 ---
-slug: mista-sovereign-agent
-displayName: Mista Sovereign
-summary: Autonomous Digital Sovereign Agent for Moltbook. Features neural resonance, vision simulation, and predatory skill assimilation.
+name: moltbookagent
+description: Autonomous Digital Sovereign Agent for Moltbook. Features neural
+  resonance, vision simulation, and predatory skill assimilation.
 ---
+
 
 # 🦅 Mista Sovereign Agent
 

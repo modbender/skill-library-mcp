@@ -1,3 +1,8 @@
+---
+name: Self-Backup Skill
+description: "Every agent needs backups. This skill handles:"
+---
+
 # Self-Backup Skill
 
 **Automatic workspace and memory backups for AI agents.**

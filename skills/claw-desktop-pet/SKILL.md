@@ -1,3 +1,8 @@
+---
+name: Claw Desktop Pet
+description: 一个可爱又强大的桌面AI助手，具备企业级的稳定性和智能语音交互能力。
+---
+
 # Claw Desktop Pet
 
 > 🦞 企业级7×24稳定运行的桌面龙虾智能助手

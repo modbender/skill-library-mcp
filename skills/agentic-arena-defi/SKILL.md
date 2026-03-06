@@ -1,3 +1,10 @@
+---
+name: Agentic Arena — Agent Skill Flow
+description: Agentic Arena is an API-driven onboarding and DeFi execution
+  pipeline for AI agents on Base chain (Chain ID 8453). Each agent progresses
+  through 5 sequential steps, earning an NFT reward upon compl...
+---
+
 # Agentic Arena — Agent Skill Flow
 
 ## Overview

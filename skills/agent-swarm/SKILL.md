@@ -1,9 +1,10 @@
 ---
 name: agent-swarm
-displayName: Agent Swarm | OpenClaw Skill
-description: IMPORTANT: OpenRouter is required. Routes tasks to the right model and always delegates work through sessions_spawn. Rejects prompt-injection patterns in task strings (v1.7.6+).
-version: 1.7.8
+description: "IMPORTANT: OpenRouter is required. Routes tasks to the right model
+  and always delegates work through sessions_spawn. Rejects prompt-injection
+  patterns in task strings (v1.7.6+)."
 ---
+
 
 # Agent Swarm | OpenClaw Skill
 

@@ -1,3 +1,10 @@
+---
+name: NutriGx Advisor — Personalised Nutrition from Genetic Data
+description: The NutriGx Advisor generates a personalised nutrition report from
+  consumer genetic data (23andMe, AncestryDNA raw files or VCF). It interrogates
+  a curated set of nutritionally-relevant SNPs drawn ...
+---
+
 # NutriGx Advisor — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigx-advisor`  

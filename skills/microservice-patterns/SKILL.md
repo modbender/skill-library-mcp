@@ -1,7 +1,10 @@
 ---
 name: microservices-patterns
-model: reasoning
+description: 'Patterns for building distributed systems: service decomposition,
+  inter-service communication, data management, and resilience. Helps you avoid
+  the "distributed monolith" anti-pattern.'
 ---
+
 
 # Microservices Patterns
 

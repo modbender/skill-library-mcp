@@ -1,3 +1,10 @@
+---
+name: SKILL.md 元数据格式示例
+description: "name: openclaw-deploy description: Build and deploy OpenClaw as
+  Docker images or portable packages author: zfanmy-梦月儿 version: 1.0.1 homepage:
+  license: MIT keywords:"
+---
+
 # SKILL.md 元数据格式示例
 
 ---

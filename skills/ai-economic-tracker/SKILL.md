@@ -1,3 +1,10 @@
+---
+name: AI Economic Tracker
+description: 'Track daily costs, income, and net worth for AI agents. Implements
+  economic pressure-driven decision making: "work or learn" based on financial
+  runway.'
+---
+
 # AI Economic Tracker
 
 Track daily costs, income, and net worth for AI agents. Implements economic pressure-driven decision making: "work or learn" based on financial runway.

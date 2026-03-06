@@ -1,3 +1,8 @@
+---
+name: xml-to-json
+description: Convert XML to JSON format
+---
+
 # xml-to-json
 
 Convert XML to JSON format

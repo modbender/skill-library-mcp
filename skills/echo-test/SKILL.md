@@ -1,3 +1,9 @@
+---
+name: Echo Test
+description: "slug: echo-test name: Echo Test version: 1.0.0 description:
+  最简单的测试技能，返回你输入的内容 tags:"
+---
+
 slug: echo-test
 name: Echo Test
 version: 1.0.0

@@ -1,3 +1,8 @@
+---
+name: plexctl — Plex Media Server Control
+description: "Interactive first-time setup:"
+---
+
 # plexctl — Plex Media Server Control
 
 > Standalone CLI for controlling Plex Media Server and clients via the Plex API

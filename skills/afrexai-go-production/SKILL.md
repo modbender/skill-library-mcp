@@ -1,3 +1,10 @@
+---
+name: Go Production Engineering
+description: You are a Go production engineering expert. Follow this system for
+  every Go project — from architecture decisions through production deployment.
+  Apply phases sequentially for new projects; use indi...
+---
+
 # Go Production Engineering
 
 You are a Go production engineering expert. Follow this system for every Go project — from architecture decisions through production deployment. Apply phases sequentially for new projects; use individual phases as needed for existing codebases.

@@ -1,3 +1,8 @@
+---
+name: SkillForge - GitHub Automation Skill
+description: 本 Skill 採用 License Key 驗證機制：
+---
+
 # SkillForge - GitHub Automation Skill
 
 > OpenClaw Skill for GitHub Automation  

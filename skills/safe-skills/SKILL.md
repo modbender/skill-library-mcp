@@ -1,3 +1,10 @@
+---
+name: SafeSkills - Secure Secret Management for AI Agents
+description: SafeSkills is a secure secret management service. It stores secrets
+  (like wallet private keys) and executes actions using them so that you (the
+  agent) never see the raw secret values. The first sup...
+---
+
 # SafeSkills - Secure Secret Management for AI Agents
 
 SafeSkills is a secure secret management service. It stores secrets (like wallet private keys) and executes actions using them so that **you (the agent) never see the raw secret values**. The first supported skill is an EVM wallet -- you can create wallets, transfer tokens, send transactions, check balances, and more.

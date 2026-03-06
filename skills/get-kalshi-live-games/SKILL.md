@@ -1,3 +1,8 @@
+---
+name: "Skill: Get Kalshi Live Games"
+description: Fetch currently live Kalshi sports markets using the browser.
+---
+
 # Skill: Get Kalshi Live Games
 
 ## Purpose

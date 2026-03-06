@@ -1,3 +1,10 @@
+---
+name: Automated Content Generation Pipeline Skill
+description: "This skill builds a fully automated content factory that runs
+  24/7: 1. Apify scrapes the most viral content across TikTok, Instagram,
+  YouTube, and Reddit 2. Claude (OpenClaw) extracts the hooks, re..."
+---
+
 # Automated Content Generation Pipeline Skill
 
 ## Overview

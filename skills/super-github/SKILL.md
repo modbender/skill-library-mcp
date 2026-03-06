@@ -1,3 +1,9 @@
+---
+name: Super GitHub
+description: Complete GitHub management - issues, PRs, releases, automation -
+  all in one skill.
+---
+
 # Super GitHub
 
 **The ultimate GitHub automation framework.** Combines the best of GitHub skills for issues, PRs, releases, and more.

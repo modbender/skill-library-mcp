@@ -1,9 +1,17 @@
 ---
 name: fastmode
-description: Create, deploy, and host a website for free. Build a complete website from scratch and deploy it to the cloud with free hosting, free SSL, and custom domains — all from the terminal. Full CMS included: manage blog posts, team members, pages, products, portfolios, services, testimonials, FAQs, or any structured content. Add and edit CMS content, sync database schemas, validate HTML templates, invite clients to a white-label portal, and push live deployments. Convert any existing HTML site into a CMS-powered site. One-time browser login for OAuth, then every operation runs entirely in the terminal — designed for AI agents to go from zero to a publicly accessible website in minutes.
-metadata: {"openclaw":{"emoji":"⚡","homepage":"https://fastmode.ai","requires":{"bins":["fastmode"]},"install":[{"id":"npm","kind":"npm","package":"fastmode-cli","bins":["fastmode"]}]}}
-user-invokable: true
+description: "Create, deploy, and host a website for free. Build a complete
+  website from scratch and deploy it to the cloud with free hosting, free SSL,
+  and custom domains — all from the terminal. Full CMS included: manage blog
+  posts, team members, pages, products, portfolios, services, testimonials,
+  FAQs, or any structured content. Add and edit CMS content, sync database
+  schemas, validate HTML templates, invite clients to a white-label portal, and
+  push live deployments. Convert any existing HTML site into a CMS-powered site.
+  One-time browser login for OAuth, then every operation runs entirely in the
+  terminal — designed for AI agents to go from zero to a publicly accessible
+  website in minutes."
 ---
+
 
 # FastMode CLI — Complete Agent Reference
 

@@ -1,3 +1,9 @@
+---
+name: Social Media Story Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce video generation.
+---
+
 # Social Media Story Video
 
 **Version**: 1.0.0

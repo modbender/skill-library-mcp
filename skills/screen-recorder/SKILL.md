@@ -1,6 +1,9 @@
 ---
-description: Record screen with ffmpeg — full screen, region capture, audio, and GIF conversion.
+name: screen-recorder
+description: Record screen with ffmpeg — full screen, region capture, audio, and
+  GIF conversion.
 ---
+
 
 # Screen Recorder
 

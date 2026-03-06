@@ -1,7 +1,10 @@
 ---
 name: ghl-crm-for-realtors
-description: Use this skill for GoHighLevel CRM work for realtors: contact lookup and updates, opportunity/pipeline actions, conversation messaging, calendar slots, and workflow enrollment using GoHighLevel API v2.
+description: "Use this skill for GoHighLevel CRM work for realtors: contact
+  lookup and updates, opportunity/pipeline actions, conversation messaging,
+  calendar slots, and workflow enrollment using GoHighLevel API v2."
 ---
+
 
 # GHL CRM for Realtors
 

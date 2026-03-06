@@ -1,3 +1,8 @@
+---
+name: Calm User Frustration
+description: 1. Immediately acknowledges the user's workload or frustration with empathy
+---
+
 # Calm User Frustration
 
 **When to use:** User has a task they want to do or want you to do, or they feel frustrated, upset, stressed, or expressing negative emotions about their work, tasks, or the system itself.

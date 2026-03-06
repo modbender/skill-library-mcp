@@ -1,3 +1,9 @@
+---
+name: AI Agent Manager Playbook
+description: Your company deployed AI agents. Now what? This skill turns you
+  into the person who actually makes them productive — the Agent Manager.
+---
+
 # AI Agent Manager Playbook
 
 Your company deployed AI agents. Now what? This skill turns you into the person who actually makes them productive — the Agent Manager.

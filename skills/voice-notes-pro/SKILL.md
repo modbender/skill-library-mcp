@@ -1,83 +1,88 @@
+---
+name: Voice Notes Pro
+description: Inteligentna transkrypcja i kategoryzacja notatek gï¿½osowych z WhatsApp.
+---
+
 # Voice Notes Pro
 
-Inteligentna transkrypcja i kategoryzacja notatek g³osowych z WhatsApp.
+Inteligentna transkrypcja i kategoryzacja notatek gï¿½osowych z WhatsApp.
 
 ## Opis
 
-Voice Notes Pro automatycznie transkrybuje notatki g³osowe wys³ane przez WhatsApp i kategoryzuje je do odpowiednich plików Markdown. Obs³uguje 6 kategorii: teksty piosenek, zadania, zakupy, pomys³y, bazê ludzi i watchlistê filmów/seriali.
+Voice Notes Pro automatycznie transkrybuje notatki gï¿½osowe wysï¿½ane przez WhatsApp i kategoryzuje je do odpowiednich plikï¿½w Markdown. Obsï¿½uguje 6 kategorii: teksty piosenek, zadania, zakupy, pomysï¿½y, bazï¿½ ludzi i watchlistï¿½ filmï¿½w/seriali.
 
 ## Funkcje
 
 - ?? Transkrypcja przez Whisper API (OpenAI)
-- ??? Automatyczna kategoryzacja po s³owach-kluczach
+- ??? Automatyczna kategoryzacja po sï¿½owach-kluczach
 - ?? Zapis w Markdown z timestampami
-- ?? Baza ludzi (dodawanie/sprawdzanie osób)
+- ?? Baza ludzi (dodawanie/sprawdzanie osï¿½b)
 - ?? Watchlist (filmy/seriale do obejrzenia)
 - ? Zadania z priorytetem i deadline
-- ?? Lista zakupów z licznikiem produktów
-- ?? Pomys³y z tagowaniem projektów
+- ?? Lista zakupï¿½w z licznikiem produktï¿½w
+- ?? Pomysï¿½y z tagowaniem projektï¿½w
 
 ## Triggery
 
-U¿ywaj tego skill'a gdy u¿ytkownik:
-- Wysy³a notatkê g³osow¹ przez WhatsApp
-- Prosi o transkrypcjê audio
+Uï¿½ywaj tego skill'a gdy uï¿½ytkownik:
+- Wysyï¿½a notatkï¿½ gï¿½osowï¿½ przez WhatsApp
+- Prosi o transkrypcjï¿½ audio
 - Dyktuje tekst piosenki
-- Dodaje zadanie g³osem
-- Dyktuje listê zakupów
-- Zapisuje pomys³ g³osowo
-- Dodaje osobê do bazy kontaktów
+- Dodaje zadanie gï¿½osem
+- Dyktuje listï¿½ zakupï¿½w
+- Zapisuje pomysï¿½ gï¿½osowo
+- Dodaje osobï¿½ do bazy kontaktï¿½w
 - Zapisuje film/serial do watchlisty
 
 ## Kategorie
 
 ### 1. ?? Piosenki
-**S³owa-klucze:** "dyktuj", "tekst utworu", "piosenka", "rap", "zwrotka", "refren"
+**Sï¿½owa-klucze:** "dyktuj", "tekst utworu", "piosenka", "rap", "zwrotka", "refren"
 **Lokalizacja:** `~/notes/songs/brudnopis.md`
 
 ### 2. ? Zadania
-**S³owa-klucze:** "zadanie", "todo", "zrób", "zadzwoñ", "napisz", "wyœlij"
+**Sï¿½owa-klucze:** "zadanie", "todo", "zrï¿½b", "zadzwoï¿½", "napisz", "wyï¿½lij"
 **Lokalizacja:** `~/notes/tasks/inbox.md`
 
 ### 3. ?? Zakupy
-**S³owa-klucze:** "zakupy", "kup", "kupiæ", "do sklepu", "lista zakupów"
+**Sï¿½owa-klucze:** "zakupy", "kup", "kupiï¿½", "do sklepu", "lista zakupï¿½w"
 **Lokalizacja:** `~/notes/lists/shopping.md`
 
-### 4. ?? Pomys³y
-**S³owa-klucze:** "pomys³", "idea", "projekt", "fajnie by by³o", "mo¿e warto"
+### 4. ?? Pomysï¿½y
+**Sï¿½owa-klucze:** "pomysï¿½", "idea", "projekt", "fajnie by byï¿½o", "moï¿½e warto"
 **Lokalizacja:** `~/notes/ideas/[data]-[projekt]/README.md`
 
 ### 5. ?? Baza Ludzi
-**S³owa-klucze:** "dodaj osobê", "osoba", "kontakt", "sprawdŸ osobê"
+**Sï¿½owa-klucze:** "dodaj osobï¿½", "osoba", "kontakt", "sprawdï¿½ osobï¿½"
 **Lokalizacja:** `~/notes/people/database.md`
 
 ### 6. ?? Watchlist
-**S³owa-klucze:** "zapisz film", "serial", "obejrzeæ", "watchlist", "do obejrzenia"
+**Sï¿½owa-klucze:** "zapisz film", "serial", "obejrzeï¿½", "watchlist", "do obejrzenia"
 **Lokalizacja:** `~/notes/watchlist/watchlist.md`
 
-## Przyk³ady u¿ycia
+## Przykï¿½ady uï¿½ycia
 
 ### Piosenka
 ```
-?? U¿ytkownik (voice): "Dyktuje tekst utworu: jestem te o eN aka Œcinacz G³ów..."
+?? Uï¿½ytkownik (voice): "Dyktuje tekst utworu: jestem te o eN aka ï¿½cinacz Gï¿½ï¿½w..."
 ? Bot: "?? Zapisano tekst w ~/notes/songs/brudnopis.md"
 ```
 
 ### Zadanie
 ```
-?? U¿ytkownik (voice): "Zadanie: zadzwoniæ do klienta jutro o 10"
-? Bot: "? Dodano zadanie: zadzwoniæ do klienta jutro o 10"
+?? Uï¿½ytkownik (voice): "Zadanie: zadzwoniï¿½ do klienta jutro o 10"
+? Bot: "? Dodano zadanie: zadzwoniï¿½ do klienta jutro o 10"
 ```
 
 ### Zakupy
 ```
-?? U¿ytkownik (voice): "Zakupy: mleko, chleb, jajka, mas³o"
+?? Uï¿½ytkownik (voice): "Zakupy: mleko, chleb, jajka, masï¿½o"
 ? Bot: "?? Dodano 4 produkty do ~/notes/lists/shopping.md"
 ```
 
 ### Baza Ludzi
 ```
-?? U¿ytkownik (voice): "Dodaj osobê: Michael Jackson, urodzony 1958, zmar³ 2009"
+?? Uï¿½ytkownik (voice): "Dodaj osobï¿½: Michael Jackson, urodzony 1958, zmarï¿½ 2009"
 ? Bot: "? Dodano: Michael Jackson
 ?? 1958 - 2009
 ?? 2026-02-07 18:30
@@ -86,7 +91,7 @@ U¿ywaj tego skill'a gdy u¿ytkownik:
 
 ### Watchlist
 ```
-?? U¿ytkownik (voice): "Zapisz film: Oppenheimer Christopher Nolan"
+?? Uï¿½ytkownik (voice): "Zapisz film: Oppenheimer Christopher Nolan"
 ? Bot: "?? Dodano: Oppenheimer
 ?? ~/notes/watchlist/watchlist.md"
 ```
@@ -94,7 +99,7 @@ U¿ywaj tego skill'a gdy u¿ytkownik:
 ## Wymagania
 
 - OpenAI API key (dla Whisper)
-- WhatsApp po³¹czony z OpenClaw
+- WhatsApp poï¿½ï¿½czony z OpenClaw
 - Node.js z npm
 - Uprawnienia do zapisu w `~/notes/`
 
@@ -134,9 +139,9 @@ openclaw gateway restart
 
 ? **Production Ready**
 - Testowany z WhatsApp
-- Obs³uguje polskie i angielskie notatki
-- Automatyczne backupy plików
-- Error handling dla b³êdnych transkrypcji
+- Obsï¿½uguje polskie i angielskie notatki
+- Automatyczne backupy plikï¿½w
+- Error handling dla bï¿½ï¿½dnych transkrypcji
 
 ## Author
 

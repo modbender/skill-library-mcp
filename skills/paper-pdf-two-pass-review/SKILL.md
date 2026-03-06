@@ -1,3 +1,10 @@
+---
+name: CVPR PDF Two-Pass Review
+description: "name: cvpr-pdf-two-pass-review description: Analyze uploaded CVPR
+  paper PDFs with a strict two-pass workflow. First pass extracts verifiable
+  facts with page/section/figure/table evidence only. Seco..."
+---
+
 ﻿---
 name: cvpr-pdf-two-pass-review
 description: Analyze uploaded CVPR paper PDFs with a strict two-pass workflow. First pass extracts verifiable facts with page/section/figure/table evidence only. Second pass produces a 2000-3000 Chinese research critique grounded in those facts. Use when the user uploads a paper PDF and asks for deep interpretation, critical review, reproducibility assessment, or PhD-level reading notes.

@@ -1,3 +1,10 @@
+---
+name: seithar-intel — Threat Intelligence & Cognitive Security Feed
+description: A personal cyber threat intelligence and cognitive security analyst
+  for OpenClaw. Monitors RSS feeds for security news, vulnerability disclosures,
+  exploit drops, and influence operation reports. Sc...
+---
+
 # seithar-intel — Threat Intelligence & Cognitive Security Feed
 
 ## Seithar Group — Intelligence Division

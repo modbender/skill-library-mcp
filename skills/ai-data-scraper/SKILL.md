@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: 自动化数据抓取和清洗服务。
+---
+
 # SKILL.md
 
 # Data Scraping Service

@@ -1,3 +1,10 @@
+---
+name: Socialite Photography Guide (名媛拍照指南)
+description: Expert guidance for generating "Socialite Style" (名媛风) images using
+  AI art tools (Nano Banana Pro). Contains professional advice on lighting,
+  composition, poses, makeup, styling, and prompt enginee...
+---
+
 # Socialite Photography Guide (名媛拍照指南)
 
 ## Description

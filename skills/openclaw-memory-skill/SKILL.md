@@ -1,3 +1,8 @@
+---
+name: OpenClaw Memory — Agent Skill
+description: "Use OpenClaw Memory when:"
+---
+
 # OpenClaw Memory — Agent Skill
 
 **MongoDB-backed long-term memory with Voyage AI semantic search**

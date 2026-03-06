@@ -1,3 +1,8 @@
+---
+name: Causal Graph Auto-Builder — 因果图谱自动构建
+description: 从日志和记忆文件中自动提取事件、实体、因果关系，构建知识图谱。
+---
+
 # Causal Graph Auto-Builder — 因果图谱自动构建
 
 > 降低 Knowledge Graph 维护成本，自动发现事件因果关系

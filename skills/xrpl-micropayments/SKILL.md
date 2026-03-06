@@ -1,3 +1,10 @@
+---
+name: XRPL Micropayments
+description: "name: XRPL Micropayments description: Enable instant XRP
+  micropayments for AI skills and services author: xrplcontrolroom version:
+  1.0.0 tags: [payments, xrpl, crypto, micropayments]"
+---
+
 ﻿---
 name: XRPL Micropayments
 description: Enable instant XRP micropayments for AI skills and services

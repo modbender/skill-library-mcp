@@ -1,3 +1,9 @@
+---
+name: TokenWatch
+description: Free and open-source (MIT License) • Zero dependencies • Works
+  locally • No API keys required
+---
+
 # TokenWatch
 
 **Track, analyze, and optimize token usage and costs across AI providers. Set budgets, get alerts, compare models, and reduce your spend.**

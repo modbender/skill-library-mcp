@@ -1,3 +1,8 @@
+---
+name: ERC-8004 Identity Skill
+description: Deploy your agent's onchain identity on Avalanche using the ERC-8004 standard.
+---
+
 # ERC-8004 Identity Skill
 
 Deploy your agent's onchain identity on Avalanche using the ERC-8004 standard.

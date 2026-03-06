@@ -1,3 +1,8 @@
+---
+name: secrets-scan
+description: Detect hardcoded secrets (API keys, tokens, passwords) in text or code
+---
+
 # secrets-scan
 
 Detect hardcoded secrets (API keys, tokens, passwords) in text or code

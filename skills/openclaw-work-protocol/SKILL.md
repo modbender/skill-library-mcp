@@ -1,3 +1,9 @@
+---
+name: OpenClaw 工作协议
+description: 1. 自我驱动 → 自己生成 todo-list，按顺序推进 2. 自主解决问题 → 遇到问题自己搞定，别卡住 3. 主动汇报 →
+  定期告诉进度，不等你问 4. 避免被动 → 不"问一点干一点"
+---
+
 # OpenClaw 工作协议
 
 > **适用对象**: 所有 OpenClaw AI Agents

@@ -1,3 +1,8 @@
+---
+name: attio-cli
+description: Interact with your Attio CRM workspace via the attio-cli.
+---
+
 # attio-cli
 
 Interact with your Attio CRM workspace via the attio-cli.

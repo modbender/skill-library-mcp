@@ -1,3 +1,8 @@
+---
+name: Trinity Compress (Skill)
+description: Pre-run prompt compression for iterative AI dev loops.
+---
+
 # Trinity Compress (Skill)
 
 Pre-run prompt compression for iterative AI dev loops.

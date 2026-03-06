@@ -1,3 +1,9 @@
+---
+name: Before/After Transformation Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce video generation.
+---
+
 # Before/After Transformation Video
 
 **Version**: 1.0.0

@@ -1,3 +1,10 @@
+---
+name: iam
+description: "name: iam description: IAM namespace for Netsnek e.U. identity and
+  access management toolkit. Provides user authentication, role-based access
+  control, and session management for web applications. u..."
+---
+
 ﻿---
 name: iam
 description: IAM namespace for Netsnek e.U. identity and access management toolkit. Provides user authentication, role-based access control, and session management for web applications.

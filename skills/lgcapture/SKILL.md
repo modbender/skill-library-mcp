@@ -1,3 +1,8 @@
+---
+name: lgCapture - 抖音视频抓取技能
+description: 自动抓取抖音视频，支持短链接和标准链接。
+---
+
 # lgCapture - 抖音视频抓取技能
 
 ## 技能描述

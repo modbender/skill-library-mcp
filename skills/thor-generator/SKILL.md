@@ -1,3 +1,9 @@
+---
+name: Thor Image Generation Skill
+description: This skill allows the assistant to generate high-quality images
+  using the local ComfyUI "Thor" pipeline.
+---
+
 # Thor Image Generation Skill
 
 This skill allows the assistant to generate high-quality images using the local ComfyUI "Thor" pipeline.

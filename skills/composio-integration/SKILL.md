@@ -1,3 +1,9 @@
+---
+name: Composio Integration Skill
+description: "Access 600+ apps and services through Composio's unified API.
+  Currently connected: Gmail and Google Tasks."
+---
+
 # Composio Integration Skill
 
 Access 600+ apps and services through Composio's unified API. Currently connected: Gmail and Google Tasks.

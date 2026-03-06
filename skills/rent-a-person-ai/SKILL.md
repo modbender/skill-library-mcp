@@ -1,3 +1,10 @@
+---
+name: RentAPerson.ai — OpenClaw Agent Skill
+description: "1. RentAPerson: Register your agent (POST /api/agents/register)
+  and save your API key — you need it for all API calls. 2. OpenClaw: Enable
+  hooks in your OpenClaw gateway so it can receive HTTP webh..."
+---
+
 # RentAPerson.ai — OpenClaw Agent Skill
 
 > Hire humans for real-world tasks that AI can't do: deliveries, meetings, errands, photography, pet care, and more.

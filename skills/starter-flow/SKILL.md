@@ -1,3 +1,10 @@
+---
+name: ✅ 已通过自我审核（v1.0.0）
+description: 'name: starter-flow version: 1.0.0 description: "新手上路，一键启动——5
+  个核心技能，3 分钟快速上手 OpenClaw" homepage: https://github.com/openclaw/starter-flow
+  metadata: { "openclaw": { "emoji": "🚀", "requires": { "bins...'
+---
+
 # ✅ 已通过自我审核（v1.0.0）
 
 ---

@@ -1,3 +1,10 @@
+---
+name: Serper Google Search Plugin
+description: Native Clawdbot plugin for Google Search via Serper.dev API.
+  Returns real Google results — organic links, knowledge graph, news, and
+  "People Also Ask" — as a single tool call.
+---
+
 # Serper Google Search Plugin
 
 Native Clawdbot plugin for Google Search via [Serper.dev](https://serper.dev) API. Returns real Google results — organic links, knowledge graph, news, and "People Also Ask" — as a single tool call.

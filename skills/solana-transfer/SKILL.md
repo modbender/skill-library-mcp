@@ -1,3 +1,8 @@
+---
+name: Solana Transfer Skill
+description: "Generate a keypair (or use an existing one):"
+---
+
 # Solana Transfer Skill
 
 **Description:** Send SOL and SPL tokens on Solana blockchain from OpenClaw agents.

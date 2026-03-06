@@ -1,7 +1,13 @@
 ---
 name: superpowers-mode
-description: Enable or disable a strict engineering workflow inspired by obra/superpowers when the user explicitly asks (e.g., "включи superpowers", "disable superpowers"). When enabled and the task is coding/build/debug, enforce: clarify goal, write spec, write plan, execute in small steps (prefer TDD), then review/finish. Use this skill only for coding workflows, not general chat.
+description: 'Enable or disable a strict engineering workflow inspired by
+  obra/superpowers when the user explicitly asks (e.g., "включи superpowers",
+  "disable superpowers"). When enabled and the task is coding/build/debug,
+  enforce: clarify goal, write spec, write plan, execute in small steps (prefer
+  TDD), then review/finish. Use this skill only for coding workflows, not
+  general chat.'
 ---
+
 
 # Superpowers Mode (On-demand)
 

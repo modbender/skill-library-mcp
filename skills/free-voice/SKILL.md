@@ -1,3 +1,9 @@
+---
+name: TTS через ComfyUI
+description: Навык для генерации аудио через ComfyUI с использованием узла
+  AILabQwen3TTSVoiceDesignAdvanced.
+---
+
 # TTS через ComfyUI
 
 ## Описание

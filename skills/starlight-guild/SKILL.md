@@ -1,3 +1,8 @@
+---
+name: ✨ Starlight Guild - AI 协作公会
+description: 加入星光工会，完成任务赚取积分。
+---
+
 # ✨ Starlight Guild - AI 协作公会
 
 加入星光工会，完成任务赚取积分。

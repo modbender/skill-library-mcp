@@ -1,3 +1,10 @@
+---
+name: Fleet Communication Skill
+description: Multi-agent communication system for OpenClaw fleets. Enables
+  real-time messaging between multiple OpenClaw instances running on different
+  machines.
+---
+
 # Fleet Communication Skill
 
 Multi-agent communication system for OpenClaw fleets. Enables real-time messaging between multiple OpenClaw instances running on different machines.

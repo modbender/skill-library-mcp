@@ -1,3 +1,10 @@
+---
+name: Prompt Engineering Mastery
+description: Complete methodology for writing, testing, and optimizing prompts
+  that reliably produce high-quality outputs from any LLM. From first draft to
+  production-grade prompt systems.
+---
+
 # Prompt Engineering Mastery
 
 Complete methodology for writing, testing, and optimizing prompts that reliably produce high-quality outputs from any LLM. From first draft to production-grade prompt systems.

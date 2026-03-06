@@ -1,7 +1,10 @@
 ---
 name: kim-msg
-description: 快手 Kim即时通讯消息发送。支持两种方式：(1) Webhook - 向 Kim 机器人所在的群聊发送消息；(2) 消息号 - 使用 appKey/secretKey 直接向快手 Kim 用户发送消息。适用于向 Kim 推送通知、告警、日报等场景。官网: https://kim.kuaishou.com/
+description: "快手 Kim即时通讯消息发送。支持两种方式：(1) Webhook - 向 Kim 机器人所在的群聊发送消息；(2) 消息号 -
+  使用 appKey/secretKey 直接向快手 Kim 用户发送消息。适用于向 Kim 推送通知、告警、日报等场景。官网:
+  https://kim.kuaishou.com/"
 ---
+
 
 # Kim 消息发送（快手 IM）
 

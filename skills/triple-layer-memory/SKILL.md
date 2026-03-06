@@ -1,3 +1,8 @@
+---
+name: Triple-Layer Memory System
+description: 三层记忆系统 - 解决 AI Agent 长对话记忆丢失和上下文管理问题
+---
+
 # Triple-Layer Memory System
 
 三层记忆系统 - 解决 AI Agent 长对话记忆丢失和上下文管理问题

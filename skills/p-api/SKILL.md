@@ -1,8 +1,12 @@
 ---
 name: p-api
-summary: Complete WhatsApp automation API with microservices architecture. Send messages, interactive buttons, lists, carousels, polls, manage instances, groups, catalogs and webhooks. Features Admin Panel (free), Phone Calls, RCS Messaging, SMS, Virtual Numbers (Pro).
-description: Integration with P-API for WhatsApp automation. Use to send messages (text, image, video, audio, documents), interactive messages (buttons, lists, carousel, polls), manage WhatsApp instances, groups, product catalogs and webhooks. Triggers: whatsapp, papi, p-api, send whatsapp message, create instance, QR code, whatsapp buttons, whatsapp list, carousel, poll.
+description: "Integration with P-API for WhatsApp automation. Use to send
+  messages (text, image, video, audio, documents), interactive messages
+  (buttons, lists, carousel, polls), manage WhatsApp instances, groups, product
+  catalogs and webhooks. Triggers: whatsapp, papi, p-api, send whatsapp message,
+  create instance, QR code, whatsapp buttons, whatsapp list, carousel, poll."
 ---
+
 
 # P-API - WhatsApp Connections Hub
 

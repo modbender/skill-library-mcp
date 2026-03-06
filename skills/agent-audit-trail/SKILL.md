@@ -1,3 +1,8 @@
+---
+name: Agent Audit Trail Skill
+description: Tamper-evident, hash-chained audit logging for AI agents. EU AI Act compliant.
+---
+
 # Agent Audit Trail Skill
 
 Tamper-evident, hash-chained audit logging for AI agents. EU AI Act compliant.

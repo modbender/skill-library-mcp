@@ -1,3 +1,10 @@
+---
+name: Insurance Operations Automation
+description: Comprehensive insurance operations framework for AI agents. Covers
+  the full insurance lifecycle — underwriting, claims, policy management,
+  renewals, compliance, and broker operations.
+---
+
 # Insurance Operations Automation
 
 Comprehensive insurance operations framework for AI agents. Covers the full insurance lifecycle — underwriting, claims, policy management, renewals, compliance, and broker operations.

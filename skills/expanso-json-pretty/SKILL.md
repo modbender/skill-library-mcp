@@ -1,3 +1,8 @@
+---
+name: json-pretty
+description: '"Pretty print JSON with indentation"'
+---
+
 # json-pretty
 
 "Pretty print JSON with indentation"

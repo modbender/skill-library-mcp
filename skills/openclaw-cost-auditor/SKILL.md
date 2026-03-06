@@ -1,15 +1,9 @@
 ---
-summary: "OpenClaw Cost Auditor: Track API usage, model costs, token burn, and revenue for OpenClaw deployments."
-description: "Parse logs, query API metrics, forecast bills, optimize spend with reports & alerts."
-triggers:
-  - "audit openclaw costs"
-  - "openclaw billing"
-  - "check API spend"
-  - "token usage report"
-read_when:
-  - "openclaw cost" in message
-  - "API auditor" in message
+name: openclaw-cost-auditor
+description: Parse logs, query API metrics, forecast bills, optimize spend with
+  reports & alerts.
 ---
+
 
 # OpenClaw Cost Auditor v1.0.0
 

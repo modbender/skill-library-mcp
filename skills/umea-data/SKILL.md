@@ -1,3 +1,9 @@
+---
+name: Umeå Data - Open Data från Umeå kommun
+description: Query open data from Umeå kommun about locations, facilities,
+  demographics, environment, and more.
+---
+
 # Umeå Data - Open Data från Umeå kommun
 
 Query open data from Umeå kommun about locations, facilities, demographics, environment, and more.

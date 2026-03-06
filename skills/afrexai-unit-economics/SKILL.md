@@ -1,3 +1,10 @@
+---
+name: Unit Economics Analyzer
+description: Break down your business to the numbers that actually matter. This
+  skill calculates and benchmarks your unit economics — CAC, LTV, payback
+  period, contribution margin — so you know exactly which cu...
+---
+
 # Unit Economics Analyzer
 
 Break down your business to the numbers that actually matter. This skill calculates and benchmarks your unit economics — CAC, LTV, payback period, contribution margin — so you know exactly which customers make you money and which ones burn it.

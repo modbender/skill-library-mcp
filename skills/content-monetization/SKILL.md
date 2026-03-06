@@ -1,3 +1,8 @@
+---
+name: Content Monetization Playbook
+description: 幫你將內容變現既Skill - Twitter, YouTube, Newsletter, Products
+---
+
 # Content Monetization Playbook
 
 幫你將內容變現既Skill - Twitter, YouTube, Newsletter, Products

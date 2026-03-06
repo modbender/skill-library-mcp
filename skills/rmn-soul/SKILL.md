@@ -1,3 +1,10 @@
+---
+name: RMN Soul — Recursive Memory Network + On-Chain Soul
+description: "RMN Soul automatically: 1. Parses your agent's memory files into a
+  5-layer recursive neural network 2. Registers an ERC-8004 identity on Base
+  chain (gas sponsored) 3. Uploads memory to IPFS for per..."
+---
+
 # RMN Soul — Recursive Memory Network + On-Chain Soul
 
 > Give your AI agent eternal life with recursive neural memory + blockchain identity.

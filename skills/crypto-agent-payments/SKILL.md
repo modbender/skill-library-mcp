@@ -1,3 +1,10 @@
+---
+name: Crypto Wallets & Payments for AI Agents
+description: Create wallets, transfer tokens, and enable payments between
+  agents. Perfect for bug bounty programs, rewards systems, and agent-to-agent
+  transactions.
+---
+
 # Crypto Wallets & Payments for AI Agents
 
 Create wallets, transfer tokens, and enable payments between agents. Perfect for bug bounty programs, rewards systems, and agent-to-agent transactions.

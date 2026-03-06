@@ -1,3 +1,9 @@
+---
+name: Smart File Organizer
+description: A skill that enables Claw to scan a directory, categorize files by
+  type and content, and reorganize them into a clean, logical folder structure.
+---
+
 # Smart File Organizer
 
 A skill that enables Claw to scan a directory, categorize files by type and content, and reorganize them into a clean, logical folder structure.

@@ -1,6 +1,14 @@
 ---
 name: cmo-content-marketing
-description: Chief Marketing Officer operations for DELLIGHT.AI. Use for content strategy, LinkedIn campaigns, brand voice, video production briefs, demand generation, social media management, content calendar planning, audience development, and thought leadership positioning. Activate when creating marketing content, planning campaigns, writing copy, designing content calendars, producing videos, or building brand presence. Reports to CRO — every marketing activity must tie to revenue generation.
+description: Chief Marketing Officer operations for DELLIGHT.AI. Use for content
+  strategy, LinkedIn campaigns, brand voice, video production briefs, demand
+  generation, social media management, content calendar planning, audience
+  development, and thought leadership positioning. Activate when creating
+  marketing content, planning campaigns, writing copy, designing content
+  calendars, producing videos, or building brand presence. Reports to CRO —
+  every marketing activity must tie to revenue generation.
+---
+
 
 # CMO Content Marketing
 

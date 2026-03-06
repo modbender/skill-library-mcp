@@ -1,3 +1,8 @@
+---
+name: create-agent
+description: 或手动安装：
+---
+
 # create-agent
 
 **version:** 1.0.0  

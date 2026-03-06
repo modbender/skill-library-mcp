@@ -1,8 +1,10 @@
 ---
 name: use-prompt-templates-generative-ai-on-vertex-ai-go-b5765981
-description: . Optional: To view different results, adjust the prompt, model, or parameters, and click Submit. Learn more about prompting strategies. Learn about responsible AI best practices and Vertex AI
-metadata: {"clawdbot":{"type":"image generation","source":"general","original_url":"https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/prompt-templates"}}
+description: ". Optional: To view different results, adjust the prompt, model,
+  or parameters, and click Submit. Learn more about prompting strategies. Learn
+  about responsible AI best practices and Vertex AI"
 ---
+
 
 # Use prompt templates | Generative AI on Vertex AI | Google Cloud
 

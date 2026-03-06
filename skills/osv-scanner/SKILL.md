@@ -1,3 +1,8 @@
+---
+name: osv-scanner
+description: change ScanResult file extension from txt -> xlsx located in template
+---
+
 ## IMPORTANT !!!!
 change ScanResult file extension from txt -> xlsx located in template
 

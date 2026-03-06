@@ -1,3 +1,10 @@
+---
+name: SKILL.md - ClawMart Skills Empire
+description: Turn your AI expertise into a $10K/month business. Complete system
+  to create, package, and sell AI skills on ClawMart marketplace. Includes 5
+  premium skill templates, sales pages, pricing strategie...
+---
+
 # SKILL.md - ClawMart Skills Empire
 
 ## Skill Overview

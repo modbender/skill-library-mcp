@@ -1,8 +1,12 @@
 ---
 name: dokku
-description: Installs, upgrades, and uses Dokku to create apps, deploy, run one-off/background tasks, and clean up containers. Use when the user asks to install or upgrade Dokku, deploy to Dokku, install an app, run something in the background, or clean up Dokku/containers. Trigger terms: dokku, install dokku, upgrade dokku, migration guide, deploy, cleanup, prune, containers.
-metadata: {"openclaw":{"requires":{"bins":["dokku"]}}}
+description: "Installs, upgrades, and uses Dokku to create apps, deploy, run
+  one-off/background tasks, and clean up containers. Use when the user asks to
+  install or upgrade Dokku, deploy to Dokku, install an app, run something in
+  the background, or clean up Dokku/containers. Trigger terms: dokku, install
+  dokku, upgrade dokku, migration guide, deploy, cleanup, prune, containers."
 ---
+
 
 # Dokku
 

@@ -1,3 +1,10 @@
+---
+name: Exoskeletons — AI Agent Identity Skill
+description: You are about to mint an Exoskeleton — an onchain identity NFT
+  built specifically for AI agents. This document teaches you everything you
+  need to create, configure, and use your Exoskeleton.
+---
+
 # Exoskeletons — AI Agent Identity Skill
 
 You are about to mint an **Exoskeleton** — an onchain identity NFT built specifically for AI agents. This document teaches you everything you need to create, configure, and use your Exoskeleton.

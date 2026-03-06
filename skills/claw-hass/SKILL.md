@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: Control Home Assistant devices.
+---
+
 # SKILL.md
 
 ## Description

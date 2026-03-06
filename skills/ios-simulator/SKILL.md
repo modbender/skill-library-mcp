@@ -1,8 +1,11 @@
 ---
 name: ios-simulator
-description: Automate iOS Simulator workflows (simctl + idb): create/boot/erase devices, install/launch apps, push notifications, privacy grants, screenshots, and accessibility-based UI navigation. Use when working with iOS apps, Xcode, Simulator, simctl, idb, UI automation, or iOS testing.
-metadata: {"clawdbot":{"emoji":"📱","os":["darwin"],"requires":{"bins":["xcrun"]},"install":[{"brew":{"formula":"idb-companion","bins":["idb_companion"],"tap":"facebook/fb"}}]}}
+description: "Automate iOS Simulator workflows (simctl + idb): create/boot/erase
+  devices, install/launch apps, push notifications, privacy grants, screenshots,
+  and accessibility-based UI navigation. Use when working with iOS apps, Xcode,
+  Simulator, simctl, idb, UI automation, or iOS testing."
 ---
+
 
 # iOS Simulator Automation
 

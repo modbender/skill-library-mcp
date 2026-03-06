@@ -1,3 +1,10 @@
+---
+name: Ogment CLI Skill
+description: Securely invoke MCP tools via the Ogment CLI. Access your connected
+  SaaS tools (Linear, Notion, Gmail, PostHog, etc.) through Ogment's governance
+  layer.
+---
+
 # Ogment CLI Skill
 
 Securely invoke MCP tools via the Ogment CLI. Access your connected SaaS tools (Linear, Notion, Gmail, PostHog, etc.) through Ogment's governance layer.

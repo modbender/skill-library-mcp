@@ -1,3 +1,9 @@
+---
+name: Employee Offboarding Manager
+description: Generate complete offboarding checklists and transition plans when
+  an employee leaves.
+---
+
 # Employee Offboarding Manager
 
 Generate complete offboarding checklists and transition plans when an employee leaves.

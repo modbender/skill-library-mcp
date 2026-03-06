@@ -1,3 +1,9 @@
+---
+name: Waste Reminder Skill
+description: A flexible, token-efficient skill for automated waste container
+  collection reminders.
+---
+
 # Waste Reminder Skill
 
 A flexible, token-efficient skill for automated waste container collection reminders.

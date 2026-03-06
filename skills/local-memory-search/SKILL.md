@@ -1,3 +1,8 @@
+---
+name: Local Memory Search
+description: Lightweight semantic search for OpenClaw memory files. No external API needed.
+---
+
 # Local Memory Search
 
 Lightweight semantic search for OpenClaw memory files. No external API needed.

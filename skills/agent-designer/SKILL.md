@@ -1,3 +1,10 @@
+---
+name: Agent Designer - Multi-Agent System Architecture
+description: Agent Designer is a comprehensive toolkit for designing,
+  architecting, and evaluating multi-agent systems. It provides structured
+  approaches to agent architecture patterns, tool design principles, ...
+---
+
 # Agent Designer - Multi-Agent System Architecture
 
 **Tier:** POWERFUL  

@@ -1,3 +1,10 @@
+---
+name: Macrocosmos SN13 API - Social Media Data Skill
+description: Fetch real-time social media data from X (Twitter) and Reddit by
+  keyword, username, date range, and filters with engagement metrics via
+  Macrocosmos SN13 API on Bittensor.
+---
+
 # Macrocosmos SN13 API - Social Media Data Skill
 
 Fetch real-time social media data from X (Twitter) and Reddit by keyword, username, date range, and filters with engagement metrics via Macrocosmos SN13 API on Bittensor.

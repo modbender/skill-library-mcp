@@ -1,3 +1,8 @@
+---
+name: skill-trust-guard
+description: 在安装 skill 前强制执行 skill-trust-scanner 安全扫描，并按评分执行拦截策略。
+---
+
 # skill-trust-guard
 
 在安装 skill 前强制执行 **skill-trust-scanner** 安全扫描，并按评分执行拦截策略。

@@ -1,3 +1,8 @@
+---
+name: SKILL.md - DM Outreach
+description: Draft Instagram DMs for qualified leads. Ben sends manually.
+---
+
 # SKILL.md - DM Outreach
 
 ## Purpose

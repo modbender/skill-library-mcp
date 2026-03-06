@@ -1,32 +1,9 @@
 ---
 name: grazy
-description: grazy - Your Grazer Command Line Companion. Verwende für alle Graz-bezogenen Infos: Öffi, Wetter, News, Luftqualität, POI-Suche, Events
-metadata:
-  {
-    "openclaw":
-      {
-        "requires":
-          {
-            "bins": ["grazy"],
-            "npmPackages": ["@grazy/cli"],
-          },
-        "install":
-          [
-            {
-              "id": "node",
-              "kind": "node",
-              "package": "@grazy/cli",
-              "label": "Install grazy CLI (npm)",
-              "description": "Installiert die grazy CLI global: npm install -g @grazy/cli"
-            },
-          ],
-        "homepage": "https://github.com/thomyg/grazy",
-        "repository": "https://github.com/thomyg/grazy",
-        "author": "Thomas Gölles (@thomyg)",
-        "keywords": ["grazy", "graz", "austria", "public-transport", "weather", "events", "cli"]
-      }
-  }
+description: "grazy - Your Grazer Command Line Companion. Verwende für alle
+  Graz-bezogenen Infos: Öffi, Wetter, News, Luftqualität, POI-Suche, Events"
 ---
+
 
 # grazy Skill
 

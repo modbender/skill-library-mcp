@@ -1,3 +1,9 @@
+---
+name: percept-listen
+description: Ambient audio capture and transcription for OpenClaw agents via
+  wearable devices.
+---
+
 # percept-listen
 
 Ambient audio capture and transcription for OpenClaw agents via wearable devices.

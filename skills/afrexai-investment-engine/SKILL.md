@@ -1,3 +1,10 @@
+---
+name: Investment Analysis & Portfolio Management Engine
+description: Complete investment analysis, portfolio construction, risk
+  management, and trade execution methodology. Works across stocks, crypto,
+  ETFs, bonds, and alternatives. Zero dependencies — pure agent sk...
+---
+
 # Investment Analysis & Portfolio Management Engine
 
 Complete investment analysis, portfolio construction, risk management, and trade execution methodology. Works across stocks, crypto, ETFs, bonds, and alternatives. Zero dependencies — pure agent skill.

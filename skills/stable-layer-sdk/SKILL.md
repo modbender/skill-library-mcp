@@ -1,3 +1,10 @@
+---
+name: Stable Layer SDK
+description: A TypeScript SDK for interacting with the Stable Layer protocol on
+  the Sui blockchain. It supports minting and burning stablecoins, and claiming
+  yield farming rewards.
+---
+
 # Stable Layer SDK
 
 A TypeScript SDK for interacting with the Stable Layer protocol on the Sui blockchain. It supports minting and burning stablecoins, and claiming yield farming rewards.

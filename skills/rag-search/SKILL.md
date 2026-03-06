@@ -1,3 +1,8 @@
+---
+name: rag-search
+description: Minimal RAG search skill for backend retrieval.
+---
+
 # rag-search
 
 Minimal RAG search skill for backend retrieval.

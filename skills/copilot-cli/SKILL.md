@@ -1,3 +1,8 @@
+---
+name: Copilot CLI - AI 代码分析助手
+description: 使用 GitHub Copilot CLI 分析代码、探索项目、生成代码和自动化开发任务。
+---
+
 # Copilot CLI - AI 代码分析助手
 
 ## 功能

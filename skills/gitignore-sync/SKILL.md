@@ -1,7 +1,9 @@
 ---
 name: gitignore-sync
-description: Context-aware .gitignore generation backed by gitignore.io, not vibes. Make it boring again: accurate, idempotent, context-aware.
+description: "Context-aware .gitignore generation backed by gitignore.io, not
+  vibes. Make it boring again: accurate, idempotent, context-aware."
 ---
+
 
 # Gitignore Sync
 

@@ -1,8 +1,10 @@
 ---
 name: openclaw-sentinel
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🏰","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Supply chain security scanner for agent skills. Detects obfuscated
+  code, known-bad signatures, suspicious install behaviors, dependency
+  confusion, and metadata inconsistencies — before and after in...
 ---
+
 
 # OpenClaw Sentinel
 

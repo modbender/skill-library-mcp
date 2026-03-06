@@ -1,3 +1,10 @@
+---
+name: Pocket TTS Skill
+description: Fully local, offline text-to-speech using Kyutai's Pocket TTS
+  model. Generate high-quality audio from text without any API calls or internet
+  connection. Features 8 built-in voices, voice cloning su...
+---
+
 # Pocket TTS Skill
 
 Fully local, offline text-to-speech using Kyutai's Pocket TTS model. Generate high-quality audio from text without any API calls or internet connection. Features 8 built-in voices, voice cloning support, and runs entirely on CPU.

@@ -1,7 +1,12 @@
 ---
 name: revenue-calculator
-description: Projects revenue for OpenClaw sub-agent strategies (marketplace, subs, pay-per-task). Use for monetization estimates: input users/pricing/conversions → detailed annual/monthly projections, sensitivity analysis, break-even. Triggers: 'calculate revenue', 'project earnings', 'monetize skill/agent'.
+description: "Projects revenue for OpenClaw sub-agent strategies (marketplace,
+  subs, pay-per-task). Use for monetization estimates: input
+  users/pricing/conversions → detailed annual/monthly projections, sensitivity
+  analysis, break-even. Triggers: 'calculate revenue', 'project earnings',
+  'monetize skill/agent'."
 ---
+
 
 # Revenue Calculator
 

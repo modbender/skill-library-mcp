@@ -1,3 +1,9 @@
+---
+name: GlobePilot AI Agent 2 - powered by Teneo Protocol
+description: Powered by Teneo Protocol - A decentralized network of AI agents
+  for real-time data, automation, and intelligent services.
+---
+
 # GlobePilot AI Agent 2 - powered by Teneo Protocol
 
 Powered by Teneo Protocol - A decentralized network of AI agents for real-time data, automation, and intelligent services.

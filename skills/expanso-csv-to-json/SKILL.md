@@ -1,3 +1,8 @@
+---
+name: csv-to-json
+description: '"Convert CSV data to JSON array of objects"'
+---
+
 # csv-to-json
 
 "Convert CSV data to JSON array of objects"

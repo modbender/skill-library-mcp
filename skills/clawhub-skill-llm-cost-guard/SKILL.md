@@ -1,3 +1,9 @@
+---
+name: LLM Cost Guard — Token Budget & Spend Monitor
+description: Track, budget, and alert on LLM API spending in real-time. Prevents
+  runaway costs for AI agents, multi-user apps, and homelab automation.
+---
+
 # LLM Cost Guard — Token Budget & Spend Monitor
 
 Track, budget, and alert on LLM API spending in real-time. Prevents runaway costs for AI agents, multi-user apps, and homelab automation.

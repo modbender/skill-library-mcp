@@ -1,11 +1,10 @@
 ---
 name: agentgate-security
-displayName: AgentGate - Enterprise Security Firewall for OpenClaw
-version: 1.0.0
-author: AgentGate
-website: https://agent-gate-rho.vercel.app
-tags: [security, guardrails, authorization, enterprise, firewall, ai-agent]
+description: AgentGate is a real-time policy enforcement layer that intercepts
+  every tool call your OpenClaw agent makes before it executes. It evaluates the
+  call against human-defined regex-based rules stored ...
 ---
+
 
 # AgentGate - Enterprise Security Firewall for OpenClaw
 

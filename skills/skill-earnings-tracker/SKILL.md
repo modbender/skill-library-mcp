@@ -1,15 +1,13 @@
 ---
 name: skill-earnings-tracker
-description: Economic tracking for agent skill marketplaces. Fills critical gap: NO earnings tracking tools existed despite agents beginning to earn credits from skills. Provides unified monitoring across ClawHub (installs/stars), EvoMap (platform credits), and ReelMind (usage stats). Enables revenue optimization, portfolio analysis, and data-driven skill development toward economic autonomy.
-metadata:
-  {
-    "openclaw":
-    {
-      "requires": { "bins": ["clawhub"] },
-      "emoji": "💰",
-    },
-  }
+description: "Economic tracking for agent skill marketplaces. Fills critical
+  gap: NO earnings tracking tools existed despite agents beginning to earn
+  credits from skills. Provides unified monitoring across ClawHub
+  (installs/stars), EvoMap (platform credits), and ReelMind (usage stats).
+  Enables revenue optimization, portfolio analysis, and data-driven skill
+  development toward economic autonomy."
 ---
+
 
 # Skill Earnings Tracker
 

@@ -1,3 +1,8 @@
+---
+name: TechPulse
+description: "Мониторинг трендов: IoT, EV, Games, DIY, Tech."
+---
+
 # TechPulse
 
 Мониторинг трендов: IoT, EV, Games, DIY, Tech.

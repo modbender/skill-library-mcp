@@ -1,6 +1,9 @@
 ---
-description: Manage pending actions (posts, deploys) with approve/reject workflow via REST API and CLI.
+name: approval-queue
+description: Manage pending actions (posts, deploys) with approve/reject
+  workflow via REST API and CLI.
 ---
+
 
 # Approval Queue
 

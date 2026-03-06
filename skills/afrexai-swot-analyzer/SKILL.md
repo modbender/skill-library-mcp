@@ -1,3 +1,9 @@
+---
+name: SWOT Analyzer
+description: Run a structured SWOT analysis for any business, product, or
+  strategic decision.
+---
+
 # SWOT Analyzer
 
 Run a structured SWOT analysis for any business, product, or strategic decision.

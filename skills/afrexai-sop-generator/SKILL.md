@@ -1,3 +1,9 @@
+---
+name: SOP Generator
+description: Generate Standard Operating Procedures from plain-language process
+  descriptions.
+---
+
 # SOP Generator
 
 Generate Standard Operating Procedures from plain-language process descriptions.

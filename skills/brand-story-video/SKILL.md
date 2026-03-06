@@ -1,3 +1,9 @@
+---
+name: Brand Story Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI sora2 video generation.
+---
+
 # Brand Story Video
 
 **Version**: 1.0.0

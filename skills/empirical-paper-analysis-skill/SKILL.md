@@ -1,3 +1,10 @@
+---
+name: Empirical Paper Analysis Skill
+description: "This skill enables Claude Code to deeply analyze empirical
+  research papers, following a structured framework: Problem Statement → Core
+  Empirical Challenges → Identification Strategy → Key Findings ..."
+---
+
 # Empirical Paper Analysis Skill
 
 ## Skill Description

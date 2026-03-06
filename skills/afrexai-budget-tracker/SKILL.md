@@ -1,3 +1,9 @@
+---
+name: Budget & Expense Tracker — AI Agent Financial Command Center
+description: Track every dollar, enforce budgets, spot spending patterns, and
+  build wealth — all through natural conversation with your AI agent.
+---
+
 # Budget & Expense Tracker — AI Agent Financial Command Center
 
 Track every dollar, enforce budgets, spot spending patterns, and build wealth — all through natural conversation with your AI agent.

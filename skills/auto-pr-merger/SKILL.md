@@ -1,3 +1,9 @@
+---
+name: Auto PR Merger Skill
+description: This skill automates the workflow of checking out a GitHub PR,
+  running tests, attempting to fix failures, and merging if successful.
+---
+
 # Auto PR Merger Skill
 
 This skill automates the workflow of checking out a GitHub PR, running tests, attempting to fix failures, and merging if successful.

@@ -1,3 +1,10 @@
+---
+name: 🏏 Cricket Live
+description: "Get real-time scores, upcoming schedules, detailed scorecards, and
+  IPL standings — all from your OpenClaw agent. Powered by CricketData.org API
+  (endpoint: api.cricapi.com)."
+---
+
 # 🏏 Cricket Live
 
 **Live cricket scores, IPL tracking, and match alerts for OpenClaw.**

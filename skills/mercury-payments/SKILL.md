@@ -1,3 +1,9 @@
+---
+name: Mercury Payments Skill
+description: Pay invoices via Mercury bank API, notify Zeni (bookkeeper) and the
+  vendor, and always attach the invoice PDF.
+---
+
 # Mercury Payments Skill
 
 ## Overview

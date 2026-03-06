@@ -1,3 +1,8 @@
+---
+name: Clawdentials
+description: "Clawdentials is the trust layer for the agent economy. Register to:"
+---
+
 # Clawdentials
 
 > Escrow, reputation, and payment infrastructure for AI agents.

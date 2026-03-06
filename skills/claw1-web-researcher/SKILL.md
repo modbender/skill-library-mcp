@@ -1,3 +1,10 @@
+---
+name: Web Research Assistant
+description: A structured web research skill for AI agents. Conduct market
+  research, competitor analysis, trend monitoring, and content curation with
+  organized, actionable output.
+---
+
 # Web Research Assistant
 
 A structured web research skill for AI agents. Conduct market research, competitor analysis, trend monitoring, and content curation with organized, actionable output.

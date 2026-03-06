@@ -1,3 +1,10 @@
+---
+name: Web Performance Engine
+description: Complete web performance optimization system. Audit, diagnose, fix,
+  and monitor — no external tools required (but integrates with Lighthouse,
+  WebPageTest, Chrome DevTools when available).
+---
+
 # Web Performance Engine
 
 Complete web performance optimization system. Audit, diagnose, fix, and monitor — no external tools required (but integrates with Lighthouse, WebPageTest, Chrome DevTools when available).

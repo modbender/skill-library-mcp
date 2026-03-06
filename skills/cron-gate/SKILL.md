@@ -1,3 +1,10 @@
+---
+name: Cron Gate
+description: Every OpenClaw cron that spawns an isolated LLM session burns
+  tokens — prompt loading, Weave files, tool calls — even when there's nothing
+  new to process. If you run memory integration across 5 ses...
+---
+
 # Cron Gate
 
 **Stop wasting tokens on crons with nothing to do.**

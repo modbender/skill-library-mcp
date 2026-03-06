@@ -1,3 +1,9 @@
+---
+name: Craft.do Integration Skill
+description: Complete REST API integration for Craft.do - the beautiful
+  note-taking and document app.
+---
+
 # Craft.do Integration Skill
 
 Complete REST API integration for Craft.do - the beautiful note-taking and document app.

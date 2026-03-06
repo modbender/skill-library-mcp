@@ -1,3 +1,10 @@
+---
+name: Project Setup Wizard
+description: An interactive project scaffolding tool that generates complete,
+  production-ready project structures for Node.js, Python, Go, and Rust with
+  proper .gitignore, README, CI/CD configurations, and Dock...
+---
+
 # Project Setup Wizard
 
 An interactive project scaffolding tool that generates complete, production-ready

@@ -1,3 +1,8 @@
+---
+name: Abby Autonomy Skill
+description: 自主任务执行系统 - 让 从被动 Abby变主动
+---
+
 # Abby Autonomy Skill
 
 _自主任务执行系统 - 让 从被动 Abby变主动_

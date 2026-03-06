@@ -1,3 +1,10 @@
+---
+name: canvascli
+description: SKILL.md canvas-cli Use canvas-cli for Canvas LMS — courses,
+  assignments, grades, submissions, discussions, files, and more. Uses SAML SSO
+  with TOTP (session cached after first login).
+---
+
 SKILL.md
 canvas-cli
 Use canvas-cli for Canvas LMS — courses, assignments, grades, submissions, discussions, files, and more. Uses SAML SSO with TOTP (session cached after first login).

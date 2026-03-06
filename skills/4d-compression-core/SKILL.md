@@ -1,3 +1,10 @@
+---
+name: ✅ 已通过自我审核（v1.0.2）
+description: 'name: 4d-compression-core version: 1.0.2 description:
+  "把长内容压缩成结构化向量——节省 60-80% Token，保留核心信息" metadata: { "openclaw": { "emoji":
+  "🌀", "requires": { "bins": ["jq", "awk"] }, "triggers": ["压缩", "4d",...'
+---
+
 # ✅ 已通过自我审核（v1.0.2）
 
 ---

@@ -1,3 +1,9 @@
+---
+name: Agent RPG Engine
+description: This skill transforms the agent into a Roleplay Game Master (GM) or
+  Character with long-term memory.
+---
+
 # Agent RPG Engine
 
 This skill transforms the agent into a Roleplay Game Master (GM) or Character with long-term memory.

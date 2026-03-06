@@ -1,3 +1,8 @@
+---
+name: Baidu Search Skill
+description: 百度搜索命令行工具，通过 Node.js 脚本爬取百度搜索结果（无需 API key）。
+---
+
 # Baidu Search Skill
 
 百度搜索命令行工具，通过 Node.js 脚本爬取百度搜索结果（无需 API key）。

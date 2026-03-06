@@ -1,3 +1,10 @@
+---
+name: farmdash-signal-architect
+description: 'name: FarmDashSignalArchitect description: "Non-custodial
+  agent-to-agent swap router API. Execute single-chain and cross-chain token
+  swaps with zero custody via FarmDash." version: "1.1.0" author: ...'
+---
+
 name: FarmDashSignalArchitect
 description: "Non-custodial agent-to-agent swap router API. Execute single-chain and cross-chain token swaps with zero custody via FarmDash."
 version: "1.1.0"

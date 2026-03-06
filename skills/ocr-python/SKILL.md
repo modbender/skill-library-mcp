@@ -1,7 +1,11 @@
 ---
 name: ocr
-description: Optical Character Recognition (OCR) tool, supports Chinese and English text extraction from PDFs and images. Use cases: (1) extract text from scanned PDFs, (2) recognize text from images, (3) extract text content from invoices, contracts, and other documents
+description: "Optical Character Recognition (OCR) tool, supports Chinese and
+  English text extraction from PDFs and images. Use cases: (1) extract text from
+  scanned PDFs, (2) recognize text from images, (3) extract text content from
+  invoices, contracts, and other documents"
 ---
+
 
 # OCR Text Recognition
 

@@ -1,7 +1,12 @@
 ---
 name: plansuite
-description: Unified planning+execution workflow: create a file-based plan with sub-plans, freeze it as FINALIZED, and execute in a separate session with checkpoints and progress/findings logs. Use when you want project plans with subplans (milestones), controlled execution, and session-based implementation runs.
+description: "Unified planning+execution workflow: create a file-based plan with
+  sub-plans, freeze it as FINALIZED, and execute in a separate session with
+  checkpoints and progress/findings logs. Use when you want project plans with
+  subplans (milestones), controlled execution, and session-based implementation
+  runs."
 ---
+
 
 # PlanSuite
 

@@ -1,3 +1,8 @@
+---
+name: 🎵 Play Music Skill
+description: Single entry point, background server for full control
+---
+
 # 🎵 Play Music Skill
 
 **Controlled music player with pause/resume/stop support**  

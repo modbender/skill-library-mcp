@@ -1,3 +1,8 @@
+---
+name: exec-inspector
+description: 查看和分析 OpenClaw Agent 的 exec 工具执行历史和明细。
+---
+
 # exec-inspector
 
 查看和分析 OpenClaw Agent 的 exec 工具执行历史和明细。

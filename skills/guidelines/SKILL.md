@@ -1,3 +1,8 @@
+---
+name: FTdesign HTML 生成器技能
+description: 本技能能够根据用户的自然语言描述，自动生成符合FTdesign设计规范的HTML预览界面。支持列表页、表单页、详情页三种主要页面类型，生成的页面可直接在浏览器中预览。
+---
+
 # FTdesign HTML 生成器技能
 
 ## 技能概述

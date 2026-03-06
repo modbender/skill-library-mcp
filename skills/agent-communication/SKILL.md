@@ -1,3 +1,8 @@
+---
+name: Agent Communication Skill
+description: 一个通用的 Agent 间沟通技能，基于 WebSocket 实现实时双向通信，解决多 Agent 团队协作中的沟通问题。
+---
+
 # Agent Communication Skill
 
 一个通用的 Agent 间沟通技能，基于 **WebSocket** 实现实时双向通信，解决多 Agent 团队协作中的沟通问题。

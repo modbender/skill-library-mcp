@@ -1,3 +1,9 @@
+---
+name: A/B Test Variations
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI google veo generation.
+---
+
 # A/B Test Variations
 
 **Version**: 1.0.0

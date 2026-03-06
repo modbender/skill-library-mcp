@@ -1,3 +1,8 @@
+---
+name: SQ Memory - OpenClaw Skill
+description: SQ is open-source software you can run yourself or use our hosted version.
+---
+
 # SQ Memory - OpenClaw Skill
 
 **Give your OpenClaw agents permanent memory.**

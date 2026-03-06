@@ -1,3 +1,9 @@
+---
+name: SKILL.md — Updated AgentSecrets OpenClaw Skill
+description: AgentSecrets is not a credential lookup tool. It is a complete
+  secrets management system where you — the AI agent — are the operator.
+---
+
 # SKILL.md — Updated AgentSecrets OpenClaw Skill
 
 ```yaml

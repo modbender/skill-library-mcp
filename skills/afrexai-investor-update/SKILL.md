@@ -1,3 +1,9 @@
+---
+name: Investor Update Generator
+description: Generate professional monthly/quarterly investor updates that keep
+  stakeholders informed and build trust.
+---
+
 # Investor Update Generator
 
 Generate professional monthly/quarterly investor updates that keep stakeholders informed and build trust.

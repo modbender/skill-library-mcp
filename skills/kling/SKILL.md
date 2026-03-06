@@ -1,3 +1,8 @@
+---
+name: Kling Video Generation Skill
+description: Generate AI videos using Kling 2.6 (via Kie.ai).
+---
+
 # Kling Video Generation Skill
 
 Generate AI videos using Kling 2.6 (via Kie.ai).

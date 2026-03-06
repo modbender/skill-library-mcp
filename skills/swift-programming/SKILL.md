@@ -1,7 +1,9 @@
 ---
 name: swift-programming
-version: 1.0.0
+description: Learn and program in Swift - Apple's programming language for iOS,
+  macOS, watchOS, and tvOS.
 ---
+
 
 # Swift Programming Skill
 

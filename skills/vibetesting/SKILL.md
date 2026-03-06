@@ -1,3 +1,10 @@
+---
+name: vibetesting - Browser Automation Testing Skill
+description: A comprehensive browser automation testing skill for OpenClaw that
+  performs functional, UI, accessibility, performance, and visual regression
+  testing.
+---
+
 # vibetesting - Browser Automation Testing Skill
 
 A comprehensive browser automation testing skill for OpenClaw that performs functional, UI, accessibility, performance, and visual regression testing.

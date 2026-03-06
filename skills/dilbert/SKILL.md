@@ -1,3 +1,9 @@
+---
+name: Dilbert Skill
+description: This skill fetches a random Dilbert comic from an archive source
+  and sends it to the chat.
+---
+
 # Dilbert Skill
 
 **Name:** dilbert

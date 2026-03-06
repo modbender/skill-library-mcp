@@ -1,14 +1,11 @@
 ---
 name: plan-executor
-description: Executes frozen, validated plans produced by an autonomous planner with zero interpretation, zero interaction, and strict termination guarantees. Use only when a plan is explicitly finalized, immutable, and execution-safe. Trigger keywords: execute plan, run execution, enact finalized plan.
-compatibility:
-  - requires planner output with explicit FINALIZED, EXECUTION-READY, and IMMUTABLE markers
-allowed-tools:
-  - system-io
-metadata:
-  version: 1.0.0
-  owner: user
+description: "Executes frozen, validated plans produced by an autonomous planner
+  with zero interpretation, zero interaction, and strict termination guarantees.
+  Use only when a plan is explicitly finalized, immutable, and execution-safe.
+  Trigger keywords: execute plan, run execution, enact finalized plan."
 ---
+
 
 ## Activation Criteria
 

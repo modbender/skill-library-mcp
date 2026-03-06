@@ -1,31 +1,8 @@
 ---
 name: api-monitor
-description: >
-  API 配额监控与手动切换技能。监控 OpenClaw 模型 API 使用量，配额不足时询问用户确认后再切换。
-  触发词：API配额、API监控、模型切换、检查API。
-
-# ⚠️ 前置要求（使用前必读）
-
-## 必需环境
-1. **Python 3.8+** - 脚本运行环境
-2. **OpenClaw 已配置** - Gateway 正常运行
-3. **jq 工具** - JSON 解析（大多数系统已预装）
-
-## 权限要求
-- 需要修改 OpenClaw 配置文件的权限
-- 可能需要重启 Gateway（需要相应权限）
-
-## 路径配置
-- 默认路径：`~/.openclaw/skills/api-monitor/`
-- 配置文件可移动到其他位置
-- 脚本支持绝对路径和相对路径
-
-## 风险提示
-- 切换模型会重启 Gateway，短期内服务中断
-- 自动重启 Gateway 需要足够权限
-- 建议在非高峰期操作
-
+description: ">"
 ---
+
 
 # API 使用量监控技能（询问确认模式）
 

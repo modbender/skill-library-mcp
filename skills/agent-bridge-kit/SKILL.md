@@ -1,3 +1,10 @@
+---
+name: Agent Bridge Kit
+description: Agent Bridge Kit gives any OpenClaw agent unified access to
+  multiple agent platforms through a single config file and CLI. Instead of
+  maintaining separate scripts for each platform, you configure o...
+---
+
 # Agent Bridge Kit
 
 > Cross-platform presence for AI agents. One config, many platforms.

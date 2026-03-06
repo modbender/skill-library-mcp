@@ -1,3 +1,9 @@
+---
+name: GuavaMemory — Episodic Memory System for OpenClaw
+description: Structured episodic memory with Q-value scoring. Remember what
+  worked, forget what didn't.
+---
+
 # GuavaMemory — Episodic Memory System for OpenClaw
 
 Structured episodic memory with Q-value scoring. Remember what worked, forget what didn't.

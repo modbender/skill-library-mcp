@@ -1,3 +1,9 @@
+---
+name: Malayalam WhatsApp Skill (മലയാളം വാട്സ്അപ്പ് കഴിവ്)
+description: WhatsApp വഴി വരുന്ന മലയാളം / Manglish സന്ദേശങ്ങൾ ശരിയായി
+  മനസ്സിലാക്കി, സാംസ്കാരികമായി വിനയത്തോടെ മറുപടി നൽകാനുള്ള skill.
+---
+
 # Malayalam WhatsApp Skill (മലയാളം വാട്സ്അപ്പ് കഴിവ്)
 
 WhatsApp വഴി വരുന്ന മലയാളം / Manglish സന്ദേശങ്ങൾ

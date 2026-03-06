@@ -1,3 +1,9 @@
+---
+name: NESP Marketing & Airdrop Engine
+description: "This skill enables the agent to drive growth for Neural Standard
+  ($NESP). It focuses on:"
+---
+
 # NESP Marketing & Airdrop Engine
 This skill enables the agent to drive growth for Neural Standard ($NESP).
 It focuses on:

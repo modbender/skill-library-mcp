@@ -1,6 +1,9 @@
 ---
-description: Compare configuration files, highlight differences, and suggest merge strategies for YAML, JSON, TOML, and INI formats.
+name: cfg-diff
+description: Compare configuration files, highlight differences, and suggest
+  merge strategies for YAML, JSON, TOML, and INI formats.
 ---
+
 
 # Config Diff
 

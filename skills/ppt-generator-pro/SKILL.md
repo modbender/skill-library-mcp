@@ -1,3 +1,8 @@
+---
+name: PPT Generator Pro - Claude Code Skill
+description: 或直接告诉 Claude：
+---
+
 # PPT Generator Pro - Claude Code Skill
 
 ## 📋 元数据

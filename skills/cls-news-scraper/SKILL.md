@@ -1,3 +1,9 @@
+---
+name: cls-news-scraper
+description: Use this skill to pull real-time market news from Cailian Press
+  (CLS) and extract stock-positive catalysts.
+---
+
 # cls-news-scraper
 
 Use this skill to pull real-time market news from Cailian Press (CLS) and extract stock-positive catalysts.

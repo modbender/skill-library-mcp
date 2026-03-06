@@ -1,3 +1,9 @@
+---
+name: Terminal Screenshots & Recordings with VHS
+description: Generate terminal screenshots and animated GIFs/videos using VHS
+  from Charmbracelet.
+---
+
 # Terminal Screenshots & Recordings with VHS
 
 Generate terminal screenshots and animated GIFs/videos using [VHS](https://github.com/charmbracelet/vhs) from Charmbracelet.

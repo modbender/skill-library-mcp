@@ -1,3 +1,10 @@
+---
+name: B2B Lead Generation & Business Contact Extraction Skill
+description: This skill enables Claude to collect and structure publicly
+  available business contact data from professional directories, company pages,
+  and business listings — for sales prospecting, market resea...
+---
+
 # B2B Lead Generation & Business Contact Extraction Skill
 
 ## Overview

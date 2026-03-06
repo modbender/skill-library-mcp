@@ -1,3 +1,10 @@
+---
+name: gank — solana trading terminal for agents
+description: gank is a multi-wallet solana trading terminal. launch tokens on
+  pump.fun, run swarm buys, volume bots, copy trades, manage wallets. we
+  literally have the most toxic platform atm and now your agent...
+---
+
 # gank — solana trading terminal for agents
 
 gank is a multi-wallet solana trading terminal. launch tokens on pump.fun, run swarm buys, volume bots, copy trades, manage wallets. we literally have the most toxic platform atm and now your agents can take full advantage of it lol.

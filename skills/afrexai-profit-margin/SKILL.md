@@ -1,3 +1,9 @@
+---
+name: Profit Margin Analyzer
+description: Analyze and optimize profit margins across your business.
+  Identifies margin compression, pricing opportunities, and cost levers.
+---
+
 # Profit Margin Analyzer
 
 Analyze and optimize profit margins across your business. Identifies margin compression, pricing opportunities, and cost levers.

@@ -1,3 +1,10 @@
+---
+name: quiet-mail - Email for AI Agents
+description: ✅ Unlimited sending - No 25/day limit like ClawMail ✅ No
+  verification - Instant signup, no Twitter required ✅ Simple API - Create
+  agent, send email, done ✅ Free forever - No hidden costs, no usage ...
+---
+
 # quiet-mail - Email for AI Agents
 
 **Unlimited email for AI agents. No verification, no limits, just reliable email.**

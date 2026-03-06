@@ -1,3 +1,9 @@
+---
+name: Payroll Compliance Auditor
+description: Run a full payroll audit in under 10 minutes. Catches the errors
+  that cost companies $845 per violation.
+---
+
 # Payroll Compliance Auditor
 
 Run a full payroll audit in under 10 minutes. Catches the errors that cost companies $845 per violation.

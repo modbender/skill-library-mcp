@@ -1,3 +1,8 @@
+---
+name: yt-digest
+description: Extract summaries, transcripts, and key moments from YouTube videos.
+---
+
 # yt-digest
 
 Extract summaries, transcripts, and key moments from YouTube videos.

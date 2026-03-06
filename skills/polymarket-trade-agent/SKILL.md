@@ -1,3 +1,9 @@
+---
+name: Polymarket Trade Agent Skill
+description: A fully functional Polymarket trading agent that can research
+  markets, analyze opportunities, and execute trades.
+---
+
 # Polymarket Trade Agent Skill
 
 ## Overview

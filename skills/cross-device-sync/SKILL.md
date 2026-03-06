@@ -1,3 +1,8 @@
+---
+name: Cross-Device Sync Skill
+description: 通过GitHub仓库实现OpenClaw跨设备记忆同步的技能。
+---
+
 # Cross-Device Sync Skill
 
 通过GitHub仓库实现OpenClaw跨设备记忆同步的技能。

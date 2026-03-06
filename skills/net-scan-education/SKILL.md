@@ -1,3 +1,8 @@
+---
+name: "Skill: net-scan-education"
+description: Objective
+---
+
 # Skill: net-scan-education
 
 Objective

@@ -1,7 +1,13 @@
 ---
 name: limesurvey
-description: Automate LimeSurvey operations via RemoteControl 2 API. Use when: (1) managing surveys, questions, groups, or participants, (2) exporting responses or statistics, (3) sending invitations or reminders, (4) importing surveys or questions, (5) batch operations on survey data. Supports JSON-RPC API with full CRUD operations for surveys, participants, responses, questions, and groups.
+description: "Automate LimeSurvey operations via RemoteControl 2 API. Use when:
+  (1) managing surveys, questions, groups, or participants, (2) exporting
+  responses or statistics, (3) sending invitations or reminders, (4) importing
+  surveys or questions, (5) batch operations on survey data. Supports JSON-RPC
+  API with full CRUD operations for surveys, participants, responses, questions,
+  and groups."
 ---
+
 
 # LimeSurvey RemoteControl 2 API
 

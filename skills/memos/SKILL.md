@@ -1,3 +1,10 @@
+---
+name: SKILL.md for the Memos skill
+description: This skill provides a simple interface to the Memos API
+  (https://usememos.com/docs/api). It lets you create, read, delete, and list
+  memos from OpenClaw.
+---
+
 # SKILL.md for the Memos skill
 
 ## Purpose

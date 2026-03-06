@@ -1,8 +1,9 @@
 ---
-slug: dashboard-manager
-display_name: Dashboard Manager
-version: 1.0.0
+name: dashboard-manager
+description: Gère les interactions avec le dashboard Jarvis. Ce skill permet de
+  lire, mettre à jour et synchroniser le fichier data.json en temps réel.
 ---
+
 
 
 

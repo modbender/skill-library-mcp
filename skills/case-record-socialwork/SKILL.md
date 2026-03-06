@@ -1,3 +1,11 @@
+---
+name: 使用時機
+description: 'name: case-record-socialwork description:
+  依LINE對話/口述內容，快速產生「個案紀錄」（含主題、問題、評估、介入、計畫），並可套用處理路線A/B/C與話術模板（尤其鄰里衝突/被說壞話/被指控很吵）。
+  user-invocable: true metadata:
+  {"openclaw":{"emoji":"","domain":"socialwork...'
+---
+
 ﻿---
 name: case-record-socialwork
 description: 依LINE對話/口述內容，快速產生「個案紀錄」（含主題、問題、評估、介入、計畫），並可套用處理路線A/B/C與話術模板（尤其鄰里衝突/被說壞話/被指控很吵）。

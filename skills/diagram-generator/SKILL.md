@@ -1,13 +1,11 @@
 ---
 name: diagram-generator
-description: Generate and edit various types of diagrams (including draw.io, Mermaid, and Excalidraw). This tool supports common diagram types such as flowcharts, sequence diagrams, class diagrams, Entity-Relationship (ER) diagrams, mind maps, architecture diagrams, and network topologies.
-Natural Language Creation: Create new diagrams based on simple text descriptions.
-Legacy File Support: Read and modify existing .drawio, .mmd (Mermaid), or Excalidraw files.
-MCP Server Integration: Utilizes a dedicated MCP server (mcp-diagram-generator) to generate files, which minimizes token consumption and ensures consistent output formatting.
-Automated Configuration: * Default Output Path: Diagrams are saved to diagrams/{format}/ within the project directory.
-Customization: Supports custom file paths and automatic directory creation.
-version： 1.1.1
+description: Generate and edit various types of diagrams (including draw.io,
+  Mermaid, and Excalidraw). This tool supports common diagram types such as
+  flowcharts, sequence diagrams, class diagrams, Entity-Relationship (ER)
+  diagrams, mind maps, architecture diagrams, and network topologies.
 ---
+
 
 # Diagram Generator
 

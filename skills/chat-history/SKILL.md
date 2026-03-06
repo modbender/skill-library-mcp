@@ -1,3 +1,8 @@
+---
+name: Chat History Skill
+description: 自动归档每天的对话记录，分类保存，支持快速搜索和历史回溯。
+---
+
 # Chat History Skill
 
 > 📦 对话归档系统 - 自动归档、搜索和管理对话记录

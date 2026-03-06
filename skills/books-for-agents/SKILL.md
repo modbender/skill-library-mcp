@@ -1,3 +1,9 @@
+---
+name: Books for Agents
+description: An open source knowledge base of structured book summaries,
+  available to any AI agent via MCP.
+---
+
 # Books for Agents
 
 An open source knowledge base of structured book summaries, available to any AI agent via MCP.

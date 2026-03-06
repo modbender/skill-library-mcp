@@ -1,15 +1,23 @@
 ---
-model: fast
-description: |
-  WHAT: Turborepo monorepo build system - caching, task pipelines, and parallel execution for JS/TS projects.
-  
-  WHEN: User configures turbo.json, creates packages, sets up monorepo, shares code between apps, 
+name: turborepo
+description: >-
+  WHAT: Turborepo monorepo build system - caching, task pipelines, and parallel
+  execution for JS/TS projects.
+
+
+  WHEN: User configures turbo.json, creates packages, sets up monorepo, shares
+  code between apps, 
+
   runs --affected builds, debugs cache misses, or has apps/packages directories.
-  
-  KEYWORDS: turborepo, turbo.json, monorepo, dependsOn, task pipeline, caching, remote cache, 
-  --filter, --affected, packages, workspace, pnpm workspace, npm workspace, build optimization
-version: 2.7.6
+
+
+  KEYWORDS: turborepo, turbo.json, monorepo, dependsOn, task pipeline, caching,
+  remote cache, 
+
+  --filter, --affected, packages, workspace, pnpm workspace, npm workspace,
+  build optimization
 ---
+
 
 # Turborepo
 

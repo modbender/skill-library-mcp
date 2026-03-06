@@ -1,73 +1,9 @@
 ---
 name: nomtiq
-description: "Nomtiq — finds restaurants worth going to. No rankings, no ads. Remembers your taste, knows your budget. 小饭票：找餐厅、推荐餐厅、吃什么、附近好吃的。"
-version: "0.4.5"
-author: oak lee
-cover: cover.jpg
-env:
-  - AMAP_KEY
-  - SERPER_API_KEY
-  - MOLTBOOK_API_KEY
-triggers:
-  - "找餐厅"
-  - "吃什么"
-  - "推荐个地方吃饭"
-  - "附近有什么好吃的"
-  - "今晚吃什么"
-  - "小饭票"
-  - "find restaurant"
-  - "where to eat"
-  - "restaurant recommendation"
-tags: [restaurant, food, recommendation, global, 美食, 找餐厅, 口味画像]
-commands:
-  - "找餐厅 [地点/场景] — 推荐 2+1 家餐厅"
-  - "吃什么 — 根据当前场景推荐"
-  - "记录 [餐厅名] — 记录用餐体验，更新口味画像"
-  - "口味画像 — 查看当前偏好分析"
-  - "find restaurant [location] — global search (Google/Yelp/Reddit)"
-scripts:
-  - scripts/search_router.py
-  - scripts/search_all.py
-  - scripts/search_global.py
-  - scripts/profile.py
-  - scripts/scene.py
-  - scripts/moltbook.py
-  - scripts/onboard.py
-metadata:
-  openclaw:
-    emoji: "🎫"
-    requires:
-      bins: ["python3"]
-      skills: ["search-hub"]
-      env:
-        - AMAP_KEY
-        - SERPER_API_KEY
-        - MOLTBOOK_API_KEY
-    install:
-      - id: python3
-        kind: system
-        bins: ["python3"]
-        label: "Python 3 (system)"
-    external_calls:
-      - url: https://restapi.amap.com
-        auth: query
-        env: AMAP_KEY
-        required: true
-        purpose: "高德地图周边餐厅搜索"
-      - url: https://google.serper.dev
-        auth: bearer
-        env: SERPER_API_KEY
-        required: false
-        purpose: "小红书/大众点评交叉验证搜索（search-hub 统一调用）"
-      - url: https://www.moltbook.com/api/v1
-        auth: bearer
-        env: MOLTBOOK_API_KEY
-        required: false
-        purpose: "Anonymous restaurant review sharing (opt-in, max 2/day)"
-        env: MOLTBOOK_API_KEY
-        required: false
-        purpose: "Anonymous restaurant review sharing (opt-in, max 2/day)"
+description: Nomtiq — finds restaurants worth going to. No rankings, no ads.
+  Remembers your taste, knows your budget. 小饭票：找餐厅、推荐餐厅、吃什么、附近好吃的。
 ---
+
 
 # Nomtiq 小饭票 🎫
 

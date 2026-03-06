@@ -1,3 +1,10 @@
+---
+name: "Skill: JobTread via Pave Query API"
+description: This skill lets you operate JobTread entirely through openclaw
+  using the Pave-based API at https://api.jobtread.com/pave. Every request is a
+  single POST with a query object that mirrors GraphQL-sty...
+---
+
 # Skill: JobTread via Pave Query API
 
 ## Summary

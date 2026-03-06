@@ -1,3 +1,8 @@
+---
+name: Method Dev Agent - 方法开发助手
+description: 药品分析实验室方法开发过程中的痛点：
+---
+
 # Method Dev Agent - 方法开发助手
 
 **专业技能**: 药品分析实验室 | 色谱方法开发 | HPLC/UPLC/GC

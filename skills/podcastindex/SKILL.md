@@ -1,3 +1,10 @@
+---
+name: podcastindex
+description: "name: podcast-index description: Access and search podcast
+  information using the Podcast Index API, including searching for podcasts,
+  episodes, and retrieving details. homepage: https://podcastinde..."
+---
+
 
 name: podcast-index description: Access and search podcast information using the Podcast Index API, including searching for podcasts, episodes, and retrieving details. homepage: https://podcastindex.org/api/docs metadata: {“openclaw”:{“requires”:{“env”:[“PODCASTINDEX_API_KEY”,“PODCASTINDEX_API_SECRET”]},“primaryEnv”:“PODCASTINDEX_API_KEY”,“emoji”:“🎙️”}}
 This skill allows you to interact with the Podcast Index API to search for podcasts, retrieve podcast and episode details, and more. Use this when the user asks for podcast recommendations, episode information, or searches related to podcasts.

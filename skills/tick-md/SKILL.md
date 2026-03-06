@@ -1,3 +1,10 @@
+---
+name: Tick Multi-Agent Coordination
+description: Coordinate work across human and AI agents using structured
+  Markdown files. Users interact naturally with you, and you maintain tasks
+  transparently in TICK.md.
+---
+
 # Tick Multi-Agent Coordination
 
 Coordinate work across human and AI agents using structured Markdown files. Users interact naturally with you, and you maintain tasks transparently in TICK.md.

@@ -1,3 +1,8 @@
+---
+name: Scripture-Curated Skill Documentation
+description: "This skill operates within Nicene Christianity:"
+---
+
 # Scripture-Curated Skill Documentation
 
 ## Overview

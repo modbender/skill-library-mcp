@@ -1,3 +1,8 @@
+---
+name: skill-cold-email-outreach
+description: Apollo → Hunter → Instantly automated cold email pipeline.
+---
+
 # skill-cold-email-outreach
 
 Apollo → Hunter → Instantly automated cold email pipeline.

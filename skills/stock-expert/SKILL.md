@@ -1,3 +1,8 @@
+---
+name: KIS Stock Expert
+description: 한국투자증권 API를 활용하여 국내 주식 시세 조회, 계좌 잔고 확인 및 매매 주문을 수행합니다.
+---
+
 # KIS Stock Expert
 
 한국투자증권 API를 활용하여 국내 주식 시세 조회, 계좌 잔고 확인 및 매매 주문을 수행합니다.

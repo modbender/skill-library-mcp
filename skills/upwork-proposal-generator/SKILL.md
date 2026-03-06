@@ -1,3 +1,8 @@
+---
+name: Upwork Proposal Generator
+description: 自動幫你分析Upwork job post同埋生成專業proposal
+---
+
 # Upwork Proposal Generator
 
 自動幫你分析Upwork job post同埋生成專業proposal

@@ -1,3 +1,10 @@
+---
+name: Dropbox KB Auto
+description: Your AI agent can't search your Dropbox. Documents, receipts,
+  research papers, and notes sit in folders your agent doesn't know about — so
+  you end up searching manually.
+---
+
 # Dropbox KB Auto
 
 ## What problem does this solve?

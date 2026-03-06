@@ -1,3 +1,9 @@
+---
+name: Partnership Agreement Generator
+description: Generate comprehensive partnership agreements, joint venture
+  frameworks, and strategic alliance documents for B2B relationships.
+---
+
 # Partnership Agreement Generator
 
 Generate comprehensive partnership agreements, joint venture frameworks, and strategic alliance documents for B2B relationships.

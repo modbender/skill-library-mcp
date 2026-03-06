@@ -1,3 +1,10 @@
+---
+name: Alert System
+description: Smart monitoring with customizable triggers — price alerts (stocks,
+  crypto, products), event monitoring, custom condition alerts with Telegram
+  notification.
+---
+
 # Alert System
 
 Smart monitoring with customizable triggers — price alerts (stocks, crypto, products), event monitoring, custom condition alerts with Telegram notification.

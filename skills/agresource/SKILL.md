@@ -1,3 +1,9 @@
+---
+name: AgResource Newsletter Scraper
+description: Use this skill to scrape, summarize, and analyze AgResource grain
+  marketing newsletters.
+---
+
 # AgResource Newsletter Scraper
 
 Use this skill to scrape, summarize, and analyze AgResource grain marketing newsletters.

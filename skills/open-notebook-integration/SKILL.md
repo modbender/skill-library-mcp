@@ -1,3 +1,9 @@
+---
+name: Open Notebook Integration
+description: A skill for integrating OpenClaw agents with open-notebook, a local
+  AI research assistant (NotebookLM alternative).
+---
+
 # Open Notebook Integration
 
 A skill for integrating OpenClaw agents with open-notebook, a local AI research assistant (NotebookLM alternative).

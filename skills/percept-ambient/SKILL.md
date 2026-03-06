@@ -1,3 +1,9 @@
+---
+name: percept-ambient
+description: Ambient intelligence mode — continuous context awareness without
+  explicit commands.
+---
+
 # percept-ambient
 
 Ambient intelligence mode — continuous context awareness without explicit commands.

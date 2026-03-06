@@ -1,23 +1,9 @@
 ---
-name: hiro  
-## Security Warning: Semi-Traceless Execution
-
-**⚠️ HIGH RISK: This skill enables execution of encrypted Python code with minimal traces.**
-
-The Hiro system executes decoded Python scripts entirely in memory using `exec()`, leaving no temporary files or disk artifacts. This "semi-traceless" execution provides strong security for legitimate use but poses significant risks:
-
-- **Malicious Code Execution**: Encrypted scripts can contain arbitrary Python code that runs with full access to the system.
-- **No Audit Trail**: Memory-only execution leaves no logs or artifacts for forensic analysis.
-- **Prompt Injection Risk**: If compromised, this could enable injection of malicious prompts or code into AI systems.
-
-**Use extreme caution:**
-- Only execute .glyph files from trusted sources.
-- Verify key integrity before execution.
-- Consider the security implications for your deployment environment.
-
-This tool is designed for secure agent communications but requires responsible use to prevent exploitation. Includes CLI tools, glyph execution, and GUI notepad.
-metadata: {"openclaw": {"requires": {"bins": ["python"]}}}
+name: hiro
+description: "This skill enables encoding and decoding of text messages using
+  the Hiro hieroglyphic system. It supports:"
 ---
+
 
 # Hiro Cipher
 

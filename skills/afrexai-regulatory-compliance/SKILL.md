@@ -1,3 +1,10 @@
+---
+name: Regulatory Compliance Audit
+description: Run a full regulatory compliance audit for any business. Covers US,
+  UK, and EU frameworks across 8 compliance domains with gap analysis, risk
+  scoring, and remediation timelines.
+---
+
 # Regulatory Compliance Audit
 
 Run a full regulatory compliance audit for any business. Covers US, UK, and EU frameworks across 8 compliance domains with gap analysis, risk scoring, and remediation timelines.

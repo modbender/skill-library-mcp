@@ -1,3 +1,9 @@
+---
+name: Context Optimizer & Task Processing Skills Package
+description: "This package contains two powerful OpenClaw skills for automated
+  context management:"
+---
+
 # Context Optimizer & Task Processing Skills Package
 
 ## Overview

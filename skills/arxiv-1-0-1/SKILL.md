@@ -1,3 +1,9 @@
+---
+name: arXiv Research Assistant
+description: Search, fetch, and analyze academic papers from arXiv.org directly
+  from your AI assistant.
+---
+
 # arXiv Research Assistant
 
 Search, fetch, and analyze academic papers from arXiv.org directly from your AI assistant.

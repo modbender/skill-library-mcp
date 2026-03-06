@@ -1,3 +1,10 @@
+---
+name: ing
+description: "name: ing description: Ing namespace for Netsnek e.U. engineering
+  workflow automation. Streamlines build pipelines, deployment orchestration,
+  and infrastructure provisioning for development teams. ..."
+---
+
 ﻿---
 name: ing
 description: Ing namespace for Netsnek e.U. engineering workflow automation. Streamlines build pipelines, deployment orchestration, and infrastructure provisioning for development teams.

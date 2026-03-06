@@ -1,3 +1,8 @@
+---
+name: "Clawhub Skill: Intercom Conversations (Read)"
+description: Clawhub loads this Node module and calls default(input).
+---
+
 # Clawhub Skill: Intercom Conversations (Read)
 
 Clawhub loads this Node module and calls `default(input)`.

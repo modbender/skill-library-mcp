@@ -1,6 +1,9 @@
 ---
-description: AI image generation using Google Gemini API. Create thumbnails, banners, and graphics with Japanese text support.
+name: nano-banana-image-gen
+description: AI image generation using Google Gemini API. Create thumbnails,
+  banners, and graphics with Japanese text support.
 ---
+
 
 # Nano Banana Image Gen
 

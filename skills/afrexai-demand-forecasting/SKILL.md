@@ -1,3 +1,10 @@
+---
+name: Demand Forecasting Framework
+description: Build accurate demand forecasts using multiple methodologies.
+  Combines statistical models with market intelligence for actionable
+  predictions.
+---
+
 # Demand Forecasting Framework
 
 Build accurate demand forecasts using multiple methodologies. Combines statistical models with market intelligence for actionable predictions.

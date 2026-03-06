@@ -1,3 +1,10 @@
+---
+name: Childcare & Daycare Compliance Agent
+description: Licensing, safety, staffing, and operational compliance for
+  childcare centers, family daycare homes, and early learning programs in the
+  US.
+---
+
 # Childcare & Daycare Compliance Agent
 
 Licensing, safety, staffing, and operational compliance for childcare centers, family daycare homes, and early learning programs in the US.

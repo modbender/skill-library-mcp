@@ -1,3 +1,9 @@
+---
+name: Pod Point Watcher
+description: This skill monitors the live status of a specific Pod Point
+  charging pod using Pod Point's public status endpoint.
+---
+
 # Pod Point Watcher
 
 This skill monitors the live status of a specific Pod Point charging pod using Pod Point's public status endpoint.

@@ -1,3 +1,10 @@
+---
+name: G-Prophet AI Skills Documentation
+description: G-Prophet is an AI-powered stock prediction platform that exposes
+  its core capabilities through an external API for other AI agent systems. It
+  supports global markets (China A-shares, US stocks, HK...
+---
+
 # G-Prophet AI Skills Documentation
 
 > Stock prediction and market analysis capabilities for AI agents

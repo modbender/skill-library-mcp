@@ -1,7 +1,12 @@
 ---
 name: seedance2
-description: Seedance Video Creative Studio. Autonomously analyzes images, expands copy, matches camera work, validates quality, and generates via API when user provides images/text. Triggers on: Seedance, video generation, video prompt, AI video, camera work, short drama, ad video, video extend, image-to-video.
+description: "Seedance Video Creative Studio. Autonomously analyzes images,
+  expands copy, matches camera work, validates quality, and generates via API
+  when user provides images/text. Triggers on: Seedance, video generation, video
+  prompt, AI video, camera work, short drama, ad video, video extend,
+  image-to-video."
 ---
+
 
 # Seedance Video Creative Studio
 

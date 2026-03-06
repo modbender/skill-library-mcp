@@ -1,3 +1,9 @@
+---
+name: feishu-calendar
+description: Manage Feishu (Lark) Calendars. Use this skill to list calendars,
+  check schedules, and sync events.
+---
+
 # feishu-calendar
 
 Manage Feishu (Lark) Calendars. Use this skill to list calendars, check schedules, and sync events.

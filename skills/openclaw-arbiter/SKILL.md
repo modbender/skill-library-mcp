@@ -1,8 +1,10 @@
 ---
 name: openclaw-arbiter
-user-invocable: true
-metadata: {"openclaw":{"emoji":"⚖️","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Audits installed skills to report exactly what system resources
+  each one accesses — network, subprocess, file I/O, environment variables, and
+  unsafe operations.
 ---
+
 
 # OpenClaw Arbiter
 

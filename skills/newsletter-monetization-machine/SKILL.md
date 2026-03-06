@@ -1,3 +1,10 @@
+---
+name: 📧 Newsletter Monetization Machine — Build, Grow & Monetize on Autopilot
+description: Newsletter is the highest-ROI content channel alive. The average
+  email list generates $36 for every $1 spent. Creators like Morning Brew, The
+  Hustle, and Milk Road turned newsletters into $10M+ bus...
+---
+
 # 📧 Newsletter Monetization Machine — Build, Grow & Monetize on Autopilot
 
 **Slug:** `newsletter-monetization-machine`  

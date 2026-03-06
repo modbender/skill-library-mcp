@@ -1,3 +1,9 @@
+---
+name: Incident Postmortem Generator
+description: Generate blameless incident postmortems from raw notes, Slack
+  threads, or bullet points.
+---
+
 # Incident Postmortem Generator
 
 Generate blameless incident postmortems from raw notes, Slack threads, or bullet points.

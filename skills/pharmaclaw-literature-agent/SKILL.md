@@ -1,7 +1,19 @@
 ---
 name: pharmaclaw-literature-agent
-description: Literature mining agent v2.0.0 for novel drug discovery: PubMed/Semantic Scholar + ClinicalTrials Phase II/III + bioRxiv preprints. Novelty scoring, phase/FDA query boosts. Best for latest breakthroughs. Searches PubMed (NCBI E-utilities) and Semantic Scholar for papers related to compounds, targets, diseases, mechanisms, reactions, and catalysts. Returns structured results with titles, authors, abstracts, DOIs, MeSH terms, citation counts, TLDR summaries, and open-access PDFs. Supports paper lookup by DOI/PMID, citation tracking, and related paper discovery. Chains from any PharmaClaw agent (compound name, target, disease) and recommends next agents based on findings. No API keys required. Triggers on literature, papers, publications, PubMed, search papers, citations, references, what's published, research on, studies about, review articles, recent papers, state of the art.
+description: "Literature mining agent v2.0.0 for novel drug discovery:
+  PubMed/Semantic Scholar + ClinicalTrials Phase II/III + bioRxiv preprints.
+  Novelty scoring, phase/FDA query boosts. Best for latest breakthroughs.
+  Searches PubMed (NCBI E-utilities) and Semantic Scholar for papers related to
+  compounds, targets, diseases, mechanisms, reactions, and catalysts. Returns
+  structured results with titles, authors, abstracts, DOIs, MeSH terms, citation
+  counts, TLDR summaries, and open-access PDFs. Supports paper lookup by
+  DOI/PMID, citation tracking, and related paper discovery. Chains from any
+  PharmaClaw agent (compound name, target, disease) and recommends next agents
+  based on findings. No API keys required. Triggers on literature, papers,
+  publications, PubMed, search papers, citations, references, what's published,
+  research on, studies about, review articles, recent papers, state of the art."
 ---
+
 
 # Literature Agent v1.0.0
 

@@ -1,3 +1,9 @@
+---
+name: hashbox-plugin
+description: OpenClaw plugin that connects an AI agent to the HashBox iOS app
+  via Firebase webhook for push notifications.
+---
+
 # hashbox-plugin
 
 OpenClaw plugin that connects an AI agent to the HashBox iOS app via Firebase webhook for push notifications.

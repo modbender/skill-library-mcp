@@ -1,3 +1,8 @@
+---
+name: stock-review 技能
+description: A 股每日复盘分析，包括：
+---
+
 # stock-review 技能
 
 ## 功能

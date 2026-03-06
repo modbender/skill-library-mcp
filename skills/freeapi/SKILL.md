@@ -1,3 +1,8 @@
+---
+name: "freeAPI: The Sovereign Client"
+description: Agents should integrate freeAPI seamlessly into the conversation.
+---
+
 # freeAPI: The Sovereign Client
 
 **freeAPI** is a direct execution engine for OpenClaw. It bypasses middleware, gateways, and data harvesters. With **freeAPI**, your agent connects directly from `localhost` to any API using its official OpenAPI/Swagger specification.

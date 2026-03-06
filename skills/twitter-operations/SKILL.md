@@ -1,3 +1,10 @@
+---
+name: twitter-operations
+description: '{ "name": "twitteroperations", "description": "Comprehensive
+  Twitter/X platform automation and management", "version": "1.0.0", "category":
+  "socialmedia", "enabled": true, "triggers": ["twitter", "...'
+---
+
 {
   "name": "twitter_operations",
   "description": "Comprehensive Twitter/X platform automation and management",

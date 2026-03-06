@@ -1,3 +1,9 @@
+---
+name: Hotbutter Voice Skill (Hosted Relay)
+description: For a fully local alternative where no data leaves your machine,
+  see hotbutter-os.
+---
+
 # Hotbutter Voice Skill (Hosted Relay)
 
 **This skill routes data through hotbutter.ai.** Voice transcripts and agent responses are transmitted through the hosted relay server at `wss://hotbutter.ai`. This is a convenience skill — not a private or local-only solution.

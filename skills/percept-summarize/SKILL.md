@@ -1,3 +1,9 @@
+---
+name: percept-summarize
+description: Automatic conversation summaries with entity extraction and
+  relationship mapping.
+---
+
 # percept-summarize
 
 Automatic conversation summaries with entity extraction and relationship mapping.

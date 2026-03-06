@@ -1,7 +1,12 @@
 ---
 name: duckduckgo-websearch
-description: High-quality web search using DuckDuckGo (Instant Answer + SERP scraping fallback). Use when the user asks to search the web, fetch top results, or summarize web pages. Triggers for: (1) general web queries (news, facts, links), (2) site-specific searches, (3) short summaries of top results. Prefer this skill for private/offline-friendly search without Brave API keys.
+description: "High-quality web search using DuckDuckGo (Instant Answer + SERP
+  scraping fallback). Use when the user asks to search the web, fetch top
+  results, or summarize web pages. Triggers for: (1) general web queries (news,
+  facts, links), (2) site-specific searches, (3) short summaries of top results.
+  Prefer this skill for private/offline-friendly search without Brave API keys."
 ---
+
 
 # DuckDuckGo Websearch Skill
 

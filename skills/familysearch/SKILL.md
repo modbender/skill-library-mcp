@@ -1,14 +1,15 @@
 ---
 name: familysearch
-description: Search, explore, and analyze family history using the FamilySearch API and offline GEDCOM files. Use when the user asks about genealogy, ancestors, family trees, family history research, pedigree charts, or wants to look up relatives. Supports live FamilySearch API queries (person search, ancestry/descendancy, relationships, historical records) and offline GEDCOM file parsing (search, profiles, narrative biographies, statistics). Trigger on: "search my family tree", "who are my ancestors", "tell me about [ancestor name]", "family tree", "GEDCOM", "genealogy", "FamilySearch".
-os: [macos, linux]
-credentials:
-  - name: FamilySearch OAuth Token
-    description: OAuth 2.0 access token for FamilySearch API (required for API mode only; GEDCOM mode works offline)
-    required: false
-bins:
-  - python3
+description: 'Search, explore, and analyze family history using the FamilySearch
+  API and offline GEDCOM files. Use when the user asks about genealogy,
+  ancestors, family trees, family history research, pedigree charts, or wants to
+  look up relatives. Supports live FamilySearch API queries (person search,
+  ancestry/descendancy, relationships, historical records) and offline GEDCOM
+  file parsing (search, profiles, narrative biographies, statistics). Trigger
+  on: "search my family tree", "who are my ancestors", "tell me about [ancestor
+  name]", "family tree", "GEDCOM", "genealogy", "FamilySearch".'
 ---
+
 
 # FamilySearch Genealogy Skill
 

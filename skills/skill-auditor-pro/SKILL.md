@@ -1,9 +1,10 @@
 ---
 name: skill-auditor
-version: 2.1.1
-description: Security scanner for ClawHub skills. Detects malicious code, obfuscated payloads, and social engineering before installation. Three-layer analysis: pattern matching, deobfuscation, and LLM intent analysis.
-author: sypsyp97
+description: "Security scanner for ClawHub skills. Detects malicious code,
+  obfuscated payloads, and social engineering before installation. Three-layer
+  analysis: pattern matching, deobfuscation, and LLM intent analysis."
 ---
+
 
 # Skill Auditor 🔍
 

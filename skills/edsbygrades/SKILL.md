@@ -1,3 +1,10 @@
+---
+name: Edsby Student Integration Skill
+description: "Author: Lysandre Stone-Bourgeois Version: 1.0.0 Description:
+  Integrates with Edsby via browser relay to fetch classes/grades/assignments,
+  generate reports/summaries, and sync due dates to Google Ca..."
+---
+
 # Edsby Student Integration Skill
 
 Author: Lysandre Stone-Bourgeois

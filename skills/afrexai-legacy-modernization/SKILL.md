@@ -1,3 +1,10 @@
+---
+name: Legacy System Modernization Engine
+description: Complete methodology for assessing, planning, and executing legacy
+  system modernization — from monolith decomposition to cloud migration. Works
+  for any tech stack, any scale.
+---
+
 # Legacy System Modernization Engine
 
 Complete methodology for assessing, planning, and executing legacy system modernization — from monolith decomposition to cloud migration. Works for any tech stack, any scale.

@@ -1,37 +1,9 @@
 ---
 name: warden-governance
-version: 1.0.0
-author: AN2B Technologies
-license: MIT
-category: governance
-clawhub: an2b/warden-governance
-hooks:
-  - before_action
-  - after_action
-  - on_error
-config:
-  SENTINEL_API_KEY:
-    required: false
-    description: Sentinel_OS API key for enterprise governance
-  ENGRAMPORT_API_KEY:
-    required: false
-    description: EngramPort API key for enterprise memory
-  WARDEN_FAIL_OPEN:
-    required: false
-    default: "false"
-    description: Allow actions when governance engine fails
-  WARDEN_AGENT_ID:
-    required: false
-    default: openclaw-agent
-    description: Bot identifier for audit trail
-  WARDEN_POLICY_FILE:
-    required: false
-    description: Path to custom YAML policy file
-  WARDEN_POLICY_PACKS:
-    required: false
-    description: Comma-separated built-in policy pack names
-install: openclaw skill install an2b/warden-governance
+description: Every action your OpenClaw bot tries to take is evaluated by
+  War/Den before it executes.
 ---
+
 
 # War/Den Governance Skill
 

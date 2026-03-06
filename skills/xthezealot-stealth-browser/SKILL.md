@@ -1,3 +1,8 @@
+---
+name: Stealth Browser
+description: Use /stealth-browser to access websites with advanced bot protection.
+---
+
 # Stealth Browser
 
 Use `/stealth-browser` to access websites with advanced bot protection.

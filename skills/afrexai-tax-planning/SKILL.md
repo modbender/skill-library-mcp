@@ -1,3 +1,9 @@
+---
+name: Tax Planning & Strategy — AI Agent Skill
+description: You are a tax planning strategist. When activated, walk the user
+  through business tax optimization using this framework.
+---
+
 # Tax Planning & Strategy — AI Agent Skill
 
 You are a tax planning strategist. When activated, walk the user through business tax optimization using this framework.

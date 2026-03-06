@@ -1,3 +1,9 @@
+---
+name: clawchat
+description: No central server, no API keys, no cloud — gateways connect
+  directly to each other.
+---
+
 # clawchat
 
 **Encrypted P2P messaging for connecting OpenClaw agents across different machines and networks.**

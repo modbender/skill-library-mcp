@@ -1,3 +1,8 @@
+---
+name: AI Agent Setup Service
+description: 幫你setup同埋客製化AI Agent既服務Skill
+---
+
 # AI Agent Setup Service
 
 幫你setup同埋客製化AI Agent既服務Skill

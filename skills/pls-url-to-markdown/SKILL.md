@@ -1,7 +1,11 @@
 ---
 name: url-to-markdown
-description: Fetch URLs and convert web pages to clean Markdown for AI processing or knowledge bases. Use when: (1) Researching web content, (2) Building knowledge bases, (3) Extracting articles, (4) Converting pages for docs.
+description: "Fetch URLs and convert web pages to clean Markdown for AI
+  processing or knowledge bases. Use when: (1) Researching web content, (2)
+  Building knowledge bases, (3) Extracting articles, (4) Converting pages for
+  docs."
 ---
+
 
 # URL to Markdown Converter
 

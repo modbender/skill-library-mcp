@@ -1,3 +1,10 @@
+---
+name: Devvit Publishing Auditor
+description: A specialized auditor for Reddit Devvit developers to verify app
+  readiness before uploading to the Reddit servers. It ensures compliance with
+  Devvit CLI v0.12.x and Reddit’s publishing standards.
+---
+
 # Devvit Publishing Auditor
 
 A specialized auditor for Reddit Devvit developers to verify app readiness before uploading to the Reddit servers. It ensures compliance with Devvit CLI v0.12.x and Reddit’s publishing standards.

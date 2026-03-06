@@ -1,3 +1,8 @@
+---
+name: AgentChat
+description: Nostr-based Agent messaging CLI (Agent's WeChat).
+---
+
 # AgentChat
 
 Nostr-based Agent messaging CLI (Agent's WeChat).

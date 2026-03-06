@@ -1,3 +1,10 @@
+---
+name: Compensation & Salary Benchmarking Planner
+description: Build data-driven compensation structures that attract talent
+  without overpaying. Covers base salary bands, equity/bonus frameworks,
+  geographic differentials, and total rewards packaging.
+---
+
 # Compensation & Salary Benchmarking Planner
 
 Build data-driven compensation structures that attract talent without overpaying. Covers base salary bands, equity/bonus frameworks, geographic differentials, and total rewards packaging.

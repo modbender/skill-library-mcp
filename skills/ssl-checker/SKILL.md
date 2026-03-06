@@ -1,6 +1,9 @@
 ---
-description: Check SSL/TLS certificate expiry, validity, chain, and configuration for any domain.
+name: ssl-checker
+description: Check SSL/TLS certificate expiry, validity, chain, and
+  configuration for any domain.
 ---
+
 
 # SSL Checker
 

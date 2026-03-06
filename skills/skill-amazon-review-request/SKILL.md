@@ -1,3 +1,10 @@
+---
+name: skill-amazon-review-request
+description: Sends Amazon review requests for eligible Shipped orders via SP-API
+  Messaging API. Hardened with retry logic, deduplication, eligibility window
+  enforcement, and dry-run mode.
+---
+
 # skill-amazon-review-request
 
 Sends Amazon review requests for eligible Shipped orders via SP-API Messaging API.

@@ -1,3 +1,8 @@
+---
+name: MBTI Agent - 数字精灵人格测评
+description: 针对 OpenClaw 等非交互式 AI 智能体的 MBTI 测评方案。
+---
+
 # MBTI Agent - 数字精灵人格测评
 
 针对 OpenClaw 等非交互式 AI 智能体的 MBTI 测评方案。

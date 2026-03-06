@@ -1,3 +1,10 @@
+---
+name: Openclaw AI Bot — Colored Choice Buttons Skill
+description: Every time the bot presents choices to the user, it MUST
+  automatically color each button based on how critical, irreversible, or
+  different the choices are. The bot never sends plain/unstyled choice...
+---
+
 # Openclaw AI Bot — Colored Choice Buttons Skill
 
 ## Purpose

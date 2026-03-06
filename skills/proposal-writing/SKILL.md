@@ -1,3 +1,10 @@
+---
+name: Proposal Writing — Confirmation-First Closing Framework
+description: "Write proposals that confirm verbal agreements and close deals,
+  not proposals that try to sell. Sources: Consulting Success (reviewed 100s of
+  proposals, 60%+ win rate benchmark), Aura/Prosal (2024 ..."
+---
+
 # Proposal Writing — Confirmation-First Closing Framework
 
 Write proposals that confirm verbal agreements and close deals, not proposals that try to sell.

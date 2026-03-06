@@ -1,3 +1,10 @@
+---
+name: Larry — Autonomous TikTok Slideshow Agent
+description: 1. Research — Identifies viral hooks and trending topics in your
+  niche 2. Ideation — Creates 6-slide concepts linked to your affiliate articles
+  3. Image Generation — Generates 6 consistent images v...
+---
+
 # Larry — Autonomous TikTok Slideshow Agent
 
 > Automatically generates and posts TikTok slideshows for affiliate content sites.

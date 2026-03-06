@@ -1,3 +1,8 @@
+---
+name: Kit Email Marketing Operator
+description: "Version: 1.0.0 Distribution: Private ClawHub (Premium Skool members only)"
+---
+
 # Kit Email Marketing Operator
 
 **AI-powered email marketing for Kit (ConvertKit)**

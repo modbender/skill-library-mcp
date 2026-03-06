@@ -1,3 +1,8 @@
+---
+name: exo-installer Skill
+description: Install, update, and monitor all E.x.O. tools with a single command.
+---
+
 # exo-installer Skill
 
 **E.x.O. Ecosystem Manager**

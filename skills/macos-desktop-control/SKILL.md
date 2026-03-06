@@ -1,3 +1,10 @@
+---
+name: macOS Control Skill
+description: A high-fidelity automation bridge for macOS (Darwin) that enables
+  agents to perceive the desktop state and execute precise mouse and keyboard
+  interactions.
+---
+
 # macOS Control Skill
 
 A high-fidelity automation bridge for macOS (Darwin) that enables agents to perceive the desktop state and execute precise mouse and keyboard interactions.

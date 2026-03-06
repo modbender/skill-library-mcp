@@ -1,3 +1,9 @@
+---
+name: Ant Design 组件库 (antd)
+description: 为 AI 助手提供 Ant Design 组件库的使用能力。AI 可以在任何 React 项目中使用 Ant Design
+  的基础组件来构建 UI，包括按钮、表单、表格、模态框、布局等所有官方组件。
+---
+
 # Ant Design 组件库 (antd)
 
 ## 描述

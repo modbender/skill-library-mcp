@@ -1,3 +1,10 @@
+---
+name: Video Analyzer Skill
+description: Analyze any video by dropping a URL. Works with TikTok, YouTube,
+  Instagram, Twitter/X, and 1000+ other sites. Transcribes the audio locally and
+  answers any question about the content.
+---
+
 # Video Analyzer Skill
 
 Analyze any video by dropping a URL. Works with TikTok, YouTube, Instagram, Twitter/X, and 1000+ other sites. Transcribes the audio locally and answers any question about the content.

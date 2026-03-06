@@ -1,3 +1,9 @@
+---
+name: Freelance Toolkit
+description: "Boîte à outils pour freelances/indépendants en France : factures,
+  time tracking, clients, dashboard."
+---
+
 # Freelance Toolkit
 
 Boîte à outils pour freelances/indépendants en France : factures, time tracking, clients, dashboard.

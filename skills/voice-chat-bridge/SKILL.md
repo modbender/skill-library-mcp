@@ -1,12 +1,8 @@
 ---
-skill_id: voice-chat-bridge
-version: 1.1.0
-author: laoxu
+name: voice-chat-bridge
 description: 双向语音对话系统 - 语音识别转文字 + Edge TTS语音合成 + Cloudflare Tunnel公网访问
-categories: [voice, speech, communication]
-requires: [ffmpeg]
-optional: [cloudflared, ngrok]
 ---
+
 
 # Voice Chat Bridge Skill
 

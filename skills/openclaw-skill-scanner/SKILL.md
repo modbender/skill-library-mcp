@@ -1,3 +1,10 @@
+---
+name: Skill Scanner
+description: Scans ClawHub skills for malicious patterns before and after
+  installation. Detects base64 payloads, reverse shells, data exfiltration,
+  crypto miners, obfuscated URLs, and more.
+---
+
 # Skill Scanner
 
 **Name:** skill-scanner

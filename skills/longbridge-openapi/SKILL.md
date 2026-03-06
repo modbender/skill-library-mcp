@@ -1,3 +1,9 @@
+---
+name: Longbridge OpenAPI
+description: Longbridge Securities OpenAPI SDK, supporting Hong Kong and US
+  stock trading, real-time market data subscription, and account management.
+---
+
 # Longbridge OpenAPI
 
 Longbridge Securities OpenAPI SDK, supporting Hong Kong and US stock trading, real-time market data subscription, and account management.

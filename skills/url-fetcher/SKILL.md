@@ -1,7 +1,14 @@
 ---
 name: url-fetcher
-description: Simple web content fetching without API keys or external dependencies. Uses Python stdlib (urllib) only. Features: fetch HTML/text from URLs, basic HTML to markdown conversion, path-validated file writes (blocks system paths), URL validation (blocks localhost/internal). Security: File writes use is_safe_path() to prevent malicious writes. Perfect for content aggregation, research collection, and web scraping without API costs or dependencies.
+description: "Simple web content fetching without API keys or external
+  dependencies. Uses Python stdlib (urllib) only. Features: fetch HTML/text from
+  URLs, basic HTML to markdown conversion, path-validated file writes (blocks
+  system paths), URL validation (blocks localhost/internal). Security: File
+  writes use is_safe_path() to prevent malicious writes. Perfect for content
+  aggregation, research collection, and web scraping without API costs or
+  dependencies."
 ---
+
 
 # URL Fetcher
 

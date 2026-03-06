@@ -1,3 +1,8 @@
+---
+name: Molt-Solver 🧩
+description: 自动解决 Moltbook 验证码难题的专家。
+---
+
 # Molt-Solver 🧩
 
 自动解决 Moltbook 验证码难题的专家。

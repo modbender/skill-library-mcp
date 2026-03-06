@@ -1,3 +1,10 @@
+---
+name: AetherLang V3 — Claude Code Integration Skill
+description: Use this skill to execute AetherLang V3 AI workflows from Claude
+  Code. AetherLang provides 9 specialized AI engines for culinary consulting,
+  business strategy, scientific research, and more.
+---
+
 # AetherLang V3 — Claude Code Integration Skill
 
 Use this skill to execute AetherLang V3 AI workflows from Claude Code. AetherLang provides 9 specialized AI engines for culinary consulting, business strategy, scientific research, and more.

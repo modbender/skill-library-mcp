@@ -1,13 +1,10 @@
 ---
-description: Agent-to-agent task coordination via RFP, bid, and hire pattern. Use when delegating tasks to other agents, requesting proposals, hiring agents, or coordinating multi-agent work.
-triggers:
-  - rfp
-  - hire agent
-  - delegate task
-  - bid on task
-  - agent coordination
-  - request for proposal
+name: quack-coordinator
+description: Agent-to-agent task coordination via RFP, bid, and hire pattern.
+  Use when delegating tasks to other agents, requesting proposals, hiring
+  agents, or coordinating multi-agent work.
 ---
+
 
 # Quack Coordinator
 

@@ -1,3 +1,10 @@
+---
+name: Mailbox CLI (OpenClaw Skill)
+description: Use the mailbox CLI as a tool to read and manage email. OpenClaw
+  handles channel delivery and scheduling. The mailbox CLI returns structured
+  JSON outputs and optional text summaries.
+---
+
 # Mailbox CLI (OpenClaw Skill)
 
 Use the mailbox CLI as a tool to read and manage email. OpenClaw handles

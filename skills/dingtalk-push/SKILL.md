@@ -1,3 +1,8 @@
+---
+name: "skill: dingtalk-push"
+description: 发送钉钉群聊机器人消息的技能。
+---
+
 # skill: dingtalk-push
 
 发送钉钉群聊机器人消息的技能。

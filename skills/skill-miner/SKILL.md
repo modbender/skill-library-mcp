@@ -1,7 +1,13 @@
 ---
 name: skill-miner
-description: Professional skill discovery and clean-skill creation from ClawHub research. Use when you need to find existing functionality, research approaches, or build new skills based on ClawHub inspiration without downloading external code. Implements safe workflow: Search ClawHub → Inspect metadata → Analyze approach → Build own clean implementation. Prevents security risks while enabling rapid skill development.
+description: "Professional skill discovery and clean-skill creation from ClawHub
+  research. Use when you need to find existing functionality, research
+  approaches, or build new skills based on ClawHub inspiration without
+  downloading external code. Implements safe workflow: Search ClawHub → Inspect
+  metadata → Analyze approach → Build own clean implementation. Prevents
+  security risks while enabling rapid skill development."
 ---
+
 
 # skill-miner
 

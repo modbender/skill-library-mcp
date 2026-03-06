@@ -1,3 +1,9 @@
+---
+name: ML & AI Engineering System
+description: Complete methodology for building, deploying, and operating
+  production ML/AI systems — from experiment to scale.
+---
+
 # ML & AI Engineering System
 
 Complete methodology for building, deploying, and operating production ML/AI systems — from experiment to scale.

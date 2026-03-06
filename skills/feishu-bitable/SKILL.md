@@ -1,3 +1,8 @@
+---
+name: Feishu Bitable Skill
+description: 操作飞书多维表格（Bitable/Base）记录。
+---
+
 # Feishu Bitable Skill
 
 操作飞书多维表格（Bitable/Base）记录。

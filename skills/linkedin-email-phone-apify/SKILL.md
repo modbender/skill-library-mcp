@@ -1,20 +1,11 @@
 ---
 name: linkedin-email-phone-apify
-description: Use this skill when the user needs LinkedIn contact enrichment by URLs with both phone and email lookup via Apify actors (phones: X95BXRaFOqZ7rzjxM, emails: q3wko0Sbx6ZAAB2xf), including optional branches and merged output.
-required_env_vars:
-  - APIFY_TOKEN
-required-env-vars:
-  - APIFY_TOKEN
-primary_credential: APIFY_TOKEN
-primary-credential: APIFY_TOKEN
-metadata:
-  short-description: Enrich LinkedIn URLs with emails and phones
-  openclaw:
-    requires:
-      env:
-        - APIFY_TOKEN
-    primaryCredential: APIFY_TOKEN
+description: "Use this skill when the user needs LinkedIn contact enrichment by
+  URLs with both phone and email lookup via Apify actors (phones:
+  X95BXRaFOqZ7rzjxM, emails: q3wko0Sbx6ZAAB2xf), including optional branches and
+  merged output."
 ---
+
 
 # LinkedIn Email + Phone Enrichment (Apify)
 

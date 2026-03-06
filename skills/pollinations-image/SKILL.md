@@ -1,3 +1,9 @@
+---
+name: 🎨 Pollinations Image Generation Skill
+description: A clean, modular, and user-friendly image generation tool powered
+  by Pollinations.ai.
+---
+
 # 🎨 Pollinations Image Generation Skill
 
 A clean, modular, and user-friendly image generation tool powered by [Pollinations.ai](https://pollinations.ai).

@@ -1,3 +1,9 @@
+---
+name: quant-trading-backtrader
+description: A comprehensive skill for building, backtesting, and optimizing
+  quantitative trading strategies using the Backtrader framework in Python.
+---
+
 # quant-trading-backtrader
 
 A comprehensive skill for building, backtesting, and optimizing quantitative trading strategies using the Backtrader framework in Python.

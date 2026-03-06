@@ -1,8 +1,10 @@
 ---
 name: openclaw-memory
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🧠","requires":{"bins":["node"]},"os":["darwin","linux","win32"]}}
+description: The first OpenClaw skill that gives your agents persistent memory -
+  they remember facts, preferences, patterns, and conversation history across
+  all sessions. Never repeat context again.
 ---
+
 
 # OpenClaw Memory System
 

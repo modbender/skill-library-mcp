@@ -1,3 +1,9 @@
+---
+name: Memory Pro Skill
+description: A highly efficient semantic search engine for your OpenClaw
+  workspace memory, powered by FAISS and Sentence-Transformers.
+---
+
 # Memory Pro Skill
 
 A highly efficient semantic search engine for your OpenClaw workspace memory, powered by FAISS and Sentence-Transformers.

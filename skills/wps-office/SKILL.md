@@ -1,3 +1,8 @@
+---
+name: WPS Office Skill
+description: WPS Office 自动化操作 Skill，支持本地文档操作和 WPS 365 云端协作功能。
+---
+
 # WPS Office Skill
 
 ## 简介

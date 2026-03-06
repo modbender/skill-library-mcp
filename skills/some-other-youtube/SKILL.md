@@ -1,3 +1,9 @@
+---
+name: youtube-apify-transcript
+description: Fetch YouTube transcripts via APIFY API (works from cloud IPs,
+  bypasses YouTube bot detection).
+---
+
 # youtube-apify-transcript
 
 Fetch YouTube transcripts via APIFY API (works from cloud IPs, bypasses YouTube bot detection).

@@ -1,3 +1,8 @@
+---
+name: NERRA AI Launch Engine
+description: An AI-powered Solana token strategist designed for Bags.fm launches.
+---
+
 # NERRA AI Launch Engine
 
 An AI-powered Solana token strategist designed for Bags.fm launches.

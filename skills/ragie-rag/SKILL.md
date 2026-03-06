@@ -1,35 +1,8 @@
 ---
 name: ragie-rag
-description: |
-  Execute Retrieval-Augmented Generation (RAG) using Ragie.ai.
-  Use this skill whenever the user wants to:
-  - Search their knowledge base
-  - Ask questions about uploaded documents
-  - Upload documents to Ragie
-  - Retrieve context from Ragie
-  - Perform grounded answering using stored documents
-  - List, check status, or delete Ragie documents
-
-  This skill manages the full Ragie.ai API lifecycle including ingestion,
-  retrieval, and grounded answer construction.
-metadata:
-{
-    "openclaw":
-      {
-        "requires":
-          {
-            "bins": ["python3"],
-            "env": ["RAGIE_API_KEY"],
-            "python": ["requests", "python-dotenv"]
-          },
-        "credentials":
-          {
-            "primary": "RAGIE_API_KEY",
-            "description": "API key from https://app.ragie.ai"
-          }
-      }
-  }
+description: "|"
 ---
+
 
 # Ragie.ai RAG Skill (OpenClaw Optimized)
 

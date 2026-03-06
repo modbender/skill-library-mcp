@@ -1,3 +1,8 @@
+---
+name: Lead Processing Agent
+description: 外贸 B2B 线索自动化清洗与分发代理。
+---
+
 # Lead Processing Agent
 
 外贸 B2B 线索自动化清洗与分发代理。

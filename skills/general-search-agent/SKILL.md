@@ -1,7 +1,9 @@
 ---
 name: general-search-agent
-description: Current Date: $DATE$. If you perform google search, it often betters for English query input.
+description: "Current Date: $DATE$. If you perform google search, it often
+  betters for English query input."
 ---
+
 
 # General Search Agent
 

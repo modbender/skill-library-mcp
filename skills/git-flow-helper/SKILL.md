@@ -1,3 +1,8 @@
+---
+name: Git Flow Helper
+description: 智能 Git 操作助手，帮助处理分支、合并、冲突等。
+---
+
 # Git Flow Helper
 
 智能 Git 操作助手，帮助处理分支、合并、冲突等。

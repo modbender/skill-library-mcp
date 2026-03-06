@@ -1,3 +1,8 @@
+---
+name: AOI Squad Orchestrator (Lite)
+description: "S-DNA: AOI-2026-0215-SDNA-SQUAD01"
+---
+
 # AOI Squad Orchestrator (Lite)
 
 S-DNA: `AOI-2026-0215-SDNA-SQUAD01`

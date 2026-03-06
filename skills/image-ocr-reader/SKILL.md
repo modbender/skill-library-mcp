@@ -1,3 +1,8 @@
+---
+name: Image OCR Reader
+description: 从图片中提取文字内容的技能，支持中文和英文识别。
+---
+
 # Image OCR Reader
 
 从图片中提取文字内容的技能，支持中文和英文识别。

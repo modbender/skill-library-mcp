@@ -1,3 +1,10 @@
+---
+name: SKILL.md - OpenClaw Migration
+description: When the workspace is in the middle of renaming the Clawd project
+  to OpenClaw, this skill lives in the repo so everyone—human or helper—can
+  follow the same migration playbook. It outlines what gets...
+---
+
 # SKILL.md - OpenClaw Migration
 
 ## Purpose

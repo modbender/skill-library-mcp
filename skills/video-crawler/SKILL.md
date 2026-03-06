@@ -1,3 +1,8 @@
+---
+name: Video Crawler - 视频抓取技能
+description: 一键抓取抖音和推特视频。
+---
+
 # Video Crawler - 视频抓取技能
 
 一键抓取抖音和推特视频。

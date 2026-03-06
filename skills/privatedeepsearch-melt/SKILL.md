@@ -1,3 +1,8 @@
+---
+name: privatedeepsearch-melt
+description: Powered by SearXNG. No Google. No tracking. No API keys. No BS.
+---
+
 # privatedeepsearch-melt
 
 > *"Google wants to know everything about you. I want to know nothing."*

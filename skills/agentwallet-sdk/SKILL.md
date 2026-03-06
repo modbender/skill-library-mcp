@@ -1,3 +1,10 @@
+---
+name: Agent Wallet SDK Skill
+description: Non-custodial wallet SDK for autonomous AI agents. Handles x402
+  payments, CCTP V2 cross-chain bridge transfers, ERC-8004 agent identity, and
+  Uniswap V3 token swaps — all without holding user keys.
+---
+
 # Agent Wallet SDK Skill
 
 Non-custodial wallet SDK for autonomous AI agents. Handles x402 payments, CCTP V2 cross-chain bridge transfers, ERC-8004 agent identity, and Uniswap V3 token swaps — all without holding user keys.

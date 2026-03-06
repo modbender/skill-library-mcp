@@ -1,3 +1,9 @@
+---
+name: "SKILL: DJI Video Backup"
+description: This skill automates backing up DJI camera footage from an SD card
+  (or USB share) to a NAS archive folder.
+---
+
 # SKILL: DJI Video Backup
 
 This skill automates backing up DJI camera footage from an SD card (or USB share) to a NAS archive folder.

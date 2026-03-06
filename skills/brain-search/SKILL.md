@@ -1,3 +1,10 @@
+---
+name: "Skill: brain-search"
+description: Search and interact with Frank's Second Brain — the persistent
+  knowledge base that stores conversation logs, research, journal entries, job
+  results, and long-term memory.
+---
+
 # Skill: brain-search
 
 ## CRITICAL RULE — NO FABRICATION

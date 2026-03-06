@@ -1,6 +1,9 @@
 ---
-description: Auto-generate and manage Git hooks for pre-commit, pre-push, commit-msg, and more.
+name: git-hooks
+description: Auto-generate and manage Git hooks for pre-commit, pre-push,
+  commit-msg, and more.
 ---
+
 
 # Git Hooks
 

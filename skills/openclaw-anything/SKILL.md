@@ -1,3 +1,9 @@
+---
+name: OpenClaw Skill
+description: "name: openclaw description: OpenClaw CLI wrapper — gateway,
+  channels, models, agents, nodes, browser, memory, security, automation."
+---
+
 ﻿---
 name: openclaw
 description: OpenClaw CLI wrapper — gateway, channels, models, agents, nodes, browser, memory, security, automation.

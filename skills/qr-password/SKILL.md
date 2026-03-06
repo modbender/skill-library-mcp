@@ -1,7 +1,12 @@
 ---
 name: qr-password
-description: Air-gapped credential bridge using QR codes. Use when transferring credentials between networked and air-gapped devices via QR codes. Triggers on: generating QR from credentials, reading QR codes containing credentials, air-gapped password transfer, credential QR codes, vault-to-QR, camera-to-credential.
+description: "Air-gapped credential bridge using QR codes. Use when transferring
+  credentials between networked and air-gapped devices via QR codes. Triggers
+  on: generating QR from credentials, reading QR codes containing credentials,
+  air-gapped password transfer, credential QR codes, vault-to-QR,
+  camera-to-credential."
 ---
+
 
 # QR Password — Air-Gapped Credential Bridge
 

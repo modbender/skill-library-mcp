@@ -1,3 +1,10 @@
+---
+name: Trade Manager - Automated Stop-Loss, Take-Profit, and Trailing Stops
+description: Use this skill to create automated trading rules (stop-loss,
+  take-profit, trailing stop) for your Polymarket positions. The Trade Manager
+  runs as part of the Vincent backend and automatically execu...
+---
+
 # Trade Manager - Automated Stop-Loss, Take-Profit, and Trailing Stops
 
 Use this skill to create automated trading rules (stop-loss, take-profit, trailing stop) for your Polymarket positions. The Trade Manager runs as part of the Vincent backend and automatically executes trades when price conditions are met.

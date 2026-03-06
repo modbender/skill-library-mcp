@@ -1,3 +1,9 @@
+---
+name: Gym & Fitness Studio Operations
+description: Run a profitable gym or fitness studio. Covers membership pricing,
+  retention, staffing, equipment lifecycle, class scheduling, and growth.
+---
+
 # Gym & Fitness Studio Operations
 
 Run a profitable gym or fitness studio. Covers membership pricing, retention, staffing, equipment lifecycle, class scheduling, and growth.

@@ -1,3 +1,8 @@
+---
+name: JSON Formatter
+description: 格式化、验证和压缩 JSON 数据。
+---
+
 # JSON Formatter
 
 格式化、验证和压缩 JSON 数据。

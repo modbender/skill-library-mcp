@@ -1,3 +1,9 @@
+---
+name: OpenClaw Advanced Memory
+description: Three-tier AI agent memory system — real-time capture, vector
+  search, and LLM-curated long-term recall.
+---
+
 # OpenClaw Advanced Memory
 
 Three-tier AI agent memory system — real-time capture, vector search, and LLM-curated long-term recall.

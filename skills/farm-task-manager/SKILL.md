@@ -1,3 +1,9 @@
+---
+name: Farm Task Manager
+description: "Farm Task Manager helps farmers organize daily, weekly, and
+  seasonal chores with task scheduling, priorities, and tracking. Perfect for:"
+---
+
 # Farm Task Manager
 
 *Daily, weekly, and seasonal farm chore management with task scheduling and priorities.*

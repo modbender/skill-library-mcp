@@ -1,3 +1,10 @@
+---
+name: "Skill: Refua"
+description: Refua is used in drug discovery to computationally fold and score
+  biomolecular complexes (e.g., protein–ligand/protein–protein) and optionally
+  profile ADMET, helping prioritize which molecules to s...
+---
+
 # Skill: Refua
 
 ## Summary

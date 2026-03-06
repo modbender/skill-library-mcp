@@ -1,3 +1,10 @@
+---
+name: Nmap Recon
+description: Network reconnaissance and port scanning using Nmap. Use when asked
+  to scan a target, find open ports, detect services, check for vulnerabilities,
+  or perform network reconnaissance.
+---
+
 # Nmap Recon
 
 Network reconnaissance and port scanning using Nmap. Use when asked to scan a target, find open ports, detect services, check for vulnerabilities, or perform network reconnaissance.

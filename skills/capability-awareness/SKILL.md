@@ -1,3 +1,10 @@
+---
+name: Capability Awareness System
+description: Makes OpenClaw agents aware of custom skills and capabilities.
+  Skills-first approach with on-demand documentation loading. Zero overhead when
+  not in use. Foundation for skill marketplace discovery.
+---
+
 # Capability Awareness System
 
 Makes OpenClaw agents aware of custom skills and capabilities. Skills-first approach with on-demand documentation loading. Zero overhead when not in use. Foundation for skill marketplace discovery.

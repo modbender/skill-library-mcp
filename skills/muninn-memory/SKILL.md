@@ -1,12 +1,10 @@
 ---
 name: muninn-memory
-version: "1.0.5"
-description: Memory system for AI agents. Store, recall, and manage memories with semantic search, entity extraction, and salience scoring. Works locally with SQLite and Ollama. Free tier: full features, no restrictions.
-install: "clawhub install muninn-memory"
-type: skill
-repository: https://github.com/openclaw/muninn-memory
-author: KakāpōHiko (KH)
+description: "Memory system for AI agents. Store, recall, and manage memories
+  with semantic search, entity extraction, and salience scoring. Works locally
+  with SQLite and Ollama. Free tier: full features, no restrictions."
 ---
+
 
 # Muninn Memory
 

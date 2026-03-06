@@ -1,16 +1,11 @@
 ---
-description: >-
-  Execute a Uniswap token swap. Use when user wants to swap, trade, buy, or sell
-  tokens. Handles quotes, safety checks, simulation, and execution autonomously.
-  Supports V2, V3, V4, UniswapX, and cross-chain routing on all supported chains.
-allowed-tools: >-
-  Read, Glob, Grep,
-  Task(subagent_type:trade-executor),
-  mcp__uniswap__get_supported_chains,
-  mcp__uniswap__search_tokens,
-  mcp__uniswap__check_safety_status
-model: opus
+name: execute-swap
+description: Execute a Uniswap token swap. Use when user wants to swap, trade,
+  buy, or sell tokens. Handles quotes, safety checks, simulation, and execution
+  autonomously. Supports V2, V3, V4, UniswapX, and cross-chain routing on all
+  supported chains.
 ---
+
 
 # Execute Swap
 

@@ -1,3 +1,9 @@
+---
+name: Twitter/X Reader Skill
+description: A comprehensive skill for reading and extracting data from X
+  (formerly Twitter) tweets using multiple reliable data sources.
+---
+
 # Twitter/X Reader Skill
 
 A comprehensive skill for reading and extracting data from X (formerly Twitter) tweets using multiple reliable data sources.

@@ -1,3 +1,9 @@
+---
+name: cninfo-announcement-scraper
+description: Use this skill to pull CNINFO official disclosures and extract
+  positive catalysts for A-share monitoring.
+---
+
 # cninfo-announcement-scraper
 
 Use this skill to pull CNINFO official disclosures and extract positive catalysts for A-share monitoring.

@@ -1,7 +1,10 @@
 ---
 name: react-composition-patterns
-model: standard
+description: Build flexible, maintainable React components using compound
+  components, context providers, and explicit variants. Avoid boolean prop
+  proliferation.
 ---
+
 
 # React Composition Patterns
 

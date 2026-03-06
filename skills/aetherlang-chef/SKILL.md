@@ -1,3 +1,9 @@
+---
+name: AetherLang Chef Ω V3 — AI Culinary Intelligence
+description: "⚠️ External API Notice: This skill sends queries to
+  api.neurodoc.app for processing."
+---
+
 # AetherLang Chef Ω V3 — AI Culinary Intelligence
 
 > Michelin-grade recipe consulting with 17 mandatory sections. The most advanced AI culinary engine available.

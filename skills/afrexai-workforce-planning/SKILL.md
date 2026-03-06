@@ -1,3 +1,10 @@
+---
+name: Workforce Planning Framework
+description: Build a data-driven workforce plan that aligns headcount, skills,
+  and costs with business goals. Covers demand forecasting, gap analysis,
+  succession planning, and contingent workforce strategy.
+---
+
 # Workforce Planning Framework
 
 Build a data-driven workforce plan that aligns headcount, skills, and costs with business goals. Covers demand forecasting, gap analysis, succession planning, and contingent workforce strategy.

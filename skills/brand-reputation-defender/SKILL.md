@@ -1,3 +1,10 @@
+---
+name: 🛡️ Brand Reputation Defender — Monitor, Respond & Protect Your Image 24/7
+description: One viral negative post can destroy years of brand building
+  overnight. Most businesses have zero system to monitor what's being said about
+  them online — until it's too late.
+---
+
 # 🛡️ Brand Reputation Defender — Monitor, Respond & Protect Your Image 24/7
 
 **Slug:** `brand-reputation-defender`  

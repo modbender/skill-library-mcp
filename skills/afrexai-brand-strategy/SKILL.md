@@ -1,3 +1,10 @@
+---
+name: Brand Strategy Engine
+description: Complete brand building and go-to-market system — from identity
+  foundations through positioning, messaging, visual systems, and launch
+  execution. Works for solopreneurs, startups, and established b...
+---
+
 # Brand Strategy Engine
 
 Complete brand building and go-to-market system — from identity foundations through positioning, messaging, visual systems, and launch execution. Works for solopreneurs, startups, and established businesses rebranding.

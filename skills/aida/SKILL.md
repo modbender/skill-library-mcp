@@ -1,3 +1,8 @@
+---
+name: AIDA Skill for OpenClaw
+description: aida
+---
+
 # AIDA Skill for OpenClaw
 
 ## Skill Name

@@ -1,3 +1,8 @@
+---
+name: Stock Board Skill - 股票打板筛选
+description: 筛选A股市场中的涨停板及强势股票。
+---
+
 # Stock Board Skill - 股票打板筛选
 
 筛选A股市场中的涨停板及强势股票。

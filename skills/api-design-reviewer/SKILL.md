@@ -1,3 +1,10 @@
+---
+name: API Design Reviewer
+description: The API Design Reviewer skill provides comprehensive analysis and
+  review of API designs, focusing on REST conventions, best practices, and
+  industry standards. This skill helps engineering teams bui...
+---
+
 # API Design Reviewer
 
 **Tier:** POWERFUL  

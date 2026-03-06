@@ -1,3 +1,8 @@
+---
+name: Deepgram CLI Skills Guide
+description: Uses your Deepgram API key (stored locally).
+---
+
 # Deepgram CLI Skills Guide
 
 ## Tool

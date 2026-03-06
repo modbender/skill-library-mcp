@@ -1,3 +1,8 @@
+---
+name: Cron Scheduler
+description: Manage scheduled tasks and automation on your system using cron.
+---
+
 # Cron Scheduler
 
 Manage scheduled tasks and automation on your system using cron.

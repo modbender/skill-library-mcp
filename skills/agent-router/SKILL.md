@@ -1,6 +1,9 @@
 ---
-description: Route prompts to the optimal AI model based on task type, complexity, and cost constraints.
+name: agent-router
+description: Route prompts to the optimal AI model based on task type,
+  complexity, and cost constraints.
 ---
+
 
 # Agent Router
 

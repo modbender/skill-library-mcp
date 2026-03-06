@@ -1,3 +1,9 @@
+---
+name: Agent Observability & Monitoring
+description: Score, monitor, and troubleshoot AI agent fleets in production.
+  Built for ops teams running 1-100+ agents.
+---
+
 # Agent Observability & Monitoring
 
 Score, monitor, and troubleshoot AI agent fleets in production. Built for ops teams running 1-100+ agents.

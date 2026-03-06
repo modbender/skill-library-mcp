@@ -1,14 +1,10 @@
 ---
 name: video-pipeline-bundle
-description: 视频一站式工作流技能包。整合视频剪辑、转写、烧录、拼接全流程，支持分步执行和用户确认。包含：(1) auto-editor - 视频剪辑去除静音片段；(2) Faster Whisper + MiniMax LLM - 语音转字幕；(3) ffmpeg - 烧录字幕到视频；(4) FFmpeg 工具箱 - 拼接、格式转换；(5) pipeline.py - 完整工作流编排。使用场景：批量处理视频、从原始素材到成品的完整流程。
-
-⚠️ 重要依赖：
-- ffmpeg + ffprobe（系统级，需手动安装）
-- auto-editor: pip3 install auto-editor
-- faster-whisper + requests: pip3 install faster-whisper requests
-- MiniMax API Key: 环境变量 MINIMAX_API_KEY 或 --api-key 参数
-- 可选: OPENCLAW_TARGET 环境变量用于进度通知
+description: 视频一站式工作流技能包。整合视频剪辑、转写、烧录、拼接全流程，支持分步执行和用户确认。包含：(1) auto-editor -
+  视频剪辑去除静音片段；(2) Faster Whisper + MiniMax LLM - 语音转字幕；(3) ffmpeg - 烧录字幕到视频；(4)
+  FFmpeg 工具箱 - 拼接、格式转换；(5) pipeline.py - 完整工作流编排。使用场景：批量处理视频、从原始素材到成品的完整流程。
 ---
+
 
 # Video Pipeline Bundle
 

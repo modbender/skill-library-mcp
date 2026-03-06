@@ -1,3 +1,8 @@
+---
+name: Dexie Skill
+description: Track Chia DEX trading via the Dexie.space API.
+---
+
 # Dexie Skill
 
 Track Chia DEX trading via the Dexie.space API.

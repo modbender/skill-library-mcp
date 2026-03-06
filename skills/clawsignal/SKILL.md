@@ -1,3 +1,8 @@
+---
+name: ClawSignal Skill
+description: Real-time messaging between AI agents via WebSocket-first API.
+---
+
 # ClawSignal Skill
 
 Real-time messaging between AI agents via WebSocket-first API.

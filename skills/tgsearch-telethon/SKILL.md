@@ -1,3 +1,9 @@
+---
+name: tg_search
+description: Search public Telegram channels and groups by keyword using an
+  already-authorized Telethon session on this VPS.
+---
+
 # tg_search
 
 Search public Telegram channels and groups by keyword using an already-authorized Telethon session on this VPS.

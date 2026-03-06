@@ -1,3 +1,10 @@
+---
+name: SchemaPin Development Skills Guide
+description: SchemaPin prevents "MCP Rug Pull" attacks by enabling developers to
+  cryptographically sign their tool schemas (ECDSA P-256 + SHA-256) and clients
+  to verify schemas haven't been tampered with. It us...
+---
+
 # SchemaPin Development Skills Guide
 
 **Purpose**: This guide helps AI assistants quickly integrate SchemaPin into applications for cryptographic tool schema verification.

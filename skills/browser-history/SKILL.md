@@ -1,3 +1,9 @@
+---
+name: "Skill: browser-history — Search Chrome History"
+description: Search Das's Chrome browsing history to find URLs, videos, sites
+  he's visited before.
+---
+
 # Skill: browser-history — Search Chrome History
 
 Search Das's Chrome browsing history to find URLs, videos, sites he's visited before.

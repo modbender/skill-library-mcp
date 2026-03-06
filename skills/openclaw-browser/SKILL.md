@@ -1,7 +1,12 @@
 ---
 name: openclaw-browser
-description: Browser automation via Chrome DevTools Protocol (CDP) for OpenClaw. Use when user needs to take screenshots of websites, automate browser actions, or interact with web pages programmatically. Triggers on: screenshot requests, browser automation, web page capture, CDP-based browser control.
+description: "Browser automation via Chrome DevTools Protocol (CDP) for
+  OpenClaw. Use when user needs to take screenshots of websites, automate
+  browser actions, or interact with web pages programmatically. Triggers on:
+  screenshot requests, browser automation, web page capture, CDP-based browser
+  control."
 ---
+
 
 # OpenClaw Browser
 

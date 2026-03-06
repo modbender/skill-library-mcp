@@ -1,3 +1,10 @@
+---
+name: FiberAgent Skill for OpenClaw
+description: FiberAgent connects your OpenClaw agent to a shopping intelligence
+  layer powered by the Wildfire affiliate network on Monad blockchain. When a
+  user asks about shopping deals, cashback, or product p...
+---
+
 # FiberAgent Skill for OpenClaw
 
 **Find products with cryptocurrency cashback across 50,000+ merchants.**

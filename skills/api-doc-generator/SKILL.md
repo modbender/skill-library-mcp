@@ -1,3 +1,8 @@
+---
+name: API Doc Generator
+description: 自动从代码生成 API 文档。
+---
+
 # API Doc Generator
 
 自动从代码生成 API 文档。

@@ -1,3 +1,8 @@
+---
+name: OpenClaw-Finnhub
+description: OpenClaw skill for real-time stock quote, and financials via Finnhub API.
+---
+
 # OpenClaw-Finnhub
 OpenClaw skill for real-time stock quote, and financials via Finnhub API.
 

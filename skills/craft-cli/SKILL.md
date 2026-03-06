@@ -1,3 +1,9 @@
+---
+name: Craft CLI Skill
+description: Interact with Craft Documents via the craft CLI tool. Fast,
+  token-efficient, LLM-ready.
+---
+
 # Craft CLI Skill
 
 Interact with Craft Documents via the `craft` CLI tool. Fast, token-efficient, LLM-ready.

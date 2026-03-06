@@ -1,3 +1,9 @@
+---
+name: todo-boss
+description: Task capture + delegation tracking + daily remaining-work report
+  for Telegram. NO web browsing, NO web search, NO external lookups.
+---
+
 # todo-boss
 
 ## Purpose

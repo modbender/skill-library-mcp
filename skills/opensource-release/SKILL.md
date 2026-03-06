@@ -1,3 +1,10 @@
+---
+name: Open Source Release
+description: "name: opensource-release description: Convert a private repository
+  to public open-source. Use when making a repo public, sanitizing personal info
+  from code/docs/git history, or preparing a project ..."
+---
+
 ﻿---
 name: opensource-release
 description: Convert a private repository to public open-source. Use when making a repo public, sanitizing personal info from code/docs/git history, or preparing a project for open-source release. Triggers on "open source", "make public", "public release", "sanitize repo".

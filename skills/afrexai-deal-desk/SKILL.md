@@ -1,3 +1,10 @@
+---
+name: Deal Desk — Structured Deal Review & Approval
+description: Run every non-standard deal through a repeatable review process.
+  Catch margin leaks, enforce discount guardrails, and close faster with
+  pre-approved terms.
+---
+
 # Deal Desk — Structured Deal Review & Approval
 
 Run every non-standard deal through a repeatable review process. Catch margin leaks, enforce discount guardrails, and close faster with pre-approved terms.

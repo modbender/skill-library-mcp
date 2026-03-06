@@ -1,8 +1,8 @@
 ---
 name: clawstats
-description: Comprehensive system monitoring for OpenClaw: CPU, RAM, Disk, and Processes.
-metadata: {"clawdbot":{"emoji":"📊","requires":{"bins":["free","df","top","ps"]},"install":[]}}
+description: "Comprehensive system monitoring for OpenClaw: CPU, RAM, Disk, and Processes."
 ---
+
 # 📊 ClawStat Skill
 
 A comprehensive system monitoring skill for OpenClaw agents to track server health and performance.

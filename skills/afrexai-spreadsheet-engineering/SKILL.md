@@ -1,3 +1,8 @@
+---
+name: Spreadsheet Engineering — AfrexAI
+description: "Score your spreadsheet /16:"
+---
+
 # Spreadsheet Engineering — AfrexAI
 
 > Build bulletproof spreadsheets: financial models, dashboards, data systems, and automation. Platform-agnostic methodology for Google Sheets, Excel, and LibreOffice.

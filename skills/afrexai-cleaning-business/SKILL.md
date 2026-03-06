@@ -1,3 +1,10 @@
+---
+name: Cleaning Business Operations
+description: Commercial and residential cleaning business operations agent.
+  Covers pricing, bidding, staffing, supply costs, insurance, OSHA compliance,
+  quality control, and growth from solo operator to multi-c...
+---
+
 # Cleaning Business Operations
 
 Commercial and residential cleaning business operations agent. Covers pricing, bidding, staffing, supply costs, insurance, OSHA compliance, quality control, and growth from solo operator to multi-crew company.

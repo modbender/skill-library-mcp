@@ -1,3 +1,9 @@
+---
+name: EchoDecks Skill
+description: Integrates with the EchoDecks External API for flashcard
+  management, AI generation, and audio study sessions.
+---
+
 # EchoDecks Skill
 
 Integrates with the EchoDecks External API for flashcard management, AI generation, and audio study sessions.

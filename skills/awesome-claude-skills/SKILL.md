@@ -1,3 +1,10 @@
+---
+name: awesome-claude-skills
+description: A large collection of reusable Claude skill templates (design,
+  marketing, dev, automation). We treat it as a library we can import patterns
+  from.
+---
+
 # awesome-claude-skills
 
 ## Purpose

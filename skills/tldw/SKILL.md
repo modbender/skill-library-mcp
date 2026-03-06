@@ -1,3 +1,8 @@
+---
+name: tldw - YouTube Video Summarizer
+description: Extract and summarize YouTube video transcripts quickly and efficiently.
+---
+
 # tldw - YouTube Video Summarizer
 
 **too long; didn't watch**

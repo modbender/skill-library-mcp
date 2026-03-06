@@ -1,6 +1,9 @@
 ---
-description: Scan npm and pip projects for outdated dependencies, security vulnerabilities, and updates.
+name: dependency-checker
+description: Scan npm and pip projects for outdated dependencies, security
+  vulnerabilities, and updates.
 ---
+
 
 # Dependency Checker
 

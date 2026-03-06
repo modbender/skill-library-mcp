@@ -1,3 +1,10 @@
+---
+name: "SKILL: Social Media Manager"
+description: Automate the creation and scheduling of high-engagement social
+  media content across any platform (TikTok, Instagram, X/Twitter, LinkedIn,
+  Facebook, YouTube, and more) using AI generation and the Po...
+---
+
 # SKILL: Social Media Manager
 
 ## Goal

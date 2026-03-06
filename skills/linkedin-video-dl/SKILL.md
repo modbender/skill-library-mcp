@@ -1,3 +1,8 @@
+---
+name: linkedin-video-dl
+description: SKILL.md
+---
+
 SKILL.md
 
 # linkedin-video-dl

@@ -1,3 +1,10 @@
+---
+name: 👥 AI Recruitment & Talent Scout Engine
+description: Recruitment agencies charge $15,000–$30,000 per hire. In-house HR
+  teams spend 23 days on average to fill a single position. This skill does the
+  same work in under 10 minutes.
+---
+
 # 👥 AI Recruitment & Talent Scout Engine
 
 **Slug:** `ai-recruitment-talent-scout`  

@@ -1,3 +1,9 @@
+---
+name: Job Search MCP Skill
+description: This skill enables AI agents to search for job listings across
+  multiple job boards using the JobSpy MCP server.
+---
+
 # Job Search MCP Skill
 
 This skill enables AI agents to search for job listings across multiple job boards

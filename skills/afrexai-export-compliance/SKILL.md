@@ -1,3 +1,10 @@
+---
+name: Export Compliance & Trade Controls
+description: Analyze products, destinations, and end-users against US export
+  control regulations (EAR, ITAR, OFAC sanctions). Generate classification
+  recommendations, license requirements, and compliance checkl...
+---
+
 # Export Compliance & Trade Controls
 
 Analyze products, destinations, and end-users against US export control regulations (EAR, ITAR, OFAC sanctions). Generate classification recommendations, license requirements, and compliance checklists.

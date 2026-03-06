@@ -1,3 +1,10 @@
+---
+name: E-Commerce Price Monitoring & Competitive Intelligence Skill
+description: This skill enables Claude to monitor and track product prices
+  across major e-commerce platforms — Amazon, Zalando, eBay, and more — for
+  competitive pricing analysis, dynamic repricing strategies, a...
+---
+
 # E-Commerce Price Monitoring & Competitive Intelligence Skill
 
 ## Overview

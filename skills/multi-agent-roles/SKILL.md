@@ -1,3 +1,10 @@
+---
+name: Multi-Agent Roles - Professional AI Role Design
+description: This skill provides a comprehensive framework for designing
+  professional multi-agent systems. It includes standardized role definitions
+  for various AI applications and workflows.
+---
+
 # Multi-Agent Roles - Professional AI Role Design
 
 ## Overview

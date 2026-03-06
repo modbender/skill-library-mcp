@@ -1,3 +1,10 @@
+---
+name: Quote Generator
+description: A simple skill to inject inspirational or technical quotes into
+  agent responses, reports, or logs. Useful for "personality" injection and
+  breaking up robotic monotony.
+---
+
 # Quote Generator
 
 **Version:** 1.0.0

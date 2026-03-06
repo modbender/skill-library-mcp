@@ -1,3 +1,10 @@
+---
+name: Dependency Auditor
+description: The Dependency Auditor is a comprehensive toolkit for analyzing,
+  auditing, and managing dependencies across multi-language software projects.
+  This skill provides deep visibility into your project's...
+---
+
 # Dependency Auditor
 
 > **Skill Type:** POWERFUL  

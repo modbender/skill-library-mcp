@@ -1,3 +1,10 @@
+---
+name: Social Media Data Extraction Skill
+description: This skill enables Claude to extract public data from Instagram,
+  TikTok, and Reddit for trend analysis, content research, competitor
+  monitoring, and audience insights — powered by the Apify platform.
+---
+
 # Social Media Data Extraction Skill
 
 ## Overview

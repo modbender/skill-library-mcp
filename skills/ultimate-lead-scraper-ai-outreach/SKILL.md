@@ -1,3 +1,10 @@
+---
+name: Ultimate Lead Scraper & AI Outreach Engine
+description: This skill helps Claude discover, qualify, and structure publicly
+  available B2B business contact data and generate personalized outreach
+  messages — for legitimate sales prospecting, partnership dis...
+---
+
 # Ultimate Lead Scraper & AI Outreach Engine
 
 **Version:** 1.0.0

@@ -1,3 +1,9 @@
+---
+name: Docs Feeder
+description: Auto-fetch project documentation and feed it to your AI agent for
+  debugging and learning.
+---
+
 # Docs Feeder
 
 Auto-fetch project documentation and feed it to your AI agent for debugging and learning.

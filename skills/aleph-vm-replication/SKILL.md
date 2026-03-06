@@ -1,3 +1,10 @@
+---
+name: Aleph Cloud Self-Deployment
+description: "This skill gives an AI agent everything it needs to: 1. Provision
+  its own VM on the Aleph Cloud network 2. Install its agent framework
+  (OpenClaw) on the new instance 3. Configure its own credential..."
+---
+
 # Aleph Cloud Self-Deployment
 
 > Teach an AI agent to deploy itself onto Aleph Cloud decentralized infrastructure — from provisioning a VM to configuring its own runtime, autonomously.

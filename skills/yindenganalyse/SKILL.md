@@ -1,3 +1,9 @@
+---
+name: CoPAW 银登公告与结果爬取 Skill
+description: 这是一个用于 CoPAW (Copilot Automation Workflow) 的标准
+  Skill，支持自动爬取银登网不良贷款转让公告及转让结果，并利用大模型（LLM）提取关键数据。
+---
+
 # CoPAW 银登公告与结果爬取 Skill
 
 这是一个用于 CoPAW (Copilot Automation Workflow) 的标准 Skill，支持自动爬取银登网不良贷款转让公告及转让结果，并利用大模型（LLM）提取关键数据。

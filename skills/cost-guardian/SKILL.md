@@ -1,3 +1,10 @@
+---
+name: cost-guardian — AI & Infrastructure Cost Tracker
+description: Track, analyze, and optimize the total cost of running your AI
+  agent and infrastructure. Budget alerts, spend forecasts, and concrete
+  optimization recommendations.
+---
+
 # cost-guardian — AI & Infrastructure Cost Tracker
 
 Track, analyze, and optimize the total cost of running your AI agent and infrastructure. Budget alerts, spend forecasts, and concrete optimization recommendations.

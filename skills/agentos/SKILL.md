@@ -1,3 +1,9 @@
+---
+name: AgentOS SDK for Clawdbot
+description: The complete AgentOS integration for Clawdbot. One install, full
+  access to everything.
+---
+
 # AgentOS SDK for Clawdbot
 
 **Version:** 1.4.4

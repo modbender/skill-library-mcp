@@ -1,3 +1,8 @@
+---
+name: Audio Editor
+description: 音频处理技能，支持剪辑、音量调整、格式转换、提取视频音频等操作。
+---
+
 # Audio Editor
 ## Description
 音频处理技能，支持剪辑、音量调整、格式转换、提取视频音频等操作。

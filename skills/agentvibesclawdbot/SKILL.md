@@ -1,3 +1,9 @@
+---
+name: AgentVibes Clawdbot Skill - local-gen-tts Integration
+description: Automatically integrates AgentVibes with Clawdbot for local TTS
+  generation on remote devices (Android/Termux, Linux, macOS) via SSH.
+---
+
 # AgentVibes Clawdbot Skill - local-gen-tts Integration
 
 **Version:** 1.0.0  

@@ -1,3 +1,8 @@
+---
+name: Maven Build Skill
+description: Run Maven with full passthrough support for all Maven capabilities.
+---
+
 # Maven Build Skill
 
 Run Maven with full passthrough support for all Maven capabilities.

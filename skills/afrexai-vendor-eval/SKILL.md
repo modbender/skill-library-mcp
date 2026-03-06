@@ -1,3 +1,9 @@
+---
+name: Vendor Evaluation & Due Diligence
+description: Structured framework for evaluating software vendors, service
+  providers, and technology partners before signing contracts.
+---
+
 # Vendor Evaluation & Due Diligence
 
 Structured framework for evaluating software vendors, service providers, and technology partners before signing contracts.

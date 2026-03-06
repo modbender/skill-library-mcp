@@ -1,3 +1,8 @@
+---
+name: YBoard Operator
+description: Operate yboard.online to edit video/presentation plans.
+---
+
 # YBoard Operator
 
 Operate **yboard.online** to edit video/presentation plans.

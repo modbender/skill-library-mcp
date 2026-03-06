@@ -1,17 +1,11 @@
 ---
 name: gallery-dl
-description: Download image galleries and collections from 100+ sites. Use when: (1) Downloading from Reddit, Twitter, Instagram, Pixiv, Danbooru, (2) Batch downloading image galleries, (3) Archiving artist portfolios, (4) Downloading from specific tags or users.
-version: 1.1.0
-changelog: "v1.1.0: Added reasoning framework, decision tree, troubleshooting, self-checks"
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - python3
-    emoji: "🖼️"
-    category: "utility"
-    homepage: https://github.com/mikf/gallery-dl
+description: "Download image galleries and collections from 100+ sites. Use
+  when: (1) Downloading from Reddit, Twitter, Instagram, Pixiv, Danbooru, (2)
+  Batch downloading image galleries, (3) Archiving artist portfolios, (4)
+  Downloading from specific tags or users."
 ---
+
 
 # gallery-dl
 

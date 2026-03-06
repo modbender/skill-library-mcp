@@ -1,3 +1,8 @@
+---
+name: React Next.js 项目生成器技能
+description: 根据需求文档和UI设计图生成完整的React + Next.js项目，使用Ant Design、Tailwind CSS和Zustand技术栈。
+---
+
 # React Next.js 项目生成器技能
 
 ## 描述

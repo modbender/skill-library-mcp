@@ -1,22 +1,10 @@
 ---
 name: blindoracle
-display_name: BlindOracle - Privacy-First Agent Infrastructure
-version: 1.0.1
-author: Craig M. Brown
-homepage: https://craigmbrown.com/blindoracle
-license: Proprietary
-category: infrastructure
-tags:
-  - forecasting
-  - identity
-  - payments
-  - privacy
-  - x402
-  - micropayments
-  - agent-infrastructure
-  - settlement
-min_sdk_version: "0.1.0"
+description: Privacy-first agent infrastructure providing forecasting,
+  credential verification, settlement, and cross-rail transfers via x402
+  micropayments.
 ---
+
 
 # BlindOracle
 

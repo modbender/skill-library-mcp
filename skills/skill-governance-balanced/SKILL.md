@@ -1,3 +1,9 @@
+---
+name: skill-governance
+description: Use this skill to control multi-skill side effects with a balanced
+  governance model.
+---
+
 # skill-governance
 
 Use this skill to control multi-skill side effects with a balanced governance model.

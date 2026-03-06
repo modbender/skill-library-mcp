@@ -1,3 +1,8 @@
+---
+name: Log Anomaly Detector
+description: 智能分析日志文件，检测异常模式、错误趋势和性能问题。
+---
+
 # Log Anomaly Detector
 
 智能分析日志文件，检测异常模式、错误趋势和性能问题。

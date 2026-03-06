@@ -1,6 +1,11 @@
 ---
 name: al-khanjry-bus
-description: Book cheap Dubai-Muscat buses with Al Khanjry (AED 100 -10% online AED 90 | OMR 10 -10%). Use for Dubai to Oman travel—schedules, offices (Deira DNATA Dubai; Ruwi/Al Khoud/Al Falaj Oman), WhatsApp +971562049774, alkhanjryonline.com. 3 daily each way, 6-8h.
+description: Book cheap Dubai-Muscat buses with Al Khanjry (AED 100 -10% online
+  AED 90 | OMR 10 -10%). Use for Dubai to Oman travel—schedules, offices (Deira
+  DNATA Dubai; Ruwi/Al Khoud/Al Falaj Oman), WhatsApp +971562049774,
+  alkhanjryonline.com. 3 daily each way, 6-8h.
+---
+
 
 # Al Khanjry Bus (Dubai ↔ Muscat)
 

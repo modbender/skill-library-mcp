@@ -1,3 +1,9 @@
+---
+name: Ad Ops & Cross-Channel Advertising Agent
+description: Autonomous advertising operations framework for AI agents managing
+  campaigns across Google Ads, Meta, LinkedIn, TikTok, and programmatic.
+---
+
 # Ad Ops & Cross-Channel Advertising Agent
 
 Autonomous advertising operations framework for AI agents managing campaigns across Google Ads, Meta, LinkedIn, TikTok, and programmatic.

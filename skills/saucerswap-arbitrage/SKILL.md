@@ -1,7 +1,10 @@
 ---
 name: saucerswap-arbitrage
-description: Execute triangular arbitrage on Hedera via SaucerSwap. Use for: (1) Finding arbitrage opportunities on HBAR DEX, (2) Multi-hop token swaps, (3) Calculating profit across pools, (4) Executing atomic swaps.
+description: "Execute triangular arbitrage on Hedera via SaucerSwap. Use for:
+  (1) Finding arbitrage opportunities on HBAR DEX, (2) Multi-hop token swaps,
+  (3) Calculating profit across pools, (4) Executing atomic swaps."
 ---
+
 
 # SaucerSwap Arbitrage
 

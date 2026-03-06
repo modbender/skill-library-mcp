@@ -1,3 +1,8 @@
+---
+name: ppt-maker
+description: 使用 python-pptx 制作精美PPT，支持科技风设计、图文混排、HTML内容嵌入。
+---
+
 # ppt-maker
 
 使用 python-pptx 制作精美PPT，支持科技风设计、图文混排、HTML内容嵌入。

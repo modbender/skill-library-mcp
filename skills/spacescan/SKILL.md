@@ -1,3 +1,8 @@
+---
+name: Spacescan Skill
+description: Explore the Chia blockchain via Spacescan.io API.
+---
+
 # Spacescan Skill
 
 Explore the Chia blockchain via Spacescan.io API.

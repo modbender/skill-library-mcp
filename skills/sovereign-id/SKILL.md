@@ -1,3 +1,9 @@
+---
+name: Sovereign Identity Skill
+description: Enables the agent to manage its own identity (DID) and generate
+  cryptographic proofs for B2B and B2C trust.
+---
+
 # Sovereign Identity Skill
 
 ## Purpose

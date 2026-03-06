@@ -1,7 +1,11 @@
 ---
 name: telegram-todolist
-description: Telegram bot Todo List manager. Three commands: /todo query (show tasks), /todo organize (add/delete/edit tasks), /todo execute (complete tasks). Uses TODO.md file. Perfect for task tracking in Telegram. Supports statistics, progress tracking, and organized task management.
+description: "Telegram bot Todo List manager. Three commands: /todo query (show
+  tasks), /todo organize (add/delete/edit tasks), /todo execute (complete
+  tasks). Uses TODO.md file. Perfect for task tracking in Telegram. Supports
+  statistics, progress tracking, and organized task management."
 ---
+
 
 # Telegram Todo List
 

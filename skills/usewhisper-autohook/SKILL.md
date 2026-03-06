@@ -1,20 +1,10 @@
 ---
 name: usewhisper-autohook
-version: 1.0.0
-description: Auto-hook tools for OpenClaw: query Whisper Context before every generation, ingest after every turn. Built for Telegram agents (stable user_id/session_id).
-author: "usewhisper"
-metadata:
-  openclaw:
-    requires:
-      bins: ["node"]
-      env: ["WHISPER_CONTEXT_API_KEY", "WHISPER_CONTEXT_PROJECT"]
-      optional_env: ["WHISPER_CONTEXT_API_URL"]
-    security:
-      notes:
-        - Makes outbound HTTPS requests to the Whisper Context API using a user-provided API key.
-        - Does not require additional npm dependencies.
-        - Review the script before use.
+description: "Auto-hook tools for OpenClaw: query Whisper Context before every
+  generation, ingest after every turn. Built for Telegram agents (stable
+  user_id/session_id)."
 ---
+
 
 # usewhisper-autohook (OpenClaw Skill)
 

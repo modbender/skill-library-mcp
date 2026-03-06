@@ -1,3 +1,8 @@
+---
+name: pii-detect
+description: Detect personally identifiable information (PII) in text
+---
+
 # pii-detect
 
 Detect personally identifiable information (PII) in text

@@ -1,3 +1,10 @@
+---
+name: 📱 Viral Short-Form Video Factory — TikTok, Reels & Shorts at Scale With AI
+description: "Short-form video is the #1 distribution channel on earth right
+  now. TikTok alone serves 1 billion users. Instagram Reels reach 2 billion.
+  YouTube Shorts hit 70 billion views per day."
+---
+
 # 📱 Viral Short-Form Video Factory — TikTok, Reels & Shorts at Scale With AI
 
 **Slug:** `viral-short-form-video-factory`  

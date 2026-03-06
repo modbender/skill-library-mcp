@@ -1,3 +1,8 @@
+---
+name: Config Refactor - 配置驱动重构工具
+description: 基于易经思维设计的配置管理库，将硬编码重构为配置驱动。
+---
+
 # Config Refactor - 配置驱动重构工具
 
 **版本**: 1.0.0  

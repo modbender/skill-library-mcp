@@ -1,3 +1,9 @@
+---
+name: Browser Automation Stealth
+description: Anti-bot evasion Playwright wrapper. Stealth mode, proxy rotation,
+  captcha handling, fingerprint randomization.
+---
+
 # Browser Automation Stealth
 
 **Version:** 1.0.0  

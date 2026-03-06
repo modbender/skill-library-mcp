@@ -1,3 +1,10 @@
+---
+name: Margin Analysis & Profit Optimization
+description: Analyze gross, operating, and net margins by product line, customer
+  segment, and channel. Identify margin erosion patterns and build pricing
+  power.
+---
+
 # Margin Analysis & Profit Optimization
 
 Analyze gross, operating, and net margins by product line, customer segment, and channel. Identify margin erosion patterns and build pricing power.

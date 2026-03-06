@@ -1,3 +1,9 @@
+---
+name: "openClaw Skill: Quality Gateways (Generic Web + API Applications)"
+description: "This skill defines and applies 6 universal quality gateways for
+  typical application projects that include:"
+---
+
 # openClaw Skill: Quality Gateways (Generic Web + API Applications)
 
 ## Purpose

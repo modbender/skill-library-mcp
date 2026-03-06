@@ -1,3 +1,8 @@
+---
+name: notion-cli-agent
+description: notion-cli Interact with your Notion workspace via the notion-cli.
+---
+
 notion-cli
 Interact with your Notion workspace via the notion-cli.
 

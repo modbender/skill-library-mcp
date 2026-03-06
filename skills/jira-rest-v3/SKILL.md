@@ -1,3 +1,8 @@
+---
+name: "File: skills/jira-rest-v3/SKILL.md"
+description: "Use this skill to perform everyday Jira work from openClaw:"
+---
+
 # File: skills/jira-rest-v3/SKILL.md
 
 # openClaw Skill — Jira Daily Work via ATREST (Jira Cloud REST API v3 + Jira Software Agile API)

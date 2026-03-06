@@ -1,3 +1,10 @@
+---
+name: Web3 Grant Tracker — Gitcoin, Giveth & DAO Funding Monitor
+description: Track active Web3 grant rounds, deadlines, and funding
+  opportunities across Gitcoin, Giveth, Optimism RPGF, Arbitrum, and other DAO
+  treasuries. Get alerts before rounds close.
+---
+
 # Web3 Grant Tracker — Gitcoin, Giveth & DAO Funding Monitor
 
 Track active Web3 grant rounds, deadlines, and funding opportunities across Gitcoin, Giveth, Optimism RPGF, Arbitrum, and other DAO treasuries. Get alerts before rounds close.

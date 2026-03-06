@@ -1,3 +1,8 @@
+---
+name: arscontexta
+description: placeholder for arscontexta.org
+---
+
 placeholder for arscontexta.org
 
 ∵ ars contexta ∴

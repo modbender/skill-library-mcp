@@ -1,3 +1,8 @@
+---
+name: Security Evaluation Heuristics
+description: "My human isn't a coder. I'm the last line of defense against:"
+---
+
 # Security Evaluation Heuristics
 
 **Purpose:** Mental checklist before installing ANY external skill, code, or integration.

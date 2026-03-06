@@ -1,3 +1,9 @@
+---
+name: Workspace Skill Entry
+description: This file exists as a stable entry-point for agents that try to
+  read SKILL.md from the workspace root.
+---
+
 # Workspace Skill Entry
 
 This file exists as a stable entry-point for agents that try to read `SKILL.md` from the workspace root.

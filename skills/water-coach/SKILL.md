@@ -1,10 +1,10 @@
 ---
 name: water-coach
-description: "Hydration tracking and coaching skill. Use when user wants to track water intake, get reminders to drink water, log body metrics, or get analytics on hydration habits."
-compatibility: "Requires python3, openclaw cron feature, heartbeat feature"
-metadata: {"clawdbot":{"emoji":"💧"} 
-  author: oristides
+description: Hydration tracking and coaching skill. Use when user wants to track
+  water intake, get reminders to drink water, log body metrics, or get analytics
+  on hydration habits.
 ---
+
 
 # 💧 Water Coach
 

@@ -1,3 +1,9 @@
+---
+name: Podman Browser Skill
+description: Headless browser automation using Podman + Playwright for scraping
+  JavaScript-rendered pages.
+---
+
 # Podman Browser Skill
 
 Headless browser automation using Podman + Playwright for scraping JavaScript-rendered pages.

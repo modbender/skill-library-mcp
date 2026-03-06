@@ -1,3 +1,9 @@
+---
+name: RMN Visualizer — 递归记忆神经网络可视化
+description: RMN Visualizer 扫描你的 Agent 记忆文件（MEMORY.md, memory/.md, .issues/），
+  自动解析为 5 层递归神经网络，并用 D3.js 力导向图实时可视化。
+---
+
 # RMN Visualizer — 递归记忆神经网络可视化
 
 > 一键查看你的 AI Agent 大脑结构

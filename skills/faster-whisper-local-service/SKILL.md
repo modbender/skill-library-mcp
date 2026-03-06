@@ -1,7 +1,14 @@
 ---
 name: faster-whisper-local-service
-description: Local speech-to-text (STT) transcription service for OpenClaw using faster-whisper. Runs as HTTP microservice on localhost for voice input, microphone transcription, and speech recognition. No recurring API costs — after initial model download, runs fully local. Supports WebChat voice input, Telegram voice messages, and any OpenClaw voice workflow. Keywords: STT, speech to text, voice transcription, local transcription, whisper, faster-whisper, offline, microphone, speech recognition, voice input.
+description: "Local speech-to-text (STT) transcription service for OpenClaw
+  using faster-whisper. Runs as HTTP microservice on localhost for voice input,
+  microphone transcription, and speech recognition. No recurring API costs —
+  after initial model download, runs fully local. Supports WebChat voice input,
+  Telegram voice messages, and any OpenClaw voice workflow. Keywords: STT,
+  speech to text, voice transcription, local transcription, whisper,
+  faster-whisper, offline, microphone, speech recognition, voice input."
 ---
+
 
 # Faster Whisper Local Service
 

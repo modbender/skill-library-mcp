@@ -1,3 +1,9 @@
+---
+name: WhatsApp Video Skill
+description: Create animated WhatsApp-style chat videos using Remotion. Perfect
+  for X, TikTok, Instagram Reels.
+---
+
 # WhatsApp Video Skill
 
 Create animated WhatsApp-style chat videos using Remotion. Perfect for X, TikTok, Instagram Reels.

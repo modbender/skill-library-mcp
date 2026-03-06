@@ -1,3 +1,8 @@
+---
+name: Email Auto-Reply Generator
+description: Generate context-aware email replies.
+---
+
 # Email Auto-Reply Generator
 
 Generate context-aware email replies.

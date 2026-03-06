@@ -1,3 +1,10 @@
+---
+name: myagentinbox
+description: Disposable email inboxes for AI agents. Create a temporary email
+  address, receive emails, read messages, and download attachments — all through
+  MCP tools. Inboxes auto-delete after 24 hours.
+---
+
 # myagentinbox
 
 Disposable email inboxes for AI agents. Create a temporary email address, receive emails, read messages, and download attachments — all through MCP tools. Inboxes auto-delete after 24 hours.

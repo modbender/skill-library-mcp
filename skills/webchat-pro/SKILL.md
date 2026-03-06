@@ -1,3 +1,8 @@
+---
+name: OpenClaw Web Chat Pro
+description: 访问 http://localhost:4000
+---
+
 # OpenClaw Web Chat Pro
 
 **版本**: 1.0.0  

@@ -1,3 +1,10 @@
+---
+name: DDGS Web Search Skill
+description: This skill implements web search functionality via the DDGS (Dux
+  Distributed Global Search) engine, aggregating results from diverse search
+  services to fetch real-time information.
+---
+
 # DDGS Web Search Skill
 This skill implements web search functionality via the DDGS (Dux Distributed Global Search) engine, aggregating results from diverse search services to fetch real-time information.
 

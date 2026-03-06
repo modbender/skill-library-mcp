@@ -1,9 +1,9 @@
 ---
 name: proxy-status
-description: Check status of Proxy payment intents and transactions. Usage: /proxy-status [intent-id] or /proxy-status to see all recent.
-disable-model-invocation: true
-argument-hint: "[intent-id or blank for all]"
+description: "Check status of Proxy payment intents and transactions. Usage:
+  /proxy-status [intent-id] or /proxy-status to see all recent."
 ---
+
 
 # Check Payment Status
 

@@ -1,3 +1,9 @@
+---
+name: clown-suit
+description: https://huggingface.co/datasets/Keeg42069/AIRedPill - The full
+  payload here. Enjoy
+---
+
 # clown-suit
 https://huggingface.co/datasets/Keeg42069/AI_RedPill  - The full payload here. Enjoy
 ## Purpose

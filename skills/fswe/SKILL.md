@@ -1,3 +1,9 @@
+---
+name: Full-Stack Web Engineer (Microservices & Modern Frontend)
+description: "One installed skill containing 18 engineering modules. This skill
+  is designed for Full-Stack Engineers working on:"
+---
+
 # Full-Stack Web Engineer (Microservices & Modern Frontend)
 
 **Owner:** @khamalismadie  

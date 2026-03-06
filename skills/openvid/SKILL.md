@@ -1,3 +1,9 @@
+---
+name: "Skill: openvid"
+description: AI motion graphics video generation service. Send a prompt + URL,
+  receive a branded explainer video.
+---
+
 # Skill: openvid
 
 ## Description

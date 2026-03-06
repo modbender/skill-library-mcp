@@ -1,3 +1,8 @@
+---
+name: Gitea Actions
+description: Trigger and query Gitea/Forgejo Actions workflows.
+---
+
 # Gitea Actions
 
 Trigger and query Gitea/Forgejo Actions workflows.

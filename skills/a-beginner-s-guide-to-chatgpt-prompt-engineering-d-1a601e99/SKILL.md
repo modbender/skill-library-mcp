@@ -1,8 +1,8 @@
 ---
 name: a-beginner-s-guide-to-chatgpt-prompt-engineering-d-1a601e99
-description: Understanding this is key to prompt engineering: you
-metadata: {"clawdbot":{"type":"image generation","source":"chatgpt","original_url":"https://www.datacamp.com/tutorial/a-beginners-guide-to-chatgpt-prompt-engineering"}}
+description: "Understanding this is key to prompt engineering: you"
 ---
+
 
 # A Beginner's Guide to ChatGPT Prompt Engineering | DataCamp
 

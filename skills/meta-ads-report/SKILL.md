@@ -1,3 +1,10 @@
+---
+name: Meta Ads Analytics & Event Finder
+description: A powerful toolkit to monitor your Meta (Facebook/Instagram)
+  advertising performance directly through chat. This bundle includes analytics
+  reporting and an event discovery tool to ensure accurate t...
+---
+
 # Meta Ads Analytics & Event Finder
 
 A powerful toolkit to monitor your Meta (Facebook/Instagram) advertising performance directly through chat. This bundle includes analytics reporting and an event discovery tool to ensure accurate tracking.

@@ -1,7 +1,15 @@
 ---
 name: create-agent-with-telegram-group
-description: Create a new OpenClaw agent and bind it to a dedicated Telegram group with workspace ~/claw-<agent-name>. Use when the user asks for one-agent-one-group setup, Telegram group binding, or repeatable agent provisioning. Always ask which model to use, ask for essential initialization choices (USER.md/IDENTITY.md/SOUL.md), and set group reply mode to no-mention-required. Explicit user confirmation is required before any high-privilege actions: modifying openclaw.json, triggering browser automation, or restarting the gateway.
+description: "Create a new OpenClaw agent and bind it to a dedicated Telegram
+  group with workspace ~/claw-<agent-name>. Use when the user asks for
+  one-agent-one-group setup, Telegram group binding, or repeatable agent
+  provisioning. Always ask which model to use, ask for essential initialization
+  choices (USER.md/IDENTITY.md/SOUL.md), and set group reply mode to
+  no-mention-required. Explicit user confirmation is required before any
+  high-privilege actions: modifying openclaw.json, triggering browser
+  automation, or restarting the gateway."
 ---
+
 
 # Agent Create + Dedicated Telegram Group
 

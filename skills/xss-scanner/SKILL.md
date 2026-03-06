@@ -1,3 +1,9 @@
+---
+name: XSS Scanner
+description: Detect cross-site scripting vulnerabilities in your frontend code
+  before they ship.
+---
+
 # XSS Scanner
 
 Detect cross-site scripting vulnerabilities in your frontend code before they ship.

@@ -1,3 +1,9 @@
+---
+name: Human-Like Memory Skill
+description: This skill provides long-term memory capabilities, allowing you to
+  recall past conversations and save important information across sessions.
+---
+
 # Human-Like Memory Skill
 
 This skill provides long-term memory capabilities, allowing you to recall past conversations and save important information across sessions.

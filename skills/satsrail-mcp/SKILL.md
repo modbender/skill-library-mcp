@@ -1,3 +1,10 @@
+---
+name: satsrail-mcp
+description: Give any MCP-compatible AI agent the ability to accept Bitcoin
+  Lightning payments. Create orders, generate invoices, and check payment status
+  — all through natural language. No browser, no forms, n...
+---
+
 # satsrail-mcp
 
 Give any MCP-compatible AI agent the ability to accept Bitcoin Lightning payments. Create orders, generate invoices, and check payment status — all through natural language. No browser, no forms, no redirects.

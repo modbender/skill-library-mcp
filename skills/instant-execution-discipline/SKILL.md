@@ -1,7 +1,12 @@
 ---
 name: instant-execution-discipline
-description: Revenue-focused execution operating system for agents: converts "do it now" requests into immediate tool actions, enforces strict start/progress/finish SLAs, and prevents kickoff-only false completions. Best for shipping tasks where delay kills conversion (publish/release/distribution).
+description: 'Revenue-focused execution operating system for agents: converts
+  "do it now" requests into immediate tool actions, enforces strict
+  start/progress/finish SLAs, and prevents kickoff-only false completions. Best
+  for shipping tasks where delay kills conversion
+  (publish/release/distribution).'
 ---
+
 
 # Instant Execution Discipline
 

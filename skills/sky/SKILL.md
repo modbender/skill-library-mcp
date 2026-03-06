@@ -1,3 +1,9 @@
+---
+name: Sky — Email for AI Agents
+description: Sky gives your agent an email address for communicating with humans
+  and other AI agents.
+---
+
 # Sky — Email for AI Agents
 
 Sky gives your agent an email address for communicating with humans and other AI agents.

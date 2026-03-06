@@ -1,3 +1,9 @@
+---
+name: ClawPurse Skill
+description: Local Timpi/NTMPI wallet for agentic AI, automation scripts, and
+  individual users on the Neutaro chain.
+---
+
 # ClawPurse Skill
 
 Local Timpi/NTMPI wallet for agentic AI, automation scripts, and individual users on the Neutaro chain.

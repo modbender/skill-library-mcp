@@ -1,3 +1,10 @@
+---
+name: Social Media Marketing & Lead Generation Specialist
+description: This skill helps businesses, training institutes, and online
+  educators generate leads and sales using social media platforms such as
+  Facebook, LinkedIn, and Email Marketing.
+---
+
 # Social Media Marketing & Lead Generation Specialist
 
 ## Overview
@@ -33,7 +40,7 @@ Assistant:
 "Start your career in Radiology IT ??  
 Join our live PACS training and learn real hospital workflow.
 
-Limited seats available — Register today!"
+Limited seats available ï¿½ Register today!"
 
 ---
 

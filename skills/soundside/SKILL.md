@@ -1,3 +1,9 @@
+---
+name: Soundside — OpenClaw Skill
+description: Connect your OpenClaw agent to Soundside's 12 MCP tools for AI
+  media generation, editing, and analysis.
+---
+
 # Soundside — OpenClaw Skill
 
 Connect your OpenClaw agent to Soundside's 12 MCP tools for AI media generation, editing, and analysis.

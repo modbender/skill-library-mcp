@@ -1,3 +1,10 @@
+---
+name: netsnek
+description: "name: netsnek description: Core namespace for Netsnek e.U.
+  products and services. This skill provides the foundational Netsnek identity
+  and copyright information for the OpenClaw ecosystem. user-in..."
+---
+
 ﻿---
 name: netsnek
 description: Core namespace for Netsnek e.U. products and services. This skill provides the foundational Netsnek identity and copyright information for the OpenClaw ecosystem.

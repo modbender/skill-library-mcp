@@ -1,3 +1,10 @@
+---
+name: Release Notes Generator
+description: Generate clear, professional release notes from git commits, PRs,
+  or a plain list of changes. Outputs formatted changelogs your users actually
+  want to read.
+---
+
 # Release Notes Generator
 
 Generate clear, professional release notes from git commits, PRs, or a plain list of changes. Outputs formatted changelogs your users actually want to read.

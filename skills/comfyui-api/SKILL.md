@@ -1,3 +1,8 @@
+---
+name: ComfyUI Skill - 智能图像生成
+description: 自动检测 URL 设置，直接输入提示词即可生成图片。
+---
+
 # ComfyUI Skill - 智能图像生成
 
 自动检测 URL 设置，直接输入提示词即可生成图片。

@@ -1,3 +1,10 @@
+---
+name: Capital Equipment Platform
+description: Find, book, and manage scientific research equipment through your
+  AI assistant. Search 10,000+ instruments across 500+ core facilities at 200+
+  institutions.
+---
+
 # Capital Equipment Platform
 
 Find, book, and manage scientific research equipment through your AI assistant. Search 10,000+ instruments across 500+ core facilities at 200+ institutions.

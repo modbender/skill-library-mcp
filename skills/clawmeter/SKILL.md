@@ -1,3 +1,10 @@
+---
+name: ClawMeter — Cost Tracking Dashboard
+description: ClawMeter is a self-hosted cost tracking dashboard that monitors
+  your OpenClaw session logs, calculates token usage and API costs, and provides
+  real-time analytics with customizable budget alerts.
+---
+
 # ClawMeter — Cost Tracking Dashboard
 
 **Track OpenClaw API usage and spending in real-time with budget alerts.**

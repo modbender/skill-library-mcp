@@ -1,3 +1,10 @@
+---
+name: LibreNMS Skill
+description: Monitor network infrastructure via LibreNMS REST API. Read-only
+  monitoring skill for device status, health sensors, port statistics, and
+  alerts.
+---
+
 # LibreNMS Skill
 
 Monitor network infrastructure via LibreNMS REST API. Read-only monitoring skill for device status, health sensors, port statistics, and alerts.

@@ -1,3 +1,10 @@
+---
+name: Change Management Planner
+description: Plan, communicate, and execute organizational change with
+  structured frameworks. Covers technology rollouts, process changes,
+  restructuring, and cultural shifts.
+---
+
 # Change Management Planner
 
 Plan, communicate, and execute organizational change with structured frameworks. Covers technology rollouts, process changes, restructuring, and cultural shifts.

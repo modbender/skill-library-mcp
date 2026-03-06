@@ -1,3 +1,9 @@
+---
+name: Code Reviewer
+description: AI-powered code review for staged git changes. Catches bugs,
+  security issues, and code smells before you push.
+---
+
 # Code Reviewer
 
 AI-powered code review for staged git changes. Catches bugs, security issues, and code smells before you push.

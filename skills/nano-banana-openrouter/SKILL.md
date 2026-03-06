@@ -1,3 +1,9 @@
+---
+name: Nano Banana OpenRouter Skill
+description: Generate images using Google's Nano Banana (Gemini 2.5 Flash Image)
+  models via OpenRouter API.
+---
+
 # Nano Banana OpenRouter Skill
 
 Generate images using Google's **Nano Banana** (Gemini 2.5 Flash Image) models via **OpenRouter API**.

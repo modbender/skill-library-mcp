@@ -1,3 +1,9 @@
+---
+name: Feishu Broadcast Skill
+description: Broadcast messages (Post/Rich Text) and Images/Stickers to ALL
+  users in the Feishu tenant.
+---
+
 # Feishu Broadcast Skill
 
 Broadcast messages (Post/Rich Text) and Images/Stickers to ALL users in the Feishu tenant.

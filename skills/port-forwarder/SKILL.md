@@ -1,6 +1,9 @@
 ---
-description: Set up and manage SSH tunnels, port forwarding, and SOCKS proxies with simple commands.
+name: port-forwarder
+description: Set up and manage SSH tunnels, port forwarding, and SOCKS proxies
+  with simple commands.
 ---
+
 
 # Port Forwarder
 

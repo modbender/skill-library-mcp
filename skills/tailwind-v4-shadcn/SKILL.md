@@ -1,7 +1,9 @@
 ---
 name: tailwind-v4-+-shadcn/ui-stack
-model: fast
+description: Production-tested setup for Tailwind v4 with shadcn/ui. Prevents 8
+  documented errors through a mandatory four-step architecture.
 ---
+
 
 # Tailwind v4 + shadcn/ui Stack
 

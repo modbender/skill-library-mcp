@@ -1,3 +1,8 @@
+---
+name: Docker Workspace Access
+description: cat <<'EOF' > /.openclaw/workspace/skills/astra-docker/SKILL.md
+---
+
 cat <<'EOF' > ~/.openclaw/workspace/skills/astra-docker/SKILL.md
 ---
 name: astra-docker

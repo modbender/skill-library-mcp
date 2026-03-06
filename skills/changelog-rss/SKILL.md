@@ -1,6 +1,8 @@
 ---
+name: changelog-rss
 description: Convert CHANGELOG.md files into RSS 2.0 feeds for release monitoring.
 ---
+
 
 # Changelog RSS
 

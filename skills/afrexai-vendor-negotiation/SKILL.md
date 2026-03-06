@@ -1,3 +1,10 @@
+---
+name: Vendor Negotiation Playbook
+description: Prepare for any vendor or supplier negotiation with a structured
+  framework. This skill gives your AI agent the tools to research leverage,
+  build counter-proposals, and close better deals on softwar...
+---
+
 # Vendor Negotiation Playbook
 
 Prepare for any vendor or supplier negotiation with a structured framework. This skill gives your AI agent the tools to research leverage, build counter-proposals, and close better deals on software, services, and materials contracts.

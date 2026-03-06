@@ -1,7 +1,10 @@
 ---
 name: ant_design_skill
-description: Front-end design skill for building React UIs with Ant Design (antd): component patterns, layout, forms, tables, and theming/tokens via ConfigProvider.
+description: "Front-end design skill for building React UIs with Ant Design
+  (antd): component patterns, layout, forms, tables, and theming/tokens via
+  ConfigProvider."
 ---
+
 
 # Ant Design (React) — Practical Front-end Design Skill
 

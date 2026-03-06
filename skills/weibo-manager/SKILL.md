@@ -1,3 +1,9 @@
+---
+name: weibo-manager
+description: Control Weibo via Puppeteer (Unofficial API). Supports requesting
+  posts, admin approval flow, and executing posts with text/images.
+---
+
 # weibo-manager
 
 Control Weibo via Puppeteer (Unofficial API).

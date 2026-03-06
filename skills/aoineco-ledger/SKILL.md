@@ -1,3 +1,8 @@
+---
+name: Aoineco Ledger — AI Agent Financial Tracking Engine
+description: "<!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-AL01 -->"
+---
+
 # Aoineco Ledger — AI Agent Financial Tracking Engine
 
 <!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-AL01 -->

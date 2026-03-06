@@ -1,12 +1,9 @@
 ---
-
 name: novafon\_api
-
-description: Novafon Data API и Call API интеграция и примеры запросов — работа с данными, отчётами и управлением звонками через JSON-RPC.
-
-metadata: {"clawdbot":{"emoji":"📞","always":true,"requires":{"bins":\["curl","jq"]}}}
-
+description: Novafon Data API и Call API интеграция и примеры запросов — работа
+  с данными, отчётами и управлением звонками через JSON-RPC.
 ---
+
 
 
 

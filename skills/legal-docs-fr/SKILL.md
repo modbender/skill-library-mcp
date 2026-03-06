@@ -1,3 +1,10 @@
+---
+name: Legal Docs FR
+description: Générateur de documents juridiques français pour
+  freelances/micro-entrepreneurs. Génère des CGV, mentions légales, contrats de
+  prestation et devis en HTML.
+---
+
 # Legal Docs FR
 
 Générateur de documents juridiques français pour freelances/micro-entrepreneurs.

@@ -1,7 +1,14 @@
 ---
 name: browser-use-local
-description: Use when you need browser automation via the browser-use CLI or Python code in this OpenClaw container/host: open pages, click/type, take screenshots, extract HTML/links, or run an Agent with an OpenAI-compatible LLM (e.g. Moonshot/Kimi) using a custom base_url. Also use for debugging browser-use sessions (state empty, page readiness timeouts), and for extracting login QR codes from demo/login pages via screenshots or HTML data:image.
+description: "Use when you need browser automation via the browser-use CLI or
+  Python code in this OpenClaw container/host: open pages, click/type, take
+  screenshots, extract HTML/links, or run an Agent with an OpenAI-compatible LLM
+  (e.g. Moonshot/Kimi) using a custom base_url. Also use for debugging
+  browser-use sessions (state empty, page readiness timeouts), and for
+  extracting login QR codes from demo/login pages via screenshots or HTML
+  data:image."
 ---
+
 
 # browser-use (local) playbook
 

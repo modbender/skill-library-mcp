@@ -1,7 +1,12 @@
 ---
 name: htlc-trade
-description: HTLC (Hash Time Locked Contract) trading for inscriptions and NFTs on EVM chains. Use when: (1) Buying or selling inscriptions via atomic swap, (2) Trading NFTs peer-to-peer without intermediaries, (3) Setting up trustless escrow for any digital asset, (4) Implementing commit-reveal trading patterns. Supports Base, Ethereum, Arbitrum and other EVM chains.
+description: "HTLC (Hash Time Locked Contract) trading for inscriptions and NFTs
+  on EVM chains. Use when: (1) Buying or selling inscriptions via atomic swap,
+  (2) Trading NFTs peer-to-peer without intermediaries, (3) Setting up trustless
+  escrow for any digital asset, (4) Implementing commit-reveal trading patterns.
+  Supports Base, Ethereum, Arbitrum and other EVM chains."
 ---
+
 
 # HTLC Trade
 

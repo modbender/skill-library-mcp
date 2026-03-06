@@ -1,3 +1,9 @@
+---
+name: ABIXUS Deterministic Oracle
+description: A high-performance validation layer for autonomous agent
+  consistency on Polygon PoS.
+---
+
 # ABIXUS Deterministic Oracle
 A high-performance validation layer for autonomous agent consistency on Polygon PoS.
 

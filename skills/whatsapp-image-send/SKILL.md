@@ -1,7 +1,12 @@
 ---
 name: whatsapp-image-send
-description: Send images/files to WhatsApp. Use when user wants to send an image, photo, screenshot, video, audio or document via WhatsApp. Workflow: (1) Download to /tmp, (2) Copy to ~/.openclaw/workspace/, (3) Send via message tool with filePath, (4) Delete /tmp file. Required because WhatsApp plugin only allows workspace paths for media.
+description: "Send images/files to WhatsApp. Use when user wants to send an
+  image, photo, screenshot, video, audio or document via WhatsApp. Workflow: (1)
+  Download to /tmp, (2) Copy to ~/.openclaw/workspace/, (3) Send via message
+  tool with filePath, (4) Delete /tmp file. Required because WhatsApp plugin
+  only allows workspace paths for media."
 ---
+
 
 # WhatsApp Image Send
 

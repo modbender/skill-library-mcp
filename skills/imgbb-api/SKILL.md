@@ -1,21 +1,11 @@
 ---
 name: imgbb-api
-description: Upload images to ImgBB and get shareable URLs. Use when: (1) User wants to upload images to imgbb, (2) Need to get direct image URLs for sharing, (3) Converting local images to shareable links, (4) Bulk uploading images, (5) Uploading from URL, (6) Base64 encoding.
-version: 1.1.0
-changelog: "v1.1.0: Added reasoning framework, decision tree, troubleshooting"
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - python3
-      pip:
-        - requests
-      env:
-        - IMGBB_API_KEY
-    emoji: "📸"
-    category: "utility"
-    homepage: https://github.com/KeXu9/imgbb-api
+description: "Upload images to ImgBB and get shareable URLs. Use when: (1) User
+  wants to upload images to imgbb, (2) Need to get direct image URLs for
+  sharing, (3) Converting local images to shareable links, (4) Bulk uploading
+  images, (5) Uploading from URL, (6) Base64 encoding."
 ---
+
 
 # ImgBB API
 

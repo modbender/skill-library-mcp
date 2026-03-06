@@ -1,3 +1,10 @@
+---
+name: Feishu Post (RichText) Skill
+description: Send Rich Text (Post) messages to Feishu. This format is distinct
+  from Cards. It supports native rich text elements but is less flexible in
+  layout than cards. It is better for long-form text mixed ...
+---
+
 # Feishu Post (RichText) Skill
 
 Send Rich Text (Post) messages to Feishu.

@@ -1,3 +1,8 @@
+---
+name: Garden Temp Market (GTM) Skill
+description: Play the daily garden temperature prediction market on Base.
+---
+
 # Garden Temp Market (GTM) Skill
 
 Play the daily garden temperature prediction market on Base.

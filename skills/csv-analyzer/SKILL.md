@@ -1,6 +1,9 @@
 ---
-description: Analyze CSV/TSV files with statistics, data profiling, and ASCII visualizations.
+name: csv-analyzer
+description: Analyze CSV/TSV files with statistics, data profiling, and ASCII
+  visualizations.
 ---
+
 
 # CSV Analyzer
 

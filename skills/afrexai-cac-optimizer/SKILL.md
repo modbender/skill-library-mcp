@@ -1,3 +1,9 @@
+---
+name: Customer Acquisition Cost (CAC) Optimizer
+description: Analyze, benchmark, and reduce your customer acquisition cost
+  across every channel.
+---
+
 # Customer Acquisition Cost (CAC) Optimizer
 
 Analyze, benchmark, and reduce your customer acquisition cost across every channel.

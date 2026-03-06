@@ -1,3 +1,8 @@
+---
+name: Singleshot Prompt Testing & Optimization Skill
+description: Prompt cost testing with single shot
+---
+
 # Singleshot Prompt Testing & Optimization Skill
 
 ## Description

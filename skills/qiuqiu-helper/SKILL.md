@@ -1,3 +1,9 @@
+---
+name: SKILL.md - Qiuqiu Helper
+description: This is a multi-purpose helper skill for Jesse, designed to
+  automate common workspace tasks.
+---
+
 # SKILL.md - Qiuqiu Helper
 
 This is a multi-purpose helper skill for Jesse, designed to automate common workspace tasks.

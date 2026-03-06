@@ -1,3 +1,9 @@
+---
+name: MCP Registry Manager 🌐
+description: Centralized discovery and quality scoring for the exploding MCP
+  (Model Context Protocol) ecosystem.
+---
+
 # MCP Registry Manager 🌐
 
 Centralized discovery and quality scoring for the exploding MCP (Model Context Protocol) ecosystem.

@@ -1,3 +1,10 @@
+---
+name: Authentication & Authorization Patterns
+description: Master authentication and authorization patterns including JWT,
+  OAuth2, session management, and RBAC to build secure, scalable access control
+  systems.
+---
+
 # Authentication & Authorization Patterns
 
 Master authentication and authorization patterns including JWT, OAuth2, session management, and RBAC to build secure, scalable access control systems.

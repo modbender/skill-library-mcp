@@ -1,3 +1,10 @@
+---
+name: AI Customer Service Knowledge Base Builder
+description: Help SMBs quickly build AI-powered customer service systems. Input
+  FAQ documents or website URLs to automatically generate a knowledge base and
+  configure auto-reply capabilities.
+---
+
 # AI Customer Service Knowledge Base Builder
 
 ## Description

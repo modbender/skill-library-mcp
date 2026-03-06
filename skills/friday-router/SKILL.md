@@ -1,9 +1,10 @@
 ---
 name: friday-router
-displayName: IntentRouter
-description: Your AI's Smart Traffic Director—precisely matching OpenClaw tasks to the perfect LLM. Intelligent orchestration with OpenRouter. Security-focused: no gateway auth exposure.
-version: 1.7.0
+description: "Your AI's Smart Traffic Director—precisely matching OpenClaw tasks
+  to the perfect LLM. Intelligent orchestration with OpenRouter.
+  Security-focused: no gateway auth exposure."
 ---
+
 
 # IntentRouter
 

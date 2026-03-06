@@ -1,3 +1,9 @@
+---
+name: Epstein Emails API
+description: Query 383,000+ court-released Epstein emails via a pay-per-request
+  API. Structured JSON. USDC on Base via the x402 protocol.
+---
+
 # Epstein Emails API
 
 Query 383,000+ court-released Epstein emails via a pay-per-request API. Structured JSON. USDC on Base via the x402 protocol.

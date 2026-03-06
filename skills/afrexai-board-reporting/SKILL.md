@@ -1,3 +1,10 @@
+---
+name: Board Reporting Framework
+description: Generate investor-ready board decks and reporting packages. Covers
+  monthly board updates, quarterly deep dives, and annual reviews with the
+  metrics that actually matter.
+---
+
 # Board Reporting Framework
 
 Generate investor-ready board decks and reporting packages. Covers monthly board updates, quarterly deep dives, and annual reviews with the metrics that actually matter.

@@ -1,3 +1,8 @@
+---
+name: "SKILL: TikTok Dynamic Slideshow Generator"
+description: review et openclaw skills.
+---
+
 review et openclaw skills.
 
 # SKILL: TikTok Dynamic Slideshow Generator

@@ -1,3 +1,8 @@
+---
+name: percept-voice-cmd
+description: Voice command detection and action execution for OpenClaw agents.
+---
+
 # percept-voice-cmd
 
 Voice command detection and action execution for OpenClaw agents.

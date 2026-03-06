@@ -1,7 +1,10 @@
 ---
 name: Openclaw-X-article-cover-generator
-description: Generate OpenClaw-themed X (Twitter) article cover images with fixed composition: lobster logo on right quarter, text zone on left three quarters.
+description: "Generate OpenClaw-themed X (Twitter) article cover images with
+  fixed composition: lobster logo on right quarter, text zone on left three
+  quarters."
 ---
+
 
 # Openclaw-X-article-cover-generator
 

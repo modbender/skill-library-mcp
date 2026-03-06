@@ -1,3 +1,8 @@
+---
+name: Abby Browser Skill
+description: 基于 OpenClaw 内置浏览器工具封装
+---
+
 # Abby Browser Skill
 
 _基于 OpenClaw 内置浏览器工具封装_

@@ -1,3 +1,8 @@
+---
+name: Agent Team Kit — SKILL.md
+description: "A complete team process kit for OpenClaw agents that enables:"
+---
+
 # Agent Team Kit — SKILL.md
 
 *A framework for self-sustaining AI agent teams.*

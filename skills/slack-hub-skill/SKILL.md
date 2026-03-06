@@ -1,3 +1,9 @@
+---
+name: Slack Hub Skill
+description: Professional Slack integration for OpenClaw. Supports messaging,
+  threading, and workspace search.
+---
+
 # Slack Hub Skill
 
 Professional Slack integration for OpenClaw. Supports messaging, threading, and workspace search.

@@ -1,3 +1,10 @@
+---
+name: Kroger/QFC API Skill
+description: "Skill for searching Kroger/QFC products, managing cart, checking
+  pickup availability, and creating pickup orders. Uses official Kroger API. QFC
+  chain ID: 213."
+---
+
 # Kroger/QFC API Skill
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+name: Meeting Notes Summarizer 📋
+description: Transform raw meeting transcripts into structured, actionable summaries.
+---
+
 # Meeting Notes Summarizer 📋
 
 Transform raw meeting transcripts into structured, actionable summaries.

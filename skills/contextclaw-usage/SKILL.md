@@ -1,3 +1,8 @@
+---
+name: ContextClaw Plugin Usage
+description: "Use this skill when the user asks about:"
+---
+
 # ContextClaw Plugin Usage
 
 ## When to Use

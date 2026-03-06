@@ -1,3 +1,10 @@
+---
+name: "OSTRTA: One Skill To Rule Them All"
+description: OSTRTA applies adversarial security analysis to detect malicious
+  patterns in OpenClaw skills. Using an "assume-malicious" posture, it
+  identifies prompt injection, data exfiltration, obfuscation, an...
+---
+
 # OSTRTA: One Skill To Rule Them All
 
 **Security analysis skill for auditing other SKILL.md files**

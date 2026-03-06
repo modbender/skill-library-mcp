@@ -1,3 +1,9 @@
+---
+name: ZeroEx Swap Skill
+description: "⚠️ SECURITY WARNING: This skill involves real funds. Review all
+  parameters before executing swaps."
+---
+
 # ZeroEx Swap Skill
 
 ⚠️ **SECURITY WARNING:** This skill involves real funds. Review all parameters before executing swaps.

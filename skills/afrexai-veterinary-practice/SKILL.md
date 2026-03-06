@@ -1,3 +1,10 @@
+---
+name: Veterinary Practice Operations
+description: Context pack for running a profitable, compliant veterinary
+  practice. Covers service pricing benchmarks, DEA controlled substance
+  compliance, OSHA safety programs, pharmacy/inventory management, st...
+---
+
 # Veterinary Practice Operations
 
 Context pack for running a profitable, compliant veterinary practice. Covers service pricing benchmarks, DEA controlled substance compliance, OSHA safety programs, pharmacy/inventory management, staffing models, DVM compensation, and growth strategy from solo practice to multi-doctor hospital.

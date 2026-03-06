@@ -1,3 +1,10 @@
+---
+name: Progressive Memory
+description: Token-efficient memory system for AI agents. Scan an index first,
+  fetch details on demand. Based on progressive disclosure principles from
+  claude-mem.
+---
+
 # Progressive Memory
 
 Token-efficient memory system for AI agents. Scan an index first, fetch details on demand. Based on progressive disclosure principles from claude-mem.

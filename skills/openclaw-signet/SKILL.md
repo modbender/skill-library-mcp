@@ -1,8 +1,9 @@
 ---
 name: openclaw-signet
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🔏","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Cryptographic verification for installed skills. Sign skills at
+  install time, verify they haven't been tampered with later.
 ---
+
 
 # OpenClaw Signet
 

@@ -1,3 +1,8 @@
+---
+name: Code Flow Visualizer
+description: 将代码转换为 Mermaid 流程图表示，便于理解代码逻辑流程。
+---
+
 # Code Flow Visualizer
 
 将代码转换为 Mermaid 流程图表示，便于理解代码逻辑流程。

@@ -1,3 +1,9 @@
+---
+name: File to Markdown — Skill
+description: Convert files into clean, structured, AI-ready Markdown using the
+  markdown.new API powered by Cloudflare Workers AI toMarkdown().
+---
+
 # File to Markdown — Skill
 
 ## Overview

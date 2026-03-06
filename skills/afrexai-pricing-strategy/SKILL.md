@@ -1,3 +1,9 @@
+---
+name: Pricing Strategy Analyzer
+description: Analyze and optimize pricing for any product or service. Covers
+  value-based, cost-plus, competitive, and tiered pricing models.
+---
+
 # Pricing Strategy Analyzer
 
 Analyze and optimize pricing for any product or service. Covers value-based, cost-plus, competitive, and tiered pricing models.

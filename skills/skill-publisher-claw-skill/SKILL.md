@@ -1,7 +1,11 @@
 ---
 name: skill-publisher-claw-skill
-description: Prepare Claw skills for public release. Use when publishing skills to GitHub or ClawdHub - covers security audit, portability, documentation, git hygiene. Triggers: publish skill, release skill, audit skill, skill checklist, prepare skill for release.
+description: "Prepare Claw skills for public release. Use when publishing skills
+  to GitHub or ClawdHub - covers security audit, portability, documentation, git
+  hygiene. Triggers: publish skill, release skill, audit skill, skill checklist,
+  prepare skill for release."
 ---
+
 
 # Skill Publisher
 

@@ -1,3 +1,10 @@
+---
+name: whiss
+description: "name: whiss description: Whiss namespace for Netsnek e.U.
+  real-time messaging and notification platform. Provides WebSocket-based chat,
+  push notifications, and event-driven communication channels. ..."
+---
+
 ﻿---
 name: whiss
 description: Whiss namespace for Netsnek e.U. real-time messaging and notification platform. Provides WebSocket-based chat, push notifications, and event-driven communication channels.

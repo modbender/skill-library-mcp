@@ -1,7 +1,13 @@
 ---
 name: agents-refresh-md-en
-description: AGENTS.md/IDENTITY/SOUL/USER periodic reload skill to keep context fresh (.md-only v1.1.1). Prevents confusion and forgetting in long sessions. Edit HEARTBEAT.md + add cron (manual tool calls). Lightweight ClawHub distribution without Python scripts. Use when: (1) Long sessions risk personality drift, (2) Avoid /new for human-like memory continuity, (3) Auto-summarize MEMORY/ToDo.
+description: "AGENTS.md/IDENTITY/SOUL/USER periodic reload skill to keep context
+  fresh (.md-only v1.1.1). Prevents confusion and forgetting in long sessions.
+  Edit HEARTBEAT.md + add cron (manual tool calls). Lightweight ClawHub
+  distribution without Python scripts. Use when: (1) Long sessions risk
+  personality drift, (2) Avoid /new for human-like memory continuity, (3)
+  Auto-summarize MEMORY/ToDo."
 ---
+
 
 ## 🧠 Purpose (Agent's 3-Layer Memory System! 🐾)
 

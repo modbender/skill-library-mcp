@@ -1,3 +1,10 @@
+---
+name: Local Task Runner
+description: This skill provides a mechanism to execute Node.js code snippets or
+  full scripts locally on the host machine. It is the default execution method
+  when subagent spawning is unavailable or inefficient.
+---
+
 # Local Task Runner
 
 This skill provides a mechanism to execute Node.js code snippets or full scripts locally on the host machine.

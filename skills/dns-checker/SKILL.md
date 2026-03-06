@@ -1,6 +1,9 @@
 ---
-description: Perform DNS lookups, check record types, and verify propagation across DNS servers.
+name: dns-checker
+description: Perform DNS lookups, check record types, and verify propagation
+  across DNS servers.
 ---
+
 
 # DNS Lookup
 

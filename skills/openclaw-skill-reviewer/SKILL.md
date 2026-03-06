@@ -1,7 +1,13 @@
 ---
 name: skill-reviewer
-description: Comprehensive skill review and validation. Use when you need to audit an OpenClaw skill for correctness, completeness, and compliance with OpenClaw specifications. Performs three levels of review: (1) Format validation via package_skill.py, (2) Content quality assessment of SKILL.md structure and writing, (3) Functional verification that generated templates/scripts match actual OpenClaw specifications.
+description: "Comprehensive skill review and validation. Use when you need to
+  audit an OpenClaw skill for correctness, completeness, and compliance with
+  OpenClaw specifications. Performs three levels of review: (1) Format
+  validation via package_skill.py, (2) Content quality assessment of SKILL.md
+  structure and writing, (3) Functional verification that generated
+  templates/scripts match actual OpenClaw specifications."
 ---
+
 
 # Skill Reviewer
 

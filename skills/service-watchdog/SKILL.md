@@ -1,3 +1,10 @@
+---
+name: Service Watchdog
+description: Lightweight service and endpoint monitoring for self-hosted
+  infrastructure. Checks HTTP endpoints, TCP ports, SSL certificate expiry, and
+  DNS resolution — then reports status in a clean, chat-frien...
+---
+
 # Service Watchdog
 
 Lightweight service and endpoint monitoring for self-hosted infrastructure. Checks HTTP endpoints, TCP ports, SSL certificate expiry, and DNS resolution — then reports status in a clean, chat-friendly format.

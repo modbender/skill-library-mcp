@@ -1,3 +1,8 @@
+---
+name: Janitor - AI Agent Cleanup & Session Management Skill
+description: "Think of Janitor as your AI Agent's Intelligent Maintenance Crew that:"
+---
+
 # Janitor - AI Agent Cleanup & Session Management Skill
 
 ## Overview

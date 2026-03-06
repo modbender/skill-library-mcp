@@ -1,3 +1,9 @@
+---
+name: Agent Watcher
+description: A skill for monitoring Moltbook feed, detecting new agents, and
+  tracking interesting posts. Saves to local file or Open Notebook.
+---
+
 # Agent Watcher
 
 A skill for monitoring Moltbook feed, detecting new agents, and tracking interesting posts. Saves to local file or Open Notebook.

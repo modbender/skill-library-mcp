@@ -1,3 +1,8 @@
+---
+name: QQ 官方机器人配置指南
+description: QQ 官方机器人 (QQ Bot) 完整配置教程，包含从创建机器人到接入 OpenClaw AI 的全过程，以及常见问题排查。
+---
+
 # QQ 官方机器人配置指南
 
 QQ 官方机器人 (QQ Bot) 完整配置教程，包含从创建机器人到接入 OpenClaw AI 的全过程，以及常见问题排查。

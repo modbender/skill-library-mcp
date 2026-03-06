@@ -1,8 +1,11 @@
 ---
 name: serper
-description: Google search via Serper API. Use when you need to search the web and the user has a Serper API key. Triggers on: (1) user asks to search the web, (2) user wants Google search results, (3) user provides a Serper API key.
-metadata: { "openclaw": { "emoji": "🔍", "requires": { "bins": ["curl"], "env": ["SERPER_API_KEY"] } } }
+description: "Google search via Serper API. Use when you need to search the web
+  and the user has a Serper API key. Triggers on: (1) user asks to search the
+  web, (2) user wants Google search results, (3) user provides a Serper API
+  key."
 ---
+
 
 # Serper Search
 

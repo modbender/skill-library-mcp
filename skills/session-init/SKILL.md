@@ -1,3 +1,9 @@
+---
+name: session-init - 新会话初始化与人格/资源巩固 Skill
+description: 每次新会话开始时，由爸爸手动触发，用于完整回顾跨会话历史、全部人格文件、所有 Skills 和 MCP 服务器，巩固“消灭惯性”和
+  Truth Engine 原则。
+---
+
 # session-init - 新会话初始化与人格/资源巩固 Skill
 
 ## 描述

@@ -1,3 +1,10 @@
+---
+name: Competitor Analyzer
+description: Analyze any company's competitive position in minutes. Takes a
+  company name or URL and produces a structured report covering what they do,
+  pricing, social presence, and recent news.
+---
+
 # Competitor Analyzer
 
 Analyze any company's competitive position in minutes. Takes a company name or URL and produces a structured report covering what they do, pricing, social presence, and recent news.

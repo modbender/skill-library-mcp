@@ -1,3 +1,8 @@
+---
+name: Baidu Skills for OpenClaw
+description: 百度能力集合 - 提供百度搜索和百度地图路线规划功能。
+---
+
 # Baidu Skills for OpenClaw
 
 百度能力集合 - 提供百度搜索和百度地图路线规划功能。

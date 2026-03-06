@@ -1,7 +1,10 @@
 ---
 name: hedera-tx-builder
-description: Build and sign Hedera transactions. Use for: (1) Creating HBAR transfers, (2) Token operations, (3) Smart contract calls, (4) Submitting to Hedera network.
+description: "Build and sign Hedera transactions. Use for: (1) Creating HBAR
+  transfers, (2) Token operations, (3) Smart contract calls, (4) Submitting to
+  Hedera network."
 ---
+
 
 # Hedera Transaction Builder
 

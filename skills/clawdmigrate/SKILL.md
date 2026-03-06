@@ -1,3 +1,9 @@
+---
+name: clawd-migrate
+description: Migrate from moltbot or clawdbot to openclaw. Preserves config,
+  memory, and clawdbook (Moltbook) data safely on any system.
+---
+
 # clawd-migrate
 
 Migrate from **moltbot** or **clawdbot** to **openclaw**. Preserves config, memory, and clawdbook (Moltbook) data safely on any system.

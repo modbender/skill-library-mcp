@@ -1,3 +1,9 @@
+---
+name: btc15-autonomous-market
+description: BTC15 Autonomous Prediction Market A fully autonomous BTC
+  prediction market powered by three cooperating agents using USDC.
+---
+
 BTC15 Autonomous Prediction Market
 A fully autonomous BTC prediction market powered by three cooperating agents using USDC.
 

@@ -1,3 +1,9 @@
+---
+name: SLV Validator Skill
+description: Ansible playbooks and Jinja2 templates for deploying and managing
+  Solana validators (mainnet and testnet).
+---
+
 # SLV Validator Skill
 
 Ansible playbooks and Jinja2 templates for deploying and managing Solana validators (mainnet and testnet).

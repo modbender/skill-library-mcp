@@ -1,7 +1,13 @@
 ---
 name: knowledge-answer
-description: Current Date: $DATE$. Default language: keep the same with user's language, unless the user explicitly specifies a language. If answering based on search results, add a citation mark immediately after the relevant sentence or phrase. 2. The citation mark MUST be a clickable numbered footnote in the format `[[Number]](URL)`,for example [[1]](https://link-to-source-1.com). At the end, there shoul...
+description: "Current Date: $DATE$. Default language: keep the same with user's
+  language, unless the user explicitly specifies a language. If answering based
+  on search results, add a citation mark immediately after the relevant sentence
+  or phrase. 2. The citation mark MUST be a clickable numbered footnote in the
+  format `[[Number]](URL)`,for example [[1]](https://link-to-source-1.com). At
+  the end, there shoul..."
 ---
+
 
 # Knowledge Answer
 

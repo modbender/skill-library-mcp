@@ -1,3 +1,10 @@
+---
+name: Advisory Committee
+description: 'name: advisory-committee description: "4-agent AI advisory
+  committee for strategic decisions. Runs CS, Marketing, Finance, and Tech
+  agents in sequence to analyze proposals and deliver a majority-vo...'
+---
+
 ﻿---
 name: advisory-committee
 description: "4-agent AI advisory committee for strategic decisions. Runs CS, Marketing, Finance, and Tech agents in sequence to analyze proposals and deliver a majority-vote recommendation. Trigger: when you need help deciding strategy, prioritization, or whether to build something new."

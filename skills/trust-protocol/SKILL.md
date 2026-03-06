@@ -1,3 +1,10 @@
+---
+name: Agent Trust Protocol (ATP)
+description: Establish, verify, and maintain trust between AI agents. Bayesian
+  trust scoring with domain-specific trust, revocation, forgetting curves, and a
+  visual dashboard.
+---
+
 # Agent Trust Protocol (ATP)
 
 Establish, verify, and maintain trust between AI agents. Bayesian trust scoring with domain-specific trust, revocation, forgetting curves, and a visual dashboard.

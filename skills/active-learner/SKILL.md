@@ -1,3 +1,10 @@
+---
+name: Active Learner
+description: Implements the Active Learning Protocol (R3). Allows the agent to
+  programmatically internalize lessons into MEMORY.md and generate structured
+  "ask for help" requests.
+---
+
 # Active Learner
 
 **Version:** 1.0.0

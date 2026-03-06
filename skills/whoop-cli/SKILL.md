@@ -1,24 +1,10 @@
 ---
 name: whoop-cli
-description: Companion skill for @andreasnlarsen/whoop-cli: agent-friendly WHOOP access via stable CLI JSON (day briefs, health flags, trends, exports) without raw API plumbing.
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - whoop
-      env:
-        - WHOOP_CLIENT_ID
-        - WHOOP_CLIENT_SECRET
-        - WHOOP_REDIRECT_URI
-    primaryEnv: WHOOP_CLIENT_SECRET
-    homepage: https://github.com/andreasnlarsen/whoop-cli
-    install:
-      - kind: node
-        package: "@andreasnlarsen/whoop-cli@0.3.1"
-        bins:
-          - whoop
-        label: Install whoop-cli from npm
+description: "Companion skill for @andreasnlarsen/whoop-cli: agent-friendly
+  WHOOP access via stable CLI JSON (day briefs, health flags, trends, exports)
+  without raw API plumbing."
 ---
+
 
 # whoop-cli
 

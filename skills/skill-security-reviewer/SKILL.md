@@ -1,3 +1,8 @@
+---
+name: Skill Security Reviewer v3.0.0
+description: "<!-- Skill Security Reviewer | Version 3.0.0 | Author: chris@zast.ai -->"
+---
+
 <!-- Skill Security Reviewer | Version 3.0.0 | Author: chris@zast.ai -->
 
 ---

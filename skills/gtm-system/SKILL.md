@@ -1,3 +1,8 @@
+---
+name: GTM Tracking System Skill
+description: A Go-To-Market tracking system for Expanso/Prometheus.
+---
+
 # GTM Tracking System Skill
 
 A Go-To-Market tracking system for Expanso/Prometheus.

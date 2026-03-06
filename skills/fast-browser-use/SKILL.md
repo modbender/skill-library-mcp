@@ -1,29 +1,9 @@
 ---
 name: fast-browser-use
-displayName: Fastest Browser Use
-emoji: "⚡"
-summary: Rust-powered browser automation that rips through DOMs 10x faster than Puppeteer.
-homepage: https://github.com/rknoche6/fast-browser-use
-primaryEnv: bash
-os:
-  - darwin
-  - linux
-requires:
-  bins:
-    - chrome
-install:
-  - kind: brew
-    formula: rknoche6/tap/fast-browser-use
-  - kind: cargo
-    package: fast-browser-use
-config:
-  requiredEnv:
-    - CHROME_PATH
-  example: |
-    # Standard headless setup
-    export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    export BROWSER_HEADLESS="true"
+description: Rust-powered browser automation that rips through DOMs 10x faster
+  than Puppeteer.
 ---
+
 
 # Fastest Browser Use
 

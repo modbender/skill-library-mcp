@@ -1,3 +1,8 @@
+---
+name: eBay Trading API Skill
+description: Create, manage, and research eBay listings for trading cards and collectibles.
+---
+
 # eBay Trading API Skill
 
 Create, manage, and research eBay listings for trading cards and collectibles.

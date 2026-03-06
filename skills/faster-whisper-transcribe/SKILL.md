@@ -1,3 +1,8 @@
+---
+name: Voice Transcription Skill
+description: Transcribes voice messages using Faster Whisper (local, privacy-first).
+---
+
 # Voice Transcription Skill
 
 Transcribes voice messages using Faster Whisper (local, privacy-first).

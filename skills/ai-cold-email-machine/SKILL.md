@@ -1,3 +1,11 @@
+---
+name: 🤖 AI Cold Email Machine — Automated Outreach Sequences for Agencies &
+  Freelancers
+description: "Cold email is still the #1 channel for agency client acquisition.
+  But 99% of agencies fail because they blast generic, copy-paste emails that
+  get ignored. This skill fixes that forever."
+---
+
 # 🤖 AI Cold Email Machine — Automated Outreach Sequences for Agencies & Freelancers
 
 **Slug:** `ai-cold-email-machine`  

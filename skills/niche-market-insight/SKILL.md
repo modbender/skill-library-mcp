@@ -1,3 +1,10 @@
+---
+name: Niche Market Insight Skill
+description: This skill provides in-depth market analysis for a specific
+  industry and geographical region. It helps users understand market trends,
+  consumer sentiment, emerging technologies, and identify potent...
+---
+
 # Niche Market Insight Skill
 
 ## Description

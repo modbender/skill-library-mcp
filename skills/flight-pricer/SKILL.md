@@ -1,3 +1,9 @@
+---
+name: flight-pricer Skill
+description: A command-line interface (CLI) to search for flight prices using
+  the Duffel API.
+---
+
 # flight-pricer Skill
 
 A command-line interface (CLI) to search for flight prices using the Duffel API.

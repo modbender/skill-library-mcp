@@ -1,3 +1,8 @@
+---
+name: KPI Tracker Skill
+description: Track, analyze, and report on Key Performance Indicators for any business.
+---
+
 # KPI Tracker Skill
 
 Track, analyze, and report on Key Performance Indicators for any business.

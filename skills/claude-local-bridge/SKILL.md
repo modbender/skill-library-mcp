@@ -1,21 +1,8 @@
 ---
 name: claude-local-bridge
-version: 0.1.0
-summary: Access local repos from Claude on your phone via approval-gated MCP bridge
-tags:
-  - mcp
-  - file-access
-  - remote-development
-  - code-bridge
-  - approval-gating
-  - developer-tools
-author: suhteevah
-repository: https://github.com/suhteevah/claude-local-bridge
-license: MIT
-install:
-  - pip install -r requirements.txt
-env: []
+description: Access local repos from Claude on your phone via approval-gated MCP bridge
 ---
+
 
 # Claude Local Bridge
 

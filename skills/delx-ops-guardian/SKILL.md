@@ -1,3 +1,10 @@
+---
+name: Delx Ops Guardian
+description: "name: delx-ops-guardian summary: Incident handling and operational
+  recovery guardrails for OpenClaw production agents. owner: davidmosiah status:
+  active"
+---
+
 name: delx-ops-guardian
 summary: Incident handling and operational recovery guardrails for OpenClaw production agents.
 owner: davidmosiah

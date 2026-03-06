@@ -1,3 +1,10 @@
+---
+name: java-change-with-tests
+description: "1. Repo map (brief): identify the module, entrypoint, and test
+  location. 2. Plan: smallest diff that meets acceptance criteria. 3. Implement:
+  minimal edits. 4. Tests:"
+---
+
 # java-change-with-tests
 
 ## When to use

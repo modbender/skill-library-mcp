@@ -1,3 +1,8 @@
+---
+name: AI Coding Toolkit — Master Every AI Coding Assistant
+description: "Rate yourself 1-5 on each:"
+---
+
 # AI Coding Toolkit — Master Every AI Coding Assistant
 
 > The complete methodology for 10X productivity with AI-assisted development. Covers Cursor, Windsurf, Cline, Aider, Claude Code, GitHub Copilot, and more — tool-agnostic principles that work everywhere.

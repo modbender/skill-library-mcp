@@ -1,3 +1,10 @@
+---
+name: SkillsIndex MCP
+description: Gives your AI agent read/write access to the SkillsIndex public
+  directory — 11,000+ MCP servers, Claude skills, GPT actions, and IDE plugins,
+  each scored on security, utility, maintenance, and uniq...
+---
+
 # SkillsIndex MCP
 
 **Search, score, and submit AI agent tools from [SkillsIndex](https://skillsindex.dev)**

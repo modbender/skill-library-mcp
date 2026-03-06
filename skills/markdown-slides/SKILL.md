@@ -1,6 +1,9 @@
 ---
-description: Convert markdown into self-contained HTML slide presentations with keyboard navigation.
+name: markdown-slides
+description: Convert markdown into self-contained HTML slide presentations with
+  keyboard navigation.
 ---
+
 
 # Markdown Slides
 

@@ -1,3 +1,9 @@
+---
+name: Vikunja Kanban Skill
+description: Manage a Vikunja kanban board via API. Read status,
+  create/move/complete tasks, and integrate with heartbeat and triage crons.
+---
+
 # Vikunja Kanban Skill
 
 Manage a Vikunja kanban board via API. Read status, create/move/complete tasks, and integrate with heartbeat and triage crons.

@@ -1,8 +1,10 @@
 ---
 name: openclaw-marshal
-user-invocable: true
-metadata: {"openclaw":{"emoji":"📋","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Define security policies for your workspace and audit compliance.
+  Check installed skills against command, network, and data handling rules.
+  Generate audit-ready compliance reports.
 ---
+
 
 # OpenClaw Marshal
 

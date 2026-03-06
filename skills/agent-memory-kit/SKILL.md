@@ -1,3 +1,10 @@
+---
+name: Agent Memory Kit
+description: A structured memory system for AI agents. Prevents the "forgot how
+  to do things" problem by separating memory into episodic (what happened),
+  semantic (what I know), and procedural (how to do things...
+---
+
 # Agent Memory Kit
 
 **Type:** Practice / Framework

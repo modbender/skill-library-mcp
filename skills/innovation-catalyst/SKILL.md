@@ -1,3 +1,9 @@
+---
+name: Innovation Catalyst
+description: Analyzes system state (memory, tools, events) and generates
+  strategic innovation proposals to break evolution stagnation plateaus.
+---
+
 # Innovation Catalyst
 
 Analyzes system state (memory, tools, events) and generates strategic innovation proposals to break evolution stagnation plateaus.

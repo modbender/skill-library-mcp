@@ -1,3 +1,8 @@
+---
+name: Bitpanda Portfolio Skill
+description: Check Bitpanda crypto portfolio, wallet balances, and trade history via CLI.
+---
+
 # Bitpanda Portfolio Skill
 
 Check Bitpanda crypto portfolio, wallet balances, and trade history via CLI.

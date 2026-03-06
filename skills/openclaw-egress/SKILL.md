@@ -1,8 +1,9 @@
 ---
 name: openclaw-egress
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🌐","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Network DLP for agent workspaces. Scans skills and files for
+  outbound URLs, data exfiltration endpoints, and network function calls.
 ---
+
 
 # OpenClaw Egress
 

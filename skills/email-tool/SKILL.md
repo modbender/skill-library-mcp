@@ -1,3 +1,8 @@
+---
+name: Email Skill
+description: Send an email to one or more recipients.
+---
+
 # Email Skill
 
 **Description:** Use this skill to send and read emails (IMAP/SMTP). Designed for Zoho Mail but configurable.

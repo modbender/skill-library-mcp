@@ -1,3 +1,10 @@
+---
+name: Daily Devotional Auto Skill
+description: Automated daily devotional generation for OpenClaw. Fetches news,
+  generates contextual devotionals, creates videos with your voice, and uploads
+  to YouTube automatically.
+---
+
 # Daily Devotional Auto Skill
 
 Automated daily devotional generation for OpenClaw. Fetches news, generates contextual devotionals, creates videos with your voice, and uploads to YouTube automatically.

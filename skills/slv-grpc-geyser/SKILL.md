@@ -1,3 +1,9 @@
+---
+name: SLV gRPC Geyser Skill
+description: Ansible playbooks and Jinja2 templates for deploying and managing
+  Solana gRPC Geyser streaming nodes.
+---
+
 # SLV gRPC Geyser Skill
 
 Ansible playbooks and Jinja2 templates for deploying and managing Solana gRPC Geyser streaming nodes.

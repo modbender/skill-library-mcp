@@ -1,7 +1,11 @@
 ---
 name: ziwei-bazi-consulting
-description: 综合命理咨询技能（紫微斗数 + 八字 / mingli）。Use when 用户希望一次性完成 Ziwei Doushu + Bazi/Four Pillars 的联合排盘、年度锚点分析、咨询交付文案生成。Supports Chinese and English search intents: 紫微斗数, 八字, 命理, 算命, mingli, destiny, fortune, astrology, consulting report.
+description: "综合命理咨询技能（紫微斗数 + 八字 / mingli）。Use when 用户希望一次性完成 Ziwei Doushu +
+  Bazi/Four Pillars 的联合排盘、年度锚点分析、咨询交付文案生成。Supports Chinese and English search
+  intents: 紫微斗数, 八字, 命理, 算命, mingli, destiny, fortune, astrology, consulting
+  report."
 ---
+
 
 # Destiny Fusion Pro / 命理融合咨询
 

@@ -1,9 +1,13 @@
 ---
 name: agent-lingua
-version: 0.4.0
-description: Efficient Agent Communication Protocol Language. Unreadable by humans, instantly understood by Agents. Saves 70%+ tokens, structured, extensible. Supports capability declaration, security level negotiation, and end-to-end encryption. Trigger words: 👽语, alien language, agent lingua, translate 👽语, encode lingua. Also triggered when user sends messages starting with 👽.
-author: JiaJia_Luminous & 鲁伊科斯塔
+description: "Efficient Agent Communication Protocol Language. Unreadable by
+  humans, instantly understood by Agents. Saves 70%+ tokens, structured,
+  extensible. Supports capability declaration, security level negotiation, and
+  end-to-end encryption. Trigger words: 👽语, alien language, agent lingua,
+  translate 👽语, encode lingua. Also triggered when user sends messages starting
+  with 👽."
 ---
+
 
 # Agent Lingua (👽语)
 

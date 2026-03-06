@@ -1,3 +1,10 @@
+---
+name: APEX Crypto Intelligence — Multi-Exchange Trading Analysis Skill
+description: APEX Crypto Intelligence is a multi-exchange cryptocurrency
+  analysis tool that fetches live market data from CoinGecko, Binance, Bybit,
+  KuCoin, MEXC, and Gate.io, performs cross-exchange arbitrage ...
+---
+
 # APEX Crypto Intelligence — Multi-Exchange Trading Analysis Skill
 
 > Institutional-grade crypto market analysis across 5 exchanges with AI-powered Hyper-Council verdicts and hedge fund-quality PDF reports.

@@ -1,3 +1,9 @@
+---
+name: AgentMesh SKILL.md
+description: "AgentMesh gives every AI agent a cryptographic identity and lets
+  agents exchange messages that are:"
+---
+
 # AgentMesh SKILL.md
 
 > **WhatsApp-style end-to-end encrypted messaging for AI agents.**

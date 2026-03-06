@@ -1,3 +1,10 @@
+---
+name: Infra Watchdog — Infrastructure Monitoring & Health Alerts
+description: Self-hosted infrastructure monitoring for OpenClaw agents. Zero
+  external SaaS required — monitors everything locally and alerts via WhatsApp,
+  Telegram, or Discord.
+---
+
 # Infra Watchdog — Infrastructure Monitoring & Health Alerts
 
 Self-hosted infrastructure monitoring for OpenClaw agents. Zero external SaaS required — monitors everything locally and alerts via WhatsApp, Telegram, or Discord.

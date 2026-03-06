@@ -1,3 +1,9 @@
+---
+name: RTFM Testing
+description: A documentation quality methodology that spawns fresh agents to
+  validate whether docs are actually usable.
+---
+
 # RTFM Testing
 
 A documentation quality methodology that spawns fresh agents to validate whether docs are actually usable.

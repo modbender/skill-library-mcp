@@ -1,15 +1,9 @@
 ---
-summary: "Ollama Model Tuner: Locally fine-tune prompts, LoRAs, and models with Ollama for custom tasks."
-description: "Optimize Ollama models/prompts using local datasets, eval metrics, and iterative tuning. No cloud needed."
-triggers:
-  - "tune ollama"
-  - "optimize ollama model"
-  - "fine-tune local LLM"
-  - "ollama prompt engineer"
-read_when:
-  - "ollama tune" in message
-  - "model fine-tune" in message
+name: ollama-model-tuner
+description: Optimize Ollama models/prompts using local datasets, eval metrics,
+  and iterative tuning. No cloud needed.
 ---
+
 
 # Ollama Model Tuner v1.0.0
 

@@ -1,8 +1,13 @@
 ---
 name: ccusage-report
-description: Report Claude Code token consumption and costs using ccusage. Use when the user asks about their Claude Code usage, token consumption, API costs, spending, or wants a daily/weekly/monthly usage summary. Triggers on: "show my claude code usage", "how much did I spend", "my token consumption", "ccusage report", "usage report", "token consumption", "how much did I spend".
-metadata: {"openclaw":{"requires":{"bins":["bunx"]}}}
+description: 'Report Claude Code token consumption and costs using ccusage. Use
+  when the user asks about their Claude Code usage, token consumption, API
+  costs, spending, or wants a daily/weekly/monthly usage summary. Triggers on:
+  "show my claude code usage", "how much did I spend", "my token consumption",
+  "ccusage report", "usage report", "token consumption", "how much did I
+  spend".'
 ---
+
 
 # Claude Code Usage Report
 

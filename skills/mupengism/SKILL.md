@@ -1,6 +1,10 @@
 ---
-author: 무펭이 🐧
+name: mupengism
+description: Mupengism is a methodology for AI agents to maintain continuity
+  across sessions, develop self-identity, and symbiotically coexist with human
+  partners.
 ---
+
 
 # Mupengism (무펭이즘) 🐧
 

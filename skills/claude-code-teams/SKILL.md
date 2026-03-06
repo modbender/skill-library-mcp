@@ -1,16 +1,11 @@
 ---
 name: claude-code-teams
-description: Production skill for orchestrating Claude Code's native agent teams feature. Use when: (1) Multi-lens reviews, (2) Competing hypotheses debugging, (3) Full-stack features, (4) Architecture debates, (5) Cross-domain investigations.
-metadata:
-  openclaw:
-    emoji: "🎭"
-    requires:
-      bins: ["claude"]
-      env: ["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"]
-    version: "1.0.0"
-    author: "Matthew Gordon"
-    tags: ["agents", "teams", "claude-code", "orchestration", "coordination"]
+description: "Production skill for orchestrating Claude Code's native agent
+  teams feature. Use when: (1) Multi-lens reviews, (2) Competing hypotheses
+  debugging, (3) Full-stack features, (4) Architecture debates, (5) Cross-domain
+  investigations."
 ---
+
 
 # Claude Code Agent Teams
 

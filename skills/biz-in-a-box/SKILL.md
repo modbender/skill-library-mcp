@@ -1,7 +1,15 @@
 ---
 name: biz-in-a-box
-description: Agent-native business ledger using the biz-in-a-box protocol. Use when: (1) setting up a new business entity ledger (LLC, rental unit, sole trader, DAO, trust, etc.), (2) recording financial transactions as double-entry journal entries, (3) querying a biz-in-a-box journal for P&L, cash flow, burn rate, balances, or audit trails, (4) forking the repo for a new vertical (pm-in-a-box, dental-in-a-box, etc.), (5) validating a journal.ndjson file for hash chain integrity or double-entry balance. One repo = one entity. Works with any entity type on earth.
+description: "Agent-native business ledger using the biz-in-a-box protocol. Use
+  when: (1) setting up a new business entity ledger (LLC, rental unit, sole
+  trader, DAO, trust, etc.), (2) recording financial transactions as
+  double-entry journal entries, (3) querying a biz-in-a-box journal for P&L,
+  cash flow, burn rate, balances, or audit trails, (4) forking the repo for a
+  new vertical (pm-in-a-box, dental-in-a-box, etc.), (5) validating a
+  journal.ndjson file for hash chain integrity or double-entry balance. One repo
+  = one entity. Works with any entity type on earth."
 ---
+
 
 # biz-in-a-box Skill
 

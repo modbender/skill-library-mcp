@@ -1,3 +1,10 @@
+---
+name: "Skill: WordPress Remote News Publisher"
+description: This skill enables automated news content creation and publication
+  to WordPress websites hosted on remote servers. It leverages SSH with public
+  key authentication for secure, passwordless connectio...
+---
+
 # Skill: WordPress Remote News Publisher
 
 > Automated news article generation and publishing to WordPress via SSH and WP-CLI.

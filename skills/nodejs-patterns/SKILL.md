@@ -1,15 +1,27 @@
 ---
-model: standard
-description: |
-  WHAT: Production-ready Node.js backend patterns - Express/Fastify setup, layered architecture, 
-  middleware, error handling, validation, database integration, authentication, and caching.
-  
-  WHEN: User is building REST APIs, setting up Node.js servers, implementing authentication, 
-  integrating databases, adding validation/caching, or structuring backend applications.
-  
-  KEYWORDS: nodejs, node, express, fastify, typescript, api, rest, middleware, authentication, 
-  jwt, validation, zod, postgres, mongodb, redis, caching, rate limiting, error handling
+name: nodejs-patterns
+description: >-
+  WHAT: Production-ready Node.js backend patterns - Express/Fastify setup,
+  layered architecture, 
+
+  middleware, error handling, validation, database integration, authentication,
+  and caching.
+
+
+  WHEN: User is building REST APIs, setting up Node.js servers, implementing
+  authentication, 
+
+  integrating databases, adding validation/caching, or structuring backend
+  applications.
+
+
+  KEYWORDS: nodejs, node, express, fastify, typescript, api, rest, middleware,
+  authentication, 
+
+  jwt, validation, zod, postgres, mongodb, redis, caching, rate limiting, error
+  handling
 ---
+
 
 # Node.js Backend Patterns
 

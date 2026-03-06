@@ -1,7 +1,12 @@
 ---
 name: office-docs
-description: Generate and manipulate office documents (PDF, DOCX, XLSX, PPTX) for professional reports, presentations, and data exports. Use when: (1) Creating PDFs from text/images, (2) Generating Word documents, (3) Creating Excel spreadsheets with formulas, (4) Building PowerPoint presentations, (5) Extracting content from office documents.
+description: "Generate and manipulate office documents (PDF, DOCX, XLSX, PPTX)
+  for professional reports, presentations, and data exports. Use when: (1)
+  Creating PDFs from text/images, (2) Generating Word documents, (3) Creating
+  Excel spreadsheets with formulas, (4) Building PowerPoint presentations, (5)
+  Extracting content from office documents."
 ---
+
 
 # Office Docs - Professional Document Generation
 

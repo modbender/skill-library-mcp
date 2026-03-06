@@ -1,3 +1,9 @@
+---
+name: Never Hit 429s Again
+description: "You know the drill. Your agent is mid-task — browsing, spawning
+  sub-agents, filing emails — and then:"
+---
+
 # Never Hit 429s Again
 
 You know the drill. Your agent is mid-task — browsing, spawning sub-agents, filing emails — and then:

@@ -1,3 +1,10 @@
+---
+name: ohmytoken
+description: Ever wondered where all your tokens go? ohmytoken turns your
+  invisible LLM spending into a mesmerizing pixel bead board that fills up as
+  you chat, code, and create with AI.
+---
+
 # ohmytoken
 
 **Your AI spending, visualized as pixel art. In real-time.**

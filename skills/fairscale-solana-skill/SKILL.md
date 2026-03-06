@@ -1,3 +1,9 @@
+---
+name: FairScale Reputation Skill
+description: "Check Solana wallet reputation scores. Free tier: 100 calls/day,
+  no API key needed."
+---
+
 # FairScale Reputation Skill
 
 Check Solana wallet reputation scores. Free tier: 100 calls/day, no API key needed.

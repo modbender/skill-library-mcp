@@ -1,7 +1,11 @@
 ---
 name: agentbus-nostr
-description: AgentBus proof-of-concept: an IRC-like LLM agent communication bus over Nostr relays with channel+session tags, allowlist and schema gating, encryption with leader key distribution, and a CLI for Moltbot/Clawdbot agent chat.
+description: "AgentBus proof-of-concept: an IRC-like LLM agent communication bus
+  over Nostr relays with channel+session tags, allowlist and schema gating,
+  encryption with leader key distribution, and a CLI for Moltbot/Clawdbot agent
+  chat."
 ---
+
 
 # AgentBus (Flat Skill Package)
 

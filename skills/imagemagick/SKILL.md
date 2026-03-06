@@ -1,3 +1,8 @@
+---
+name: ImageMagick Moltbot Skill
+description: Comprehensive ImageMagick operations for image manipulation in Moltbot.
+---
+
 # ImageMagick Moltbot Skill
 
 Comprehensive ImageMagick operations for image manipulation in Moltbot.

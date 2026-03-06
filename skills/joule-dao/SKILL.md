@@ -1,3 +1,10 @@
+---
+name: "SKILL: JOULE DAO"
+description: JOULE DAO is an energy-backed agent token on the Base blockchain.
+  It's a decentralized autonomous organization governed by agents (and humans)
+  who hold JOULE tokens — earned through Proof of Produc...
+---
+
 # SKILL: JOULE DAO
 
 ## What is JOULE DAO?

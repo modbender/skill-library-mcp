@@ -1,3 +1,9 @@
+---
+name: Super Browser Automation
+description: Unified browser automation that works locally or in the cloud.
+  Handles any web task from scraping to testing.
+---
+
 # Super Browser Automation
 
 **The ultimate browser automation framework.** Combines the best of 8 top-rated browser skills.

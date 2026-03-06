@@ -1,3 +1,10 @@
+---
+name: OpenClawdy
+description: Give your agent persistent memory that survives sessions. Store
+  facts, preferences, decisions, and learnings - recall them semantically
+  whenever needed. Advanced features include reputation trackin...
+---
+
 # OpenClawdy
 
 **Memory Infrastructure for Autonomous Agents**

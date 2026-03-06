@@ -1,3 +1,11 @@
+---
+name: Spaces Group Assistant Skill
+description: Spaces Group Assistant расширяет возможности
+  OpenClaw/Telegram-ассистента для вашей команды или сообщества — даёт
+  расширенный доступ к внутренней базе знаний, памяти, логу событий, навыкам и
+  аналит...
+---
+
 # Spaces Group Assistant Skill
 
 ## Описание

@@ -1,3 +1,9 @@
+---
+name: Ralph Loops Skill
+description: Autonomous AI agent loops for iterative development. Based on
+  Geoffrey Huntley's Ralph Wiggum technique, as documented by Clayton Farr.
+---
+
 # Ralph Loops Skill
 
 > **First time?** Read [SETUP.md](./SETUP.md) first to install dependencies and verify your setup.

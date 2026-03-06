@@ -1,3 +1,10 @@
+---
+name: AgentGuard - Security Monitoring Skill
+description: AgentGuard is a comprehensive security monitoring skill that
+  watches over agent operations, detecting suspicious behavior, logging
+  communications, and providing actionable security reports.
+---
+
 # AgentGuard - Security Monitoring Skill
 
 **Version:** 1.0.0  

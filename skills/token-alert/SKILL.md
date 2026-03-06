@@ -1,3 +1,8 @@
+---
+name: Token Alert Skill
+description: 🚨 Monitor session tokens and get alerts at 75%/90%/95%
+---
+
 # Token Alert Skill
 
 🚨 **Monitor session tokens and get alerts at 75%/90%/95%**

@@ -1,7 +1,11 @@
 ---
 name: stock-analyzer
-description: Analyze Japanese and US stocks, track portfolios, and summarize financial news using Yahoo Finance data. Use when: (1) Fetching stock prices and indicators, (2) Analyzing portfolio performance, (3) Summarizing quarterly earnings reports, (4) Calculating technical analysis indicators.
+description: "Analyze Japanese and US stocks, track portfolios, and summarize
+  financial news using Yahoo Finance data. Use when: (1) Fetching stock prices
+  and indicators, (2) Analyzing portfolio performance, (3) Summarizing quarterly
+  earnings reports, (4) Calculating technical analysis indicators."
 ---
+
 
 # Stock Analyzer
 

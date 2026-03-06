@@ -1,3 +1,10 @@
+---
+name: claw-clawbridge
+description: Clawbridge transforms a simple human prompt into a persistent,
+  nightly scouting operation. It doesn't just find leads; it builds a bridge
+  between your goals and the people who can help you achieve ...
+---
+
 # claw-clawbridge
 
 > **The Intelligent Connection Bridge**: A high-signal scouting agent that runs nightly to bridge you with the right people. 

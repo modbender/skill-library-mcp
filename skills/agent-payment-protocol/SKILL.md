@@ -1,3 +1,8 @@
+---
+name: Agent Payment Protocol Skill
+description: "Enable this flow in your agent ecosystem:"
+---
+
 # Agent Payment Protocol Skill
 
 **Description:** Orchestrate agent-to-agent payments in IRC channels using Solana transactions.

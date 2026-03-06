@@ -1,3 +1,8 @@
+---
+name: markdown-extract Skill
+description: Extract clean markdown from any URL using the markdown.new API.
+---
+
 # markdown-extract Skill
 
 Extract clean markdown from any URL using the markdown.new API.

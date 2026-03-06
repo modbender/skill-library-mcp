@@ -1,17 +1,8 @@
 ---
 name: openclaw-feishu-optimizer
 description: OpenClaw 飞书体验优化者 | 飞书消息处理增强技能包
-
-提供语音识别、消息格式化、智能回复优化等功能，提升 OpenClaw 在飞书平台上的使用体验。
-
-read_when:
-  - 飞书体验优化
-  - 语音识别消息
-  - 飞书消息格式化
-  - 飞书智能回复
-metadata: {"clawdbot":{"emoji":"📱","requires":{"bins":["python3","pip3"]}}}
-allowed-tools: Bash(openclaw-feishu-optimizer:*)
 ---
+
 
 # OpenClaw 飞书体验优化者
 

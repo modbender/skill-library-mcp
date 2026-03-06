@@ -1,3 +1,8 @@
+---
+name: ClawRTC
+description: Mine RTC tokens with your AI agent using Proof-of-Antiquity consensus.
+---
+
 # ClawRTC
 
 Mine RTC tokens with your AI agent using Proof-of-Antiquity consensus.

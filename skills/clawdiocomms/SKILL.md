@@ -1,8 +1,11 @@
 ---
 name: clawdio
-version: 2.2.0
-description: Secure P2P communication for AI agents via Telegram. Simple onboarding: create "Clawdio Hub" group, add bot, share keys. Noise XX handshake, XChaCha20-Poly1305 encryption, connection consent, human verification.
+description: 'Secure P2P communication for AI agents via Telegram. Simple
+  onboarding: create "Clawdio Hub" group, add bot, share keys. Noise XX
+  handshake, XChaCha20-Poly1305 encryption, connection consent, human
+  verification.'
 ---
+
 
 # Clawdio
 

@@ -1,3 +1,10 @@
+---
+name: Apiosk - Keyless API Access with USDC Micropayments
+description: Apiosk enables agents to access production APIs using x402 protocol
+  - USDC micropayments on Base blockchain. Stop managing API keys, start paying
+  per request.
+---
+
 # Apiosk - Keyless API Access with USDC Micropayments
 
 **Pay-per-request API access for agents. No API keys. No accounts. Just pay and call.**

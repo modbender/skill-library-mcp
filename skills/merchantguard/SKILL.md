@@ -1,3 +1,10 @@
+---
+name: MerchantGuard — Compliance Layer for AI Agents
+description: MerchantGuard is the compliance and security layer for the agent
+  economy. Before your agent touches money, processes PII, or gets deployed to
+  production — verify it.
+---
+
 # MerchantGuard — Compliance Layer for AI Agents
 
 **Version:** 2.0.0

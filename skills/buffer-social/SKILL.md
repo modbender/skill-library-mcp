@@ -1,3 +1,9 @@
+---
+name: Buffer Skill for OpenClaw
+description: Use this skill to create and manage Buffer content from OpenClaw or
+  terminal commands.
+---
+
 # Buffer Skill for OpenClaw
 
 Use this skill to create and manage Buffer content from OpenClaw or terminal commands.

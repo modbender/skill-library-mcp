@@ -1,3 +1,8 @@
+---
+name: 사용자 환경변수로 영구 설정
+description: 카카오 로컬 API를 호출하여 주소 정규화 및 장소 검색을 수행하는 OpenClaw Skill입니다.
+---
+
 ﻿# Kakao Local API Skill
 
 **OpenClaw Skill for Kakao Local (Places & Address) API**

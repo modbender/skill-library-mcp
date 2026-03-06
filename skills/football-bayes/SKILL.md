@@ -1,3 +1,8 @@
+---
+name: "Skill: football-bayes"
+description: 当用户出现以下意图时启用：
+---
+
 # Skill: football-bayes
 
 > 20年经验的足球竞彩策略官：贝叶斯统计 + 现代战术周期化。

@@ -1,3 +1,8 @@
+---
+name: Business Automation Strategy — AfrexAI
+description: Before building anything, map where time and money leak.
+---
+
 # Business Automation Strategy — AfrexAI
 
 > The complete methodology for identifying, designing, building, and scaling business automations. Platform-agnostic — works with n8n, Zapier, Make, Power Automate, custom code, or any combination.

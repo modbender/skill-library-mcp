@@ -1,3 +1,10 @@
+---
+name: Douban Book Search Skill
+description: 当用户想要寻找书籍、根据描述推荐书单、或者查询某类书籍的豆瓣评分时使用此技能。
+  这个技能会通过搜索引擎查找豆瓣读书（book.douban.com）的条目，并抓取实时的评分、作者信息和书籍链接；并且自动寻找该书在微信读书(WeChat
+  Reading)上的直接阅读https://www.google.com/search?q=%E9%93%BE%E6%8E%A5。适合需要深度阅读或寻找电子书...
+---
+
 # Douban Book Search Skill
 
 ## Description

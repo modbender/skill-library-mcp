@@ -1,7 +1,18 @@
 ---
 name: m365-calendar
-description: MS365 / Microsoft365 calendar automation via Microsoft Graph for Microsoft 365 (M365) Business (work/school, Exchange Online) and M365 Home/Consumer (hotmail.com, outlook.com, live.com). Use when listing upcoming events, searching calendar entries (e.g. “Lunch”), checking attendee response status (accepted/declined/tentative), creating or updating meetings, moving events to a new time, or troubleshooting Graph/MSAL auth/token cache for calendar access. Related keywords: OneDrive, SharePoint, Exchange Online (calendar). Privacy note: no third-party API key is required; authentication is via your own Microsoft login (device code) and tokens are stored locally per profile. **Token cost:** ~600-1.5k tokens per use (skill body ~2-3k tokens, Graph calls + light parsing).
+description: "MS365 / Microsoft365 calendar automation via Microsoft Graph for
+  Microsoft 365 (M365) Business (work/school, Exchange Online) and M365
+  Home/Consumer (hotmail.com, outlook.com, live.com). Use when listing upcoming
+  events, searching calendar entries (e.g. “Lunch”), checking attendee response
+  status (accepted/declined/tentative), creating or updating meetings, moving
+  events to a new time, or troubleshooting Graph/MSAL auth/token cache for
+  calendar access. Related keywords: OneDrive, SharePoint, Exchange Online
+  (calendar). Privacy note: no third-party API key is required; authentication
+  is via your own Microsoft login (device code) and tokens are stored locally
+  per profile. **Token cost:** ~600-1.5k tokens per use (skill body ~2-3k
+  tokens, Graph calls + light parsing)."
 ---
+
 
 # M365 Calendar (Microsoft Graph)
 

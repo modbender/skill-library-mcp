@@ -1,8 +1,10 @@
 ---
 name: openclaw-triage
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🚨","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Incident response and forensics for agent workspaces. When
+  something goes wrong — a skill behaves unexpectedly, files change without
+  explanation, or another security tool flags an anomaly — triage ...
 ---
+
 
 # OpenClaw Triage
 

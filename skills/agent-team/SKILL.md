@@ -1,3 +1,8 @@
+---
+name: agent-team - 多 Agent 团队管理系统
+description: 管理和调用具有不同"灵魂"的子 Agent 团队，每个 Agent 拥有独特的身份定义和专用模型。
+---
+
 # agent-team - 多 Agent 团队管理系统
 
 管理和调用具有不同"灵魂"的子 Agent 团队，每个 Agent 拥有独特的身份定义和专用模型。

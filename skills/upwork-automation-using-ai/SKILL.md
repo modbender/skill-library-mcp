@@ -1,7 +1,13 @@
 ---
 name: upwork-automation-using-ai
-description: Automate Upwork job search and proposal drafting in one browser session using the Browser Relay/Browser Automation workflow. Use when the user wants to: (1) open/login Upwork, (2) find top matching jobs from explicit criteria, (3) filter out disqualifiers, (4) open the best job, and (5) fill proposal fields without submitting. Also use when the user asks to persist in the same tab/session across steps.
+description: "Automate Upwork job search and proposal drafting in one browser
+  session using the Browser Relay/Browser Automation workflow. Use when the user
+  wants to: (1) open/login Upwork, (2) find top matching jobs from explicit
+  criteria, (3) filter out disqualifiers, (4) open the best job, and (5) fill
+  proposal fields without submitting. Also use when the user asks to persist in
+  the same tab/session across steps."
 ---
+
 
 # Upwork Automation Using AI
 

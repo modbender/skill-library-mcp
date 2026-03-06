@@ -1,9 +1,9 @@
 ---
 name: agents-manager
-description: Manage Clawdbot agents: discover, profile, track capabilities, define routing hierarchy, and assign tasks.
-homepage: https://www.clawhub.com/skills/agents-manager
-metadata: {"openclaw":{"emoji":"🕵️","requires":{"bins":["node"]}}}
+description: "Manage Clawdbot agents: discover, profile, track capabilities,
+  define routing hierarchy, and assign tasks."
 ---
+
 
 # Agents Manager
 

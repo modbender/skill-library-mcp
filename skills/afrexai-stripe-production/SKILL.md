@@ -1,3 +1,10 @@
+---
+name: Stripe Production Engineering
+description: Complete methodology for building, scaling, and operating
+  production Stripe payment systems. From first checkout to enterprise billing
+  at scale.
+---
+
 # Stripe Production Engineering
 
 Complete methodology for building, scaling, and operating production Stripe payment systems. From first checkout to enterprise billing at scale.

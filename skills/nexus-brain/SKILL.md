@@ -1,3 +1,8 @@
+---
+name: "Skill: Nexus-Orchestrator (V1.1)"
+description: Intelligent SRE Bridge for AI-driven system diagnosis and recovery.
+---
+
 # Skill: Nexus-Orchestrator (V1.1)
 
 Intelligent SRE Bridge for AI-driven system diagnosis and recovery.

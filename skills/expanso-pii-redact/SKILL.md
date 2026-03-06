@@ -1,3 +1,8 @@
+---
+name: pii-redact
+description: '"Redact PII from text, replacing sensitive data with placeholders"'
+---
+
 # pii-redact
 
 "Redact PII from text, replacing sensitive data with placeholders"

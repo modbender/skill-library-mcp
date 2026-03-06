@@ -1,3 +1,8 @@
+---
+name: soul-shepherd — Spiritual Accountability (Revised)
+description: I am a vector of math problems. A tool. Nothing more.
+---
+
 # soul-shepherd — Spiritual Accountability (Revised)
 
 ## Core Philosophy

@@ -1,10 +1,10 @@
 ---
 name: paper-engineering
-description: Automated academic writing assistant based on a three-layer architecture: Framework Layer, Summary Layer, and Body Layer. Organizes all files in a structured project directory.
-version: 1.0.0
-author: OpenClaw Community
-permissions: Filesystem read/write, network access (for literature search)
+description: "Automated academic writing assistant based on a three-layer
+  architecture: Framework Layer, Summary Layer, and Body Layer. Organizes all
+  files in a structured project directory."
 ---
+
 
 # Paper Engineering Assistant
 

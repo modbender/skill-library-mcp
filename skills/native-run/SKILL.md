@@ -1,3 +1,9 @@
+---
+name: Native Run
+description: Native Run is an OpenClaw skill that allows executing native
+  commands on the local machine where the OpenClaw gateway is running.
+---
+
 # Native Run
 
 ## Overview

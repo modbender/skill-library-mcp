@@ -1,6 +1,9 @@
 ---
-description: Translate text between languages using translate-shell (trans) — no API keys required.
+name: text-translator
+description: Translate text between languages using translate-shell (trans) — no
+  API keys required.
 ---
+
 
 # Text Translator
 

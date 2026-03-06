@@ -1,8 +1,10 @@
 ---
 name: jasper-configguard
-version: 1.0.0
-description: Safe config changes for OpenClaw with automatic rollback. Backs up before patching, health-checks after restart, auto-rolls back on failure. Commands: patch, restore, list, diff, validate, doctor.
+description: "Safe config changes for OpenClaw with automatic rollback. Backs up
+  before patching, health-checks after restart, auto-rolls back on failure.
+  Commands: patch, restore, list, diff, validate, doctor."
 ---
+
 
 # Jasper ConfigGuard v1.0.0
 

@@ -1,3 +1,8 @@
+---
+name: FutureFulfillment Picqer Dashboard v2
+description: JSON-only API for dashboard data. No markdown responses.
+---
+
 # FutureFulfillment Picqer Dashboard v2
 
 JSON-only API for dashboard data. No markdown responses.

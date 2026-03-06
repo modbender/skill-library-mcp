@@ -1,3 +1,9 @@
+---
+name: SaySigned — AI Agent E-Signature Skill
+description: Connect directly to the remote MCP endpoint — no local install, no
+  HTTP requests to craft.
+---
+
 # SaySigned — AI Agent E-Signature Skill
 
 > **E-signatures for AI agents.** Legally binding under ESIGN Act & UETA Section 14.

@@ -1,9 +1,8 @@
 ---
 name: gmail_last5
-summary: "Show the last 5 unique emails in the inbox using gog"
-command: gmail_last5
-command-dispatch: model
+description: Show the last 5 unique emails in the inbox using gog
 ---
+
 
 # gmail_last5
 

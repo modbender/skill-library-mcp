@@ -1,3 +1,10 @@
+---
+name: FastAPI Production Engineering
+description: Complete methodology for building, deploying, and scaling
+  production FastAPI applications. Not a tutorial — a production operating
+  system.
+---
+
 # FastAPI Production Engineering
 
 Complete methodology for building, deploying, and scaling production FastAPI applications. Not a tutorial — a production operating system.

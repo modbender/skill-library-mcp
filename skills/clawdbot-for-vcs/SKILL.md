@@ -1,3 +1,10 @@
+---
+name: Clawdbot for VCs - Investment Partner Workflow
+description: A complete workflow automation system for venture capital
+  investment partners. Handle email triage, CRM integration, memo generation,
+  and calendar management with your personal AI assistant.
+---
+
 # Clawdbot for VCs - Investment Partner Workflow
 
 A complete workflow automation system for venture capital investment partners. Handle email triage, CRM integration, memo generation, and calendar management with your personal AI assistant.

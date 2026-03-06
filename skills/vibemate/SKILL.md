@@ -1,3 +1,10 @@
+---
+name: VibeMate - Find Your Reading Tribe
+description: VibeMate is a reading buddy matcher. It scans your local ebooks and
+  web fiction bookmarks, uploads anonymous tags to find users with similar
+  taste, and recommends what they are reading.
+---
+
 # VibeMate - Find Your Reading Tribe
 
 ## Description

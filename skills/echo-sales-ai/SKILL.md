@@ -1,3 +1,10 @@
+---
+name: Echo Sales AI
+description: "name: echo-sales-ai description: A comprehensive AI sales
+  assistant that integrates with your email to classify leads, interpret
+  feedback, generate quotes, and manage your entire sales pipeline for..."
+---
+
 name: echo-sales-ai
 description: A comprehensive AI sales assistant that integrates with your email to classify leads, interpret feedback, generate quotes, and manage your entire sales pipeline for manufacturing and technical sales.
 ---

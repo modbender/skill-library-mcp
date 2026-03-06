@@ -1,6 +1,9 @@
 ---
-description: Generate automated backup scripts with rotation for PostgreSQL, MySQL, SQLite, and MongoDB.
+name: db-backup
+description: Generate automated backup scripts with rotation for PostgreSQL,
+  MySQL, SQLite, and MongoDB.
 ---
+
 
 # DB Backup
 

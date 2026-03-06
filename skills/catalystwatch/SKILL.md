@@ -1,14 +1,9 @@
 ---
-metadata:
-  name: CatalystWatch
-  description: Monitor and analyze market-moving catalysts including earnings, FDA decisions, economic data releases, and corporate events
-  version: 0.0.2
-  tags: [finance, trading, catalysts, earnings, market-events]
-  openclaw:
-    requires:
-      env: [CATALYSTWATCH_API_KEY]
-    primaryEnv: CATALYSTWATCH_API_KEY
+name: catalystwatch
+description: Monitor and analyze market-moving catalysts for equities and other
+  financial instruments.
 ---
+
 
 # CatalystWatch
 

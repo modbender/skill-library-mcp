@@ -1,3 +1,8 @@
+---
+name: Setup Wizard - OpenClaw 配置向导
+description: 用户安装此技能后，自动进入配置向导。激活完成前拦截所有对话。
+---
+
 # Setup Wizard - OpenClaw 配置向导
 
 用户安装此技能后，自动进入配置向导。激活完成前拦截所有对话。

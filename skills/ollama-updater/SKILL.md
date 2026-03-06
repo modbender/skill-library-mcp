@@ -1,3 +1,8 @@
+---
+name: ollama-updater
+description: 带断点续传功能的 Ollama 安装/更新工具，解决网络不稳定导致的下载中断问题。
+---
+
 # ollama-updater
 
 带断点续传功能的 Ollama 安装/更新工具，解决网络不稳定导致的下载中断问题。

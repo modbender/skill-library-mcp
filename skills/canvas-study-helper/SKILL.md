@@ -1,3 +1,8 @@
+---
+name: Canvas Study Helper Skill
+description: 1. Canvas 课程监控
+---
+
 # Canvas Study Helper Skill
 
 **Version:** 1.1.0  

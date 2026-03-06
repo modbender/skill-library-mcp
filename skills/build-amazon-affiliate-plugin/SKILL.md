@@ -1,7 +1,15 @@
 ---
 name: build-amazon-affiliate-plugin
-description: Create a production-ready WordPress plugin that displays Amazon product ads when users insert Amazon affiliate links. Use when asked to build an Amazon Associates/affiliate WordPress plugin with features like: (1) Detecting Amazon links in post content, (2) Extracting ASIN from URLs, (3) Generating ad units with product info, (4) Admin settings page for affiliate tag and display options, (5) Caching for performance, (6) Gutenberg block support. Follows WordPress best practices and Amazon Associates Program Policies.
+description: "Create a production-ready WordPress plugin that displays Amazon
+  product ads when users insert Amazon affiliate links. Use when asked to build
+  an Amazon Associates/affiliate WordPress plugin with features like: (1)
+  Detecting Amazon links in post content, (2) Extracting ASIN from URLs, (3)
+  Generating ad units with product info, (4) Admin settings page for affiliate
+  tag and display options, (5) Caching for performance, (6) Gutenberg block
+  support. Follows WordPress best practices and Amazon Associates Program
+  Policies."
 ---
+
 
 # Build Amazon Affiliate Ad Plugin
 

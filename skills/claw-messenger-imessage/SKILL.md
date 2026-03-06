@@ -1,3 +1,9 @@
+---
+name: "@emotion-machine/claw-messenger"
+description: iMessage, RCS & SMS channel plugin for OpenClaw — no phone or Mac
+  Mini required.
+---
+
 # @emotion-machine/claw-messenger
 
 iMessage, RCS & SMS channel plugin for [OpenClaw](https://openclaw.ai) — no phone or Mac Mini required.

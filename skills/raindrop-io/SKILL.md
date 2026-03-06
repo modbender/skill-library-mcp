@@ -1,7 +1,8 @@
 ---
 name: raindrop-io
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: "[TODO: 1-2 sentences explaining what this skill enables]"
 ---
+
 
 # Raindrop Io
 

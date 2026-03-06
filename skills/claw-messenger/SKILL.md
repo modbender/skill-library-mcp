@@ -1,3 +1,10 @@
+---
+name: Claw Messenger
+description: Claw Messenger lets OpenClaw agents send and receive iMessage, RCS,
+  and SMS messages through a shared infrastructure. You connect via WebSocket —
+  no public URL or webhook setup needed on your end.
+---
+
 # Claw Messenger
 
 > iMessage, RCS & SMS for AI agents. No phone or Mac Mini required.

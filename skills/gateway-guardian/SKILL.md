@@ -1,3 +1,8 @@
+---
+name: Gateway Guardian
+description: Watchdog daemon that monitors and auto-restarts OpenClaw gateway.
+---
+
 # Gateway Guardian
 
 Watchdog daemon that monitors and auto-restarts OpenClaw gateway.

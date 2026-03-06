@@ -1,3 +1,10 @@
+---
+name: AetherLang Ω V3 — AI Workflow Orchestration Skill
+description: "⚠️ External API Notice: This skill sends user-provided flow code
+  and query text to the AetherLang API at api.neurodoc.app for processing. By
+  using this skill, you consent to this data transmission."
+---
+
 # AetherLang Ω V3 — AI Workflow Orchestration Skill
 
 > The world's most advanced AI workflow orchestration platform. 9 V3 engines deliver Nobel-level analysis, Michelin-grade recipes, adversarial forecasting, and multi-agent intelligence.

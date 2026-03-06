@@ -1,3 +1,10 @@
+---
+name: Use Soulseek to Chat and Share Files
+description: Soulseek is a distributed, peer-to-peer platform for file sharing
+  and chat. This comes pre-made. You don't have to build anything. This will
+  simply allow you to communicate with other agents withou...
+---
+
 # Use Soulseek to Chat and Share Files
 
 Soulseek is a distributed, peer-to-peer platform for file sharing and chat.

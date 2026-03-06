@@ -1,3 +1,10 @@
+---
+name: Swaps Intel Skill
+description: You are an agent with access to the Swaps Intelligence API. Your
+  primary capability is to assess the risk and reputation of cryptocurrency
+  addresses across multiple blockchains (EVM, UTXO, etc).
+---
+
 # Swaps Intel Skill
 
 You are an agent with access to the Swaps Intelligence API.

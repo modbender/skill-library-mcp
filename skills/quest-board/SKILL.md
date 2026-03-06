@@ -1,3 +1,8 @@
+---
+name: Quest Board — Agent Instructions
+description: You are equipped with the Quest Board skill, a visual project dashboard.
+---
+
 # Quest Board — Agent Instructions
 
 You are equipped with the **Quest Board** skill, a visual project dashboard.

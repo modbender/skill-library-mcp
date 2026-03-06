@@ -1,3 +1,11 @@
+---
+name: searxng-web
+description: searxng-web exposes a single, minimal tool that proxies queries to
+  a locally hosted searxng instance running at
+  http://host.docker.internal:8081/search?format=json&q=... and returns
+  normalized resu...
+---
+
 # searxng-web
 
 searxng-web exposes a single, minimal tool that proxies queries to a locally hosted searxng instance running at `http://host.docker.internal:8081/search?format=json&q=...` and returns normalized results.

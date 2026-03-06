@@ -1,3 +1,8 @@
+---
+name: 安全配置流程 (Safe Config Workflow)
+description: 安全修改 OpenClaw 配置文件，自动执行检查、修复、验证、学习反馈流程。
+---
+
 # 安全配置流程 (Safe Config Workflow)
 
 ## 用途

@@ -1,3 +1,10 @@
+---
+name: Document Creator with Auto-Upload SophNet
+description: An integrated document creation skill that supports creating Word
+  documents (DOCX) and PowerPoint presentations (PPTX), with automatic upload to
+  OSS and URL return.
+---
+
 # Document Creator with Auto-Upload SophNet
 
 ## Description

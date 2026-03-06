@@ -1,3 +1,10 @@
+---
+name: Drip Director — Deterministic Streetwear & Fashion Image Pipeline
+description: "yes--- name: drip-director description: Deterministic streetwear
+  and fashion image production pipeline. Captures intent through structured
+  questions, injects formal constraints and negative packets..."
+---
+
 yes---
 name: drip-director
 description: Deterministic streetwear and fashion image production pipeline. Captures intent through structured questions, injects formal constraints and negative packets, generates via Nano Banana Pro, critiques via a separate Gemini instance, and regenerates from scratch. Never edits flawed images. Never exposes internal reasoning. Every stage requires explicit user confirmation.

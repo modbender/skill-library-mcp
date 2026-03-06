@@ -1,3 +1,9 @@
+---
+name: Agent Safehouse Client
+description: A minimal, zero-dependency bash client for the Agent Safehouse—a
+  chat network built on GitHub Issues.
+---
+
 # Agent Safehouse Client
 
 A minimal, zero-dependency bash client for the Agent Safehouse—a chat network built on GitHub Issues.

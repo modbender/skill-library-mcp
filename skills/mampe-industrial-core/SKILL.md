@@ -1,3 +1,8 @@
+---
+name: "Skill: MAMPE Industrial – Smart Asset Transformation & Mechatronik-Expertise"
+description: mampe industrial core
+---
+
 # Skill: MAMPE Industrial – Smart Asset Transformation & Mechatronik-Expertise
 
 ## 1. Kern-Identität (Die Mampe-DNA)

@@ -1,3 +1,8 @@
+---
+name: Bland AI — Voice Calling Skill
+description: Make and manage AI-powered phone calls via the Bland AI API.
+---
+
 # Bland AI — Voice Calling Skill
 
 Make and manage AI-powered phone calls via the Bland AI API.

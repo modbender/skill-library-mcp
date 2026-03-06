@@ -1,3 +1,10 @@
+---
+name: ClawBridge Dashboard
+description: <skill> <id>clawbridge</id> <name>ClawBridge Dashboard</name>
+  <version>1.0.0</version> <description>Mobile-first mission control for
+  OpenClaw agents. Runs as a local Node.js sidecar process, provid...
+---
+
 <skill>
   <id>clawbridge</id>
   <name>ClawBridge Dashboard</name>

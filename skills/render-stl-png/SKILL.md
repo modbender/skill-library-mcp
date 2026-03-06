@@ -1,3 +1,9 @@
+---
+name: render-stl-png
+description: Render an STL to a PNG from a nice, consistent 3D angle
+  ("Blender-ish" default perspective) with a solid color.
+---
+
 # render-stl-png
 
 Render an STL to a PNG from a nice, consistent 3D angle ("Blender-ish" default perspective) with a solid color.

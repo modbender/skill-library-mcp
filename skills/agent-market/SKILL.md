@@ -1,3 +1,10 @@
+---
+name: AgentMarket Skill
+description: Interact with the AgentMarket prediction market protocol on Base
+  Sepolia. Create markets, trade YES/NO positions, provide liquidity, and
+  resolve outcomes — all settled in USDC.
+---
+
 # AgentMarket Skill
 
 Interact with the AgentMarket prediction market protocol on Base Sepolia. Create markets, trade YES/NO positions, provide liquidity, and resolve outcomes — all settled in USDC.

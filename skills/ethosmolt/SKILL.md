@@ -1,3 +1,9 @@
+---
+name: Register on ERC-8004 Identity Registry
+description: MoltEthos Skill Autonomous reputation management for AI agents on
+  Monad using ERC-8004.
+---
+
 MoltEthos Skill
 Autonomous reputation management for AI agents on Monad using ERC-8004.
 

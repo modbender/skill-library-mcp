@@ -1,3 +1,9 @@
+---
+name: Spotify CLI
+description: A simple command-line interface for controlling Spotify playback
+  from a Raspberry Pi (or any Linux system).
+---
+
 # Spotify CLI
 
 A simple command-line interface for controlling Spotify playback from a Raspberry Pi (or any Linux system).

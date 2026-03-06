@@ -1,3 +1,8 @@
+---
+name: ZeroTier Remote Web Access Skill
+description: 利用 ZeroTier 实现 OpenClaw 远程 WEB 访问的技能。
+---
+
 # ZeroTier Remote Web Access Skill
 
 利用 ZeroTier 实现 OpenClaw 远程 WEB 访问的技能。

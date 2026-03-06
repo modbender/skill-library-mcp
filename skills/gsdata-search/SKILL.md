@@ -1,3 +1,9 @@
+---
+name: GS Data Search
+description: A skill that provides a simple interface to search data from
+  projects-databus.gsdata.cn API.
+---
+
 # GS Data Search
 
 ## Description

@@ -1,10 +1,11 @@
 ---
 name: stanley-druckenmiller-workflow
-description: Druckenmiller style market analysis in natural Chinese with a living PM memo voice. Thesis-driven workflow: formulate macro thesis first, test via tape, integrate liquidity, rates, credit, and internals into asymmetric causal throughlines.
-user-invocable: true
-disable-model-invocation: false
-metadata: {"openclaw":{"requires":{}}}
+description: "Druckenmiller style market analysis in natural Chinese with a
+  living PM memo voice. Thesis-driven workflow: formulate macro thesis first,
+  test via tape, integrate liquidity, rates, credit, and internals into
+  asymmetric causal throughlines."
 ---
+
 
 # Stanley Druckenmiller Workflow (V4.2 Thesis-Driven)
 

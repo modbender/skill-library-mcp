@@ -1,3 +1,8 @@
+---
+name: Technical SEO Mastery
+description: "Before a full audit, run a rapid assessment. Fetch the site and check:"
+---
+
 # Technical SEO Mastery
 
 > Complete technical SEO audit, fix, and monitoring system. From crawlability to Core Web Vitals to international SEO — everything search engines need to find, crawl, index, and rank your site.

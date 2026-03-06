@@ -1,3 +1,9 @@
+---
+name: Tech Security Audit Skill
+description: This skill integrates Nmap scanning functionality to perform local
+  network vulnerability assessments.
+---
+
 # Tech Security Audit Skill
 
 This skill integrates Nmap scanning functionality to perform local network vulnerability assessments.

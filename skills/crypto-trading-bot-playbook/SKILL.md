@@ -1,3 +1,8 @@
+---
+name: Crypto Trading Bot Development Playbook
+description: Learn how to build and sell crypto trading bots for consistent profits.
+---
+
 # Crypto Trading Bot Development Playbook
 
 ## Overview

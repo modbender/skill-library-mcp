@@ -1,7 +1,14 @@
 ---
 name: creative-ops-copilot
-description: Turn messy client briefs into a production-ready plan for motion design/VFX projects: scope, assumptions/exclusions, deliverables matrix, schedule/milestones, review rounds, and estimate/quote. Also generate an invoice draft payload for Chris's local invoicing system (invoicing_system_2025) or export quote/invoice JSON/CSV/Markdown. Use when Chris asks to go from brief/email notes/chat logs into a clear plan + quote/invoice, or to create a repeatable project folder + docs.
+description: "Turn messy client briefs into a production-ready plan for motion
+  design/VFX projects: scope, assumptions/exclusions, deliverables matrix,
+  schedule/milestones, review rounds, and estimate/quote. Also generate an
+  invoice draft payload for Chris's local invoicing system
+  (invoicing_system_2025) or export quote/invoice JSON/CSV/Markdown. Use when
+  Chris asks to go from brief/email notes/chat logs into a clear plan +
+  quote/invoice, or to create a repeatable project folder + docs."
 ---
+
 
 # Creative Ops Copilot
 

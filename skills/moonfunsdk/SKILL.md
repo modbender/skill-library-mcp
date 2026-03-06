@@ -1,3 +1,9 @@
+---
+name: MoonfunSDK - BSC Meme Token Creation Tool
+description: Professional Python SDK for creating and trading Meme tokens on
+  Binance Smart Chain with AI-powered image generation.
+---
+
 # MoonfunSDK - BSC Meme Token Creation Tool
 
 Professional Python SDK for creating and trading Meme tokens on Binance Smart Chain with AI-powered image generation.

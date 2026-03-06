@@ -1,3 +1,8 @@
+---
+name: SkillStore - OpenClaw Skill Manager
+description: Search, install, and create OpenClaw skills with intelligent matching.
+---
+
 # SkillStore - OpenClaw Skill Manager
 
 Search, install, and create OpenClaw skills with intelligent matching.

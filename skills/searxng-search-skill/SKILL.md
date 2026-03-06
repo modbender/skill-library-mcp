@@ -1,3 +1,10 @@
+---
+name: SearXNG Advanced Search Skill
+description: cat > .env << EOF SEARXNGURL=http://localhost:8080
+  SEARXNGTIMEOUT=10 SEARXNGMAXRETRIES=3 SEARXNGRETRYDELAY=1.0
+  SEARXNGBACKOFFFACTOR=2.0 SEARXNGVERIFYSSL=true SEARXNGLANGUAGE=en EOF
+---
+
 # SearXNG Advanced Search Skill
 
 ```markdown

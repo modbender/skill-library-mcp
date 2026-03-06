@@ -1,3 +1,10 @@
+---
+name: EvoClaw — Self-Evolving Identity Framework
+description: Every "you" in this document refers to you, the AI agent reading
+  this — not to the human. The human is referred to as "the human" throughout.
+  When this document says "your SOUL.md," it means YOUR s...
+---
+
 # EvoClaw — Self-Evolving Identity Framework
 
 > _Experience → Classification → Memory → Reflection → Proposal → Governance → SOUL Update → Log_

@@ -1,3 +1,8 @@
+---
+name: SQL Query Optimizer
+description: 分析并优化 SQL 查询，提升数据库性能。
+---
+
 # SQL Query Optimizer
 
 分析并优化 SQL 查询，提升数据库性能。

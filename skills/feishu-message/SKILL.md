@@ -1,3 +1,9 @@
+---
+name: Feishu Message Skill
+description: A unified toolkit for Feishu messaging operations, providing a
+  single CLI entry point for common tasks.
+---
+
 # Feishu Message Skill
 
 A unified toolkit for Feishu messaging operations, providing a single CLI entry point for common tasks.

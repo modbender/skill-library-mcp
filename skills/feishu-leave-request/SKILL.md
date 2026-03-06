@@ -1,8 +1,10 @@
 ---
 name: feishu-leave-request
-description: Submit a leave request through Feishu (Lark). Use when the user wants to request time off, submit a leave application, or mentions taking leave.
-argument-hint: [date] [duration] [type] [reason]
+description: Submit a leave request through Feishu (Lark). Use when the user
+  wants to request time off, submit a leave application, or mentions taking
+  leave.
 ---
+
 
 # Feishu Leave Request Assistant
 

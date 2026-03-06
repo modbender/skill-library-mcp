@@ -1,3 +1,9 @@
+---
+name: ai-prompt-craft
+description: Transform basic prompts into elite structured prompts using
+  Anthropic's 10-step framework.
+---
+
 # ai-prompt-craft
 
 Transform basic prompts into elite structured prompts using Anthropic's 10-step framework.

@@ -1,3 +1,9 @@
+---
+name: Backup Manager
+description: Automated backups for your files, databases, and configurations.
+  Local, network, or cloud storage.
+---
+
 # Backup Manager
 
 Automated backups for your files, databases, and configurations. Local, network, or cloud storage.

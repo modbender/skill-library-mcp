@@ -1,3 +1,10 @@
+---
+name: openbotauth
+description: Cryptographic identity for AI agents. Register once, then sign HTTP
+  requests (RFC 9421) anywhere. Optional browser integrations via per-request
+  signing proxy.
+---
+
 # openbotauth
 
 Cryptographic identity for AI agents. Register once, then sign HTTP requests (RFC 9421) anywhere. Optional browser integrations via per-request signing proxy.

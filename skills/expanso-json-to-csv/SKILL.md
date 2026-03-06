@@ -1,3 +1,8 @@
+---
+name: json-to-csv
+description: '"Convert JSON array of objects to CSV format"'
+---
+
 # json-to-csv
 
 "Convert JSON array of objects to CSV format"

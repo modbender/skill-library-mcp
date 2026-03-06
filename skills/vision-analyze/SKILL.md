@@ -1,3 +1,8 @@
+---
+name: Vision Analyze (Google)
+description: Analyze images using Google Cloud Vision API.
+---
+
 # Vision Analyze (Google)
 
 Analyze images using **Google Cloud Vision API**.

@@ -1,3 +1,8 @@
+---
+name: OpenClaw 賺錢實戰 Playbook
+description: 1. OpenClaw 入門指南 2. 點樣Set Up Agent 3. 賺錢方法大公開
+---
+
 # OpenClaw 賺錢實戰 Playbook
 
 ## 目錄

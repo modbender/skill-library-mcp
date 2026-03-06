@@ -1,8 +1,9 @@
 ---
 name: google-home
-description: Control Google Nest devices (thermostats, cameras, doorbells) via the Google Smart Device Management API using curl and jq.
-metadata: {"clawdbot":{"emoji":"🏠","requires":{"bins":["curl","jq"]}}
+description: Control Google Nest devices (thermostats, cameras, doorbells) via
+  the Google Smart Device Management API using curl and jq.
 ---
+
 
 # Google Home / Nest CLI
 

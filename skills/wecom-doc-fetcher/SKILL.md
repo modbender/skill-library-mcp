@@ -1,3 +1,11 @@
+---
+name: wecom-doc-fetcher
+description: Use this skill when the user wants to save any page from the WeChat
+  Work (企业微信) developer documentation site
+  (developer.work.weixin.qq.com/document/path/) as a clean Markdown file in
+  their Obsidian...
+---
+
 # wecom-doc-fetcher
 
 Use this skill when the user wants to save any page from the WeChat Work (企业微信) developer documentation site (`developer.work.weixin.qq.com/document/path/*`) as a clean Markdown file in their Obsidian vault.

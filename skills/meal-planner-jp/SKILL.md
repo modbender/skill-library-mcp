@@ -1,6 +1,9 @@
 ---
-description: Japanese meal planning with nutrition balance, seasonal ingredients, and budget optimization.
+name: meal-planner-jp
+description: Japanese meal planning with nutrition balance, seasonal
+  ingredients, and budget optimization.
 ---
+
 
 # Meal Planner JP
 

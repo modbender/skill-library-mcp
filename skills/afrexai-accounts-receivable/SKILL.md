@@ -1,3 +1,9 @@
+---
+name: Accounts Receivable Manager
+description: "Automate AR workflows: aging analysis, collection prioritization,
+  payment follow-ups, cash application, and bad debt forecasting."
+---
+
 # Accounts Receivable Manager
 
 Automate AR workflows: aging analysis, collection prioritization, payment follow-ups, cash application, and bad debt forecasting.

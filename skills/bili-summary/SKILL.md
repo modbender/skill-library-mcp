@@ -1,8 +1,11 @@
 ---
 name: bili-summary
-description: "Bilibili video download, subtitle extraction, and AI summarization tool. Supports video info, audio download, Whisper transcription, and Gemini-powered detailed summaries. Use when: user asks to download/summarize B站 video, extract subtitles, or transcribe bilibili video."
-metadata:{"openclaw":{"emoji": "📺","requires": { "bins": ["yt-dlp", "python"] },"install":[{"id": "pip","kind": "pip","package": "yt-dlp faster-whisper","bins": ["yt-dlp"],"label": "Install yt-dlp and faster-whisper",},],},}
+description: "Bilibili video download, subtitle extraction, and AI summarization
+  tool. Supports video info, audio download, Whisper transcription, and
+  Gemini-powered detailed summaries. Use when: user asks to download/summarize
+  B站 video, extract subtitles, or transcribe bilibili video."
 ---
+
 
 # bili-summary
 

@@ -1,3 +1,10 @@
+---
+name: Observability Designer (POWERFUL)
+description: Observability Designer enables you to create production-ready
+  observability strategies that provide deep insights into system behavior,
+  performance, and reliability. This skill combines the three p...
+---
+
 # Observability Designer (POWERFUL)
 
 **Category:** Engineering  

@@ -1,3 +1,8 @@
+---
+name: Qiniu KODO 技能
+description: 通过 qiniu-mcp MCP 工具 + Node.js SDK 脚本 + qshell 管理七牛云对象存储和数据处理。
+---
+
 # Qiniu KODO 技能
 
 通过 qiniu-mcp MCP 工具 + Node.js SDK 脚本 + qshell 管理七牛云对象存储和数据处理。

@@ -1,3 +1,10 @@
+---
+name: Whistleblower & Ethics Hotline Framework
+description: Build a confidential reporting system and ethics investigation
+  workflow for your organization. Covers anonymous intake, case triage,
+  investigation protocols, regulatory obligations, and retaliation...
+---
+
 # Whistleblower & Ethics Hotline Framework
 
 Build a confidential reporting system and ethics investigation workflow for your organization. Covers anonymous intake, case triage, investigation protocols, regulatory obligations, and retaliation prevention.

@@ -1,6 +1,9 @@
 ---
-description: Publish markdown articles to note.com with image upload, tags, and browser automation.
+name: note-article-publisher
+description: Publish markdown articles to note.com with image upload, tags, and
+  browser automation.
 ---
+
 
 # Note Article Publisher
 

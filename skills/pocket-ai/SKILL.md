@@ -1,3 +1,9 @@
+---
+name: Pocket AI Skill
+description: Pocket AI captures your meetings, calls, and thoughts via a
+  wearable device, then transcribes and indexes everything for semantic search.
+---
+
 # Pocket AI Skill
 
 **Voice recording transcription, semantic search, and meeting intelligence across all conversations.**

@@ -1,3 +1,9 @@
+---
+name: OpenClaw Claude Code Skill
+description: "MCP (Model Context Protocol) integration for OpenClaw/Clawdbot.
+  Use when you need to:"
+---
+
 # OpenClaw Claude Code Skill
 
 ## Description

@@ -1,3 +1,8 @@
+---
+name: Facebook Page & Group Scraper
+description: A browser-based Facebook page and group discovery and scraping tool.
+---
+
 
 # Facebook Page & Group Scraper
 

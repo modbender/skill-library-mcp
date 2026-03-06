@@ -1,3 +1,8 @@
+---
+name: Next.js Production Engineering
+description: "Run through these 8 signals — score 0 (no) or 2 (yes):"
+---
+
 # Next.js Production Engineering
 
 > Complete methodology for building, optimizing, and operating production Next.js applications. From architecture decisions to deployment strategies — everything beyond "hello world."

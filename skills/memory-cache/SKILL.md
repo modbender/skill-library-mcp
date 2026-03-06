@@ -1,8 +1,11 @@
 ---
 name: memory-cache
-description: High-performance temporary storage system using Redis. Supports namespaced keys (mema:*), TTL management, and session context caching. Use for: (1) Saving agent state, (2) Caching API results, (3) Sharing data between sub-agents.
-metadata: {"openclaw":{"requires":{"bins":["python3"],"env":["REDIS_URL"]},"install":[{"id":"pip-dependencies","kind":"exec","command":"pip install -r requirements.txt"}]}}
+description: "High-performance temporary storage system using Redis. Supports
+  namespaced keys (mema:*), TTL management, and session context caching. Use
+  for: (1) Saving agent state, (2) Caching API results, (3) Sharing data between
+  sub-agents."
 ---
+
 
 # Memory Cache
 

@@ -1,3 +1,9 @@
+---
+name: e2e-repro2-1772127134
+description: Provides a deterministic end-to-end test skill for the ClawHub
+  publish lifecycle.
+---
+
 # e2e-repro2-1772127134
 
 ## Purpose

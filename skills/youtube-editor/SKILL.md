@@ -1,13 +1,10 @@
 ---
 name: youtube-editor
-description: Automate YouTube video editing workflow: Download -> Transcribe (Whisper) -> Analyze (GPT-4) -> High-Quality Thumbnail (Korean & Character Consistency).
-version: 1.0.14
-author: Flux
-requiredEnvVars:
-  - OPENAI_API_KEY
-optionalEnvVars:
-  - NANO_BANANA_KEY
+description: "Automate YouTube video editing workflow: Download -> Transcribe
+  (Whisper) -> Analyze (GPT-4) -> High-Quality Thumbnail (Korean & Character
+  Consistency)."
 ---
+
 
 # 🎬 YouTube AI Editor (v1.0.14)
 

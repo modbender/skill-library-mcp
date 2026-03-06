@@ -1,3 +1,8 @@
+---
+name: Claw Vault Backup
+description: Use this skill to run encrypted workspace backups with Claw Vault.
+---
+
 # Claw Vault Backup
 
 Use this skill to run encrypted workspace backups with Claw Vault.

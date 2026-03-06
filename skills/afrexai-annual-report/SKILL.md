@@ -1,3 +1,10 @@
+---
+name: Annual Report Generator
+description: Build a complete annual business report from raw data. Covers
+  financial performance, operational metrics, strategic highlights, and
+  forward-looking guidance.
+---
+
 # Annual Report Generator
 
 Build a complete annual business report from raw data. Covers financial performance, operational metrics, strategic highlights, and forward-looking guidance.

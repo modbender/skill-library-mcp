@@ -1,3 +1,8 @@
+---
+name: SOTA Tracker
+description: Auto-updated daily from LMArena, Artificial Analysis, and HuggingFace.
+---
+
 # SOTA Tracker
 
 **The definitive open-source database of State-of-the-Art AI models.**

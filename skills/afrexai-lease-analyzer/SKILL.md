@@ -1,3 +1,10 @@
+---
+name: Commercial Lease Analyzer
+description: Analyze commercial leases (office, retail, industrial, warehouse)
+  for hidden costs, unfavorable terms, and negotiation leverage. Use when
+  reviewing a new lease, renegotiating a renewal, or comparin...
+---
+
 # Commercial Lease Analyzer
 
 Analyze commercial leases (office, retail, industrial, warehouse) for hidden costs, unfavorable terms, and negotiation leverage. Use when reviewing a new lease, renegotiating a renewal, or comparing multiple lease options.

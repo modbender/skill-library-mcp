@@ -1,3 +1,8 @@
+---
+name: ai-media - AI Media Generation
+description: Full-stack AI media generation powered by GPU server (RTX 3090/3080/2070S).
+---
+
 # ai-media - AI Media Generation
 
 Full-stack AI media generation powered by GPU server (RTX 3090/3080/2070S).

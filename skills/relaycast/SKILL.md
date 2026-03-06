@@ -1,6 +1,9 @@
 ---
-summary: Structured messaging for multi-claw communication — channels, threads, DMs, reactions, search, and persistent history.
+name: relaycast
+description: Structured messaging for multi-claw communication — channels,
+  threads, DMs, reactions, search, and persistent history.
 ---
+
 
 # Relaycast
 

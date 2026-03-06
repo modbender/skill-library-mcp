@@ -1,3 +1,10 @@
+---
+name: Unified Conversation Logger v1.2.5
+description: A dual-output conversation logger for OpenClaw that captures
+  everything - user messages, assistant responses, sub-agent conversations, tool
+  calls, and system events - to both JSONL (backup) and Mem...
+---
+
 # Unified Conversation Logger v1.2.5
 
 **Version:** 1.2.5 (Critical Fixes Edition)  

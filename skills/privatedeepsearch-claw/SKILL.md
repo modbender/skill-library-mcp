@@ -1,3 +1,9 @@
+---
+name: 🧿 Deep Private Search (VPN Required)
+description: Don't let Big Tech know what you and your open claw are up to.
+  Multi-iteration deep research that helps keep your claws private.
+---
+
 # 🧿 Deep Private Search (VPN Required)
 
 **🚨 VPN REQUIRED** - This tool MUST be used with VPN to be hidden. Without VPN, you're exposing your real IP to search engines.

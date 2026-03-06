@@ -1,7 +1,9 @@
 ---
 name: oc-sre-on-demand-service
-description: Service blueprint for OpenClaw SRE support: health checks, connectivity repair, execution stabilization, and hardening guidance.
+description: "Service blueprint for OpenClaw SRE support: health checks,
+  connectivity repair, execution stabilization, and hardening guidance."
 ---
+
 
 # OC SRE On-Demand Service
 

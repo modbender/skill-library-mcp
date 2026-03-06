@@ -1,14 +1,10 @@
 ---
-description: Persistent memory for agents. Stores preferences, decisions, facts, and events as a connected knowledge graph. Recalled by who, what, when, or why.
-metadata:
-  clawdbot:
-    emoji: "🧠"
-    requires:
-      env: []
-      bins: ["uvx"]
-    primaryEnv: "HYPABASE_DB_PATH"
-    files: []
+name: hypabase-memory
+description: Persistent memory for agents. Stores preferences, decisions, facts,
+  and events as a connected knowledge graph. Recalled by who, what, when, or
+  why.
 ---
+
 
 # Hypabase Memory
 

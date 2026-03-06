@@ -1,3 +1,8 @@
+---
+name: Invoice Generator
+description: Generate professional invoices in Markdown or HTML from simple inputs.
+---
+
 # Invoice Generator
 
 Generate professional invoices in Markdown or HTML from simple inputs.

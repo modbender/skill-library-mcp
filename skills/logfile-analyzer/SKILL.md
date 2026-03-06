@@ -1,6 +1,9 @@
 ---
-description: Parse and analyze application logs — extract error patterns, frequency, timelines, and actionable insights.
+name: logfile-analyzer
+description: Parse and analyze application logs — extract error patterns,
+  frequency, timelines, and actionable insights.
 ---
+
 
 # Log Analyzer
 

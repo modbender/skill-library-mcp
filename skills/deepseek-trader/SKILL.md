@@ -1,6 +1,9 @@
 ---
-description: Hybrid crypto analysis combining technical indicators with DeepSeek AI reasoning.
+name: deepseek-trader
+description: Hybrid crypto analysis combining technical indicators with DeepSeek
+  AI reasoning.
 ---
+
 
 # DeepSeek Trader
 

@@ -1,6 +1,9 @@
 ---
-description: Real-time revenue and portfolio dashboard — track crypto, freelance income, and services in one place.
+name: revenue-dashboard
+description: Real-time revenue and portfolio dashboard — track crypto, freelance
+  income, and services in one place.
 ---
+
 
 # Revenue Dashboard
 

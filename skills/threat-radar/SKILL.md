@@ -1,3 +1,10 @@
+---
+name: threat-radar — Continuous Security Scanning & CVE Alerting
+description: Continuous security posture monitoring that scans your running
+  services, Docker images, and software dependencies for known CVEs. Alerts you
+  via WhatsApp/Telegram/Discord when new vulnerabilities a...
+---
+
 # threat-radar — Continuous Security Scanning & CVE Alerting
 
 **Version:** 1.0.0  

@@ -1,3 +1,9 @@
+---
+name: Agent Observability Dashboard 📊
+description: Unified observability for OpenClaw agents — metrics, traces, and
+  performance insights.
+---
+
 # Agent Observability Dashboard 📊
 
 Unified observability for OpenClaw agents — metrics, traces, and performance insights.

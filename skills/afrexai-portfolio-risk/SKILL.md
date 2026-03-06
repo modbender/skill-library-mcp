@@ -1,3 +1,10 @@
+---
+name: Portfolio Risk Analyzer
+description: Complete investment portfolio risk management system. Analyze
+  positions, calculate risk metrics, stress test scenarios, optimize
+  allocations, and generate institutional-grade risk reports — all wit...
+---
+
 # Portfolio Risk Analyzer
 
 Complete investment portfolio risk management system. Analyze positions, calculate risk metrics, stress test scenarios, optimize allocations, and generate institutional-grade risk reports — all without external APIs.

@@ -1,3 +1,8 @@
+---
+name: AOI Demo Clip Maker (macOS)
+description: "S-DNA: AOI-2026-0215-SDNA-CLIP01"
+---
+
 # AOI Demo Clip Maker (macOS)
 
 S-DNA: `AOI-2026-0215-SDNA-CLIP01`

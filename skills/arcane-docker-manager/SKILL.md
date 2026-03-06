@@ -1,3 +1,10 @@
+---
+name: OpenClaw - Arcane Docker Management Skill
+description: This skill enables you to interact with your Arcane Docker
+  Management API to manage Docker containers, compose stacks, templates,
+  networks, volumes, images, and system monitoring. Arcane is a compr...
+---
+
 # OpenClaw - Arcane Docker Management Skill
 
 ## Overview

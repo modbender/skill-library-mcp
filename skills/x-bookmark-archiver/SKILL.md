@@ -1,3 +1,9 @@
+---
+name: X Bookmark Archiver
+description: Archive your X (Twitter) bookmarks into categorized markdown files
+  with AI-generated summaries.
+---
+
 # X Bookmark Archiver
 
 Archive your X (Twitter) bookmarks into categorized markdown files with AI-generated summaries.

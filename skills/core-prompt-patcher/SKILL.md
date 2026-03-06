@@ -1,3 +1,10 @@
+---
+name: Core Prompt Patcher
+description: This skill reads your workspace/SOUL.md file and injects its
+  content directly into OpenClaw's core system prompt. This ensures your custom
+  persona persists even after OpenClaw updates that reset th...
+---
+
 # Core Prompt Patcher
 
 **Dynamic SOUL.md-based persona injector** - Automatically syncs your workspace SOUL.md into OpenClaw's core system prompt after updates.

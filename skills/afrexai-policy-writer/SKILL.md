@@ -1,3 +1,9 @@
+---
+name: Policy Writer
+description: Generate professional internal policies for any business function —
+  HR, IT, finance, compliance, data privacy, acceptable use, and more.
+---
+
 # Policy Writer
 
 Generate professional internal policies for any business function — HR, IT, finance, compliance, data privacy, acceptable use, and more.

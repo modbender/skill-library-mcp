@@ -1,3 +1,10 @@
+---
+name: Google Suite Skill
+description: 1. On first use, the skill will prompt for OAuth2 authentication.
+  2. Visit the provided URL, log in, and paste the authorization code. 3. Tokens
+  will be saved for future use.
+---
+
 # Google Suite Skill
 
 **Version:** 1.0.0

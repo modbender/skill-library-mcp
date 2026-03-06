@@ -1,3 +1,8 @@
+---
+name: Salesforce CRM Skill
+description: Main skill definition with frontmatter, CLI reference, SOQL patterns
+---
+
 Main skill definition with frontmatter, CLI reference, SOQL patterns
 
 ---

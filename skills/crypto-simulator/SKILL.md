@@ -1,6 +1,9 @@
 ---
-description: Backtest crypto trading strategies (RSI, DCA, MACD, Grid, etc.) against real CoinGecko data.
+name: crypto-simulator
+description: Backtest crypto trading strategies (RSI, DCA, MACD, Grid, etc.)
+  against real CoinGecko data.
 ---
+
 
 # Crypto Simulator
 

@@ -1,3 +1,10 @@
+---
+name: "Skill: advisory-council"
+description: Run the Advisory Council — a multi-perspective market analysis that
+  spawns 5 AI advisors (The Skeptic, The Macro Bull, The Risk Manager, The
+  Technical Analyst, The Contrarian) powered by MiniMax M2...
+---
+
 # Skill: advisory-council
 
 ## CRITICAL RULE — NO FABRICATION

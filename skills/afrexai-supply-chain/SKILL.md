@@ -1,3 +1,9 @@
+---
+name: Supply Chain Risk Monitor
+description: Analyze supply chain vulnerabilities, map supplier dependencies,
+  and generate risk mitigation plans.
+---
+
 # Supply Chain Risk Monitor
 
 Analyze supply chain vulnerabilities, map supplier dependencies, and generate risk mitigation plans.

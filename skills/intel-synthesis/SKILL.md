@@ -1,3 +1,10 @@
+---
+name: "SKILL: intel-synthesis"
+description: Advanced intelligence processing pipeline optimized for
+  high-context models (Gemini 1.5 Pro/Ultra). Ingests raw multi-source data,
+  performs cross-verification, deduplication, and conflict analysis,...
+---
+
 # SKILL: intel-synthesis
 
 ## Description

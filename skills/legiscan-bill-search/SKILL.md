@@ -1,3 +1,9 @@
+---
+name: LegiScan Bill Tracker
+description: A skill to monitor state legislative activity using the LegiScan
+  API. It filters for active bills based on custom keywords and state selection.
+---
+
 # LegiScan Bill Tracker
 
 A skill to monitor state legislative activity using the LegiScan API. It filters for active bills based on custom keywords and state selection.

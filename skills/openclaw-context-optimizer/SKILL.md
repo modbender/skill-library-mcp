@@ -1,8 +1,10 @@
 ---
 name: context-optimizer
-user-invocable: true
-metadata: {"openclaw":{"emoji":"⚡","requires":{"bins":["node"]},"os":["darwin","linux","win32"]}}
+description: The first OpenClaw skill that intelligently compresses context to
+  reduce token costs by 40-60%. Uses multiple strategies (deduplication,
+  pruning, summarization) and learns what context matters over...
 ---
+
 
 # OpenClaw Context Optimizer
 

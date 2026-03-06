@@ -1,18 +1,8 @@
 ---
 name: prompt-engineering-openai-api-f7c24501
 description: Log in [Sign up](https://platform.openai.com/signup)
-
-# Prompt engineering
-
-Enhance results with prompt engineering strategies.
-
-Copy page
-
-With the OpenAI API, you can use a [large language model](https://platform.openai.com/docs/models) to generate text from a prompt, as you might using [ChatGPT](https://chatgpt.com/). Models can generate almost any kind of text response—like code, mathematical equations, structured JSON data, or human-like prose.
-
-Here's a simple example using the [Responses ...
-metadata: {"clawdbot": {"type": "text prompt", "inferred_type": "Text Prompt", "source": "firecrawl", "original_url": "https://platform.openai.com/docs/guides/prompt-engineering", "quality_score": 0}}
 ---
+
 
 # Prompt engineering | OpenAI API
 

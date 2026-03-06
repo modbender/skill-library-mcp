@@ -1,3 +1,8 @@
+---
+name: 会员专属文案
+description: VIP优惠
+---
+
 # 会员专属文案
 
 VIP优惠

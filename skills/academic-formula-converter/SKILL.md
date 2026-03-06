@@ -1,3 +1,8 @@
+---
+name: academic-formula-converter
+description: 学术论文数学公式转换工具 - 将Markdown中的LaTeX公式转换为docx和html格式
+---
+
 # academic-formula-converter
 
 学术论文数学公式转换工具 - 将Markdown中的LaTeX公式转换为docx和html格式

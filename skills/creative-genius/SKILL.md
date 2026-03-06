@@ -1,3 +1,8 @@
+---
+name: Creative Genius Skill
+description: Three geniuses. Three domains. Three approaches. One synthesis.
+---
+
 # Creative Genius Skill
 
 **Version:** 1.0.0

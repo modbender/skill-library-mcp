@@ -1,7 +1,12 @@
 ---
 name: sap-integration
-description: SAP system integration, data extraction, and automation for ABAP, HANA, S/4HANA environments. Use when working with SAP systems for: (1) Data extraction and reporting, (2) RFC/BAPI calls, (3) SAP API integration, (4) ABAP code generation, (5) SAP table analysis, (6) Workflow automation, (7) S/4HANA migration tasks, or any SAP-related development and integration work.
+description: "SAP system integration, data extraction, and automation for ABAP,
+  HANA, S/4HANA environments. Use when working with SAP systems for: (1) Data
+  extraction and reporting, (2) RFC/BAPI calls, (3) SAP API integration, (4)
+  ABAP code generation, (5) SAP table analysis, (6) Workflow automation, (7)
+  S/4HANA migration tasks, or any SAP-related development and integration work."
 ---
+
 
 # SAP Integration Skill
 

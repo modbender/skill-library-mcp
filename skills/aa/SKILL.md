@@ -1,3 +1,10 @@
+---
+name: "Skill: Gmail Auto-Reply for Client"
+description: This skill enables the agent to automatically answer Gmail messages
+  on behalf of a client. The agent drafts and (when the user approves or when
+  configured) sends replies using the client’s tone, si...
+---
+
 # Skill: Gmail Auto-Reply for Client
 
 ## Purpose

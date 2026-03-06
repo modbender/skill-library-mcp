@@ -1,15 +1,10 @@
 ---
-description: >-
-  Execute multiple token swaps in sequence. Use when user wants to rebalance,
-  swap into multiple tokens, or execute a multi-step trading plan. Each swap
-  goes through full safety validation independently.
-allowed-tools: >-
-  Read, Glob, Grep,
-  Task(subagent_type:trade-executor),
-  mcp__uniswap__check_safety_status,
-  mcp__uniswap__get_agent_balance
-model: opus
+name: batch-swap
+description: Execute multiple token swaps in sequence. Use when user wants to
+  rebalance, swap into multiple tokens, or execute a multi-step trading plan.
+  Each swap goes through full safety validation independently.
 ---
+
 
 # Batch Swap
 

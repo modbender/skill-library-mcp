@@ -1,6 +1,9 @@
 ---
-description: Schedule and automate social media posts to X/Twitter with cron-based queue management.
+name: sns-auto-poster
+description: Schedule and automate social media posts to X/Twitter with
+  cron-based queue management.
 ---
+
 
 # SNS Auto Poster
 

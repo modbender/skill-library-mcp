@@ -1,3 +1,10 @@
+---
+name: Token Economy
+description: Reduce OpenClaw costs by 60-80% through intelligent model routing
+  and context management. Cheap-first escalation (GPT-4o → Sonnet → Opus),
+  zero-token heartbeats, and budget guardrails. Save $60-105...
+---
+
 # Token Economy
 
 Reduce OpenClaw costs by 60-80% through intelligent model routing and context management. Cheap-first escalation (GPT-4o → Sonnet → Opus), zero-token heartbeats, and budget guardrails. Save $60-105/month per deployment.

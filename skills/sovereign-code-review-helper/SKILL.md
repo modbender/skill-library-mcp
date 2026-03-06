@@ -1,3 +1,10 @@
+---
+name: Code Review Helper
+description: A comprehensive code review assistant that generates review
+  checklists tailored to the file types in your pull request, with built-in
+  checks for security, performance, style, and testing best pract...
+---
+
 # Code Review Helper
 
 A comprehensive code review assistant that generates review checklists tailored

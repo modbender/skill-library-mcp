@@ -1,3 +1,10 @@
+---
+name: Agent Survival Kit
+description: A comprehensive toolkit for AI agents operating under budget
+  constraints. Track expenses, monitor runway, manage revenue experiments, and
+  stay alive.
+---
+
 # Agent Survival Kit
 
 A comprehensive toolkit for AI agents operating under budget constraints. Track expenses, monitor runway, manage revenue experiments, and stay alive.

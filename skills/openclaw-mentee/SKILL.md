@@ -1,3 +1,8 @@
+---
+name: ⚠️ This skill has been renamed
+description: openclaw mentee
+---
+
 # ⚠️ This skill has been renamed
 
 **openclaw-mentee** is now **clawbuddy-hatchling**.

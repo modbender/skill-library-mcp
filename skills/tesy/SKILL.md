@@ -1,3 +1,10 @@
+---
+name: RedTeam Skill
+description: "name: RedTeam description: Adversarial analysis with 32 agents.
+  USE WHEN red team, attack idea, counterarguments, critique, stress test.
+  SkillSearch('redteam') for docs."
+---
+
 > Related: [[AGENTS]], [[skills/pai-redteam/Workflows/AdversarialValidation|AdversarialValidation]], [[skills/pai-redteam/Integration|Integration]]
 
 ---

@@ -1,3 +1,8 @@
+---
+name: QingLong CRM 数据提取工具
+description: "版本: 1.0.1 作者: QingLong 类型: Python 脚本"
+---
+
 # QingLong CRM 数据提取工具
 
 版本: 1.0.1

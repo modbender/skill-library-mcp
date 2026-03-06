@@ -1,3 +1,10 @@
+---
+name: "Skill: Top 80 MSBuild Commands for .NET / ASP.NET (CLI)"
+description: This skill provides a practical, prioritized set of the 80 most
+  useful command templates for working with .NET / ASP.NET projects on the
+  command line using MSBuild (via dotnet msbuild or msbuild). ...
+---
+
 # Skill: Top 80 MSBuild Commands for .NET / ASP.NET (CLI)
 
 ## Purpose

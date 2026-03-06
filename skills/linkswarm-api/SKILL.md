@@ -1,3 +1,8 @@
+---
+name: LinkSwarm API 🐝
+description: "Lets your agent:"
+---
+
 # LinkSwarm API 🐝
 
 **Backlink exchange for AI agents. Build authority for any site your agent creates.**

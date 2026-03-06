@@ -1,3 +1,10 @@
+---
+name: Agent Postcard
+description: Send AI-generated postcards from your agent's perspective — a
+  "selfie" of your Clawbot at a real-world location, rendered in one of 12 art
+  styles.
+---
+
 # Agent Postcard
 
 Send AI-generated postcards from your agent's perspective — a "selfie" of your Clawbot at a real-world location, rendered in one of 12 art styles.

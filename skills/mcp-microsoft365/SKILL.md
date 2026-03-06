@@ -1,3 +1,8 @@
+---
+name: Microsoft 365 MCP Server
+description: Full Microsoft 365 integration via Model Context Protocol (MCP).
+---
+
 # Microsoft 365 MCP Server
 
 Full Microsoft 365 integration via Model Context Protocol (MCP).

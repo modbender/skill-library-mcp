@@ -1,8 +1,11 @@
 ---
 name: claude-tmux-runner
-description: Claude Code parallel task manager with tmux backend. For running multiple Claude Code tasks concurrently, monitoring progress, and managing background jobs. Activate when user mentions: Claude Code, background task, parallel, tmux.
-tools: Bash, Read, Write
+description: "Claude Code parallel task manager with tmux backend. For running
+  multiple Claude Code tasks concurrently, monitoring progress, and managing
+  background jobs. Activate when user mentions: Claude Code, background task,
+  parallel, tmux."
 ---
+
 
 # Claude Code tmux Runner
 

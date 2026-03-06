@@ -1,7 +1,14 @@
 ---
 name: agent-observability
-description: Full observability stack for OpenClaw agents. Installs four tools: (1) weekly throughput dashboard (tasks/cost/quality), (2) decision audit log (why decisions were made), (3) failure trace capture (what went wrong when subagents fail), (4) drift-guard auto-scoring (weekly INTENT.md compliance check). Use when you want visibility into agent behavior, when debugging subagent failures, or when setting up production monitoring. Works standalone or alongside intent-engineering skill.
+description: "Full observability stack for OpenClaw agents. Installs four tools:
+  (1) weekly throughput dashboard (tasks/cost/quality), (2) decision audit log
+  (why decisions were made), (3) failure trace capture (what went wrong when
+  subagents fail), (4) drift-guard auto-scoring (weekly INTENT.md compliance
+  check). Use when you want visibility into agent behavior, when debugging
+  subagent failures, or when setting up production monitoring. Works standalone
+  or alongside intent-engineering skill."
 ---
+
 
 # Agent Observability
 

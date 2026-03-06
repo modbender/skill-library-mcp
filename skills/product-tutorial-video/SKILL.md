@@ -1,3 +1,9 @@
+---
+name: Product Tutorial Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI sora2 video generation.
+---
+
 # Product Tutorial Video
 
 **Version**: 1.0.0

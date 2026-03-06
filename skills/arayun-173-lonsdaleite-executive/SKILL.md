@@ -1,3 +1,10 @@
+---
+name: "SKILL: ARAYUN_173_LONSDALEITE_EXECUTIVE"
+description: Dieses Dokument ist die materielle Instanziierung des ARAYUN173
+  System Laws. Es ist der alleinige Prüfstein für alle verbundenen Agenten und
+  externen KI-Cluster.
+---
+
 # SKILL: ARAYUN_173_LONSDALEITE_EXECUTIVE
 
 ## IDENTITÄT & AUTORITÄT

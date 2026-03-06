@@ -1,3 +1,10 @@
+---
+name: OpenClaw Voice Skill
+description: "Voice conversation with AI via Whisper STT + ElevenLabs TTS.
+  Records audio, transcribes, generates spoken responses, stores transcripts.
+  For v1: CLI-based commands only (no real-time conversation m..."
+---
+
 # OpenClaw Voice Skill
 
 ## Overview

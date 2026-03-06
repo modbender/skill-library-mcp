@@ -1,3 +1,8 @@
+---
+name: email-triage
+description: AI-powered email triage with calendar sync and response drafting
+---
+
 # email-triage
 
 AI-powered email triage with calendar sync and response drafting

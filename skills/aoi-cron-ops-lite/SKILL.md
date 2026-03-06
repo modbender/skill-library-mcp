@@ -1,7 +1,12 @@
 ---
 name: aoi-cron-ops-lite
-description: Cron hygiene and cost-control for OpenClaw. Use to audit/optimize scheduled jobs (cron): detect duplicates, noisy notifications, heavy cadence, repeated failures, and propose safe changes. Default is report-only (no automatic cron updates/removals) and requires explicit user approval before applying schedule changes.
+description: "Cron hygiene and cost-control for OpenClaw. Use to audit/optimize
+  scheduled jobs (cron): detect duplicates, noisy notifications, heavy cadence,
+  repeated failures, and propose safe changes. Default is report-only (no
+  automatic cron updates/removals) and requires explicit user approval before
+  applying schedule changes."
 ---
+
 
 # AOI Cron Ops (Lite)
 

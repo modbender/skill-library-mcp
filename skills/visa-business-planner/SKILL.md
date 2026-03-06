@@ -1,3 +1,10 @@
+---
+name: Visa Business Planner Skill
+description: This skill helps users create comprehensive business plans for
+  obtaining a Japanese Business Manager Visa. It includes templates, examples,
+  resources, and tools for market analysis, revenue project...
+---
+
 # Visa Business Planner Skill
 
 ## Overview

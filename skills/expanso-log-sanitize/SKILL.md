@@ -1,3 +1,8 @@
+---
+name: log-sanitize
+description: '"Sanitize log entries by removing passwords, tokens, and sensitive patterns"'
+---
+
 # log-sanitize
 
 "Sanitize log entries by removing passwords, tokens, and sensitive patterns"

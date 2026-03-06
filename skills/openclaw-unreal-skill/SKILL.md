@@ -1,3 +1,8 @@
+---
+name: OpenClaw Unreal Plugin
+description: "version: 1.0.0"
+---
+
 # OpenClaw Unreal Plugin
 version: 1.0.0
 

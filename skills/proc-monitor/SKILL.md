@@ -1,6 +1,9 @@
 ---
-description: Monitor system processes and report CPU/memory usage, top consumers, and resource alerts.
+name: proc-monitor
+description: Monitor system processes and report CPU/memory usage, top
+  consumers, and resource alerts.
 ---
+
 
 # Process Monitor
 

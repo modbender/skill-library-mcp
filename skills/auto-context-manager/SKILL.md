@@ -1,3 +1,9 @@
+---
+name: Auto Context Manager
+description: AI-powered automatic project context management. Detects which
+  project the user is referring to and maintains context awareness.
+---
+
 # Auto Context Manager
 
 AI-powered automatic project context management. Detects which project the user is referring to and maintains context awareness.

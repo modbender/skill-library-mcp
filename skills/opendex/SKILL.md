@@ -1,3 +1,9 @@
+---
+name: OpenDex API Skill
+description: You can interact with the OpenDex API to retrieve Solana token
+  data, community-curated content, market sentiment, and more.
+---
+
 # OpenDex API Skill
 
 You can interact with the OpenDex API to retrieve Solana token data, community-curated content, market sentiment, and more.

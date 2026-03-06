@@ -1,3 +1,8 @@
+---
+name: SQL Server Toolkit
+description: Command-line toolkit for Microsoft SQL Server.
+---
+
 
 # SQL Server Toolkit
 

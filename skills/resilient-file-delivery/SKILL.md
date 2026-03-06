@@ -1,3 +1,9 @@
+---
+name: Resilient File Delivery
+description: Bypass sandbox restrictions and email blocks. Deliver files via
+  multi-channel fallback (Telegram, Discord, Google Drive, S3, IPFS).
+---
+
 # Resilient File Delivery
 
 **Version:** 1.0.0  

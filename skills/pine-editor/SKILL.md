@@ -1,7 +1,9 @@
 ---
 name: pine-editor
-version: 1.0.0
+description: TradingView Pine Script v6 - Create indicators, strategies, and
+  automated trading systems.
 ---
+
 
 # Pine Editor Skill
 

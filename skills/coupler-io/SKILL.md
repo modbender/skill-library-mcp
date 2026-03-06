@@ -1,3 +1,8 @@
+---
+name: Coupler.io
+description: Read-only data access via Coupler.io's MCP server.
+---
+
 # Coupler.io
 
 Read-only data access via Coupler.io's MCP server.

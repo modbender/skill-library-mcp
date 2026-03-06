@@ -1,8 +1,8 @@
 ---
-slug: parcel
-display_name: Parcel
+name: parcel-package-tracking
 description: Track and add deliveries via Parcel API.
 ---
+
 
 # Parcel
 

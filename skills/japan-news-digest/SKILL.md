@@ -1,6 +1,9 @@
 ---
-description: Fetch and summarize top Japanese news into a categorized, digestible daily digest.
+name: japan-news-digest
+description: Fetch and summarize top Japanese news into a categorized,
+  digestible daily digest.
 ---
+
 
 # Japan News Digest
 

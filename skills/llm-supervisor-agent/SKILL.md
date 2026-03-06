@@ -1,3 +1,9 @@
+---
+name: LLM Supervisor
+description: Automatically switches OpenClaw between cloud and local Ollama
+  models when rate limits occur.
+---
+
 # LLM Supervisor
 
 Automatically switches OpenClaw between cloud and local Ollama models when rate limits occur.

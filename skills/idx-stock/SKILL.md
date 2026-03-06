@@ -1,3 +1,8 @@
+---
+name: IDX Stock Profile Scraper
+description: "parameters:"
+---
+
 # IDX Stock Profile Scraper
 
 ## Skill Metadata

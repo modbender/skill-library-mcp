@@ -1,3 +1,8 @@
+---
+name: Job Market Intelligence & Career Tracker
+description: This skill turns Claude into a job market research analyst.
+---
+
 # Job Market Intelligence & Career Tracker
 
 **Version:** 1.0.0

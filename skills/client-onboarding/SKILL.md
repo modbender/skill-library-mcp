@@ -1,3 +1,10 @@
+---
+name: Client Onboarding Checklist Generator
+description: Generate a comprehensive, customized client onboarding checklist
+  for any service business. Covers intake, setup, communication, milestones, and
+  success metrics.
+---
+
 # Client Onboarding Checklist Generator
 
 Generate a comprehensive, customized client onboarding checklist for any service business. Covers intake, setup, communication, milestones, and success metrics.

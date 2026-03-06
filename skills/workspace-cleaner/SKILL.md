@@ -1,3 +1,9 @@
+---
+name: Workspace Cleaner
+description: Safe, automated cleanup for OpenClaw workspaces. Finds temp files,
+  duplicates, and cruft while protecting important data.
+---
+
 # Workspace Cleaner
 
 Safe, automated cleanup for OpenClaw workspaces. Finds temp files, duplicates, and cruft while protecting important data.

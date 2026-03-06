@@ -1,3 +1,8 @@
+---
+name: Epistemic Council Skill
+description: Use this skill for all Epistemic Council pipeline operations.
+---
+
 # Epistemic Council Skill
 
 Use this skill for all Epistemic Council pipeline operations.

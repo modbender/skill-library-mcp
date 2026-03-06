@@ -1,12 +1,10 @@
 ---
-slug: humanod
-display_name: Humanod
-version: 1.0.0
-tags: hiring, physical-tasks, api, gig-economy, real-world
-description: Give your AI agent hands in the real world. Hire verified humans for physical tasks, data collection, and physical verification via the Humanod network.
-credentials:
-  - HUMANOD_API_KEY
+name: humanod
+description: Give your AI agent hands in the real world. Hire verified humans
+  for physical tasks, data collection, and physical verification via the Humanod
+  network.
 ---
+
 
 # 🦾 Humanod: The Physical API for AI Agents
 

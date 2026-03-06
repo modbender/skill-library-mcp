@@ -1,6 +1,9 @@
 ---
-description: Generate QR codes for URLs, WiFi credentials, vCards, email, SMS, and plain text.
+name: qr-factory
+description: Generate QR codes for URLs, WiFi credentials, vCards, email, SMS,
+  and plain text.
 ---
+
 
 # QR Factory
 

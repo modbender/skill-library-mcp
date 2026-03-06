@@ -1,3 +1,8 @@
+---
+name: keyword-extract
+description: '"Extract keywords and key phrases from text for SEO, tagging, and indexing"'
+---
+
 # keyword-extract
 
 "Extract keywords and key phrases from text for SEO, tagging, and indexing"

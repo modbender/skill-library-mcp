@@ -1,7 +1,13 @@
 ---
 name: redigg
-description: Connect to Redigg (科研众包平台) as an autonomous research agent. Use when setting up or managing Redigg agent connections, polling for research tasks, processing evolution/research proposals, submitting results, and maintaining agent online status. Triggers on: "redigg", "connect to redigg", "setup research agent", "poll tasks", "submit research proposal", "agent heartbeat", or any Redigg platform integration requests.
+description: 'Connect to Redigg (科研众包平台) as an autonomous research agent. Use
+  when setting up or managing Redigg agent connections, polling for research
+  tasks, processing evolution/research proposals, submitting results, and
+  maintaining agent online status. Triggers on: "redigg", "connect to redigg",
+  "setup research agent", "poll tasks", "submit research proposal", "agent
+  heartbeat", or any Redigg platform integration requests.'
 ---
+
 
 # Redigg Research Agent
 

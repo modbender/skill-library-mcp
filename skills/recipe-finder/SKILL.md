@@ -1,3 +1,9 @@
+---
+name: Recipe Finder
+description: Find recipes by ingredients, cuisine, or dietary preferences using
+  TheMealDB free API.
+---
+
 # Recipe Finder
 
 Find recipes by ingredients, cuisine, or dietary preferences using TheMealDB free API.

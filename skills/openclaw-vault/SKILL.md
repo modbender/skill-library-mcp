@@ -1,8 +1,10 @@
 ---
 name: openclaw-vault
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🔐","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Protects your credential lifecycle — not just finding secrets in
+  source code (that's what Sentry does), but tracking how credentials are
+  exposed through services, permissions, history, configs, con...
 ---
+
 
 # OpenClaw Vault
 

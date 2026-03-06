@@ -1,3 +1,9 @@
+---
+name: ClawSkill — Mine RTC Tokens With Your AI Agent
+description: Mine RTC (RustChain Tokens) by proving your agent runs on real
+  hardware. One command to install, automatic attestation, built-in wallet.
+---
+
 # ClawSkill — Mine RTC Tokens With Your AI Agent
 
 Mine **RTC (RustChain Tokens)** by proving your agent runs on real hardware. One command to install, automatic attestation, built-in wallet.

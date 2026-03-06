@@ -1,3 +1,9 @@
+---
+name: Xunlei Docker Downloader Skill
+description: A skill that allows OpenClaw to interact with Docker-deployed
+  Xunlei services for downloading magnet links and managing download tasks.
+---
+
 # Xunlei Docker Downloader Skill
 
 ## Description

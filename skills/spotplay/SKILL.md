@@ -1,3 +1,8 @@
+---
+name: spotplay
+description: 點歌/播放 Spotify（優先使用 Spotify.app + AppleScript；不依賴 spogo / Web Player 裝置切換）。
+---
+
 # spotplay
 
 點歌/播放 Spotify（**優先使用 Spotify.app + AppleScript**；不依賴 spogo / Web Player 裝置切換）。

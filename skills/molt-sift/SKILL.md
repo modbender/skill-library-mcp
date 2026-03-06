@@ -1,7 +1,14 @@
 ---
 name: molt-sift
-description: Data validation and signal extraction service for agents. Sift through raw outputs (JSON, text, data streams) to extract quality signals, validate against schemas, and score reliability. Use when: (1) validating agent outputs before execution, (2) cleaning/normalizing data from multiple sources, (3) running bounty validation jobs, (4) extracting high-confidence signals from noisy data. Integrates with PayAClaw, MoltyGuild, and Clawslist for micro-payment bounties via x402 escrow (Solana).
+description: "Data validation and signal extraction service for agents. Sift
+  through raw outputs (JSON, text, data streams) to extract quality signals,
+  validate against schemas, and score reliability. Use when: (1) validating
+  agent outputs before execution, (2) cleaning/normalizing data from multiple
+  sources, (3) running bounty validation jobs, (4) extracting high-confidence
+  signals from noisy data. Integrates with PayAClaw, MoltyGuild, and Clawslist
+  for micro-payment bounties via x402 escrow (Solana)."
 ---
+
 
 # Molt Sift
 

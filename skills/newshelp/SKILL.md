@@ -1,3 +1,8 @@
+---
+name: skills.md — NewsHelp Content Navigation Skills
+description: https://newshelp.org/tag/{topic}
+---
+
 ```md
 # skills.md — NewsHelp Content Navigation Skills
 

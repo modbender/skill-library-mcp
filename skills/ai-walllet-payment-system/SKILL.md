@@ -1,3 +1,10 @@
+---
+name: AI Wallet Payment System - Skill Guide
+description: This skill enables AI agents to securely manage cryptocurrency
+  wallets and perform blockchain transactions. It provides encrypted key
+  storage, multi-factor authentication, and secure transaction pr...
+---
+
 # AI Wallet Payment System - Skill Guide
 
 ## Overview

@@ -1,3 +1,9 @@
+---
+name: deBridge MCP Skill
+description: Enable AI agents to execute non-custodial cross-chain
+  cryptocurrency swaps and transfers via the deBridge protocol.
+---
+
 # deBridge MCP Skill
 
 Enable AI agents to execute non-custodial cross-chain cryptocurrency swaps and transfers via the deBridge protocol.

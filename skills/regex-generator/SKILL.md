@@ -1,3 +1,8 @@
+---
+name: Regex Generator
+description: 根据描述和示例生成正则表达式。
+---
+
 # Regex Generator
 
 根据描述和示例生成正则表达式。

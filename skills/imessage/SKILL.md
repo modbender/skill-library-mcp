@@ -1,3 +1,8 @@
+---
+name: iMessage Skill
+description: iMessage Skill 让 OpenClaw 能够通过 macOS 的 Messages 应用发送和接收 iMessage 消息。
+---
+
 # iMessage Skill
 
 ## 简介

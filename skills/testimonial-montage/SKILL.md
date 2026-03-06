@@ -1,3 +1,9 @@
+---
+name: Testimonial Montage
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI google veo generation.
+---
+
 # Testimonial Montage
 
 **Version**: 1.0.0

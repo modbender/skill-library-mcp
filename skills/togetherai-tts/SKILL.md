@@ -1,3 +1,8 @@
+---
+name: TogetherAI TTS
+description: Text-to-speech using TogetherAI API with MiniMax speech-2.6-turbo model.
+---
+
 # TogetherAI TTS
 
 Text-to-speech using TogetherAI API with MiniMax speech-2.6-turbo model.

@@ -1,3 +1,10 @@
+---
+name: NG Lawyer DB Build (Step 1)
+description: "This is Step 1 of Fei Gao’s “Nigeria Lawyer Network” workflow: 1)
+  Build a Lawyer Database (this skill) 2) Send outreach emails and score by
+  response (separate skill) 3) Sort & export for fast looku..."
+---
+
 # NG Lawyer DB Build (Step 1)
 
 ## What this skill does

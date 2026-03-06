@@ -1,6 +1,9 @@
 ---
-description: Monitor website uptime, measure response times, and check HTTP status codes for any URL.
+name: site-uptime-monitor
+description: Monitor website uptime, measure response times, and check HTTP
+  status codes for any URL.
 ---
+
 
 # Uptime Monitor
 

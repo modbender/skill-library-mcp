@@ -1,3 +1,8 @@
+---
+name: Product Description Generator
+description: Generate compelling product descriptions for e-commerce platforms.
+---
+
 # Product Description Generator
 
 Generate compelling product descriptions for e-commerce platforms.

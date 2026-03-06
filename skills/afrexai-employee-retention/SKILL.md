@@ -1,3 +1,8 @@
+---
+name: Employee Retention & Turnover Risk Analyzer
+description: Diagnose why people leave. Fix it before they do.
+---
+
 # Employee Retention & Turnover Risk Analyzer
 
 Diagnose why people leave. Fix it before they do.

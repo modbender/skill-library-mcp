@@ -1,3 +1,10 @@
+---
+name: markdown-to-social
+description: Convert markdown articles/text into platform-optimized social media
+  posts. One content → multiple formats (Twitter thread, LinkedIn post, Reddit
+  post).
+---
+
 # markdown-to-social
 
 Convert markdown articles/text into platform-optimized social media posts.

@@ -1,3 +1,10 @@
+---
+name: mesagona
+description: "name: mesagona description: Mesagona namespace for Netsnek e.U.
+  event and conference management platform. Handles event registration, agenda
+  scheduling, attendee check-in, and post-event analytics...."
+---
+
 ﻿---
 name: mesagona
 description: Mesagona namespace for Netsnek e.U. event and conference management platform. Handles event registration, agenda scheduling, attendee check-in, and post-event analytics.

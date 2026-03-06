@@ -1,7 +1,11 @@
 ---
 name: shopify-bulk-upload
-description: Bulk upload products to Shopify stores. Read product data from Excel/CSV, automatically create products, images, variants, prices and inventory. Use cases: (1) Batch list new products (2) Migrate products from other platforms to Shopify (3) Batch update existing product information.
+description: "Bulk upload products to Shopify stores. Read product data from
+  Excel/CSV, automatically create products, images, variants, prices and
+  inventory. Use cases: (1) Batch list new products (2) Migrate products from
+  other platforms to Shopify (3) Batch update existing product information."
 ---
+
 
 # Shopify Bulk Upload Tool
 

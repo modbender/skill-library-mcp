@@ -1,3 +1,11 @@
+---
+name: 🏠 Real Estate Lead Machine — Scrape & Contact Property Sellers Before
+  Anyone Else
+description: Real estate is a race. The agent or investor who contacts a
+  motivated seller first wins the deal. Most pros spend hours manually browsing
+  listings, copy-pasting into spreadsheets, then writing the ...
+---
+
 # 🏠 Real Estate Lead Machine — Scrape & Contact Property Sellers Before Anyone Else
 
 **Slug:** `real-estate-lead-machine`  

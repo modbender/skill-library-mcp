@@ -1,3 +1,9 @@
+---
+name: Debt Collection & Recovery Playbook
+description: Generate compliant debt recovery strategies, collection letter
+  sequences, and payment plan frameworks.
+---
+
 # Debt Collection & Recovery Playbook
 
 Generate compliant debt recovery strategies, collection letter sequences, and payment plan frameworks.

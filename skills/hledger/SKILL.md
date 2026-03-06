@@ -1,3 +1,9 @@
+---
+name: hledger Skill for OpenClaw
+description: The hledger skill allows OpenClaw agents to execute hledger CLI
+  commands on the host system and return structured output to the user.
+---
+
 # hledger Skill for OpenClaw
 
 The **hledger skill** allows OpenClaw agents to execute `hledger` CLI commands

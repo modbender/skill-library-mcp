@@ -1,3 +1,9 @@
+---
+name: French Services — Services français du quotidien
+description: "Skill pour accéder aux services français : trains SNCF, suivi
+  colis La Poste, météo, transports IDF."
+---
+
 # French Services — Services français du quotidien
 
 Skill pour accéder aux services français : trains SNCF, suivi colis La Poste, météo, transports IDF.

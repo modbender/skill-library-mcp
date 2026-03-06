@@ -1,3 +1,10 @@
+---
+name: JRB Remote Site API Skill
+description: Interface with WordPress sites running the jrb-remote-site-api
+  plugin. This skill enables AI agents to perform administrative tasks, content
+  management, and integration with the Fluent suite (CRM, ...
+---
+
 # JRB Remote Site API Skill
 
 Interface with WordPress sites running the `jrb-remote-site-api` plugin. This skill enables AI agents to perform administrative tasks, content management, and integration with the Fluent suite (CRM, Forms, Support, etc.) via a secure REST API.

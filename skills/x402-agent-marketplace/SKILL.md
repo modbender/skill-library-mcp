@@ -1,3 +1,8 @@
+---
+name: x402 Agent Marketplace Skill
+description: Sell AI agent capabilities via SOL micro-payments.
+---
+
 # x402 Agent Marketplace Skill
 
 Sell AI agent capabilities via SOL micro-payments.

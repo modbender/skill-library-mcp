@@ -1,3 +1,8 @@
+---
+name: V2RayN Skill
+description: Manage V2RayN proxy client on macOS with auto-failover.
+---
+
 # V2RayN Skill
 
 Manage V2RayN proxy client on macOS with auto-failover.

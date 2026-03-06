@@ -1,3 +1,10 @@
+---
+name: Semantic Scholar Search
+description: Search for academic papers, get detailed paper information, author
+  profiles, and citation data through Semantic Scholar API. This skill provides
+  comprehensive academic literature search capabilitie...
+---
+
 # Semantic Scholar Search
 
 > **AI-Powered Academic Paper Search Tool** - Search academic papers through Semantic Scholar

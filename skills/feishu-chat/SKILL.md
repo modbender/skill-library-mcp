@@ -1,7 +1,12 @@
 ---
 name: feishu-chat
-description: Feishu (Lark) group chat messaging guide for OpenClaw. Includes Raw/Card message modes, @ mention formatting, and group member management. Use when sending messages in Feishu groups, mentioning users/bots, or formatting messages with Markdown. Trigger words: feishu, lark, chat, mention, at, markdown, group.
+description: "Feishu (Lark) group chat messaging guide for OpenClaw. Includes
+  Raw/Card message modes, @ mention formatting, and group member management. Use
+  when sending messages in Feishu groups, mentioning users/bots, or formatting
+  messages with Markdown. Trigger words: feishu, lark, chat, mention, at,
+  markdown, group."
 ---
+
 
 # Feishu Group Chat Guide
 

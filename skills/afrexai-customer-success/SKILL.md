@@ -1,3 +1,10 @@
+---
+name: Customer Success Playbook
+description: "Build and run a customer success operation for B2B SaaS. Covers
+  the full lifecycle: onboarding, health scoring, QBRs, churn prevention, and
+  expansion revenue."
+---
+
 # Customer Success Playbook
 
 Build and run a customer success operation for B2B SaaS. Covers the full lifecycle: onboarding, health scoring, QBRs, churn prevention, and expansion revenue.

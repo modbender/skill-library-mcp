@@ -1,3 +1,8 @@
+---
+name: MLX Brain - 맥북 MLX LLM 오케스트레이터
+description: mlx brain
+---
+
 # MLX Brain - 맥북 MLX LLM 오케스트레이터
 
 ## 설치 (맥북)

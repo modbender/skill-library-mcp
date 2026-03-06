@@ -1,6 +1,9 @@
 ---
-description: Monitor system processes, identify top CPU/memory consumers, and alert on resource thresholds.
+name: process-monitor
+description: Monitor system processes, identify top CPU/memory consumers, and
+  alert on resource thresholds.
 ---
+
 
 # Process Monitor
 

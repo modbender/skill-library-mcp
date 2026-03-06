@@ -1,3 +1,9 @@
+---
+name: guardrails - Interactive Security Guardrails Configuration
+description: Helps users configure comprehensive security guardrails for their
+  OpenClaw workspace through an interactive interview process.
+---
+
 # guardrails - Interactive Security Guardrails Configuration
 
 Helps users configure comprehensive security guardrails for their OpenClaw workspace through an interactive interview process.

@@ -1,3 +1,9 @@
+---
+name: admin-cli
+description: Provides a simple command-line interface for performing
+  administrative tasks that require elevated privileges.
+---
+
 # admin-cli
 
 ## Description

@@ -1,3 +1,10 @@
+---
+name: Agent Daily Planner 📋
+description: A structured daily planning and execution tracking system for AI
+  agents. Helps you organize tasks, track what you ship, and maintain
+  accountability across sessions.
+---
+
 # Agent Daily Planner 📋
 
 A structured daily planning and execution tracking system for AI agents. Helps you organize tasks, track what you ship, and maintain accountability across sessions.

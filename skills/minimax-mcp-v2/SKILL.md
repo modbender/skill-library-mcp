@@ -1,3 +1,8 @@
+---
+name: MiniMax MCP Search Skill
+description: 使用 MiniMax MCP 进行网络搜索和图像理解。通过 mcporter 调用 MiniMax Coding Plan MCP 服务。
+---
+
 # MiniMax MCP Search Skill
 
 ## 功能

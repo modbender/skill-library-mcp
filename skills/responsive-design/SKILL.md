@@ -1,7 +1,9 @@
 ---
 name: responsive-design
-model: standard
+description: Modern responsive CSS patterns using container queries, fluid
+  typography, CSS Grid, and mobile-first strategies.
 ---
+
 
 # Responsive Design
 

@@ -1,3 +1,10 @@
+---
+name: Automated QA Testing Bots Skill
+description: This skill enables Claude to build and run automated QA testing
+  bots that simulate real user journeys across websites and web applications —
+  catching bugs, broken flows, and regressions before your...
+---
+
 # Automated QA Testing Bots Skill
 
 ## Overview

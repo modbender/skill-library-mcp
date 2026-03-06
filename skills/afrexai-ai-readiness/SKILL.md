@@ -1,3 +1,10 @@
+---
+name: AI Readiness Assessment
+description: Run a structured AI readiness audit for any organization. Scores 8
+  dimensions, identifies gaps, produces a prioritized 90-day action plan with
+  budget ranges.
+---
+
 # AI Readiness Assessment
 
 Run a structured AI readiness audit for any organization. Scores 8 dimensions, identifies gaps, produces a prioritized 90-day action plan with budget ranges.

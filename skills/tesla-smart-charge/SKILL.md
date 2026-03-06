@@ -1,7 +1,14 @@
 ---
 name: tesla-smart-charge
-description: Smart Tesla charging scheduler with charge limit management. Runs daily to check a schedule file and charge only on configured dates. Automatically manages charge limits during sessions (default 100%) and after sessions (default 80%). Use when you need to: (1) Charge your Tesla on specific planned dates, (2) Manage charge limits for battery health, (3) Calculate optimal charging start times, (4) Set up recurring daily checking with flexible charge scheduling.
+description: "Smart Tesla charging scheduler with charge limit management. Runs
+  daily to check a schedule file and charge only on configured dates.
+  Automatically manages charge limits during sessions (default 100%) and after
+  sessions (default 80%). Use when you need to: (1) Charge your Tesla on
+  specific planned dates, (2) Manage charge limits for battery health, (3)
+  Calculate optimal charging start times, (4) Set up recurring daily checking
+  with flexible charge scheduling."
 ---
+
 
 # Tesla Smart Charge Optimizer
 

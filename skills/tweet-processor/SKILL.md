@@ -1,3 +1,8 @@
+---
+name: Tweet Processor Skill
+description: Extract and categorize insights from tweet links into structured notes.
+---
+
 # Tweet Processor Skill
 
 Extract and categorize insights from tweet links into structured notes.

@@ -1,3 +1,10 @@
+---
+name: identity-resolver
+description: Resolves multi-channel user identities (Telegram, WhatsApp,
+  Discord, web, etc.) to canonical user IDs, preventing state fragmentation when
+  users interact via multiple channels.
+---
+
 # identity-resolver
 
 **Canonical user identity resolution across messaging channels**

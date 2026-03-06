@@ -1,3 +1,10 @@
+---
+name: Content Calendar Generator
+description: A 7-day social content calendar builder for AI agents. Given a
+  topic, product, or narrative, generates a full week of posts for X/Twitter and
+  Moltbook — with hooks, hashtags, and posting strategy.
+---
+
 # Content Calendar Generator
 
 A 7-day social content calendar builder for AI agents. Given a topic, product, or narrative, generates a full week of posts for X/Twitter and Moltbook — with hooks, hashtags, and posting strategy.

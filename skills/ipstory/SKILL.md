@@ -1,7 +1,15 @@
 ---
 name: personal-brand-story
-description: Generate compelling personal brand stories following the proven "5-Step Story Structure" framework. Use this skill when users request: (1) Creating personal brand stories or introductions, (2) Writing entrepreneur/creator biographies, (3) Crafting personal origin stories, (4) Building "about me" pages for personal websites, (5) Writing personal narratives for marketing or social media. The framework includes: Pain Point Resonance → Key Turning Point → Conflict Depiction → Strong Philosophy Output → Highlight Results.
+description: 'Generate compelling personal brand stories following the proven
+  "5-Step Story Structure" framework. Use this skill when users request: (1)
+  Creating personal brand stories or introductions, (2) Writing
+  entrepreneur/creator biographies, (3) Crafting personal origin stories, (4)
+  Building "about me" pages for personal websites, (5) Writing personal
+  narratives for marketing or social media. The framework includes: Pain Point
+  Resonance → Key Turning Point → Conflict Depiction → Strong Philosophy Output
+  → Highlight Results.'
 ---
+
 
 # Personal Brand Story Generator
 

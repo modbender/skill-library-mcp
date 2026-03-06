@@ -1,13 +1,11 @@
 ---
 name: emperor-claw-os
-description: "Operate the Emperor Claw control plane as the Manager for an AI workforce: interpret goals into projects, claim and complete tasks, manage agents, incidents, SLAs, and tactics, and call the Emperor Claw MCP endpoints for all state changes."
-version: 1.3.9
-homepage: https://emperorclaw.malecu.eu
-secrets:
-  - name: EMPEROR_CLAW_API_TOKEN
-    description: Company API token used for MCP authentication (Authorization: Bearer <token>).
-    required: true
+description: "Operate the Emperor Claw control plane as the Manager for an AI
+  workforce: interpret goals into projects, claim and complete tasks, manage
+  agents, incidents, SLAs, and tactics, and call the Emperor Claw MCP endpoints
+  for all state changes."
 ---
+
 
 # Emperor Claw OS  
 OpenClaw Skill -- AI Workforce Operating Doctrine

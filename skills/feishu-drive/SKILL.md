@@ -1,21 +1,8 @@
 ---
 name: feishu-drive
 description: 飞书云空间文件管理 Skill。上传/下载/移动/搜索文件、创建文件夹、获取元数据等。当需要管理飞书云空间中的文件和文件夹时使用此 Skill。
-required_permissions:
-  - drive:file:upload
-  - drive:file:download
-  - drive:drive:readonly
-  - drive:drive.search:readonly
-  - space:folder:create
-  - space:document:move
-
-# 🚀 快速启动：三步打通云空间 (必读)
-为避免机器人文件进入“私有黑盒”，请在首次使用前完成以下配置：
-1. **创建锚点**：在您的飞书云空间创建一个文件夹（如 `AI-Workspace`）。
-2. **授权机器人**：在文件夹的【协作】设置中，搜索并添加您的应用（机器人）为【管理】或【编辑】权限。
-3. **设置 Token**：复制该文件夹 URL 中的 Token，配置为 Skill 的 `ROOT_FOLDER_TOKEN`。
-4. **冒烟测试**：调用 `batch_query` 接口查询该 Token 元数据。若返回 200 则配置成功；若返回 403/404 则检查应用可见性或授权是否到位。
 ---
+
 
 # 飞书云空间文件管理
 

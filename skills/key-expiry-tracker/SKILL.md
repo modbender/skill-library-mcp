@@ -1,3 +1,9 @@
+---
+name: Key Expiry Tracker
+description: Track only expiry dates (metadata) for API keys/client
+  secrets/certificates and alert before they expire.
+---
+
 # Key Expiry Tracker
 
 Track **only expiry dates** (metadata) for API keys/client secrets/certificates and alert before they expire.

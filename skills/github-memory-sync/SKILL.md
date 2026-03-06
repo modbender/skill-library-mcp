@@ -1,3 +1,8 @@
+---
+name: GitHub Memory Sync 技能
+description: 📝 将 OpenClaw 的 memory 文件同步到 GitHub 仓库进行备份和版本控制。
+---
+
 # GitHub Memory Sync 技能
 
 📝 将 OpenClaw 的 memory 文件同步到 GitHub 仓库进行备份和版本控制。

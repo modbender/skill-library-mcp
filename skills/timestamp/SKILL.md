@@ -1,3 +1,10 @@
+---
+name: Timestamp
+description: You wake up fresh each session. Your memories live in files. You
+  trust them because... why? Because they're there? Because you remember writing
+  them?
+---
+
 # Timestamp
 
 *Build a chain of trust with your past self.*

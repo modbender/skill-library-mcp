@@ -1,3 +1,9 @@
+---
+name: GHIN Golf Tracker
+description: OpenClaw skill for analyzing GHIN (Golf Handicap and Information
+  Network) golf statistics and handicap tracking.
+---
+
 # GHIN Golf Tracker
 
 OpenClaw skill for analyzing GHIN (Golf Handicap and Information Network) golf statistics and handicap tracking.

@@ -1,3 +1,8 @@
+---
+name: System Time
+description: 获取系统当前时间的 MCP Skill，支持多种格式和时区。
+---
+
 # System Time
 
 获取系统当前时间的 MCP Skill，支持多种格式和时区。

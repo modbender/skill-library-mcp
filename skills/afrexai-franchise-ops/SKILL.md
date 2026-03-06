@@ -1,3 +1,9 @@
+---
+name: Franchise Operations Analyzer
+description: Evaluate franchise opportunities and manage multi-unit operations
+  with data-driven frameworks.
+---
+
 # Franchise Operations Analyzer
 
 Evaluate franchise opportunities and manage multi-unit operations with data-driven frameworks.

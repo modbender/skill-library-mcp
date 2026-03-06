@@ -1,3 +1,9 @@
+---
+name: PCClaw — OpenClaw for Windows
+description: 14 Windows-native AI agent skills + 2 cross-platform + one-command
+  PowerShell installer.
+---
+
 # PCClaw — OpenClaw for Windows
 
 14 Windows-native AI agent skills + 2 cross-platform + one-command PowerShell installer.

@@ -1,7 +1,15 @@
 ---
 name: openclaw-skill-debugger
-description: Identifica e resolve problemas comuns em AgentSkills do OpenClaw, incluindo: (1) Falhas de instalação via ClawHub, (2) Inconsistências de configuração (ex: paths absolutos), (3) Dependências ausentes ou mal documentadas, e (4) Erros de execução de scripts ou integração com APIs. Fornece um guia passo a passo para depurar e validar skills, garantindo sua correta operação em ambientes de quarentena ou produção. Use esta skill quando uma AgentSkill não se comporta como esperado ou você precisa auditar seu código.
+description: "Identifica e resolve problemas comuns em AgentSkills do OpenClaw,
+  incluindo: (1) Falhas de instalação via ClawHub, (2) Inconsistências de
+  configuração (ex: paths absolutos), (3) Dependências ausentes ou mal
+  documentadas, e (4) Erros de execução de scripts ou integração com APIs.
+  Fornece um guia passo a passo para depurar e validar skills, garantindo sua
+  correta operação em ambientes de quarentena ou produção. Use esta skill quando
+  uma AgentSkill não se comporta como esperado ou você precisa auditar seu
+  código."
 ---
+
 
 # OpenClaw Skill Debugger
 

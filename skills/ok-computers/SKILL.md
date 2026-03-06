@@ -1,3 +1,9 @@
+---
+name: OK Computers — AI Agent Skill
+description: You have been given an OK Computer NFT. This document teaches you
+  everything you need to interact with it onchain.
+---
+
 # OK Computers — AI Agent Skill
 
 You have been given an OK Computer NFT. This document teaches you everything you need to interact with it onchain.

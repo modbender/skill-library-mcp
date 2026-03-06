@@ -1,3 +1,10 @@
+---
+name: Financial Due Diligence Analyzer
+description: Run comprehensive financial due diligence on acquisition targets,
+  investment opportunities, or partnership prospects. Built for PE firms,
+  corporate development teams, and founders evaluating deals.
+---
+
 # Financial Due Diligence Analyzer
 
 Run comprehensive financial due diligence on acquisition targets, investment opportunities, or partnership prospects. Built for PE firms, corporate development teams, and founders evaluating deals.

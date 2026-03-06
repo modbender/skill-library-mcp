@@ -1,3 +1,8 @@
+---
+name: notion
+description: Here is the complete SKILL.md file updated for the January 15, 2026 API state.
+---
+
 Here is the complete `SKILL.md` file updated for the January 15, 2026 API state.
 
 ```markdown

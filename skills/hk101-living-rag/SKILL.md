@@ -1,3 +1,8 @@
+---
+name: claw-rag
+description: Simple RAG over local text/markdown.
+---
+
 # claw-rag
 Simple RAG over local text/markdown.
 

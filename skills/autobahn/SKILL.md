@@ -1,8 +1,9 @@
 ---
 name: autobahn
-description: Operate autonomous onchain-governed entities via agents: identity, governance, contracts, and registry/community workflows.
-metadata: {"openclaw":{"requires":{"bins":[],"config":["network.enabled"]},"os":["darwin","linux"],"emoji":"highway","homepage":"https://autobahn.surf"}}
+description: "Operate autonomous onchain-governed entities via agents: identity,
+  governance, contracts, and registry/community workflows."
 ---
+
 
 ## Autobahn Skill
 

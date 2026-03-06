@@ -1,21 +1,8 @@
 ---
 name: launchfast-ppc-research
-description: |
-  Amazon PPC keyword research using the LaunchFast MCP. Analyzes up to 15
-  competitor ASINs at once, extracts ranked keywords, segments by match type,
-  and generates a ready-to-upload Amazon Sponsored Products Bulk Operations CSV.
-
-  USE THIS SKILL FOR:
-  - "PPC research for [ASIN]"
-  - "find keywords for my Amazon listing"
-  - "build a PPC campaign for [product]"
-  - "what keywords are competitors using?"
-  - "generate Amazon bulk upload file"
-
-  Requirements: mcp__launchfast__amazon_keyword_research available
-
-argument-hint: [ASIN1] [ASIN2] ... | "ppc [keyword]"
+description: "|"
 ---
+
 
 # LaunchFast PPC Research Skill
 

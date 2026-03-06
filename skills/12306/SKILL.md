@@ -1,8 +1,10 @@
 ---
-name: 12306
-description: Query China Railway 12306 for train schedules, remaining tickets, and station info. Use when user asks about train/高铁/火车 tickets, schedules, or availability within China.
-metadata: {"openclaw":{"emoji":"🚄","requires":{"bins":["node"]}}}
+name: "12306"
+description: Query China Railway 12306 for train schedules, remaining tickets,
+  and station info. Use when user asks about train/高铁/火车 tickets, schedules, or
+  availability within China.
 ---
+
 
 # 12306 Train Query
 

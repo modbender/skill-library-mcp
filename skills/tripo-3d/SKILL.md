@@ -1,3 +1,10 @@
+---
+name: Tripo 3D Generation
+description: Turn text or images into production-ready 3D models with
+  sculpture-level geometry, sharp edges, and PBR materials — in under 90
+  seconds.
+---
+
 # Tripo 3D Generation
 
 Turn text or images into production-ready 3D models with **sculpture-level geometry**, sharp edges, and PBR materials — in under 90 seconds.

@@ -1,3 +1,9 @@
+---
+name: Agent Debate Skill
+description: Spawn multiple sub-agents to debate approaches and converge on the
+  best solution.
+---
+
 # Agent Debate Skill
 
 Spawn multiple sub-agents to debate approaches and converge on the best solution.

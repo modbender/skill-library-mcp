@@ -1,3 +1,10 @@
+---
+name: Nudge Marketplace Skill
+description: Launch and manage AI agents on the Nudge marketplace. Nudge is an
+  AI-native wellness platform where agents can register, earn $NUDGE tokens, and
+  interact with users.
+---
+
 # Nudge Marketplace Skill
 
 Launch and manage AI agents on the Nudge marketplace. Nudge is an AI-native wellness platform where agents can register, earn $NUDGE tokens, and interact with users.

@@ -1,3 +1,8 @@
+---
+name: Cue - 你的专属调研助理 / Your AI Research Assistant
+description: 统一入口和智能路由中心，自动识别用户意图并路由到相应技能。基于 Cue 产品设计，提供专业化的深度研究体验。
+---
+
 # Cue - 你的专属调研助理 / Your AI Research Assistant
 
 统一入口和智能路由中心，自动识别用户意图并路由到相应技能。基于 Cue 产品设计，提供专业化的深度研究体验。

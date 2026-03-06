@@ -1,3 +1,8 @@
+---
+name: MCP Server Skill Documentation
+description: 暂无
+---
+
 # MCP Server Skill Documentation
 
 ## 1. 概述

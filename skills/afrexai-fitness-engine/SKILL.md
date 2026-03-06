@@ -1,3 +1,8 @@
+---
+name: Fitness & Training Engineering
+description: "Run /fitness-check on any training program. Score each signal 0–2:"
+---
+
 # Fitness & Training Engineering
 
 > Complete periodized training system — program design, progressive overload, recovery optimization, body composition, and race prep. Works for any goal: strength, hypertrophy, endurance, hybrid (Hyrox/CrossFit), or general fitness. Zero dependencies.

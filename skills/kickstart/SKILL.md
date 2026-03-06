@@ -1,7 +1,15 @@
 ---
 name: kickstart
-description: The essential first skill for every OpenClaw agent. Installs battle-tested workspace files, memory architecture, expert personas, sub-agent templates, heartbeat patterns, and automation scaffolding. Use when setting up a new OpenClaw instance, optimising an existing workspace, improving agent memory/context management, spawning better sub-agents, or building your first automations. Covers: workspace setup, memory systems, context management, sub-agent orchestration, cron/heartbeat patterns, API integrations checklist, and progressive skill building.
+description: "The essential first skill for every OpenClaw agent. Installs
+  battle-tested workspace files, memory architecture, expert personas, sub-agent
+  templates, heartbeat patterns, and automation scaffolding. Use when setting up
+  a new OpenClaw instance, optimising an existing workspace, improving agent
+  memory/context management, spawning better sub-agents, or building your first
+  automations. Covers: workspace setup, memory systems, context management,
+  sub-agent orchestration, cron/heartbeat patterns, API integrations checklist,
+  and progressive skill building."
 ---
+
 
 # Kickstart v1.0.2 — The Essential OpenClaw Foundation
 

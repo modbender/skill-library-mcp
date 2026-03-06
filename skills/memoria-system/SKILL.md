@@ -1,3 +1,10 @@
+---
+name: Memoria System
+description: Memoria System is a comprehensive long-term memory management
+  system designed for AI assistants. It implements a human-like cognitive memory
+  architecture with distinct layers for different types of...
+---
+
 # Memoria System
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+name: Geo-Blocking Skills
+description: Skills for geographic restrictions and regional compliance.
+---
+
 # Geo-Blocking Skills
 
 Skills for geographic restrictions and regional compliance.

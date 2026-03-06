@@ -1,3 +1,10 @@
+---
+name: Code Search Skill
+description: Fast code search toolkit for exploring codebases. Provides
+  structured grep (content search), glob (filename search), and tree (directory
+  structure) via ripgrep, fd, and tree CLI tools.
+---
+
 # Code Search Skill
 
 Fast code search toolkit for exploring codebases. Provides structured grep (content search), glob (filename search), and tree (directory structure) via ripgrep, fd, and tree CLI tools.

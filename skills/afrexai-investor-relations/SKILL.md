@@ -1,3 +1,9 @@
+---
+name: Investor Relations Framework
+description: Complete IR playbook for startups and growth companies managing
+  investor communications, reporting, and capital market positioning.
+---
+
 # Investor Relations Framework
 
 Complete IR playbook for startups and growth companies managing investor communications, reporting, and capital market positioning.

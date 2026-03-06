@@ -1,7 +1,12 @@
 ---
 name: note-processor
-description: Summarize and analyze research notes created by research-assistant. Features: generate summaries, extract keywords, search within topics, list all topics. Works with research_db.json format. Perfect for finding patterns, reviewing research progress, and extracting insights from accumulated notes without re-reading everything.
+description: "Summarize and analyze research notes created by
+  research-assistant. Features: generate summaries, extract keywords, search
+  within topics, list all topics. Works with research_db.json format. Perfect
+  for finding patterns, reviewing research progress, and extracting insights
+  from accumulated notes without re-reading everything."
 ---
+
 
 # Note Processor
 

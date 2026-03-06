@@ -1,6 +1,9 @@
 ---
-description: Compare config files semantically, highlight differences, and suggest merge strategies.
+name: config-diff
+description: Compare config files semantically, highlight differences, and
+  suggest merge strategies.
 ---
+
 
 # Config Diff
 

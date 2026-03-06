@@ -1,3 +1,9 @@
+---
+name: Passo - Remote Browser Access
+description: Give your user remote access to a browser on your server. Perfect
+  for logins, 2FA, captchas, or any manual browser action.
+---
+
 # Passo - Remote Browser Access
 
 Give your user remote access to a browser on your server. Perfect for logins, 2FA, captchas, or any manual browser action.

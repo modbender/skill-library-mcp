@@ -1,3 +1,8 @@
+---
+name: text-summarize
+description: Summarize text into 3-5 bullet points using AI
+---
+
 # text-summarize
 
 Summarize text into 3-5 bullet points using AI

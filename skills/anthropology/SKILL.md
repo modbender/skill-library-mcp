@@ -1,6 +1,10 @@
 ---
-summary: Comprehensive AI instructor skill covering cultural, biological, archaeological, and linguistic anthropology with 580K tokens of educational content and narrative-driven teaching frameworks.
+name: anthropology
+description: Comprehensive AI instructor skill covering cultural, biological,
+  archaeological, and linguistic anthropology with 580K tokens of educational
+  content and narrative-driven teaching frameworks.
 ---
+
 
 # Anthropology Instructor
 

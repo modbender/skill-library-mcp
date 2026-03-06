@@ -1,3 +1,8 @@
+---
+name: 🐾 Social Research (Ravens) — What Are People Saying?
+description: Tiered X/Twitter research tool. Sends out the ravens, brings back intelligence.
+---
+
 # 🐾 Social Research (Ravens) — What Are People Saying?
 
 > by Odin's Eye Enterprises — Ancient Wisdom. Modern Intelligence.

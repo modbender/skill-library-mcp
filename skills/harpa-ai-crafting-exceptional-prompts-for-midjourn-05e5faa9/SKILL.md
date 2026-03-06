@@ -1,8 +1,8 @@
 ---
 name: harpa-ai-crafting-exceptional-prompts-for-midjourn-05e5faa9
-description: , and Midjourney would fragment this into
-metadata: {"clawdbot":{"type":"image generation","source":"image-generation","original_url":"https://harpa.ai/blog/ultimate-midjourney-prompts-guide"}}
+description: ", and Midjourney would fragment this into"
 ---
+
 
 # HARPA AI | Crafting Exceptional Prompts for Midjourney
 

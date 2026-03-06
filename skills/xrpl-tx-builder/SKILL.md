@@ -1,7 +1,10 @@
 ---
 name: xrpl-tx-builder
-description: Build and sign XRP Ledger transactions. Use for: (1) Creating payment transactions, (2) Building NFT mint/burn transactions, (3) Signing with Xaman wallet, (4) Submitting to XRPL.
+description: "Build and sign XRP Ledger transactions. Use for: (1) Creating
+  payment transactions, (2) Building NFT mint/burn transactions, (3) Signing
+  with Xaman wallet, (4) Submitting to XRPL."
 ---
+
 
 # XRPL Transaction Builder
 

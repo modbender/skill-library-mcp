@@ -1,7 +1,11 @@
 ---
 name: coda-packs
-description: Manage Coda Packs via REST API v1. Supports listing, creating, updating, and deleting private Packs. Requires CODA_API_TOKEN. Delete requires confirmation. Note: Builds, Gallery submission, Analytics, and Collaborators require Coda's Pack SDK CLI, not available via REST API.
+description: "Manage Coda Packs via REST API v1. Supports listing, creating,
+  updating, and deleting private Packs. Requires CODA_API_TOKEN. Delete requires
+  confirmation. Note: Builds, Gallery submission, Analytics, and Collaborators
+  require Coda's Pack SDK CLI, not available via REST API."
 ---
+
 
 # Coda Packs Skill
 

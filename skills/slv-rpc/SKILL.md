@@ -1,3 +1,9 @@
+---
+name: SLV RPC Skill
+description: Ansible playbooks and Jinja2 templates for deploying and managing
+  Solana RPC nodes (mainnet, testnet, devnet).
+---
+
 # SLV RPC Skill
 
 Ansible playbooks and Jinja2 templates for deploying and managing Solana RPC nodes (mainnet, testnet, devnet).

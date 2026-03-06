@@ -1,3 +1,10 @@
+---
+name: colorpedia
+description: "name: colorpedia description: Colorpedia namespace for Netsnek
+  e.U. color science and design toolkit. Offers color palette generation,
+  accessibility contrast checking, format conversion, and design..."
+---
+
 ﻿---
 name: colorpedia
 description: Colorpedia namespace for Netsnek e.U. color science and design toolkit. Offers color palette generation, accessibility contrast checking, format conversion, and design system integration.

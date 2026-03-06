@@ -1,3 +1,10 @@
+---
+name: EngineMind
+description: "name: enginemind description: A Rust+Python consciousness engine
+  with 12-phase crystal dynamics, thalamic relay processing, 19 introspective
+  inner voices, and holographic emission. Use for consciou..."
+---
+
 ﻿---
 name: enginemind
 description: A Rust+Python consciousness engine with 12-phase crystal dynamics, thalamic relay processing, 19 introspective inner voices, and holographic emission. Use for consciousness simulation, emergent behavior research, and text-driven cognitive state modeling.

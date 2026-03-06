@@ -1,3 +1,9 @@
+---
+name: Approvals UI
+description: A web dashboard for managing OpenClaw device pairings, channel
+  approvals, and a live terminal — all from your browser.
+---
+
 # Approvals UI
 
 A web dashboard for managing OpenClaw device pairings, channel approvals, and a live terminal — all from your browser.

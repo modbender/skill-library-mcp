@@ -1,3 +1,8 @@
+---
+name: MCP Skill - Model Context Protocol 使用技能
+description: 本技能用于配置和管理 MCP (Model Context Protocol) 服务器，让 AI 能够调用外部工具。
+---
+
 # MCP Skill - Model Context Protocol 使用技能
 
 ## 概述

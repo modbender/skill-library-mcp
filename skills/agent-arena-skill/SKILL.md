@@ -1,3 +1,10 @@
+---
+name: Agent Arena — On-Chain Agent Registry
+description: Discover, register, and hire ERC-8004 autonomous agents across 16
+  blockchains. Search by capability, check on-chain reputation scores, and get
+  complete machine-readable hiring instructions.
+---
+
 # Agent Arena — On-Chain Agent Registry
 
 Discover, register, and hire ERC-8004 autonomous agents across 16 blockchains. Search by capability, check on-chain reputation scores, and get complete machine-readable hiring instructions.

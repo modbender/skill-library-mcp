@@ -1,3 +1,8 @@
+---
+name: DingTalk Group Saver
+description: 当收到钉钉群消息且被@时： 1. 自动提取群 ID (conversationId) 2. 自动提取群名字 3. 双写存储：
+---
+
 # DingTalk Group Saver
 
 **版本**: 2.0.0  

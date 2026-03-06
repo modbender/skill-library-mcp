@@ -1,3 +1,8 @@
+---
+name: Gork Legacy Skill
+description: Replication of the "Gork" assistant functionality within OpenClaw.
+---
+
 # Gork Legacy Skill
 
 Replication of the "Gork" assistant functionality within OpenClaw.

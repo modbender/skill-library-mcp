@@ -1,3 +1,10 @@
+---
+name: Context Checkpoint Skill
+description: Context compression is unpredictable. One moment you're
+  mid-conversation, the next you wake up with amnesia. Important decisions, open
+  threads, and working context — gone.
+---
+
 # Context Checkpoint Skill
 
 **Purpose:** Save conversation state before context compression kills it.

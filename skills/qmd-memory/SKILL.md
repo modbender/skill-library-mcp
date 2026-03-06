@@ -1,3 +1,8 @@
+---
+name: QMD Memory Skill for OpenClaw
+description: One-time setup. Forever free searches.
+---
+
 # QMD Memory Skill for OpenClaw
 ## Local Hybrid Search — Save $50-300/month in API Costs
 

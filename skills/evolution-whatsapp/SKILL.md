@@ -1,3 +1,8 @@
+---
+name: Evolution WhatsApp Skill
+description: Control WhatsApp via Evolution API v2.
+---
+
 # Evolution WhatsApp Skill
 
 Control WhatsApp via Evolution API v2.

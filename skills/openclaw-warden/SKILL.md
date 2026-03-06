@@ -1,8 +1,10 @@
 ---
 name: openclaw-warden
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🛡️","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Monitors your workspace files for unauthorized modifications and
+  prompt injection attacks. Existing security tools scan skills before
+  installation — this tool watches the workspace itself after ins...
 ---
+
 
 # OpenClaw Warden
 

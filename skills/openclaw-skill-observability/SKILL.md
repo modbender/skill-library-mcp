@@ -1,3 +1,8 @@
+---
+name: Observability Skill
+description: Tools for monitoring OpenClaw health, costs, and logs.
+---
+
 # Observability Skill
 
 Tools for monitoring OpenClaw health, costs, and logs.

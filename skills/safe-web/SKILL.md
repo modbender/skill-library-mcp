@@ -1,3 +1,8 @@
+---
+name: safe-web
+description: Secure web fetch and search with PromptGuard scanning.
+---
+
 # safe-web
 
 Secure web fetch and search with **PromptGuard** scanning.

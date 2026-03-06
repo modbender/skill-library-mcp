@@ -1,3 +1,10 @@
+---
+name: Financial Skill (YFinance-AI)
+description: "Scope: 56+ financial data tools via Yahoo Finance. Stock prices,
+  fundamentals, earnings, dividends, options, crypto, forex, commodities, news,
+  and more."
+---
+
 # Financial Skill (YFinance-AI)
 
 Scope: 56+ financial data tools via Yahoo Finance. Stock prices, fundamentals, earnings, dividends, options, crypto, forex, commodities, news, and more.

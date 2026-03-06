@@ -1,3 +1,8 @@
+---
+name: sentiment-score
+description: '"Score text sentiment from -1 (negative) to +1 (positive)"'
+---
+
 # sentiment-score
 
 "Score text sentiment from -1 (negative) to +1 (positive)"

@@ -1,14 +1,8 @@
 ---
-metadata:
-  name: ChartClass
-  description: Technical analysis and chart pattern recognition for equities, options, and crypto markets
-  version: 0.0.2
-  tags: [finance, trading, technical-analysis, charting, patterns]
-  openclaw:
-    requires:
-      env: [CHARTCLASS_API_KEY]
-    primaryEnv: CHARTCLASS_API_KEY
+name: chartclass
+description: Technical analysis and chart pattern recognition for financial markets.
 ---
+
 
 # ChartClass
 

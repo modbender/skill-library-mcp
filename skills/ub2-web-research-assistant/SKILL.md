@@ -1,3 +1,10 @@
+---
+name: Web Research Assistant
+description: A skill that enables Claw to perform structured web research on any
+  topic, synthesize findings from multiple sources, and produce a well-organized
+  summary with citations.
+---
+
 # Web Research Assistant
 
 A skill that enables Claw to perform structured web research on any topic, synthesize findings from multiple sources, and produce a well-organized summary with citations.

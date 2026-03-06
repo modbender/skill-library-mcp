@@ -1,3 +1,10 @@
+---
+name: Git Commit Analyzer
+description: A comprehensive git commit history analysis tool that generates
+  detailed reports about your repository's development activity, contributor
+  patterns, and commit message quality.
+---
+
 # Git Commit Analyzer
 
 A comprehensive git commit history analysis tool that generates detailed reports

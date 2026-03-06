@@ -1,3 +1,10 @@
+---
+name: Stakeholder Report Generator
+description: Generate executive-ready stakeholder reports from raw project data.
+  Covers status updates, risk flags, milestone tracking, budget variance, and
+  next-period outlook.
+---
+
 # Stakeholder Report Generator
 
 Generate executive-ready stakeholder reports from raw project data. Covers status updates, risk flags, milestone tracking, budget variance, and next-period outlook.

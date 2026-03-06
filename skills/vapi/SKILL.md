@@ -1,3 +1,10 @@
+---
+name: Vapi (vapi.ai) — OpenClaw Skill
+description: Use this skill when you need to manage Vapi voice agents
+  (assistants), calls, phone numbers, tools, and webhooks from an OpenClaw
+  agent.
+---
+
 # Vapi (vapi.ai) — OpenClaw Skill
 
 Use this skill when you need to manage **Vapi voice agents** (assistants), calls, phone numbers, tools, and webhooks from an OpenClaw agent.

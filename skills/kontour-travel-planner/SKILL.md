@@ -1,3 +1,9 @@
+---
+name: Kontour Travel Planner
+description: This skill transforms any agent into a world-class travel planner
+  using Kontour AI's 9-dimension progressive planning model.
+---
+
 # Kontour Travel Planner
 
 > The planning brain that any AI agent can plug in. Not a search wrapper — a planning **methodology**.

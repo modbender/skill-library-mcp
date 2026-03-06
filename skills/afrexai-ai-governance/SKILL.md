@@ -1,3 +1,10 @@
+---
+name: AI Governance Policy Builder
+description: Build internal AI governance policies from scratch. Covers
+  acceptable use, model selection, data handling, vendor contracts, compliance
+  mapping, and board reporting.
+---
+
 # AI Governance Policy Builder
 
 Build internal AI governance policies from scratch. Covers acceptable use, model selection, data handling, vendor contracts, compliance mapping, and board reporting.

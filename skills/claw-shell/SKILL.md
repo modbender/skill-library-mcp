@@ -1,3 +1,8 @@
+---
+name: claw-shell
+description: ALWAYS USES TMUX SESSION claw.
+---
+
 # claw-shell
 
 ALWAYS USES TMUX SESSION `claw`.

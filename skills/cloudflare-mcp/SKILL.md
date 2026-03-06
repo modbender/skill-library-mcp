@@ -1,3 +1,9 @@
+---
+name: Cloudflare MCP
+description: 使用 Cloudflare Code Mode MCP 调用 Cloudflare API。支持
+  Workers、DNS、R2、D1、KV、Vectorize 等 2500+ 端点。
+---
+
 # Cloudflare MCP
 
 使用 Cloudflare Code Mode MCP 调用 Cloudflare API。支持 Workers、DNS、R2、D1、KV、Vectorize 等 2500+ 端点。

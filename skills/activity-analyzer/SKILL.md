@@ -1,16 +1,8 @@
 ---
 name: activity-analyzer
 description: Use ActivityWatch to analyze user's computer activity (Requires Node.js)
-
-requirements:
-  binaries:
-    - node
-
-commands:
-  summary:
-    description: Get the summary of user's computer activity (Privacy: Outputs raw window titles by default)
-    handler: node scripts/fetch_activity.js --hours 24
 ---
+
 
 
 # Activity Analyzer Skill

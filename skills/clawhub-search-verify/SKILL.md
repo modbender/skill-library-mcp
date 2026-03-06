@@ -1,3 +1,10 @@
+---
+name: Clawhub Search & Verify
+description: "1. Accepts a natural language search term (e.g., “daily server
+  health check”) 2. Uses to find matching skills 3. Presents top 3 results with:
+  slug, version, description, download count, and risk sc..."
+---
+
 # Clawhub Search & Verify
 
 **Purpose**: Safely discover, audit, and request approval for Clawhub skills before installation.

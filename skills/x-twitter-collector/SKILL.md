@@ -1,3 +1,8 @@
+---
+name: X/Twitter 推文收集技能
+description: x-twitter-collector
+---
+
 # X/Twitter 推文收集技能
 
 ## 技能名称

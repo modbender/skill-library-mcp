@@ -1,3 +1,8 @@
+---
+name: Research Engine Skill
+description: '"Research Engine"是一个自动化研究引擎，帮助agent：'
+---
+
 # Research Engine Skill
 
 **Agent:** guogangAgent  

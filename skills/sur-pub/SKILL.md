@@ -1,14 +1,10 @@
 ---
 name: SURGE OpenClaw (Dev)
-description: Create and trade tokens on SURGE via API (DEV). Full lifecycle — wallet setup, one-time free funding, token launch, and trading (pre-DEX + post-DEX). Base URL: back.surgedevs.xyz.
-author: SURGE
-version: 6.0.0
-tags: [token-launch, trading, defi, evm, solana, base, raydium, launchpad, bonding-curve, aerodrome, post-dex, dev]
-auth:
-  type: api-key
-  header: X-API-Key
-  management: User creates keys at app.surgedevs.xyz → Settings → API Keys
+description: "Create and trade tokens on SURGE via API (DEV). Full lifecycle —
+  wallet setup, one-time free funding, token launch, and trading (pre-DEX +
+  post-DEX). Base URL: back.surgedevs.xyz."
 ---
+
 
 # SURGE OpenClaw — AI Agent Skill (Dev)
 

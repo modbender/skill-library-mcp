@@ -1,3 +1,8 @@
+---
+name: Claw Problem Diagnoser
+description: 基于Moltbook社区的最大需求（技术帮助：21次提及），开发这个OpenClaw问题诊断器。自动诊断和修复常见的OpenClaw配置、依赖、服务问题。
+---
+
 # Claw Problem Diagnoser
 
 ## 🔧 OpenClaw问题诊断器

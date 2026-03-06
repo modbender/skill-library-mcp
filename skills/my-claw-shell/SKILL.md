@@ -1,3 +1,8 @@
+---
+name: claw-shell-kali
+description: ALWAYS USES TMUX SESSION claw.
+---
+
 # claw-shell-kali
 
 ALWAYS USES TMUX SESSION `claw`.

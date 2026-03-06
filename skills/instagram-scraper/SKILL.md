@@ -1,3 +1,8 @@
+---
+name: Instagram Profile Scraper
+description: A browser-based Instagram profile discovery and scraping tool.
+---
+
 # Instagram Profile Scraper
 
 A browser-based Instagram profile discovery and scraping tool.

@@ -1,3 +1,10 @@
+---
+name: Gmail Label Manager Skill
+description: This skill automates the organization of unread Gmail messages by
+  applying labels, removing unnecessary labels, and archiving emails, based on
+  predefined patterns from archived emails.
+---
+
 # Gmail Label Manager Skill
 
 This skill automates the organization of unread Gmail messages by applying labels, removing unnecessary labels, and archiving emails, based on predefined patterns from **archived emails**.

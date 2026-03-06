@@ -1,3 +1,8 @@
+---
+name: json-flatten
+description: Flatten nested JSON objects
+---
+
 # json-flatten
 
 Flatten nested JSON objects

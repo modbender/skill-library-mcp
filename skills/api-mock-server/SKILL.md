@@ -1,6 +1,9 @@
 ---
-description: Spin up mock API servers from OpenAPI/Swagger specs with auto-generated test data.
+name: api-mock-server
+description: Spin up mock API servers from OpenAPI/Swagger specs with
+  auto-generated test data.
 ---
+
 
 # API Mock Server
 

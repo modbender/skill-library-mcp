@@ -1,7 +1,12 @@
 ---
 name: us-value-investing-framework
-description: US stock valuation model skill (English-first + 中文) based on financial report data. Use when you need to apply explicit rules: ROE > 15% for 3+ years, debt ratio < 50%, free cash flow > 80% of net income, moat assessment (brand/network effect/cost advantage), then output investment rating (A/B/C/D) with reasons.
+description: "US stock valuation model skill (English-first + 中文) based on
+  financial report data. Use when you need to apply explicit rules: ROE > 15%
+  for 3+ years, debt ratio < 50%, free cash flow > 80% of net income, moat
+  assessment (brand/network effect/cost advantage), then output investment
+  rating (A/B/C/D) with reasons."
 ---
+
 
 # US Stock Valuation Model - Value Investing Framework (EN + 中文)
 

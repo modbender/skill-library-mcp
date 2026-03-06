@@ -1,3 +1,9 @@
+---
+name: PCO CLI - Planning Center Services
+description: CLI for the Planning Center Services API. Used for Shadow's church
+  work (FBC Gulfport).
+---
+
 # PCO CLI - Planning Center Services
 
 CLI for the Planning Center Services API. Used for Shadow's church work (FBC Gulfport).

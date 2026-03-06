@@ -1,3 +1,8 @@
+---
+name: language-detect
+description: Detect the language of text using AI
+---
+
 # language-detect
 
 Detect the language of text using AI

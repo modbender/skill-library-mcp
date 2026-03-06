@@ -1,3 +1,10 @@
+---
+name: WeCom Skill
+description: 'name: wecom description: "Send messages to WeCom (企业微信) via
+  webhooks using MCP protocol. Works with Claude Code, Claude Desktop, and other
+  MCP clients."'
+---
+
 ---`
 name: wecom
 description: "Send messages to WeCom (企业微信) via webhooks using MCP protocol. Works with Claude Code, Claude Desktop, and other MCP clients."

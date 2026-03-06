@@ -1,3 +1,10 @@
+---
+name: OpenClaw Integrations API
+description: OpenClaw is a skill-based integration system that allows apps built
+  on MakeX to discover and execute actions from third-party services (Gmail,
+  Slack, GitHub, etc.) via Composio.
+---
+
 # OpenClaw Integrations API
 
 OpenClaw is a skill-based integration system that allows apps built on MakeX to discover and execute actions from third-party services (Gmail, Slack, GitHub, etc.) via Composio.

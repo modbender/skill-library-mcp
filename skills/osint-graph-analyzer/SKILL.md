@@ -1,3 +1,9 @@
+---
+name: OSINT Graph Analyzer 🕵️
+description: Build knowledge graphs from OSINT data and discover hidden patterns
+  using Neo4j graph algorithms.
+---
+
 # OSINT Graph Analyzer 🕵️
 
 Build knowledge graphs from OSINT data and discover hidden patterns using Neo4j graph algorithms.

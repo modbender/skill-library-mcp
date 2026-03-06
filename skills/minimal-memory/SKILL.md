@@ -1,7 +1,12 @@
 ---
 name: minimal-memory
-description: Maintain clean, efficient memory files with GOOD/BAD/NEUTRAL categorization and semantic search. Use when managing agent memory, deciding what to store, searching past memories, or organizing knowledge. Triggers on: memory cleanup requests, "remember this", "search memory", memory organization discussions, or when MEMORY.md grows too large.
+description: 'Maintain clean, efficient memory files with GOOD/BAD/NEUTRAL
+  categorization and semantic search. Use when managing agent memory, deciding
+  what to store, searching past memories, or organizing knowledge. Triggers on:
+  memory cleanup requests, "remember this", "search memory", memory organization
+  discussions, or when MEMORY.md grows too large.'
 ---
+
 
 # Minimal Memory Management
 

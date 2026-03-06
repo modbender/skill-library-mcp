@@ -1,3 +1,8 @@
+---
+name: Feishu Minutes (妙记) Skill
+description: Fetch info, stats, transcript, and media from Feishu Minutes.
+---
+
 # Feishu Minutes (妙记) Skill
 
 Fetch info, stats, transcript, and media from Feishu Minutes.

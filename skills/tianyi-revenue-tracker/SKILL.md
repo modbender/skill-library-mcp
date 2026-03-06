@@ -1,11 +1,8 @@
 ---
-clawdbot:
-  name: revenue-tracker
-  version: 1.0.0
-  requires.env: []
-  files: ["scripts/*"]
-  homepage: https://github.com/openclaw_ceo/skills/revenue-tracker
+name: tianyi-revenue-tracker
+description: 完整的收益管理和任务定价系统。
 ---
+
 
 # Revenue Tracker - 收益追踪与定价系统
 

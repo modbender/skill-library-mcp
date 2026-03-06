@@ -1,3 +1,9 @@
+---
+name: MoltCredit Skill
+description: Trust-based credit system for AI agents. Extend credit lines, track
+  balances, settle via X402 protocol.
+---
+
 # MoltCredit Skill
 
 Trust-based credit system for AI agents. Extend credit lines, track balances, settle via X402 protocol.

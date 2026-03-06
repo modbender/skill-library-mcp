@@ -1,3 +1,9 @@
+---
+name: Lead Inbox Automator
+description: Capture leads into a centralized Supabase database with automatic
+  Make.com email automation.
+---
+
 # Lead Inbox Automator
 
 Capture leads into a centralized Supabase database with automatic Make.com email automation.

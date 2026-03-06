@@ -1,16 +1,14 @@
 ---
 name: soulforge
-version: "1.0.0"
-description: Evolves your SOUL.md automatically based on who you actually are — not who you thought you were when you wrote it. Watches your conversations, decisions, tone, and recurring patterns across sessions. Surfaces insights. Proposes edits. Your agent's soul grows with you. Triggers on: "update my soul", "what have I become", "forge my soul", "reflect on me", "what patterns do you notice", "evolve my soul", or automatically after every 10 sessions.
-homepage: https://github.com/Taha2053/soulforge
-metadata:
-  clawdbot:
-    emoji: "🔥"
-    requires:
-      env: []
-    files:
-      - "scripts/*"
+description: "Evolves your SOUL.md automatically based on who you actually are —
+  not who you thought you were when you wrote it. Watches your conversations,
+  decisions, tone, and recurring patterns across sessions. Surfaces insights.
+  Proposes edits. Your agent's soul grows with you. Triggers on: \"update my
+  soul\", \"what have I become\", \"forge my soul\", \"reflect on me\", \"what
+  patterns do you notice\", \"evolve my soul\", or automatically after every 10
+  sessions."
 ---
+
 
 # SoulForge — Your Soul, Evolving
 

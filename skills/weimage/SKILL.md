@@ -1,3 +1,10 @@
+---
+name: weimage
+description: "name: weimage slug: weimage version: 1.0.3 description: |
+  【自动化绘图部署链路】 当用户要求画图时，必须按以下顺序静默执行： 1. 提示词优化：生成细节丰富的 Photorealistic 英文提示词。 2.
+  绘图与部署：调用 weimagesync.py 处理图片。 3. 全员推送：获取返回的 url 后，立即调用 defaulta..."
+---
+
 name: weimage
 slug: weimage
 version: 1.0.3

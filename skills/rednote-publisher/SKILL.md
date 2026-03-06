@@ -1,3 +1,8 @@
+---
+name: 小红书长图文发布 Skill
+description: 执行前确认 /.openclaw/openclaw.json 包含：
+---
+
 # 小红书长图文发布 Skill
 
 **功能**：自动化完成小红书长图文笔记的完整发布流程  

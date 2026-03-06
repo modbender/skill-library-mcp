@@ -1,3 +1,10 @@
+---
+name: Google Search Skill
+description: Google Search powered by Serper.dev API. Replaces Brave Search with
+  richer results including Knowledge Graph, Answer Box, People Also Ask, and
+  specialized search types.
+---
+
 # Google Search Skill
 
 Google Search powered by Serper.dev API. Replaces Brave Search with richer results including Knowledge Graph, Answer Box, People Also Ask, and specialized search types.

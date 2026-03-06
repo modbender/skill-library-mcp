@@ -1,3 +1,10 @@
+---
+name: WhatsApp Intelligent Context Manager - Skill Guide
+description: This skill provides an AI-powered context management system for
+  WhatsApp customer service agents, enabling instant access to customer history,
+  sentiment analysis, and smart response suggestions.
+---
+
 # WhatsApp Intelligent Context Manager - Skill Guide
 
 This skill provides an AI-powered context management system for WhatsApp customer service agents, enabling instant access to customer history, sentiment analysis, and smart response suggestions.

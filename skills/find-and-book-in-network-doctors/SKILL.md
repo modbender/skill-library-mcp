@@ -1,3 +1,10 @@
+---
+name: Find and Book In-Network Doctors with Real-Time Availability
+description: This skill enables AI agents to help users find, research, and book
+  in-network doctors through Zocdoc.com. It surfaces real-time appointment
+  availability, verified patient reviews, accepted insuran...
+---
+
 # Find and Book In-Network Doctors with Real-Time Availability
 
 ## Overview

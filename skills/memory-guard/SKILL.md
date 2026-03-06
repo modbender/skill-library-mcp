@@ -1,3 +1,8 @@
+---
+name: Memory Guard - Agent Memory Integrity & Security
+description: Protect your agent's memory files from injection, tampering, and drift.
+---
+
 # Memory Guard - Agent Memory Integrity & Security
 
 Protect your agent's memory files from injection, tampering, and drift.

@@ -1,3 +1,10 @@
+---
+name: workspace-casual-lucas
+description: Provides a casual interface for interacting with your OpenClaw
+  workspace. Supports listing files, running commands, reading files, and other
+  workspace automation tasks.
+---
+
 # workspace-casual-lucas
 
 **Description:**  

@@ -1,3 +1,10 @@
+---
+name: n8n Automation — Build & Deliver Workflows Fast
+description: "Build, customize, and deliver n8n workflows using our
+  2,061-template library. Reference: /projects/n8n-workflows/ — browse by
+  integration folder. Our n8n instance: localhost:5678 (requires fnm use ..."
+---
+
 # n8n Automation — Build & Deliver Workflows Fast
 
 Build, customize, and deliver n8n workflows using our 2,061-template library.

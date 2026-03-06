@@ -1,3 +1,10 @@
+---
+name: SRE & Incident Management Platform
+description: Complete Site Reliability Engineering system — from SLO definition
+  through incident response, chaos engineering, and operational excellence. Zero
+  dependencies.
+---
+
 # SRE & Incident Management Platform
 
 Complete Site Reliability Engineering system — from SLO definition through incident response, chaos engineering, and operational excellence. Zero dependencies.

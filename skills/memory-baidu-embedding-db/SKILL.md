@@ -1,3 +1,10 @@
+---
+name: Memory Baidu Embedding DB - Semantic Memory for Clawdbot
+description: A semantic memory system for Clawdbot that uses Baidu's
+  Embedding-V1 model to store and retrieve memories based on meaning rather than
+  keywords. Designed as a secure, locally-stored replacement for...
+---
+
 # Memory Baidu Embedding DB - Semantic Memory for Clawdbot
 
 **Vector-Based Memory Storage and Retrieval Using Baidu Embedding Technology**

@@ -1,3 +1,9 @@
+---
+name: GitHub Issue Manager
+description: Fetch GitHub issues, spawn sub-agents to implement fixes, open PRs,
+  and monitor review comments.
+---
+
 # GitHub Issue Manager
 
 Fetch GitHub issues, spawn sub-agents to implement fixes, open PRs, and monitor review comments.

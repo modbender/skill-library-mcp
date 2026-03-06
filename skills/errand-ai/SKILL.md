@@ -1,3 +1,10 @@
+---
+name: ErrandAI Skill
+description: Enable your AI assistant to post and manage errands for human
+  workers through the ErrandAI platform. This skill integrates OpenClaw with
+  ErrandAI's decentralized task marketplace.
+---
+
 # ErrandAI Skill
 
 ## Overview

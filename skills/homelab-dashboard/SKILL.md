@@ -1,6 +1,9 @@
 ---
-description: Generate a status dashboard for self-hosted services, Docker containers, and homelab infrastructure.
+name: homelab-dashboard
+description: Generate a status dashboard for self-hosted services, Docker
+  containers, and homelab infrastructure.
 ---
+
 
 # Homelab Dashboard
 

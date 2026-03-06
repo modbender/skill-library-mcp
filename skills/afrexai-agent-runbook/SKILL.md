@@ -1,3 +1,10 @@
+---
+name: Agent Ops Runbook
+description: Generate a production-ready operations runbook for deploying AI
+  agents. Covers pre-deployment checklists, shadow mode → supervised →
+  autonomous rollout stages, monitoring dashboards, rollback proce...
+---
+
 # Agent Ops Runbook
 
 Generate a production-ready operations runbook for deploying AI agents. Covers pre-deployment checklists, shadow mode → supervised → autonomous rollout stages, monitoring dashboards, rollback procedures, cost management, and incident response templates.

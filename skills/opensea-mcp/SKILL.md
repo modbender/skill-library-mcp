@@ -1,3 +1,9 @@
+---
+name: OpenSea API
+description: Query NFT data, trade on the Seaport marketplace, and swap ERC20
+  tokens across Ethereum, Base, Arbitrum, Optimism, Polygon, and more.
+---
+
 # OpenSea API
 
 Query NFT data, trade on the Seaport marketplace, and swap ERC20 tokens across Ethereum, Base, Arbitrum, Optimism, Polygon, and more.

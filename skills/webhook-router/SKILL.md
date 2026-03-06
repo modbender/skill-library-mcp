@@ -1,3 +1,10 @@
+---
+name: Webhook Router for OpenClaw
+description: A general-purpose webhook receiver that routes incoming webhooks
+  from any source to appropriate handlers. Integrates seamlessly with OpenClaw's
+  hooks system and Tailscale Funnel for secure, public ...
+---
+
 # Webhook Router for OpenClaw
 
 A general-purpose webhook receiver that routes incoming webhooks from any source to appropriate handlers. Integrates seamlessly with OpenClaw's hooks system and Tailscale Funnel for secure, public webhook endpoints.

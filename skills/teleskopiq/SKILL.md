@@ -1,3 +1,9 @@
+---
+name: Teleskopiq Skill
+description: YouTube content creation platform — AI-generated scripts, metadata,
+  and thumbnails via GraphQL API.
+---
+
 # Teleskopiq Skill
 
 YouTube content creation platform — AI-generated scripts, metadata, and thumbnails via GraphQL API.

@@ -1,3 +1,9 @@
+---
+name: Polymarket Trader Skill
+description: "name: polymarkettrader description: A skill to securely execute
+  trades on the Polymarket CLOB via a Python script. tools:"
+---
+
 
 ---
 name: polymarket_trader

@@ -1,3 +1,10 @@
+---
+name: Cloudflare R2 CLI Skill
+description: This skill provides a minimal CLI tool for interacting with
+  Cloudflare R2 storage using Python. The script (r2.py) implements upload,
+  download, list, and delete operations via the Cloudflare R2 S3-...
+---
+
 # Cloudflare R2 CLI Skill
 
 ## Skill Metadata

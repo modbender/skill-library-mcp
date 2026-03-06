@@ -1,3 +1,8 @@
+---
+name: Security Vulnerability Scanner
+description: 扫描代码中的安全漏洞，提供修复建议。
+---
+
 # Security Vulnerability Scanner
 
 扫描代码中的安全漏洞，提供修复建议。

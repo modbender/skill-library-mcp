@@ -1,3 +1,11 @@
+---
+name: OpenClaw-Last.fm
+description: GET
+  https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Radiohead&apikey=YOURAPIKEY&format=json
+  GET
+  https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=Radiohead&apikey...
+---
+
 ```markdown
 # OpenClaw-Last.fm
 A openclaw Skill with Last.fm API

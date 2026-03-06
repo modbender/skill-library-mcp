@@ -1,17 +1,12 @@
 ---
 name: clawvault
-version: "2.5.11"
-description: Agent memory system with memory graph, context profiles, checkpoint/recover, structured storage, semantic search, and observational memory. Use when: storing/searching memories, preventing context death, graph-aware context retrieval, repairing broken sessions. Don't use when: general file I/O.
-author: Versatly
-repository: https://github.com/Versatly/clawvault
-homepage: https://clawvault.dev
-user-invocable: true
-always: false
-openclaw: {"emoji":"🐘","requires":{"bins":["clawvault","qmd"]}}
-requires: {"bins":["clawvault","qmd"],"env_optional":["CLAWVAULT_PATH","OPENCLAW_HOME","OPENCLAW_STATE_DIR","GEMINI_API_KEY"]}
-install: [{"id":"node","kind":"node","package":"clawvault","bins":["clawvault"],"label":"Install ClawVault CLI (npm)"},{"id":"qmd","kind":"node","package":"github:tobi/qmd","bins":["qmd"],"label":"Install qmd backend (required for query/context workflows)"}]
-metadata: {"openclaw":{"emoji":"🐘","requires":{"bins":["clawvault","qmd"]},"install":[{"id":"node","kind":"node","package":"clawvault","bins":["clawvault"],"label":"Install ClawVault CLI (npm)"},{"id":"qmd","kind":"node","package":"github:tobi/qmd","bins":["qmd"],"label":"Install qmd backend (required for query/context workflows)"}],"env_optional":["CLAWVAULT_PATH","OPENCLAW_HOME","OPENCLAW_STATE_DIR","GEMINI_API_KEY"],"homepage":"https://clawvault.dev"}}
+description: "Agent memory system with memory graph, context profiles,
+  checkpoint/recover, structured storage, semantic search, and observational
+  memory. Use when: storing/searching memories, preventing context death,
+  graph-aware context retrieval, repairing broken sessions. Don't use when:
+  general file I/O."
 ---
+
 
 # ClawVault 🐘
 

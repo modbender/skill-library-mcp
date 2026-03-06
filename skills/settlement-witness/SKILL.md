@@ -1,3 +1,9 @@
+---
+name: SettlementWitness
+description: 'name: settlement-witness description: "Generate a signed delivery
+  receipt in under 30 seconds."'
+---
+
 ﻿---
 name: settlement-witness
 description: "Generate a signed delivery receipt in under 30 seconds."

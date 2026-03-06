@@ -1,3 +1,8 @@
+---
+name: Dual-Brain Skill
+description: "Before responding to any user message, check for a dual-brain perspective:"
+---
+
 # Dual-Brain Skill
 
 **What it does:** Provides cognitive diversity by automatically generating perspectives from a secondary LLM (different from your primary model) for every user message.

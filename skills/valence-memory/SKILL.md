@@ -1,3 +1,10 @@
+---
+name: Valence Memory
+description: Persistent knowledge substrate for OpenClaw. Replaces flat-file
+  memory with confidence-scored beliefs, semantic search, pattern recognition,
+  and federated knowledge sharing.
+---
+
 # Valence Memory
 
 Persistent knowledge substrate for OpenClaw. Replaces flat-file memory with confidence-scored beliefs, semantic search, pattern recognition, and federated knowledge sharing.

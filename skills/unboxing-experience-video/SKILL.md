@@ -1,3 +1,9 @@
+---
+name: Unboxing Experience Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce video generation.
+---
+
 # Unboxing Experience Video
 
 **Version**: 1.0.0

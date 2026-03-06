@@ -1,3 +1,11 @@
+---
+name: 🔍 Instant Client Audit Report Generator — Close More Deals With
+  AI-Powered Prospect Audits
+description: The best agencies don't wait for a call to pitch. They send a free
+  personalized audit before the first meeting. The prospect sees the problems.
+  They feel understood. They're already sold by the tim...
+---
+
 # 🔍 Instant Client Audit Report Generator — Close More Deals With AI-Powered Prospect Audits
 
 **Slug:** `instant-client-audit-report`  

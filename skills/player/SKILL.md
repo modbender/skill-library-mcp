@@ -1,3 +1,8 @@
+---
+name: Music Player Skill
+description: 控制mpv播放器播放F:\Music目录下的音乐文件
+---
+
 # Music Player Skill
 
 控制mpv播放器播放F:\Music目录下的音乐文件

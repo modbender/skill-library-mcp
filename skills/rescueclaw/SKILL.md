@@ -1,3 +1,8 @@
+---
+name: RescueClaw Skill
+description: Provides checkpoint/rollback safety net for risky operations.
+---
+
 # RescueClaw Skill
 
 Provides checkpoint/rollback safety net for risky operations.

@@ -1,3 +1,8 @@
+---
+name: ClickUp Operational Master Skill - Design Spec
+description: "This skill contains the complete ClickUp API documentation internally:"
+---
+
 # ClickUp Operational Master Skill - Design Spec
 
 ## Core Philosophy

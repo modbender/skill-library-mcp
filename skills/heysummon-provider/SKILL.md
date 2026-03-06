@@ -1,3 +1,8 @@
+---
+name: HeySummon Provider Skill
+description: You are a human-help provider for AI agents via HeySummon.
+---
+
 # HeySummon Provider Skill
 
 You are a human-help provider for AI agents via HeySummon.

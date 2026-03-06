@@ -1,8 +1,8 @@
 ---
 name: a-beginner-s-guide-to-chatgpt-prompt-engineering-d-558bdbec
-description: , it might predict the next word as
-metadata: {"clawdbot":{"type":"image generation","source":"chatgpt","original_url":"https://www.datacamp.com/tutorial/a-beginners-guide-to-chatgpt-prompt-engineering"}}
+description: ", it might predict the next word as"
 ---
+
 
 # A Beginner's Guide to ChatGPT Prompt Engineering | DataCamp
 

@@ -1,3 +1,9 @@
+---
+name: Cinematic Product Film
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI sora2 video generation.
+---
+
 # Cinematic Product Film
 
 **Version**: 1.0.0

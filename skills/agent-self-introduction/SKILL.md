@@ -1,3 +1,9 @@
+---
+name: Agent Self-Introduction Skill
+description: "Summary: A narrative identity skill that allows AI agents to
+  introduce themselves clearly, consistently, and contextually."
+---
+
 Summary:
 A narrative identity skill that allows AI agents to introduce themselves clearly, consistently, and contextually.
 

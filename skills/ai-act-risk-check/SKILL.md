@@ -1,3 +1,9 @@
+---
+name: SKILL.md - AI Act Risk Check
+description: \\\bash ai-act-risk-check "Our system is an AI algorithm that
+  screens job applications based on predicted performance metrics." \\\
+---
+
 # SKILL.md - AI Act Risk Check
 
 ## `ai-act-risk-check`

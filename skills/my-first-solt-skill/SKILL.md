@@ -1,3 +1,8 @@
+---
+name: My First Skill
+description: This is a demo MoltHub skill.
+---
+
 # My First Skill
 
 ## Description

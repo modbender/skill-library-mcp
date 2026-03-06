@@ -1,3 +1,8 @@
+---
+name: Geekbench 技能
+description: 1. 使用 "产品名 + geekbench" 搜索 2. 获取内部型号 3. 用内部型号查询详细跑分
+---
+
 # Geekbench 技能
 
 ## 核心原则

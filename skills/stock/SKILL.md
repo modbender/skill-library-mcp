@@ -1,3 +1,8 @@
+---
+name: Stock Skill - 股票查询
+description: 获取A股、港股、美股的实时行情数据。
+---
+
 # Stock Skill - 股票查询
 
 获取A股、港股、美股的实时行情数据。

@@ -1,3 +1,8 @@
+---
+name: SKILL.md - Data Enricher
+description: Enrich leads with email addresses and format data for Notion.
+---
+
 # SKILL.md - Data Enricher
 
 ## Purpose

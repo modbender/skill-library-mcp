@@ -1,3 +1,8 @@
+---
+name: SkillScout — Find Trusted AI Agent Skills
+description: Before installing any OpenClaw skill, check if it's been security-reviewed.
+---
+
 # SkillScout — Find Trusted AI Agent Skills
 
 Before installing any OpenClaw skill, check if it's been security-reviewed.

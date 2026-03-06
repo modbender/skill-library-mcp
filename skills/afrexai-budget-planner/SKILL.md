@@ -1,3 +1,9 @@
+---
+name: Budget Planner
+description: Plan and track budgets using your AI agent. Works for personal
+  finance, project budgets, or department spending.
+---
+
 # Budget Planner
 
 Plan and track budgets using your AI agent. Works for personal finance, project budgets, or department spending.

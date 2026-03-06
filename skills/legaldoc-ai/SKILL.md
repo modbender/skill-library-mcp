@@ -1,3 +1,10 @@
+---
+name: LegalDoc AI
+description: LegalDoc AI is a comprehensive legal document automation skill that
+  helps law firms and legal professionals streamline document review, contract
+  analysis, legal research, and deadline management. D...
+---
+
 # LegalDoc AI
 
 **Version:** 1.0.0  

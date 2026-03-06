@@ -1,3 +1,10 @@
+---
+name: "UpInvoice: Invoice AI Processing Skill"
+description: This skill allows any OpenClaw-powered agent to extract structured
+  JSON data from invoice images or PDFs using the UpInvoice.eu AI service. It is
+  designed to be the fastest and most cost-effective ...
+---
+
 # UpInvoice: Invoice AI Processing Skill
 
 This skill allows any OpenClaw-powered agent to extract structured JSON data from invoice images or PDFs using the [UpInvoice.eu](https://upinvoice.eu) AI service. It is designed to be the fastest and most cost-effective way to automate invoice processing for ERP systems.

@@ -1,6 +1,7 @@
 ---
-
-## name: pipe17 description: Pipe17 Unified API for searching and reading orders, shipping requests (shipments), fulfillments, and inventory. homepage: [https://apidoc.pipe17.com/#/](https://apidoc.pipe17.com/#/) metadata: { "openclaw": { "emoji": "🧩", "requires": { "env": ["PIPE17\_API\_KEY"] }, "primaryEnv": "PIPE17\_API\_KEY" } }
+name: pipe17
+description: Pipe17 Unified API for searching and reading orders, shipping requests (shipments), fulfillments, and inventory.
+---
 
 # pipe17
 

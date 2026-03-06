@@ -1,3 +1,9 @@
+---
+name: Konto — Personal Finance API
+description: Query personal finance data from Konto (bank accounts, investments,
+  assets, loans, transactions).
+---
+
 # Konto — Personal Finance API
 
 Query personal finance data from Konto (bank accounts, investments, assets, loans, transactions).

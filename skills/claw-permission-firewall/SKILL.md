@@ -1,3 +1,9 @@
+---
+name: Claw Permission Firewall
+description: "Runtime least-privilege firewall for agent/skill actions. It
+  evaluates a requested action and returns one of:"
+---
+
 # Claw Permission Firewall
 
 Runtime least-privilege firewall for agent/skill actions. It evaluates a requested action and returns one of:

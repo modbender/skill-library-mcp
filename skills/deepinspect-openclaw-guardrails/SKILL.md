@@ -1,3 +1,9 @@
+---
+name: OpenClaw Guardrails (MVP)
+description: DeepInspect Guardrails provides deterministic preflight decisions
+  for command-like actions.
+---
+
 # OpenClaw Guardrails (MVP)
 
 DeepInspect Guardrails provides deterministic preflight decisions for command-like actions.

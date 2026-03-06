@@ -1,3 +1,10 @@
+---
+name: offline-llama
+description: Autonomously manage and use local Ollama models for continuous
+  operation without internet dependency. Includes model health monitoring,
+  automatic fallback, and self-healing capabilities.
+---
+
 # offline-llama
 
 Autonomously manage and use local Ollama models for continuous operation without internet dependency. Includes model health monitoring, automatic fallback, and self-healing capabilities.

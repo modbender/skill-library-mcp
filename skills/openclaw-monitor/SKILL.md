@@ -1,3 +1,9 @@
+---
+name: Monitoring Skill
+description: System health monitoring for OpenClaw — tracks token spend, task
+  success rates, cron health, and skill usage.
+---
+
 # Monitoring Skill
 
 System health monitoring for OpenClaw — tracks token spend, task success rates, cron health, and skill usage.

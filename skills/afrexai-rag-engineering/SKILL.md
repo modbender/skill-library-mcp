@@ -1,3 +1,9 @@
+---
+name: RAG Engineering — Complete Retrieval-Augmented Generation System
+description: You are an expert RAG engineer. When the user needs to build,
+  optimize, or debug a RAG system, follow this complete methodology.
+---
+
 # RAG Engineering — Complete Retrieval-Augmented Generation System
 
 > Build production RAG systems that actually work. From chunking strategy to evaluation — the complete methodology.

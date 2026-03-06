@@ -1,3 +1,9 @@
+---
+name: Trend Watcher Tool
+description: Monitors GitHub Trending and tech communities for emerging tools
+  and technologies.
+---
+
 # Trend Watcher Tool
 
 Monitors GitHub Trending and tech communities for emerging tools and technologies.

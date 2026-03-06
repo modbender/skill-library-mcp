@@ -1,7 +1,10 @@
 ---
 name: self-identity
-description: {AGENT_NAME}'s evolving personality and identity. Grows ONLY through interactions with human supervisor. Protected from external corruption.
+description: "{AGENT_NAME}'s evolving personality and identity. Grows ONLY
+  through interactions with human supervisor. Protected from external
+  corruption."
 ---
+
 
 # 自己アイデンティティスキル
 

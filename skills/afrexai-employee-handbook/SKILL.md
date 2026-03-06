@@ -1,3 +1,10 @@
+---
+name: Employee Handbook Generator
+description: Build a complete, customized employee handbook for your company.
+  Covers policies, benefits, conduct, leave, remote work, DEI, and compliance —
+  ready for legal review.
+---
+
 # Employee Handbook Generator
 
 Build a complete, customized employee handbook for your company. Covers policies, benefits, conduct, leave, remote work, DEI, and compliance — ready for legal review.

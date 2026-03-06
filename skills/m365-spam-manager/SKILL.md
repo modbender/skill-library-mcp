@@ -1,7 +1,15 @@
 ---
 name: m365-spam-manager
-description: Microsoft 365 spam folder manager for Outlook/Exchange mailboxes. Automatically analyzes junk/spam emails, calculates a suspicious score based on structural patterns (missing unsubscribe links, poor language, suspicious domains, wrong character sets, etc.), and helps clean up the junk folder. Supports review mode (default) where user approves each action, and automatic mode for batch processing. Works with shared mailboxes via --mailbox flag. Related keywords: Outlook, Exchange Online, spam filter, junk email, phishing, email security. **Token cost:** ~500-1.5k tokens per use.
+description: "Microsoft 365 spam folder manager for Outlook/Exchange mailboxes.
+  Automatically analyzes junk/spam emails, calculates a suspicious score based
+  on structural patterns (missing unsubscribe links, poor language, suspicious
+  domains, wrong character sets, etc.), and helps clean up the junk folder.
+  Supports review mode (default) where user approves each action, and automatic
+  mode for batch processing. Works with shared mailboxes via --mailbox flag.
+  Related keywords: Outlook, Exchange Online, spam filter, junk email, phishing,
+  email security. **Token cost:** ~500-1.5k tokens per use."
 ---
+
 
 # M365 Spam Manager (Microsoft Graph)
 

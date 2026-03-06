@@ -1,3 +1,8 @@
+---
+name: IsTokenSafe
+description: Checks whether a given crypto token is potentially malicious or risky.
+---
+
 # IsTokenSafe
 
 Checks whether a given crypto token is potentially malicious or risky.

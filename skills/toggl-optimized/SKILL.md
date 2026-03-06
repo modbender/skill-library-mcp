@@ -1,3 +1,9 @@
+---
+name: Toggl-Optimized
+description: A high-performance Toggl Track agent skill optimized for token
+  efficiency and reporting.
+---
+
 # Toggl-Optimized
 
 A high-performance Toggl Track agent skill optimized for token efficiency and reporting.

@@ -1,3 +1,10 @@
+---
+name: specter
+description: SKILL.md specter-cli Enrich, search, and manage company and people
+  data from the Specter intelligence platform via the specter-cli. Look up
+  companies by domain, enrich professionals via LinkedIn, m...
+---
+
 SKILL.md
 specter-cli
 Enrich, search, and manage company and people data from the Specter intelligence platform via the specter-cli. Look up companies by domain, enrich professionals via LinkedIn, manage lists, query saved searches, and track talent and investor signals.

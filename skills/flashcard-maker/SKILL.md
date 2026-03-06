@@ -1,6 +1,9 @@
 ---
-description: Generate Anki/Quizlet-compatible flashcards from text, notes, or documents using learning science principles.
+name: flashcard-maker
+description: Generate Anki/Quizlet-compatible flashcards from text, notes, or
+  documents using learning science principles.
 ---
+
 
 # Flashcard Maker
 

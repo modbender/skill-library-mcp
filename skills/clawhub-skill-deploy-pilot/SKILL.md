@@ -1,3 +1,8 @@
+---
+name: deploy-pilot — Docker/LXC Deployment Automation
+description: Deploy with confidence. Version control for your containers.
+---
+
 # deploy-pilot — Docker/LXC Deployment Automation
 
 **Version:** 1.0.0  

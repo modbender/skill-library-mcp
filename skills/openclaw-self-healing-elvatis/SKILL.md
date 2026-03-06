@@ -1,3 +1,10 @@
+---
+name: openclaw-self-healing-elvatis
+description: "name: openclaw-self-healing-elvatis description: OpenClaw plugin
+  that applies guardrails and auto-fixes reversible failures (rate limits,
+  disconnects, stuck session pins)."
+---
+
 ﻿---
 name: openclaw-self-healing-elvatis
 description: OpenClaw plugin that applies guardrails and auto-fixes reversible failures (rate limits, disconnects, stuck session pins).

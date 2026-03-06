@@ -1,3 +1,10 @@
+---
+name: skill-explorer
+description: A systematic framework for discovering, evaluating, and comparing
+  OpenClaw skills. Use when you need to find the right skill for a specific
+  task, compare multiple options, or assess skill quality a...
+---
+
 # skill-explorer
 
 A systematic framework for discovering, evaluating, and comparing OpenClaw skills. Use when you need to find the right skill for a specific task, compare multiple options, or assess skill quality and safety.

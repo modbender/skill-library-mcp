@@ -1,3 +1,10 @@
+---
+name: Copywriting — Conversion Copy That Sells
+description: "Write landing pages, product descriptions, ads, and sales copy
+  using proven direct-response frameworks. Sources: Digitaloft (13 frameworks),
+  CrazyEgg, NON.agency, DesignRush (direct response exampl..."
+---
+
 # Copywriting — Conversion Copy That Sells
 
 Write landing pages, product descriptions, ads, and sales copy using proven direct-response frameworks.

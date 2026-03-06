@@ -1,6 +1,8 @@
 ---
+name: desktop-control
 description: Advanced desktop automation with mouse, keyboard, and screen control
 ---
+
 
 # Desktop Control Skill
 

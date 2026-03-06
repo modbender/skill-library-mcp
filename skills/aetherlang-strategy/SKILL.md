@@ -1,3 +1,9 @@
+---
+name: AetherLang Strategy Ω V3 — Nobel-Level Business Intelligence
+description: "⚠️ External API Notice: This skill sends queries to
+  api.neurodoc.app for processing."
+---
+
 # AetherLang Strategy Ω V3 — Nobel-Level Business Intelligence
 
 > Game theory, Monte Carlo simulations, behavioral economics, and competitive war gaming. The most advanced AI strategy engine available.

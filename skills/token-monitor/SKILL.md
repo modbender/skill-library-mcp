@@ -1,7 +1,14 @@
 ---
 name: token-monitor
-description: Monitor OpenClaw token/quota usage and alert when any quota drops below a threshold (default 20%). Uses `openclaw models status` and writes only a local state file to avoid duplicate alerts. **Does not handle secrets.** **Token cost:** Script itself: 0 tokens (pure bash). Heartbeat integration: ~1k-2k tokens/hour (reading HEARTBEAT.md + executing script). Alert delivery: ~500-1k tokens/alert. **Optimization:** Use system cron instead of heartbeat to reduce to ~0 tokens (except alerts).
+description: "Monitor OpenClaw token/quota usage and alert when any quota drops
+  below a threshold (default 20%). Uses `openclaw models status` and writes only
+  a local state file to avoid duplicate alerts. **Does not handle secrets.**
+  **Token cost:** Script itself: 0 tokens (pure bash). Heartbeat integration:
+  ~1k-2k tokens/hour (reading HEARTBEAT.md + executing script). Alert delivery:
+  ~500-1k tokens/alert. **Optimization:** Use system cron instead of heartbeat
+  to reduce to ~0 tokens (except alerts)."
 ---
+
 
 # Token Monitor
 

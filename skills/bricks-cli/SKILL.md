@@ -1,7 +1,12 @@
 ---
 name: bricks-cli
-description: Manage BRICKS workspace via CLI. Use for device status, screenshots, control, monitoring, group operations, application management, module management, and project initialization and deployment. Triggers on: device management, digital signage control, BRICKS workspace tasks, app/module updates, project setup.
+description: "Manage BRICKS workspace via CLI. Use for device status,
+  screenshots, control, monitoring, group operations, application management,
+  module management, and project initialization and deployment. Triggers on:
+  device management, digital signage control, BRICKS workspace tasks, app/module
+  updates, project setup."
 ---
+
 
 # BRICKS CLI
 

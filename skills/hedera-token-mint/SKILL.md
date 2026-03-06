@@ -1,7 +1,10 @@
 ---
 name: hedera-token-mint
-description: Create and manage tokens on Hedera (HTS). Use for: (1) Minting fungible tokens, (2) Creating NFTs (HTS), (3) Setting up token supplies, (4) Configuring token permissions.
+description: "Create and manage tokens on Hedera (HTS). Use for: (1) Minting
+  fungible tokens, (2) Creating NFTs (HTS), (3) Setting up token supplies, (4)
+  Configuring token permissions."
 ---
+
 
 # Hedera Token Minting (HTS)
 

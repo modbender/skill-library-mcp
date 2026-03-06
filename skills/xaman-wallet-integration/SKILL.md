@@ -1,7 +1,11 @@
 ---
 name: xaman-wallet
-description: Integrate Xaman wallet (formerly Xumm) for XRP Ledger authentication and transactions. Use for: (1) Adding wallet connection to a webapp, (2) Implementing sign-in with Xaman, (3) Requesting payment/signatures from users, (4) Loading XummPkce SDK from CDN.
+description: "Integrate Xaman wallet (formerly Xumm) for XRP Ledger
+  authentication and transactions. Use for: (1) Adding wallet connection to a
+  webapp, (2) Implementing sign-in with Xaman, (3) Requesting payment/signatures
+  from users, (4) Loading XummPkce SDK from CDN."
 ---
+
 
 # Xaman Wallet Integration
 

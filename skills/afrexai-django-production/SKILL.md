@@ -1,3 +1,10 @@
+---
+name: Django Production Engineering
+description: Complete methodology for building, scaling, and operating
+  production Django applications. From project structure to deployment, security
+  to performance — every decision framework a Django team needs.
+---
+
 # Django Production Engineering
 
 Complete methodology for building, scaling, and operating production Django applications. From project structure to deployment, security to performance — every decision framework a Django team needs.

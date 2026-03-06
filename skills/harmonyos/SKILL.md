@@ -1,3 +1,10 @@
+---
+name: HarmonyOS Developer Skills
+description: 1. DevEco Studio → Build → Build Hap 2. Configure signing in
+  Project Structure → Signing Configs 3. Requires .p12 certificate and .cer
+  public key 4. Use debug signing for development, release for p...
+---
+
 # HarmonyOS Developer Skills
 
 ## Core Rules

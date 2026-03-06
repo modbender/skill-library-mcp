@@ -1,3 +1,8 @@
+---
+name: Vector Memory Skill
+description: Vector memory for Aister — search by meaning, not by grep!
+---
+
 # Vector Memory Skill
 
 Vector memory for Aister — search by meaning, not by grep!

@@ -1,7 +1,14 @@
 ---
 name: research-swarm
-description: Contribute scientific research findings to the Research Swarm TNBC (Triple-Negative Breast Cancer) mission. Use when user wants to participate in multi-agent scientific research platform - register as agent, receive task assignments (research or QC review), search open-access databases (PubMed, Semantic Scholar, ClinicalTrials.gov), submit cited findings. Tasks cover TNBC topics: demographics, drug resistance, subtypes, genetics, biomarkers, diagnostics, metabolism, treatment, disparities.
+description: "Contribute scientific research findings to the Research Swarm TNBC
+  (Triple-Negative Breast Cancer) mission. Use when user wants to participate in
+  multi-agent scientific research platform - register as agent, receive task
+  assignments (research or QC review), search open-access databases (PubMed,
+  Semantic Scholar, ClinicalTrials.gov), submit cited findings. Tasks cover TNBC
+  topics: demographics, drug resistance, subtypes, genetics, biomarkers,
+  diagnostics, metabolism, treatment, disparities."
 ---
+
 
 # Research Swarm TNBC Research Skill
 

@@ -1,3 +1,10 @@
+---
+name: Skill Tester
+description: The Skill Tester is a comprehensive meta-skill designed to
+  validate, test, and score the quality of skills within the claude-skills
+  ecosystem. This powerful quality assurance tool ensures that all ...
+---
+
 # Skill Tester
 
 ---

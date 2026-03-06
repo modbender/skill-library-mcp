@@ -1,3 +1,9 @@
+---
+name: Hytale Server Skill
+description: Manage a local Hytale dedicated server using the official
+  downloader and screen.
+---
+
 # Hytale Server Skill
 
 Manage a local Hytale dedicated server using the official downloader and screen.

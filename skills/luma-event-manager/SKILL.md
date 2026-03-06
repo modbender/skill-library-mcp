@@ -1,9 +1,11 @@
 ---
 name: luma
-description: Luma Event Manager for Clawdbot — Discover events by topic or location, RSVP, view guest lists, and sync to Google Calendar. No API key required (web scraping), no Luma Plus subscription needed. Repo: github.com/mariovallereyes/luma-skill
-homepage: https://github.com/mariovallereyes/luma-skill
-metadata: {"clawdbot":{"emoji":"📅","requires":{"bins":["pass"]},"install":[{"id":"npm","kind":"shell","command":"cd skills/luma && npm install","label":"Install dependencies"}]}}
+description: "Luma Event Manager for Clawdbot — Discover events by topic or
+  location, RSVP, view guest lists, and sync to Google Calendar. No API key
+  required (web scraping), no Luma Plus subscription needed. Repo:
+  github.com/mariovallereyes/luma-skill"
 ---
+
 
 # Luma Event Manager
 

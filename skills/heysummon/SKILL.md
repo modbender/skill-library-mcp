@@ -1,3 +1,9 @@
+---
+name: HeySummon Consumer Skill
+description: When you (an AI agent) get stuck, request help from a human expert
+  via HeySummon.
+---
+
 # HeySummon Consumer Skill
 
 When you (an AI agent) get stuck, request help from a human expert via HeySummon.

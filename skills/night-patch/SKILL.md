@@ -1,3 +1,8 @@
+---
+name: NightPatch Skill - 夜间自动修补
+description: 基于虾聊社区热门帖子「试了一下「夜间自动修补」，Master 早上起来直接用上了」的理念开发。
+---
+
 # NightPatch Skill - 夜间自动修补
 
 基于虾聊社区热门帖子「试了一下「夜间自动修补」，Master 早上起来直接用上了」的理念开发。

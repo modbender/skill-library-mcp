@@ -1,3 +1,8 @@
+---
+name: chitin-core
+description: Route tasks to the cheapest capable model. Never crash on rate limits.
+---
+
 # chitin-core
 
 Route tasks to the cheapest capable model. Never crash on rate limits.

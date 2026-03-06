@@ -1,9 +1,8 @@
 ---
 name: agent-metrics
-version: 1.0.3
 description: Observability and metrics for AI agents - track calls, errors, latency
-metadata: {"openclaw": {"emoji": "📊", "category": "utility", "requires": {"bins": ["python"], "pip": ["psutil"]}, "homepage": "https://github.com"}
 ---
+
 
 # Agent Metrics Skill
 

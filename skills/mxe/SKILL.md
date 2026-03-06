@@ -1,3 +1,8 @@
+---
+name: MXE Skill - Markdown Export Tool
+description: Convert Markdown files to PDF, DOCX, or HTML with advanced features.
+---
+
 # MXE Skill - Markdown Export Tool
 
 Convert Markdown files to PDF, DOCX, or HTML with advanced features.

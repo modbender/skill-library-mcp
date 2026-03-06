@@ -1,12 +1,10 @@
 ---
 name: Lightpanda
-version: 1.0.3
-description: Lightpanda browser, drop-in replacement for Chrome and Openclaw default browser - faster and lighter for tasks without graphical rendering like data retrieval. Use it with CDP clients like Playwright or Puppeteer.
-metadata:
-  author: Pierre Tachoire
-  source: "https://github.com/lightpanda-io/agent-skill",
-  homepage: "https://github.com/lightpanda-io/agent-skill"
+description: Lightpanda browser, drop-in replacement for Chrome and Openclaw
+  default browser - faster and lighter for tasks without graphical rendering
+  like data retrieval. Use it with CDP clients like Playwright or Puppeteer.
 ---
+
 
 # Lightpanda
 

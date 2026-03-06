@@ -1,3 +1,10 @@
+---
+name: Event Management & Conference Engine
+description: Complete system for planning, executing, and measuring corporate
+  events, conferences, workshops, webinars, and meetups. From initial concept
+  through post-event ROI analysis.
+---
+
 # Event Management & Conference Engine
 
 Complete system for planning, executing, and measuring corporate events, conferences, workshops, webinars, and meetups. From initial concept through post-event ROI analysis.

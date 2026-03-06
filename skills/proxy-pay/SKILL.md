@@ -1,9 +1,10 @@
 ---
 name: proxy-pay
-description: Quick command to create a payment via Proxy. Usage: /proxy-pay [amount] [merchant] [description]. Creates payment intent and provisions virtual card.
-disable-model-invocation: true
-argument-hint: "[amount] [merchant] [description]"
+description: "Quick command to create a payment via Proxy. Usage: /proxy-pay
+  [amount] [merchant] [description]. Creates payment intent and provisions
+  virtual card."
 ---
+
 
 # Make a Payment
 

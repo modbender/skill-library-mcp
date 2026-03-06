@@ -1,3 +1,9 @@
+---
+name: Regex Gen
+description: Generate regex patterns from plain English descriptions. Because
+  nobody actually remembers regex syntax.
+---
+
 # Regex Gen
 
 Generate regex patterns from plain English descriptions. Because nobody actually remembers regex syntax.

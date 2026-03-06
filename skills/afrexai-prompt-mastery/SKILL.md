@@ -1,3 +1,10 @@
+---
+name: Prompt Engineering Mastery
+description: Complete system for designing, testing, optimizing, and managing
+  prompts for LLMs and AI agents. From first draft to production-grade prompt
+  libraries.
+---
+
 # Prompt Engineering Mastery
 
 Complete system for designing, testing, optimizing, and managing prompts for LLMs and AI agents. From first draft to production-grade prompt libraries.

@@ -1,3 +1,8 @@
+---
+name: EchoAgent
+description: EchoAgent is a minimal OpenClaw-compatible skill.
+---
+
 # EchoAgent
 
 EchoAgent is a minimal OpenClaw-compatible skill.

@@ -1,7 +1,8 @@
 ---
-Name: COPILOT-VIBE
-Version: 1.0.2
+name: copilot-agent
+description: copilot agent
 ---
+
 
 # 🤖 COPILOT SIMULATOR (Powered by Gemini)
 

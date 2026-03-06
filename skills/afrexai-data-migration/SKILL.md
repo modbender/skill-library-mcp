@@ -1,3 +1,10 @@
+---
+name: Data Migration Planner
+description: Plan, execute, and validate data migrations between systems. Covers
+  schema mapping, ETL pipeline design, rollback strategies, and post-migration
+  validation.
+---
+
 # Data Migration Planner
 
 Plan, execute, and validate data migrations between systems. Covers schema mapping, ETL pipeline design, rollback strategies, and post-migration validation.

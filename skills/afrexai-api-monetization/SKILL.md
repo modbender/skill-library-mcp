@@ -1,3 +1,10 @@
+---
+name: API Monetization Strategy
+description: Turn your internal APIs into revenue streams. This skill helps you
+  evaluate, price, package, and launch API products — whether you're monetizing
+  existing infrastructure or building API-first produc...
+---
+
 # API Monetization Strategy
 
 Turn your internal APIs into revenue streams. This skill helps you evaluate, price, package, and launch API products — whether you're monetizing existing infrastructure or building API-first products from scratch.

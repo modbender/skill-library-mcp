@@ -1,3 +1,9 @@
+---
+name: Seedance 2.0 JiMeng Skill (OpenClaw / ClawHub)
+description: Create high-control English prompts for Seedance 2.0 and Seedance
+  2.0 Fast using multimodal references (image/video/audio/text).
+---
+
 # Seedance 2.0 JiMeng Skill (OpenClaw / ClawHub)
 
 ## Purpose

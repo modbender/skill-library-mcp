@@ -1,3 +1,10 @@
+---
+name: 🎯 Google & Meta Ads Spy Tool — Steal Winning Ad Creatives From Any Competitor
+description: "The #1 shortcut in paid advertising is this: don't guess what
+  works — copy what's already proven. The problem? Manually spying on
+  competitors takes hours, across multiple tools that each cost $100–..."
+---
+
 # 🎯 Google & Meta Ads Spy Tool — Steal Winning Ad Creatives From Any Competitor
 
 **Slug:** `google-meta-ads-spy`  

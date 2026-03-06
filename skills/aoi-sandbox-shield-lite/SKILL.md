@@ -1,3 +1,8 @@
+---
+name: AOI Sandbox Shield (Lite)
+description: "S-DNA: AOI-2026-0215-SDNA-SS02"
+---
+
 # AOI Sandbox Shield (Lite)
 
 S-DNA: `AOI-2026-0215-SDNA-SS02`

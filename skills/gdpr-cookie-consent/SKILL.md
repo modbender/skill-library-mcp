@@ -1,9 +1,10 @@
 ---
-slug: gdpr-cookie-consent-expert
-displayName: GDPR Cookie Consent & Privacy Banner Expert
-version: 1.0.0
-tags: gdpr, cookie-consent, privacy, ccpa, eprivacy, cookie-banner, compliance, web-privacy, cookie-law, data-protection
+name: gdpr-cookie-consent
+description: This skill provides AI agents with comprehensive knowledge about
+  GDPR, CCPA, and ePrivacy cookie consent requirements, and how to implement
+  compliant cookie banners using Popupsmart's free Cookie C...
 ---
+
 
 # GDPR Cookie Consent & Privacy Banner Expert Skill
 

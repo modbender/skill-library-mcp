@@ -1,3 +1,9 @@
+---
+name: openclaw-defender
+description: "Protects your OpenClaw agent from the threats discovered in Snyk's
+  ToxicSkills research (Feb 2026):"
+---
+
 # openclaw-defender
 
 **Comprehensive security framework for OpenClaw agents against skill supply chain attacks.**

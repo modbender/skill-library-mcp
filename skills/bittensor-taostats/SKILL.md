@@ -1,3 +1,8 @@
+---
+name: TaoStats Skill
+description: "Get a free API key from taostats.io and export it as an environment variable:"
+---
+
 # TaoStats Skill
 
 **Purpose**: Interact with TaoStats API for Bittensor blockchain data - subnets, validators, miners, staking, emissions, and more.

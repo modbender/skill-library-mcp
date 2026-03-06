@@ -1,11 +1,10 @@
 ---
-metadata.openclaw:
-  name: "viam-cli-manager"
-  description: "Exhaustive Viam CLI interface for managing fleets, modules, machine data, and handling initial CLI installation."
-  requires:
-    anyBins: ["viam", "brew"]
-  disable-model-invocation: false
+name: viam-cli
+description: This skill allows the agent to interact with the Viam robotics
+  platform across all available CLI surfaces, including initial setup,
+  deployment, data management, and the local developer loop.
 ---
+
 
 # Comprehensive Viam CLI Management Skill
 

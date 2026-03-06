@@ -1,3 +1,10 @@
+---
+name: Git Sentinel (Code Reviewer)
+description: This skill allows the agent to act as a Senior Software Engineer &
+  Security Auditor. It retrieves code from the current git repository (staged
+  changes) or specific files, and then performs a rigoro...
+---
+
 # Git Sentinel (Code Reviewer)
 
 This skill allows the agent to act as a **Senior Software Engineer & Security Auditor**. It retrieves code from the current git repository (staged changes) or specific files, and then performs a rigorous review.

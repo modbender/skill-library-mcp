@@ -1,3 +1,10 @@
+---
+name: Prezentit - AI Presentation Generator
+description: 'GET /api/v1/me/credits Authorization: Bearer {PREZENTITAPIKEY} {
+  "credits": 100, "pricing": { "outlinePerSlide": 5, "designPerSlide": 10,
+  "estimatedCostPerSlide": 15 }, "ai": { "canGenerate": true,...'
+---
+
 ```skill
 ---
 name: prezentit

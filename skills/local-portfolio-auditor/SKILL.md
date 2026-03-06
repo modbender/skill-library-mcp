@@ -1,3 +1,10 @@
+---
+name: SKILL.md
+description: "name: Local Portfolio Auditor slug: local-portfolio-auditor
+  summary: Monitors cryptocurrency addresses and stock tickers from a local file
+  using public APIs. description: |- This skill provides a p..."
+---
+
 # SKILL.md
 
 name: Local Portfolio Auditor

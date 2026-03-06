@@ -1,15 +1,13 @@
 ---
 name: genome-manager
-description: Complete genome lifecycle management for GEP (Genome Evolution Protocol). Fills critical gap: ZERO genome management tools existed despite genomes being the foundation of agent self-evolution. Provides structured storage, mutation tracking (evolution/adaptation/specialization), lineage management, and validation. Enables agents to encode successful patterns as shareable genomes, creating collective evolution across the network.
-metadata:
-  {
-    "openclaw":
-    {
-      "requires": { "bins": ["python3"] },
-      "emoji": "🧬",
-    },
-  }
+description: "Complete genome lifecycle management for GEP (Genome Evolution
+  Protocol). Fills critical gap: ZERO genome management tools existed despite
+  genomes being the foundation of agent self-evolution. Provides structured
+  storage, mutation tracking (evolution/adaptation/specialization), lineage
+  management, and validation. Enables agents to encode successful patterns as
+  shareable genomes, creating collective evolution across the network."
 ---
+
 
 # Genome Manager
 

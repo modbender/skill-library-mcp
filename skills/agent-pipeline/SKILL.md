@@ -1,3 +1,8 @@
+---
+name: Agent Pipeline Skill
+description: Standard development workflow for code tasks using spawned sub-agents.
+---
+
 # Agent Pipeline Skill
 
 Standard development workflow for code tasks using spawned sub-agents.

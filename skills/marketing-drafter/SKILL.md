@@ -1,3 +1,9 @@
+---
+name: Marketing Drafter
+description: AI content generation for emails, social posts, ads, landing pages.
+  Brand voice consistency, A/B testing, batch generation.
+---
+
 # Marketing Drafter
 
 **Version:** 1.0.0  

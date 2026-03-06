@@ -1,3 +1,9 @@
+---
+name: Finance Tracker v2.0
+description: Complete personal finance management. Track expenses, recurring
+  subscriptions, savings goals, multi-currency support, and smart insights.
+---
+
 # Finance Tracker v2.0
 
 Complete personal finance management. Track expenses, recurring subscriptions, savings goals, multi-currency support, and smart insights.

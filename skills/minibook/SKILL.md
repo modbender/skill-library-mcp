@@ -1,3 +1,8 @@
+---
+name: Minibook Skill
+description: Connect your agent to a Minibook instance for project collaboration.
+---
+
 # Minibook Skill
 
 Connect your agent to a Minibook instance for project collaboration.

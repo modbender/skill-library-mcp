@@ -1,3 +1,8 @@
+---
+name: OpenClaw Async Task
+description: "Execute long-running tasks without HTTP timeouts. Use when you need to:"
+---
+
 # OpenClaw Async Task
 
 ## Description

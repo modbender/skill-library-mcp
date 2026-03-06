@@ -1,3 +1,8 @@
+---
+name: Config Validator Skill（配置验证器）
+description: 验证 OpenClaw 配置字段和值的有效性，提供完整的 schema 参考和有效值枚举。
+---
+
 # Config Validator Skill（配置验证器）
 
 ## 用途

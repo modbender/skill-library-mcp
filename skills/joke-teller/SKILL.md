@@ -1,3 +1,9 @@
+---
+name: SKILL.md
+description: This skill teaches the AI how to generate high-quality,
+  context-aware, original jokes.
+---
+
 # SKILL.md
 
 ## High-Quality Joke Generation Skill

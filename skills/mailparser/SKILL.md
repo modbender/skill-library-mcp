@@ -1,3 +1,8 @@
+---
+name: Mail Parser
+description: Extract structured data from emails.
+---
+
 # Mail Parser
 
 ## Description

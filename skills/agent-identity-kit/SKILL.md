@@ -1,3 +1,9 @@
+---
+name: Agent Identity Kit — OpenClaw Skill
+description: A portable identity system for AI agents. Create, validate, and
+  publish agent.json identity cards.
+---
+
 # Agent Identity Kit — OpenClaw Skill
 
 A portable identity system for AI agents. Create, validate, and publish `agent.json` identity cards.

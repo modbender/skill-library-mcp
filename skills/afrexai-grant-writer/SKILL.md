@@ -1,3 +1,10 @@
+---
+name: Grant Writer
+description: Write winning grant proposals and funding applications. Works for
+  government grants (SBIR, Innovate UK, Horizon Europe), foundation grants, and
+  corporate funding programs.
+---
+
 # Grant Writer
 
 Write winning grant proposals and funding applications. Works for government grants (SBIR, Innovate UK, Horizon Europe), foundation grants, and corporate funding programs.

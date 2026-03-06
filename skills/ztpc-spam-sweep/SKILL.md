@@ -1,3 +1,10 @@
+---
+name: ztpc-spam-sweep
+description: Use a persistent OpenClaw browser profile to access
+  http://mail.ztpc.com/ (Aliyun Enterprise Mail), scan UNREAD emails only, and
+  conservatively mark obvious spam / phishing as Spam (never delete). ...
+---
+
 # ztpc-spam-sweep
 ## Purpose
 Use a persistent OpenClaw browser profile to access **http://mail.ztpc.com/** (Aliyun Enterprise Mail),

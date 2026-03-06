@@ -1,3 +1,10 @@
+---
+name: OpenClaw Skill
+description: "name: openclaw description: OpenClaw CLI wrapper and docs
+  companion for gateway, channels, models, automation, and operational
+  workflows."
+---
+
 ﻿---
 name: openclaw
 description: OpenClaw CLI wrapper and docs companion for gateway, channels, models, automation, and operational workflows.

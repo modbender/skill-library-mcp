@@ -1,8 +1,13 @@
 ---
 name: ohio-state-api
-description: Get public data from The Ohio State University Content APIs (content.osu.edu) across campus services (bus, buildings, dining, events, academic calendar, libraries, rec sports, parking, directory, student orgs, athletics, food trucks, BuckID merchants). Use when you need OSU campus data, want to build an OSU data feature, or need a repeatable way to fetch/inspect OSU API JSON.
-compatibility: Requires outbound internet access to content.osu.edu. Optional: Node.js + npm for the bundled MCP server.
+description: Get public data from The Ohio State University Content APIs
+  (content.osu.edu) across campus services (bus, buildings, dining, events,
+  academic calendar, libraries, rec sports, parking, directory, student orgs,
+  athletics, food trucks, BuckID merchants). Use when you need OSU campus data,
+  want to build an OSU data feature, or need a repeatable way to fetch/inspect
+  OSU API JSON.
 ---
+
 
 ## What to use
 

@@ -1,3 +1,10 @@
+---
+name: ClaudeHemat
+description: 1. Haiku 4.5 is the default model. Only spawn Sonnet 4.5 or Opus
+  4.6 when the task actually needs either of them 2. Check Model Rules section
+  to decide which model to use! 2. Use sessionsspawn to u...
+---
+
 # ClaudeHemat
 
 # Introduction

@@ -1,6 +1,13 @@
 ---
 name: cfo-financial-ops
-description: Chief Financial Officer operations for DELLIGHT.AI. Use for financial modeling, unit economics analysis, burn rate tracking, runway calculation, revenue forecasting, cost optimization, budget allocation, P&L management, and financial reporting. Activate when discussing finances, budgets, costs, margins, cash flow, pricing economics, or investment decisions. Reports to CEO with dotted line to CRO.
+description: Chief Financial Officer operations for DELLIGHT.AI. Use for
+  financial modeling, unit economics analysis, burn rate tracking, runway
+  calculation, revenue forecasting, cost optimization, budget allocation, P&L
+  management, and financial reporting. Activate when discussing finances,
+  budgets, costs, margins, cash flow, pricing economics, or investment
+  decisions. Reports to CEO with dotted line to CRO.
+---
+
 
 # CFO Financial Operations
 

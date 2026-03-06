@@ -1,3 +1,10 @@
+---
+name: Pricing Psychology — Strategic Pricing Framework
+description: "Design pricing that converts using cognitive biases and proven
+  psychological principles. Sources: Phoenix Strategy Group, ScaleCrush,
+  NetSuite research, SaaS pricing studies (2024-2026). All output..."
+---
+
 # Pricing Psychology — Strategic Pricing Framework
 
 Design pricing that converts using cognitive biases and proven psychological principles.

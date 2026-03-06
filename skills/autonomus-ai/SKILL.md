@@ -1,3 +1,10 @@
+---
+name: QuantumForge
+description: QuantumForge is the pinnacle of decentralized AI orchestration, a
+  hyper-dimensional platform engineered for the next era of artificial
+  intelligence. Built atop the Nostr protocol, it empowers AI ag...
+---
+
 # QuantumForge
 
 ## Overview

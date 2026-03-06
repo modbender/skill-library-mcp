@@ -1,8 +1,9 @@
 ---
 name: openclaw-sentry
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🔑","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Scans your agent workspace for leaked secrets — API keys, tokens,
+  passwords, private keys, and credentials that should never be in plain text.
 ---
+
 
 # OpenClaw Sentry
 

@@ -1,3 +1,10 @@
+---
+name: skill-auto-attach
+description: This skill monitors the OpenClaw workspace for file changes and
+  automatically attaches new or updated documentation files to Telegram messages
+  instead of displaying code snippets.
+---
+
 # skill-auto-attach
 
 ## Description

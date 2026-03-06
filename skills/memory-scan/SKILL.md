@@ -1,3 +1,10 @@
+---
+name: memory-scan
+description: Scans MEMORY.md, daily logs (memory/.md), and workspace
+  configuration files for malicious content, prompt injection, credential
+  leakage, and dangerous instructions that could compromise user security.
+---
+
 # memory-scan
 
 **Security scanner for OpenClaw agent memory files**

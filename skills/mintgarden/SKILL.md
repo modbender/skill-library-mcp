@@ -1,3 +1,8 @@
+---
+name: MintGarden Skill
+description: Browse, search, and analyze Chia NFTs via the MintGarden API.
+---
+
 # MintGarden Skill
 
 Browse, search, and analyze Chia NFTs via the MintGarden API.

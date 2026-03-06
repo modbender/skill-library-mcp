@@ -1,43 +1,10 @@
 ---
 name: weave
-description: Create crypto invoices and stablecoin invoices (USDC/USDT), generate payment quotes, and monitor invoice payment status with the Weave CLI.
-license: AGPL-3.0-or-later
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - weave
-    install:
-      - kind: go
-        module: github.com/AryanJ-NYC/weave-cash/apps/cli/cmd/weave
-        bins:
-          - weave
-      - id: node
-        kind: node
-        package: weave-cash-cli
-        label: Fallback: Install Weave CLI (npm)
-        bins:
-          - weave
-    emoji: '🧶'
-    homepage: 'https://www.weavecash.com'
-  clawdbot:
-    requires:
-      bins:
-        - weave
-    install:
-      - kind: go
-        module: github.com/AryanJ-NYC/weave-cash/apps/cli/cmd/weave
-        bins:
-          - weave
-      - id: node
-        kind: node
-        package: weave-cash-cli
-        label: Fallback: Install Weave CLI (npm)
-        bins:
-          - weave
-    emoji: '🧶'
-    homepage: 'https://www.weavecash.com'
+description: Create crypto invoices and stablecoin invoices (USDC/USDT),
+  generate payment quotes, and monitor invoice payment status with the Weave
+  CLI.
 ---
+
 
 # Weave
 

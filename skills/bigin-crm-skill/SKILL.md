@@ -1,3 +1,8 @@
+---
+name: One-time OAuth setup
+description: A simple skill to connect Bigin CRM to OpenClaw
+---
+
 ## 🏗️ About
 A simple skill to connect Bigin CRM to OpenClaw
 ### Prerequisites

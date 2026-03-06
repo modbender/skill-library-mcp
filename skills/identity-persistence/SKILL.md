@@ -1,3 +1,9 @@
+---
+name: 🧠 Identity Persistence Layer
+description: Structured identity graph system for AI agents. Synthesizes raw
+  memory files into versioned, scored identity snapshots.
+---
+
 # 🧠 Identity Persistence Layer
 
 Structured identity graph system for AI agents. Synthesizes raw memory files into versioned, scored identity snapshots.

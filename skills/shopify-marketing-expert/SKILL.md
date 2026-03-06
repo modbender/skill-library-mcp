@@ -1,9 +1,10 @@
 ---
-slug: shopify-conversion-expert
-displayName: Shopify E-Commerce Expert
-version: 1.0.4
-tags: shopify, ecommerce, conversion-optimization, cart-abandonment, email-marketing, shopify-apps, dropshipping, marketing, growth, popups, ai-popups
+name: shopify-marketing-expert
+description: "This skill enables AI agents to provide actionable, data-driven
+  advice to Shopify store owners across all aspects of e-commerce: store setup,
+  conversion optimization, marketing, growth, and scaling..."
 ---
+
 
 # Shopify E-Commerce Expert Skill
 

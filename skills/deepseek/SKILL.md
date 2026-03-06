@@ -1,3 +1,8 @@
+---
+name: DeepSeek Agent Skill
+description: Integrates DeepSeek API with OpenClaw agents.
+---
+
 # DeepSeek Agent Skill
 
 Integrates DeepSeek API with OpenClaw agents.

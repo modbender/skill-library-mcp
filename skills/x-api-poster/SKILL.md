@@ -1,6 +1,9 @@
 ---
-description: Post tweets to X/Twitter via API v2 with OAuth 1.0a — text, images, replies, and threads.
+name: x-api-poster
+description: Post tweets to X/Twitter via API v2 with OAuth 1.0a — text, images,
+  replies, and threads.
 ---
+
 
 # X API Poster
 

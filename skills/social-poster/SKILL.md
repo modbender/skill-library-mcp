@@ -1,12 +1,9 @@
 ---
-description: Post to social media via VibePost API. Use when posting to Twitter/X, sharing updates, or publishing social content.
-triggers:
-  - post to twitter
-  - social post
-  - tweet
-  - share update
-  - vibepost
+name: social-poster
+description: Post to social media via VibePost API. Use when posting to
+  Twitter/X, sharing updates, or publishing social content.
 ---
+
 
 # Social Poster
 

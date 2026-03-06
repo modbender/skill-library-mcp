@@ -1,3 +1,8 @@
+---
+name: Dashboard Skill
+description: Build and run a Kanban-style task management dashboard for your Clawdbot agent.
+---
+
 # Dashboard Skill
 
 Build and run a Kanban-style task management dashboard for your Clawdbot agent.

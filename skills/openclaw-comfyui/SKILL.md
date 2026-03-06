@@ -1,3 +1,10 @@
+---
+name: ComfyUI-OpenClaw Skill 🎨✨
+description: A professional, token-saving agent skill for connecting and
+  controlling ComfyUI via API. Designed for high efficiency, automatic asset
+  handling, and seamless integration with OpenClaw.
+---
+
 # ComfyUI-OpenClaw Skill 🎨✨
 
 A professional, token-saving agent skill for connecting and controlling ComfyUI via API. Designed for high efficiency, automatic asset handling, and seamless integration with OpenClaw.

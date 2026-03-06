@@ -1,3 +1,9 @@
+---
+name: Contract Review Assistant
+description: Analyze business contracts for risks, unfavorable terms, and
+  missing clauses. Get a plain-English summary of what you're signing.
+---
+
 # Contract Review Assistant
 
 Analyze business contracts for risks, unfavorable terms, and missing clauses. Get a plain-English summary of what you're signing.

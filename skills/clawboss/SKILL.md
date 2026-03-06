@@ -1,3 +1,8 @@
+---
+name: ClawBoss Skill
+description: "ClawBoss transforms your OpenClaw agent into a productivity coach that:"
+---
+
 # ClawBoss Skill
 
 **Description:** AI productivity coach using professional coaching techniques (GROW model, powerful questions, adaptive accountability)

@@ -1,3 +1,10 @@
+---
+name: ✅ 已通过自我审核（v2.0.2）
+description: 'name: skill-dashboard version: 2.0.4 description: "像管手机 APP 一样管你的
+  AI 技能——分页显示、一键巡查、轻松管理" homepage: https://github.com/openclaw/skill-dashboard
+  metadata: { "openclaw": { "emoji": "📊", "requires": {...'
+---
+
 # ✅ 已通过自我审核（v2.0.2）
 
 ---

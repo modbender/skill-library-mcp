@@ -1,3 +1,10 @@
+---
+name: Prompt Performance Tester
+description: Pass any model ID — provider auto-detected. Compare latency, cost,
+  quality, and consistency across Claude, GPT, Gemini, DeepSeek, Grok, MiniMax,
+  Qwen, Llama, and Mistral.
+---
+
 # Prompt Performance Tester
 
 **Model-agnostic prompt benchmarking across 9 providers.**

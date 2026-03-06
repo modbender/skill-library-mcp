@@ -1,13 +1,13 @@
 ---
 name: prompt-master
-description: The ultimate prompt engineering toolkit that combines three powerful skills: 50+ role templates from awesome-chatgpt-prompts (143k+ stars), systematic learning of 58+ techniques from beginner to expert, and intelligent prompt optimizer with 6-dimensional quality assessment. Automatically routes to the right capability based on your request - get templates, learn techniques, or optimize prompts seamlessly.
-version: 1.0.0
-author: Clawdbot Skills Collection
-license: MIT
-tags: [prompt-engineering, templates, learning, optimization, chatgpt, ai]
-category: knowledge
-requires: []
+description: "The ultimate prompt engineering toolkit that combines three
+  powerful skills: 50+ role templates from awesome-chatgpt-prompts (143k+
+  stars), systematic learning of 58+ techniques from beginner to expert, and
+  intelligent prompt optimizer with 6-dimensional quality assessment.
+  Automatically routes to the right capability based on your request - get
+  templates, learn techniques, or optimize prompts seamlessly."
 ---
+
 
 # Prompt Master - 终极提示词工程工具包
 

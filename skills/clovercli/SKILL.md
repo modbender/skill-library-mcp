@@ -1,3 +1,9 @@
+---
+name: CloverCLI Skill
+description: CLI for Clover POS API — inventory, orders, payments, customers,
+  employees, discounts, and analytics.
+---
+
 # CloverCLI Skill
 
 CLI for Clover POS API — inventory, orders, payments, customers, employees, discounts, and analytics.

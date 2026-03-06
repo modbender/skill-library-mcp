@@ -1,3 +1,8 @@
+---
+name: tls-inspect
+description: Inspect TLS certificate (expiry, SANs, chain, cipher)
+---
+
 # tls-inspect
 
 Inspect TLS certificate (expiry, SANs, chain, cipher)

@@ -1,3 +1,10 @@
+---
+name: YouTube Video Downloader Skill
+description: Download any YouTube video in various resolutions with a simple
+  command. Supports 360p, 480p, 720p, 1080p, best quality, and audio-only
+  extraction.
+---
+
 # YouTube Video Downloader Skill
 
 Download any YouTube video in various resolutions with a simple command. Supports 360p, 480p, 720p, 1080p, best quality, and audio-only extraction.

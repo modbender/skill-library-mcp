@@ -1,3 +1,9 @@
+---
+name: Dashboard
+description: Unified web terminal for task management, queue processing, and
+  system monitoring.
+---
+
 # Dashboard
 
 Unified web terminal for task management, queue processing, and system monitoring.

@@ -1,3 +1,8 @@
+---
+name: KKClaw Server
+description: Optimized OpenClaw client for Ubuntu/Raspbian as remote server.
+---
+
 # KKClaw Server
 
 Optimized OpenClaw client for Ubuntu/Raspbian as remote server.

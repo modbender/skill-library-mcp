@@ -1,3 +1,9 @@
+---
+name: GoList Shared-List Manager (OpenClaw Skill)
+description: Enable OpenClaw to manage GoList through a simple,
+  beginner-friendly CLI wrapper around the backend API.
+---
+
 # GoList Shared-List Manager (OpenClaw Skill)
 
 ## Purpose

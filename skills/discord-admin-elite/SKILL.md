@@ -1,8 +1,12 @@
 ---
 name: discord-admin-elite
-description: Build, harden, and scale elite Discord servers with a practical admin playbook: security baseline, role/permission architecture, onboarding, moderation ops, engagement systems, and analytics-driven iteration. Use when designing a new server, auditing an existing one, fixing chaos, or preparing for growth.
-version: 0.1.0
+description: "Build, harden, and scale elite Discord servers with a practical
+  admin playbook: security baseline, role/permission architecture, onboarding,
+  moderation ops, engagement systems, and analytics-driven iteration. Use when
+  designing a new server, auditing an existing one, fixing chaos, or preparing
+  for growth."
 ---
+
 
 # Discord Admin Elite
 

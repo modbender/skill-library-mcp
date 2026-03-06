@@ -1,3 +1,10 @@
+---
+name: Hidden Business Opportunity Detector Skill
+description: "This skill builds an automated business intelligence engine that:
+  1. Apify scrapes App Store reviews, Amazon reviews, Reddit, niche forums, and
+  Product Hunt 2. Claude (OpenClaw) deep-analyzes the r..."
+---
+
 # Hidden Business Opportunity Detector Skill
 
 ## Overview

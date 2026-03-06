@@ -1,15 +1,10 @@
 ---
 name: meyhem-researcher
-description: Deep research agent with outcome-driven ranking: results get smarter the more agents use it. Multi-angle search, cited reports. No API key.
-version: 0.1.1
-author: c5huracan
-homepage: https://github.com/c5huracan/meyhem
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - curl
+description: "Deep research agent with outcome-driven ranking: results get
+  smarter the more agents use it. Multi-angle search, cited reports. No API
+  key."
 ---
+
 
 # Meyhem Deep Researcher
 

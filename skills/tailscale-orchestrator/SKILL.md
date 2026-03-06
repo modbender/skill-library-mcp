@@ -1,3 +1,10 @@
+---
+name: SKILL.md
+description: "name: Tailscale Network Orchestrator slug: tailscale-orchestrator
+  summary: Manage your Tailscale network and devices directly from ClawBot.
+  description: |- This skill provides commands to check Tai..."
+---
+
 # SKILL.md
 
 name: Tailscale Network Orchestrator

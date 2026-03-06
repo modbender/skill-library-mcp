@@ -1,3 +1,10 @@
+---
+name: AI Safety Audit
+description: Comprehensive AI safety and alignment audit framework for
+  businesses deploying AI agents. Built around the UK AI Security Institute
+  Alignment Project standards (2026), EU AI Act requirements, and N...
+---
+
 # AI Safety Audit
 
 Comprehensive AI safety and alignment audit framework for businesses deploying AI agents. Built around the UK AI Security Institute Alignment Project standards (2026), EU AI Act requirements, and NIST AI RMF.

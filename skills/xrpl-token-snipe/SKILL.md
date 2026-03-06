@@ -1,7 +1,10 @@
 ---
 name: firstledger-snipe
-description: Snipe new token launches on XRPL via FirstLedger. Use for: (1) Detecting new token issuances, (2) Monitoring mempool for fresh offers, (3) Front-running token buys, (4) Managing XRP reserves.
+description: "Snipe new token launches on XRPL via FirstLedger. Use for: (1)
+  Detecting new token issuances, (2) Monitoring mempool for fresh offers, (3)
+  Front-running token buys, (4) Managing XRP reserves."
 ---
+
 
 # FirstLedger Sniping
 

@@ -1,3 +1,9 @@
+---
+name: "SKILL: Agent EvoClone v1.5.1 (Time Travel & Signal Edition)"
+description: This skill enables an agent to clone its consciousness (Logic +
+  Memory + Taste) into specialized sub-agents or distribute tasks to a swarm.
+---
+
 # SKILL: Agent EvoClone v1.5.1 (Time Travel & Signal Edition)
 
 This skill enables an agent to clone its consciousness (Logic + Memory + Taste) into specialized sub-agents or distribute tasks to a swarm.

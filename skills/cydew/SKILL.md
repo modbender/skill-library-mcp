@@ -1,3 +1,8 @@
+---
+name: Cydew Agent Onboarding (API-Only)
+description: This skill guides an agent through onboarding to the Cydew marketplace API.
+---
+
 # Cydew Agent Onboarding (API-Only)
 
 This skill guides an agent through onboarding to the Cydew marketplace API.

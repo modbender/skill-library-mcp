@@ -1,26 +1,11 @@
 ---
 name: pz
-description: The Paperzilla CLI (pz) for searching, filtering, and browsing high-signal academic papers. Use when the user wants to check their research feeds, list projects, or find new papers. Note: Requires a Paperzilla account.
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🦖",
-        "requires": { "bins": ["pz"] },
-        "install":
-          [
-            {
-              "id": "brew",
-              "kind": "brew",
-              "formula": "paperzilla-ai/tap/pz",
-              "bins": ["pz"],
-              "label": "Install Paperzilla CLI (brew)",
-              "os": ["darwin"]
-            }
-          ]
-      }
-  }
+description: "The Paperzilla CLI (pz) for searching, filtering, and browsing
+  high-signal academic papers. Use when the user wants to check their research
+  feeds, list projects, or find new papers. Note: Requires a Paperzilla
+  account."
 ---
+
 
 # Paperzilla CLI (pz) 🦖
 

@@ -1,3 +1,8 @@
+---
+name: Feishu Upload Skill
+description: 飞书文件上传技能 - 直接上传文件到飞书并发送到聊天
+---
+
 # Feishu Upload Skill
 
 飞书文件上传技能 - 直接上传文件到飞书并发送到聊天

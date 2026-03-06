@@ -1,8 +1,8 @@
 ---
 name: motivation-skill
-summary: Provide a daily motivational quote.
-tags: ["motivation","quotes","fun"]
+description: Provide a daily motivational quote.
 ---
+
 
 # Motivation Skill
 

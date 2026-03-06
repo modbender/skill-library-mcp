@@ -1,43 +1,10 @@
 ---
 name: bitrix24
-description: Bitrix24 (Битрикс24) — CRM, tasks, calendar, drive, chat via REST API. Управление порталом Битрикс24: сделки, контакты, лиды, задачи, календарь, диск, мессенджер. Install Bitrix24 skill to connect your portal.
-version: 0.5.1
-metadata:
-  openclaw:
-    requires:
-      env:
-        - BITRIX24_WEBHOOK_URL
-      bins:
-        - curl
-      mcp:
-        - url: https://mcp-dev.bitrix24.tech/mcp
-          tools:
-            - bitrix-search
-            - bitrix-method-details
-            - bitrix-article-details
-            - bitrix-event-details
-    primaryEnv: BITRIX24_WEBHOOK_URL
-    emoji: "B24"
-    homepage: https://github.com/rsvbitrix/openclaw-bitrix24
-    aliases:
-      - Битрикс24
-      - Битрикс
-      - битрикс24
-      - битрикс
-    tags:
-      - crm
-      - tasks
-      - productivity
-      - bitrix24
-      - bitrix
-      - b24
-      - Битрикс24
-      - Битрикс
-      - CRM
-      - задачи
-      - календарь
-      - мессенджер
+description: "Bitrix24 (Битрикс24) — CRM, tasks, calendar, drive, chat via REST
+  API. Управление порталом Битрикс24: сделки, контакты, лиды, задачи, календарь,
+  диск, мессенджер. Install Bitrix24 skill to connect your portal."
 ---
+
 
 # Bitrix24 (Битрикс24)
 

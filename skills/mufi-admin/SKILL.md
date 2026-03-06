@@ -1,3 +1,8 @@
+---
+name: MUFI Admin 이벤트 등록 스킬
+description: https://admin.muinfilm.com
+---
+
 # MUFI Admin 이벤트 등록 스킬
 
 ## URL

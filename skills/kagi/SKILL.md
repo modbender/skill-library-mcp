@@ -1,7 +1,12 @@
 ---
 name: kagi
-description: Use the Kagi API (Search API + FastGPT) for web research when you want higher-quality results than Brave/Google, or when Brave Search is rate-limited. Triggers: “search with Kagi”, “Kagi search”, “use FastGPT”, “Kagi FastGPT”, “Kagi summarize”, or when you want programmatic web search via Kagi’s API token.
+description: "Use the Kagi API (Search API + FastGPT) for web research when you
+  want higher-quality results than Brave/Google, or when Brave Search is
+  rate-limited. Triggers: “search with Kagi”, “Kagi search”, “use FastGPT”,
+  “Kagi FastGPT”, “Kagi summarize”, or when you want programmatic web search via
+  Kagi’s API token."
 ---
+
 
 # Kagi (API)
 

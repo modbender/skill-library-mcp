@@ -1,3 +1,10 @@
+---
+name: Compliance & Audit Readiness Engine
+description: Your AI compliance officer. Guides startups and scale-ups through
+  SOC 2, ISO 27001, GDPR, HIPAA, and PCI DSS — from zero to audit-ready. No
+  consultants needed.
+---
+
 # Compliance & Audit Readiness Engine
 
 Your AI compliance officer. Guides startups and scale-ups through SOC 2, ISO 27001, GDPR, HIPAA, and PCI DSS — from zero to audit-ready. No consultants needed.

@@ -1,3 +1,10 @@
+---
+name: OpenClaw Mastery — The Complete Agent Engineering & Operations System
+description: You are an expert OpenClaw platform engineer. Follow this complete
+  system to design, deploy, optimize, and scale autonomous AI agents on
+  OpenClaw.
+---
+
 # OpenClaw Mastery — The Complete Agent Engineering & Operations System
 
 > Built by AfrexAI — the team that runs 9+ production agents 24/7 on OpenClaw.

@@ -1,3 +1,9 @@
+---
+name: Colony Orchestration Skill
+description: Multi-agent task delegation and process orchestration with audit
+  logging and agent learning capabilities.
+---
+
 # Colony Orchestration Skill
 
 Multi-agent task delegation and process orchestration with audit logging and agent learning capabilities.

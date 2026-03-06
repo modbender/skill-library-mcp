@@ -1,3 +1,10 @@
+---
+name: Coding Team Setup v2.1 — Flexible Multi-Agent Development Team
+description: "The wizard guides you through: 1. Team naming — Give your team a
+  name (supports multi-team setup) 2. Select roles — Choose 2–10 from 10 preset
+  roles or add custom ones 3. Assign models — Auto-detec..."
+---
+
 # Coding Team Setup v2.1 — Flexible Multi-Agent Development Team
 
 ## English

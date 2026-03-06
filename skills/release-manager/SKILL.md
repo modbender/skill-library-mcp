@@ -1,3 +1,10 @@
+---
+name: Release Manager
+description: The Release Manager skill provides comprehensive tools and
+  knowledge for managing software releases end-to-end. From parsing conventional
+  commits to generating changelogs, determining version bumps...
+---
+
 # Release Manager
 
 **Tier:** POWERFUL  

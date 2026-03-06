@@ -1,15 +1,10 @@
 ---
 name: archive-tool
-description: Extract and create archive files (zip, rar, 7z, tar, gz). Use when: (1) Extracting zip/rar/7z files, (2) Creating zip archives, (3) Viewing archive contents, (4) Batch extracting files.
-version: 1.0.1
-metadata:
-  openclaw:
-    requires:
-      bins:
-        - python3
-    emoji: "📦"
-    homepage: https://github.com/KeXu9/archive-skill
+description: "Extract and create archive files (zip, rar, 7z, tar, gz). Use
+  when: (1) Extracting zip/rar/7z files, (2) Creating zip archives, (3) Viewing
+  archive contents, (4) Batch extracting files."
 ---
+
 
 # Archive Skill
 

@@ -1,3 +1,9 @@
+---
+name: Teneo SDK Skill
+description: "The Teneo SDK (@teneo-protocol/sdk) enables connection to AI
+  agents on the Teneo Protocol platform. It provides:"
+---
+
 # Teneo SDK Skill
 
 ## Overview

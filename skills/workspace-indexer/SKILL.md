@@ -1,3 +1,8 @@
+---
+name: Workspace Indexer
+description: 自动维护 workspace 目录索引。
+---
+
 # Workspace Indexer
 
 自动维护 workspace 目录索引。

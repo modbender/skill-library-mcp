@@ -1,3 +1,9 @@
+---
+name: Healthcheck Readiness Starter Skill
+description: "Description: Performs a quick risk posture check on the host and
+  reports basic security/posture status."
+---
+
 # Healthcheck Readiness Starter Skill
 
 Description: Performs a quick risk posture check on the host and reports basic security/posture status.

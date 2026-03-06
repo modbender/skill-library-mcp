@@ -1,3 +1,9 @@
+---
+name: Hiring Scorecard Skill
+description: Score and compare job candidates objectively using weighted
+  criteria. Eliminates gut-feel hiring decisions.
+---
+
 # Hiring Scorecard Skill
 
 Score and compare job candidates objectively using weighted criteria. Eliminates gut-feel hiring decisions.

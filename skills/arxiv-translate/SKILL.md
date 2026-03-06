@@ -1,3 +1,8 @@
+---
+name: arxiv-translate
+description: Download Chinese translations of arXiv papers.
+---
+
 # arxiv-translate
 
 Download Chinese translations of arXiv papers.

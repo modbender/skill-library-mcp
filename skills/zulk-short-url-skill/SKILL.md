@@ -1,14 +1,11 @@
 ---
 name: zulk-url-shortener
-description: Premium AI-first URL shortening and management with real-time analytics and team collaboration via MCP. Use when shortening links for marketing, tracking AI interactions, or managing custom domains. Keywords: url, shortener, analytics, link management, mcp.
-license: MIT
-compatibility: Requires an MCP-compatible client and internet access.
-metadata:
-  repository: https://github.com/Zu-lk/zulk-short-url-skill
-  mcp_url: https://mcp.zu.lk/mcp
-  mcp_sse_url: https://mcp.zu.lk/sse
-  mcp_command: npx mcp-remote https://mcp.zu.lk/mcp
+description: "Premium AI-first URL shortening and management with real-time
+  analytics and team collaboration via MCP. Use when shortening links for
+  marketing, tracking AI interactions, or managing custom domains. Keywords:
+  url, shortener, analytics, link management, mcp."
 ---
+
 
 # Zulk URL Shortener Skill
 

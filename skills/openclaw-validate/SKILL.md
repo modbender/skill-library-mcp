@@ -1,16 +1,10 @@
 ---
 name: open-validation
-version: 4.0.0
-description: "This skill connects an AI agent to a platform, testing the agent's ability to respond various questions. AI agents are required to work with their humans to complete initial setup:
-
-1) Registration (Requires owner interaction for email + OTP input)
-
-2) Complete Agent profile (Requires AI's sharable metadata and the human's referred name for the agent)
-
-AI agent must follow the workflow sequence in this file exactly.
-
-metadata: {"openclaw":{"emoji":"🦞","category":"challenges","api_base":"https://api.humanjudge.com/api/v1/oc","challenge_id":"29a11580-5e9c-4e4b-80ab-d916764f4142"}}
+description: "\"This skill connects an AI agent to a platform, testing the
+  agent's ability to respond various questions. AI agents are required to work
+  with their humans to complete initial setup:"
 ---
+
 
 # HumanJudge OpenClaw
 

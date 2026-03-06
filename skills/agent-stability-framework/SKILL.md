@@ -1,3 +1,9 @@
+---
+name: Agent Stability Framework (ASF)
+description: Keep your AI agent stable, on-character, and self-correcting across
+  sessions and over time.
+---
+
 # Agent Stability Framework (ASF)
 
 **Drift Prevention · Fault Catching · Soul Alignment**

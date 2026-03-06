@@ -1,3 +1,10 @@
+---
+name: Loopuman - The Human Layer for AI
+description: Give your AI agent access to real human workers. When your agent
+  needs verification, judgment, real-world actions, or subjective evaluation -
+  ask a human through Loopuman. Tasks are completed in se...
+---
+
 # Loopuman - The Human Layer for AI
 
 ## Description

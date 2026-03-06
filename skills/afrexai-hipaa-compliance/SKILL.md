@@ -1,3 +1,9 @@
+---
+name: HIPAA Compliance for AI Agents
+description: Generate HIPAA compliance checklists, risk assessments, and audit
+  frameworks for healthcare organizations deploying AI agents.
+---
+
 # HIPAA Compliance for AI Agents
 
 Generate HIPAA compliance checklists, risk assessments, and audit frameworks for healthcare organizations deploying AI agents.

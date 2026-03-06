@@ -1,3 +1,9 @@
+---
+name: MicroSaaS-Launcher Skill
+description: This runbook outlines the process for launching a micro-SaaS. Each
+  step must be explicitly completed and documented.
+---
+
 # MicroSaaS-Launcher Skill
 
 **Name:** MicroSaaS Launcher

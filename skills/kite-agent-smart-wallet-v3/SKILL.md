@@ -1,3 +1,8 @@
+---
+name: Kite AI Agent Smart Wallet Protocol V3
+description: 用户直接通过OpenClaw（Telegram）控制Kite AI链上钱包，无需自己运行Bot。
+---
+
 # Kite AI Agent Smart Wallet Protocol V3
 
 ## 简介

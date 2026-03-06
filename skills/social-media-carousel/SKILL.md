@@ -1,3 +1,9 @@
+---
+name: Social Media Carousel
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce image generation.
+---
+
 # Social Media Carousel
 
 **Version**: 1.0.0

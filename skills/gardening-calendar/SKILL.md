@@ -1,7 +1,12 @@
 ---
 name: gardening-calendar
-description: Precise horticultural advice for UK and international gardening. Use when a user asks for: (1) What to plant or harvest this month, (2) Sowing/harvesting windows for specific plants, (3) UK-specific (Celsius/Allotment) advice, or (4) International gardening context (Thailand, US, Australia).
+description: "Precise horticultural advice for UK and international gardening.
+  Use when a user asks for: (1) What to plant or harvest this month, (2)
+  Sowing/harvesting windows for specific plants, (3) UK-specific
+  (Celsius/Allotment) advice, or (4) International gardening context (Thailand,
+  US, Australia)."
 ---
+
 
 # Gardening Calendar Skill 🎷
 

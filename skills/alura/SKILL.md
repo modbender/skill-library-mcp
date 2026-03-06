@@ -1,7 +1,10 @@
 ---
 name: alura-backend-api
-description: Integrate with Alura Trading backend API. Use when calling Alura testnet API, trading sessions, user auth, indicators, or leaderboard. Base URL: https://testnet-api.alura.fun
+description: "Integrate with Alura Trading backend API. Use when calling Alura
+  testnet API, trading sessions, user auth, indicators, or leaderboard. Base
+  URL: https://testnet-api.alura.fun"
 ---
+
 
 # Alura Backend API
 

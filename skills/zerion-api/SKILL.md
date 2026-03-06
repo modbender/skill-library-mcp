@@ -1,14 +1,9 @@
 ---
-summary: Query crypto wallet portfolios, transactions, DeFi positions, and token prices across EVM chains and Solana using Zerion's MCP server.
-tags:
-  - blockchain
-  - crypto
-  - defi
-  - evm
-  - mcp
-  - solana
-  - wallet
+name: zerion-api
+description: Query crypto wallet portfolios, transactions, DeFi positions, and
+  token prices across EVM chains and Solana using Zerion's MCP server.
 ---
+
 
 # Zerion API Skill
 

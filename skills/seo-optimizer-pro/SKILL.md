@@ -1,3 +1,10 @@
+---
+name: SEO Optimizer Pro
+description: Analyze and optimize content with AI for search visibility across
+  traditional Google results and emerging AI search platforms (ChatGPT, Google
+  AI Overviews, Claude, etc).
+---
+
 # SEO Optimizer Pro
 
 **AI-powered SEO content optimization for both Google ranking and AI search (AEO).**

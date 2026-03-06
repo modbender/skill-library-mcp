@@ -1,11 +1,12 @@
 ---
 name: consensus-interact
-description: Use the open-source @consensus-tools/consensus-tools engine to run multi-LLM policy-based decision workflows: post jobs, collect submissions, cast votes, and resolve outcomes with customizable consensus logic gates. The engine is local-first by design; consensus.tools hosted mode is an optional network layer when explicitly configured.
-homepage: https://github.com/kaicianflone/consensus-interact
-source: https://github.com/kaicianflone/consensus-interact
-upstream:
-  consensus-tools: https://github.com/kaicianflone/consensus-tools
+description: "Use the open-source @consensus-tools/consensus-tools engine to run
+  multi-LLM policy-based decision workflows: post jobs, collect submissions,
+  cast votes, and resolve outcomes with customizable consensus logic gates. The
+  engine is local-first by design; consensus.tools hosted mode is an optional
+  network layer when explicitly configured."
 ---
+
 
 # consensus.tools Interact
 

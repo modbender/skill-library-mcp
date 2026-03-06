@@ -1,3 +1,9 @@
+---
+name: Finance Skill
+description: Personal finance memory layer. Parse statements, store
+  transactions, query spending.
+---
+
 # Finance Skill
 
 Personal finance memory layer. Parse statements, store transactions, query spending.

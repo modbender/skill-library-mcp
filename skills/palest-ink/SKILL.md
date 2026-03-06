@@ -1,7 +1,14 @@
 ---
 name: palest-ink
-description: Record and query user activities (git operations, web browsing, commands, etc.) with automatic storage, daily report generation, and flexible search capabilities. Use when: (1) recording daily activities for later reference, (2) generating daily/weekly activity reports, (3) searching historical records by type, keywords, or tags, (4) tracking what work was done on specific topics (plugins, features, etc.), (5) understanding productivity patterns or reviewing past work.
+description: "Record and query user activities (git operations, web browsing,
+  commands, etc.) with automatic storage, daily report generation, and flexible
+  search capabilities. Use when: (1) recording daily activities for later
+  reference, (2) generating daily/weekly activity reports, (3) searching
+  historical records by type, keywords, or tags, (4) tracking what work was done
+  on specific topics (plugins, features, etc.), (5) understanding productivity
+  patterns or reviewing past work."
 ---
+
 
 # Palest Ink
 

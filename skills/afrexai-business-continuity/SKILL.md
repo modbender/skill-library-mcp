@@ -1,3 +1,9 @@
+---
+name: Business Continuity Planner
+description: Build a complete Business Continuity Plan (BCP) and Disaster
+  Recovery (DR) strategy for any organization.
+---
+
 # Business Continuity Planner
 
 Build a complete Business Continuity Plan (BCP) and Disaster Recovery (DR) strategy for any organization.

@@ -1,9 +1,11 @@
 ---
 name: nori-health
-description: Query your personal health data and get coaching from Nori, your AI health coach. Use when the user asks about sleep, workouts, nutrition, weight, heart rate, HRV, or wants health insights. NOT for: medical diagnosis, prescriptions, or emergency health situations.
-homepage: https://nori.health
-metadata: {"openclaw":{"emoji":"🌿","requires":{"env":["NORI_API_KEY"],"bins":["curl","jq"]},"primaryEnv":"NORI_API_KEY"}}
+description: "Query your personal health data and get coaching from Nori, your
+  AI health coach. Use when the user asks about sleep, workouts, nutrition,
+  weight, heart rate, HRV, or wants health insights. NOT for: medical diagnosis,
+  prescriptions, or emergency health situations."
 ---
+
 
 # Nori Health Coach
 

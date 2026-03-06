@@ -1,3 +1,9 @@
+---
+name: Overseerr Request Media Skill
+description: Request a movie or TV show using the user's Overseerr instance.
+  Overseerr forwards the request to Sonarr/Radarr.
+---
+
 # Overseerr Request Media Skill
 
 ## Purpose

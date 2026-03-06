@@ -1,7 +1,13 @@
 ---
 name: near-tools
-description: NEAR Protocol CLI installation and setup guide. Use when: (1) User asks how to install NEAR CLI, (2) User needs help setting up near-cli-rs, (3) User wants to verify NEAR CLI installation, (4) User needs to install near-cli-rs, (5) user wants to use near cli to perform any action on the blockchain. AGENTS MUST ALWAYS get the absolute path of the 'near' binary before execution.
+description: "NEAR Protocol CLI installation and setup guide. Use when: (1) User
+  asks how to install NEAR CLI, (2) User needs help setting up near-cli-rs, (3)
+  User wants to verify NEAR CLI installation, (4) User needs to install
+  near-cli-rs, (5) user wants to use near cli to perform any action on the
+  blockchain. AGENTS MUST ALWAYS get the absolute path of the 'near' binary
+  before execution."
 ---
+
 
 # NEAR Tools - NEAR CLI Installation & Setup
 

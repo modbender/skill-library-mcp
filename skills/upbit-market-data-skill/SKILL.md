@@ -1,3 +1,9 @@
+---
+name: Upbit Market Data Skill
+description: A CLI-based OpenClaw skill that fetches quotation/market data from
+  the Upbit Open API.
+---
+
 # Upbit Market Data Skill
 
 A CLI-based OpenClaw skill that fetches quotation/market data from the Upbit Open API.

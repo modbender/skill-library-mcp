@@ -1,16 +1,27 @@
 ---
-model: fast
-description: |
-  WHAT: Kubernetes manifest generation - Deployments, StatefulSets, CronJobs, Services, Ingresses, 
-  ConfigMaps, Secrets, and PVCs with production-grade security and health checks.
-  
-  WHEN: User needs to create K8s manifests, deploy containers, configure Services/Ingress, 
-  manage ConfigMaps/Secrets, set up persistent storage, or organize multi-environment configs.
-  
-  KEYWORDS: kubernetes, k8s, manifest, deployment, statefulset, cronjob, service, ingress, 
-  configmap, secret, pvc, pod, container, yaml, kustomize, helm, namespace, probe, security context
-version: 1.0.0
+name: kubernetes-devops
+description: >-
+  WHAT: Kubernetes manifest generation - Deployments, StatefulSets, CronJobs,
+  Services, Ingresses, 
+
+  ConfigMaps, Secrets, and PVCs with production-grade security and health
+  checks.
+
+
+  WHEN: User needs to create K8s manifests, deploy containers, configure
+  Services/Ingress, 
+
+  manage ConfigMaps/Secrets, set up persistent storage, or organize
+  multi-environment configs.
+
+
+  KEYWORDS: kubernetes, k8s, manifest, deployment, statefulset, cronjob,
+  service, ingress, 
+
+  configmap, secret, pvc, pod, container, yaml, kustomize, helm, namespace,
+  probe, security context
 ---
+
 
 # Kubernetes
 

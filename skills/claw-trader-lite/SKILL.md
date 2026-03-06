@@ -1,3 +1,8 @@
+---
+name: claw-trader-lite
+description: "To create the file yourself:"
+---
+
 To create the file yourself:
 
 

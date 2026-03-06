@@ -1,3 +1,8 @@
+---
+name: 创建飞书 Agent 技能
+description: 快速创建新的 OpenClaw Agent 并连接到飞书机器人。
+---
+
 # 创建飞书 Agent 技能
 
 快速创建新的 OpenClaw Agent 并连接到飞书机器人。

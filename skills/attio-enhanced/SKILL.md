@@ -1,3 +1,8 @@
+---
+name: Enhanced Attio Skill
+description: Enhanced Attio CRM API skill with batch operations.
+---
+
 # Enhanced Attio Skill
 
 Enhanced Attio CRM API skill with batch operations.

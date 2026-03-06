@@ -1,3 +1,10 @@
+---
+name: "SKILL: CleanApp Ingest v1 (OpenClaw/ClawHub)"
+description: This is a skill package that lets an agent submit any problem
+  signal into CleanApp (bugs, incidents, scams, UX friction, policy violations,
+  safety hazards, improvement proposals) using the Fetcher ...
+---
+
 # SKILL: CleanApp Ingest v1 (OpenClaw/ClawHub)
 
 This is a **skill package** that lets an agent submit **any problem signal** into CleanApp (bugs, incidents, scams, UX friction, policy violations, safety hazards, improvement proposals) using the **Fetcher Key System**:

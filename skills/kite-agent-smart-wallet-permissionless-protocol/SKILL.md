@@ -1,3 +1,10 @@
+---
+name: Kite AI Agent Smart Wallet Permissionless Protocol
+description: Kite AI Agent Wallet Protocol enables AI agents to create and
+  manage smart wallets on Kite AI network. Inspired by Biconomy Nexus design,
+  this protocol provides extensible, secure wallet infrastruc...
+---
+
 # Kite AI Agent Smart Wallet Permissionless Protocol
 
 > Version: 1.0.0

@@ -1,3 +1,9 @@
+---
+name: Google Docs API Integration
+description: Direct access to the Google Docs API using OAuth 2.0. Create
+  documents, insert and format text, and manage document content.
+---
+
 # Google Docs API Integration
 
 Direct access to the Google Docs API using OAuth 2.0. Create documents, insert and format text, and manage document content.

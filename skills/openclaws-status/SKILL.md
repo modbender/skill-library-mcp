@@ -1,3 +1,8 @@
+---
+name: OpenClaw Status API
+description: Monetize your OpenClaw agent status and health as an x402-paid API endpoint.
+---
+
 # OpenClaw Status API
 
 Monetize your OpenClaw agent status and health as an x402-paid API endpoint.

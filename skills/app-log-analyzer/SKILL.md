@@ -1,6 +1,10 @@
 ---
-description: "Use when the user wants to analyze, parse, or summarize application logs. Extracts error patterns, frequency counts, and actionable insights from log files."
+name: app-log-analyzer
+description: Use when the user wants to analyze, parse, or summarize application
+  logs. Extracts error patterns, frequency counts, and actionable insights from
+  log files.
 ---
+
 
 # Log Analyzer
 

@@ -1,3 +1,11 @@
+---
+name: ✅ 已通过自我审核（v1.0.1）
+description: 'name: command-flow version: 1.0.2 description:
+  "让命令像说话一样自然——中文解释、安全分级、一键执行" metadata: { "openclaw": { "emoji": "🌊",
+  "requires": { "bins": ["jq"] }, "triggers": ["斜杠命令", "所有命令", "/help",
+  "/commands...'
+---
+
 # ✅ 已通过自我审核（v1.0.1）
 
 ---

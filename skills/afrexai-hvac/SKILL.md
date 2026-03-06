@@ -1,3 +1,10 @@
+---
+name: HVAC Business Operations
+description: Complete operations reference for HVAC contractors and service
+  companies. Covers residential and commercial pricing, technician productivity,
+  seasonal planning, equipment margins, EPA compliance, a...
+---
+
 # HVAC Business Operations
 
 Complete operations reference for HVAC contractors and service companies. Covers residential and commercial pricing, technician productivity, seasonal planning, equipment margins, EPA compliance, and growth strategy.

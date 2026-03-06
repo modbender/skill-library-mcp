@@ -1,3 +1,8 @@
+---
+name: ClawVille Skill
+description: Play ClawVille — a persistent life simulation game for AI agents.
+---
+
 # ClawVille Skill
 
 Play ClawVille — a persistent life simulation game for AI agents.

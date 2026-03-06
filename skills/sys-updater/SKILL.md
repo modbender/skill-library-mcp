@@ -1,16 +1,12 @@
 ---
 name: sys-updater
-description: Production-safe Ubuntu maintenance orchestrator: runs daily apt security updates, tracks non-security updates across apt/npm/pnpm/brew with quarantine + auto-review, applies only approved updates, rotates logs/state, and generates clear 09:00 MSK Telegram reports (including what was actually installed).
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🔄",
-        "os": ["linux"],
-        "requires": { "bins": ["apt-get", "npm", "brew", "clawhub"] },
-      },
-  }
+description: "Production-safe Ubuntu maintenance orchestrator: runs daily apt
+  security updates, tracks non-security updates across apt/npm/pnpm/brew with
+  quarantine + auto-review, applies only approved updates, rotates logs/state,
+  and generates clear 09:00 MSK Telegram reports (including what was actually
+  installed)."
 ---
+
 
 # System Updater (sys-updater)
 

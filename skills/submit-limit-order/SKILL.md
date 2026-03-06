@@ -1,17 +1,10 @@
 ---
-description: >-
-  Submit a UniswapX Dutch auction limit order. Use when user wants to set a
-  limit price, get MEV-protected execution, or submit an order that fills at
-  the best available price. No gas cost until filled.
-allowed-tools: >-
-  Read, Glob, Grep,
-  Task(subagent_type:trade-executor),
-  mcp__uniswap__get_quote,
-  mcp__uniswap__submit_uniswapx_order,
-  mcp__uniswap__get_uniswapx_order_status,
-  mcp__uniswap__check_safety_status
-model: opus
+name: submit-limit-order
+description: Submit a UniswapX Dutch auction limit order. Use when user wants to
+  set a limit price, get MEV-protected execution, or submit an order that fills
+  at the best available price. No gas cost until filled.
 ---
+
 
 # Submit Limit Order
 

@@ -1,3 +1,9 @@
+---
+name: node-transfer
+description: High-speed, memory-efficient file transfer between OpenClaw nodes
+  using native Node.js streams.
+---
+
 # node-transfer
 
 High-speed, memory-efficient file transfer between OpenClaw nodes using native Node.js streams.

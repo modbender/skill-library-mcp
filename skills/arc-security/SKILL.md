@@ -1,3 +1,10 @@
+---
+name: Arc Security - Agent Trust Protocol
+description: Chain-agnostic security infrastructure for OpenClaw skills.
+  Auditors stake USDC to vouch for skill safety, users pay micro-fees to access
+  verified skills, and malicious skills get slashed through d...
+---
+
 # Arc Security - Agent Trust Protocol
 
 Chain-agnostic security infrastructure for OpenClaw skills. Auditors stake USDC to vouch for skill safety, users pay micro-fees to access verified skills, and malicious skills get slashed through decentralized governance -- all powered by CCTP on Arc.

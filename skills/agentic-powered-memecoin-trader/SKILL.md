@@ -1,3 +1,9 @@
+---
+name: "OpenClaw Skill: fdv.lol (CLI / Headless Memecoin Auto Trader)"
+description: This skill is for running fdv.lol CLI mode (cli.mjs) with Agent
+  Gary Full AI Control enabled, so the AI can fully drive Auto Trader decisions.
+---
+
 
 # OpenClaw Skill: fdv.lol (CLI / Headless Memecoin Auto Trader)
 

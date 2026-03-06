@@ -1,6 +1,9 @@
 ---
-description: Track work time per project with start/stop timers and generate productivity reports.
+name: time-tracker
+description: Track work time per project with start/stop timers and generate
+  productivity reports.
 ---
+
 
 # Time Tracker
 

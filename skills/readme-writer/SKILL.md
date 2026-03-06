@@ -1,3 +1,9 @@
+---
+name: Readme Writer
+description: Generate polished README.md files from your codebase automatically.
+  No more staring at a blank page.
+---
+
 # Readme Writer
 
 Generate polished README.md files from your codebase automatically. No more staring at a blank page.

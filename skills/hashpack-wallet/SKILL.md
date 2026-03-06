@@ -1,7 +1,10 @@
 ---
 name: hashpack-wallet
-description: Integrate HashPack wallet for Hedera blockchain authentication. Use for: (1) Adding HashPack login to webapps, (2) Signing Hbar transactions, (3) Connecting to Hedera DApps, (4) Getting account balance.
+description: "Integrate HashPack wallet for Hedera blockchain authentication.
+  Use for: (1) Adding HashPack login to webapps, (2) Signing Hbar transactions,
+  (3) Connecting to Hedera DApps, (4) Getting account balance."
 ---
+
 
 # HashPack Wallet Integration
 

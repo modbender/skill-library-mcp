@@ -1,3 +1,9 @@
+---
+name: Bittensor Subnet 85 "Vibe Miner" Skill
+description: "Guides users through setting up profitable video processing miners
+  on Bittensor Subnet 85:"
+---
+
 # Bittensor Subnet 85 "Vibe Miner" Skill
 
 **Author:** Mark Jeffrey  

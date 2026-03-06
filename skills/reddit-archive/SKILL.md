@@ -1,3 +1,9 @@
+---
+name: SKILL.md — Reddit Archive
+description: Download and archive Reddit posts (images, GIFs, videos) from users
+  or subreddits.
+---
+
 # SKILL.md — Reddit Archive
 
 _Download and archive Reddit posts (images, GIFs, videos) from users or subreddits._

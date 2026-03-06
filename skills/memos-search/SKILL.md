@@ -1,7 +1,11 @@
 ---
 name: memos
-description: Use MemOS API for memory operations. Use when: (1) user asks to save/store/remember something to memory, (2) user asks to read/retrieve memory, (3) user wants to list/delete memory files, (4) replacing OpenClaw's default memory with MemOS.
+description: "Use MemOS API for memory operations. Use when: (1) user asks to
+  save/store/remember something to memory, (2) user asks to read/retrieve
+  memory, (3) user wants to list/delete memory files, (4) replacing OpenClaw's
+  default memory with MemOS."
 ---
+
 
 # MemOS - External Memory Service
 

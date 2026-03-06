@@ -1,3 +1,8 @@
+---
+name: My Weather
+description: Get current weather using wttr.in (no API key required).
+---
+
 # My Weather
 
 Get current weather using wttr.in (no API key required).

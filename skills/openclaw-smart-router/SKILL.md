@@ -1,8 +1,10 @@
 ---
 name: smart-router
-user-invocable: true
-metadata: {"openclaw":{"emoji":"🎯","requires":{"bins":["node"]},"os":["darwin","linux","win32"]}}
+description: The first OpenClaw skill that automatically routes requests to
+  optimal models based on complexity analysis and budget constraints. Stops you
+  from wasting money on expensive models for simple tasks....
 ---
+
 
 # OpenClaw Smart Router
 

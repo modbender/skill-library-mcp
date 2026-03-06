@@ -1,3 +1,9 @@
+---
+name: zugferd-invoice
+description: Create ZUGFeRD 2.1 / Factur-X compliant e-invoices with visible
+  merged pages. German B2B / Gov-ready.
+---
+
 # zugferd-invoice
 
 Create ZUGFeRD 2.1 / Factur-X compliant e-invoices with **visible merged pages**. German B2B / Gov-ready.

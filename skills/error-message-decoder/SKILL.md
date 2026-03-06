@@ -1,3 +1,8 @@
+---
+name: Error Message Decoder
+description: 解析错误信息，提供可能的原因和解决方案。
+---
+
 # Error Message Decoder
 
 解析错误信息，提供可能的原因和解决方案。

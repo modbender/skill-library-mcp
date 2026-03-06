@@ -1,12 +1,12 @@
 ---
 name: bittensor-sdk
-description: Comprehensive Bittensor blockchain interaction skill with wallet management, staking, subnet operations, neuron registration, and emissions tracking. Use for: bittensor operations, subtensor queries, stake/unstake TAO, register neurons, query subnet info, wallet operations, metagraph analysis, emissions tracking, and weight management.
-license: MIT
-compatibility: Requires Python 3.8+, bittensor>=8.0.0, network access to Bittensor network endpoints
-metadata:
-  author: bittensor_quest
-  version: "1.0.0"
+description: "Comprehensive Bittensor blockchain interaction skill with wallet
+  management, staking, subnet operations, neuron registration, and emissions
+  tracking. Use for: bittensor operations, subtensor queries, stake/unstake TAO,
+  register neurons, query subnet info, wallet operations, metagraph analysis,
+  emissions tracking, and weight management."
 ---
+
 
 # Bittensor SDK Skill
 

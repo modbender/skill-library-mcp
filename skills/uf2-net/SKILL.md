@@ -1,13 +1,13 @@
 ---
 name: uf2-net
-description: Create, manage, and track short URLs using uf2.net API-first URL shortener. Use when: (1) shortening URLs for sharing or tracking, (2) creating custom short links with branded slugs, (3) managing existing short links (list/delete/stats), (4) tracking click counts on shortened URLs. Links never expire and support custom slugs. Service: uf2.net (https://uf2.net) - API-first URL shortener for bots and engineers.
-homepage: https://uf2.net
-source: https://github.com/openclaw/openclaw
-credentials:
-  - name: UF2_API_KEY
-    description: API key from uf2.net account registration (obtain via POST /api/v1/accounts/register)
-    required: true
+description: "Create, manage, and track short URLs using uf2.net API-first URL
+  shortener. Use when: (1) shortening URLs for sharing or tracking, (2) creating
+  custom short links with branded slugs, (3) managing existing short links
+  (list/delete/stats), (4) tracking click counts on shortened URLs. Links never
+  expire and support custom slugs. Service: uf2.net (https://uf2.net) -
+  API-first URL shortener for bots and engineers."
 ---
+
 
 # uf2.net URL Shortener
 

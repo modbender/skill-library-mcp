@@ -1,3 +1,10 @@
+---
+name: Audio Mastering CLI
+description: 'name: audio-mastering-cli description: CLI audio mastering without
+  a reference track using ffmpeg; accepts audio or video inputs and outputs
+  mastered WAV/MP3 or remuxed MP4. metadata: {"openclaw":{...'
+---
+
 ﻿---
 name: audio-mastering-cli
 description: CLI audio mastering without a reference track using ffmpeg; accepts audio or video inputs and outputs mastered WAV/MP3 or remuxed MP4.

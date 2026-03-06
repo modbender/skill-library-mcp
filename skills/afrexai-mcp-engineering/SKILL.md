@@ -1,3 +1,9 @@
+---
+name: MCP Engineering — Complete Model Context Protocol System
+description: Build, integrate, secure, and scale MCP servers and clients. From
+  first server to production multi-tool architecture.
+---
+
 # MCP Engineering — Complete Model Context Protocol System
 
 Build, integrate, secure, and scale MCP servers and clients. From first server to production multi-tool architecture.

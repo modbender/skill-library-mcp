@@ -1,3 +1,10 @@
+---
+name: AgentMail Wrapper
+description: Verified email delivery integration. Send, track, schedule with
+  multi-provider support (SendGrid, Mailgun, AWS SES, SMTP). GDPR/CAN-SPAM
+  compliant.
+---
+
 # AgentMail Wrapper
 
 **Version:** 1.0.0  

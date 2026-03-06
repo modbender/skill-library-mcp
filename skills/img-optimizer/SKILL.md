@@ -1,6 +1,9 @@
 ---
-description: Compress, resize, and convert images using ImageMagick. Batch process with quality control.
+name: img-optimizer
+description: Compress, resize, and convert images using ImageMagick. Batch
+  process with quality control.
 ---
+
 
 # Image Optimizer
 

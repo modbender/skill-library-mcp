@@ -1,3 +1,9 @@
+---
+name: Market Sizing — TAM/SAM/SOM Calculator
+description: Build defensible market sizing for any product, pitch deck, or
+  business case. Top-down and bottom-up methodologies combined.
+---
+
 # Market Sizing — TAM/SAM/SOM Calculator
 
 Build defensible market sizing for any product, pitch deck, or business case. Top-down and bottom-up methodologies combined.

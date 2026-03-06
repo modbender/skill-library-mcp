@@ -1,3 +1,8 @@
+---
+name: Text Detection Skills
+description: Skills for analyzing and detecting AI-generated text content.
+---
+
 # Text Detection Skills
 
 Skills for analyzing and detecting AI-generated text content.

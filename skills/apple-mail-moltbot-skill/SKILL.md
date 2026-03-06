@@ -1,8 +1,11 @@
 ---
 name: apple-mail
-description: Read and interact with Apple Mail via osascript on macOS. Use when you need to: (1) List mail accounts, (2) List mailboxes/folders for an account, (3) Get messages from a specific mailbox, (4) Read message content. Works with Apple Mail app on macOS only.
-metadata: {"moltbot":{"emoji":"📧","os":["darwin"],"requires":{"bins":["osascript"]}}}
+description: "Read and interact with Apple Mail via osascript on macOS. Use when
+  you need to: (1) List mail accounts, (2) List mailboxes/folders for an
+  account, (3) Get messages from a specific mailbox, (4) Read message content.
+  Works with Apple Mail app on macOS only."
 ---
+
 
 # Apple Mail Skill
 

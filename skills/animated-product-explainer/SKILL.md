@@ -1,3 +1,9 @@
+---
+name: Animated Product Explainer
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI sora2 video generation.
+---
+
 # Animated Product Explainer
 
 **Version**: 1.0.0

@@ -1,3 +1,9 @@
+---
+name: 🐾 Knowledge Base (RAG) — Your Second Brain
+description: Save anything, recall it semantically. Personal RAG-powered
+  knowledge base with SQLite + embeddings.
+---
+
 # 🐾 Knowledge Base (RAG) — Your Second Brain
 
 > by Odin's Eye Enterprises — Ancient Wisdom. Modern Intelligence.

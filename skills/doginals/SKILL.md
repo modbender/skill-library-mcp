@@ -1,3 +1,10 @@
+---
+name: Doginals Skill v1.0.2
+description: The Doginals skill enables users to interact with the Doginals and
+  Dunes protocols, facilitating inscription minting, token management, and
+  seamless integration with Dogecoin Core.
+---
+
 # Doginals Skill v1.0.2
 
 ## Purpose

@@ -1,8 +1,14 @@
 ---
 name: remote-disk-mount
-description: Mount remote storage (SMB/CIFS, FTP, SFTP, WebDAV) as local directory. For Debian/Ubuntu Linux only. Triggered when user needs to: (1) mount Windows/Samba share, (2) mount FTP/SFTP server, (3) mount WebDAV storage, (4) map remote storage to local disk. NOTE: Requires user confirmation before running privileged commands. Does NOT support plaintext passwords on command line — use credential files or interactive prompts instead.
-metadata: {"openclaw":{"requires":{"os":["linux"],"bins":["sudo"]}}}
+description: "Mount remote storage (SMB/CIFS, FTP, SFTP, WebDAV) as local
+  directory. For Debian/Ubuntu Linux only. Triggered when user needs to: (1)
+  mount Windows/Samba share, (2) mount FTP/SFTP server, (3) mount WebDAV
+  storage, (4) map remote storage to local disk. NOTE: Requires user
+  confirmation before running privileged commands. Does NOT support plaintext
+  passwords on command line — use credential files or interactive prompts
+  instead."
 ---
+
 
 # Remote Disk Mount
 

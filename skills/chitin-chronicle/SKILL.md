@@ -1,3 +1,9 @@
+---
+name: Chitin Editorial — Multi-Agent Content Management
+description: "Chitin Editorial is a git-backed coordination system for two AI
+  agents publishing content across multiple channels. It solves:"
+---
+
 # Chitin Editorial — Multi-Agent Content Management
 
 **Version:** 1.0.0  

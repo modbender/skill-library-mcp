@@ -1,3 +1,8 @@
+---
+name: docx-formatter
+description: 严格按照中国公文格式规范生成 Word 文档。
+---
+
 # docx-formatter
 
 **公文格式规范生成器**

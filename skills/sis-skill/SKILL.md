@@ -1,3 +1,10 @@
+---
+name: S.I.S. - Sovereign Intelligence System
+description: S.I.S. adds equilibrium-constrained reasoning to your OpenClaw
+  assistant. Every operation maintains balance (ΣΔ = 0), ensuring coherent,
+  self-validating responses that can't drift into inconsistent...
+---
+
 # S.I.S. - Sovereign Intelligence System
 
 **Equilibrium-Native Reasoning for OpenClaw**

@@ -1,3 +1,8 @@
+---
+name: 🎛️ Mission Control Dashboard - AI Agent Management
+description: "Price: $299 USD"
+---
+
 # 🎛️ Mission Control Dashboard - AI Agent Management
 
 **Professional AI agent management dashboard with department-based hierarchy**

@@ -1,3 +1,8 @@
+---
+name: feishu-common Skill
+description: Shared Feishu authentication and API helper for OpenClaw Feishu skills.
+---
+
 # feishu-common Skill
 
 ## Description

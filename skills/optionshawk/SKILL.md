@@ -1,14 +1,9 @@
 ---
-metadata:
-  name: OptionsHawk
-  description: Options flow analysis, unusual activity detection, and options strategy evaluation for equities and ETFs
-  version: 0.0.1
-  tags: [finance, trading, options, flow, unusual-activity]
-  openclaw:
-    requires:
-      env: [OPTIONSHAWK_API_KEY]
-    primaryEnv: OPTIONSHAWK_API_KEY
+name: optionshawk
+description: Options flow analysis, unusual activity detection, and strategy
+  evaluation for equities and ETFs.
 ---
+
 
 # OptionsHawk
 

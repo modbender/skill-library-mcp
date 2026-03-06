@@ -1,3 +1,8 @@
+---
+name: Multi-Brain Protocol
+description: Multi-Brain is system-enforced via a turn:before hook. No manual steps needed.
+---
+
 # Multi-Brain Protocol
 
 **What it does:** Gives your AI agents cognitive diversity by calling multiple LLMs (Kimi K2.5 + GPT 5.3 Codex) in parallel before the primary agent responds. Three brains instead of one.

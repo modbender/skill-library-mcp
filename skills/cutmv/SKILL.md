@@ -1,3 +1,8 @@
+---
+name: SKILL.md - cutmv Video Tool
+description: cutmv-video-tool
+---
+
 # SKILL.md - cutmv Video Tool
 
 ## Skill Name

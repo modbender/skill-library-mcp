@@ -1,3 +1,8 @@
+---
+name: HeyLead — Autonomous LinkedIn SDR
+description: Your AI sales rep. One command to fill your pipeline.
+---
+
 # HeyLead — Autonomous LinkedIn SDR
 
 Your AI sales rep. One command to fill your pipeline.

@@ -1,3 +1,8 @@
+---
+name: Autonomous Executor
+description: Self-healing, error-recovering task execution with full autonomy.
+---
+
 # Autonomous Executor
 
 Self-healing, error-recovering task execution with full autonomy.

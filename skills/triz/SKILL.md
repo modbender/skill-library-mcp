@@ -1,3 +1,10 @@
+---
+name: TRIZ - Systematic Innovation Methodology
+description: A comprehensive TRIZ (Theory of Inventive Problem Solving) tool
+  that helps engineers and product managers systematically analyze technical
+  problems and generate innovative solutions through the Fiv...
+---
+
 # TRIZ - Systematic Innovation Methodology
 
 A comprehensive TRIZ (Theory of Inventive Problem Solving) tool that helps engineers and product managers systematically analyze technical problems and generate innovative solutions through the Five Bridges methodology.

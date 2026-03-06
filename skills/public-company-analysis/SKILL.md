@@ -1,11 +1,10 @@
 ---
 name: public-company-analysis
-description: Analyze any listed company with a structured professional report: overview, in-depth fundamentals (incl. DCF), technicals + sentiment. Input ticker, name, or exchange.
-version: 1.0.0
-author: fengwensheng
-tags: [stock, finance, investment, DCF, fundamental-analysis, technical-analysis, valuation, earnings, sentiment]
-keywords: [stock analysis, financial report, DCF valuation, equity research, stock picker, fundamentals, technicals, sentiment analysis]
+description: "Analyze any listed company with a structured professional report:
+  overview, in-depth fundamentals (incl. DCF), technicals + sentiment. Input
+  ticker, name, or exchange."
 ---
+
 
 # Public Company Deep Research Skill
 

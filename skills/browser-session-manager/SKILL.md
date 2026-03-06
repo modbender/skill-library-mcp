@@ -1,3 +1,9 @@
+---
+name: 即梦AI (Jimeng) 视频自动化生成完全指南
+description: 即梦AI (jimeng.jianying.com) 是字节跳动旗下的 AI 视频生成平台。官方提供了 Web 界面，但没有开放
+  API。当我们需要批量生成视频或集成到工作流时，就需要通过浏览器自动化来实现。
+---
+
 # 即梦AI (Jimeng) 视频自动化生成完全指南
 
 > **TL;DR**: 本文记录如何通过 Playwright + 浏览器 Session 管理，实现即梦AI视频生成的全自动化。包含图片压缩、Cookie 注入、表单填写、视频提交等完整流程。

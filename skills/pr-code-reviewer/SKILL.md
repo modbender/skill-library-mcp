@@ -1,3 +1,10 @@
+---
+name: PR Code Reviewer
+description: "name: pr-code-reviewer description: > Revisa automáticamente Pull
+  Requests en Bitbucket detectando errores de sintaxis, malas prácticas,
+  vulnerabilidades de seguridad y violaciones de estándares de..."
+---
+
 name: pr-code-reviewer
 description: >
   Revisa automáticamente Pull Requests en Bitbucket detectando errores de

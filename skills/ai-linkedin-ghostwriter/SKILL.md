@@ -1,3 +1,9 @@
+---
+name: ✍️ AI LinkedIn Ghostwriter & 30-Day Content Engine
+description: LinkedIn has 1 billion users. 97% never post. The 3% who do get all
+  the leads, speaking gigs, clients, and opportunities.
+---
+
 # ✍️ AI LinkedIn Ghostwriter & 30-Day Content Engine
 
 **Slug:** `ai-linkedin-ghostwriter`  

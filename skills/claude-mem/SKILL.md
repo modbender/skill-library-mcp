@@ -1,3 +1,10 @@
+---
+name: Claude-Mem OpenClaw Plugin — Setup Guide
+description: This guide walks through setting up the claude-mem plugin on an
+  OpenClaw gateway. By the end, your agents will have persistent memory across
+  sessions, a live-updating MEMORY.md in their workspace, ...
+---
+
 # Claude-Mem OpenClaw Plugin — Setup Guide
 
 This guide walks through setting up the claude-mem plugin on an OpenClaw gateway. By the end, your agents will have persistent memory across sessions, a live-updating MEMORY.md in their workspace, and optionally a real-time observation feed streaming to a messaging channel.

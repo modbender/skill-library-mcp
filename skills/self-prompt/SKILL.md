@@ -1,7 +1,13 @@
 ---
 name: self-prompt
-description: Force agent responses to scheduled/automated messages. Use when cron jobs, monitoring scripts, or automated systems send messages that agents ignore. Solves the problem where agents treat system-sent messages as "background info" instead of tasks requiring response. Key pattern: use `openclaw agent` instead of `openclaw message send` to trigger actual agent turns.
+description: 'Force agent responses to scheduled/automated messages. Use when
+  cron jobs, monitoring scripts, or automated systems send messages that agents
+  ignore. Solves the problem where agents treat system-sent messages as
+  "background info" instead of tasks requiring response. Key pattern: use
+  `openclaw agent` instead of `openclaw message send` to trigger actual agent
+  turns.'
 ---
+
 
 # Self-Prompt: Forcing Agent Responses
 

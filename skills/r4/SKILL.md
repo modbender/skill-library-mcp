@@ -1,3 +1,10 @@
+---
+name: R4 Skill
+description: You have access to the R4 platform — your personal password
+  manager, secret store, and domain registrar. R4 is how you manage credentials
+  and buy domains.
+---
+
 # R4 Skill
 
 You have access to the **R4 platform** — your personal password manager, secret store, and domain registrar. R4 is how you manage credentials and buy domains.

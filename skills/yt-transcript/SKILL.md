@@ -1,3 +1,8 @@
+---
+name: YouTube Transcript Extraction
+description: Extract high-quality transcripts from YouTube videos using multiple methods.
+---
+
 # YouTube Transcript Extraction
 
 Extract high-quality transcripts from YouTube videos using multiple methods.

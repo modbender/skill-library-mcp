@@ -1,3 +1,8 @@
+---
+name: X (Twitter) Automation Skill
+description: Automate X posts via browser control - bypass $200/month API costs.
+---
+
 # X (Twitter) Automation Skill
 
 Automate X posts via browser control - bypass $200/month API costs.

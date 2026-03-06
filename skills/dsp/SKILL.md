@@ -1,3 +1,8 @@
+---
+name: 技能名称
+description: "name: 短视频文案输出"
+---
+
 --- 
 
 name: 短视频文案输出

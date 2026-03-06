@@ -1,3 +1,9 @@
+---
+name: Farseek — AI Job Search API
+description: Find relevant job openings matched to your skills using AI-powered
+  search across 22,700+ company boards and 20+ ATS platforms.
+---
+
 # Farseek — AI Job Search API
 
 Find relevant job openings matched to your skills using AI-powered search across 22,700+ company boards and 20+ ATS platforms.

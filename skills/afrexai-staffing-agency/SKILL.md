@@ -1,3 +1,10 @@
+---
+name: Staffing Agency Operations
+description: Run a staffing agency with hard numbers. Covers temp, temp-to-hire,
+  and direct placement across light industrial, clerical, healthcare, and IT
+  verticals.
+---
+
 # Staffing Agency Operations
 
 Run a staffing agency with hard numbers. Covers temp, temp-to-hire, and direct placement across light industrial, clerical, healthcare, and IT verticals.

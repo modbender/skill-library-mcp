@@ -1,3 +1,10 @@
+---
+name: OpenClaw Shield
+description: Enterprise security scanner for AI agents. Detects credential
+  theft, data exfiltration, and malicious code with static analysis + runtime
+  guards + ClamAV integration. Audit logging and tamper-evide...
+---
+
 # OpenClaw Shield
 
 Enterprise security scanner for AI agents. Detects credential theft, data exfiltration, and malicious code with static analysis + runtime guards + ClamAV integration. Audit logging and tamper-evident reports.

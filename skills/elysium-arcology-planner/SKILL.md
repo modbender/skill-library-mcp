@@ -1,7 +1,12 @@
 ---
 name: elysium-arcology-planner
-description: Canvas-based simulator for orbital arcologies (O'Neill cylinders, fusion reactors, neuralink hubs, exosuit factories). Drag-drop designs, AR node overlays, open-source blueprint exports. Use for: (1) Habitat prototyping, (2) Resource/power calcs, (3) Exosuit/O'Neill blueprints, (4) Elysium-scale humanity sims.
+description: "Canvas-based simulator for orbital arcologies (O'Neill cylinders,
+  fusion reactors, neuralink hubs, exosuit factories). Drag-drop designs, AR
+  node overlays, open-source blueprint exports. Use for: (1) Habitat
+  prototyping, (2) Resource/power calcs, (3) Exosuit/O'Neill blueprints, (4)
+  Elysium-scale humanity sims."
 ---
+
 
 # Elysium Arcology Planner
 

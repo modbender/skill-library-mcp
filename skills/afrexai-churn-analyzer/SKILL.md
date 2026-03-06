@@ -1,3 +1,10 @@
+---
+name: Churn Risk Analyzer
+description: Identify customers most likely to churn before they leave. Uses
+  behavioral signals, usage patterns, and engagement data to score accounts and
+  recommend retention actions.
+---
+
 # Churn Risk Analyzer
 
 Identify customers most likely to churn before they leave. Uses behavioral signals, usage patterns, and engagement data to score accounts and recommend retention actions.

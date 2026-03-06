@@ -1,3 +1,8 @@
+---
+name: 复杂任务三步法 (Complex Task Three-Step Methodology)
+description: 即使 S0 漏判或 S1 低估，执行过程中出现以下情况时动态升级：
+---
+
 # 复杂任务三步法 (Complex Task Three-Step Methodology)
 
 > **通用方法论** — 适用于任何被评估为复杂的任务，不限于 Coding Team。

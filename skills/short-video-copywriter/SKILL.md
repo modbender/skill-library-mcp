@@ -1,3 +1,8 @@
+---
+name: Short Video Copywriter
+description: Generate viral short video copy for TikTok, Xiaohongshu, Kuaishou, and more.
+---
+
 # Short Video Copywriter
 
 Generate viral short video copy for TikTok, Xiaohongshu, Kuaishou, and more.

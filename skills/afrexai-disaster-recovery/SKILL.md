@@ -1,3 +1,9 @@
+---
+name: IT Disaster Recovery Plan Generator
+description: Build production-ready disaster recovery plans that actually get
+  followed when things break.
+---
+
 # IT Disaster Recovery Plan Generator
 
 Build production-ready disaster recovery plans that actually get followed when things break.

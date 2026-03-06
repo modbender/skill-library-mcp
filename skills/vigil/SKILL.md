@@ -1,7 +1,15 @@
 ---
 name: vigil
-description: AI agent safety guardrails for tool calls. Use when (1) you want to validate agent tool calls before execution, (2) building agents that run shell commands, file operations, or API calls, (3) adding a safety layer to any MCP server or agent framework, (4) auditing what your agents are doing. Catches destructive commands, SSRF, SQL injection, path traversal, data exfiltration, prompt injection, and credential leaks. Requires npm package vigil-agent-safety (12.3KB, under 2ms latency). Source: github.com/hexitlabs/vigil
+description: "AI agent safety guardrails for tool calls. Use when (1) you want
+  to validate agent tool calls before execution, (2) building agents that run
+  shell commands, file operations, or API calls, (3) adding a safety layer to
+  any MCP server or agent framework, (4) auditing what your agents are doing.
+  Catches destructive commands, SSRF, SQL injection, path traversal, data
+  exfiltration, prompt injection, and credential leaks. Requires npm package
+  vigil-agent-safety (12.3KB, under 2ms latency). Source:
+  github.com/hexitlabs/vigil"
 ---
+
 
 # Vigil — Agent Safety Guardrails
 

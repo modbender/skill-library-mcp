@@ -1,6 +1,8 @@
 ---
-author: 무펭이 🐧
+name: kmong
+description: kmong
 ---
+
 
 # Kmong Automation Skill 🐧
 

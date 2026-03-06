@@ -1,3 +1,9 @@
+---
+name: Get eSIM Skill
+description: Purchase eSIM data packages using USDC on Base Mainnet (or testnet
+  for testing) via the x402 protocol.
+---
+
 # Get eSIM Skill
 
 Purchase eSIM data packages using USDC on Base Mainnet (or testnet for testing) via the x402 protocol.

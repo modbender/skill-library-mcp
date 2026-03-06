@@ -1,3 +1,10 @@
+---
+name: Go-to-Market Strategy Builder
+description: Build a complete GTM plan for product launches, market entries, or
+  expansion plays. Covers positioning, channel strategy, pricing, launch
+  timeline, and success metrics.
+---
+
 # Go-to-Market Strategy Builder
 
 Build a complete GTM plan for product launches, market entries, or expansion plays. Covers positioning, channel strategy, pricing, launch timeline, and success metrics.

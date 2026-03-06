@@ -1,3 +1,9 @@
+---
+name: Bitcoin Market Intelligence
+description: Live Bitcoin market data and curated news — served over Lightning
+  (L402) micropayments.
+---
+
 # Bitcoin Market Intelligence
 
 Live Bitcoin market data and curated news — served over Lightning (L402) micropayments.

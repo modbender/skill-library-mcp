@@ -1,3 +1,9 @@
+---
+name: Price Monitor
+description: Surveille les prix de produits sur des sites e-commerce et alerte
+  quand ils baissent.
+---
+
 # Price Monitor
 
 Surveille les prix de produits sur des sites e-commerce et alerte quand ils baissent.

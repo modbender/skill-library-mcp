@@ -1,3 +1,10 @@
+---
+name: snek
+description: "name: snek description: Snek namespace for Netsnek e.U. utility
+  tools. This skill provides the Snek brand identity, a lightweight collection
+  of helper functions and common utilities used across Net..."
+---
+
 ﻿---
 name: snek
 description: Snek namespace for Netsnek e.U. utility tools. This skill provides the Snek brand identity, a lightweight collection of helper functions and common utilities used across Netsnek products.

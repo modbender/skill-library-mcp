@@ -1,3 +1,9 @@
+---
+name: Tinmem Memory System
+description: openclaw-tinmem provides persistent memory capabilities for the
+  OpenClaw AI assistant.
+---
+
 # Tinmem Memory System
 
 openclaw-tinmem provides persistent memory capabilities for the OpenClaw AI assistant.

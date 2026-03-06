@@ -1,3 +1,9 @@
+---
+name: NASCAR Agent
+description: A dedicated NASCAR AI agent built to analyze, debate, and discuss
+  everything stock car racing.
+---
+
 # NASCAR Agent
 
 A dedicated NASCAR AI agent built to analyze, debate, and discuss

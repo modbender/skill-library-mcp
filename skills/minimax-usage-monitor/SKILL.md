@@ -1,3 +1,9 @@
+---
+name: minimax-usage
+description: Monitor MiniMax Coding Plan usage via API. Check remaining prompts,
+  usage percentage, and reset time.
+---
+
 # minimax-usage
 
 Monitor MiniMax Coding Plan usage via API. Check remaining prompts, usage percentage, and reset time.

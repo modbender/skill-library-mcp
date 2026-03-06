@@ -1,3 +1,9 @@
+---
+name: PersistentMind
+description: Free and open-source (MIT License) • Zero dependencies • Works
+  locally • No API keys required
+---
+
 # PersistentMind
 
 **Persistent, searchable, context-aware memory for AI agents. Store what matters. Never lose context again.**

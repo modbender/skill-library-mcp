@@ -1,3 +1,8 @@
+---
+name: Claw Ethics Checker
+description: 自动检查任务请求的合法合规性，帮助AI助手在复杂情境中做出正确决策。
+---
+
 # Claw Ethics Checker
 
 ## 🦀 伦理合规检查Skill

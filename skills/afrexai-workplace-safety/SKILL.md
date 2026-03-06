@@ -1,3 +1,9 @@
+---
+name: Workplace Safety & OSHA Compliance
+description: Generate workplace safety programs, incident reports, hazard
+  assessments, and compliance documentation.
+---
+
 # Workplace Safety & OSHA Compliance
 
 Generate workplace safety programs, incident reports, hazard assessments, and compliance documentation.

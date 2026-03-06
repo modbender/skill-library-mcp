@@ -1,3 +1,10 @@
+---
+name: Financial Times Deep Reader (ft-reader)
+description: Use this skill to perform deep, structured, and bilingual analysis
+  of top articles from Financial Times (ft.com). This skill automates login,
+  article selection, and high-quality summarization suita...
+---
+
 # Financial Times Deep Reader (ft-reader)
 
 Use this skill to perform deep, structured, and bilingual analysis of top articles from Financial Times (ft.com). This skill automates login, article selection, and high-quality summarization suitable for academic and professional use.

@@ -1,3 +1,10 @@
+---
+name: Vendor Risk Assessment
+description: Score and manage third-party vendor risk across security, financial
+  stability, compliance, operational dependency, and data handling. Built for
+  procurement teams, CISOs, and operations leaders mana...
+---
+
 # Vendor Risk Assessment
 
 Score and manage third-party vendor risk across security, financial stability, compliance, operational dependency, and data handling. Built for procurement teams, CISOs, and operations leaders managing 10+ vendors.

@@ -1,3 +1,10 @@
+---
+name: Scientific Graphical Abstract Generator
+description: Generate professional graphical abstracts for scientific papers
+  using multiple AI models. This skill transforms research descriptions and data
+  into publication-quality, editable SVG visualizations.
+---
+
 # Scientific Graphical Abstract Generator
 
 > **AI-Powered Scientific Visualization Tool** - Generate editable graphical abstracts for research papers

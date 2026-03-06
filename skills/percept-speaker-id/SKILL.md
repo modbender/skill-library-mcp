@@ -1,3 +1,8 @@
+---
+name: percept-speaker-id
+description: Speaker identification and management for multi-person conversations.
+---
+
 # percept-speaker-id
 
 Speaker identification and management for multi-person conversations.

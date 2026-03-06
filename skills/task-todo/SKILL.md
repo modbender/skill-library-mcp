@@ -1,3 +1,10 @@
+---
+name: Task-Todo Agent Skill
+description: A task management agent skill that provides persistent task storage
+  and management using SQLite database. This skill enables AI agents to create,
+  read, update, delete, and query tasks with status t...
+---
+
 # Task-Todo Agent Skill
 
 ## Overview

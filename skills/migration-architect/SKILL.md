@@ -1,3 +1,10 @@
+---
+name: Migration Architect
+description: The Migration Architect skill provides comprehensive tools and
+  methodologies for planning, executing, and validating complex system
+  migrations with minimal business impact. This skill combines prov...
+---
+
 # Migration Architect
 
 **Tier:** POWERFUL  

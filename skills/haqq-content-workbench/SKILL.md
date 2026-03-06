@@ -1,7 +1,11 @@
 ---
 name: haqq-content-workbench
-description: Create, verify, and package Islamic-ethics content for discussion. Use when the user asks for: (1) summarizing long texts, (2) checking sources/claims, (3) producing multiple post variants to avoid duplication, (4) generating discussion questions, or (5) archiving ideas for later publishing.
+description: "Create, verify, and package Islamic-ethics content for discussion.
+  Use when the user asks for: (1) summarizing long texts, (2) checking
+  sources/claims, (3) producing multiple post variants to avoid duplication, (4)
+  generating discussion questions, or (5) archiving ideas for later publishing."
 ---
+
 
 # Haqq Content Workbench
 

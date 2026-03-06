@@ -1,3 +1,9 @@
+---
+name: Wojak.ink Skill
+description: Browse, search, and analyze Wojak Farmers Plot NFTs from the
+  wojak.ink collection.
+---
+
 # Wojak.ink Skill
 
 Browse, search, and analyze Wojak Farmers Plot NFTs from the wojak.ink collection.

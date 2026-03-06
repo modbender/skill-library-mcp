@@ -1,3 +1,8 @@
+---
+name: My Custom Skill
+description: This skill adds custom functionality to OpenClaw.
+---
+
 # My Custom Skill
 
 ## Description

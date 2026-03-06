@@ -1,3 +1,9 @@
+---
+name: Agent Security Auditor
+description: Scans ERC-8004 agents for security vulnerabilities and generates
+  comprehensive security reports.
+---
+
 # Agent Security Auditor
 
 Scans ERC-8004 agents for security vulnerabilities and generates comprehensive security reports.

@@ -1,3 +1,10 @@
+---
+name: Wreckit Skill (jmanhype Fork)
+description: Connects Clawdbot to the jmanhype fork of Wreckit, the Autonomic
+  Software Factory. This version is optimized for Cattle Architecture (Ephemeral
+  Sprite VMs) and high-concurrency loops.
+---
+
 # Wreckit Skill (jmanhype Fork)
 
 > **First time?** Read [SETUP.md](./SETUP.md) first to install the Wreckit CLI from the jmanhype fork.

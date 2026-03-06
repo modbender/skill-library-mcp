@@ -1,3 +1,9 @@
+---
+name: telegram-notify
+description: Send consistent Telegram DM alerts for key trading events
+  (entry/exit/self-heal) with rate limits and clean templates.
+---
+
 # telegram-notify
 
 ## Purpose

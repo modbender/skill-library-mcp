@@ -1,3 +1,10 @@
+---
+name: Upwork Hunting — Find, Bid, Win Automation Jobs
+description: Systematically find and win Upwork jobs using our n8n workflow
+  library (2,061 templates) as a speed advantage. All outputs go to
+  workspace/artifacts/.
+---
+
 # Upwork Hunting — Find, Bid, Win Automation Jobs
 
 Systematically find and win Upwork jobs using our n8n workflow library (2,061 templates) as a speed advantage.

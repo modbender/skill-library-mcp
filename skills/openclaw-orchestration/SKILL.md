@@ -1,3 +1,9 @@
+---
+name: Orchestration Skill
+description: Multi-agent task orchestration framework. Agents delegate tasks via
+  a shared SQLite queue, with .md interchange files for visibility.
+---
+
 # Orchestration Skill
 
 Multi-agent task orchestration framework. Agents delegate tasks via a shared SQLite queue, with .md interchange files for visibility.

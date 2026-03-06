@@ -1,3 +1,10 @@
+---
+name: Telegram Bot间群聊通信技能
+description: 'name: telegram-bot-chat version: 1.0.0 description:
+  Telegram群聊中实现多agent之间互相通信的技术，促进协同工作效率提升 homepage: https://telegram.org
+  metadata: {"category":"communication","platform":"telegram","usecase":"mul...'
+---
+
 # Telegram Bot间群聊通信技能
 **创建时间**: 2026-02-20 11:03 UTC+8
 **技能版本**: 1.0.0

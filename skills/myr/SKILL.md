@@ -1,7 +1,15 @@
 ---
 name: myr
-description: Capture, search, verify, export, import, and synthesize Methodological Yield Reports (MYRs) for Starfighter/Pistis intelligence compounding. Use when: (1) installing MYR on a node, (2) storing yield from OODA cycles, (3) searching prior yield before new work, (4) operator-reviewing MYR quality, (5) exporting/importing signed MYRs between nodes, (6) generating weekly digests, or (7) integrating MYR with an agent memory system. Triggers: "install MYR", "store a MYR", "what did we learn about", "weekly yield", "export yield", "import yield", "methodological yield", "MYR".
+description: 'Capture, search, verify, export, import, and synthesize
+  Methodological Yield Reports (MYRs) for Starfighter/Pistis intelligence
+  compounding. Use when: (1) installing MYR on a node, (2) storing yield from
+  OODA cycles, (3) searching prior yield before new work, (4) operator-reviewing
+  MYR quality, (5) exporting/importing signed MYRs between nodes, (6) generating
+  weekly digests, or (7) integrating MYR with an agent memory system. Triggers:
+  "install MYR", "store a MYR", "what did we learn about", "weekly yield",
+  "export yield", "import yield", "methodological yield", "MYR".'
 ---
+
 
 # MYR — Methodological Yield Reports
 

@@ -1,3 +1,8 @@
+---
+name: "Skill: Nexus-Safe (V1.3.0)"
+description: Autonomous local System Reliability Agent for OpenClaw.
+---
+
 # Skill: Nexus-Safe (V1.3.0)
 
 Autonomous local System Reliability Agent for OpenClaw.

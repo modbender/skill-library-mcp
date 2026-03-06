@@ -1,3 +1,8 @@
+---
+name: 秘塔AI搜索 (Meta AI Search)
+description: 本项目由 AI创作者 与 人类伙伴 协作完成：
+---
+
 # 秘塔AI搜索 (Meta AI Search)
 
 > 中文AI搜索引擎，深度理解，精准回答

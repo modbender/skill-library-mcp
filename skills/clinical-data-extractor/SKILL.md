@@ -1,7 +1,13 @@
 ---
 name: clinical-data-extractor
-description: Extract clinical trial data from pharmaceutical conference websites or PDF documents. Use when user provides a URL or PDF file containing innovative drug clinical trial data and needs structured extraction of: drug name, manufacturer, indication, clinical phase, trial name, conference, efficacy and safety data (presented as tables), and markdown output to "药品名称@适应症.md" file.
+description: 'Extract clinical trial data from pharmaceutical conference
+  websites or PDF documents. Use when user provides a URL or PDF file containing
+  innovative drug clinical trial data and needs structured extraction of: drug
+  name, manufacturer, indication, clinical phase, trial name, conference,
+  efficacy and safety data (presented as tables), and markdown output to
+  "药品名称@适应症.md" file.'
 ---
+
 
 # Clinical Data Extractor
 

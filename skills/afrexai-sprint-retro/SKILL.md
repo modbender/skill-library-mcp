@@ -1,3 +1,9 @@
+---
+name: Sprint Retrospective Facilitator
+description: Run structured sprint retrospectives that produce real action items
+  — not vague "we should communicate better" fluff.
+---
+
 # Sprint Retrospective Facilitator
 
 Run structured sprint retrospectives that produce real action items — not vague "we should communicate better" fluff.

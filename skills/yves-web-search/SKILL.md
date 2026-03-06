@@ -1,15 +1,11 @@
 ---
 name: web-search
-description: Search the web and fetch web pages. Use when user wants to look up information, find answers, or search for anything online. Supports multiple free methods: Jina AI reader, DuckDuckGo Lite, and Python ddgs fallback. No API keys required for basic use.
-metadata:
-  {
-    "openclaw": {
-      "emoji": "🔍",
-      "homepage": "https://github.com/openclaw/openclaw",
-      "requires": {}
-    }
-  }
+description: "Search the web and fetch web pages. Use when user wants to look up
+  information, find answers, or search for anything online. Supports multiple
+  free methods: Jina AI reader, DuckDuckGo Lite, and Python ddgs fallback. No
+  API keys required for basic use."
 ---
+
 
 # Web Search Skill
 

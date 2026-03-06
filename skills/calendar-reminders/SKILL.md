@@ -1,7 +1,10 @@
 ---
 name: calendar-reminders
-description: Calendar reminders pipeline: config-driven wrapper around gcalcli (Google Calendar) plus optional CalDAV source via vdirsyncer+khal, and a reminder planner that outputs a JSON plan for one-shot OpenClaw reminders.
+description: "Calendar reminders pipeline: config-driven wrapper around gcalcli
+  (Google Calendar) plus optional CalDAV source via vdirsyncer+khal, and a
+  reminder planner that outputs a JSON plan for one-shot OpenClaw reminders."
 ---
+
 
 # gcalcli calendar wrapper + reminder planner
 

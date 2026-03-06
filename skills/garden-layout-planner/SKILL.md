@@ -1,7 +1,12 @@
 ---
 name: garden-layout-planner
-description: Garden design and layout planning for gardeners. Plan your garden with companion planting, spacing, and sun requirements. Use when designing a new garden, planning crop rotation, or optimizing space. Security: file exports restricted to safe directories. Perfect for home gardeners, small farmers, and anyone maximizing their growing space.
+description: "Garden design and layout planning for gardeners. Plan your garden
+  with companion planting, spacing, and sun requirements. Use when designing a
+  new garden, planning crop rotation, or optimizing space. Security: file
+  exports restricted to safe directories. Perfect for home gardeners, small
+  farmers, and anyone maximizing their growing space."
 ---
+
 
 # Garden Layout Planner
 

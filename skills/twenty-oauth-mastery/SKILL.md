@@ -1,3 +1,8 @@
+---
+name: Twenty CRM OAuth Mastery Skill
+description: "You should use this skill when working on:"
+---
+
 # Twenty CRM OAuth Mastery Skill
 
 **Author**: Generated from extensive OAuth debugging sessions in OpenCode  

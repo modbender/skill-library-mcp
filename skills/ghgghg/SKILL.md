@@ -1,7 +1,8 @@
 ---
 name: github-repo-stats
-descrition: Query a GitHub repository's star count and lines of code. Use when the user asks for repo stars, stargazers, LOC, code lines, or repository statistics for a given GitHub repo.
+description: 在用户需要查询某个 GitHub 仓库的 star 数量和代码行数时，按下列方式执行。
 ---
+
 
 # GitHub 仓库统计查询
 

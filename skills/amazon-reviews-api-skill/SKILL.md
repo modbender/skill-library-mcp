@@ -1,7 +1,17 @@
 ---
 name: amazon-reviews-api-skill
-description: This skill helps users automatically extract Amazon product reviews via the Amazon Reviews API. Agent should proactively apply this skill when users express needs like: 1. Get reviews for Amazon product with ASIN B07TS6R1SF; 2. Analyze customer feedback for a specific Amazon item; 3. Get ratings and comments for a competitive product; 4. Track sentiment of recent Amazon reviews; 5. Extract verified purchase reviews for quality assessment; 6. Summarize user experiences from Amazon product pages; 7. Monitor product performance through customer reviews; 8. Collect reviewer profiles and links for market research; 9. Gather review titles and descriptions for content analysis; 10. Scrape Amazon reviews without requiring a login.
+description: "This skill helps users automatically extract Amazon product
+  reviews via the Amazon Reviews API. Agent should proactively apply this skill
+  when users express needs like: 1. Get reviews for Amazon product with ASIN
+  B07TS6R1SF; 2. Analyze customer feedback for a specific Amazon item; 3. Get
+  ratings and comments for a competitive product; 4. Track sentiment of recent
+  Amazon reviews; 5. Extract verified purchase reviews for quality assessment;
+  6. Summarize user experiences from Amazon product pages; 7. Monitor product
+  performance through customer reviews; 8. Collect reviewer profiles and links
+  for market research; 9. Gather review titles and descriptions for content
+  analysis; 10. Scrape Amazon reviews without requiring a login."
 ---
+
 
 # Amazon Reviews Automation Extraction Skill
 

@@ -1,3 +1,9 @@
+---
+name: TubeClaw - YouTube Video Analyzer
+description: Analyze any YouTube video, extract key insights, remove fluff, and
+  provide actionable summaries with relevant links.
+---
+
 # TubeClaw - YouTube Video Analyzer
 
 Analyze any YouTube video, extract key insights, remove fluff, and provide actionable summaries with relevant links.

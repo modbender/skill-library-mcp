@@ -1,3 +1,10 @@
+---
+name: Office to Markdown Converter Skill (v2)
+description: Convert office documents (PDF, DOC, DOCX, PPTX) to Markdown format.
+  This skill uses the word-extractor library for .doc support and provides full
+  OpenClaw integration.
+---
+
 # Office to Markdown Converter Skill (v2)
 
 ## Description

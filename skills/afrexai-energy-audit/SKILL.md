@@ -1,3 +1,10 @@
+---
+name: Energy Audit — Commercial Building Assessment
+description: Run a full energy audit for commercial or industrial facilities.
+  Identifies waste, models savings, and generates a prioritized retrofit roadmap
+  with ROI timelines.
+---
+
 # Energy Audit — Commercial Building Assessment
 
 Run a full energy audit for commercial or industrial facilities. Identifies waste, models savings, and generates a prioritized retrofit roadmap with ROI timelines.

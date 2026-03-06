@@ -1,3 +1,10 @@
+---
+name: 🔖 Bookmark Intelligence
+description: Bookmark Intelligence watches your X bookmarks, fetches the full
+  content from linked articles, analyzes everything with AI, and surfaces ideas
+  relevant to YOUR projects. Stop letting great content ...
+---
+
 # 🔖 Bookmark Intelligence
 
 **Turn your X (Twitter) bookmarks into actionable insights, automatically.**

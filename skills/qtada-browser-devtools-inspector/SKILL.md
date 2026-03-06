@@ -1,7 +1,13 @@
 ---
 name: browser-devtools-inspector
-description: Inspect browser DevTools (Console, Network, Performance) for debugging frontend applications. Use when: (1) checking console errors or warnings, (2) analyzing failed API requests or CORS issues, (3) investigating slow page loads or network performance, (4) debugging JavaScript errors, (5) inspecting HTTP request/response headers, (6) monitoring API endpoints during page load, or (7) troubleshooting frontend issues with real browser data.
+description: "Inspect browser DevTools (Console, Network, Performance) for
+  debugging frontend applications. Use when: (1) checking console errors or
+  warnings, (2) analyzing failed API requests or CORS issues, (3) investigating
+  slow page loads or network performance, (4) debugging JavaScript errors, (5)
+  inspecting HTTP request/response headers, (6) monitoring API endpoints during
+  page load, or (7) troubleshooting frontend issues with real browser data."
 ---
+
 
 # Browser DevTools Inspector
 

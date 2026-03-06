@@ -1,6 +1,9 @@
 ---
-description: Diagnose Wi-Fi issues with signal analysis, channel scanning, speed tests, and DNS checks.
+name: wifi-diagnostics
+description: Diagnose Wi-Fi issues with signal analysis, channel scanning, speed
+  tests, and DNS checks.
 ---
+
 
 # Wi-Fi Diagnostics
 

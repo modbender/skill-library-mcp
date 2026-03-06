@@ -1,3 +1,10 @@
+---
+name: ToA Crypto News Skill
+description: "name: toa-news description: Real-time crypto news API with
+  millisecond-level updates. Supports keyword search, coin filtering, and
+  pagination. 6551-compatible format. user-invocable: true metadata:..."
+---
+
 name: toa-news
 description: Real-time crypto news API with millisecond-level updates. Supports keyword search, coin filtering, and pagination. 6551-compatible format.
 user-invocable: true

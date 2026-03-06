@@ -1,3 +1,8 @@
+---
+name: Morning Briefing Generator
+description: "Generates personalized morning briefings with:"
+---
+
 # Morning Briefing Generator
 
 **Version:** 1.0

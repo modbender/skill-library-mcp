@@ -1,3 +1,10 @@
+---
+name: b3ehive Skill Specification
+description: Enable competitive code generation where three isolated AI agents
+  implement the same functionality, evaluate each other objectively, and deliver
+  the optimal solution through data-driven selection.
+---
+
 # b3ehive Skill Specification
 ## PCTF-Compliant Multi-Agent Competition System
 

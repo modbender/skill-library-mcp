@@ -1,3 +1,9 @@
+---
+name: 🦒 Giraffe Guard — 长颈鹿卫士
+description: Scan OpenClaw skill directories for supply chain attacks and
+  malicious code. 扫描 OpenClaw skill 目录，检测潜在的供应链投毒和恶意代码。
+---
+
 # 🦒 Giraffe Guard — 长颈鹿卫士
 
 Scan OpenClaw skill directories for supply chain attacks and malicious code.

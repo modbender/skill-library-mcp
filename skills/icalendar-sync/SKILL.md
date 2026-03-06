@@ -1,3 +1,8 @@
+---
+name: iCloud Calendar Sync Skill
+description: Synchronizes calendar events between local system and iCloud.
+---
+
 # iCloud Calendar Sync Skill
 
 Synchronizes calendar events between local system and iCloud.

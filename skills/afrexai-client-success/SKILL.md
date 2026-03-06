@@ -1,3 +1,10 @@
+---
+name: Client Success & Revenue Expansion — The Complete Retention Operating System
+description: Turn clients into long-term revenue engines. This isn't advice —
+  it's a complete operating system with scoring models, templates, playbooks,
+  and automation patterns that work for any B2B or B2C sub...
+---
+
 # Client Success & Revenue Expansion — The Complete Retention Operating System
 
 Turn clients into long-term revenue engines. This isn't advice — it's a complete operating system with scoring models, templates, playbooks, and automation patterns that work for any B2B or B2C subscription business.

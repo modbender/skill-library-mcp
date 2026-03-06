@@ -1,14 +1,8 @@
 ---
-metadata.clawdbot:
-  name: "ticket-monitor-ichinosuke"
-  version: "1.0.5"
-  description: "春風亭一之輔の公式サイトを監視し、東京公演のチケット情報をDiscordに通知します。"
-  requires.env:
-    - DISCORD_WEBHOOK_URL
-  files:
-    - "*"
-  install: "bash scripts/install.sh"
+name: ticket-monitor-ichinosuke
+description: 春風亭一之輔の公式ウェブサイト（いちのすけえん）をスクレイピングし、東京都内で開催される新しい公演チケット情報を検知して指定のDiscordに通知するツールです。
 ---
+
 
 # Ticket Monitor - 春風亭一之輔
 

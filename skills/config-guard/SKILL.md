@@ -1,3 +1,8 @@
+---
+name: Claw Seatbelt 🛡️ (OpenClaw 安全带)
+description: 这是一款为你修改 openclaw.json 准备的“安全带”。它不像普通插件那样全天候运行，而是只在你需要修改配置并备份时，提供 10 秒的自动回滚保护。
+---
+
 # Claw Seatbelt 🛡️ (OpenClaw 安全带)
 
 这是一款为你修改 `openclaw.json` 准备的“安全带”。它不像普通插件那样全天候运行，而是只在你需要修改配置并备份时，提供 10 秒的自动回滚保护。

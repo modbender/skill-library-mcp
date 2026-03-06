@@ -1,3 +1,10 @@
+---
+name: Prompt Injection Protection Skill
+description: A comprehensive skill to protect against prompt injection attacks
+  when processing external content such as websites, emails, documents, and
+  other untrusted input sources.
+---
+
 # Prompt Injection Protection Skill
 
 ## Description

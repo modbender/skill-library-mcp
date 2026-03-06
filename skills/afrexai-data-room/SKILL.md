@@ -1,3 +1,9 @@
+---
+name: Data Room Builder
+description: Build a structured virtual data room checklist and folder hierarchy
+  for fundraising, M&A, or due diligence.
+---
+
 # Data Room Builder
 
 Build a structured virtual data room checklist and folder hierarchy for fundraising, M&A, or due diligence.

@@ -1,3 +1,8 @@
+---
+name: Twitter/X Profile Scraper
+description: A browser-based Twitter/X profile discovery and scraping tool.
+---
+
 # Twitter/X Profile Scraper
 
 

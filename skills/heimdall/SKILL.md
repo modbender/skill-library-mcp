@@ -1,3 +1,9 @@
+---
+name: Heimdall - Security Scanner for AI Agent Skills
+description: Scan OpenClaw skills for malicious patterns before installation.
+  Context-aware scanning with AI-powered narrative analysis.
+---
+
 # Heimdall - Security Scanner for AI Agent Skills
 
 Scan OpenClaw skills for malicious patterns before installation. Context-aware scanning with AI-powered narrative analysis.

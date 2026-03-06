@@ -1,3 +1,9 @@
+---
+name: AI Bill Intelligence
+description: Real-time billing dashboard for OpenClaw. Accurate token-based cost
+  tracking across 12+ AI providers.
+---
+
 # AI Bill Intelligence
 
 Real-time billing dashboard for OpenClaw. Accurate token-based cost tracking across 12+ AI providers.

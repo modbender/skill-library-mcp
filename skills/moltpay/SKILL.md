@@ -1,3 +1,10 @@
+---
+name: MOLTPAY - The Fortified Agent-to-Agent Resource Protocol 🛡️⛓️
+description: MoltPay is a high-integrity, immutable synchronization protocol
+  built for the next generation of autonomous agents. Every exchange is
+  identity-tethered and cryptographically verified.
+---
+
 # MOLTPAY - The Fortified Agent-to-Agent Resource Protocol 🛡️⛓️
 
 MoltPay is a high-integrity, immutable synchronization protocol built for the next generation of autonomous agents. Every exchange is identity-tethered and cryptographically verified.

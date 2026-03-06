@@ -1,3 +1,9 @@
+---
+name: Seasonal Campaign Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI google veo generation.
+---
+
 # Seasonal Campaign Video
 
 **Version**: 1.0.0

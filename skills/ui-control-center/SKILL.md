@@ -1,3 +1,9 @@
+---
+name: ui-control-center
+description: "Maintain the local Agent Control UI: reliability, caching,
+  dashboards, trading tab, agents/workflows/skills tabs."
+---
+
 # ui-control-center
 
 ## Purpose

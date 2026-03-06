@@ -1,7 +1,12 @@
 ---
 name: pest-disease-tracker
-description: Track garden pests and diseases with treatments. Identify problems, track treatments, and monitor effectiveness. Use when dealing with garden pests, plant diseases, or treatment planning. Security: file exports restricted to safe directories. Perfect for home gardeners and small farmers managing plant health.
+description: "Track garden pests and diseases with treatments. Identify
+  problems, track treatments, and monitor effectiveness. Use when dealing with
+  garden pests, plant diseases, or treatment planning. Security: file exports
+  restricted to safe directories. Perfect for home gardeners and small farmers
+  managing plant health."
 ---
+
 
 # Pest & Disease Tracker
 

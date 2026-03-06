@@ -1,3 +1,8 @@
+---
+name: Feishu Voice Skill - 飞书语音交互技能
+description: 本技能用于实现飞书与 ElevenLabs 的语音交互，包括：
+---
+
 # Feishu Voice Skill - 飞书语音交互技能
 
 ## 概述

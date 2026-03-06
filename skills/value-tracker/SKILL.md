@@ -1,3 +1,10 @@
+---
+name: Value Tracker Skill
+description: Track and quantify the value your AI assistant generates. Measure
+  hours saved, calculate ROI with differentiated rates by category, and prove
+  the impact.
+---
+
 # Value Tracker Skill
 
 Track and quantify the value your AI assistant generates. Measure hours saved, calculate ROI with differentiated rates by category, and prove the impact.

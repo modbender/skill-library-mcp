@@ -1,3 +1,9 @@
+---
+name: Cetus Protocol SDK v2 - OpenClaw Integration Guide
+description: This guide covers all Cetus SDK v2 packages for building DeFi
+  applications on Sui.
+---
+
 # Cetus Protocol SDK v2 - OpenClaw Integration Guide
 
 This guide covers all Cetus SDK v2 packages for building DeFi applications on Sui.

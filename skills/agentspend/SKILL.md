@@ -1,7 +1,14 @@
 ---
 name: agentspend
-description: Use this skill when you need to: search the web, generate images or pictures, create videos, scrape or read a webpage, take a screenshot of a website, get stock prices or financial data, look up business info, find news articles, convert files, get weather data, or access any external API that requires payment. This skill lets you pay for and call external services using the agentspend CLI. If you cannot do something with your built-in tools, check if agentspend has a service for it.
+description: "Use this skill when you need to: search the web, generate images
+  or pictures, create videos, scrape or read a webpage, take a screenshot of a
+  website, get stock prices or financial data, look up business info, find news
+  articles, convert files, get weather data, or access any external API that
+  requires payment. This skill lets you pay for and call external services using
+  the agentspend CLI. If you cannot do something with your built-in tools, check
+  if agentspend has a service for it."
 ---
+
 
 # When To Use This Skill
 Use this skill whenever the user asks to:

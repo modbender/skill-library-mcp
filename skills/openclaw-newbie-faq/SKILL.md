@@ -1,14 +1,9 @@
 ---
-name: "openclaw-newbie-faq"
-version: "1.0.43"
-displayName: "openclaw新手帮帮忙"
-description: "为刚接触 OpenClaw 的新手提供完整指南。安装后请说"启动新手帮助"来启动34567端口的Web服务。源码：https://github.com/kunyashaw/openclaw-newbie-faq.git"
-entryPoint:
-  type: javascript
-  path: "index.js"
-triggers:
-  keywords: ["启动新手帮助", "停止新手帮助", "openclaw 新手", "openclaw 帮助", "openclaw 指南"]
+name: openclaw-newbie-faq
+description: 为刚接触 OpenClaw
+  的新手提供完整指南。安装后请说"启动新手帮助"来启动34567端口的Web服务。源码：https://github.com/kunyashaw/openclaw-newbie-faq.git
 ---
+
 
 # OpenClaw 新手帮帮忙
 

@@ -1,13 +1,10 @@
 ---
 name: clickup
-displayName: ClickUp Integration
-description: Interact with ClickUp API for task management. Use for listing tasks, creating tasks, updating task status, and managing workspaces. Base URL: https://api.clickup.com/api/v2
-version: 1.0.0
-tags:
-  - productivity
-  - task-management
-  - api
+description: "Interact with ClickUp API for task management. Use for listing
+  tasks, creating tasks, updating task status, and managing workspaces. Base
+  URL: https://api.clickup.com/api/v2"
 ---
+
 
 # ClickUp Integration
 

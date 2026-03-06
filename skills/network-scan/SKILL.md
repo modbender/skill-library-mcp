@@ -1,3 +1,10 @@
+---
+name: network-scan
+description: This skill scans ports and devices on a network using nmap. It
+  supports various target formats, including CIDR notation, IP ranges, and
+  comma-separated lists. Defaults to quick scan for CIDR.
+---
+
 # network-scan
 
 ## Description

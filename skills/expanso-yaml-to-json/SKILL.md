@@ -1,3 +1,8 @@
+---
+name: yaml-to-json
+description: Convert YAML to JSON format
+---
+
 # yaml-to-json
 
 Convert YAML to JSON format

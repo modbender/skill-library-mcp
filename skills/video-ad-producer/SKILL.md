@@ -1,3 +1,10 @@
+---
+name: Video Ad Production Skill
+description: This skill enables Claude to transform a text brief into a fully
+  produced video advertisement — ready to run on Facebook Ads, Instagram Ads, or
+  YouTube Ads — using the InVideo AI platform.
+---
+
 # Video Ad Production Skill
 
 ## Overview

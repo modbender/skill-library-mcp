@@ -1,12 +1,12 @@
 ---
 name: boycott-chatgpt-54c8dfea
-description: OpenAI president Greg Brockman gave [$25 million](https://www.sfgate.com/tech/article/brockman-openai-top-trump-donor-21273419.php) to MAGA Inc in 2025. They gave Trump 26x more than any other major AI company. ICE's resume screening tool is powered by OpenAI's GPT-4. They're spending 50 million dollars to prevent states from regulating AI.
-
-They're cozying up to Trump while ICE is killing Americans and Trump is threatening to invade peaceful allies. 
-
-Many people have quit OpenAI because of its...
-metadata: {"clawdbot": {"type": "text prompt", "inferred_type": "Text Prompt", "source": "reddit", "original_url": "https://www.reddit.com/r/ChatGPT/comments/1qrda7y/boycott_chatgpt/", "quality_score": 70}}
+description: OpenAI president Greg Brockman gave [$25
+  million](https://www.sfgate.com/tech/article/brockman-openai-top-trump-donor-21273419.php)
+  to MAGA Inc in 2025. They gave Trump 26x more than any other major AI company.
+  ICE's resume screening tool is powered by OpenAI's GPT-4. They're spending 50
+  million dollars to prevent states from regulating AI.
 ---
+
 
 # Boycott ChatGPT
 

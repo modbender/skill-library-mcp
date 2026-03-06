@@ -1,43 +1,14 @@
 ---
 name: glab
-description: GitLab CLI for managing issues, merge requests, CI/CD pipelines, and repositories. Use when: (1) Creating, reviewing, or merging MRs, (2) Managing GitLab issues, (3) Monitoring or triggering CI/CD pipelines, (4) Working with self-hosted GitLab instances, (5) Automating GitLab workflows from the command line. Requires GITLAB_TOKEN (recommend minimal scopes). The `glab api` command enables arbitrary API calls - use read-only tokens when possible.
-homepage: https://github.com/bezko/openclaw-skills/tree/main/skills/glab
-metadata:
-  openclaw:
-    requires:
-      bins: [glab, jq]
-      envs:
-        - name: GITLAB_TOKEN
-          description: GitLab personal access token. Recommend minimal scopes (read_api for read-only).
-          secret: true
-          required: true
-        - name: GITLAB_HOST
-          description: GitLab instance hostname (e.g., gitlab.example.org). Defaults to gitlab.com.
-          required: false
-        - name: TIMEOUT
-          description: Pipeline/MR wait timeout in seconds. Defaults vary by script.
-          required: false
-        - name: INTERVAL
-          description: Polling interval in seconds for watch scripts. Default 5-10s.
-          required: false
-    install:
-      - id: brew
-        kind: brew
-        package: glab
-        label: Install glab via Homebrew
-      - id: apt
-        kind: apt
-        package: glab
-        label: Install glab via apt
-      - id: jq-brew
-        kind: brew
-        package: jq
-        label: Install jq via Homebrew
-      - id: jq-apt
-        kind: apt
-        package: jq
-        label: Install jq via apt
+description: "GitLab CLI for managing issues, merge requests, CI/CD pipelines,
+  and repositories. Use when: (1) Creating, reviewing, or merging MRs, (2)
+  Managing GitLab issues, (3) Monitoring or triggering CI/CD pipelines, (4)
+  Working with self-hosted GitLab instances, (5) Automating GitLab workflows
+  from the command line. Requires GITLAB_TOKEN (recommend minimal scopes). The
+  `glab api` command enables arbitrary API calls - use read-only tokens when
+  possible."
 ---
+
 
 # GitLab CLI (glab)
 

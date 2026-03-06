@@ -1,3 +1,8 @@
+---
+name: Portfolio Risk & Optimization Analyzer
+description: "Crypto traders suck at risk management. This tool:"
+---
+
 # Portfolio Risk & Optimization Analyzer
 
 **AI-powered crypto portfolio risk analysis with automated $BANKR buyback monetization.**

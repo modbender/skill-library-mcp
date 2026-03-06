@@ -1,3 +1,8 @@
+---
+name: Skill Usage Tracker
+description: 自动追踪和审计 skill 使用情况，确保强制规则被执行。
+---
+
 # Skill Usage Tracker
 
 ## Purpose

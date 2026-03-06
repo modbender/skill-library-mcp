@@ -1,3 +1,10 @@
+---
+name: Content Writer
+description: A multi-platform content creation skill for AI agents. Generate
+  posts, threads, newsletters, and product descriptions optimized for each
+  platform's format and audience.
+---
+
 # Content Writer
 
 A multi-platform content creation skill for AI agents. Generate posts, threads, newsletters, and product descriptions optimized for each platform's format and audience.

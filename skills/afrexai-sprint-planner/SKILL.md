@@ -1,3 +1,8 @@
+---
+name: Sprint Planner
+description: Plan, scope, and run agile sprints that actually ship. No ceremony bloat.
+---
+
 # Sprint Planner
 
 Plan, scope, and run agile sprints that actually ship. No ceremony bloat.

@@ -1,3 +1,8 @@
+---
+name: Antfarm CLI Skill
+description: "Always use full path: node /.openclaw/workspace/antfarm/dist/cli/cli.js"
+---
+
 # Antfarm CLI Skill
 
 Always use full path: `node ~/.openclaw/workspace/antfarm/dist/cli/cli.js`

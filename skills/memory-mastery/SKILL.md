@@ -1,3 +1,10 @@
+---
+name: Memory Mastery - OpenClaw Memory System
+description: "This skill implements a structured memory system for OpenClaw
+  agents, enabling them to maintain context and continuity across sessions
+  through a three-layer architecture:"
+---
+
 # Memory Mastery - OpenClaw Memory System
 
 **A three-layer memory architecture for persistent context across sessions.**

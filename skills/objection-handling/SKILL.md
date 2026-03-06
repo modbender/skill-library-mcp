@@ -1,3 +1,10 @@
+---
+name: Objection Handling — Turn Resistance Into Revenue
+description: "Overcome buyer objections using proven frameworks. Every objection
+  is a buying signal — they're considering it, they just need clarity. Sources:
+  Gong.io (AI sales data), Thriving Tech (sales method..."
+---
+
 # Objection Handling — Turn Resistance Into Revenue
 
 Overcome buyer objections using proven frameworks. Every objection is a buying signal — they're considering it, they just need clarity.

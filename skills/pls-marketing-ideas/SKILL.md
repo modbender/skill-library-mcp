@@ -1,7 +1,11 @@
 ---
 name: marketing-ideas
-description: Generate campaign concepts, viral hooks, and marketing strategies that go beyond "buy my product." Use when: (1) Planning campaigns, (2) Creating content hooks, (3) Brainstorming promotions, (4) Developing brand messaging.
+description: 'Generate campaign concepts, viral hooks, and marketing strategies
+  that go beyond "buy my product." Use when: (1) Planning campaigns, (2)
+  Creating content hooks, (3) Brainstorming promotions, (4) Developing brand
+  messaging.'
 ---
+
 
 # Marketing Ideas
 

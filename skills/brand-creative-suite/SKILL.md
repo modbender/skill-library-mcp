@@ -1,3 +1,8 @@
+---
+name: 品牌创意套件 (Brand Creative Suite)
+description: 为品牌方和企业提供专业级品牌视觉内容生成工具,基于Nano Banana Pro的908+精选提示词案例,通过即梦API实现商业化图像生成。
+---
+
 # 品牌创意套件 (Brand Creative Suite)
 
 ## 概述

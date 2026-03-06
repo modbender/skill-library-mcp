@@ -1,3 +1,9 @@
+---
+name: Agentic Calling Skill
+description: "This skill provides a complete toolkit for AI agents to handle
+  phone calls programmatically. Agents can:"
+---
+
 # Agentic Calling Skill
 
 **Enable AI agents to make and receive phone calls autonomously using Twilio.**

@@ -1,3 +1,8 @@
+---
+name: 📚 Enterprise Knowledge Retrieval
+description: operation platform enterprise knowledge
+---
+
 ```
 ---
 name: enterprise-knowledge

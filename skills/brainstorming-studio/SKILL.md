@@ -1,3 +1,10 @@
+---
+name: ✅ 2️⃣ RESULTADO
+description: Skill Router operates as a decision and governance layer above all
+  other skills. It inventories available skills, scores them transparently,
+  applies safety gates, and orchestrates the optimal execu...
+---
+
 ﻿# 🧠 Skill Router (Skill Orchestrator)
 **An explainable, deterministic meta-skill that decides _which_ skill to use, _how_ to use it, and _whether_ it is safe — before anything runs.**
 Skill Router operates as a **decision and governance layer above all other skills**.

@@ -1,3 +1,10 @@
+---
+name: coder
+description: "name: coder description: Coder namespace for Netsnek e.U.
+  developer productivity suite. Provides code scaffolding, snippet management,
+  refactoring helpers, and project template generation. user-inv..."
+---
+
 ﻿---
 name: coder
 description: Coder namespace for Netsnek e.U. developer productivity suite. Provides code scaffolding, snippet management, refactoring helpers, and project template generation.

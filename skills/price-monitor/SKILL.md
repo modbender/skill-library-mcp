@@ -1,6 +1,9 @@
 ---
-description: Track crypto and stock prices in real-time with configurable alerts and multi-currency support.
+name: price-monitor
+description: Track crypto and stock prices in real-time with configurable alerts
+  and multi-currency support.
 ---
+
 
 # Price Monitor
 

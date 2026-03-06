@@ -1,3 +1,9 @@
+---
+name: 🐾 CRM Intelligence — Smart Contact Filtering
+description: 2-stage Berman-style filtering and contact scoring for your
+  personal CRM. Learns what matters to you.
+---
+
 # 🐾 CRM Intelligence — Smart Contact Filtering
 
 > by Odin's Eye Enterprises — Ancient Wisdom. Modern Intelligence.

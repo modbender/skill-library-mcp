@@ -1,3 +1,9 @@
+---
+name: hotel-pricer Skill
+description: A Go-based CLI for searching hotel availability and pricing using
+  the Amadeus API.
+---
+
 # hotel-pricer Skill
 
 A Go-based CLI for searching hotel availability and pricing using the Amadeus API.

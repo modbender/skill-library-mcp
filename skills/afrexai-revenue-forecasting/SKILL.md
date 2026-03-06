@@ -1,3 +1,9 @@
+---
+name: Revenue Forecasting Engine
+description: Build accurate, data-driven revenue forecasts your board and
+  investors actually trust.
+---
+
 # Revenue Forecasting Engine
 
 Build accurate, data-driven revenue forecasts your board and investors actually trust.

@@ -1,3 +1,10 @@
+---
+name: 🛡️ AgentShield Audit
+description: ✅ Zero data leaves your system ✅ 52+ tests run locally in your
+  agent ✅ Only certificate public key is shared ✅ Open source - verify every
+  test
+---
+
 # 🛡️ AgentShield Audit
 
 > **Privacy-First Security Assessment with Public Trust Registry**

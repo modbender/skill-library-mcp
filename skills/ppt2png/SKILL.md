@@ -1,3 +1,8 @@
+---
+name: ppt2png
+description: ppt2png
+---
+
 ppt2png
 
 适用某个PPT，帮我生成图片和缩略图

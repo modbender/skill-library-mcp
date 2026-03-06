@@ -1,3 +1,10 @@
+---
+name: Tork Guardian for OpenClaw
+description: Enterprise-grade security and governance layer for OpenClaw agents.
+  Detect PII, enforce policies, generate compliance receipts, control tool
+  access, and scan skills for vulnerabilities before insta...
+---
+
 # Tork Guardian for OpenClaw
 
 > OpenClaw is powerful. Tork makes it safe.

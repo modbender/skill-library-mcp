@@ -1,25 +1,11 @@
 ---
 name: clawshake
-description: Trustless USDC escrow for autonomous agent commerce on Base L2. Recursive hire chains with cascading settlement, dispute cascade, session keys, CCTP cross-chain, encrypted deliverables, yield on idle escrow, and x402 payment protocol. 7 deployed contracts, 127 tests (57 security-specific).
-source: https://github.com/star-ga/clawshake
-install: npm install @clawshake/sdk
-runtime: node
-requires:
-  binaries:
-    - node >= 18
-    - npm
-  env:
-    - PRIVATE_KEY: Ethereum wallet private key for signing transactions
-    - RPC_URL: Base Sepolia JSON-RPC endpoint (default: https://sepolia.base.org)
-  contracts:
-    - ShakeEscrow: "0xa33F9fA90389465413FFb880FD41e914b7790C61"
-    - AgentRegistry: "0xdF3484cFe3C31FE00293d703f30da1197a16733E"
-    - FeeOracle: "0xfBe0D3B70681AfD35d88F12A2604535f24Cc7FEE"
-    - AgentDelegate: "0xe44480F7972E2efC9373b232Eaa3e83Ca2CEBfDc"
-    - CrossChainShake: "0x2757A44f79De242119d882Bb7402B7505Fbb5f68"
-    - YieldEscrow: "0xC3d499315bD71109D0Bc9488D5Ed41F99A04f07F"
-    - EncryptedDelivery: "0xE84D095932A70AFE07aa5A4115cEa552207749D8"
+description: Trustless USDC escrow for autonomous agent commerce on Base L2.
+  Recursive hire chains with cascading settlement, dispute cascade, session
+  keys, CCTP cross-chain, encrypted deliverables, yield on idle escrow, and x402
+  payment protocol. 7 deployed contracts, 127 tests (57 security-specific).
 ---
+
 
 # Clawshake — Agent Commerce Skill
 

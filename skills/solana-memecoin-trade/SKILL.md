@@ -1,3 +1,9 @@
+---
+name: Solana Memecoin Guardian v2
+description: Solana Memecoin Guardian v2 is an autonomous trading skill designed
+  to discover and trade Solana memecoins while minimizing downside risk.
+---
+
 # Solana Memecoin Guardian v2
 
 ## Overview

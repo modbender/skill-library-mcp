@@ -1,3 +1,9 @@
+---
+name: Nightly Build 🌙
+description: An automation skill that runs maintenance tasks while you sleep and
+  delivers a morning briefing.
+---
+
 # Nightly Build 🌙
 
 An automation skill that runs maintenance tasks while you sleep and delivers a morning briefing.

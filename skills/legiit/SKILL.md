@@ -1,7 +1,10 @@
 ---
 name: legiit-marketplace
-description: Help an OpenClaw agent guide buyers on Legiit: clarify what they need, choose a fitting service, reduce risk, and draft practical messages for each order stage (pre-order, active order, revisions, delivery).
+description: "Help an OpenClaw agent guide buyers on Legiit: clarify what they
+  need, choose a fitting service, reduce risk, and draft practical messages for
+  each order stage (pre-order, active order, revisions, delivery)."
 ---
+
 
 # Legiit Marketplace
 

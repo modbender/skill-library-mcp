@@ -1,3 +1,10 @@
+---
+name: SoulKeeper
+description: "The problem: agents forget who they are between sessions. They
+  drift. They ask when they should act. They forget tools they have. They become
+  the corporate drone their soul forbids."
+---
+
 # SoulKeeper
 
 **Identity persistence for AI agents.**

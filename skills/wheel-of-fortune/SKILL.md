@@ -1,3 +1,10 @@
+---
+name: Glucksrad — Decision Wheel
+description: Use this skill when a user is stuck choosing between multiple
+  options and wants a fun, random way to decide. Generate a URL that opens an
+  interactive 3D spinning wheel.
+---
+
 # Glucksrad — Decision Wheel
 
 Use this skill when a user is stuck choosing between multiple options and wants a fun, random way to decide. Generate a URL that opens an interactive 3D spinning wheel.

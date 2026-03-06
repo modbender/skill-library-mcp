@@ -1,3 +1,10 @@
+---
+name: Lead Magnets — Free-to-Paid Conversion Framework
+description: "Design lead magnets that attract qualified prospects and convert
+  them to paying customers. Sources: Hormozi ($100M Leads), Funnelytics,
+  BusySeed (500+ clients), LeadsPicker research. All outputs go..."
+---
+
 # Lead Magnets — Free-to-Paid Conversion Framework
 
 Design lead magnets that attract qualified prospects and convert them to paying customers.

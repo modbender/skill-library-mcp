@@ -1,7 +1,13 @@
 ---
 name: aoi-openclaw-security-toolkit-core
-description: Fail-closed OpenClaw security toolkit (public-safe). Use to prevent accidental or unexpected data leakage by running local-only checks: default-deny allowlists, lightweight secret/token scans, egress-risk pattern scans, and prompt/document injection pattern scans. Use when preparing GitHub/ClawHub publishing, reviewing skills/scripts for risky behavior, or validating inbound text/doc content before tool execution.
+description: "Fail-closed OpenClaw security toolkit (public-safe). Use to
+  prevent accidental or unexpected data leakage by running local-only checks:
+  default-deny allowlists, lightweight secret/token scans, egress-risk pattern
+  scans, and prompt/document injection pattern scans. Use when preparing
+  GitHub/ClawHub publishing, reviewing skills/scripts for risky behavior, or
+  validating inbound text/doc content before tool execution."
 ---
+
 
 # AOI OpenClaw Security Toolkit (Core)
 

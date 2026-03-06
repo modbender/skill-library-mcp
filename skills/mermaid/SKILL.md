@@ -1,3 +1,8 @@
+---
+name: Mermaid Diagrams Skill
+description: Generate diagrams from text using Mermaid.
+---
+
 # Mermaid Diagrams Skill
 
 Generate diagrams from text using [Mermaid](https://mermaid.js.org/).

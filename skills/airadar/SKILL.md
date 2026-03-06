@@ -1,7 +1,12 @@
 ---
 name: ai-tools-github-radar
-description: Distill the signal around AI-native tools/apps and their GitHub home bases: fast-growing, hyped, well-funded projects plus repos with rapidly rising stars or trending status. Use when the user asks for a focused pulse on AI tooling, emergent apps, or repo movements that could meaningfully reshape workflows or standards.
+description: "Distill the signal around AI-native tools/apps and their GitHub
+  home bases: fast-growing, hyped, well-funded projects plus repos with rapidly
+  rising stars or trending status. Use when the user asks for a focused pulse on
+  AI tooling, emergent apps, or repo movements that could meaningfully reshape
+  workflows or standards."
 ---
+
 
 # Thesis
 Treat today’s AI tooling and GitHub traction as complementary data streams for technological momentum: the stories, raises, and features that command attention *and* the repos whose star graphs are climbing fastest together reveal where value, community trust, and experimentation are accelerating. The purpose of this skill is to keep that thesis front and center—every summary should answer “why does this tool/repo matter *now*?” and “what does its trajectory say about the broader AI ecosystem?”

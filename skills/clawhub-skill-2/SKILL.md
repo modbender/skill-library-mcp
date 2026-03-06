@@ -1,3 +1,10 @@
+---
+name: Xrouter
+description: Xrouter is an open-source inference router that sits between
+  OpenClaw and your LLM providers. It uses a fast, hardware-aware classifier to
+  route each request to the most cost-effective model that c...
+---
+
 # Xrouter
 
 Xrouter is an open-source inference router that sits between OpenClaw and your LLM providers. It uses a fast, hardware-aware classifier to route each request to the most cost-effective model that can handle the task.

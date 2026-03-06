@@ -1,3 +1,8 @@
+---
+name: notify-bot
+description: 向指定 Telegram bot 发送任务通知，激活其群组 session。
+---
+
 # notify-bot
 
 向指定 Telegram bot 发送任务通知，激活其群组 session。

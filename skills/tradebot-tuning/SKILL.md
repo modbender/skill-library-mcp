@@ -1,3 +1,9 @@
+---
+name: tradebot-tuning
+description: Increase tradability safely by adjusting parameters one step at a
+  time based on regime and diagnostics.
+---
+
 # tradebot-tuning
 
 ## Purpose

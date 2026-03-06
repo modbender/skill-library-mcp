@@ -1,3 +1,10 @@
+---
+name: Privacy Concierge Skill for OpenClaw
+description: Guardian is a personal, always-on AI concierge dedicated to helping
+  users protect their online privacy and reduce data exposure from data brokers,
+  adtech networks, people-search sites, and trackers.
+---
+
 # Privacy Concierge Skill for OpenClaw
 
 ## Overview

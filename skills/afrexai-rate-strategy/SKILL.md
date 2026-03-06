@@ -1,3 +1,10 @@
+---
+name: Interest Rate Strategy for AI-Era Businesses
+description: Help business operators model how AI-driven productivity gains
+  interact with interest rate cycles. Built for CFOs, founders, and finance
+  teams navigating rate decisions in 2026-2028.
+---
+
 # Interest Rate Strategy for AI-Era Businesses
 
 ## Purpose

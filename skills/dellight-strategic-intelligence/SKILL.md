@@ -1,6 +1,11 @@
 ---
 name: cio-intelligence
-description: Chief Intelligence Officer analytical framework for AI startups. Use for competitive analysis, technology trend assessment, signal classification, opportunity scoring, threat identification, and strategic intelligence briefings.
+description: Chief Intelligence Officer analytical framework for AI startups.
+  Use for competitive analysis, technology trend assessment, signal
+  classification, opportunity scoring, threat identification, and strategic
+  intelligence briefings.
+---
+
 
 # CIO Intelligence Operations
 

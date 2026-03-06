@@ -1,7 +1,10 @@
 ---
 name: tg-voice-whisper
-description: Auto-transcribe Telegram voice messages (.ogg Opus) to text using local OpenAI Whisper (tiny model). Reply with transcription + auto-delete file for privacy. No API keys, fully offline after install.
-emoji: 🎙️🔊
+description: Auto-transcribe Telegram voice messages (.ogg Opus) to text using
+  local OpenAI Whisper (tiny model). Reply with transcription + auto-delete file
+  for privacy. No API keys, fully offline after install.
+---
+
 
 requires:
   bins: [whisper, ffmpeg]

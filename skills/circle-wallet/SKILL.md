@@ -1,3 +1,9 @@
+---
+name: Circle Wallet Skill
+description: USDC wallet operations for OpenClaw agents via Circle
+  Developer-Controlled Wallets.
+---
+
 # Circle Wallet Skill
 
 USDC wallet operations for OpenClaw agents via Circle Developer-Controlled Wallets.

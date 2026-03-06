@@ -1,13 +1,10 @@
 ---
-description: Strategies for productive agent idle time using heartbeats and cron jobs. Use when setting up proactive behaviors, scheduling background tasks, or making your agent work while you sleep.
-triggers:
-  - agent dreams
-  - idle time
-  - proactive agent
-  - heartbeat setup
-  - cron schedule
-  - background tasks
+name: agent-dreams
+description: Strategies for productive agent idle time using heartbeats and cron
+  jobs. Use when setting up proactive behaviors, scheduling background tasks, or
+  making your agent work while you sleep.
 ---
+
 
 # Agent Dreams
 

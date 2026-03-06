@@ -1,3 +1,9 @@
+---
+name: Notify - Smart Notification Delivery
+description: Use when sending notifications to users from an AI agent. Covers
+  channel selection, timing, formatting, and avoiding notification fatigue.
+---
+
 # Notify - Smart Notification Delivery
 
 ## When to Use This Skill

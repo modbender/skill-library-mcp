@@ -1,3 +1,8 @@
+---
+name: ETHSKILLS — The missing knowledge between AI agents and production Ethereum.
+description: "For individual topics, fetch any of these directly:"
+---
+
 # ETHSKILLS — The missing knowledge between AI agents and production Ethereum.
 
 ## Terminology

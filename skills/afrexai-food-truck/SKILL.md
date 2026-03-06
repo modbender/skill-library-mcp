@@ -1,3 +1,10 @@
+---
+name: Food Truck Business Operations
+description: Complete operational playbook for launching and scaling a food
+  truck business. Covers menu engineering, pricing, permits, commissary
+  kitchens, route planning, event booking, and growth from 1 truck...
+---
+
 # Food Truck Business Operations
 
 Complete operational playbook for launching and scaling a food truck business. Covers menu engineering, pricing, permits, commissary kitchens, route planning, event booking, and growth from 1 truck to a fleet.

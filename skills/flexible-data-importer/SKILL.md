@@ -1,3 +1,10 @@
+---
+name: OpenClaw Data Importer Skill
+description: "<!-- SKILL-META id: flexible-data-importer version: 1.0.0 author:
+  OpenClaw description: AI-driven data ingestion for CSV, JSON, XLSX with
+  auto-schema generation and Supabase integration. capabilities:"
+---
+
 # OpenClaw Data Importer Skill
 
 <!-- SKILL-META

@@ -1,7 +1,14 @@
 ---
 name: ak-rss-24h-brief
-description: Read RSS/Atom feeds from an OPML list, fetch articles from the last N hours, and generate a Chinese categorized brief. Use for requests like “generate a 24-hour brief from this RSS list” or “summarize recent posts from an OPML feed bundle”. Output must keep original titles + links, group by category, and avoid fabricated facts. The RSS subscription list is shared by Andrej Karpathy (source post: https://x.com/karpathy/status/2018043254986703167).
+description: "Read RSS/Atom feeds from an OPML list, fetch articles from the
+  last N hours, and generate a Chinese categorized brief. Use for requests like
+  “generate a 24-hour brief from this RSS list” or “summarize recent posts from
+  an OPML feed bundle”. Output must keep original titles + links, group by
+  category, and avoid fabricated facts. The RSS subscription list is shared by
+  Andrej Karpathy (source post:
+  https://x.com/karpathy/status/2018043254986703167)."
 ---
+
 
 # AK RSS 24h Brief
 

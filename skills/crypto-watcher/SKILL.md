@@ -1,3 +1,8 @@
+---
+name: crypto-watcher
+description: Monitor crypto wallets and DeFi positions. Get alerts when things change.
+---
+
 # crypto-watcher
 
 Monitor crypto wallets and DeFi positions. Get alerts when things change.

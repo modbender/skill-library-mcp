@@ -1,3 +1,9 @@
+---
+name: EchoDecks Skill (v1)
+description: Integrates with EchoDecks for flashcard management, study sessions,
+  and AI generation.
+---
+
 # EchoDecks Skill (v1)
 
 Integrates with EchoDecks for flashcard management, study sessions, and AI generation.

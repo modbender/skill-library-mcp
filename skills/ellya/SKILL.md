@@ -1,3 +1,10 @@
+---
+name: 💕 Ellya Skill
+description: "name: Ellya description: OpenClaw virtual companion skill. Use it
+  to bootstrap runtime files (SOUL and base image), guide user personalization,
+  learn and store style prompts from uploaded photos, a..."
+---
+
 ﻿---
 name: Ellya
 description: OpenClaw virtual companion skill. Use it to bootstrap runtime files (SOUL and base image), guide user personalization, learn and store style prompts from uploaded photos, and generate selfies from user prompts or autonomous style strategy in the current conversation context.

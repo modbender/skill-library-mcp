@@ -1,8 +1,11 @@
 ---
 name: poku
-description: Makes outbound phone calls on the user's behalf using the Poku API via the `exec` tool. Example use cases include: when the user wants to call a restaurant, business, doctor's office, or any phone number to handle errands such as reservations, appointments, reminders, follow-ups, or bill disputes.
-metadata: { "openclaw": { "required": { "env": ["POKU_API_KEY"] }, "primaryEnv": "POKU_API_KEY", "homepage": "https://pokulabs.com" } }
+description: "Makes outbound phone calls on the user's behalf using the Poku API
+  via the `exec` tool. Example use cases include: when the user wants to call a
+  restaurant, business, doctor's office, or any phone number to handle errands
+  such as reservations, appointments, reminders, follow-ups, or bill disputes."
 ---
+
 
 # Poku — Outbound Phone Calls
 

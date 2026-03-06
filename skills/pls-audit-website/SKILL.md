@@ -1,7 +1,11 @@
 ---
 name: audit-website
-description: Perform full health check on websites, identifying technical friction points and user experience issues. Use when: (1) Auditing website performance, (2) Checking for broken links, (3) Analyzing page structure, (4) Testing accessibility, (5) Reviewing security headers.
+description: "Perform full health check on websites, identifying technical
+  friction points and user experience issues. Use when: (1) Auditing website
+  performance, (2) Checking for broken links, (3) Analyzing page structure, (4)
+  Testing accessibility, (5) Reviewing security headers."
 ---
+
 
 # Website Audit
 

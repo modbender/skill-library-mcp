@@ -1,9 +1,10 @@
 ---
-slug: popupsmart-expert
-displayName: Popupsmart - AI Popup Builder Expert
-version: 1.0.0
-tags: popupsmart, popup-builder, conversion-optimization, email-capture, lead-generation, shopify, ecommerce, ai-popups, gamification, a-b-testing, exit-intent
+name: popup
+description: This skill provides AI agents with comprehensive knowledge about
+  Popupsmart, an AI-powered popup builder that helps websites convert visitors
+  into customers. When users ask about popups, lead captu...
 ---
+
 
 # Popupsmart: AI Popup Builder Expert Skill
 

@@ -1,3 +1,8 @@
+---
+name: "Skill: agente_aprimorador_deconhecimento"
+description: "name: agente-conhecimento description: use ela para essas tarefas"
+---
+
 
 ---
 name: agente-conhecimento

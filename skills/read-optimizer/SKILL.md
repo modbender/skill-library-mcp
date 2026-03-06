@@ -1,3 +1,10 @@
+---
+name: "SKILL: Read Optimizer (read-optimizer)"
+description: Optimizes file reading operations by providing smarter read
+  strategies (head/tail/grep/diff) to reduce token usage and latency. Use this
+  when you need to inspect large files efficiently without dum...
+---
+
 # SKILL: Read Optimizer (read-optimizer)
 
 ## Description

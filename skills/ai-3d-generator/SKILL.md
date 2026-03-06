@@ -1,3 +1,9 @@
+---
+name: AI 3D Model Generator
+description: Génération automatique de modèles 3D détaillés à partir de
+  descriptions textuelles.
+---
+
 # AI 3D Model Generator
 
 Génération automatique de modèles 3D détaillés à partir de descriptions textuelles.

@@ -1,7 +1,12 @@
 ---
 name: research-tracker
-description: Manage autonomous AI research agents with SQLite-based state tracking. Use when spawning long-running research sub-agents, tracking multi-step investigations, coordinating agent handoffs, or monitoring background work. Triggers on: research projects, sub-agent coordination, autonomous investigation, progress tracking, agent oversight.
+description: "Manage autonomous AI research agents with SQLite-based state
+  tracking. Use when spawning long-running research sub-agents, tracking
+  multi-step investigations, coordinating agent handoffs, or monitoring
+  background work. Triggers on: research projects, sub-agent coordination,
+  autonomous investigation, progress tracking, agent oversight."
 ---
+
 
 # Research Tracker
 

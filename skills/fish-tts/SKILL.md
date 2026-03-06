@@ -1,3 +1,9 @@
+---
+name: Fish Audio S1 TTS Skill
+description: This skill uses Fish Audio S1 to generate high-quality
+  text-to-speech audio and upload it to NextCloud.
+---
+
 # Fish Audio S1 TTS Skill
 
 ## Overview

@@ -1,3 +1,10 @@
+---
+name: Dissertation Workflow System Core (DWS-Core)
+description: This skill governs ALL dissertation writing tasks for Ryan Tang's
+  PhD dissertation in Sociology of Education. It defines the agent team,
+  knowledge base architecture, working modes, and quality cont...
+---
+
 # Dissertation Workflow System Core (DWS-Core)
 
 > **Skill Name**: `dissertation-workflow-system-core`

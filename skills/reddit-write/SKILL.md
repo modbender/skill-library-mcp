@@ -1,3 +1,10 @@
+---
+name: Reddit Write Skill
+description: Drafting posts and comments for Luka to review and post manually.
+  This skill runs after research (9am weekdays). Use Kimi model — this is
+  internal drafting work.
+---
+
 # Reddit Write Skill
 
 ## Use When

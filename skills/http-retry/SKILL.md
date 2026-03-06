@@ -1,3 +1,8 @@
+---
+name: HTTP 重试技能
+description: 网络请求失败（超时、连接重置、限流）导致服务不稳定
+---
+
 # HTTP 重试技能
 
 **触发词**: timeouterror, econnreset, econnrefused, 429, retry, http error, 网络超时

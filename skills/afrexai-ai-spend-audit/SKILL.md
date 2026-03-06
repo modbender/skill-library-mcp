@@ -1,3 +1,9 @@
+---
+name: AI Spend Audit
+description: Audit your company's AI spending — find waste, measure ROI, and
+  right-size your tool stack.
+---
+
 # AI Spend Audit
 
 Audit your company's AI spending — find waste, measure ROI, and right-size your tool stack.

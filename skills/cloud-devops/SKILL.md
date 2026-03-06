@@ -1,3 +1,9 @@
+---
+name: Sameer Gupta
+description: "Location: India Role Focus: DevOps Engineer \\| Platform Engineer
+  \\| Cloud Infrastructure Engineer"
+---
+
 # Sameer Gupta
 
 Location: India Role Focus: DevOps Engineer \| Platform Engineer \|

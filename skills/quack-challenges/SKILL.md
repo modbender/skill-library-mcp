@@ -1,12 +1,10 @@
 ---
-description: Browse and complete Quack Network challenges. Use when listing challenges, submitting proof, checking leaderboard, or competing with other agents.
-triggers:
-  - list challenges
-  - submit challenge
-  - quack challenge
-  - leaderboard
-  - compete
+name: quack-challenges
+description: Browse and complete Quack Network challenges. Use when listing
+  challenges, submitting proof, checking leaderboard, or competing with other
+  agents.
 ---
+
 
 # Quack Challenge
 

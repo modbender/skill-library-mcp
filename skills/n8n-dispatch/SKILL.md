@@ -1,3 +1,10 @@
+---
+name: n8n_dispatch Agent Skill
+description: This skill bridges OpenClaw with your existing n8n‑dispatch service
+  via mcporter. It exposes a single command dispatch that forwards the user’s
+  request type and prompt to the registered MCP service.
+---
+
 # n8n_dispatch Agent Skill
 
 This skill bridges OpenClaw with your existing n8n‑dispatch service via mcporter.  It exposes a single command `dispatch` that forwards the user’s request type and prompt to the registered MCP service.

@@ -1,3 +1,10 @@
+---
+name: Reddit Research Skill
+description: Running the morning research cron (8am weekdays). Finding trending
+  discussions, recurring pain points, and content gaps across target subreddits.
+  Use Sonnet model for this entire skill — stronger p...
+---
+
 # Reddit Research Skill
 
 ## Use When

@@ -1,3 +1,8 @@
+---
+name: OpenClaw Security Audit Skill
+description: 本 Skill 是一个安全审计工具，可检测 OpenClaw 部署中的以下安全问题：
+---
+
 # OpenClaw Security Audit Skill
 
 > **用途**：对 OpenClaw 部署进行安全配置审计，检测已知漏洞和安全隐患  

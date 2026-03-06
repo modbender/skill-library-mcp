@@ -1,3 +1,9 @@
+---
+name: SaaS Metrics Dashboard
+description: Generate a complete SaaS metrics analysis from your data. Covers
+  the 15 metrics that actually matter for B2B SaaS in 2026 — not vanity numbers.
+---
+
 # SaaS Metrics Dashboard
 
 Generate a complete SaaS metrics analysis from your data. Covers the 15 metrics that actually matter for B2B SaaS in 2026 — not vanity numbers.

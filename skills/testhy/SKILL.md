@@ -1,3 +1,10 @@
+---
+name: Claude Skills 开发框架架构指导手册
+description: 本框架基于 Anthropic Claude 的 Tool Use (Skills)
+  特性构建，旨在提供一个通过自然语言聊天即可调用各类底层工具的开发脚手架。
+  框架遵循高内聚、低耦合的设计原则，使开发者能够专注于“技能（Skill）”本身的编写，而无需过度关心 LLM 对话上下文、工具发现与函数执行的复杂逻辑。
+---
+
 # Claude Skills 开发框架架构指导手册
 
 ## 1. 项目概述 (Overview)

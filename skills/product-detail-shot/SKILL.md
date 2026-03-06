@@ -1,3 +1,9 @@
+---
+name: Product Detail Shot
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce image generation.
+---
+
 # Product Detail Shot
 
 **Version**: 1.0.0

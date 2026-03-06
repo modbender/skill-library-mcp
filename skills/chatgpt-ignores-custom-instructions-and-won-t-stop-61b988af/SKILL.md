@@ -1,15 +1,10 @@
 ---
 name: chatgpt-ignores-custom-instructions-and-won-t-stop-61b988af
-description: This speech pattern is extremely stupid. It's basically inventing a non-sequitur strawman interpretation of the situation that no one made, in order to say it's "not \[that\]" but something else.
-
-Its relentless use of this phantom contrast framing structure poisons every output.
-
-  
-I have asked it countless times to stop doing that. It's in my custom instructions; in fact it's the only custom instruction. It makes no difference. It still does it, multiple times in almost every output.
-
-I've ha...
-metadata: {"clawdbot": {"type": "text prompt", "inferred_type": "Text Prompt", "source": "reddit", "original_url": "https://www.reddit.com/r/ChatGPT/comments/1qryi6l/chatgpt_ignores_custom_instructions_and_wont_stop/", "quality_score": 85}}
+description: This speech pattern is extremely stupid. It's basically inventing a
+  non-sequitur strawman interpretation of the situation that no one made, in
+  order to say it's "not \[that\]" but something else.
 ---
+
 
 # ChatGPT ignores custom instructions, and won't stop using the asinine "that's not X; that's Y" structure in everything it writes.
 

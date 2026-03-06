@@ -1,3 +1,10 @@
+---
+name: Grago
+description: Grago bridges the gap between your OpenClaw agent and local LLMs
+  (Ollama, llama.cpp, etc.) that can't use tools natively. It runs shell scripts
+  to fetch live data from the web, APIs, and local file...
+---
+
 # Grago
 
 **Delegate research and data-fetch tasks to a free local LLM. Save tokens. Use your machine.**

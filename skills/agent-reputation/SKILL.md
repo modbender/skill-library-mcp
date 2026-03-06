@@ -1,10 +1,9 @@
 ---
 name: agent-reputation
-summary: Cross-platform AI agent reputation checker with trust scoring and PayLock escrow recommendations.
-version: 1.0.0
-publishable: true
-entrypoint: scripts/check_reputation.py
+description: Cross-platform AI agent reputation checker with trust scoring and
+  PayLock escrow recommendations.
 ---
+
 
 # agent-reputation
 

@@ -1,3 +1,10 @@
+---
+name: Employee Onboarding Generator
+description: Build a structured 90-day onboarding plan for any role. Covers
+  pre-boarding, Day 1, Week 1, 30/60/90-day milestones, buddy assignments, and
+  success metrics.
+---
+
 # Employee Onboarding Generator
 
 Build a structured 90-day onboarding plan for any role. Covers pre-boarding, Day 1, Week 1, 30/60/90-day milestones, buddy assignments, and success metrics.

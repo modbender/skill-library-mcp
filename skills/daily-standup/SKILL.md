@@ -1,6 +1,8 @@
 ---
+name: daily-standup
 description: Generate daily standup reports from Git activity, TODOs, and project status.
 ---
+
 
 # Daily Standup
 

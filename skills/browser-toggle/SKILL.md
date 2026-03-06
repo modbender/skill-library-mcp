@@ -1,3 +1,8 @@
+---
+name: OpenClaw Browser Toggle Skill
+description: browser toggle
+---
+
 # OpenClaw Browser Toggle Skill
 
 > 一键启用/禁用 OpenClaw 内置浏览器，无需手动修改配置文件

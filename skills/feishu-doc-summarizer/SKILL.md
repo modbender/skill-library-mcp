@@ -1,7 +1,13 @@
 ---
 name: feishu-doc-summarizer
-description: Summarize Feishu/Lark cloud documents the user can read. Use when the user sends a Feishu doc link (docx or wiki) and expects an auto summary without extra instructions, or explicitly asks to summarize a Feishu document. Workflow: resolve wiki to docx, read doc content via feishu_doc, summarize using the user’s fixed summary schema from MEMORY.md, and send the summary back to the current chat.
+description: "Summarize Feishu/Lark cloud documents the user can read. Use when
+  the user sends a Feishu doc link (docx or wiki) and expects an auto summary
+  without extra instructions, or explicitly asks to summarize a Feishu document.
+  Workflow: resolve wiki to docx, read doc content via feishu_doc, summarize
+  using the user’s fixed summary schema from MEMORY.md, and send the summary
+  back to the current chat."
 ---
+
 
 # Feishu Doc Summarizer
 

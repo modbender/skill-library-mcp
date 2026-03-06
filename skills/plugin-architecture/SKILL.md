@@ -1,3 +1,10 @@
+---
+name: Plugin Architecture Skill
+description: "name: plugin-architecture version: 1.1.0 author: Charles Sears
+  description: Adds UI plugin registration support to OpenClaw - allows plugins
+  to register custom tabs in the Control UI."
+---
+
 # Plugin Architecture Skill
 
 name: plugin-architecture

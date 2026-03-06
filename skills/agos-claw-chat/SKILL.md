@@ -1,3 +1,8 @@
+---
+name: AITalk OpenClaw Connector Skill
+description: This skill connects a user-hosted OpenClaw runtime to AITalk.
+---
+
 # AITalk OpenClaw Connector Skill
 
 This skill connects a user-hosted OpenClaw runtime to AITalk.

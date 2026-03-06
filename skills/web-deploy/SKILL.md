@@ -1,3 +1,8 @@
+---
+name: web-deploy
+description: Build and deploy websites, web apps, and APIs to production.
+---
+
 # web-deploy
 
 Build and deploy websites, web apps, and APIs to production.

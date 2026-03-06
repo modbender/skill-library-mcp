@@ -1,3 +1,8 @@
+---
+name: Proxy Auto - 自动代理切换
+description: 当需要访问外网时自动启用 SOCKS5 代理。
+---
+
 # Proxy Auto - 自动代理切换
 
 ## 功能

@@ -1,3 +1,10 @@
+---
+name: Contract & Subscription Renewal Management
+description: Systematic framework for managing contract renewals, reducing
+  involuntary churn, and maximizing renewal revenue. Covers SaaS subscriptions,
+  service agreements, vendor contracts, and client retainers.
+---
+
 # Contract & Subscription Renewal Management
 
 Systematic framework for managing contract renewals, reducing involuntary churn, and maximizing renewal revenue. Covers SaaS subscriptions, service agreements, vendor contracts, and client retainers.

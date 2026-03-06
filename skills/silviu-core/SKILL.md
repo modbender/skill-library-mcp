@@ -1,3 +1,8 @@
+---
+name: silviu-core
+description: Silviu-specific ops guardrails and runbooks for OpenClaw.
+---
+
 # silviu-core
 
 Silviu-specific ops guardrails and runbooks for OpenClaw.

@@ -1,3 +1,10 @@
+---
+name: Short-Form Video Creation for Social Media Skill
+description: This skill enables Claude to transform a text script or idea into a
+  fully produced short-form video — ready to publish as an Instagram Reel,
+  YouTube Short, or TikTok — using the InVideo AI platform...
+---
+
 # Short-Form Video Creation for Social Media Skill
 
 ## Overview

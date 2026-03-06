@@ -1,6 +1,9 @@
 ---
-description: Manage, benchmark, and switch between local Ollama models with performance comparison.
+name: ollama-hub
+description: Manage, benchmark, and switch between local Ollama models with
+  performance comparison.
 ---
+
 
 # Ollama Hub
 

@@ -1,3 +1,9 @@
+---
+name: Analytix402
+description: Monitor, control, and optimize your AI agent's API spend and LLM
+  costs in real-time.
+---
+
 # Analytix402
 
 Monitor, control, and optimize your AI agent's API spend and LLM costs in real-time.

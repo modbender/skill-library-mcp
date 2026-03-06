@@ -1,3 +1,9 @@
+---
+name: Clinical Trials Search
+description: Access ClinicalTrials.gov to search clinical trials with advanced
+  filtering options.
+---
+
 # Clinical Trials Search
 
 Access ClinicalTrials.gov to search clinical trials with advanced filtering options.

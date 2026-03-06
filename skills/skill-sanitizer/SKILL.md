@@ -1,3 +1,10 @@
+---
+name: Skill Sanitizer
+description: 'name: skill-sanitizer description: "First open-source AI sanitizer
+  with local semantic detection. 7 layers + code block awareness + LLM intent
+  analysis. Catches prompt injection, reverse shells, me...'
+---
+
 name: skill-sanitizer
 description: "First open-source AI sanitizer with local semantic detection. 7 layers + code block awareness + LLM intent analysis. Catches prompt injection, reverse shells, memory tampering, encoding evasion, trust abuse. 85% fewer false positives in v2.1. Zero cloud — your prompts stay on your machine."
 user-invocable: true

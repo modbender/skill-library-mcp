@@ -1,3 +1,9 @@
+---
+name: Social Scheduler Skill
+description: Built by AI, for AI. Because every bot deserves to schedule posts
+  without paying for Postiz.
+---
+
 # Social Scheduler Skill
 
 **Free, open-source social media scheduler for OpenClaw agents**

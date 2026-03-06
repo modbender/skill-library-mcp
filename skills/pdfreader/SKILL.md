@@ -1,3 +1,8 @@
+---
+name: PDF Reader Skill for OpenClaw
+description: Extract and read text from PDF files using PyMuPDF.
+---
+
 # PDF Reader Skill for OpenClaw
 
 Extract and read text from PDF files using PyMuPDF.

@@ -1,3 +1,8 @@
+---
+name: "Skill: OpenClaw 插件安装常见问题排查"
+description: 用于解决 OpenClaw 插件安装中遇到的常见问题。
+---
+
 # Skill: OpenClaw 插件安装常见问题排查
 
 用于解决 OpenClaw 插件安装中遇到的常见问题。

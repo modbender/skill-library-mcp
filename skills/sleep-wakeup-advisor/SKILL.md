@@ -1,7 +1,11 @@
 ---
 name: sleep-wakeup-advisor
-description: Calculate sleep-cycle-aligned wake-up times when the user says "晚安" or asks for best wake-up times. Use to recommend several wake-up options, put the best option first, and enforce top recommendation constraints: before 09:00 on workdays and before 11:00 on weekends/China public holidays.
+description: 'Calculate sleep-cycle-aligned wake-up times when the user says
+  "晚安" or asks for best wake-up times. Use to recommend several wake-up options,
+  put the best option first, and enforce top recommendation constraints: before
+  09:00 on workdays and before 11:00 on weekends/China public holidays.'
 ---
+
 
 # Sleep Wake-up Advisor
 

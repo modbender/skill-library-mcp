@@ -1,3 +1,10 @@
+---
+name: "Skill: charts"
+description: Generate professional technical analysis charts with candlesticks,
+  Fibonacci retracement, moving averages (SMA 20/50), RSI, and pattern
+  detection. Uses the local cryptocharts.py module.
+---
+
 # Skill: charts
 
 ## Purpose

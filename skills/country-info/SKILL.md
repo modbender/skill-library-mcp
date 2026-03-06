@@ -1,3 +1,9 @@
+---
+name: Country Info
+description: Get country data — population, languages, currencies, capital,
+  flag, and more using REST Countries API.
+---
+
 # Country Info
 
 Get country data — population, languages, currencies, capital, flag, and more using REST Countries API.

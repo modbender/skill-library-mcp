@@ -1,6 +1,9 @@
 ---
-summary: Query crypto wallet portfolios, transactions, DeFi positions, and token prices across EVM chains and Solana using Zerion's MCP server.
+name: clawhub-zerion-api
+description: Query crypto wallet portfolios, transactions, DeFi positions, and
+  token prices across EVM chains and Solana using Zerion's MCP server.
 ---
+
 
 # Zerion API Skill
 

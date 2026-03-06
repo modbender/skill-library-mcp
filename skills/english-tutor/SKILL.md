@@ -1,3 +1,9 @@
+---
+name: English Tutor
+description: This is a personalized American English tutor for helping users
+  improve their English skills.
+---
+
 # English Tutor
 
 This is a personalized American English tutor for helping users improve their English skills. 

@@ -1,3 +1,8 @@
+---
+name: Skill Audit 🔍
+description: 扫描 OpenClaw skills 中的安全风险，防止供应链攻击。
+---
+
 # Skill Audit 🔍
 
 扫描 OpenClaw skills 中的安全风险，防止供应链攻击。

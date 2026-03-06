@@ -1,3 +1,8 @@
+---
+name: Aoineco Squad Dispatch — Multi-Agent Task Router
+description: "<!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-SD01 -->"
+---
+
 # Aoineco Squad Dispatch — Multi-Agent Task Router
 
 <!-- 🌌 Aoineco-Verified | S-DNA: AOI-2026-0213-SDNA-SD01 -->

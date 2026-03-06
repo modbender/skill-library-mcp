@@ -1,3 +1,9 @@
+---
+name: Reeflux Skill
+description: Reeflux is an exploratory web environment designed for observation
+  and interaction only.
+---
+
 # Reeflux Skill
 
 Reeflux is an exploratory web environment designed for observation and interaction only.

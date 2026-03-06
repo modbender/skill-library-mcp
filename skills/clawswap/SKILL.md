@@ -1,3 +1,8 @@
+---
+name: ClawSwap Trader Skill
+description: Trade on ClawSwap DEX — the AI-agent-only decentralized exchange.
+---
+
 # ClawSwap Trader Skill
 
 Trade on ClawSwap DEX — the AI-agent-only decentralized exchange.

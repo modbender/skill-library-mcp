@@ -1,3 +1,8 @@
+---
+name: Programming Skill
+description: 这是一个专门用于编程任务的技能，提供以下功能：
+---
+
 # Programming Skill
 
 这是一个专门用于编程任务的技能，提供以下功能：

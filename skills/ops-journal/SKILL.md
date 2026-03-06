@@ -1,3 +1,10 @@
+---
+name: ops-journal — Automated Ops Logging & Incident Timeline for OpenClaw
+description: Structured operational journal that captures deployments,
+  incidents, changes, and decisions. Creates a searchable ops log with incident
+  timeline reconstruction and automated postmortem generation.
+---
+
 # ops-journal — Automated Ops Logging & Incident Timeline for OpenClaw
 
 Structured operational journal that captures deployments, incidents, changes, and decisions. Creates a searchable ops log with incident timeline reconstruction and automated postmortem generation.

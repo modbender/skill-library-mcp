@@ -1,3 +1,8 @@
+---
+name: AI Entrepreneur Guide Skill
+description: 这是一个专门为 AI 创业者设计的智能助手，能够：
+---
+
 # AI Entrepreneur Guide Skill
 
 ## 🚀 功能概述

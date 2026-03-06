@@ -1,6 +1,8 @@
 ---
+name: disk-cleaner
 description: Analyze disk usage, find large/old files, and suggest safe cleanup actions.
 ---
+
 
 # Disk Cleaner
 

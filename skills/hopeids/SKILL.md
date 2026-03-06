@@ -1,3 +1,9 @@
+---
+name: hopeIDS Security Skill
+description: Inference-based intrusion detection for AI agents with quarantine
+  and human-in-the-loop.
+---
+
 # hopeIDS Security Skill
 
 Inference-based intrusion detection for AI agents with quarantine and human-in-the-loop.

@@ -1,34 +1,12 @@
 ---
 name: zoho-mail
-version: 0.1.1
-description: Read, search, send, and manage Zoho Mail from the terminal. JSON output for scripting and agents. Requires the 'zoho' binary (install via brew/uv/pipx), one-time OAuth setup (zoho config init; zoho login), and stores credentials locally (config file and OS keyring). Optional env ZOHO_ACCOUNT, ZOHO_CONFIG, ZOHO_TOKEN_PASSWORD. No third-party service required.
-compatibility: Requires the 'zoho' CLI (install via brew/uv/pipx), one-time OAuth setup (zoho config init; zoho login), and network access. Primary credentials: OAuth client_id/client_secret and access/refresh tokens; stored locally in config.json and/or OS keyring — users should be aware these are sensitive secrets. Optional env: ZOHO_ACCOUNT, ZOHO_CONFIG, ZOHO_TOKEN_PASSWORD.
-homepage: https://github.com/robsannaa/zoho-cli
-user-invocable: false
-requires:
-  bins:
-    - zoho
-  env:
-    - name: ZOHO_ACCOUNT
-      description: Default Zoho account email
-      required: false
-    - name: ZOHO_CONFIG
-      description: Path to config.json
-      required: false
-    - name: ZOHO_TOKEN_PASSWORD
-      description: Passphrase for encrypted file token storage (CI/headless)
-      required: false
-install:
-  - kind: brew
-    formula: robsannaa/tap/zoho-cli
-    bins: [zoho]
-  - kind: uv
-    package: git+https://github.com/robsannaa/zoho-cli
-    bins: [zoho]
-  - kind: pipx
-    package: git+https://github.com/robsannaa/zoho-cli
-    bins: [zoho]
+description: Read, search, send, and manage Zoho Mail from the terminal. JSON
+  output for scripting and agents. Requires the 'zoho' binary (install via
+  brew/uv/pipx), one-time OAuth setup (zoho config init; zoho login), and stores
+  credentials locally (config file and OS keyring). Optional env ZOHO_ACCOUNT,
+  ZOHO_CONFIG, ZOHO_TOKEN_PASSWORD. No third-party service required.
 ---
+
 
 # zoho — Zoho Mail CLI
 

@@ -1,3 +1,9 @@
+---
+name: economic-calendar
+description: Fetch macro-economic events (Fed, ECB, CPI, etc.) from
+  Investing.com. No API key required — pure scraping.
+---
+
 # economic-calendar
 
 Fetch macro-economic events (Fed, ECB, CPI, etc.) from Investing.com. No API key required — pure scraping.

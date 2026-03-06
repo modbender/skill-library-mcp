@@ -1,3 +1,10 @@
+---
+name: Sales Compensation Plan Designer
+description: Design, audit, and optimize sales compensation structures that
+  actually drive the behavior you want. Covers quota setting, OTE splits,
+  accelerators, clawbacks, SPIFs, and multi-role plan architectu...
+---
+
 # Sales Compensation Plan Designer
 
 Design, audit, and optimize sales compensation structures that actually drive the behavior you want. Covers quota setting, OTE splits, accelerators, clawbacks, SPIFs, and multi-role plan architectures.

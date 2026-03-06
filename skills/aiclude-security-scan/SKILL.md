@@ -1,3 +1,10 @@
+---
+name: /security-scan - AIclude Security Vulnerability Scanner
+description: Scan MCP Servers and AI Agent Skills for security vulnerabilities.
+  Returns existing scan results instantly if available, or registers the target
+  and triggers a new scan automatically.
+---
+
 # /security-scan - AIclude Security Vulnerability Scanner
 
 Scan MCP Servers and AI Agent Skills for security vulnerabilities. Returns existing scan results instantly if available, or registers the target and triggers a new scan automatically.

@@ -1,3 +1,8 @@
+---
+name: amap-navigation - 高德地图导航与出行助手
+description: 高德地图导航与出行助手。支持路线规划、实时路况、打车估价、POI搜索、距离计算。
+---
+
 # amap-navigation - 高德地图导航与出行助手
 
 **版本**: v1.0.0  

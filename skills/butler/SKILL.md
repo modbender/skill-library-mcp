@@ -1,3 +1,8 @@
+---
+name: Butler - AI Agent Treasury & Orchestration Skill
+description: "Think of Butler as your AI Agent CFO that:"
+---
+
 # Butler - AI Agent Treasury & Orchestration Skill
 
 ## Overview

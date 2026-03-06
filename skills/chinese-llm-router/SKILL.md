@@ -1,3 +1,9 @@
+---
+name: Chinese LLM Router
+description: Route your OpenClaw conversations to the best Chinese AI models —
+  no config headaches, just pick and chat.
+---
+
 # Chinese LLM Router
 
 Route your OpenClaw conversations to the best Chinese AI models — no config headaches, just pick and chat.

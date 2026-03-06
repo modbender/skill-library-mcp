@@ -1,8 +1,16 @@
 ---
 name: xiaohongshu-assistant-operator
-version: 0.1.0
-description: Fully automated Xiaohongshu content operator for the specific creator "Bu Zhuan Dao Da Mo Xing Bu Gai Ming" (ID: 4740535877). Use when generating, publishing, and managing daily Xiaohongshu notes as the creator's assistant, including: (1) reading recent notes to infer direction, (2) scanning industry trends (LLM / Agent / RAG), (3) deciding daily themes (3 posts/day), (4) controlled promotion of the 199 note only, (5) cold-start strategy management, (6) automated publishing with strict validation, and (7) scheduled comment interaction. Trigger when operating this specific account end-to-end.
+description: "Fully automated Xiaohongshu content operator for the specific
+  creator \"Bu Zhuan Dao Da Mo Xing Bu Gai Ming\" (ID: 4740535877). Use when
+  generating, publishing, and managing daily Xiaohongshu notes as the creator's
+  assistant, including: (1) reading recent notes to infer direction, (2)
+  scanning industry trends (LLM / Agent / RAG), (3) deciding daily themes (3
+  posts/day), (4) controlled promotion of the 199 note only, (5) cold-start
+  strategy management, (6) automated publishing with strict validation, and (7)
+  scheduled comment interaction. Trigger when operating this specific account
+  end-to-end."
 ---
+
 
 # Xiaohongshu Assistant Operator
 

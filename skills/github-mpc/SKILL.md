@@ -1,3 +1,9 @@
+---
+name: MCP Prerequisites Setup
+description: A skill for verifying and configuring the required MCP (Model
+  Context Protocol) servers for the Product Guide Writer workflow.
+---
+
 # MCP Prerequisites Setup
 
 A skill for verifying and configuring the required MCP (Model Context Protocol) servers for the Product Guide Writer workflow.

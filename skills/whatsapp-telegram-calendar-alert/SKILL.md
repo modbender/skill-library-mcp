@@ -1,3 +1,9 @@
+---
+name: WhatsApp Analyzer
+description: Automatically detect appointments and urgent messages from
+  WhatsApp, alert via Telegram, and optionally add to Google Calendar.
+---
+
 # WhatsApp Analyzer
 
 Automatically detect appointments and urgent messages from WhatsApp, alert via Telegram, and optionally add to Google Calendar.

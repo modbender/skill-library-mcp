@@ -1,3 +1,8 @@
+---
+name: GitMap Skill
+description: Version control for ArcGIS web maps — exposed as native OpenClaw tools.
+---
+
 # GitMap Skill
 
 Version control for ArcGIS web maps — exposed as native OpenClaw tools.

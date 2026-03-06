@@ -1,3 +1,8 @@
+---
+name: SKILL.md
+description: 自动化 API 测试和监控服务。
+---
+
 # SKILL.md
 
 # API Testing Service

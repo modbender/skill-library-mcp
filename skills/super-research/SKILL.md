@@ -1,3 +1,9 @@
+---
+name: Super Research
+description: This skill handles any research task from quick lookups to deep
+  academic analysis. It knows when to use which approach.
+---
+
 # Super Research
 
 **The ultimate AI research system.** Combines the best of 8 top-rated research skills into one powerful framework.

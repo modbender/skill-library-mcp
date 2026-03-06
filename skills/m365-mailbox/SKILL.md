@@ -1,7 +1,18 @@
 ---
 name: m365-mailbox
-description: MS365 / Microsoft365 mailbox automation via Microsoft Graph for Microsoft 365 (M365) Business (work/school, Exchange Online) and M365 Home/Consumer (hotmail.com, outlook.com, live.com). Use when listing unread emails, searching mail, reading messages, creating drafts, editing drafts, sending email, replying, forwarding, and troubleshooting Graph/MSAL device-code authentication for mailbox access. Related keywords: Outlook, Exchange Online, IMAP alternative, OneDrive, SharePoint, Teams (via Microsoft Graph), mail, inbox. Privacy note: no third-party API key required; authentication uses your own Microsoft login (device code) and tokens are stored locally per profile. **Token cost:** ~800-2k tokens per use (skill body ~3-4k tokens, Graph calls + parsing).
+description: "MS365 / Microsoft365 mailbox automation via Microsoft Graph for
+  Microsoft 365 (M365) Business (work/school, Exchange Online) and M365
+  Home/Consumer (hotmail.com, outlook.com, live.com). Use when listing unread
+  emails, searching mail, reading messages, creating drafts, editing drafts,
+  sending email, replying, forwarding, and troubleshooting Graph/MSAL
+  device-code authentication for mailbox access. Related keywords: Outlook,
+  Exchange Online, IMAP alternative, OneDrive, SharePoint, Teams (via Microsoft
+  Graph), mail, inbox. Privacy note: no third-party API key required;
+  authentication uses your own Microsoft login (device code) and tokens are
+  stored locally per profile. **Token cost:** ~800-2k tokens per use (skill body
+  ~3-4k tokens, Graph calls + parsing)."
 ---
+
 
 # M365 Mailbox (Microsoft Graph)
 

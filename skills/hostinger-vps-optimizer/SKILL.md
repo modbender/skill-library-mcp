@@ -1,14 +1,9 @@
 ---
-summary: "Hostinger VPS Optimizer: Performance tweaks & cost-saving configs for Hostinger VPS plans."
-description: "Apply battle-tested optimizations for KVM/Cloud VPS: kernel tuning, caching, security hardening, auto-scaling."
-triggers:
-  - "optimize hostinger VPS"
-  - "hostinger tweaks"
-  - "VPS cost save"
-  - "hostinger performance"
-read_when:
-  - "hostinger VPS" in message
+name: hostinger-vps-optimizer
+description: "Apply battle-tested optimizations for KVM/Cloud VPS: kernel
+  tuning, caching, security hardening, auto-scaling."
 ---
+
 
 # Hostinger VPS Optimizer v1.0.0
 

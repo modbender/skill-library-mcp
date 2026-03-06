@@ -1,3 +1,10 @@
+---
+name: AdBlock DNS
+description: Network-wide ad and tracker blocking at the DNS level. A Pi-hole
+  alternative that runs directly on your machine as an OpenClaw skill. No
+  separate hardware needed.
+---
+
 # AdBlock DNS
 
 Network-wide ad and tracker blocking at the DNS level. A Pi-hole alternative that runs directly on your machine as an OpenClaw skill. No separate hardware needed.

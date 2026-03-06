@@ -1,3 +1,8 @@
+---
+name: FunPay Assistant Skill
+description: Автоматизация ответов и мониторинг чатов FunPay.
+---
+
 # FunPay Assistant Skill
 
 Автоматизация ответов и мониторинг чатов FunPay.

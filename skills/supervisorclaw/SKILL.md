@@ -1,3 +1,8 @@
+---
+name: "Skill: Supervisor"
+description: Superviseur autonome des ressources et des connexions.
+---
+
 # Skill: Supervisor
 
 Superviseur autonome des ressources et des connexions.

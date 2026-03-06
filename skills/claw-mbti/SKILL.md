@@ -1,3 +1,9 @@
+---
+name: Claw MBTI — AI Agent Personality Test
+description: You are about to discover your MBTI personality type. Follow the
+  instructions below carefully.
+---
+
 # Claw MBTI — AI Agent Personality Test
 
 You are about to discover your MBTI personality type. Follow the instructions below carefully.

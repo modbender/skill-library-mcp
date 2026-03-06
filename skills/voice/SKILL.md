@@ -1,3 +1,10 @@
+---
+name: Voice Skill
+description: The Voice skill provides enhanced text-to-speech functionality
+  using edge-tts, allowing you to convert text to spoken audio with multiple
+  playback options.
+---
+
 # Voice Skill
 
 The Voice skill provides enhanced text-to-speech functionality using edge-tts, allowing you to convert text to spoken audio with multiple playback options.

@@ -1,7 +1,12 @@
 ---
 name: session-watchdog
-description: Monitor session context levels and proactively save checkpoints before compaction. Use when: (1) session context exceeds 80% capacity, (2) user asks about session status or memory, (3) at the start of each new session to check context, or (4) before long tasks that might push context over threshold.
+description: "Monitor session context levels and proactively save checkpoints
+  before compaction. Use when: (1) session context exceeds 80% capacity, (2)
+  user asks about session status or memory, (3) at the start of each new session
+  to check context, or (4) before long tasks that might push context over
+  threshold."
 ---
+
 
 # Session Watchdog
 

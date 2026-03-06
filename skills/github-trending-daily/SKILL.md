@@ -1,3 +1,8 @@
+---
+name: github-trending-daily - 每日 GitHub Trending 推送
+description: 每天定时获取 GitHub Trending 热门项目并推送到钉钉群。
+---
+
 # github-trending-daily - 每日 GitHub Trending 推送
 
 每天定时获取 GitHub Trending 热门项目并推送到钉钉群。

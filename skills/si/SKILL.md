@@ -1,7 +1,13 @@
 ---
 name: si
-description: Supernal Interface CLI for test generation, contract scanning, story system, and MCP setup. Use when: (1) scanning Next.js routes/components for contracts, (2) generating tests from @Tool decorators, (3) recording/validating story-based tests, (4) setting up MCP integration, (5) validating contracts. NOT for: task management (use sc), orchestration (use orch), or CLI/API generation patterns (use universal-command).
+description: "Supernal Interface CLI for test generation, contract scanning,
+  story system, and MCP setup. Use when: (1) scanning Next.js routes/components
+  for contracts, (2) generating tests from @Tool decorators, (3)
+  recording/validating story-based tests, (4) setting up MCP integration, (5)
+  validating contracts. NOT for: task management (use sc), orchestration (use
+  orch), or CLI/API generation patterns (use universal-command)."
 ---
+
 
 # si - Supernal Interface CLI
 

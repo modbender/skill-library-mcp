@@ -1,3 +1,8 @@
+---
+name: AOI Prompt Injection Sentinel
+description: "S-DNA: AOI-2026-0215-SDNA-PG01"
+---
+
 # AOI Prompt Injection Sentinel
 
 S-DNA: `AOI-2026-0215-SDNA-PG01`

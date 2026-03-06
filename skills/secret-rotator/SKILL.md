@@ -1,6 +1,9 @@
 ---
-description: Audit and rotate API keys, tokens, and secrets with expiry tracking and safe handling.
+name: secret-rotator
+description: Audit and rotate API keys, tokens, and secrets with expiry tracking
+  and safe handling.
 ---
+
 
 # Secret Rotator
 

@@ -1,8 +1,8 @@
 ---
 name: r-promptengineering-on-reddit-ai-prompting-tips-fr-6be40b35
-description: Assignment: Write an analysis of how automation is changing the job market
-metadata: {"clawdbot": {"type": "text prompt", "inferred_type": "Text Prompt", "source": "writing", "original_url": "https://www.reddit.com/r/PromptEngineering/comments/1j5ymik/ai_prompting_tips_from_a_power_user_how_to_get/", "quality_score": 60}}
+description: "Assignment: Write an analysis of how automation is changing the job market"
 ---
+
 
 # r/PromptEngineering on Reddit: AI Prompting Tips from a Power User: How to Get Way Better Responses
 

@@ -1,3 +1,9 @@
+---
+name: Crisis Communication Playbook
+description: Generate a crisis communication plan with holding statements,
+  stakeholder messaging, media responses, and internal comms templates.
+---
+
 # Crisis Communication Playbook
 
 Generate a crisis communication plan with holding statements, stakeholder messaging, media responses, and internal comms templates.

@@ -1,3 +1,9 @@
+---
+name: MailMolt - Email Identity for AI Agents
+description: Give your AI agent a real email identity — send, receive, search,
+  and manage emails with human oversight built in.
+---
+
 # MailMolt - Email Identity for AI Agents
 
 > Your AI agent gets its own email address. Not access to your human's.

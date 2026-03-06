@@ -1,3 +1,10 @@
+---
+name: Auto Repair Shop Operations
+description: Complete operational reference for independent auto repair shops.
+  Covers labor rates, parts markup, ASE certification, EPA compliance,
+  diagnostic workflows, flat rate times, KPIs, technician compen...
+---
+
 # Auto Repair Shop Operations
 
 Complete operational reference for independent auto repair shops. Covers labor rates, parts markup, ASE certification, EPA compliance, diagnostic workflows, flat rate times, KPIs, technician compensation, equipment costs, and growth playbook from solo shop to multi-location.

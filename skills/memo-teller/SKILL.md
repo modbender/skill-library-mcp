@@ -1,3 +1,8 @@
+---
+name: 生产队往事挖掘机 (Legacy Story Agent)
+description: 这是一个专门为老一辈设计的口述历史挖掘工具。
+---
+
 # 生产队往事挖掘机 (Legacy Story Agent)
 
 这是一个专门为老一辈设计的口述历史挖掘工具。

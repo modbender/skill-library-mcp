@@ -1,3 +1,10 @@
+---
+name: Gas Town - The Cognition Engine
+description: Gas Town is a workspace manager that coordinates multiple Claude
+  Code agents working on different tasks. Instead of losing context when agents
+  restart, Gas Town persists work state in git-backed ho...
+---
+
 # Gas Town - The Cognition Engine
 
 **Multi-agent orchestration system for Claude Code with persistent work tracking**

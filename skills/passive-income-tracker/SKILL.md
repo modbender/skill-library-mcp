@@ -1,3 +1,10 @@
+---
+name: Passive Income Tracker — Bandwidth & Crypto Earnings Dashboard
+description: Track all your passive income crypto apps from one place. Unified
+  dashboard showing daily earnings, payout history, and USD/EUR totals across
+  Grass.io, Storj, Mysterium, Honeygain, EarnApp, and more.
+---
+
 # Passive Income Tracker — Bandwidth & Crypto Earnings Dashboard
 
 Track all your passive income crypto apps from one place. Unified dashboard showing daily earnings, payout history, and USD/EUR totals across Grass.io, Storj, Mysterium, Honeygain, EarnApp, and more.

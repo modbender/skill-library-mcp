@@ -1,3 +1,10 @@
+---
+name: Retail Trade Weekly Report Generator - Skill Documentation
+description: This skill processes multiple weekly sales report Excel files to
+  generate a consolidated Retail Trade Weekly Report with week-over-week (WoW)
+  comparisons across different channels (DRP, DXS, Licens...
+---
+
 # Retail Trade Weekly Report Generator - Skill Documentation
 
 ## Overview

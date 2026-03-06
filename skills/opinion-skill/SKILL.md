@@ -1,3 +1,8 @@
+---
+name: Opinion CLOB Skills
+description: 基于 bun 运行时的 Opinion 预测市场交易工具集。
+---
+
 # Opinion CLOB Skills
 
 基于 bun 运行时的 Opinion 预测市场交易工具集。

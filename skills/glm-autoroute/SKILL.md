@@ -1,3 +1,8 @@
+---
+name: GLM Autoroute
+description: Binary model routing for ZAI GLM models - lightweight vs heavyweight tasks.
+---
+
 # GLM Autoroute
 
 Binary model routing for ZAI GLM models - lightweight vs heavyweight tasks.

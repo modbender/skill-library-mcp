@@ -1,3 +1,10 @@
+---
+name: Markdown Report Generator
+description: A skill that enables Claw to compile information from multiple
+  sources into a polished, well-structured Markdown report with tables,
+  sections, and optional PDF export.
+---
+
 # Markdown Report Generator
 
 A skill that enables Claw to compile information from multiple sources into a polished, well-structured Markdown report with tables, sections, and optional PDF export.

@@ -1,7 +1,12 @@
 ---
 name: clickbait-engine
-description: Generate sensational, engagement-maximizing titles, hooks, and clip captions for social media posts, YouTube videos, and tweets. Use when creating titles, thumbnails copy, tweet hooks, clip captions, or any content that needs maximum click-through. Triggers on: clickbait, title, hook, caption, engagement, viral title, sensational, hot take.
+description: "Generate sensational, engagement-maximizing titles, hooks, and
+  clip captions for social media posts, YouTube videos, and tweets. Use when
+  creating titles, thumbnails copy, tweet hooks, clip captions, or any content
+  that needs maximum click-through. Triggers on: clickbait, title, hook,
+  caption, engagement, viral title, sensational, hot take."
 ---
+
 
 # Clickbait Engine - Engagement-Maximized Content Titles & Hooks
 

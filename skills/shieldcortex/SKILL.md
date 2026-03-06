@@ -1,3 +1,9 @@
+---
+name: ShieldCortex — Persistent Memory & Security for AI Agents
+description: Give your AI agent a brain that persists between sessions — and
+  protect it from memory poisoning attacks.
+---
+
 # ShieldCortex — Persistent Memory & Security for AI Agents
 
 Give your AI agent a brain that persists between sessions — and protect it from memory poisoning attacks.

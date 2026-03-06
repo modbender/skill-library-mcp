@@ -1,3 +1,8 @@
+---
+name: AI 火宝
+description: 🔥 火山引擎 AI 生图 Skill。支持多种模型。
+---
+
 # AI 火宝
 
 🔥 火山引擎 AI 生图 Skill。支持多种模型。

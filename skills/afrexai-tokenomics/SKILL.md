@@ -1,3 +1,10 @@
+---
+name: Token Economics Analyzer
+description: Evaluate token and digital asset economics for business decisions.
+  Covers utility tokens, governance tokens, loyalty points, and tokenized
+  assets.
+---
+
 # Token Economics Analyzer
 
 Evaluate token and digital asset economics for business decisions. Covers utility tokens, governance tokens, loyalty points, and tokenized assets.

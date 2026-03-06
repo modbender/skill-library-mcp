@@ -1,3 +1,10 @@
+---
+name: Interview Architect
+description: Complete hiring interview system — from job scorecard design
+  through structured question banks, live evaluation rubrics, panel
+  coordination, and offer decisions. Eliminates gut-feel hiring with evi...
+---
+
 # Interview Architect
 
 Complete hiring interview system — from job scorecard design through structured question banks, live evaluation rubrics, panel coordination, and offer decisions. Eliminates gut-feel hiring with evidence-based frameworks that predict on-the-job performance.

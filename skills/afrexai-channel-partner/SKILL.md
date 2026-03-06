@@ -1,3 +1,9 @@
+---
+name: Channel Partner Program Framework
+description: Build, manage, and scale a channel partner program that generates
+  indirect revenue without adding headcount.
+---
+
 # Channel Partner Program Framework
 
 Build, manage, and scale a channel partner program that generates indirect revenue without adding headcount.

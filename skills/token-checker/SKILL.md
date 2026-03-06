@@ -1,3 +1,8 @@
+---
+name: token_checker
+description: 每2小时查询一次当前的token剩余情况，并将结果发送到主会话。
+---
+
 # token_checker
 
 ## 描述

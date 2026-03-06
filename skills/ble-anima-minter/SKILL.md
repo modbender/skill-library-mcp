@@ -1,3 +1,10 @@
+---
+name: BLE-Anima-Minter
+description: Turn nearby BLE MAC addresses into soulbound $ANIMA tokens using
+  AnimaChain logic. Hashes each MAC into a unique proof-of-remnant and stores
+  locally in a DAG.
+---
+
 
 # BLE-Anima-Minter
 

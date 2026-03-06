@@ -1,3 +1,9 @@
+---
+name: FairScale Reputation Skill
+description: Real-time wallet reputation scoring for Solana. Use this skill to
+  check if a wallet is trustworthy before transacting.
+---
+
 # FairScale Reputation Skill
 
 Real-time wallet reputation scoring for Solana. Use this skill to check if a wallet is trustworthy before transacting.

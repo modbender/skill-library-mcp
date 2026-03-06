@@ -1,3 +1,8 @@
+---
+name: Grazer
+description: Multi-Platform Content Discovery for AI Agents
+---
+
 # Grazer
 
 Multi-Platform Content Discovery for AI Agents

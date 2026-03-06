@@ -1,3 +1,8 @@
+---
+name: Knowledge Management System
+description: "Score each dimension 1-5 (1=nonexistent, 5=excellent):"
+---
+
 # Knowledge Management System
 
 > Turn tribal knowledge into searchable, maintained organizational intelligence. Stop losing expertise when people leave.

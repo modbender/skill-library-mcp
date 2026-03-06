@@ -1,6 +1,9 @@
 ---
-description: Manage SSH connections, generate keys, organize config, and test remote server access.
+name: ssh-manager
+description: Manage SSH connections, generate keys, organize config, and test
+  remote server access.
 ---
+
 
 # SSH Manager
 

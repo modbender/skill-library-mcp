@@ -1,3 +1,8 @@
+---
+name: HF Daily Papers (OpenClaw Skill) — OFR 定制版
+description: 从 Hugging Face Daily Papers 热榜筛选 OFR 相关论文，按 6 大领域分类推送。
+---
+
 # HF Daily Papers (OpenClaw Skill) — OFR 定制版
 
 从 Hugging Face Daily Papers 热榜筛选 OFR 相关论文，按 6 大领域分类推送。

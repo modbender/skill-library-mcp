@@ -1,3 +1,8 @@
+---
+name: OpenClaw 浏览器自动化配置
+description: 配置OpenClaw连接远程Chrome/CDP浏览器进行自动化操作。
+---
+
 # OpenClaw 浏览器自动化配置
 
 配置OpenClaw连接远程Chrome/CDP浏览器进行自动化操作。

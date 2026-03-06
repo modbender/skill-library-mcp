@@ -1,3 +1,9 @@
+---
+name: Skill Flag Skill 🛡️
+description: Scan Clawdbot/OpenClaw skills for malicious patterns, backdoors,
+  and security risks.
+---
+
 # Skill Flag Skill 🛡️
 
 Scan Clawdbot/OpenClaw skills for malicious patterns, backdoors, and security risks.

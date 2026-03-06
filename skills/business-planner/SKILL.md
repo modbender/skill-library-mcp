@@ -1,3 +1,9 @@
+---
+name: business-planner
+description: Auto-generate business plans for government startup programs (Doyak
+  Package, TIPS, Early Startup Package, Startup Academy).
+---
+
 # business-planner
 
 > Auto-generate business plans, infrastructure diagrams, pitch decks  

@@ -1,3 +1,10 @@
+---
+name: Video Analyzer Skill
+description: "name: video-analyzer version: 1.0.10 description: 鏅鸿兘鍒嗘瀽
+  Bilibili/YouTube/鏈湴瑙嗛锛岀敓鎴愯浆鍐欍€佽瘎浼板拰鎬荤粨銆傛敮鎸佸叧閿抚鎴浘鑷姩宓屽叆銆? author: user
+  tags: [video, transcription, analysis, bilibili, youtube, ai]"
+---
+
 ﻿---
 name: video-analyzer
 version: 1.0.10

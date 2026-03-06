@@ -1,3 +1,8 @@
+---
+name: Market Data Skill
+description: This skill provides access to financial market data.
+---
+
 # Market Data Skill
 
 This skill provides access to financial market data.

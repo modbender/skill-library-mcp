@@ -1,8 +1,10 @@
 ---
 name: openclaw-bastion
-user-invocable: true
-metadata: {"openclaw":{"emoji":"\ud83c\udfdb\ufe0f","requires":{"bins":["python3"]},"os":["darwin","linux","win32"]}}
+description: Runtime prompt injection defense for agent workspaces. While other
+  tools watch workspace identity files, Bastion protects the input/output
+  boundary — the files being read by the agent, web content,...
 ---
+
 
 # OpenClaw Bastion
 

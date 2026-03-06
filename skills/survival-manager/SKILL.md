@@ -1,11 +1,8 @@
 ---
-clawdbot:
-  name: survival-manager
-  version: 1.0.0
-  requires.env: []
-  files: ["scripts/*"]
-  homepage: https://github.com/openclaw_ceo/skills/survival-manager
+name: survival-manager
+description: 实现自主运行 + 人类授权的混合系统。
 ---
+
 
 # Survival Manager - 生存管理系统
 

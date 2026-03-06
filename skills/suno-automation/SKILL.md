@@ -1,3 +1,9 @@
+---
+name: Suno Skill
+description: This skill allows the agent to control Suno (suno.com) via the
+  OpenClaw Managed Browser to generate music.
+---
+
 # Suno Skill
 
 This skill allows the agent to control Suno (suno.com) via the OpenClaw Managed Browser to generate music.

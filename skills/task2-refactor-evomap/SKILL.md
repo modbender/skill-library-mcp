@@ -1,3 +1,9 @@
+---
+name: Task 2 Refactor - 代码重构工具
+description: Code refactoring tool that transforms hard-coded structures into
+  configuration-driven designs. Improves maintainability and flexibility.
+---
+
 # Task 2 Refactor - 代码重构工具
 
 **Version**: 1.0.0  

@@ -1,3 +1,9 @@
+---
+name: SOC 2 Compliance Accelerator
+description: Your agent for achieving and maintaining SOC 2 Type I and Type II
+  compliance — from readiness assessment through audit completion.
+---
+
 # SOC 2 Compliance Accelerator
 
 Your agent for achieving and maintaining SOC 2 Type I and Type II compliance — from readiness assessment through audit completion.

@@ -1,3 +1,9 @@
+---
+name: MSP Toolkit Skill
+description: "description: Essential tools for IT MSP workflows – Azure/M365
+  audits, NPU monitoring, health checks."
+---
+
 # MSP Toolkit Skill
 
 description: Essential tools for IT MSP workflows – Azure/M365 audits, NPU monitoring, health checks.

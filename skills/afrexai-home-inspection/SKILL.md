@@ -1,3 +1,9 @@
+---
+name: Home Inspection Business Operations
+description: Run a profitable home inspection business with real numbers,
+  compliance checklists, and growth playbooks.
+---
+
 # Home Inspection Business Operations
 
 Run a profitable home inspection business with real numbers, compliance checklists, and growth playbooks.

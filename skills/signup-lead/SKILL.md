@@ -1,3 +1,8 @@
+---
+name: signup_lead
+description: Create a signup lead in the AgenticCreed system using the public HTTP endpoint.
+---
+
 # signup_lead
 
 Create a signup lead in the AgenticCreed system using the public HTTP endpoint.

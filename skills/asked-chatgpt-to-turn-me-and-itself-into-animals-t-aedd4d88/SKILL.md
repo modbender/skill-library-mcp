@@ -1,12 +1,8 @@
 ---
 name: asked-chatgpt-to-turn-me-and-itself-into-animals-t-aedd4d88
-description: cute 😇. 
-
-[PROMPT]
-
-Based on our past conversations, pick a real animal that best represents me, and preferably a different real animal that best represents you as an AI. Then create an image of those two animals taking a cute selfie together.
-metadata: {"clawdbot": {"type": "image generation", "inferred_type": "Image Generation", "source": "reddit", "original_url": "https://www.reddit.com/r/ChatGPT/comments/1qqp5ux/asked_chatgpt_to_turn_me_and_itself_into_animals/", "quality_score": 65}}
+description: cute 😇.
 ---
+
 
 # Asked ChatGPT to turn me and itself into animals. This happened
 

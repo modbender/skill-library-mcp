@@ -1,3 +1,10 @@
+---
+name: Employee Training Program Builder
+description: Build structured training programs for any role, department, or
+  compliance requirement. Generates curricula, schedules, assessment criteria,
+  and completion tracking.
+---
+
 # Employee Training Program Builder
 
 Build structured training programs for any role, department, or compliance requirement. Generates curricula, schedules, assessment criteria, and completion tracking.

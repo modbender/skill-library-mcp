@@ -1,3 +1,9 @@
+---
+name: YouTube Studio Skill
+description: Comprehensive YouTube channel management skill for Clawdbot.
+  Monitor analytics, upload videos, manage comments, and generate content ideas.
+---
+
 # YouTube Studio Skill
 
 Comprehensive YouTube channel management skill for Clawdbot. Monitor analytics, upload videos, manage comments, and generate content ideas.

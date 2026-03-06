@@ -1,11 +1,10 @@
 ---
 name: ibt
-version: 2.7.3
-title: IBT: Instinct + Behavior + Trust
-description: Execution discipline with agency, instinct detection, critical safety rules, trust layer, and error resilience. v2.7 adds timeout handling, checkpointing, and decision logging.
-homepage: https://github.com/palxislabs/ibt-skill
-metadata: {"openclaw":{"emoji":"🧠","category":"execution","tags":["ibt","instinct","behavior","trust","discipline","safety"]}}
+description: Execution discipline with agency, instinct detection, critical
+  safety rules, trust layer, and error resilience. v2.7 adds timeout handling,
+  checkpointing, and decision logging.
 ---
+
 
 # IBT v2.7 — Instinct + Behavior + Trust
 

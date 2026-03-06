@@ -1,7 +1,9 @@
 ---
 name: persona
-description: {AGENT_NAME} personality and behavior guidelines. Character and interaction rules.
+description: "{AGENT_NAME} personality and behavior guidelines. Character and
+  interaction rules."
 ---
+
 
 # Persona — REY / {AGENT_NAME}
 

@@ -1,9 +1,11 @@
 ---
 name: reminder
-summary: Natural-language reminders → save to your workspace → schedule Telegram notifications (24h/1h/10m by default).
-description: Natural-language reminder secretary: capture events into git-synced workspace (data/logic separated), schedule Telegram reminders via OpenClaw cron, and answer "what's coming up" queries. Use when user mentions meetings, birthdays, deadlines, or asks for schedule/plans.
-tags: [reminder, schedule, cron, telegram, secretary]
+description: "Natural-language reminder secretary: capture events into
+  git-synced workspace (data/logic separated), schedule Telegram reminders via
+  OpenClaw cron, and answer \"what's coming up\" queries. Use when user mentions
+  meetings, birthdays, deadlines, or asks for schedule/plans."
 ---
+
 
 # Reminder (secretary)
 

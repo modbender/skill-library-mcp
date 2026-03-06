@@ -1,3 +1,9 @@
+---
+name: Personal Genomics Skill v4.2.0
+description: Comprehensive local DNA analysis with 1600+ markers across 30
+  categories. Privacy-first genetic analysis for AI agents.
+---
+
 # Personal Genomics Skill v4.2.0
 
 Comprehensive local DNA analysis with **1600+ markers** across **30 categories**. Privacy-first genetic analysis for AI agents.

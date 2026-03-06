@@ -1,3 +1,8 @@
+---
+name: Mint Club V2 — Agent Skill
+description: Interact with Mint Club V2 bonding curve tokens on Base using the mc CLI.
+---
+
 # Mint Club V2 — Agent Skill
 
 Interact with Mint Club V2 bonding curve tokens on Base using the `mc` CLI.

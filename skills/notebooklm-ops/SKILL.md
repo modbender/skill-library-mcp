@@ -1,7 +1,12 @@
 ---
 name: notebooklm-ops
-description: Operate Google NotebookLM MCP authentication lifecycle on Linux host. Use for NotebookLM MCP (`notebooklm-mcp` via `mcporter`) when cookies expire frequently and auth must be refreshed often. Handles on/off, auth refresh, status, and smoke test. Triggers: "Включи NotebookLM", "Выключи NotebookLM", "обнови авторизацию NotebookLM", "проверь NotebookLM".
+description: 'Operate Google NotebookLM MCP authentication lifecycle on Linux
+  host. Use for NotebookLM MCP (`notebooklm-mcp` via `mcporter`) when cookies
+  expire frequently and auth must be refreshed often. Handles on/off, auth
+  refresh, status, and smoke test. Triggers: "Включи NotebookLM", "Выключи
+  NotebookLM", "обнови авторизацию NotebookLM", "проверь NotebookLM".'
 ---
+
 
 # NotebookLM Ops
 

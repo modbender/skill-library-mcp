@@ -1,3 +1,8 @@
+---
+name: Wiki.js Skill v1.4
+description: A complete CLI for managing Wiki.js via the GraphQL API.
+---
+
 # Wiki.js Skill v1.4
 
 A complete CLI for managing Wiki.js via the GraphQL API.

@@ -1,3 +1,9 @@
+---
+name: Deploy Kit — Skill de Déploiement Web
+description: Simplifie le déploiement d'apps web sur Vercel, Railway et Supabase
+  via leurs CLIs.
+---
+
 # Deploy Kit — Skill de Déploiement Web
 
 Simplifie le déploiement d'apps web sur **Vercel**, **Railway** et **Supabase** via leurs CLIs.

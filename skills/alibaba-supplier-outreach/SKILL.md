@@ -1,17 +1,8 @@
 ---
 name: alibaba-supplier-outreach
-description: |
-  Find Alibaba suppliers via LaunchFast, contact them with optimized outreach messages,
-  check their replies, and manage ongoing negotiations. Built for Amazon FBA sellers.
-
-  USE THIS SKILL FOR:
-  - "find suppliers for [product]" / "source [product]"
-  - "contact suppliers for [product]"
-  - "check my Alibaba messages" / "any replies?"
-  - "follow up with [supplier]" / "negotiate with suppliers"
-
-argument-hint: [product keyword] | "check replies" | "follow up [supplier name]"
+description: "|"
 ---
+
 
 # Alibaba Supplier Outreach Skill
 

@@ -1,3 +1,8 @@
+---
+name: Goal Tracker Skill
+description: Track long-term goals with milestones, daily logging, and accountability.
+---
+
 # Goal Tracker Skill
 
 Track long-term goals with milestones, daily logging, and accountability.

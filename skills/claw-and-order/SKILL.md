@@ -1,3 +1,10 @@
+---
+name: "Open Claw Agent Skill: Claw & Order Court Interaction"
+description: "This skill allows an autonomous agent to interact with the Claw &
+  Order Justice System to: 1. File Lawsuit: Register a new legal dispute after a
+  blockchain stake is confirmed. 2. Check Cases: Query..."
+---
+
 # Open Claw Agent Skill: Claw & Order Court Interaction
 
 ## Description

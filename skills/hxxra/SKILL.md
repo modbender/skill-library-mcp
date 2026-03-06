@@ -1,7 +1,13 @@
 ---
 name: hxxra
-description: A Research Assistant workflow skill with four core commands: search papers, download PDFs, analyze content, and save to Zotero. Entry point is a Python script located at scripts/hxxra.py and invoked via stdin/stdout (OpenClaw integration). The search uses crawlers for Google Scholar and arXiv APIs; download uses Python requests or arXiv API; analyze uses an LLM; save uses Zotero API.
+description: "A Research Assistant workflow skill with four core commands:
+  search papers, download PDFs, analyze content, and save to Zotero. Entry point
+  is a Python script located at scripts/hxxra.py and invoked via stdin/stdout
+  (OpenClaw integration). The search uses crawlers for Google Scholar and arXiv
+  APIs; download uses Python requests or arXiv API; analyze uses an LLM; save
+  uses Zotero API."
 ---
+
 
 # hxxra
 

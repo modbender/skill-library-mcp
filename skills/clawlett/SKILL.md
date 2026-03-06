@@ -1,3 +1,9 @@
+---
+name: Clawlett
+description: Secure token swaps and Trenches trading on Base Mainnet, powered by
+  Safe + Zodiac Roles.
+---
+
 # Clawlett
 
 Secure token swaps and Trenches trading on **Base Mainnet**, powered by Safe + Zodiac Roles.

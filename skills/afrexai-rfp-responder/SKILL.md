@@ -1,3 +1,8 @@
+---
+name: RFP & Proposal Responder
+description: Turn RFPs, RFIs, and proposal requests into winning responses. Fast.
+---
+
 # RFP & Proposal Responder
 
 Turn RFPs, RFIs, and proposal requests into winning responses. Fast.

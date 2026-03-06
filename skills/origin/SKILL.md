@@ -1,10 +1,9 @@
 ---
 name: origin
-version: "0.1.0"
-namespace: netsnek
-summary: Data provenance and lineage tracking. Traces data from source to destination, logs transformations, ensures auditability.
-copyright: "Copyright (c) 2026 Netsnek e.U."
+description: Data provenance and lineage tracking. Traces data from source to
+  destination, logs transformations, ensures auditability.
 ---
+
 
 # Origin
 

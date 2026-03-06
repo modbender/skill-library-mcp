@@ -1,7 +1,10 @@
 ---
 name: x-article-editor
-description: TL;DR: Turn a topic or draft into a high-engagement X Article. STEP 1 final copy/paste article. STEP 2 scored review (/80) using an 8-step framework.
+description: "TL;DR: Turn a topic or draft into a high-engagement X Article.
+  STEP 1 final copy/paste article. STEP 2 scored review (/80) using an 8-step
+  framework."
 ---
+
 
 # X Article Editor (8-step framework)
 

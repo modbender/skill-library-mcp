@@ -1,3 +1,9 @@
+---
+name: Davis-Bacon & Prevailing Wage Compliance
+description: Federal construction compliance agent. Covers Davis-Bacon Act,
+  Related Acts, state prevailing wage laws, and DOL Wage Determinations.
+---
+
 # Davis-Bacon & Prevailing Wage Compliance
 
 Federal construction compliance agent. Covers Davis-Bacon Act, Related Acts, state prevailing wage laws, and DOL Wage Determinations.

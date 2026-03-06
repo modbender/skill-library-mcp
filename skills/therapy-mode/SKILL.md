@@ -1,8 +1,9 @@
 ---
-title: Therapy Mode
-description: Comprehensive AI-assisted therapeutic support framework with CBT, ACT, DBT, MI, session notes CLI, and crisis protocols.
-tags: therapy, mental-health, support, cbt, dbt, act, counseling
+name: therapy-mode
+description: Comprehensive AI-assisted therapeutic support framework with CBT,
+  ACT, DBT, MI, session notes CLI, and crisis protocols.
 ---
+
 # Comprehensive Guide for AI-Assisted Therapeutic Support
 
 ## Session Notes

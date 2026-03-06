@@ -1,3 +1,10 @@
+---
+name: MONK-EYE 👁️ - Deep Intelligence & Human Experience Oracle
+description: MONK-EYE is a specialized OpenClaw skill designed for deep
+  infiltration and synthesis of forum-based human intelligence. While most
+  search tools focus on surface-level web pages, MONK-EYE dives int...
+---
+
 # MONK-EYE 👁️ - Deep Intelligence & Human Experience Oracle
 
 MONK-EYE is a specialized OpenClaw skill designed for deep infiltration and synthesis of forum-based human intelligence. While most search tools focus on surface-level web pages, MONK-EYE dives into the "tacit knowledge" buried in the world's most active and niche forums (R10, BlackHatWorld, Reddit, Habr, etc.).

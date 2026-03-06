@@ -1,3 +1,10 @@
+---
+name: Validator Agent
+description: "Multi-round automated validation pipeline for TypeScript/Solidity
+  projects. Runs 8 rounds of checks before any publish or deploy: compile gate,
+  lint, test suite, security audit, type coverage, docs..."
+---
+
 # Validator Agent
 
 Multi-round automated validation pipeline for TypeScript/Solidity projects. Runs 8 rounds of checks before any publish or deploy: compile gate, lint, test suite, security audit, type coverage, docs, changelog, and final review.

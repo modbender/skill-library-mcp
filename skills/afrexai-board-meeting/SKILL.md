@@ -1,3 +1,9 @@
+---
+name: Board Meeting Prep
+description: Generate complete board meeting packages — agenda, financial
+  summary, KPI dashboard, risk register, and action item tracker.
+---
+
 # Board Meeting Prep
 
 Generate complete board meeting packages — agenda, financial summary, KPI dashboard, risk register, and action item tracker.

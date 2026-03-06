@@ -1,3 +1,9 @@
+---
+name: openclaw-crm
+description: Local-first CRM for tracking leads, deals, follow-ups, and
+  pipeline. Uses SQLite with WAL mode, CLI via Commander.
+---
+
 # openclaw-crm
 
 Local-first CRM for tracking leads, deals, follow-ups, and pipeline. Uses SQLite with WAL mode, CLI via Commander.

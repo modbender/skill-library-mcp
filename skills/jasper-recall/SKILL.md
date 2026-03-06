@@ -1,8 +1,12 @@
 ---
 name: jasper-recall
-version: 0.3.1
-description: Local RAG system for agent memory using ChromaDB and sentence-transformers. v0.3.0 adds multi-agent mesh (N agents sharing memory), OpenClaw plugin with autoRecall, and agent-specific collections. Commands: recall, index-digests, digest-sessions, privacy-check, sync-shared, serve, recall-mesh.
+description: "Local RAG system for agent memory using ChromaDB and
+  sentence-transformers. v0.3.0 adds multi-agent mesh (N agents sharing memory),
+  OpenClaw plugin with autoRecall, and agent-specific collections. Commands:
+  recall, index-digests, digest-sessions, privacy-check, sync-shared, serve,
+  recall-mesh."
 ---
+
 
 # Jasper Recall v0.2.3
 

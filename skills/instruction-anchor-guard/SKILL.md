@@ -1,3 +1,10 @@
+---
+name: Instruction Anchor Guard
+description: "name: instruction-anchor-guard version: 1.1.0 description:
+  Preserve user-critical instructions across long sessions and context
+  compaction. Use when users mark constraints as important/must/always/..."
+---
+
 ﻿---
 name: instruction-anchor-guard
 version: 1.1.0

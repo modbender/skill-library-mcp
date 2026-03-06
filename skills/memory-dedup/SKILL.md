@@ -1,3 +1,8 @@
+---
+name: Memory Deduplication — 记忆去重与合并
+description: 随着时间推移，MEMORY.md 会出现：
+---
+
 # Memory Deduplication — 记忆去重与合并
 
 > 保持 MEMORY.md 清洁，避免信息冗余

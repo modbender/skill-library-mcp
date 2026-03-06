@@ -1,7 +1,14 @@
 ---
 name: portfolio-tracker
-description: Automates live portfolio tracking and analysis using browser automation on Yahoo Finance. Fetches real-time prices for Vish's 27 stocks/ETFs + 4 cryptos, updates portfolio-tracker.md, generates performance summaries, winners/losers, rebalancing suggestions, and market news. Use for: portfolio value checks, performance analysis, daily/heartbeat updates, averaging opportunities, or when user mentions stocks, portfolio, investments, or market updates.
+description: "Automates live portfolio tracking and analysis using browser
+  automation on Yahoo Finance. Fetches real-time prices for Vish's 27
+  stocks/ETFs + 4 cryptos, updates portfolio-tracker.md, generates performance
+  summaries, winners/losers, rebalancing suggestions, and market news. Use for:
+  portfolio value checks, performance analysis, daily/heartbeat updates,
+  averaging opportunities, or when user mentions stocks, portfolio, investments,
+  or market updates."
 ---
+
 
 # Portfolio Tracker
 

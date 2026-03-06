@@ -1,3 +1,8 @@
+---
+name: GPU 状态检查 (gpu_check)
+description: 实时获取局域网内分布式 AI 算力节点的显存占用情况。
+---
+
 # GPU 状态检查 (gpu_check)
 
 实时获取局域网内分布式 AI 算力节点的显存占用情况。

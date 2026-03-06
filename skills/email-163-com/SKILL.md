@@ -1,3 +1,8 @@
+---
+name: email-163-com Skill
+description: "编辑 /.config/email-163-com/config.json:"
+---
+
 # email-163-com Skill
 
 **版本**: 1.0.0  

@@ -1,41 +1,11 @@
 ---
 name: minimax-mcp
-description: MiniMax MCP server for web search and image understanding. Use when needing: (1) Web search via MiniMax API, (2) Analyze/describe images, (3) Extract content from URLs. Requires MINIMAX_API_KEY (China: api.minimaxi.com, Global: api.minimax.io).
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🔍",
-        "requires": { "bins": ["uvx"], "env": ["MINIMAX_API_KEY", "MINIMAX_API_HOST"] },
-        "primaryEnv": "MINIMAX_API_KEY",
-        "install":
-          [
-            {
-              "id": "region",
-              "kind": "select",
-              "label": "Select Region",
-              "options": ["Global (minimax.io)", "Mainland China (minimaxi.com)"],
-              "default": "Mainland China (minimaxi.com)"
-            },
-            {
-              "id": "api_key",
-              "kind": "input",
-              "label": "MiniMax API Key",
-              "description": "Global: https://www.minimax.io/platform/user-center/basic-information/interface-key | China: https://platform.minimaxi.com/user-center/basic-information/interface-key",
-              "secret": true,
-              "envVar": "MINIMAX_API_KEY"
-            },
-            {
-              "id": "uv",
-              "kind": "brew",
-              "formula": "uv",
-              "bins": ["uvx"],
-              "label": "Install uv (required for MCP server)"
-            }
-          ]
-      }
-  }
+description: "MiniMax MCP server for web search and image understanding. Use
+  when needing: (1) Web search via MiniMax API, (2) Analyze/describe images, (3)
+  Extract content from URLs. Requires MINIMAX_API_KEY (China: api.minimaxi.com,
+  Global: api.minimax.io)."
 ---
+
 
 # MiniMax MCP Skill
 

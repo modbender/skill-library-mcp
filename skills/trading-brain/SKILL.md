@@ -1,3 +1,10 @@
+---
+name: trading-brain
+description: Load Travis's personal trading strategy, rules, and mental models
+  into the current session. Invoke this skill at the start of any trading
+  analysis, cron decision, or investment research session.
+---
+
 # trading-brain
 
 Load Travis's personal trading strategy, rules, and mental models into the current session. Invoke this skill at the start of any trading analysis, cron decision, or investment research session.

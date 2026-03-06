@@ -1,3 +1,9 @@
+---
+name: Marketing Promo Video
+description: This skill provides a high-quality, manually crafted prompt
+  template for AI e-commerce video generation.
+---
+
 # Marketing Promo Video
 
 **Version**: 1.0.0

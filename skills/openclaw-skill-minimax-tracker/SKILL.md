@@ -1,3 +1,10 @@
+---
+name: SKILL.md - MiniMax Usage Tracker
+description: This skill provides real-time tracking for MiniMax API usage. It
+  calculates usage based on prompts consumed, tracks remaining quota, and
+  displays progress in a compact bar format. Designed for Open...
+---
+
 # SKILL.md - MiniMax Usage Tracker
 
 ## Skill Information

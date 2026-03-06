@@ -1,3 +1,10 @@
+---
+name: Obsidian Daily Note
+description: "name: obsidian-daily description: Create and manage Obsidian daily
+  notes. Use when asked to write daily notes, record today's work, log session
+  activities, or create daily summaries. Triggers on ke..."
+---
+
 ﻿---
 name: obsidian-daily
 description: Create and manage Obsidian daily notes. Use when asked to write daily notes, record today's work, log session activities, or create daily summaries. Triggers on keywords like "daily note", "today's log", "write daily", "daily summary".

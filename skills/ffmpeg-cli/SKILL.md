@@ -1,8 +1,12 @@
 ---
 name: ffmpeg-cli
-description: Comprehensive video/audio processing with FFmpeg. Use for: (1) Video transcoding and format conversion, (2) Cutting and merging clips, (3) Audio extraction and manipulation, (4) Thumbnail and GIF generation, (5) Resolution scaling and quality adjustment, (6) Adding subtitles or watermarks, (7) Speed adjustment (slow/fast motion), (8) Color correction and filters.
-metadata: {"clawdbot":{"emoji":"🎬","requires":{"bins":["ffmpeg"]},"install":[{"id":"brew","kind":"brew","formula":"ffmpeg","bins":["ffmpeg"],"label":"Install ffmpeg (brew)"}]}}
+description: "Comprehensive video/audio processing with FFmpeg. Use for: (1)
+  Video transcoding and format conversion, (2) Cutting and merging clips, (3)
+  Audio extraction and manipulation, (4) Thumbnail and GIF generation, (5)
+  Resolution scaling and quality adjustment, (6) Adding subtitles or watermarks,
+  (7) Speed adjustment (slow/fast motion), (8) Color correction and filters."
 ---
+
 
 # FFmpeg CLI
 

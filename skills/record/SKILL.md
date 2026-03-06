@@ -1,7 +1,15 @@
 ---
 name: record
-description: macOS CLI tool for recording audio (microphone), screen (video/screenshot), and camera (video/photo) from the terminal. Use when the user or an AI agent needs to: (1) record microphone audio, (2) capture screen video or screenshot, (3) capture camera video or photo, (4) list available devices/displays/cameras, or any task involving audio/video/image capture on macOS via the command line. Trigger on keywords like: record, microphone, screen capture, screenshot, screen recording, camera, webcam, photo, audio capture.
+description: "macOS CLI tool for recording audio (microphone), screen
+  (video/screenshot), and camera (video/photo) from the terminal. Use when the
+  user or an AI agent needs to: (1) record microphone audio, (2) capture screen
+  video or screenshot, (3) capture camera video or photo, (4) list available
+  devices/displays/cameras, or any task involving audio/video/image capture on
+  macOS via the command line. Trigger on keywords like: record, microphone,
+  screen capture, screenshot, screen recording, camera, webcam, photo, audio
+  capture."
 ---
+
 
 # record CLI
 

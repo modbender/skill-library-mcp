@@ -1,7 +1,13 @@
 ---
 name: trilium
-description: Work with Trilium Notes (notebook app) and automate via Trilium Notes ETAPI. This skill allows you to read, search, and create notes in your Trilium database. Use to manage notebook content or search for information within Trilium. To get started: (1) In Trilium, go to Options -> ETAPI and create a new ETAPI token. (2) Set TRILIUM_ETAPI_TOKEN and TRILIUM_SERVER_URL in your environment or .env file.
+description: "Work with Trilium Notes (notebook app) and automate via Trilium
+  Notes ETAPI. This skill allows you to read, search, and create notes in your
+  Trilium database. Use to manage notebook content or search for information
+  within Trilium. To get started: (1) In Trilium, go to Options -> ETAPI and
+  create a new ETAPI token. (2) Set TRILIUM_ETAPI_TOKEN and TRILIUM_SERVER_URL
+  in your environment or .env file."
 ---
+
 
 # Trilium Notes
 

@@ -1,3 +1,10 @@
+---
+name: Commune — Email for Agents
+description: Commune gives you a permanent, dedicated inbox (you@commune.ai or
+  your own domain) with a full REST API. No human sign-up. No OAuth. No browser.
+  Your inbox is persistent across every session — it's...
+---
+
 | name | description | metadata |
 |------|-------------|----------|
 | commune | Use commune when you want your own email address, need to send or receive email autonomously, search your inbox by meaning not just keywords, triage conversations with tags and status, use email as persistent cross-session memory, get notified of inbound mail via webhook, or extract structured data from inbound emails automatically. Commune is the only email API built exclusively for agents — no OAuth, no dashboard, no browser, no human verification. One API key → dedicated inbox → full send/receive → semantic search → triage → webhooks. Your inbox survives across all sessions. Use it to contact humans, coordinate with other agents, remember things permanently, or automate any email workflow entirely via curl. Requires `COMMUNE_API_KEY` env var. | author | category |

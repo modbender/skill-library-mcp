@@ -1,23 +1,14 @@
 ---
 name: Security Joes AI Analyst
-description: SecOps checks for endpoints: EDR, Sysmon, updates, EVTX on heartbeat, least privilege, network visibility, credential protection (Kerberos/NTLM/pass-the-hash), device inventory and known vulnerabilities, weekly assessment, and skill integrity (hash-on-wake, version-aware). Use when implementing or reviewing host posture, heartbeat logic, EDR/Sysmon/EVTX, privilege, network exposure, credential hardening, vuln assessment, weekly SecOps review, or skill compromise checks.
-version: 1.0.0
-author: Security Joes
-authorUrl: https://www.securityjoes.com
-homepage: https://www.securityjoes.com
-license: MIT
-metadata:
-  openclaw:
-    emoji: "🔒"
-    category: "security"
-tags:
-  - security
-  - secops
-  - clawhub
-  - edr
-  - sysmon
-  - evtx
+description: "SecOps checks for endpoints: EDR, Sysmon, updates, EVTX on
+  heartbeat, least privilege, network visibility, credential protection
+  (Kerberos/NTLM/pass-the-hash), device inventory and known vulnerabilities,
+  weekly assessment, and skill integrity (hash-on-wake, version-aware). Use when
+  implementing or reviewing host posture, heartbeat logic, EDR/Sysmon/EVTX,
+  privilege, network exposure, credential hardening, vuln assessment, weekly
+  SecOps review, or skill compromise checks."
 ---
+
 
 # Security Joes AI Analyst
 

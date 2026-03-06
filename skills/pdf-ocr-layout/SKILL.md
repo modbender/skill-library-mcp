@@ -1,17 +1,9 @@
 ---
 name: pdf-ocr-layout
-description: Multimodal document deep analysis tool based on Zhipu GLM-OCR, GLM-4.7, and GLM-4.6V.
-
-  Use when:
-  - Need to extract tables from documents (PDF/images) with high precision and convert to Markdown format
-  - Need to automatically crop and extract illustrations and charts from document pages as independent files
-  - Need to perform deep semantic understanding on extracted charts (based on GLM-4.6V visual analysis)
-  - Need to perform logical analysis on extracted table data (based on GLM-4.7 text analysis)
-
-  Core Architecture:
-  1. Visual Extraction: GLM-OCR
-  2. Semantic Understanding: GLM-4.7 (text/tables) + GLM-4.6V (multimodal/images)
+description: Multimodal document deep analysis tool based on Zhipu GLM-OCR,
+  GLM-4.7, and GLM-4.6V.
 ---
+
 
 # GLM-OCR Multimodal Deep Analysis
 

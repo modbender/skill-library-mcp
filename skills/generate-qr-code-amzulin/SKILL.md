@@ -1,3 +1,10 @@
+---
+name: Generate QR Code Skill（生成二维码技能）
+description: "name: generate-qr-code description: 生成二维码/条形码，支持文本、URL、WiFi
+  配置等内容，可自定义尺寸、颜色并指定保存路径 version: 1.0.0 author: 二码大神 permissions:
+  文件写入权限（用于保存二维码图片）"
+---
+
 
 ---
 name: generate-qr-code

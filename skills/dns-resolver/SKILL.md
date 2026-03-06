@@ -1,6 +1,9 @@
 ---
-description: Perform detailed DNS lookups, check record types, and verify DNS propagation across multiple servers.
+name: dns-resolver
+description: Perform detailed DNS lookups, check record types, and verify DNS
+  propagation across multiple servers.
 ---
+
 
 # DNS Lookup
 

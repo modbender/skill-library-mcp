@@ -1,3 +1,10 @@
+---
+name: build-transparency-dashboard
+description: Scaffold a live public "build dashboard" that automatically shows
+  proof of work — commit count, last commit message, timestamp — pulled from a
+  private GitHub repo and displayed on a public static s...
+---
+
 # build-transparency-dashboard
 
 Scaffold a live public "build dashboard" that automatically shows proof of work — commit count, last commit message, timestamp — pulled from a private GitHub repo and displayed on a public static site.

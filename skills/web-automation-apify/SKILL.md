@@ -1,3 +1,10 @@
+---
+name: Web Automation & Form Interaction Skill
+description: This skill enables Claude to automate web interactions — filling
+  forms, testing UIs, scraping data, and running repetitive web workflows —
+  using the Apify platform and its REST API.
+---
+
 # Web Automation & Form Interaction Skill
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+name: Beanstalk Gateway
+description: Connect your local Clawdbot to beans.talk for remote monitoring and control.
+---
+
 # Beanstalk Gateway
 
 Connect your local Clawdbot to [beans.talk](https://beans.talk) for remote monitoring and control.

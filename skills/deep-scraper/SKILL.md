@@ -1,3 +1,10 @@
+---
+name: "Skill: deep-scraper"
+description: A high-performance engineering tool for deep web scraping. It uses
+  a containerized Docker + Crawlee (Playwright) environment to penetrate
+  protections on complex websites like YouTube and X/Twitter,...
+---
+
 # Skill: deep-scraper
 
 ## Overview

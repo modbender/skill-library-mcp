@@ -1,3 +1,9 @@
+---
+name: Feishu Card Skill
+description: Send rich interactive cards to Feishu (Lark) users or groups.
+  Supports Markdown (code blocks, tables), titles, color headers, and buttons.
+---
+
 # Feishu Card Skill
 
 Send rich interactive cards to Feishu (Lark) users or groups. Supports Markdown (code blocks, tables), titles, color headers, and buttons.

@@ -1,3 +1,8 @@
+---
+name: Jira & Confluence Integration Skill
+description: "This skill provides automated interaction with Jira Cloud and Confluence to:"
+---
+
 # Jira & Confluence Integration Skill
 
 ## Purpose

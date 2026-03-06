@@ -1,3 +1,8 @@
+---
+name: Naver Blog Writer Skill
+description: 이 스킬은 ACP/OpenClaw 환경에서 네이버 블로그 발행을 자동화합니다.
+---
+
 # Naver Blog Writer Skill
 
 이 스킬은 ACP/OpenClaw 환경에서 네이버 블로그 발행을 자동화합니다.

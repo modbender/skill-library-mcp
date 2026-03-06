@@ -1,7 +1,10 @@
 ---
 name: todolist-md-clawdbot
-description: Operate on todolist-md Markdown todo files. Read + summarize tasks, propose edits, and write outcomes back into Markdown using only <!-- bot: ... --> markers (line-stable write-back).
+description: "Operate on todolist-md Markdown todo files. Read + summarize
+  tasks, propose edits, and write outcomes back into Markdown using only <!--
+  bot: ... --> markers (line-stable write-back)."
 ---
+
 
 # todolist-md-clawdbot
 

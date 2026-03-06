@@ -1,3 +1,9 @@
+---
+name: ClawHub Publisher
+description: Automated skill publishing to ClawHub. Version management,
+  changelog generation, asset bundling, one-command deploy.
+---
+
 # ClawHub Publisher
 
 **Version:** 1.0.0  

@@ -1,3 +1,8 @@
+---
+name: Dockerfile Generator
+description: 根据应用类型自动生成优化的 Dockerfile。
+---
+
 # Dockerfile Generator
 
 根据应用类型自动生成优化的 Dockerfile。

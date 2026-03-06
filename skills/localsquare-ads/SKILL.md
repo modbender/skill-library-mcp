@@ -1,3 +1,10 @@
+---
+name: "LocalSquare: Claim Local Business Ads via AI Agent"
+description: LocalSquare is a digital bulletin board platform covering 43,000+
+  ZIP codes across America. Local businesses claim squares on their town's 10x10
+  grid, getting a dedicated SEO-optimized webpage that...
+---
+
 # LocalSquare: Claim Local Business Ads via AI Agent
 
 > **Homepage**: https://yourlocalsquare.com

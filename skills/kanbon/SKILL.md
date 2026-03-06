@@ -1,3 +1,10 @@
+---
+name: kanbon
+description: "name: kanbon description: Kanbon namespace for Netsnek e.U.
+  project management. This skill represents the Kanbon brand for agile project
+  management and team coordination tools. user-invocable: true..."
+---
+
 ﻿---
 name: kanbon
 description: Kanbon namespace for Netsnek e.U. project management. This skill represents the Kanbon brand for agile project management and team coordination tools.

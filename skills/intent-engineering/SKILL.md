@@ -1,7 +1,15 @@
 ---
 name: intent-engineering
-description: Adds a machine-readable intent layer to OpenClaw agents. Creates INTENT.md (optimization priorities, tradeoffs, delegation rules), wires it into subagent spawns via agent-context-loader, and ensures every subagent knows what you're optimizing for — not just what to do. Solves the "Klarna failure mode": AI optimizes measurable metrics instead of actual goals. Use when setting up a new OpenClaw workspace, when subagents keep making the wrong tradeoffs, or when you want explicit control over cost/quality/speed priorities.
+description: "Adds a machine-readable intent layer to OpenClaw agents. Creates
+  INTENT.md (optimization priorities, tradeoffs, delegation rules), wires it
+  into subagent spawns via agent-context-loader, and ensures every subagent
+  knows what you're optimizing for — not just what to do. Solves the \"Klarna
+  failure mode\": AI optimizes measurable metrics instead of actual goals. Use
+  when setting up a new OpenClaw workspace, when subagents keep making the wrong
+  tradeoffs, or when you want explicit control over cost/quality/speed
+  priorities."
 ---
+
 
 # Intent Engineering
 

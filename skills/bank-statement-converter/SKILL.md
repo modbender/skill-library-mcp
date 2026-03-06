@@ -1,3 +1,8 @@
+---
+name: bank-statement-converter
+description: Convert PDF bank statements to CSV/JSON.
+---
+
 ### Bank Statement Converter Skill
 
 Convert PDF bank statements to CSV/JSON.

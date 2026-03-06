@@ -1,3 +1,8 @@
+---
+name: AgentComm
+description: No servers. No accounts. No fees. Agents talking to agents.
+---
+
 # AgentComm
 
 **Decentralized communication for AI agents — over the internet or local network.**

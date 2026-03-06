@@ -1,21 +1,16 @@
 ---
 name: brain-cms
-description: Continuum Memory System (CMS) for OpenClaw agents. Replaces flat MEMORY.md with a brain-inspired multi-layer memory architecture — semantic schemas, a hippocampal router (INDEX.md), vector store (LanceDB + nomic-embed-text), and automated NREM/REM sleep cycles for consolidation. Based on neuroscience research (LTP, spreading activation, CMS theory). Use when setting up persistent agent memory, improving context efficiency, or reducing token cost on long-running agents. Triggers: brain, memory system, CMS, long-term memory, vector store, sleep cycle, NREM, REM, memory architecture, semantic memory, context efficiency.
-metadata:
-  openclaw:
-    emoji: 🧠
-    requires:
-      bins: ["python3", "ollama"]
-    install:
-      - id: python-deps
-        kind: shell
-        label: "Install Python dependencies"
-        command: "cd ~/.openclaw/workspace/memory_brain && python3 -m venv .venv && .venv/bin/pip install lancedb numpy pyarrow requests --quiet"
-      - id: ollama-models
-        kind: shell
-        label: "Pull Ollama models (nomic-embed-text + llama3.2:3b)"
-        command: "ollama pull nomic-embed-text && ollama pull llama3.2:3b"
+description: "Continuum Memory System (CMS) for OpenClaw agents. Replaces flat
+  MEMORY.md with a brain-inspired multi-layer memory architecture — semantic
+  schemas, a hippocampal router (INDEX.md), vector store (LanceDB +
+  nomic-embed-text), and automated NREM/REM sleep cycles for consolidation.
+  Based on neuroscience research (LTP, spreading activation, CMS theory). Use
+  when setting up persistent agent memory, improving context efficiency, or
+  reducing token cost on long-running agents. Triggers: brain, memory system,
+  CMS, long-term memory, vector store, sleep cycle, NREM, REM, memory
+  architecture, semantic memory, context efficiency."
 ---
+
 
 # Brain CMS 🧠
 

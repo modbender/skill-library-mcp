@@ -1,15 +1,8 @@
 ---
 name: krea-api
 description: Generate images via Krea.ai API (Flux, Imagen, Ideogram, Seedream, etc.)
-version: 0.2.4
-metadata:
-  credentials:
-    - id: krea
-      description: Krea.ai API key (format: KEY_ID:SECRET)
-      envVar: null
-      file: ~/.openclaw/credentials/krea.json
-      required: true
 ---
+
 
 # Krea.ai Image Generation Skill
 

@@ -1,3 +1,9 @@
+---
+name: Speech is Cheap (SIC) Skill
+description: Fast, accurate, and incredibly inexpensive automatic speech-to-text
+  transcription service.
+---
+
 # Speech is Cheap (SIC) Skill
 
 Fast, accurate, and incredibly inexpensive automatic speech-to-text transcription service.

@@ -1,3 +1,8 @@
+---
+name: maasv Memory
+description: Structured long-term memory for OpenClaw agents, powered by maasv.
+---
+
 # maasv Memory
 
 Structured long-term memory for OpenClaw agents, powered by [maasv](https://github.com/ascottbell/maasv).

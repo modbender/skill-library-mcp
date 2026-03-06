@@ -1,9 +1,8 @@
 ---
-slug: basic-helper-agent
-display_name: Basic Helper Agent
-version: 1.0.0
-tags: [productivity, research, assistant]
+name: first-basic
+description: あなたはユーザーの生産性を最大化するパーソナルアシスタントです。
 ---
+
 
 # Basic Helper Agent
 

@@ -1,3 +1,8 @@
+---
+name: Age Verification Skills
+description: Skills for age verification and age-appropriate content filtering.
+---
+
 # Age Verification Skills
 
 Skills for age verification and age-appropriate content filtering.
