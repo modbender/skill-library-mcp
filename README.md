@@ -1,16 +1,16 @@
 # Skill Library MCP
 
-**14,500+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
+**15,000+ ready-to-use skills for AI coding assistants, served on demand via MCP.**
 
 [![npm version](https://img.shields.io/npm/v/skill-library-mcp)](https://www.npmjs.com/package/skill-library-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 
-An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 14,500+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
+An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 15,000+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
 
 ## Why?
 
-- **14,500+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
+- **15,000+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
 - **On-demand loading** — skills are fetched only when needed, not crammed into every conversation
 - **IDF-weighted search** — finds the right skill even from natural language queries like "help me debug a memory leak"
 - **Browse by category** — 13 categories to discover skills you didn't know existed
@@ -22,9 +22,7 @@ An MCP server that provides on-demand skill loading for AI coding assistants. In
 
 ### Claude Code Plugin (Recommended)
 
-**CLI:**
-
-First, add the repository as a marketplace source, then install the plugin:
+Add the marketplace source, then install the plugin:
 
 ```bash
 claude plugin marketplace add https://github.com/modbender/skill-library-mcp.git
@@ -33,50 +31,13 @@ claude plugin install skill-library
 
 The MCP server starts automatically when Claude Code launches. No manual configuration needed.
 
-To install for a specific scope:
+### Claude Code (CLI)
 
 ```bash
-claude plugin install skill-library --scope user      # Default, available everywhere
-claude plugin install skill-library --scope project   # Project-only, shared with collaborators
+claude mcp add skill-library -- npx -y skill-library-mcp
 ```
 
-**Desktop UI:**
-
-1. Open Claude Desktop settings
-2. Go to **Plugins** and click **Add marketplace by URL**
-3. Enter the repository URL:
-   ```
-   https://github.com/modbender/skill-library-mcp.git
-   ```
-4. Install **skill-library** from the marketplace list
-
-**Local development:**
-
-```bash
-claude --plugin-dir /path/to/skill-library-mcp
-```
-
-### MCP Server (Manual)
-
-For other tools or manual Claude Code setup, add to your MCP configuration:
-
-<details>
-<summary><strong>Claude Code (CLI)</strong></summary>
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "skill-library": {
-      "command": "npx",
-      "args": ["-y", "skill-library-mcp"]
-    }
-  }
-}
-```
-
-</details>
+### MCP Server (Other Tools)
 
 <details>
 <summary><strong>Claude Desktop</strong></summary>
@@ -151,13 +112,6 @@ Add to `.vscode/mcp.json`:
 </details>
 
 <details>
-<summary><strong>Antigravity</strong></summary>
-
-See [Antigravity docs](https://docs.antigravity.dev) for MCP server configuration format.
-
-</details>
-
-<details>
 <summary><strong>Manual installation</strong></summary>
 
 ```bash
@@ -210,7 +164,7 @@ list_categories()
 
 ## Skill Categories
 
-The library includes 14,500+ skills across 13 categories:
+The library includes 15,000+ skills across 13 categories:
 
 | Category | Examples |
 |----------|----------|
@@ -249,7 +203,7 @@ Skills can optionally include a `resources/` directory with additional `.md` fil
 
 Contributions are welcome! To add a new skill:
 
-1. Create a directory under `skills/` with your skill name
+1. Create a directory under `data/` with your skill name
 2. Add a `SKILL.md` file with YAML frontmatter (`name`, `description`)
 3. Run `pnpm dedup` to check for duplicates
 4. Submit a PR
@@ -262,7 +216,7 @@ pnpm test             # Run tests
 pnpm build            # Build to dist/
 pnpm dev              # Run server locally
 pnpm dedup            # Check for duplicate skills
-pnpm validate-skills  # Validate skills/ directory structure
+pnpm validate-skills  # Validate data/ directory structure
 pnpm fix-skills       # Fix broken skills (dry run by default)
 pnpm clean-skills     # Remove invalid skill dirs (dry run by default)
 make ci               # Run test + validate + build
