@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/modbender/skill-library-mcp/compare/v1.3.3...v1.3.4) (2026-03-06)
+
+
+### Bug Fixes
+
+* plugin version ([d133cfe](https://github.com/modbender/skill-library-mcp/commit/d133cfe4c62934049ebd85c2181c8b942a1370de))
+
 ## [1.3.3](https://github.com/modbender/skill-library-mcp/compare/v1.3.2...v1.3.3) (2026-03-06)
 
 
