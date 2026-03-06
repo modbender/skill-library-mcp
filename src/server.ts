@@ -1,12 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { createRequire } from "node:module";
 import { z } from "zod";
 import type { SkillEntry, SearchIndex } from "./types.js";
 import { searchSkills } from "./search.js";
 import { loadSkill } from "./loader.js";
 
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json");
+
 export function createServer(index: SearchIndex, skillsDir: string): McpServer {
   const server = new McpServer(
-    { name: "skill-library", version: "1.2.0" },
+    { name: "skill-library", version },
   );
 
   // Build lookup map keyed by both dirName and frontmatter name
