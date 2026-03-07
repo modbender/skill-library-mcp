@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/modbender/skill-library-mcp/compare/v1.3.5...v2.0.0) (2026-03-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* better search and hooks
+
+### Features
+
+* better search and hooks ([bd7af29](https://github.com/modbender/skill-library-mcp/commit/bd7af2902de19e31bc8053621dd795356bd927c5))
+
 ## [1.3.5](https://github.com/modbender/skill-library-mcp/compare/v1.3.4...v1.3.5) (2026-03-06)
 
 
