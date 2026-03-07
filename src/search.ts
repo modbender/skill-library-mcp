@@ -34,6 +34,8 @@ export function searchSkills(
     let score = 0;
 
     let matchedTokens = 0;
+    const nameLower = entry.frontmatter.name.toLowerCase();
+    const descLower = entry.frontmatter.description.toLowerCase();
 
     for (const qt of queryTokens) {
       const idfWeight = index.idfScores.get(qt) ?? defaultIdf;
@@ -41,9 +43,17 @@ export function searchSkills(
 
       for (const st of entry.searchTokens) {
         if (st === qt) {
+          // Exact token match — full IDF weight
           bestTokenScore = Math.max(bestTokenScore, idfWeight);
-        } else if (qt.length >= 2 && st.length >= 2 && (st.includes(qt) || qt.includes(st))) {
-          bestTokenScore = Math.max(bestTokenScore, idfWeight * 0.5);
+        } else if (qt.length >= 3 && st.length >= 3) {
+          // Substring match — require min 3 chars and scale by overlap ratio
+          if (st.includes(qt)) {
+            const overlap = qt.length / st.length;
+            bestTokenScore = Math.max(bestTokenScore, idfWeight * overlap * 0.5);
+          } else if (qt.includes(st)) {
+            const overlap = st.length / qt.length;
+            bestTokenScore = Math.max(bestTokenScore, idfWeight * overlap * 0.5);
+          }
         }
       }
 
@@ -51,18 +61,23 @@ export function searchSkills(
       score += bestTokenScore;
     }
 
-    // Bonus for exact substring match in name
-    if (entry.frontmatter.name.toLowerCase().includes(queryLower)) {
-      score += 2.0;
+    // Bonus for exact phrase match in name (strongest signal)
+    if (nameLower.includes(queryLower)) {
+      score += 3.0;
+    }
+    // Bonus for individual query tokens appearing in name
+    for (const qt of queryTokens) {
+      if (nameLower.includes(qt)) score += 1.0;
     }
 
-    // Bonus for exact substring match in description
-    if (entry.frontmatter.description.toLowerCase().includes(queryLower)) {
-      score += 1.0;
+    // Bonus for exact phrase match in description
+    if (descLower.includes(queryLower)) {
+      score += 1.5;
     }
 
-    // Normalize by matched token count (unmatched tokens don't dilute score)
-    score = score / Math.max(matchedTokens, 1);
+    // Coverage bonus: reward matching more query tokens
+    const coverage = matchedTokens / queryTokens.length;
+    score *= 1 + coverage;
 
     if (score >= 0.5) {
       results.push({

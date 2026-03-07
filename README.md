@@ -25,16 +25,16 @@ An MCP server that provides on-demand skill loading for AI coding assistants. In
 Add the marketplace source, then install the plugin:
 
 ```bash
-claude plugin marketplace add https://github.com/modbender/skill-library-mcp.git
-claude plugin install skill-library
+claude plugin marketplace add https://github.com/modbender/skill-library-mcp.git --scope user
+claude plugin install skill-library --scope user
 ```
 
 The MCP server starts automatically when Claude Code launches. No manual configuration needed.
 
-### Claude Code (CLI)
+### Claude Code (MCP Server)
 
 ```bash
-claude mcp add skill-library -- npx -y skill-library-mcp
+claude mcp add skill-library --scope user -- npx -y skill-library-mcp
 ```
 
 ### MCP Server (Other Tools)

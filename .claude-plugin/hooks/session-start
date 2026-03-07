@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# SessionStart hook for skill-library plugin
+
+set -euo pipefail
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+read -r -d '' CONTEXT << 'SKILLEOF' || true
+You have access to a skill library with 15,000+ skills via MCP tools.
+
+**IMPORTANT: Before responding to any task, check if a relevant skill exists.**
+
+Use these MCP tools from the skill-library server:
+- `search_skill({ query: "..." })` — Search for skills by keyword. Use natural language.
+- `load_skill({ name: "...", include_resources: true })` — Load the full skill content.
+- `list_categories()` — Browse all 13 skill categories.
+
+**When to search:**
+- Starting any new task (even simple ones — a skill may have best practices)
+- Working with a specific framework, library, or tool
+- Debugging, testing, deploying, or architecting
+- Any domain you're not 100% certain about
+
+**How to use:**
+1. Search with a short query related to your task
+2. If results look relevant, load the top skill
+3. Follow the skill's guidance in your response
+
+Don't skip this step. A 2-second search can prevent minutes of suboptimal work.
+SKILLEOF
+
+session_context="<IMPORTANT>\nYou have a skill library.\n\n$(escape_for_json "$CONTEXT")\n</IMPORTANT>"
+
+cat <<EOF
+{
+  "additional_context": "${session_context}",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "${session_context}"
+  }
+}
+EOF
+
+exit 0
