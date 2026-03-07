@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.1](https://github.com/modbender/skill-library-mcp/compare/v2.0.0...v2.0.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* release sync ([3508dd0](https://github.com/modbender/skill-library-mcp/commit/3508dd0e678bfb5744010719cbfe64fb440674c4))
+* release version sync ([86cb59d](https://github.com/modbender/skill-library-mcp/commit/86cb59dd265562903bdf00b26b0d75add9b69070))
+* version automatic sync with plugin ([acbf4c3](https://github.com/modbender/skill-library-mcp/commit/acbf4c3ec20a8c447c2bb96d5352817759a6c298))
+
 ## [2.0.0](https://github.com/modbender/skill-library-mcp/compare/v1.3.5...v2.0.0) (2026-03-07)
 
 
