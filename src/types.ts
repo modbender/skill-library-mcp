@@ -27,3 +27,27 @@ export interface SearchResult {
   score: number;
   hasResources: boolean;
 }
+
+export interface SkillsIndexEntry {
+  name: string;
+  description: string;
+  hasResources: boolean;
+  resourceFiles: string[];
+  metadata?: Record<string, unknown>;
+  allowedTools?: string[];
+}
+
+export interface SkillsIndex {
+  version: number;
+  skills: Record<string, SkillsIndexEntry>;
+}
+
+export interface SkillsBundleEntry {
+  content: string;
+  resources?: Record<string, string>;
+}
+
+export interface SkillsBundle {
+  version: number;
+  skills: Record<string, SkillsBundleEntry>;
+}

@@ -1,14 +1,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createRequire } from "node:module";
 import { z } from "zod";
-import type { SkillEntry, SearchIndex } from "./types.js";
+import type { SkillEntry, SearchIndex, SkillsBundle } from "./types.js";
 import { searchSkills } from "./search.js";
-import { loadSkill } from "./loader.js";
+import { loadSkill, loadSkillFromBundle } from "./loader.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json");
 
-export function createServer(index: SearchIndex, skillsDir: string): McpServer {
+export function createServer(
+  index: SearchIndex,
+  skillsDir: string,
+  getBundle?: () => Promise<SkillsBundle | undefined>,
+): McpServer {
   const server = new McpServer(
     { name: "skill-library", version },
   );
@@ -74,7 +78,10 @@ export function createServer(index: SearchIndex, skillsDir: string): McpServer {
         };
       }
 
-      const content = await loadSkill(entry, skillsDir, include_resources);
+      const bundle = getBundle ? await getBundle() : undefined;
+      const content = bundle
+        ? await loadSkillFromBundle(entry, bundle, include_resources)
+        : await loadSkill(entry, skillsDir, include_resources);
 
       return {
         content: [{ type: "text", text: content }],

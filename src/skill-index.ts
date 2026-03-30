@@ -2,7 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { tokenize } from "./tokenize.js";
-import type { SkillEntry, SkillFrontmatter, SearchIndex } from "./types.js";
+import type { SkillEntry, SkillFrontmatter, SearchIndex, SkillsBundle, SkillsIndex } from "./types.js";
 import { buildCategories } from "./categories.js";
 
 export function parseFrontmatter(content: string): SkillFrontmatter | null {
@@ -100,5 +100,46 @@ export async function buildIndex(skillsDir: string): Promise<SearchIndex> {
 
   const categories = buildCategories(entries);
 
+  return { entries, idfScores, totalDocs, categories };
+}
+
+export function buildIndexFromBundle(bundle: SkillsBundle | SkillsIndex): SearchIndex {
+  const entries: SkillEntry[] = [];
+
+  for (const [dirName, entry] of Object.entries(bundle.skills)) {
+    // Support both full bundle entries (with content) and index-only entries
+    const frontmatter: SkillFrontmatter = "content" in entry
+      ? (parseFrontmatter(entry.content) ?? { name: dirName, description: "" })
+      : {
+          name: (entry as SkillsIndex["skills"][string]).name,
+          description: (entry as SkillsIndex["skills"][string]).description,
+          metadata: (entry as SkillsIndex["skills"][string]).metadata,
+          allowedTools: (entry as SkillsIndex["skills"][string]).allowedTools,
+        };
+
+    const resourceFiles = "resources" in entry && entry.resources
+      ? Object.keys(entry.resources).filter((f) => f.endsWith(".md")).sort()
+      : ("resourceFiles" in entry ? (entry as SkillsIndex["skills"][string]).resourceFiles : []);
+
+    const searchTokens = new Set(
+      [...tokenize(frontmatter.name), ...tokenize(frontmatter.description)],
+    );
+
+    entries.push({ dirName, frontmatter, searchTokens, hasResources: resourceFiles.length > 0, resourceFiles });
+  }
+
+  const totalDocs = entries.length;
+  const docFrequency = new Map<string, number>();
+  for (const entry of entries) {
+    for (const token of entry.searchTokens) {
+      docFrequency.set(token, (docFrequency.get(token) ?? 0) + 1);
+    }
+  }
+  const idfScores = new Map<string, number>();
+  for (const [token, df] of docFrequency) {
+    idfScores.set(token, Math.log(totalDocs / df));
+  }
+
+  const categories = buildCategories(entries);
   return { entries, idfScores, totalDocs, categories };
 }
