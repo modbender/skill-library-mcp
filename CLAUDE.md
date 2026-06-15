@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-MCP server that indexes and serves Claude Code skills on demand. It exposes two tools (`search_skill`, `load_skill`) over stdio transport using the Model Context Protocol SDK.
+MCP server that indexes and serves Claude Code skills on demand. It exposes three tools (`search_skill`, `load_skill`, `list_categories`) over stdio transport using the Model Context Protocol SDK.
 
 ## Commands
 
@@ -32,7 +32,7 @@ The data flow is: `data/` → `buildIndex()` → `SearchIndex` → `createServer
 - `src/skill-index.ts` — Reads `data/*/SKILL.md`, parses YAML frontmatter, builds tokenized search index with IDF scores as `SearchIndex`
 - `src/search.ts` — IDF-weighted search with stop-word filtering, query deduplication, minimum substring length (≥2 chars), name bonus +2.0, description bonus +1.0, threshold ≥0.5. Normalizes by matched token count (not total query tokens) to prevent unmatched terms from diluting scores
 - `src/loader.ts` — Loads full SKILL.md content; optionally appends `resources/*.md` files
-- `src/server.ts` — Creates `McpServer` with two tools. Builds a case-insensitive lookup map keyed by both `dirName` and `frontmatter.name`. `load_skill` falls back to fuzzy search suggestions when exact lookup fails
+- `src/server.ts` — Creates `McpServer` with three tools (`search_skill`, `load_skill`, `list_categories`). Builds a case-insensitive lookup map keyed by both `dirName` and `frontmatter.name`. `load_skill` falls back to fuzzy search suggestions when exact lookup fails
 - `src/index.ts` — Entry point: resolves `data/` dir relative to `dist/`, builds index, connects stdio transport
 - `src/types.ts` — `SkillFrontmatter`, `SkillEntry`, `SearchIndex`, `SearchResult` interfaces
 - `src/dedup.ts` — Deduplication utility: finds exact (hash-based) and near (Jaccard similarity >0.8) duplicate skills. Runnable as CLI

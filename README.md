@@ -8,6 +8,10 @@
 
 An MCP server that provides on-demand skill loading for AI coding assistants. Instead of stuffing your system prompt with every skill you might need, this server indexes 15,000+ skills and serves only the ones relevant to your current task — keeping context windows lean and responses focused.
 
+## Documentation
+
+Full documentation is at **[modbender.in/skill-library-mcp](https://modbender.in/skill-library-mcp/)** — installation, the tools it exposes, configuration, and examples.
+
 ## Why?
 
 - **15,000+ skills** covering frontend, backend, DevOps, security, testing, databases, AI/ML, automation, and more
