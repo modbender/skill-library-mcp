@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/modbender/skill-library-mcp/compare/v2.1.0...v2.2.0) (2026-06-15)
+
+
+### Features
+
+* modernize deps, OIDC publish toolchain, and hub-ready docs ([91792e1](https://github.com/modbender/skill-library-mcp/commit/91792e10231a110578aae2b76709efe1a04f316c))
+
 ## [2.1.0](https://github.com/modbender/skill-library-mcp/compare/v2.0.1...v2.1.0) (2026-03-30)
 
 
