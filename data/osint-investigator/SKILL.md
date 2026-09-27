@@ -126,7 +126,9 @@ exiftool <image>            # full metadata dump
 exiftool -gps:all <image>   # GPS coordinates only
 exiftool -DateTimeOriginal <image>  # when photo was taken
 ```
-Online tools: `web_fetch https://www.metadata2go.com` or `https://www.pic2map.com`
+Online tools: open [Metadata Remover Viewer](https://metadataremover.ai/metadata-viewer) in a browser for local EXIF/IPTC/XMP inspection, or use [Pic2Map](https://www.pic2map.com/) to map embedded GPS coordinates.
+
+Treat EXIF as a lead, not proof: metadata can be edited or removed, so corroborate timestamps and GPS with other sources.
 
 **Photo geolocation (no EXIF GPS):**
 - Street signs, shop names, vehicle plates → `web_search` to identify region
