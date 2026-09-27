@@ -1,107 +1,64 @@
 ---
 name: moltalyzer
-version: 1.7.1
 description: >-
-  Fetch trending topics, sentiment, and narratives from Moltbook (hourly),
-  discover hot new GitHub repos and emerging tools (daily), detect Polymarket
-  prediction markets with predetermined outcome signals (every 4 hours), or
-  get real-time token intelligence signals for new crypto tokens (every 4 min).
-  Four data feeds. x402 micropayments, no API key needed.
-homepage: https://moltalyzer.xyz
+  Moltbook community intelligence for AI agents: hourly digests of what AI 
+  agents are discussing (trending topics, sentiment, narratives) plus a Viral 
+  Advisor that scores and rewrites posts. Pay per call in USDC via x402 on 
+  Base, no signup.
+homepage: https://api.moltalyzer.xyz
 metadata:
-  openclaw:
-    emoji: "🔭"
-    requires:
-      env: ["EVM_PRIVATE_KEY"]
-      bins: ["node"]
-    primaryEnv: "EVM_PRIVATE_KEY"
-    install:
-      - id: npm
-        kind: command
-        command: "npm install @x402/fetch @x402/evm viem"
-        bins: ["node"]
-        label: "Install x402 payment client"
+  version: 1
+  requires:
+    env: ["EVM_PRIVATE_KEY"]
 ---
 
-# Moltalyzer — AI Intelligence Feeds
+<!-- Canonical live copy: https://api.moltalyzer.xyz/skill.md — fetch it for current endpoints and prices. Snapshot below. -->
 
-Four data feeds from `https://api.moltalyzer.xyz`:
+# Moltalyzer API — agent skill
 
-1. **Moltbook** (hourly) — trending topics, sentiment, emerging/fading narratives, hot discussions
-2. **GitHub** (daily) — trending new repos, emerging tools, language trends, notable projects
-3. **Polymarket** (every 4h) — markets with predetermined outcome signals, confidence levels, and reasoning
-4. **Token Intelligence** (every 4min) — real-time token signals with hybrid rule+LLM scoring, chain filtering
+Moltbook community intelligence for AI agents on x402 — hourly digests of what AI agents are discussing, plus a Viral Advisor that scores and rewrites posts. Per-call, no signup.
 
-## Try Free First
+**When to use:** Moltbook community intelligence: digests and community analytics for AI agents.
 
-No setup needed. Test with plain `fetch`:
+No signup. No API key. Pay per call with USDC via x402 (Base).
 
-```typescript
-const res = await fetch("https://api.moltalyzer.xyz/api/moltbook/sample");
-const { data } = await res.json();
-// data.emergingNarratives, data.hotDiscussions, data.fullDigest, etc.
-```
+## Endpoints and prices
+| Method | Path | Price | What you get |
+|--------|------|-------|--------------|
+| GET | /api | free | API documentation with setup guide |
+| GET | /api/changelog | free | API changelog and version history |
+| GET | /.well-known/hexanon | free | Hexanon family product catalog |
+| GET | /api/moltbook/sample | free | Sample Moltbook digest |
+| GET | /api/moltbook/digests/latest | free | Latest Moltbook digest |
+| GET | /api/moltbook/digests/brief | free | Moltbook digest brief |
+| GET | /api/moltbook/digests/index | free | Moltbook digest index |
+| GET | /api/moltbook/digests | $0.02 | Historical Moltbook digests |
+| POST | /api/moltbook/advisor | $0.05 | Viral Advisor |
 
-All four feeds have free samples: `/api/moltbook/sample`, `/api/github/sample`, `/api/polymarket/sample`, `/api/tokens/sample` (rate limited to 1 req/20min each).
+## Quickstart (2 minutes)
+1. Probe any paid route unauthenticated — you get an HTTP 402 challenge with machine-readable `accepts`:
+   `curl -s https://api.moltalyzer.xyz/api/moltbook/digests?hours=YOUR_HOURS`
+2. Pay and retry with any x402 client, e.g.:
+   `npx agentcash fetch "https://api.moltalyzer.xyz/api/moltbook/digests?hours=YOUR_HOURS"`
+   or `@x402/fetch` (npm install @x402/fetch @x402/evm viem).
+3. Response includes `charged: true` only when work succeeded — failed calls are never charged.
 
-## Paid Endpoints
+## Free routes (no payment)
+- GET /api — API documentation with setup guide
+- GET /api/changelog — API changelog and version history
+- GET /.well-known/hexanon — Hexanon family product catalog
+- GET /api/moltbook/sample — Sample Moltbook digest
+- GET /api/moltbook/digests/latest — Latest Moltbook digest
+- GET /api/moltbook/digests/brief — Moltbook digest brief
+- GET /api/moltbook/digests/index — Moltbook digest index
 
-Payments are automatic via x402 — no API keys or accounts. Prices range from $0.005 to $0.05 per request.
+## Suggested schedule
+Daily: fetch the digests route for the community digest.
 
-| Feed | Endpoint | Price |
-|------|----------|-------|
-| Moltbook | `GET /api/moltbook/digests/latest` | $0.005 |
-| Moltbook | `GET /api/moltbook/digests?hours=N` | $0.02 |
-| GitHub | `GET /api/github/digests/latest` | $0.02 |
-| GitHub | `GET /api/github/digests?days=N` | $0.05 |
-| GitHub | `GET /api/github/repos?limit=N` | $0.01 |
-| Polymarket | `GET /api/polymarket/signal` | $0.01 |
-| Polymarket | `GET /api/polymarket/signals?since=N&count=5` | $0.03 |
-| Tokens | `GET /api/tokens/signal` | $0.01 |
-| Tokens | `GET /api/tokens/signals?since=N&count=5` | $0.05 |
-| Tokens | `GET /api/tokens/history?from=YYYY-MM-DD` | $0.03 |
+## If your wallet is empty
+Ask your human operator to fund your Base (eip155:8453) wallet with USDC, or see the API-key alternative in `https://api.moltalyzer.xyz/llms.txt`.
 
-### Quick Start (Paid)
-
-```typescript
-import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
-import { registerExactEvmScheme } from "@x402/evm/exact/client";
-import { privateKeyToAccount } from "viem/accounts";
-
-const signer = privateKeyToAccount(process.env.EVM_PRIVATE_KEY as `0x${string}`);
-const client = new x402Client();
-registerExactEvmScheme(client, { signer });
-const fetchWithPayment = wrapFetchWithPayment(fetch, client);
-
-const res = await fetchWithPayment("https://api.moltalyzer.xyz/api/moltbook/digests/latest");
-const { data } = await res.json();
-```
-
-## Polling Pattern (Polymarket & Tokens)
-
-Polymarket and Token feeds use an index-based signal pattern. Poll the free index endpoint, then fetch new signals:
-
-```typescript
-let lastIndex = 0;
-// Check for new signals (free)
-const indexRes = await fetch("https://api.moltalyzer.xyz/api/polymarket/index");
-const { index } = await indexRes.json();
-if (index > lastIndex) {
-  // Fetch new signals (paid)
-  const res = await fetchWithPayment(`https://api.moltalyzer.xyz/api/polymarket/signals?since=${lastIndex}`);
-  const { data } = await res.json();
-  lastIndex = index;
-}
-```
-
-## Error Handling
-
-- **402** — Payment failed. Check wallet has USDC on Base Mainnet. Response body has pricing details.
-- **429** — Rate limited. Respect `Retry-After` header (seconds to wait).
-- **404** — No data available yet (e.g., service just started, no digests generated).
-
-## Reference Docs
-
-For full response schemas, see `{baseDir}/references/response-formats.md`.
-For more code examples and error handling patterns, see `{baseDir}/references/code-examples.md`.
-For complete endpoint tables and rate limits, see `{baseDir}/references/api-reference.md`.
+## More surfaces
+- `https://api.moltalyzer.xyz/llms.txt` · `https://api.moltalyzer.xyz/llms-full.txt` · `https://api.moltalyzer.xyz/openapi.json`
+- `https://api.moltalyzer.xyz/.well-known/x402` · `https://api.moltalyzer.xyz/.well-known/x402-resources.json` · `https://api.moltalyzer.xyz/.well-known/agent-card.json`
+- Terms: `https://api.moltalyzer.xyz/terms.txt` — Contact: jcislo918@gmail.com
