@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/modbender/skill-library-mcp/compare/v2.2.0...v2.2.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* move plugin hooks to plugin root ([93e3a33](https://github.com/modbender/skill-library-mcp/commit/93e3a330c9b326d9b201584be7c682f9353eba7b))
+
 ## [2.2.0](https://github.com/modbender/skill-library-mcp/compare/v2.1.0...v2.2.0) (2026-06-15)
 
 
