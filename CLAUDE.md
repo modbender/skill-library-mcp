@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-MCP server that indexes and serves Claude Code skills on demand. It exposes three tools (`search_skill`, `load_skill`, `list_categories`) over stdio transport using the Model Context Protocol SDK.
+MCP server that indexes and serves Claude Code skills on demand. It exposes three tools (`search_skill`, `load_skill`, `list_categories`) over stdio transport using the Model Context Protocol SDK. Also ships as a Claude Code plugin (manifest in `.claude-plugin/`; `hooks/` must sit at the repo root, not inside `.claude-plugin/`, or Claude Code never loads it) with a SessionStart hook that tells the agent to search the library before each task.
 
 ## Commands
 
@@ -14,8 +14,8 @@ pnpm test             # Run unit tests (vitest)
 pnpm test:integration # Run integration + dedup tests (slow, uses real data/)
 pnpm test -- test/search.test.ts              # Run a single test file
 pnpm test -- -t "exact token match"           # Run a single test by name
-pnpm build            # Build to dist/ (tsup, ESM-only, node22 target)
-pnpm dev              # Run server locally via tsx
+pnpm build            # sync-version → tsup → bundle-skills (see Build below)
+pnpm dev              # Run server locally via tsx (filesystem mode, reads data/)
 make ci               # Run test + validate-skills + build
 make mcp-test         # Build and send initialize request to verify MCP handshake
 pnpm dedup            # Check for duplicate skills
@@ -25,21 +25,37 @@ pnpm fix-skills       # Fix broken skills: missing frontmatter, broken YAML, dup
 tsx scripts/import-skills.ts <source-dir> [--no-dry-run]  # Import skills from external source
 ```
 
+GitHub CI runs only `pnpm test` and `pnpm build`; `validate-skills` runs only via `make ci`.
+
 ## Architecture
 
-The data flow is: `data/` → `buildIndex()` → `SearchIndex` → `createServer()` → MCP tools over stdio.
+Two runtime modes, chosen in `src/index.ts` at startup:
 
-- `src/skill-index.ts` — Reads `data/*/SKILL.md`, parses YAML frontmatter, builds tokenized search index with IDF scores as `SearchIndex`
-- `src/search.ts` — IDF-weighted search with stop-word filtering, query deduplication, minimum substring length (≥2 chars), name bonus +2.0, description bonus +1.0, threshold ≥0.5. Normalizes by matched token count (not total query tokens) to prevent unmatched terms from diluting scores
-- `src/loader.ts` — Loads full SKILL.md content; optionally appends `resources/*.md` files
-- `src/server.ts` — Creates `McpServer` with three tools (`search_skill`, `load_skill`, `list_categories`). Builds a case-insensitive lookup map keyed by both `dirName` and `frontmatter.name`. `load_skill` falls back to fuzzy search suggestions when exact lookup fails
-- `src/index.ts` — Entry point: resolves `data/` dir relative to `dist/`, builds index, connects stdio transport
-- `src/types.ts` — `SkillFrontmatter`, `SkillEntry`, `SearchIndex`, `SearchResult` interfaces
-- `src/dedup.ts` — Deduplication utility: finds exact (hash-based) and near (Jaccard similarity >0.8) duplicate skills. Runnable as CLI
-- `scripts/import-skills.ts` — Imports skills from external directories (supports flat and nested `author/skill-name` layouts) with content-based dedup and dry-run support
-- `scripts/validate-skills.ts` — Validates all skill dirs have `SKILL.md` with valid frontmatter (`name` + `description`) and detects exact duplicates (O(n) hash-based). Runs in CI
-- `scripts/clean-skills.ts` — Removes skill dirs that lack `SKILL.md`. Dry run by default
-- `scripts/fix-skills.ts` — Fixes broken skills: adds missing frontmatter, repairs broken YAML (unquoted colons, numeric names), fills missing descriptions, removes exact duplicates. Dry run by default
+- **Bundle mode (npm package):** `dist/skills-index.json` exists → `buildIndexFromBundle()`. Full content lives in `dist/skills-content.json.gz`, gunzipped lazily on the first `load_skill` call and cached. The npm `files` array does **not** ship `data/`, so the bundle is the only content source for published installs (avoids thousands of files on Windows).
+- **Filesystem mode (dev):** no bundle → `buildIndex(data/)` reads `data/*/SKILL.md` directly. `loadSkill()` prepends a `> **Skill directory**: <abs path>` header so the consumer can resolve `scripts/` etc.; `loadSkillFromBundle()` does not (there is no directory on disk).
+
+Note `pnpm dev` after a `pnpm build` still uses filesystem mode, since tsx runs `src/index.ts` and resolves `skills-index.json` next to `src/`, not `dist/`.
+
+Modules:
+
+- `src/skill-index.ts` — `parseFrontmatter()` (full YAML via `yaml`; keeps `name`, `description`, `metadata`, `allowedTools`), `buildIndex()` and `buildIndexFromBundle()`. Both compute IDF scores and categories identically; keep them in sync when changing indexing.
+- `src/tokenize.ts` — shared tokenizer: lowercase, strip non-`[a-z0-9-]`, hyphenated words also emit their parts.
+- `src/search.ts` — IDF-weighted search with stop-word filtering, query deduplication, minimum substring length (≥2 chars), name bonus +2.0, description bonus +1.0, threshold ≥0.5. Normalizes by matched token count (not total query tokens) so unmatched terms don't dilute scores.
+- `src/categories.ts` — `CATEGORY_KEYWORDS` table; each skill goes to the **first** category whose keyword is a substring of `dirName + description`, else `Other`. Order in the table matters.
+- `src/loader.ts` — `loadSkill()` (disk) and `loadSkillFromBundle()`; with `include_resources`, appends `resources/*.md` sorted by filename.
+- `src/server.ts` — registers the three tools. Case-insensitive lookup map keyed by both `dirName` and `frontmatter.name`; `load_skill` falls back to fuzzy search suggestions on a miss. Server version is read from `package.json`.
+- `src/dedup.ts` — exact (hash) and near (Jaccard >0.8) duplicate finder. Runnable as CLI.
+- `src/types.ts` — in-memory types (`SkillEntry`, `SearchIndex`) plus on-disk bundle shapes (`SkillsIndex`, `SkillsBundle`).
+
+## Build
+
+`pnpm build` runs three steps:
+
+1. `scripts/sync-version.ts` — copies `package.json` version into `.claude-plugin/plugin.json` and `marketplace.json` (so a build can dirty those files).
+2. `tsup` — bundles `src/index.ts` → `dist/index.js` (ESM, node22, `#!/usr/bin/env node` banner). `clean: true` wipes `dist/`, so the bundle step must run after it.
+3. `scripts/bundle-skills.ts` — walks `data/` and writes `dist/skills-index.json` + `dist/skills-content.json.gz`.
+
+Gotcha: `bundle-skills.ts` extracts frontmatter with single-line regexes, not the YAML parser, and does not write `metadata`/`allowedTools`. Multi-line YAML descriptions (`description: >`) and those fields therefore differ between bundle mode and filesystem mode.
 
 ## Skill Data Directory
 
@@ -57,27 +73,24 @@ data/
       guide.md
     scripts/              # Optional: scripts referenced by SKILL.md
       setup.sh
-    templates/            # Optional: any supporting files
-      template.js
 ```
 
 ## Testing
 
 Two test layers, both using vitest:
 
-**Unit tests** (`pnpm test`) use synthetic skills in `test/fixtures/` for deterministic results. Never use the real `data/` directory in unit tests. These run in CI.
+**Unit tests** (`pnpm test`) use synthetic skills in `test/fixtures/` (and `test/fixtures-dedup/`) for deterministic results. Never use the real `data/` directory in unit tests. These run in CI.
 
-**Integration tests** (`pnpm test:integration`) use the real `data/` directory to validate index completeness, search relevance, and exact duplicate detection. These are slow with 15K+ skills and run on-demand, not in CI.
+**Integration tests** (`pnpm test:integration`) use the real `data/` directory to validate index completeness, search relevance, and exact duplicate detection. Slow with 15K+ skills; on-demand, not in CI.
 
-**Near-duplicate detection** (`pnpm dedup`) is O(n²) Jaccard similarity — too slow for CI with 15K+ skills. Run on-demand only.
+**Near-duplicate detection** (`pnpm dedup`) is O(n²) Jaccard similarity — too slow for CI. Run on-demand only.
 
 ## Conventions
 
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`
 - ESM-only (`"type": "module"`) — all internal imports use `.js` extensions
 - Node 22 target, pnpm package manager
-- tsup bundles `src/index.ts` to `dist/index.js` with `#!/usr/bin/env node` banner
-- `data/` lives at project root, resolved at runtime as `join(__dirname, "..", "data")` from `dist/`
+- Log to stderr only (`console.error`, `[skill-library]` prefix); stdout is the MCP stdio channel.
 
 ## Releases
 
